@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-08-11T13:32:05.273Z",
+  "evidenceKind": "deterministic_development_regression",
+  "calculator": {
+    "schemaVersion": 2,
+    "methodologyVersion": "pancakeswap-v3-sdk-3.10.1-router-compatible-v2",
+    "networkBinding": null,
+    "executionReady": false
+  },
+  "cases": [
+    {
+      "id": "rounded-calldata-zero-liquidity",
+      "input": {
+        "schemaVersion": 2,
+        "sqrtPriceX96": "12728274922838404",
+        "currentTick": -589220,
+        "tickLower": -648340,
+        "tickUpper": -535290,
+        "amount0Desired": "6000000000000",
+        "amount1Desired": "100000000000000",
+        "maxSlippageBps": 50
+      },
+      "intermediate": {
+        "preliminaryLiquidityRaw": "1",
+        "amount0DesiredMaximumRaw": "5804730384189",
+        "amount1DesiredMaximumRaw": "1",
+        "recomputedFromCalldataAtObservedPriceRaw": "0"
+      },
+      "result": {
+        "status": "blocked",
+        "issueCode": "CALLDATA_ZERO_LIQUIDITY"
+      }
+    },
+    {
+      "id": "rounded-calldata-liquidity-drift-spacing-10",
+      "enclosingContext": {
+        "chainId": 97,
+        "fee": 500,
+        "tickSpacing": 10
+      },
+      "input": {
+        "schemaVersion": 2,
+        "sqrtPriceX96": "12728274922838404",
+        "currentTick": -589220,
+        "tickLower": -648340,
+        "tickUpper": -535290,
+        "amount0Desired": "117000000000000",
+        "amount1Desired": "100000000000000",
+        "maxSlippageBps": 50
+      },
+      "intermediate": {
+        "preliminaryToken0LiquidityCandidateRaw": "20",
+        "preliminaryToken1LiquidityCandidateRaw": "656624996845987138621586365",
+        "preliminaryLiquidityRaw": "20",
+        "amount0DesiredMaximumRaw": "116094607683775",
+        "amount1DesiredMaximumRaw": "1",
+        "recomputedToken0LiquidityCandidateRaw": "19",
+        "recomputedToken1LiquidityCandidateRaw": "6566249968459",
+        "recomputedFromCalldataAtObservedPriceRaw": "19"
+      },
+      "result": {
+        "status": "blocked",
+        "issueCode": "CALLDATA_LIQUIDITY_DRIFT"
+      }
+    }
+  ],
+  "verification": {
+    "command": "pnpm --filter @proofera/domain exec vitest run src/pancake-v3-liquidity-quote.test.ts",
+    "result": "19 passed"
+  },
+  "boundaries": {
+    "callerInputsVerifiedOnchain": false,
+    "poolIdentityEstablished": false,
+    "transactionSimulated": false,
+    "transactionSubmitted": false,
+    "performanceClaim": false
+  }
+}

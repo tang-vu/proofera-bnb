@@ -1,0 +1,5 @@
+# Single-package workspace used when app/agent is the Studio deployment context.
+packages:
+  - .
+onlyBuiltDependencies:
+  - esbuild

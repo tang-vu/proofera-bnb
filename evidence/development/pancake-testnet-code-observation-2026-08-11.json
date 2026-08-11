@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "1",
+  "environment": "development",
+  "claimStatus": "observation_only_not_reviewed_manifest",
+  "chainId": 97,
+  "method": "eth_getBlockByNumber(latest) and eth_getCode(address, latest), followed by keccak256 of returned runtime bytecode",
+  "limitations": [
+    "Each JSON-RPC batch used the latest tag; the code responses do not carry their own block identifiers.",
+    "Agreement across two endpoints is not source-code verification and does not make these hashes safe for execution.",
+    "The pool belongs to a third-party test position and is not controlled by ProofEra.",
+    "A live activation manifest still requires independently reviewed deployment provenance and a same-context code-identity check immediately before submission."
+  ],
+  "observations": [
+    {
+      "rpcOrigin": "https://bsc-testnet-rpc.publicnode.com",
+      "blockNumber": "124451332",
+      "blockHash": "0xa6ffa7ed84b0be480936f84df4c9250c1905d72da2aeea23c055635a22e77be9",
+      "blockTimestamp": "2026-08-11T11:57:51.000Z",
+      "contracts": [
+        {
+          "role": "position_manager",
+          "address": "0x427bf5b37357632377ecbec9de3626c71a5396c1",
+          "runtimeByteLength": 24466,
+          "runtimeCodeHash": "0xd86730989544d7a3ea034c8a322733683137cf70b0f49231fd88405eac6098d7"
+        },
+        {
+          "role": "factory",
+          "address": "0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865",
+          "runtimeByteLength": 5151,
+          "runtimeCodeHash": "0x8191d3ab1d55d3da9822199f28865415c99566b6f1aee4a4b16713f57930678c"
+        },
+        {
+          "role": "third_party_read_candidate_pool",
+          "address": "0xe62112438bdc81d225bc35298d4829ac4fac8945",
+          "runtimeByteLength": 22962,
+          "runtimeCodeHash": "0x9d143766c2b4fe625e47e468e615fcab0317131e4634b8c3993292de8a5fcffd"
+        }
+      ]
+    },
+    {
+      "rpcOrigin": "https://bsc-testnet-dataseed.bnbchain.org",
+      "blockNumber": "124451361",
+      "blockHash": "0xc816509d5721f7d313faf7bd239c755943bdd7c6cef4b0a220a43bbce39e75f4",
+      "blockTimestamp": "2026-08-11T11:58:04.000Z",
+      "contracts": [
+        {
+          "role": "position_manager",
+          "address": "0x427bf5b37357632377ecbec9de3626c71a5396c1",
+          "runtimeByteLength": 24466,
+          "runtimeCodeHash": "0xd86730989544d7a3ea034c8a322733683137cf70b0f49231fd88405eac6098d7"
+        },
+        {
+          "role": "factory",
+          "address": "0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865",
+          "runtimeByteLength": 5151,
+          "runtimeCodeHash": "0x8191d3ab1d55d3da9822199f28865415c99566b6f1aee4a4b16713f57930678c"
+        },
+        {
+          "role": "third_party_read_candidate_pool",
+          "address": "0xe62112438bdc81d225bc35298d4829ac4fac8945",
+          "runtimeByteLength": 22962,
+          "runtimeCodeHash": "0x9d143766c2b4fe625e47e468e615fcab0317131e4634b8c3993292de8a5fcffd"
+        }
+      ]
+    }
+  ]
+}

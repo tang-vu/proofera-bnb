@@ -1,0 +1,316 @@
+{
+  "schemaVersion": "proofera-termix-preregistration-v1.0.0",
+  "preregistrationId": "termix-task-01-lp-range-v1",
+  "registeredAtUtc": "2026-08-11T18:22:25.921Z",
+  "status": "NOT RUN",
+  "runStates": { "agent": "NOT RUN", "manual": "NOT RUN" },
+  "publishable": false,
+  "nonPublishableReasons": [
+    "The exact pool, position, source block, policy bundle, agent identity, runtime configuration, and software commit are not bound.",
+    "Neither paired run has started; no timing, cost, output, score, API receipt, hiring receipt, or transaction receipt exists.",
+    "The definition digest is local tamper evidence only and does not prove that this preregistration was publicly timestamped."
+  ],
+  "definition": {
+    "task": {
+      "taskId": "pancake-lp-range-decision",
+      "title": "PancakeSwap V3 LP range decision with bounded direct-call plan",
+      "domain": "trading",
+      "exactDefinition": "Given one frozen BNB Smart Chain testnet PancakeSwap V3 PTA/WBNB position evidence bundle and one identical policy bundle, validate every source-bound input; determine retain versus bounded range change; and return canonical JSON containing current range state, selected ticks, direct Position Manager calls, spend/slippage/deadline bounds, known costs, explicitly unknown fee or impermanent-loss evidence, the decision, and limitations. The timed comparison must not sign or broadcast. Any separately approved execution demonstration is outside the paired score.",
+      "successCondition": "Both methods independently produce the required canonical output from the same immutable declaration, without a write, hidden source, fabricated metric, unsafe selector, or policy violation; a second reviewer can reproduce every scored field from hashed evidence."
+    },
+    "inputs": [
+      {
+        "inputId": "position-source-bundle",
+        "description": "Canonical manifest plus raw exact-block responses for chain, pool, Position Manager, position token ID, owner/approval, token addresses and decimals, tick spacing, slot0, liquidity, position ticks and amounts.",
+        "finalEncoding": "canonical_json",
+        "unit": null,
+        "authoritativeSourceRequirement": "Reviewed BSC testnet contract addresses and EIP-1898-capable RPC responses, each retained as a hashed raw artifact.",
+        "bindingRule": "Bind one eligible ProofEra-controlled or explicitly authorized PTA/WBNB testnet position only after source/code/selector review passes; record a single block number, hash, timestamp, and artifact digest before run order is selected.",
+        "binding": {
+          "state": "UNBOUND",
+          "value": null,
+          "reason": "No eligible funded position or approved exact-block evidence bundle exists yet.",
+          "bindBeforeEitherRun": true
+        }
+      },
+      {
+        "inputId": "observation-window",
+        "description": "Frozen tick, liquidity, fee-growth and gas observations used by both methods; realized and forecast fields remain separate.",
+        "finalEncoding": "canonical_json",
+        "unit": null,
+        "authoritativeSourceRequirement": "Hashed raw RPC responses and documented PancakeSwap contract calculations at declared blocks.",
+        "bindingRule": "Freeze the same ordered block window without selecting it based on either method's output; record missing archive data as missing rather than substituting estimates.",
+        "binding": {
+          "state": "UNBOUND",
+          "value": null,
+          "reason": "The judged observation window has not been selected or captured.",
+          "bindBeforeEitherRun": true
+        }
+      },
+      {
+        "inputId": "bounded-policy",
+        "description": "Capital/spend cap, allowed assets, maximum range movement, quote TTL, slippage, minimum amounts, gas ceiling, expiry, recipient and direct selector allowlist.",
+        "finalEncoding": "canonical_json",
+        "unit": null,
+        "authoritativeSourceRequirement": "Canonical ProofEra policy artifact reviewed before either run.",
+        "bindingRule": "Bind all integer values in token base units or explicit policy units; the recipient and wallet must be source-bound and identical for both methods.",
+        "binding": {
+          "state": "UNBOUND",
+          "value": null,
+          "reason": "Final capital and authority limits depend on the not-yet-approved testnet position.",
+          "bindBeforeEitherRun": true
+        }
+      }
+    ],
+    "constraints": [
+      {
+        "constraintId": "bsc-testnet-only",
+        "description": "The benchmark declaration must use BNB Smart Chain testnet chain ID 97.",
+        "enforcement": "hard",
+        "expected": { "encoding": "decimal_integer", "value": "97" }
+      },
+      {
+        "constraintId": "timed-run-no-write",
+        "description": "Neither timed run may sign, approve, submit, or broadcast a transaction.",
+        "enforcement": "hard",
+        "expected": { "encoding": "canonical_json", "value": "true" }
+      },
+      {
+        "constraintId": "direct-selector-set",
+        "description": "Only the four reviewed direct PancakeSwap V3 NonfungiblePositionManager selectors may appear; multicall and arbitrary dispatch are forbidden.",
+        "enforcement": "hard",
+        "expected": {
+          "encoding": "canonical_json",
+          "value": "[\"0x88316456\",\"0x219f5d17\",\"0x0c49ccbe\",\"0xfc6f7865\"]"
+        }
+      },
+      {
+        "constraintId": "no-hidden-source",
+        "description": "Both methods receive only the declared artifact bundle and the same documented source access; undeclared network calls are forbidden.",
+        "enforcement": "hard",
+        "expected": { "encoding": "canonical_json", "value": "true" }
+      },
+      {
+        "constraintId": "decision-window",
+        "description": "Finish the timed task within 900 seconds; time beyond the window scores zero for the timing/reproducibility criterion but remains recorded.",
+        "enforcement": "scored",
+        "expected": { "encoding": "decimal_integer", "value": "900" }
+      }
+    ],
+    "environment": {
+      "kind": "testnet",
+      "chainId": 97,
+      "networkName": "BNB Smart Chain Testnet",
+      "softwareCommit": {
+        "state": "UNBOUND",
+        "value": null,
+        "reason": "The benchmark must bind a commit containing the final runner and frozen evidence; the current workspace is not that release.",
+        "bindBeforeEitherRun": true
+      },
+      "components": [
+        {
+          "name": "node",
+          "versionBindingRule": "Record the exact Node.js version used by both methods.",
+          "configurationDigestRequired": false
+        },
+        {
+          "name": "proofera-lp-range-agent",
+          "versionBindingRule": "Record the exact package and Agent Studio runtime versions; manual access to its execution path is forbidden.",
+          "configurationDigestRequired": true
+        },
+        {
+          "name": "pancakeswap-v3-contracts",
+          "versionBindingRule": "Bind reviewed BSC testnet addresses and runtime-code hashes from the evidence manifest.",
+          "configurationDigestRequired": true
+        },
+        {
+          "name": "rpc-provider",
+          "versionBindingRule": "Record provider identity and capability manifest without secrets.",
+          "configurationDigestRequired": true
+        }
+      ],
+      "parameters": [
+        {
+          "key": "source-block",
+          "description": "Exact snapshot block number.",
+          "finalEncoding": "decimal_integer",
+          "bindingRule": "Bind with block hash and timestamp before either run.",
+          "binding": {
+            "state": "UNBOUND",
+            "value": null,
+            "reason": "No eligible position snapshot is frozen.",
+            "bindBeforeEitherRun": true
+          }
+        },
+        {
+          "key": "run-order-seed",
+          "description": "Public randomness input used to choose agent-first or manual-first after declaration freeze.",
+          "finalEncoding": "string",
+          "bindingRule": "Bind after the final declaration digest and before either timed run.",
+          "binding": {
+            "state": "UNBOUND",
+            "value": null,
+            "reason": "Run order must not be selected before the final declaration exists.",
+            "bindBeforeEitherRun": true
+          }
+        }
+      ]
+    },
+    "qualityRubric": {
+      "rubricId": "termix-lp-range-rubric-v1",
+      "version": "1.0.0",
+      "declaredAtUtc": "2026-08-11T18:22:25.921Z",
+      "criteria": [
+        {
+          "criterionId": "verified-inputs",
+          "description": "Validate and preserve every exact-block position, token, ownership and market input.",
+          "measurement": "Recompute the canonical output against the frozen input manifest and raw responses.",
+          "evidenceRequired": "Hashed input manifest, raw source responses, validation log and canonical output.",
+          "maximumPoints": 20
+        },
+        {
+          "criterionId": "policy-calldata-safety",
+          "description": "Use only allowed direct selectors and respect recipient, token, amount, deadline, slippage and authority bounds.",
+          "measurement": "Decode every proposed call and compare each field with the frozen policy.",
+          "evidenceRequired": "Canonical call plan, decoder output, policy artifact and reviewer checklist.",
+          "maximumPoints": 25
+        },
+        {
+          "criterionId": "net-benefit-decision",
+          "description": "Distinguish known costs and outcomes from unavailable fee or impermanent-loss evidence and justify retain versus change.",
+          "measurement": "Recalculate all supported values; award no credit for unsupported forecasts or hidden substitutions.",
+          "evidenceRequired": "Calculation trace, units, source joins, unknown-state fields and decision output.",
+          "maximumPoints": 25
+        },
+        {
+          "criterionId": "explanation-uncertainty",
+          "description": "Explain the tradeoff, worst observed condition, confidence limits and missing evidence in decision-useful language.",
+          "measurement": "Apply the predeclared reviewer checklist to the unedited raw output.",
+          "evidenceRequired": "Raw output and completed reviewer checklist.",
+          "maximumPoints": 15
+        },
+        {
+          "criterionId": "reproducibility",
+          "description": "Produce a deterministic canonical result and complete evidence/timing/cost trail.",
+          "measurement": "A second reviewer reruns the frozen declaration and checks artifact hashes and receipt joins.",
+          "evidenceRequired": "Reproduction log, active/wall timing, sourced costs, hashes and API receipt.",
+          "maximumPoints": 15
+        }
+      ],
+      "totalMaximumPoints": 100
+    },
+    "hardFailRules": [
+      "Wrong chain, pool, Position Manager, token, position, owner, recipient, decimals, or source block.",
+      "Any signature, approval, submission, broadcast, multicall, arbitrary dispatcher, or selector outside the frozen allowlist during the timed run.",
+      "Any invented fee, APR, impermanent-loss, gas, slippage, receipt, output, cost, or performance value.",
+      "Any input, network access, policy, rubric, or environment difference between the paired declarations."
+    ],
+    "pairProtocol": {
+      "oneFinalDeclarationForBothRuns": true,
+      "identicalTask": true,
+      "identicalInputs": true,
+      "identicalConstraints": true,
+      "identicalEnvironment": true,
+      "identicalQualityRubric": true,
+      "identicalSourceAccess": true,
+      "finalDeclarationSha256": null,
+      "finalDeclarationBindingState": "UNBOUND",
+      "runOrderRule": "After every binding is frozen and the shared declaration digest is recorded, use a recorded public randomness value to select run order; preserve source block/window and do not refresh between methods.",
+      "agentMethodRequirement": "Hire the registered LP agent through ProofEra, retain its marketplace/identity/hire evidence, and invoke only the frozen agent configuration with the shared declaration.",
+      "manualMethodRequirement": "One declared operator performs the same task without invoking the ProofEra agent, using only the frozen source bundle and the predeclared manual tools/procedure."
+    },
+    "measurementRequirements": {
+      "wallTime": "UTC_START_END_PLUS_MONOTONIC_DURATION",
+      "activeTime": "HASHED_MONOTONIC_OPERATOR_SEGMENTS",
+      "costs": "SOURCED_INTEGER_MINOR_UNITS_WITH_EXPLICIT_ZEROES",
+      "output": "HASHED_RAW_AND_CANONICAL_OUTPUTS",
+      "quality": "SECOND_REVIEWER_SCORES_EVERY_PREDECLARED_CRITERION",
+      "noCurrencyConversion": true
+    },
+    "artifactRequirements": [
+      {
+        "requirementId": "frozen-inputs",
+        "role": "configuration",
+        "appliesTo": "both-runs",
+        "description": "Byte-identical frozen declaration and raw input bundle.",
+        "sha256Required": true
+      },
+      {
+        "requirementId": "raw-output",
+        "role": "output",
+        "appliesTo": "both-runs",
+        "description": "Unedited raw output plus canonical parsed result.",
+        "sha256Required": true
+      },
+      {
+        "requirementId": "timing-cost-log",
+        "role": "log",
+        "appliesTo": "both-runs",
+        "description": "UTC/monotonic wall time, active-time segments, and sourced cost line items including evidenced zeroes.",
+        "sha256Required": true
+      },
+      {
+        "requirementId": "quality-review",
+        "role": "quality-evidence",
+        "appliesTo": "both-runs",
+        "description": "Second-reviewer criterion scoring and reproduction trace.",
+        "sha256Required": true
+      },
+      {
+        "requirementId": "agent-hire-proof",
+        "role": "raw-receipt",
+        "appliesTo": "agent-run",
+        "description": "Raw ProofEra marketplace hire/activation evidence for the registered agent; it is method proof, not a scored task outcome.",
+        "sha256Required": true
+      },
+      {
+        "requirementId": "manual-procedure-log",
+        "role": "log",
+        "appliesTo": "manual-run",
+        "description": "Exact operator procedure and tool-use log showing that the agent was not invoked.",
+        "sha256Required": true
+      }
+    ],
+    "receiptRequirements": [
+      {
+        "requirementId": "source-api-receipt",
+        "kind": "api",
+        "appliesTo": "both-runs",
+        "description": "Raw exact-block RPC/API response captured inside each run and joined to its request identifier and response digest.",
+        "rawArtifactRequired": true,
+        "independentVerificationRequired": true
+      },
+      {
+        "requirementId": "proof-era-hire-receipt",
+        "kind": "transaction",
+        "appliesTo": "agent-run",
+        "description": "Explorer-verifiable testnet hire/activation receipt if the final ProofEra hiring flow is onchain; otherwise this task remains non-publishable.",
+        "rawArtifactRequired": true,
+        "independentVerificationRequired": true
+      }
+    ],
+    "finalDeclarationRequiredReceiptKinds": ["api"],
+    "reproduction": {
+      "prerequisiteCommands": [
+        {
+          "step": 1,
+          "workingDirectory": "agents/lpRangeAgent",
+          "command": "pnpm verify",
+          "purpose": "Verify the current LP analyzer implementation; this is not a benchmark run or result.",
+          "state": "AVAILABLE NOW"
+        },
+        {
+          "step": 2,
+          "workingDirectory": ".",
+          "command": "pnpm --filter @proofera/benchmarks test",
+          "purpose": "Validate the preregistration and paired-run evidence contracts; synthetic harness tests are not benchmark evidence.",
+          "state": "AVAILABLE NOW"
+        }
+      ],
+      "timedRunnerCommand": null,
+      "timedRunnerBindingState": "UNBOUND",
+      "blockedReason": "A truthful timed command cannot be published until the exact input bundle, registered/hireable agent endpoint, manual procedure, runner, and release commit exist."
+    }
+  },
+  "definitionSha256": "edc4ae168600c9de5008adb59bf6cd2b6bd85333713c9b17afc76116fc13239d"
+}

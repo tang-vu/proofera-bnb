@@ -1,0 +1,28 @@
+{
+  "name": "@proofera/integrations",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./server/altana-grant-claim": "./src/altana-grant-claim-verified-store.server.ts",
+    "./server/altana-lp-activation": "./src/altana-lp-activation-composition.server.ts",
+    "./server/altana-lp-reservation": "./src/altana-lp-reservation.server.ts",
+    "./server/pancake-v3-selector-artifact-review": "./src/pancake-v3-selector-artifact-review.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@altananetwork/sdk": "0.7.0",
+    "@proofera/domain": "workspace:*",
+    "pg": "8.23.0",
+    "server-only": "0.0.1",
+    "viem": "2.55.13",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/pg": "8.21.0"
+  }
+}

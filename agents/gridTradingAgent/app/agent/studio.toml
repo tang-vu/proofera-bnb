@@ -1,0 +1,9 @@
+[project]
+name = "gridTradingAgent-agent"
+
+[stack]
+runtime = "agentcore"
+protocols = ["A2A", "MCP"]
+
+[network]
+default = "bsc-testnet"

@@ -1,0 +1,17 @@
+.next
+coverage
+dist
+node_modules
+playwright-report
+test-results
+pnpm-lock.yaml
+.env*
+!.env.example
+.studio
+**/.studio
+contracts/testnet-fixed-asset
+evidence/development/pancake-v3-selector-paths
+**/wallets
+**/*keystore*.json
+*.pem
+*.key

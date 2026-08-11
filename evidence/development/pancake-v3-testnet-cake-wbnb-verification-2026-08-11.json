@@ -1,0 +1,541 @@
+{
+  "schemaVersion": 1,
+  "evidenceId": "pancake-v3-testnet-cake-wbnb-verification-2026-08-11",
+  "capturedAt": "2026-08-11T15:20:36.006Z",
+  "environment": "development_read_only",
+  "evidenceKind": "canonical_exact_block_source_runtime_and_admission_review",
+  "chain": {
+    "name": "BNB Smart Chain testnet",
+    "chainId": 97,
+    "rpcChainId": "0x61"
+  },
+  "decision": {
+    "status": "blocked_not_m1_write_eligible",
+    "poolContractStaticIdentity": "pass_exact_official_source_runtime_reconstruction",
+    "poolAsM1WriteTarget": "blocked",
+    "wbnbToken": "static_behavior_pass_strict_source_provenance_non_ready",
+    "cakeToken": "fail_economic_and_write_eligibility",
+    "composedPool": "blocked_not_m1_write_eligible",
+    "primaryReasons": [
+      "CAKE is documented by PancakeSwap as a dummy token, has uint256.max supply, and exposes an unguarded mint(address,uint256) overload.",
+      "The pool observation cardinality is one and cannot provide a historical TWAP window.",
+      "The factory owner or LM-pool deployer can mutate fee-protocol and LM-pool dependencies.",
+      "The raw explorer compiler inputs for WBNB and CAKE were not retained or locally rebuilt exactly.",
+      "No position-manager write-target authorization or ProofEra-controlled position authority is established by this evidence."
+    ],
+    "permittedUse": "read_only_fixture_labelled_official_pancakeswap_testnet_dummy_pool",
+    "performanceClaimsPermitted": false,
+    "executionAuthorized": false
+  },
+  "noWriteBoundary": {
+    "walletUsed": false,
+    "privateKeyUsed": false,
+    "secretOrEnvironmentConfigurationInspected": false,
+    "signatureRequested": false,
+    "approvalRequested": false,
+    "transactionSubmitted": false,
+    "deploymentPerformed": false,
+    "fundsUsed": false,
+    "paidApiUsed": false
+  },
+  "canonicalObservation": {
+    "selector": {
+      "blockHash": "0x19a4a9461ceee76a834868d94822f61e5a40b8f9ca48654ac85d6041d331f290",
+      "requireCanonical": true
+    },
+    "blockNumber": "124476377",
+    "blockNumberHex": "0x76b5bd9",
+    "blockHash": "0x19a4a9461ceee76a834868d94822f61e5a40b8f9ca48654ac85d6041d331f290",
+    "parentHash": "0x5c70407344d82fd9a62827138b876948bb5e301235627719e62310dd7d0b3482",
+    "blockTimestampUnix": "1786460741",
+    "blockTimestamp": "2026-08-11T15:05:41.000Z",
+    "selectedBy": "eth_getBlockByNumber_finalized_on_historical_state_provider",
+    "numberedOrLatestStateFallbackUsed": false,
+    "officialHeaderIndependentlyMatched": true
+  },
+  "providers": {
+    "historicalExactState": {
+      "url": "https://bsc-testnet-rpc.publicnode.com",
+      "role": "EIP-1898 canonical historical code, storage, balance, and eth_call state",
+      "operatorClassification": "third_party_public_transport",
+      "returnedPinnedBlockAsFinalized": true
+    },
+    "officialBnbChain": {
+      "url": "https://bsc-testnet.bnbchain.org",
+      "role": "independent chain ID, pinned header, and later current-code confirmation",
+      "pinnedHistoricalHeaderMatched": true,
+      "pinnedHistoricalStateAvailable": false,
+      "historicalStateFailure": "missing trie node",
+      "supportingLatestBlock": {
+        "blockNumber": "124478199",
+        "blockHash": "0x97ca41416efef5ff18d0ef05689ce72d4c63de13ce0f11df422ecea6e71e100e",
+        "blockTimestamp": "2026-08-11T15:19:21.000Z",
+        "allFiveObservedCodeHashesStillMatched": true,
+        "usedAsCanonicalState": false
+      }
+    }
+  },
+  "officialSource": {
+    "repository": "https://github.com/pancakeswap/pancake-v3-contracts",
+    "commit": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+    "tree": "a5f9c90fce18ca4cdb0716322f254881aa626ed0",
+    "commitTimestamp": "2023-04-03T11:05:53Z",
+    "githubVerification": {
+      "verified": false,
+      "reason": "unsigned",
+      "endpoint": "https://api.github.com/repos/pancakeswap/pancake-v3-contracts/commits/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+      "boundary": "Official-organization repository location is provenance, not a cryptographic publisher signature."
+    },
+    "archive": {
+      "format": "git_archive_tar",
+      "command": "git archive --format=tar --output=<output.tar> ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+      "byteLength": 9912320,
+      "sha256": "b3cd0b3fd4563287f587c2776eac78e5b5a4ad98f6c805a005df10727bee782d",
+      "checkoutCleanAfterCompile": true
+    },
+    "deploymentManifest": "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/deployments/bscTestnet.json",
+    "sourceUrls": {
+      "pool": "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-core/contracts/PancakeV3Pool.sol",
+      "factory": "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-core/contracts/PancakeV3Factory.sol",
+      "deployer": "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-core/contracts/PancakeV3PoolDeployer.sol",
+      "buildConfiguration": "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-core/hardhat.config.ts"
+    }
+  },
+  "localCoreBuild": {
+    "nodeVersion": "24.14.1",
+    "nodeSupportWarning": "Hardhat 2.13.0 warned that this Node release was unsupported.",
+    "yarnVersion": "1.22.22",
+    "hardhatVersion": "2.13.0",
+    "installCommand": "corepack yarn install --frozen-lockfile --ignore-scripts --non-interactive",
+    "dependencyLifecycleScriptsExecuted": false,
+    "compileCommand": "corepack yarn workspace @pancakeswap/v3-core compile",
+    "compiler": {
+      "name": "solc",
+      "longVersion": "0.7.6+commit.7338295f",
+      "officialManifest": "https://binaries.soliditylang.org/windows-amd64/list.json",
+      "binaryPath": "solc-windows-amd64-v0.7.6+commit.7338295f.exe",
+      "binarySha256": "0x9214e06741c5cb51a61d745697c905f37480c0c8da1d5ac69e3bacda0063dfa5",
+      "binaryKeccak256": "0x4fbd020496c3a9e02c1eeb825d23f4d83d9198c4e21fda19deccdb7e74435edf"
+    },
+    "settings": {
+      "evmVersion": "istanbul",
+      "viaIr": false,
+      "metadataBytecodeHash": "none",
+      "optimizerEnabled": true,
+      "optimizerRuns": {
+        "PancakeV3Pool": 400,
+        "PancakeV3PoolDeployer": 400,
+        "PancakeV3Factory": 1000000
+      },
+      "outputSelection": [
+        "abi",
+        "evm.bytecode",
+        "evm.deployedBytecode",
+        "evm.methodIdentifiers",
+        "metadata",
+        "ast"
+      ]
+    },
+    "digestCanonicalization": {
+      "algorithm": "sha256_of_utf8_compact_json_with_recursively_lexicographically_sorted_object_keys",
+      "arrayOrder": "preserved",
+      "rfc8785Claimed": false
+    }
+  },
+  "contracts": {
+    "pool": {
+      "address": "0xeaf78e3AA2C19dF9495318Cd9EA2aD83Be7D5015",
+      "contractName": "PancakeV3Pool",
+      "sourceRuntimeMatch": "exact_after_all_compiler_reported_immutable_references_patched",
+      "artifactSha256": "09fee2650f298c458f4b8b71ecc01f3e13ee0b7b38ab653de6168d6e3b5fd4de",
+      "buildInfoSha256": "abaaa7d5ebebfada61fa431bbcbbbbdfc922186e5979014ab00eadef0b85774e",
+      "canonicalCompilerInputSha256": "3721ef156c7088f0f244e4625de97336dc64fc11fe63fceed8fe704be1a6b5ca",
+      "canonicalCompilerSettingsSha256": "87a5fecad1294a4400cb04e12e79d584400d89527258d3a011f8e8e3a16b0680",
+      "creationByteLength": 23566,
+      "creationCodeKeccak256": "0x6ce8eb472fa82df5469c6ab6d485f17c3ad13c8cd7af59b3d4a8026c5ce0f7e2",
+      "runtimeTemplateByteLength": 22962,
+      "runtimeTemplateKeccak256": "0x4ef16dfd4d3a1481e945e15d2579e8fb74f78cc27678875fdee9b06eed2e86ac",
+      "observedRuntimeByteLength": 22962,
+      "observedRuntimeKeccak256": "0x829cb2fca10db13c6c7f0a1a576e7e5d812e1209a8c5aa516924de8d34bcc13f",
+      "patchedRuntimeKeccak256": "0x829cb2fca10db13c6c7f0a1a576e7e5d812e1209a8c5aa516924de8d34bcc13f",
+      "fullRuntimeBytesEqual": true,
+      "immutables": {
+        "factory": {
+          "astId": 78,
+          "value": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+          "startOffsets": [8694, 8735, 10453, 10494, 10915, 10960, 11001]
+        },
+        "token0": {
+          "astId": 82,
+          "value": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+          "startOffsets": [2324, 5186, 7120, 8194, 9074, 16564]
+        },
+        "token1": {
+          "astId": 86,
+          "value": "0xFa60D973F7642B748046464e165A65B7323b0DEE",
+          "startOffsets": [4884, 7169, 8296, 9208, 11277, 16893]
+        },
+        "fee": {
+          "astId": 90,
+          "value": "500",
+          "startOffsets": [3488, 6983, 7038, 11313, 11776, 11842, 11913, 11984]
+        },
+        "tickSpacing": {
+          "astId": 94,
+          "value": "10",
+          "startOffsets": [3249, 11241, 20280, 20330]
+        },
+        "maxLiquidityPerTick": {
+          "astId": 98,
+          "value": "1917569901783203986719870431555990",
+          "startOffsets": [8563, 20173, 20228]
+        }
+      },
+      "create2": {
+        "deployer": "0x41ff9AA7e16B8B1a8a8dc4f0eFacd93D02d071c9",
+        "salt": "0x9f4899b3fcc0331140c69ffc65ca544db9f89d1b2f889dfb1ed16c427cd7ad99",
+        "initCodeKeccak256": "0x6ce8eb472fa82df5469c6ab6d485f17c3ad13c8cd7af59b3d4a8026c5ce0f7e2",
+        "expectedAddress": "0xeaf78e3AA2C19dF9495318Cd9EA2aD83Be7D5015",
+        "matchesObservedAddress": true
+      },
+      "factoryRelation": {
+        "poolFactoryGetter": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+        "factoryGetPoolToken0Token1Fee": "0xeaf78e3AA2C19dF9495318Cd9EA2aD83Be7D5015",
+        "exact": true
+      },
+      "proxyAndOpcodeAssessment": {
+        "deploymentKind": "direct_non_upgradeable_contract",
+        "eip1967ImplementationSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "eip1967AdminSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "eip1967BeaconSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "eip1167PatternFound": false,
+        "delegatecallOpcodeCount": 0,
+        "callcodeOpcodeCount": 0,
+        "selfdestructOpcodeCount": 0,
+        "scanMethod": "linear_disassembly_skipping_push_immediate_data"
+      },
+      "staticIdentityEligible": true,
+      "m1WriteEligible": false
+    },
+    "factory": {
+      "address": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+      "contractName": "PancakeV3Factory",
+      "sourceRuntimeMatch": "exact_after_pool_deployer_immutable_references_patched",
+      "artifactSha256": "a075f3314718f871cfe2370090b553ed0efa3fe7061a4f8be468542d7e433731",
+      "buildInfoSha256": "683326f6490b1a9850d5e62f48b6b946b2aebd6b0c2ac6bcc084e33e6c5e4b2c",
+      "canonicalCompilerInputSha256": "74bb2f58facb94e6f95b383dbb2c80a0ee5a7a54a11a03d287045b49354a1516",
+      "canonicalCompilerSettingsSha256": "9e00cb07c6a848d7c90d9722f5fa9c5bbd777a06589906fad7ede013ed1786ef",
+      "creationByteLength": 6261,
+      "creationCodeKeccak256": "0x265ecefd69f46b75312f35ae6b47b2d90fa3dcc46ff7426a997f3b9aaceeba73",
+      "runtimeTemplateByteLength": 5151,
+      "runtimeTemplateKeccak256": "0xe54452f4821538133505a3169b31ebbaa714a788487910ecaf26aff75f431cad",
+      "observedRuntimeByteLength": 5151,
+      "observedRuntimeKeccak256": "0x8191d3ab1d55d3da9822199f28865415c99566b6f1aee4a4b16713f57930678c",
+      "immutablePoolDeployer": {
+        "astId": 28,
+        "value": "0x41ff9AA7e16B8B1a8a8dc4f0eFacd93D02d071c9",
+        "startOffsets": [1779, 4315]
+      },
+      "owner": "0x261af0030618a52fa767997ed310174b3bc3b77f",
+      "lmPoolDeployer": "0x7f1745eb74d26877ec54dd9a317cc930ad01350c",
+      "fee500": {
+        "tickSpacing": "10",
+        "whiteListRequested": false,
+        "enabled": true
+      },
+      "ownerOrLmControl": ["setFeeProtocol", "collectProtocol", "setLmPool"],
+      "proxyAndOpcodeAssessment": {
+        "deploymentKind": "direct_non_upgradeable_contract",
+        "eip1967ImplementationSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "eip1967AdminSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "eip1967BeaconSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "eip1167PatternFound": false,
+        "delegatecallOpcodeCount": 0,
+        "callcodeOpcodeCount": 0,
+        "selfdestructOpcodeCount": 0,
+        "scanMethod": "linear_disassembly_skipping_push_immediate_data"
+      },
+      "staticIdentityEligible": true
+    },
+    "poolDeployer": {
+      "address": "0x41ff9AA7e16B8B1a8a8dc4f0eFacd93D02d071c9",
+      "contractName": "PancakeV3PoolDeployer",
+      "sourceRuntimeMatch": "exact_direct_runtime_match",
+      "artifactSha256": "80136db21993e3dcfe3326a61fedd290f86622fbf572ac1b5c71e52f29b9602a",
+      "buildInfoSha256": "e8b9d4ed4eb68b70523800e2c463e030e713130e463ad5fefe46300ad6f30274",
+      "canonicalCompilerInputSha256": "56f4a6aa554a4480d46d359e49a3aa570bcc3d6e373b599f00591b456ff6d66c",
+      "canonicalCompilerSettingsSha256": "87a5fecad1294a4400cb04e12e79d584400d89527258d3a011f8e8e3a16b0680",
+      "creationByteLength": 24588,
+      "creationCodeKeccak256": "0x073327179c2eb6543584b8ad12a4b7b7463137230c34df606b2872de4847df6e",
+      "observedRuntimeByteLength": 24556,
+      "observedRuntimeKeccak256": "0xedd527f11646c1912dfc51b57ffa0ee27972f8798bcaf7bc68ae6ad054b6022b",
+      "factoryAddress": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+      "parametersAtAnchor": {
+        "factory": "0x0000000000000000000000000000000000000000",
+        "token0": "0x0000000000000000000000000000000000000000",
+        "token1": "0x0000000000000000000000000000000000000000",
+        "fee": "0",
+        "tickSpacing": "0"
+      },
+      "factoryInitialization": {
+        "setterCallerRestricted": false,
+        "oneTimeZeroGuard": true,
+        "currentlyInitializedToExpectedFactory": true,
+        "currentlyMutableThroughSetter": false,
+        "boundary": "This was a historical initialization race surface, not a current upgrade path."
+      },
+      "deployCallerRestrictedToFactory": true,
+      "proxyAndOpcodeAssessment": {
+        "deploymentKind": "direct_non_upgradeable_contract",
+        "eip1967ImplementationSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "eip1967AdminSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "eip1967BeaconSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "eip1167PatternFound": false,
+        "delegatecallOpcodeCount": 0,
+        "callcodeOpcodeCount": 0,
+        "selfdestructOpcodeCount": 0,
+        "scanMethod": "linear_disassembly_skipping_push_immediate_data"
+      },
+      "staticIdentityEligible": true
+    }
+  },
+  "poolState": {
+    "factory": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+    "token0": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+    "token1": "0xFa60D973F7642B748046464e165A65B7323b0DEE",
+    "fee": "500",
+    "tickSpacing": "10",
+    "maxLiquidityPerTick": "1917569901783203986719870431555990",
+    "liquidity": "38646829250992288858564901",
+    "slot0": {
+      "sqrtPriceX96": "509142844683514237961255732673170284",
+      "tick": "313533",
+      "observationIndex": "0",
+      "observationCardinality": "1",
+      "observationCardinalityNext": "1",
+      "feeProtocolPacked": "222825800",
+      "feeProtocolToken0": "3400",
+      "feeProtocolToken1": "3400",
+      "unlocked": true
+    },
+    "lmPool": "0x0000000000000000000000000000000000000000",
+    "balances": {
+      "wbnbRaw": "2322443369138505808",
+      "cakeRaw": "19413749622293206442236079206181"
+    },
+    "interpretation": {
+      "nonzeroLiquidityObserved": true,
+      "nonzeroBalancesObserved": true,
+      "economicValueEstablished": false,
+      "historicalTwapAvailable": false,
+      "reason": "Observation cardinality one has no historical observation window, and CAKE is a dummy token."
+    }
+  },
+  "tokens": {
+    "wbnb": {
+      "address": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+      "reportedMetadataOnly": {
+        "name": "Wrapped BNB",
+        "symbol": "WBNB",
+        "decimals": 18
+      },
+      "runtimeByteLength": 3124,
+      "runtimeKeccak256": "0xb7d84205eaaf83ce7b3940c6beaad6d22790255e34a9a2b486aa8cdfff118fe6",
+      "explorerSource": {
+        "url": "https://testnet.bscscan.com/address/0xae13d989dac2f0debff460ac112a837c89baa7cd#code",
+        "matchType": "exact_match_reported_by_explorer",
+        "contractName": "WBNB",
+        "compilerVersion": "v0.4.18+commit.9cf6e910",
+        "optimizerEnabled": false,
+        "explorerDisplayedOptimizerRuns": 200,
+        "evmVersion": "default",
+        "license": "GPL-3.0"
+      },
+      "compilerArtifact": {
+        "officialManifest": "https://binaries.soliditylang.org/windows-amd64/list.json",
+        "path": "solc-windows-amd64-v0.4.18+commit.9cf6e910.zip",
+        "sha256": "0xcdd99d6c9a43e87130e57ef44e03a55e38b9bb1ce4a1121b22815d5655c1653a",
+        "keccak256": "0x36749b20f7695b608e87d23db6f3750b150506da64262694b9ac6209a5542a04"
+      },
+      "proxyAndOpcodeAssessment": {
+        "deploymentKind": "direct_non_upgradeable_contract",
+        "eip1967ImplementationSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "eip1967AdminSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "eip1967BeaconSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "eip1167PatternFound": false,
+        "delegatecallOpcodeCount": 0,
+        "callcodeOpcodeCount": 0,
+        "selfdestructOpcodeCount": 0,
+        "scanMethod": "linear_disassembly_skipping_push_immediate_data"
+      },
+      "behaviorReview": {
+        "plainDepositWithdrawWrapper": true,
+        "ownerOrAdminSurfaceFound": false,
+        "arbitraryMintFound": false,
+        "pauseFound": false,
+        "blacklistFound": false,
+        "transferFeeFound": false,
+        "upgradeSurfaceFound": false,
+        "externalTokenTransferHookFound": false,
+        "totalSupplyRawHex": "0x3a1b5a1d054955472d59",
+        "totalSupplyRawDecimal": "274401811448479839890777",
+        "nativeBalanceRawDecimal": "274401811448479839890777",
+        "totalSupplyEqualsNativeBalanceAtAnchor": true,
+        "unknownSelectorFallbackCaveat": "Unlisted owner(), paused(), or implementation() calls return empty bytes through the payable fallback and are not implemented getters."
+      },
+      "sourceProvenance": {
+        "rawExplorerCompilerInputRetained": false,
+        "exactLocalRuntimeRebuildCompleted": false,
+        "explorerExactMatchSubstitutedForLocalAttestation": false
+      },
+      "staticBehaviorResult": "pass_no_dangerous_behavior_found",
+      "strictAdmissionResult": "non_ready_source_reproduction_incomplete"
+    },
+    "cake": {
+      "address": "0xFa60D973F7642B748046464e165A65B7323b0DEE",
+      "reportedMetadataOnly": {
+        "name": "PancakeSwap Token",
+        "symbol": "Cake",
+        "decimals": 18
+      },
+      "runtimeByteLength": 8796,
+      "runtimeKeccak256": "0x6b9d0521473366d6a5e75ddacee104389f35f6f877fc08dc3aa339400e71a828",
+      "explorerSource": {
+        "url": "https://testnet.bscscan.com/address/0xfa60d973f7642b748046464e165a65b7323b0dee#code",
+        "matchType": "exact_match_reported_by_explorer",
+        "contractName": "CakeToken",
+        "compilerVersion": "v0.6.12+commit.27d51765",
+        "optimizerEnabled": true,
+        "optimizerRuns": 99999,
+        "evmVersion": "default"
+      },
+      "officialPancakeDocumentation": {
+        "url": "https://docs.pancakeswap.finance/welcome-to-pancakeswap/how-to-guides/v3-v2-migration/migration/masterchef-v2",
+        "addressExplicitlyLabelledDummyToken": true,
+        "publicMintAddressAmountShown": true
+      },
+      "compilerArtifact": {
+        "officialManifest": "https://binaries.soliditylang.org/windows-amd64/list.json",
+        "path": "solc-windows-amd64-v0.6.12+commit.27d51765.zip",
+        "sha256": "0x7a1874cff4cae30b9ee0509631ddae34a8aa573cb2a6104f25e4a6a63ab3ad5f",
+        "keccak256": "0xd5642aecd13b6af819b70e1e2a4e642ad0b481356275d6ed5ff5b77f125d4fc4"
+      },
+      "proxyAndOpcodeAssessment": {
+        "deploymentKind": "direct_non_upgradeable_contract",
+        "eip1967ImplementationSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "eip1967AdminSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "eip1967BeaconSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "eip1167PatternFound": false,
+        "delegatecallOpcodeCount": 0,
+        "callcodeOpcodeCount": 0,
+        "selfdestructOpcodeCount": 0,
+        "scanMethod": "linear_disassembly_skipping_push_immediate_data"
+      },
+      "owner": "0x1ED62c7b76AD29Bfb80F3329d1ce7e760aAD153d",
+      "behaviorReview": {
+        "transferFeeFound": false,
+        "blacklistFound": false,
+        "pauseFound": false,
+        "upgradeSurfaceFound": false,
+        "publicBurnFound": false,
+        "ownerMintUint256Overload": true,
+        "unguardedMintAddressAmountOverload": true,
+        "unguardedMintSourceSignature": "mint(address _to, uint256 _amount) public",
+        "totalSupplyRawDecimal": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+        "totalSupplyIsUint256Max": true,
+        "readOnlySimulations": [
+          {
+            "from": "0x000000000000000000000000000000000000dEaD",
+            "call": "mint(0x000000000000000000000000000000000000dEaD,0)",
+            "result": "success_0x",
+            "interpretation": "No caller access-control check rejected the call."
+          },
+          {
+            "from": "0x000000000000000000000000000000000000dEaD",
+            "call": "mint(0x000000000000000000000000000000000000dEaD,1)",
+            "result": "revert_SafeMath_addition_overflow",
+            "interpretation": "Execution reached saturated-supply arithmetic rather than an access-control check."
+          }
+        ],
+        "activeInflationClaimedAtAnchor": false,
+        "boundary": "Positive mint currently reverts because supply is saturated; the unguarded path and maximum pre-mint are design and economic-integrity failures."
+      },
+      "sourceProvenance": {
+        "rawExplorerCompilerInputRetained": false,
+        "exactLocalRuntimeRebuildCompleted": false,
+        "localSourceHypothesisRuntimeByteLength": 8805,
+        "observedRuntimeByteLength": 8796,
+        "localHypothesisUsedAsEvidence": false,
+        "explorerExactMatchSubstitutedForLocalAttestation": false
+      },
+      "staticDeploymentResult": "direct_non_upgradeable_exact_explorer_source_record",
+      "economicAdmissionResult": "fail_dummy_max_supply_unguarded_mint_surface",
+      "strictAdmissionResult": "ineligible"
+    }
+  },
+  "writePathBoundary": {
+    "positionManager": "0x427bF5b37357632377eCbEC9de3626C71A5396c1",
+    "positionManagerStaticReviewSeparate": true,
+    "positionManagerHasReviewedSelfDelegatecallMulticallModel": true,
+    "authenticatedWriteTargetAttestationEstablishedHere": false,
+    "proofEraControlledPositionEstablishedHere": false,
+    "quoteOrSlippagePolicyEstablishedHere": false,
+    "sessionOrRevokeEvidenceEstablishedHere": false,
+    "receiptEstablishedHere": false
+  },
+  "alternativeAssessment": {
+    "officialSourceEconomicallySuitableBscTestnetAlternativeKnownFromThisResearch": false,
+    "otherCakeWbnbFeeTiers": "Not independently admitted; every such pool inherits the same CAKE token failure.",
+    "unrelatedPreviouslyObservedPools": "Not eligible because their tokens lacked complete retained runtime and source proof.",
+    "broadAlternativeSearchPerformed": false
+  },
+  "reproductionMethodology": {
+    "rpcMethods": [
+      "eth_chainId",
+      "eth_getBlockByNumber",
+      "eth_getCode",
+      "eth_getStorageAt",
+      "eth_getBalance",
+      "eth_call"
+    ],
+    "historicalStateSelector": {
+      "blockHash": "0x19a4a9461ceee76a834868d94822f61e5a40b8f9ca48654ac85d6041d331f290",
+      "requireCanonical": true
+    },
+    "buildCommands": [
+      "git archive --format=tar --output=<output.tar> ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+      "corepack yarn install --frozen-lockfile --ignore-scripts --non-interactive",
+      "corepack yarn workspace @pancakeswap/v3-core compile"
+    ],
+    "runtimeMethod": "Keccak-256 observed code; patch every compiler-reported immutable reference; require complete byte equality; recompute CREATE2 address.",
+    "opcodeMethod": "Linear disassembly with PUSH immediate data skipped before counting DELEGATECALL, CALLCODE, and SELFDESTRUCT.",
+    "tokenMethod": "Inspect explorer exact-match source and ABI, direct runtime/storage, explicit getters, and read-only eth_call simulations; do not infer behavior from metadata.",
+    "standaloneRawRpcRequestsRetained": false,
+    "standaloneAnalysisProgramsRetained": false
+  },
+  "sourceUrls": [
+    "https://github.com/pancakeswap/pancake-v3-contracts",
+    "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/deployments/bscTestnet.json",
+    "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-core/contracts/PancakeV3Pool.sol",
+    "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-core/contracts/PancakeV3Factory.sol",
+    "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-core/contracts/PancakeV3PoolDeployer.sol",
+    "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-core/hardhat.config.ts",
+    "https://api.github.com/repos/pancakeswap/pancake-v3-contracts/commits/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+    "https://binaries.soliditylang.org/windows-amd64/list.json",
+    "https://testnet.bscscan.com/address/0xae13d989dac2f0debff460ac112a837c89baa7cd#code",
+    "https://testnet.bscscan.com/address/0xfa60d973f7642b748046464e165a65b7323b0dee#code",
+    "https://docs.pancakeswap.finance/welcome-to-pancakeswap/how-to-guides/v3-v2-migration/migration/masterchef-v2",
+    "https://bsc-testnet.bnbchain.org",
+    "https://bsc-testnet-rpc.publicnode.com"
+  ],
+  "limitations": [
+    "The official PancakeSwap source commit is unsigned; repository ownership is provenance but not a cryptographic publisher signature.",
+    "The core build used a Node release that Hardhat 2.13.0 warned was unsupported, although immutable-linked runtime matched deployed code byte-for-byte.",
+    "Historical state came from a third-party public RPC because the official BNB endpoint lacked the archive trie; the official endpoint independently confirmed the exact block header.",
+    "Raw WBNB and CAKE explorer Standard JSON compiler inputs were not retained and their runtimes were not exactly rebuilt locally.",
+    "The one-off RPC and bytecode-analysis programs were not retained as standalone evidence files.",
+    "Token metadata is not treated as identity or safety evidence.",
+    "Nonzero pool liquidity and balances do not establish economic value, price integrity, exit liquidity, or safe capacity.",
+    "No unrelated pool or broad alternative-pair search is claimed by this bounded report."
+  ]
+}

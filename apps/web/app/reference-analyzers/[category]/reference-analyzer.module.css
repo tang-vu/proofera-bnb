@@ -1,0 +1,390 @@
+.hero {
+  display: grid;
+  align-items: end;
+  padding-block: 76px 58px;
+  gap: 54px;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+}
+
+.hero h1 {
+  max-width: 780px;
+  margin-block: 18px 24px;
+  font-size: clamp(3rem, 7vw, 6.2rem);
+  overflow-wrap: anywhere;
+}
+
+.hero :global(.mono-kicker) {
+  margin: 18px 0 0;
+}
+
+.boundary {
+  border: 1px solid #5b492b;
+  border-left: 4px solid var(--caution);
+  padding: 26px;
+  background: rgb(240 185 104 / 5%);
+}
+
+.boundary h2 {
+  margin-block: 18px 14px;
+  font-size: clamp(1.7rem, 3vw, 2.35rem);
+}
+
+.boundary p,
+.sectionHeading > p,
+.methodBoundary p,
+.activationBoundary p {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.boundary p + p {
+  margin-top: 12px;
+}
+
+.categoryNav {
+  display: grid;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.categoryNav a,
+.currentCategory {
+  display: flex;
+  min-height: 54px;
+  align-items: center;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 12px 16px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.categoryNav a:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.currentCategory {
+  background: var(--surface-raised);
+  color: var(--signal);
+}
+
+.section {
+  padding-top: 88px;
+}
+
+.sectionHeading {
+  display: grid;
+  align-items: end;
+  margin-bottom: 34px;
+  gap: 50px;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+}
+
+.sectionHeading h2 {
+  max-width: 700px;
+}
+
+.eligibilityGrid {
+  display: grid;
+  margin: 0;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.eligibilityGrid > div {
+  display: flex;
+  min-height: 86px;
+  align-items: center;
+  justify-content: space-between;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 20px;
+  gap: 18px;
+  background: var(--surface);
+}
+
+.eligibilityGrid dt,
+.identityGrid dt,
+.metricFacts dt {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.eligibilityGrid dd,
+.identityGrid dd,
+.metricFacts dd {
+  margin: 0;
+}
+
+.identityGrid {
+  display: grid;
+  margin: 0;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.identityGrid > div {
+  display: grid;
+  min-width: 0;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 22px;
+  gap: 13px;
+}
+
+.unknownValue {
+  display: flex;
+  align-items: flex-start;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+  gap: 12px;
+}
+
+.unknownValue > :last-child {
+  padding-top: 3px;
+}
+
+.metricGrid {
+  display: grid;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.metricCard {
+  min-width: 0;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 28px;
+  background: rgb(18 21 18 / 72%);
+}
+
+.metricTopline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.metricNumber {
+  color: var(--signal);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+}
+
+.metricCard h3 {
+  margin-block: 28px 10px;
+  font-size: clamp(1.45rem, 2.5vw, 2rem);
+  letter-spacing: -0.035em;
+}
+
+.decisionUse {
+  min-height: 46px;
+  margin-bottom: 22px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.metricFacts {
+  display: grid;
+  margin: 0;
+  border-top: 1px solid var(--line);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.metricFacts > div {
+  min-width: 0;
+  border-bottom: 1px solid var(--line);
+  padding-block: 13px;
+}
+
+.metricFacts > div:nth-child(even) {
+  border-left: 1px solid var(--line);
+  padding-left: 16px;
+}
+
+.metricFacts dd {
+  margin-top: 7px;
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.evidenceNeed {
+  margin-top: 22px;
+  border-left: 2px solid var(--line);
+  padding-left: 15px;
+}
+
+.evidenceNeed strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--signal);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.evidenceNeed p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.provenanceGrid {
+  display: grid;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.provenanceGrid > div {
+  display: grid;
+  min-width: 0;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 22px;
+  gap: 10px;
+}
+
+.provenanceGrid span {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.provenanceGrid code {
+  font-size: 12px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.methodBoundary {
+  display: grid;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-top: 0;
+  padding: 24px;
+  gap: 24px;
+  background: #0f120f;
+  grid-template-columns: minmax(220px, 0.65fr) minmax(300px, 1fr) auto;
+}
+
+.methodBoundary strong {
+  display: block;
+  margin-top: 9px;
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.activationBoundary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-block: 88px 110px;
+  border: 1px solid #5b492b;
+  padding: 30px;
+  gap: 38px;
+  background: rgb(240 185 104 / 4%);
+}
+
+.activationBoundary h2 {
+  margin-block: 14px 10px;
+  font-size: clamp(1.9rem, 3vw, 2.8rem);
+}
+
+.activationBoundary p {
+  max-width: 760px;
+}
+
+.activationBoundary button {
+  min-width: 200px;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 840px) {
+  .hero,
+  .sectionHeading,
+  .methodBoundary {
+    grid-template-columns: 1fr;
+  }
+
+  .categoryNav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .eligibilityGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .activationBoundary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 580px) {
+  .hero {
+    padding-block: 54px 38px;
+  }
+
+  .categoryNav,
+  .eligibilityGrid,
+  .identityGrid,
+  .metricGrid,
+  .provenanceGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .section {
+    padding-top: 66px;
+  }
+
+  .metricCard,
+  .boundary {
+    padding: 22px;
+  }
+
+  .metricFacts {
+    grid-template-columns: 1fr;
+  }
+
+  .metricFacts > div:nth-child(even) {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .unknownValue,
+  .metricTopline {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .decisionUse {
+    min-height: 0;
+  }
+
+  .activationBoundary {
+    margin-block: 66px 80px;
+    padding: 24px;
+  }
+
+  .activationBoundary button {
+    width: 100%;
+    min-width: 0;
+  }
+}

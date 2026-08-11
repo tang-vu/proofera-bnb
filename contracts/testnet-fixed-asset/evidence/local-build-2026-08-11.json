@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "status": "local_build_only_not_deployed",
+  "checkedDateUtc": "2026-08-11",
+  "network": {
+    "name": "BSC Testnet",
+    "chainId": 97
+  },
+  "contract": {
+    "name": "ProofEraTestAsset",
+    "sourceName": "src/ProofEraTestAsset.sol",
+    "tokenName": "ProofEra Test Asset",
+    "symbol": "PTA",
+    "decimals": 18,
+    "fixedSupplyBaseUnits": "1000000000000000000000000",
+    "constructorEnforcedChainId": 97
+  },
+  "toolchain": {
+    "nodeValidated": "24.14.1",
+    "pnpm": "11.20.0",
+    "hardhat": "3.11.1",
+    "openzeppelinContracts": "5.7.0",
+    "solidityLongVersion": "0.8.36+commit.8a079791",
+    "evmVersion": "paris",
+    "optimizerEnabled": true,
+    "optimizerRuns": 200,
+    "viaIR": false,
+    "metadataBytecodeHash": "ipfs"
+  },
+  "examplePreparation": {
+    "recipient": "0x1111111111111111111111111111111111111111",
+    "recipientIsAuthorizedForDeployment": false
+  },
+  "digests": {
+    "sourceSha256": "88507b71cc4b1f1c1875a48df7a46c5eaef88b9b5a8dee92fab3f793322de925",
+    "hardhatConfigSha256": "1f5acdab60606aef8c234c884a9cc49a062ffaa0a1ac0f00f700ea589369c5c5",
+    "packageManifestSha256": "0b79d65c04a71cc4c973a377e33496b2abe004acd33cf5b8e508c966eda62dd6",
+    "lockfileSha256": "67c1644bd07ddb22c64f5889980648ad43adb86e7fef8bb45a6761c7515df799",
+    "artifactSha256": "9674d6c90840b4d0de60d6656543e767144bec9e8e79df624d82ccdaddbaf6f9",
+    "buildInfoInputSha256": "d61b2c8e6428c918de068caadcad5cdd3f21d70545e70d996846fde6d2f7f23c",
+    "buildInfoOutputSha256": "7af180599228994dfb8c60e160fd5329b5664425acdb1427627c78675e95d54d",
+    "compilerSettingsCanonicalSha256": "8f37e99b9b44f76f8bbaa7d3a33ca2d4023c1463e5a54372c2fa29f16835d800",
+    "deploymentBytecodeSha256": "6616412e717c82e73d7a37ca6ffa9df47b6fc5767a53135500d8e2e6bc671560",
+    "runtimeBytecodeSha256": "e018f428a384212f11817a24f4828c1a479403d86491e256a7f79d3142395527",
+    "unsignedDeploymentDataSha256": "a83642d6f5b43126c39e3a9d98590692fb5d189304f2ef80133c6d93da68d80a"
+  },
+  "results": {
+    "solidityTestsPassed": 11,
+    "fuzzRuns": 256,
+    "nodeTestsPassed": 25,
+    "poolPreparationAddressCorpusCases": 512,
+    "poolPreparationCompilerDerivedSelectorsChecked": 10,
+    "poolPreparationOfficialArtifactsPinned": 5,
+    "poolPreparationGoldenCases": 2,
+    "poolPreparationOpenBlockers": 12,
+    "productionAuditKnownVulnerabilities": 0
+  },
+  "poolPreparationEvidence": {
+    "status": "offline_unsigned_blocked_not_executed",
+    "retainedOfficialProvenanceManifestSha256": "8f8cf45cae3d3a8cc51bfb27f6602a7cd43220d4793f1c7a8801a42250758dc1",
+    "fixtureOnlyGoldenEvidenceSha256": "2b0e40632d8704672304d38c64c9583b722a56618d07a5ee3f13cc199cd8a455",
+    "executionReady": false,
+    "signatureRequested": false,
+    "networkRpcSigningOrBroadcastUsed": false
+  },
+  "limitations": [
+    "No RPC call, deployment, signing, transaction, or explorer verification occurred.",
+    "The example recipient is inert test input and is not authorized for a future deployment.",
+    "Local tests and static checks are not a contract-specific external audit.",
+    "PTA has no peg, redemption promise, liquidity, price, market value, or economic rights."
+  ]
+}

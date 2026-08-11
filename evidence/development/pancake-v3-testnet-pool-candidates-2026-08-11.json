@@ -1,0 +1,916 @@
+{
+  "schemaVersion": 1,
+  "evidenceId": "pancake-v3-testnet-pool-candidates-2026-08-11",
+  "capturedAt": "2026-08-11T15:51:33.180Z",
+  "environment": "bsc-testnet",
+  "evidenceKind": "read_only_bounded_candidate_discovery_and_admission_review",
+  "decision": {
+    "status": "no_economically_admissible_existing_pool_found",
+    "activationEligible": false,
+    "candidateCount": 14,
+    "factoryAuthenticatedCandidateCount": 14,
+    "hardRejectedCandidateCount": 14,
+    "executionAuthorized": false,
+    "performanceClaimsPermitted": false,
+    "summary": "Every discovered pool has exact Pancake V3 factory/deployer lineage, but every composed pool fails at least one independent token, oracle-history, liquidity-quality, or source-provenance gate.",
+    "narrowestMissingCoverageProof": "An archive-complete PoolCreated log result for factory 0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865 with WBNB in indexed token0 or token1 from block 28488223 through 124399999. Public endpoints available during this review did not permit that complete historical query.",
+    "sharedMissingComponentProof": "WBNB still lacks retained raw explorer Standard JSON input plus an exact local deployed-runtime rebuild. The existing behavior review is positive but is not substituted for strict source provenance.",
+    "existingCandidatesSalvageableByMissingProofAlone": false,
+    "boundary": "Completing the missing archive and WBNB proofs could discover or validate another candidate; it would not cure the unrestricted minting, arbitrary burning, one-observation oracle, stale observations, zero liquidity, or unavailable counterparty source found here."
+  },
+  "noWriteBoundary": {
+    "walletUsed": false,
+    "transactionSubmitted": false,
+    "signatureRequested": false,
+    "approvalRequested": false,
+    "deploymentPerformed": false,
+    "stateChangingSimulationUsed": false,
+    "readOnlyEthCallUsed": true,
+    "readOnlyZeroAmountSimulationUsed": true,
+    "secretsReadOrPrinted": false
+  },
+  "chain": {
+    "chainId": 97,
+    "network": "BNB Smart Chain Testnet",
+    "factoryDeploymentBlock": {
+      "number": "28488223",
+      "numberHex": "0x1b2b21f",
+      "hash": "0xab42d879dad8c0da00b5b2dd383117f1745587f334fefd589684e6054dca39ae",
+      "timestampHex": "0x642523e1",
+      "deploymentTransaction": "0x61af50e4c0f35001403104ba9b6949926af98f6412df347277e82feb09d143bd"
+    },
+    "canonicalAnchor": {
+      "selection": "lower_common_finalized_head",
+      "number": "124480209",
+      "numberHex": "0x76b6ad1",
+      "hash": "0xe8d54b7f796b123cd83f82c6e173d0111ed666d59e4754ad0b5546f5e560d21b",
+      "parentHash": "0xf0b4bdcffb2a61fec3caf92897a7f78a03e04bcf0b38506163dc7dd402033d33",
+      "timestampHex": "0x6a7b4101",
+      "timestampUnix": "1786462465",
+      "timestamp": "2026-08-11T15:34:25.000Z",
+      "stateSelector": {
+        "blockHash": "0xe8d54b7f796b123cd83f82c6e173d0111ed666d59e4754ad0b5546f5e560d21b",
+        "requireCanonical": true
+      },
+      "numberedOrLatestStateFallbackUsed": false,
+      "independentHeaderMatch": true
+    }
+  },
+  "providers": [
+    {
+      "id": "publicnode-bsc-testnet",
+      "url": "https://bsc-testnet-rpc.publicnode.com",
+      "chainIdResult": "0x61",
+      "finalizedHeadAtSelection": {
+        "numberHex": "0x76b6ad5",
+        "hash": "0xf7a761892c971c7b1d785ed84c86f54106bce5c234dc28d993f9a6950f72e472",
+        "timestampHex": "0x6a7b4103"
+      },
+      "uses": [
+        "EIP-1898 canonical-block contract state",
+        "bounded recent PoolCreated log search",
+        "blockHash-pinned event re-reads"
+      ],
+      "limitations": [
+        "eth_getLogs maximum range was 50000 blocks.",
+        "At the probe time, log history before block 124391822 returned a pruned-history error."
+      ]
+    },
+    {
+      "id": "bnbchain-official-testnet",
+      "url": "https://bsc-testnet-dataseed.bnbchain.org",
+      "chainIdResult": "0x61",
+      "finalizedHeadAtSelection": {
+        "numberHex": "0x76b6ad1",
+        "hash": "0xe8d54b7f796b123cd83f82c6e173d0111ed666d59e4754ad0b5546f5e560d21b",
+        "timestampHex": "0x6a7b4101"
+      },
+      "uses": ["independent start and anchor block-header confirmation"],
+      "limitations": ["Historical eth_getLogs was unavailable or rate-limited during the review."]
+    },
+    {
+      "id": "onfinality-public-bnb-testnet",
+      "url": "https://bnb-testnet.api.onfinality.io/public",
+      "uses": ["archive-capability probe only"],
+      "limitations": [
+        "The endpoint enforced a 100000-block maximum log range.",
+        "The public endpoint rate-limited the attempted complete scan; no incomplete result was represented as full coverage."
+      ]
+    }
+  ],
+  "coverage": {
+    "configuredAddressCrossProduct": {
+      "sourceRepository": "https://github.com/pancakeswap/exchange-v3-subgraphs",
+      "sourceCommit": "2f6248444994ff1c2a5f0b601324d1f531355ccf",
+      "sourceCommitUrl": "https://github.com/pancakeswap/exchange-v3-subgraphs/commit/2f6248444994ff1c2a5f0b601324d1f531355ccf",
+      "sourceCommitTimestamp": "2025-05-14T09:04:09Z",
+      "sourceCommitGitHubVerification": {
+        "verified": true,
+        "reason": "valid"
+      },
+      "sourceFile": "https://github.com/pancakeswap/exchange-v3-subgraphs/blob/2f6248444994ff1c2a5f0b601324d1f531355ccf/config/chapel.js",
+      "useOfSource": "Address seeding only. Names, stablecoin labels, whitelist membership, and configured pool membership were not treated as safety evidence.",
+      "wrappedNative": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+      "configuredCounterparties": [
+        "0x828e3fc56dd48e072e3b6f3c4fd4ddb4733c2c5e",
+        "0xc1ed9955c11585f47d0d6bfbc29034349a746a81",
+        "0x0fb5d7c73fa349a90392f873a4fa1ecf6a3d0a96",
+        "0xab1a4d4f1d656d2450692d237fdd6c7f9146e814"
+      ],
+      "feeTiersChecked": [100, 500, 2500, 10000],
+      "factoryGetPoolReads": 16,
+      "nonzeroMappings": 7,
+      "zeroMappings": [
+        { "token": "0x828e3fc56dd48e072e3b6f3c4fd4ddb4733c2c5e", "fee": 100 },
+        { "token": "0x828e3fc56dd48e072e3b6f3c4fd4ddb4733c2c5e", "fee": 500 },
+        { "token": "0x828e3fc56dd48e072e3b6f3c4fd4ddb4733c2c5e", "fee": 2500 },
+        { "token": "0x828e3fc56dd48e072e3b6f3c4fd4ddb4733c2c5e", "fee": 10000 },
+        { "token": "0xc1ed9955c11585f47d0d6bfbc29034349a746a81", "fee": 100 },
+        { "token": "0xc1ed9955c11585f47d0d6bfbc29034349a746a81", "fee": 2500 },
+        { "token": "0xc1ed9955c11585f47d0d6bfbc29034349a746a81", "fee": 10000 },
+        { "token": "0x0fb5d7c73fa349a90392f873a4fa1ecf6a3d0a96", "fee": 500 },
+        { "token": "0x0fb5d7c73fa349a90392f873a4fa1ecf6a3d0a96", "fee": 10000 }
+      ],
+      "configuredWnativeStablePool": "0x5147173e452ae4dd23dcee7baaaaab7318f16f6b",
+      "result": "complete_for_exact_configured_cross_product"
+    },
+    "recentFactoryEvents": {
+      "factory": "0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865",
+      "eventSignature": "PoolCreated(address,address,uint24,int24,address)",
+      "topic0": "0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118",
+      "wrappedNativeIndexedTopic": "0x000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd",
+      "fromBlock": "124400000",
+      "fromBlockHex": "0x76a3160",
+      "fromBlockHash": "0x22ceb74479a789f788181c2090052a4eac1806e693dbeb88abb15fdcabf3266d",
+      "fromBlockTimestamp": "2026-08-11T05:32:28.000Z",
+      "toBlock": "124480209",
+      "toBlockHex": "0x76b6ad1",
+      "toBlockHash": "0xe8d54b7f796b123cd83f82c6e173d0111ed666d59e4754ad0b5546f5e560d21b",
+      "toBlockTimestamp": "2026-08-11T15:34:25.000Z",
+      "inclusiveBlockCount": 80210,
+      "queryWindows": 2,
+      "queries": 4,
+      "method": "Two contiguous at-most-50000-block windows, queried once with WBNB as indexed token0 and once with WBNB as indexed token1.",
+      "eventCount": 6,
+      "eachEventReReadByBlockHash": true,
+      "removedEventCount": 0,
+      "result": "complete_for_declared_recent_interval"
+    },
+    "priorOfficialDummyPool": {
+      "pool": "0xeaf78e3aa2c19df9495318cd9ea2ad83be7d5015",
+      "counterparty": "0xfa60d973f7642b748046464e165a65b7323b0dee",
+      "fee": 500,
+      "evidence": "evidence/development/pancake-v3-testnet-cake-wbnb-verification-2026-08-11.json",
+      "evidenceSha256": "9e8ef430166ede762685c25315e4907fbdafe44317ffea21a0366242cafed0f7",
+      "includedReason": "Previously identified official PancakeSwap testnet dummy pair; current factory mapping and state were re-read at this report's canonical anchor."
+    },
+    "explicitlyNotCovered": [
+      "A complete factory-lifetime PoolCreated log scan between blocks 28488223 and 124399999.",
+      "Non-WBNB pools.",
+      "Fee tiers outside 100, 500, 2500, and 10000 for the configuration-derived cross-product unless observed in the recent factory event interval.",
+      "A claim that PancakeSwap's Chapel subgraph configuration is exhaustive or current.",
+      "Third-party token labels, token-list safety, market value, offchain price, or faucet availability."
+    ]
+  },
+  "coreLineage": {
+    "officialSourceRepository": "https://github.com/pancakeswap/pancake-v3-contracts",
+    "officialSourceCommit": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+    "deploymentManifest": "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/deployments/bscTestnet.json",
+    "retainedReproductionEvidence": {
+      "path": "evidence/development/pancake-v3-testnet-cake-wbnb-verification-2026-08-11.json",
+      "sha256": "9e8ef430166ede762685c25315e4907fbdafe44317ffea21a0366242cafed0f7"
+    },
+    "factory": {
+      "address": "0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865",
+      "runtimeBytes": 5151,
+      "runtimeKeccak256AtAnchor": "0x8191d3ab1d55d3da9822199f28865415c99566b6f1aee4a4b16713f57930678c",
+      "sourceRuntimeMatch": "exact_after_pool_deployer_immutable_references_patched",
+      "immutablePoolDeployer": "0x41ff9aa7e16b8b1a8a8dc4f0efacd93d02d071c9",
+      "ownerAtPriorPinnedReview": "0x261af0030618a52fa767997ed310174b3bc3b77f",
+      "lmPoolDeployerAtPriorPinnedReview": "0x7f1745eb74d26877ec54dd9a317cc930ad01350c"
+    },
+    "poolDeployer": {
+      "address": "0x41ff9aa7e16b8b1a8a8dc4f0efacd93d02d071c9",
+      "runtimeBytes": 24556,
+      "runtimeKeccak256AtAnchor": "0xedd527f11646c1912dfc51b57ffa0ee27972f8798bcaf7bc68ae6ad054b6022b",
+      "sourceRuntimeMatch": "exact_direct_runtime_match",
+      "deployCallerRestrictedToFactory": true,
+      "currentlyInitializedToExpectedFactory": true,
+      "currentlyMutableThroughInitializationSetter": false
+    },
+    "poolInitCodeKeccak256": "0x6ce8eb472fa82df5469c6ab6d485f17c3ad13c8cd7af59b3d4a8026c5ce0f7e2",
+    "poolRuntimeBytes": 22962,
+    "candidateLineageMethod": [
+      "Read factory.getPool(token0,token1,fee) with the canonical EIP-1898 selector.",
+      "Read each pool's factory, token0, token1, fee, and tickSpacing with the same selector.",
+      "Compute salt = keccak256(abi.encode(token0,token1,fee)).",
+      "Compute CREATE2 address from the exact official pool init-code hash and exact official pool-deployer address.",
+      "Require the factory mapping, pool getters, observed address, and CREATE2 result to agree."
+    ],
+    "allCandidateLineagesExact": true,
+    "mutableControlAssessment": {
+      "poolUpgradeable": false,
+      "poolDelegatecallFound": false,
+      "factoryUpgradeable": false,
+      "deployerUpgradeable": false,
+      "factoryOwnerCanSetFeeProtocol": true,
+      "factoryOrLmPoolDeployerCanSetLmPool": true,
+      "factoryCanCollectProtocolFees": true,
+      "result": "identity_pass_with_mutable_fee_protocol_and_lm_pool_dependencies",
+      "boundary": "Exact Pancake core identity does not make a token pair economically safe and does not remove factory/LM governance risk."
+    }
+  },
+  "sharedWbnb": {
+    "address": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+    "runtimeBytes": 3124,
+    "runtimeKeccak256AtAnchor": "0xb7d84205eaaf83ce7b3940c6beaad6d22790255e34a9a2b486aa8cdfff118fe6",
+    "reportedMetadataOnly": {
+      "name": "Wrapped BNB",
+      "symbol": "WBNB",
+      "decimals": 18
+    },
+    "behaviorAssessment": {
+      "plainDepositWithdrawWrapper": true,
+      "ownerOrAdminSurfaceFound": false,
+      "arbitraryMintFound": false,
+      "pauseFound": false,
+      "blacklistFound": false,
+      "transferFeeFound": false,
+      "upgradeSurfaceFound": false,
+      "externalTokenTransferHookFound": false,
+      "eip1967SlotsZero": true,
+      "eip1167PatternFound": false
+    },
+    "sourceProvenance": {
+      "explorerExactMatchReported": true,
+      "rawExplorerCompilerInputRetained": false,
+      "exactLocalRuntimeRebuildCompleted": false,
+      "sourcifyV2MatchAvailableAtCheck": false
+    },
+    "strictAdmissionResult": "non_ready_source_reproduction_incomplete"
+  },
+  "counterpartyAssessments": {
+    "0xc1ed9955c11585f47d0d6bfbc29034349a746a81": {
+      "reportedMetadataOnly": { "name": "MockA", "symbol": "A", "decimals": 18 },
+      "runtimeBytes": 2452,
+      "runtimeKeccak256": "0x60c9d1709d7e326e524f93766898bb48df87d6e259986f414dce0fba53a06704",
+      "totalSupplyRaw": "15792089237316195423570985008687907953270984667653803282678686010033439639934",
+      "sourceVerification": {
+        "service": "Sourcify v2",
+        "url": "https://sourcify.dev/server/v2/contract/97/0xc1ed9955c11585f47d0d6bfbc29034349a746a81?fields=all",
+        "match": "exact_match",
+        "runtimeMatch": "exact_match",
+        "verifiedAt": "2025-07-13T20:12:18Z",
+        "compilerVersion": "0.8.12+commit.f00d7308",
+        "fullyQualifiedName": "contracts/mocks/ERC20Mock.sol:ERC20Mock"
+      },
+      "proxyAssessment": {
+        "sourcifyIsProxy": false,
+        "eip1967SlotsZero": true,
+        "eip1167PatternFound": false
+      },
+      "behaviorAssessment": {
+        "sourceDescription": "The exact-matched source calls itself a mock and exposes public mint(address,uint256) without an access-control modifier.",
+        "unrestrictedMint": true,
+        "zeroAmountMintEthCall": {
+          "from": "0x000000000000000000000000000000000000dead",
+          "result": "0x"
+        },
+        "adminUpgradeFeeBlacklistPauseHookRebase": "not_present_in_the_exact_matched_simple_erc20_source",
+        "publisherAttribution": "not_established_by_runtime_match"
+      },
+      "strictAdmissionResult": "fail_unrestricted_public_mint"
+    },
+    "0x0fb5d7c73fa349a90392f873a4fa1ecf6a3d0a96": {
+      "reportedMetadataOnly": { "name": "MOCK Token", "symbol": "USDT", "decimals": 18 },
+      "runtimeBytes": 2880,
+      "runtimeKeccak256": "0x7d6ef6fc7ad54cff6496104b7506db54531372d740b650d1d0c544455a986c5c",
+      "totalSupplyRaw": "15792089237316195423570986008687907853270007076082018425909597117913239661934",
+      "sourceVerification": {
+        "service": "Sourcify v2",
+        "url": "https://sourcify.dev/server/v2/contract/97/0x0fb5d7c73fa349a90392f873a4fa1ecf6a3d0a96?fields=all",
+        "match": "exact_match",
+        "runtimeMatch": "exact_match",
+        "verifiedAt": "2026-06-08T23:14:20Z",
+        "compilerVersion": "0.8.10+commit.fc410830",
+        "fullyQualifiedName": "contracts/mocks/MockToken.sol:MockToken"
+      },
+      "proxyAssessment": {
+        "sourcifyIsProxy": false,
+        "eip1967SlotsZero": true,
+        "eip1167PatternFound": false
+      },
+      "behaviorAssessment": {
+        "sourceDescription": "The exact-matched source exposes unrestricted mint(address,uint256) and burnFrom(address,uint256); burnFrom calls _burn directly without allowance or caller authorization.",
+        "unrestrictedMint": true,
+        "arbitraryBurnFrom": true,
+        "zeroAmountMintEthCallResult": "0x",
+        "zeroAmountBurnFromEthCallResult": "0x",
+        "adminUpgradeFeeBlacklistPauseHookRebase": "not_present_in_the_exact_matched_simple_erc20_source",
+        "publisherAttribution": "not_established_by_runtime_match"
+      },
+      "strictAdmissionResult": "fail_unrestricted_public_mint_and_arbitrary_burn"
+    },
+    "0xab1a4d4f1d656d2450692d237fdd6c7f9146e814": {
+      "reportedMetadataOnly": { "name": "Binance USD", "symbol": "BUSD", "decimals": 18 },
+      "runtimeBytes": 2937,
+      "runtimeKeccak256": "0xebeeae2530611dbc6f4512952efce2568fa4040a0b8bd99aa2ab3a872e349d69",
+      "totalSupplyRaw": "10000000000110010202000000196051991939596770230153287782817817605190011219",
+      "sourceVerification": {
+        "service": "Sourcify v2",
+        "url": "https://sourcify.dev/server/v2/contract/97/0xab1a4d4f1d656d2450692d237fdd6c7f9146e814?fields=all",
+        "match": "exact_match",
+        "runtimeMatch": "exact_match",
+        "verifiedAt": "2026-06-10T16:38:42Z",
+        "compilerVersion": "0.8.10+commit.fc410830",
+        "fullyQualifiedName": "contracts/mocks/MockToken.sol:MockToken"
+      },
+      "proxyAssessment": {
+        "sourcifyIsProxy": false,
+        "eip1967SlotsZero": true,
+        "eip1167PatternFound": false
+      },
+      "behaviorAssessment": {
+        "sourceDescription": "The exact-matched source exposes unrestricted mint(address,uint256) and burnFrom(address,uint256); burnFrom calls _burn directly without allowance or caller authorization.",
+        "unrestrictedMint": true,
+        "arbitraryBurnFrom": true,
+        "zeroAmountMintEthCallResult": "0x",
+        "zeroAmountBurnFromEthCallResult": "0x",
+        "adminUpgradeFeeBlacklistPauseHookRebase": "not_present_in_the_exact_matched_simple_erc20_source",
+        "publisherAttribution": "not_established_by_runtime_match"
+      },
+      "strictAdmissionResult": "fail_unrestricted_public_mint_and_arbitrary_burn"
+    },
+    "0xfa60d973f7642b748046464e165A65B7323b0DEE": {
+      "reportedMetadataOnly": {
+        "name": "PancakeSwap Token",
+        "symbol": "Cake",
+        "decimals": 18
+      },
+      "runtimeBytes": 8796,
+      "runtimeKeccak256": "0x6b9d0521473366d6a5e75ddacee104389f35f6f877fc08dc3aa339400e71a828",
+      "officialPancakeDocumentationLabelsAddressAsDummyToken": true,
+      "unrestrictedMint": true,
+      "totalSupplyIsUint256Max": true,
+      "strictAdmissionResult": "fail_dummy_max_supply_unguarded_mint_surface",
+      "detailEvidence": "evidence/development/pancake-v3-testnet-cake-wbnb-verification-2026-08-11.json"
+    },
+    "recentSourceUnknownGroup": {
+      "sourceVerificationService": "Sourcify v2",
+      "sourceLookupResult": "no_match_for_each_token_and_shared_clone_implementation_at_check_time",
+      "sensitiveBehaviorAssessment": "unknown",
+      "strictAdmissionResult": "fail_closed_source_and_control_provenance_unavailable",
+      "sharedEip1167Implementation": {
+        "address": "0x311287cc1d0fa2bba7574d8cfd10edb6f3b71f93",
+        "usedBy": [
+          "0x34330f9f9fa3042bb0b6c6958c1dc8c7996db404",
+          "0x4194f04adc9b5ceaad3056049ed4d7367280175b",
+          "0x118e866995dec05e29f33bfadbd9b608a98a39d2",
+          "0x3f163738d1757e66d12fe91b19f29fbf17a86fda"
+        ],
+        "sourceAvailable": false,
+        "implementationBindingMutableInClone": false,
+        "implementationBehavior": "unknown"
+      },
+      "tokens": [
+        {
+          "address": "0xbc66928f92888001cbb412c941ab20a2deb1f0d1",
+          "reportedMetadataOnly": { "name": "fuck me", "symbol": "FUCKME", "decimals": 18 },
+          "totalSupplyRaw": "1000000000000000000000000000",
+          "runtimeBytes": 5218,
+          "runtimeKeccak256": "0xfaf73203f435dc313cd7c5fa47db76c2bf454fbba056b3e1390cc85905cd7bf7",
+          "deploymentShape": "eip1967_slots_zero_eip1167_not_detected_other_dispatch_unknown"
+        },
+        {
+          "address": "0x34330f9f9fa3042bb0b6c6958c1dc8c7996db404",
+          "reportedMetadataOnly": { "name": "spcxtomoon", "symbol": "SPCXTOMO", "decimals": 18 },
+          "totalSupplyRaw": "1000000000000000000000000000000",
+          "runtimeBytes": 45,
+          "runtimeKeccak256": "0xdcf0f426553ded4ec57864ca31eafafd050f6644aa64136710eddad5c1c4f97b",
+          "deploymentShape": "eip1167_minimal_proxy"
+        },
+        {
+          "address": "0xba28ab361023884d6e6b950bbf7e235fa9b94bd4",
+          "reportedMetadataOnly": { "name": "Monkey", "symbol": "Monkey", "decimals": 0 },
+          "totalSupplyRaw": "10000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "ownerGetterAtAnchor": "0x1c9380979b3baeca4476e02d0d4db4b5e463d392",
+          "runtimeBytes": 3475,
+          "runtimeKeccak256": "0xce62022a6e91b51c372206e90f8469ee860598ce874cab47c026cd263cb4ad10",
+          "deploymentShape": "eip1967_slots_zero_eip1167_not_detected_other_dispatch_unknown"
+        },
+        {
+          "address": "0x4194f04adc9b5ceaad3056049ed4d7367280175b",
+          "reportedMetadataOnly": { "name": "pepe", "symbol": "PEPE1", "decimals": 18 },
+          "totalSupplyRaw": "1000000000000000000000000000000",
+          "runtimeBytes": 45,
+          "runtimeKeccak256": "0xdcf0f426553ded4ec57864ca31eafafd050f6644aa64136710eddad5c1c4f97b",
+          "deploymentShape": "eip1167_minimal_proxy"
+        },
+        {
+          "address": "0x118e866995dec05e29f33bfadbd9b608a98a39d2",
+          "reportedMetadataOnly": { "name": "pepe2", "symbol": "333", "decimals": 18 },
+          "totalSupplyRaw": "1000000000000000000000000000000",
+          "runtimeBytes": 45,
+          "runtimeKeccak256": "0xdcf0f426553ded4ec57864ca31eafafd050f6644aa64136710eddad5c1c4f97b",
+          "deploymentShape": "eip1167_minimal_proxy"
+        },
+        {
+          "address": "0x3f163738d1757e66d12fe91b19f29fbf17a86fda",
+          "reportedMetadataOnly": { "name": "香水", "symbol": "XIANGSHU", "decimals": 18 },
+          "totalSupplyRaw": "1000000000000000000000000000000",
+          "runtimeBytes": 45,
+          "runtimeKeccak256": "0xdcf0f426553ded4ec57864ca31eafafd050f6644aa64136710eddad5c1c4f97b",
+          "deploymentShape": "eip1167_minimal_proxy"
+        }
+      ]
+    }
+  },
+  "candidates": [
+    {
+      "id": "configured-mocka-wbnb-500",
+      "discovery": "official_chapel_config_factory_cross_product",
+      "pool": "0x6e43f017150f283b9905bf52dfe8c384507ef7ea",
+      "counterparty": "0xc1ed9955c11585f47d0d6bfbc29034349a746a81",
+      "token0": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+      "token1": "0xc1ed9955c11585f47d0d6bfbc29034349a746a81",
+      "fee": 500,
+      "tickSpacing": 10,
+      "create2Salt": "0x7045d83cc0fffa17b77ed874ec3eb19bd542bc7024b8dedd440b882ade93efb4",
+      "lineageExact": true,
+      "runtimeKeccak256": "0x83e37b825799b4fb0b896ec889b512810464ce5767a22b519bdd4fbe38d50104",
+      "liquidityRaw": "0",
+      "token0BalanceRaw": "150000000000022",
+      "token1BalanceRaw": "114799703742349917246",
+      "oracle": {
+        "observationCardinality": 1,
+        "observationCardinalityNext": 1,
+        "currentObservationTimestamp": "1722614177",
+        "currentObservationAgeSecondsAtAnchor": "63848288"
+      },
+      "componentDecisions": {
+        "poolFactoryDeployerLineage": "pass",
+        "sharedWbnb": "non_ready_source_reproduction_incomplete",
+        "counterparty": "fail_unrestricted_public_mint",
+        "liquidity": "fail_zero_active_liquidity",
+        "oracle": "fail_one_observation"
+      },
+      "decision": "ineligible"
+    },
+    {
+      "id": "configured-mock-usdt-wbnb-100",
+      "discovery": "official_chapel_config_factory_cross_product",
+      "pool": "0xd936b344c329290be03f7fbbfa522215b1615ec9",
+      "counterparty": "0x0fb5d7c73fa349a90392f873a4fa1ecf6a3d0a96",
+      "token0": "0x0fb5d7c73fa349a90392f873a4fa1ecf6a3d0a96",
+      "token1": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+      "fee": 100,
+      "tickSpacing": 1,
+      "create2Salt": "0x1e6a5fab7f902372a845416a6cc2c2879a724dc90e54b90a07330ab832087c44",
+      "lineageExact": true,
+      "runtimeKeccak256": "0x5c7b74e30186195ff63810227a4bd5f14ceb734c698eb94286a6b0aa5aaf564c",
+      "liquidityRaw": "20006004807681572455",
+      "token0BalanceRaw": "1723000440638006",
+      "token1BalanceRaw": "27733375780934410",
+      "oracle": {
+        "observationCardinality": 1,
+        "observationCardinalityNext": 1,
+        "currentObservationTimestamp": "1759505171",
+        "currentObservationAgeSecondsAtAnchor": "26957294"
+      },
+      "componentDecisions": {
+        "poolFactoryDeployerLineage": "pass",
+        "sharedWbnb": "non_ready_source_reproduction_incomplete",
+        "counterparty": "fail_unrestricted_public_mint_and_arbitrary_burn",
+        "liquidity": "nonzero_raw_but_not_economically_usable_with_untrusted_token",
+        "oracle": "fail_one_observation"
+      },
+      "decision": "ineligible"
+    },
+    {
+      "id": "configured-mock-usdt-wbnb-2500",
+      "discovery": "official_chapel_config_factory_cross_product",
+      "pool": "0x5147173e452ae4dd23dcee7baaaaab7318f16f6b",
+      "counterparty": "0x0fb5d7c73fa349a90392f873a4fa1ecf6a3d0a96",
+      "token0": "0x0fb5d7c73fa349a90392f873a4fa1ecf6a3d0a96",
+      "token1": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+      "fee": 2500,
+      "tickSpacing": 50,
+      "create2Salt": "0x06e2273701a40787a19a3e660edb8eedf6feb2db6e9e7f83c9582a321cfc01dc",
+      "lineageExact": true,
+      "runtimeKeccak256": "0x96701dd1aaf090af28b10a5aecffd34e81d17d2ce935bfb710eb18a0d9f17fad",
+      "liquidityRaw": "99594242935678435204570",
+      "token0BalanceRaw": "1157410887685148850930203156",
+      "token1BalanceRaw": "14521644618684735972",
+      "oracle": {
+        "observationCardinality": 1,
+        "observationCardinalityNext": 1,
+        "currentObservationTimestamp": "1780163454",
+        "currentObservationAgeSecondsAtAnchor": "6299011"
+      },
+      "componentDecisions": {
+        "poolFactoryDeployerLineage": "pass",
+        "sharedWbnb": "non_ready_source_reproduction_incomplete",
+        "counterparty": "fail_unrestricted_public_mint_and_arbitrary_burn",
+        "liquidity": "nonzero_raw_but_not_economically_usable_with_untrusted_token",
+        "oracle": "fail_one_observation"
+      },
+      "decision": "ineligible"
+    },
+    {
+      "id": "configured-mock-busd-wbnb-100",
+      "discovery": "official_chapel_config_factory_cross_product",
+      "pool": "0x586b77890d0e46ef14f4a23f968b44174d150ce0",
+      "counterparty": "0xab1a4d4f1d656d2450692d237fdd6c7f9146e814",
+      "token0": "0xab1a4d4f1d656d2450692d237fdd6c7f9146e814",
+      "token1": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+      "fee": 100,
+      "tickSpacing": 1,
+      "create2Salt": "0x6598cb60f8652d5c2ef8441eaee43eab20239aa3f30d668fae4b85e63d74d1b8",
+      "lineageExact": true,
+      "runtimeKeccak256": "0xdcf77dcecfebf6b4b448536fb13f1dfe7e81470300a4070f15778bf7bb52ba6a",
+      "liquidityRaw": "35061001768266958813",
+      "token0BalanceRaw": "11753910759186179454223290300",
+      "token1BalanceRaw": "1347661402057495",
+      "oracle": {
+        "observationIndex": 237,
+        "observationCardinality": 1000,
+        "observationCardinalityNext": 1000,
+        "oldestInitializedObservationTimestamp": "1714706258",
+        "currentObservationTimestamp": "1779287094",
+        "currentObservationAgeSecondsAtAnchor": "7175371"
+      },
+      "componentDecisions": {
+        "poolFactoryDeployerLineage": "pass",
+        "sharedWbnb": "non_ready_source_reproduction_incomplete",
+        "counterparty": "fail_unrestricted_public_mint_and_arbitrary_burn",
+        "liquidity": "nonzero_raw_but_not_economically_usable_with_untrusted_token",
+        "oracle": "fail_stale_latest_observation"
+      },
+      "decision": "ineligible"
+    },
+    {
+      "id": "configured-mock-busd-wbnb-500",
+      "discovery": "official_chapel_config_factory_cross_product",
+      "pool": "0xef1509b7fef4a7dfc94c45fe9af2028ca083d11d",
+      "counterparty": "0xab1a4d4f1d656d2450692d237fdd6c7f9146e814",
+      "token0": "0xab1a4d4f1d656d2450692d237fdd6c7f9146e814",
+      "token1": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+      "fee": 500,
+      "tickSpacing": 10,
+      "create2Salt": "0xa3cf8dc45d4dc1f3ac64ee941fb308785c7db33e583cf205ac65875d2d2c7fc3",
+      "lineageExact": true,
+      "runtimeKeccak256": "0x853a0cef65571b99afc83e5b17acaeabff8434a33a4491919e97746a542dd426",
+      "liquidityRaw": "43468366460590744485",
+      "token0BalanceRaw": "768320541915788275226299",
+      "token1BalanceRaw": "10526647968923937",
+      "oracle": {
+        "observationIndex": 88,
+        "observationCardinality": 1000,
+        "observationCardinalityNext": 1000,
+        "oldestInitializedObservationTimestamp": "1709548125",
+        "currentObservationTimestamp": "1778644954",
+        "currentObservationAgeSecondsAtAnchor": "7817511"
+      },
+      "componentDecisions": {
+        "poolFactoryDeployerLineage": "pass",
+        "sharedWbnb": "non_ready_source_reproduction_incomplete",
+        "counterparty": "fail_unrestricted_public_mint_and_arbitrary_burn",
+        "liquidity": "nonzero_raw_but_not_economically_usable_with_untrusted_token",
+        "oracle": "fail_stale_latest_observation"
+      },
+      "decision": "ineligible"
+    },
+    {
+      "id": "configured-mock-busd-wbnb-2500",
+      "discovery": "official_chapel_config_factory_cross_product",
+      "pool": "0xcbb1a7c864e5ebef28e8570357dd316002666992",
+      "counterparty": "0xab1a4d4f1d656d2450692d237fdd6c7f9146e814",
+      "token0": "0xab1a4d4f1d656d2450692d237fdd6c7f9146e814",
+      "token1": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+      "fee": 2500,
+      "tickSpacing": 50,
+      "create2Salt": "0xbc7617299f971076fa801157d700ef5fbfdf51e5d2ba3cc5235c2d342279413a",
+      "lineageExact": true,
+      "runtimeKeccak256": "0xc235536ca7005df9f171bb894d533f6cd47053324a18155fe5bccae809d8c1dc",
+      "liquidityRaw": "34382573083003176799376",
+      "token0BalanceRaw": "6939013923684211976957480449470721",
+      "token1BalanceRaw": "333522689842865340",
+      "oracle": {
+        "observationIndex": 332,
+        "observationCardinality": 1000,
+        "observationCardinalityNext": 1000,
+        "oldestInitializedObservationTimestamp": "1717160144",
+        "currentObservationTimestamp": "1776513182",
+        "currentObservationAgeSecondsAtAnchor": "9949283"
+      },
+      "componentDecisions": {
+        "poolFactoryDeployerLineage": "pass",
+        "sharedWbnb": "non_ready_source_reproduction_incomplete",
+        "counterparty": "fail_unrestricted_public_mint_and_arbitrary_burn",
+        "liquidity": "nonzero_raw_but_not_economically_usable_with_untrusted_token",
+        "oracle": "fail_stale_latest_observation"
+      },
+      "decision": "ineligible"
+    },
+    {
+      "id": "configured-mock-busd-wbnb-10000",
+      "discovery": "official_chapel_config_factory_cross_product",
+      "pool": "0x0e2c8fc122e86b571a508185f00881e2d1d81ac2",
+      "counterparty": "0xab1a4d4f1d656d2450692d237fdd6c7f9146e814",
+      "token0": "0xab1a4d4f1d656d2450692d237fdd6c7f9146e814",
+      "token1": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "create2Salt": "0x8792737e5aaefb3f3d6b1e893406b7e911caadedc639aa090ae339f4a052ec64",
+      "lineageExact": true,
+      "runtimeKeccak256": "0x14d8da196746c32abad6d0b0c3635c4b55c2b23423ec2b4dd8bd37e03427ce16",
+      "liquidityRaw": "3606463140764246636286933",
+      "token0BalanceRaw": "30834283954202120989267413765717875",
+      "token1BalanceRaw": "2007078341227293207",
+      "oracle": {
+        "observationIndex": 361,
+        "observationCardinality": 1000,
+        "observationCardinalityNext": 1000,
+        "oldestInitializedObservationTimestamp": "1716165662",
+        "currentObservationTimestamp": "1785511848",
+        "currentObservationAgeSecondsAtAnchor": "950617"
+      },
+      "componentDecisions": {
+        "poolFactoryDeployerLineage": "pass",
+        "sharedWbnb": "non_ready_source_reproduction_incomplete",
+        "counterparty": "fail_unrestricted_public_mint_and_arbitrary_burn",
+        "liquidity": "nonzero_raw_but_not_economically_usable_with_untrusted_token",
+        "oracle": "fail_stale_latest_observation"
+      },
+      "decision": "ineligible"
+    },
+    {
+      "id": "official-dummy-cake-wbnb-500",
+      "discovery": "prior_official_dummy_pool_review",
+      "pool": "0xeaf78e3aa2c19df9495318cd9ea2ad83be7d5015",
+      "counterparty": "0xfa60d973f7642b748046464e165A65B7323b0DEE",
+      "token0": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+      "token1": "0xfa60d973f7642b748046464e165A65B7323b0DEE",
+      "fee": 500,
+      "tickSpacing": 10,
+      "create2Salt": "0x9f4899b3fcc0331140c69ffc65ca544db9f89d1b2f889dfb1ed16c427cd7ad99",
+      "lineageExact": true,
+      "runtimeKeccak256": "0x829cb2fca10db13c6c7f0a1a576e7e5d812e1209a8c5aa516924de8d34bcc13f",
+      "liquidityRaw": "38646829250992288858564901",
+      "token0BalanceRaw": "2322443369138505808",
+      "token1BalanceRaw": "19413749622293206442236079206181",
+      "oracle": {
+        "observationCardinality": 1,
+        "observationCardinalityNext": 1,
+        "currentObservationTimestamp": "1785197733",
+        "currentObservationAgeSecondsAtAnchor": "1264732"
+      },
+      "componentDecisions": {
+        "poolFactoryDeployerLineage": "pass",
+        "sharedWbnb": "non_ready_source_reproduction_incomplete",
+        "counterparty": "fail_dummy_max_supply_unguarded_mint_surface",
+        "liquidity": "nonzero_raw_but_not_economically_usable_with_dummy_token",
+        "oracle": "fail_one_observation"
+      },
+      "decision": "ineligible"
+    },
+    {
+      "id": "recent-fuckme-wbnb-2500",
+      "discovery": "recent_factory_poolcreated_event",
+      "pool": "0x98421fcdfa4280efad26d85df6ec93b7e7ffd1de",
+      "counterparty": "0xbc66928f92888001cbb412c941ab20a2deb1f0d1",
+      "token0": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+      "token1": "0xbc66928f92888001cbb412c941ab20a2deb1f0d1",
+      "fee": 2500,
+      "tickSpacing": 50,
+      "creation": {
+        "blockNumber": "124411880",
+        "blockHash": "0xbc0e0764676b198b391ed2a27c692f342b779b933f67c4eaa23feb47b365ea17",
+        "timestampUnix": "1786431717",
+        "transactionHash": "0x13843aa4796f1f2d3f597b4b05457dc412736a80e2ec1d7d33d87683cbc436ee"
+      },
+      "create2Salt": "0x27fe67c64db8b18c6ad6f726e96402f6edf1556d40f71925957f3606c56e747a",
+      "lineageExact": true,
+      "runtimeKeccak256": "0x1124f9da3cd624c53d072dc2b632674cebb0e8a95a42d063420804bca31c512c",
+      "liquidityRaw": "1729916701249551815330952",
+      "token0BalanceRaw": "76417384373960794",
+      "token1BalanceRaw": "999974529138883264985384741",
+      "oracle": { "observationCardinality": 1, "observationCardinalityNext": 1 },
+      "componentDecisions": {
+        "poolFactoryDeployerLineage": "pass",
+        "sharedWbnb": "non_ready_source_reproduction_incomplete",
+        "counterparty": "fail_closed_source_and_control_provenance_unavailable",
+        "liquidity": "nonzero_raw_but_not_economically_usable_with_unverified_token",
+        "oracle": "fail_one_observation"
+      },
+      "decision": "ineligible"
+    },
+    {
+      "id": "recent-spcxtomoon-wbnb-10000",
+      "discovery": "recent_factory_poolcreated_event",
+      "pool": "0xf1cf36798b35a6340f923285e60ae97424b01b5a",
+      "counterparty": "0x34330f9f9fa3042bb0b6c6958c1dc8c7996db404",
+      "token0": "0x34330f9f9fa3042bb0b6c6958c1dc8c7996db404",
+      "token1": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "creation": {
+        "blockNumber": "124410368",
+        "blockHash": "0x3c005e57123bc8596dd948ddde6d4db854465b75f2accd9ea6f17b1c6247053c",
+        "timestampUnix": "1786431028",
+        "transactionHash": "0x33571953f4ae010606fc8f82f700fd3e89319d149bc3bb469b2451ca0cfd01f0"
+      },
+      "create2Salt": "0xbde7dc7cb5731dd6bdb7210090ea025aaef12fec1acc016b30f9dd2f0a443a8d",
+      "lineageExact": true,
+      "runtimeKeccak256": "0x4d23ff4892f874d19bc0aa2e93e81c7cd85d43113a5afae0dba6f5329322db78",
+      "liquidityRaw": "4423083448066091684606",
+      "token0BalanceRaw": "999881344156425328217946695",
+      "token1BalanceRaw": "10000000000000000",
+      "oracle": { "observationCardinality": 1, "observationCardinalityNext": 1 },
+      "componentDecisions": {
+        "poolFactoryDeployerLineage": "pass",
+        "sharedWbnb": "non_ready_source_reproduction_incomplete",
+        "counterparty": "fail_closed_unverified_eip1167_implementation",
+        "liquidity": "nonzero_raw_but_not_economically_usable_with_unverified_token",
+        "oracle": "fail_one_observation"
+      },
+      "decision": "ineligible"
+    },
+    {
+      "id": "recent-monkey-wbnb-2500",
+      "discovery": "recent_factory_poolcreated_event",
+      "pool": "0x5c2f50c2bb22e48478be78e06866771d4eceb65f",
+      "counterparty": "0xba28ab361023884d6e6b950bbf7e235fa9b94bd4",
+      "token0": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+      "token1": "0xba28ab361023884d6e6b950bbf7e235fa9b94bd4",
+      "fee": 2500,
+      "tickSpacing": 50,
+      "creation": {
+        "blockNumber": "124461953",
+        "blockHash": "0x6452ad8af79d4e6ae664ebf0946f4dfe3378c9bbcba8a8f988ffbb12abc50d9d",
+        "timestampUnix": "1786454250",
+        "transactionHash": "0x64222a1371fb62c684509d2bbb0fe2282a17331e248a5ef963f9e99fab89dc9e"
+      },
+      "create2Salt": "0x0ede0ee8dc0012712907b1c5ff8be93644e5afef834080592b9c19d337780904",
+      "lineageExact": true,
+      "runtimeKeccak256": "0xa2751b00e56ddb271f095cbed223423c967790923753070c0a07768848cbd10a",
+      "liquidityRaw": "9999986780872001214259",
+      "token0BalanceRaw": "10000004993501896",
+      "token1BalanceRaw": "9999973561760934247081297817",
+      "oracle": { "observationCardinality": 1, "observationCardinalityNext": 1 },
+      "componentDecisions": {
+        "poolFactoryDeployerLineage": "pass",
+        "sharedWbnb": "non_ready_source_reproduction_incomplete",
+        "counterparty": "fail_closed_source_unknown_nonzero_owner_decimals_zero",
+        "liquidity": "nonzero_raw_but_not_economically_usable_with_unverified_token",
+        "oracle": "fail_one_observation"
+      },
+      "decision": "ineligible"
+    },
+    {
+      "id": "recent-pepe1-wbnb-10000",
+      "discovery": "recent_factory_poolcreated_event",
+      "pool": "0xfae647395b50e55af3314e36a4e405bb2703abdf",
+      "counterparty": "0x4194f04adc9b5ceaad3056049ed4d7367280175b",
+      "token0": "0x4194f04adc9b5ceaad3056049ed4d7367280175b",
+      "token1": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "creation": {
+        "blockNumber": "124462947",
+        "blockHash": "0x3af5412e96b441abf4d85975f3fb7a616a88c4fd304070d6f654a75710248556",
+        "timestampUnix": "1786454697",
+        "transactionHash": "0xf552a68c2492448319015c6265cef1f7f82a64f1297b6bee22782b1e90923b1c"
+      },
+      "create2Salt": "0x61ebf2116b6a8843c82f356ebab6dbaad915c02355965287b28b0f63fda5f7a7",
+      "lineageExact": true,
+      "runtimeKeccak256": "0x5372c2fd2523e8722d467dbfe4e496ad52af07fae18777d6f646ad963a1d7de5",
+      "liquidityRaw": "4423083448066091684606",
+      "token0BalanceRaw": "999881344156425328217946695",
+      "token1BalanceRaw": "10000000000000000",
+      "oracle": { "observationCardinality": 1, "observationCardinalityNext": 1 },
+      "componentDecisions": {
+        "poolFactoryDeployerLineage": "pass",
+        "sharedWbnb": "non_ready_source_reproduction_incomplete",
+        "counterparty": "fail_closed_unverified_eip1167_implementation",
+        "liquidity": "nonzero_raw_but_not_economically_usable_with_unverified_token",
+        "oracle": "fail_one_observation"
+      },
+      "decision": "ineligible"
+    },
+    {
+      "id": "recent-pepe2-wbnb-10000",
+      "discovery": "recent_factory_poolcreated_event",
+      "pool": "0xb125cde84e1d6443f0b1ef316a31e3959066a513",
+      "counterparty": "0x118e866995dec05e29f33bfadbd9b608a98a39d2",
+      "token0": "0x118e866995dec05e29f33bfadbd9b608a98a39d2",
+      "token1": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "creation": {
+        "blockNumber": "124466102",
+        "blockHash": "0xe5eaae37e94b19e910c613bf57ecf2a6620d6da8e91f2af49bbbf164c2ece578",
+        "timestampUnix": "1786456117",
+        "transactionHash": "0x9886c81b207fbe5b3aefec7e2665b9f4fd124e58532f4db79e96e0a48ec5a203"
+      },
+      "create2Salt": "0xa945e8083a25437460b06b68e11d9d0eeddaafc4b68848cff579bc27840ba57e",
+      "lineageExact": true,
+      "runtimeKeccak256": "0x1f396f2f37c859f077f1b9c84e8f3443e5a66f9995b30eeba712a122f8f6d16c",
+      "liquidityRaw": "4423083448066091684606",
+      "token0BalanceRaw": "999881344156425328217946695",
+      "token1BalanceRaw": "10000000000000000",
+      "oracle": { "observationCardinality": 1, "observationCardinalityNext": 1 },
+      "componentDecisions": {
+        "poolFactoryDeployerLineage": "pass",
+        "sharedWbnb": "non_ready_source_reproduction_incomplete",
+        "counterparty": "fail_closed_unverified_eip1167_implementation",
+        "liquidity": "nonzero_raw_but_not_economically_usable_with_unverified_token",
+        "oracle": "fail_one_observation"
+      },
+      "decision": "ineligible"
+    },
+    {
+      "id": "recent-xiangshu-wbnb-10000",
+      "discovery": "recent_factory_poolcreated_event",
+      "pool": "0xb8370440597effc5b13288b1e72932c1ef65dd05",
+      "counterparty": "0x3f163738d1757e66d12fe91b19f29fbf17a86fda",
+      "token0": "0x3f163738d1757e66d12fe91b19f29fbf17a86fda",
+      "token1": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "creation": {
+        "blockNumber": "124472147",
+        "blockHash": "0xc97d7b86d5fbe5d4832fa5e078da70b775c0142c4db84b37401ef5ca6b10e1fe",
+        "timestampUnix": "1786458837",
+        "transactionHash": "0x37827b423e7dc97c9f97e05af4f9469fcf726ec624073dba6c65f069fb24cd9c"
+      },
+      "create2Salt": "0x4841be410bb439fb8037d08b4bcf4077788f5c7d46ef89e73b3e1d408df3a919",
+      "lineageExact": true,
+      "runtimeKeccak256": "0x7817bb2c095380dc0305c91dd13289f3733ea3ad5676af2dcb8416d421341b8e",
+      "liquidityRaw": "4423083448066091684606",
+      "token0BalanceRaw": "999881344156425328217946695",
+      "token1BalanceRaw": "10000000000000000",
+      "oracle": { "observationCardinality": 1, "observationCardinalityNext": 1 },
+      "componentDecisions": {
+        "poolFactoryDeployerLineage": "pass",
+        "sharedWbnb": "non_ready_source_reproduction_incomplete",
+        "counterparty": "fail_closed_unverified_eip1167_implementation",
+        "liquidity": "nonzero_raw_but_not_economically_usable_with_unverified_token",
+        "oracle": "fail_one_observation"
+      },
+      "decision": "ineligible"
+    }
+  ],
+  "methodology": {
+    "admissionGates": [
+      "Exact official factory, pool-deployer, pool source, factory mapping, pool getter, and CREATE2 lineage.",
+      "Exact counterparty runtime/source provenance and explicit proxy/upgrade/admin assessment.",
+      "No public mint, unauthorized burn, transfer fee, blacklist, pause, hook, rebase, unsafe proxy, or unexplained mutable control.",
+      "Nonzero liquidity and balances that remain economically meaningful after token-integrity review.",
+      "More than one initialized oracle observation, useful time coverage, and sufficiently recent activity for the intended policy.",
+      "Shared WBNB strict source provenance, not only behavioral similarity or an explorer label."
+    ],
+    "failClosedRules": [
+      "A symbol or official configuration entry is not token safety evidence.",
+      "Nonzero raw liquidity is not usable liquidity when either token can be freely minted, arbitrarily burned, or lacks source/control proof.",
+      "A zero EIP-1967 slot does not prove a contract has no custom proxy, admin, fee, hook, blacklist, pause, or rebase mechanism.",
+      "A failed owner() call does not prove the absence of privileged control.",
+      "A one-observation pool cannot support a historical TWAP even if its liquidity field is nonzero.",
+      "A source-verification runtime match establishes code equivalence, not publisher identity or economic legitimacy."
+    ],
+    "readOnlyZeroAmountSimulationBoundary": "Calling mint or burnFrom with amount zero through eth_call shows whether caller authorization is reached without changing state. It is not a transaction, positive-amount execution, or supply-change claim.",
+    "reproductionOutline": [
+      "Fetch finalized heads from both recorded providers and choose the lower head confirmed by both.",
+      "Read the pinned official Chapel configuration and cross WBNB with each configured non-WBNB address at fee tiers 100, 500, 2500, and 10000.",
+      "Call factory.getPool for all 16 combinations using the canonical EIP-1898 block selector.",
+      "Query the declared recent block interval for PoolCreated with WBNB in each indexed token position, then re-read each event by blockHash.",
+      "For every nonzero pool, read identity, liquidity, slot0, observations where relevant, and token balances at the canonical block.",
+      "Bind every pool to the exact official init code with CREATE2 and independently review each counterparty's runtime, source, proxy shape, and sensitive behavior.",
+      "Fail closed on every hard failure or missing proof and do not rank raw balances as economic value."
+    ]
+  },
+  "sourceUrls": [
+    "https://docs.bnbchain.org/bnb-smart-chain/developers/json_rpc/json-rpc-endpoint/",
+    "https://github.com/pancakeswap/pancake-v3-contracts",
+    "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/deployments/bscTestnet.json",
+    "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-core/contracts/PancakeV3Pool.sol",
+    "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-core/contracts/PancakeV3Factory.sol",
+    "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-core/contracts/PancakeV3PoolDeployer.sol",
+    "https://github.com/pancakeswap/exchange-v3-subgraphs/commit/2f6248444994ff1c2a5f0b601324d1f531355ccf",
+    "https://github.com/pancakeswap/exchange-v3-subgraphs/blob/2f6248444994ff1c2a5f0b601324d1f531355ccf/config/chapel.js",
+    "https://docs.sourcify.dev/docs/api/index.html",
+    "https://testnet.bscscan.com/address/0xae13d989dac2f0debff460ac112a837c89baa7cd#code",
+    "https://testnet.bscscan.com/address/0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865#code"
+  ],
+  "limitations": [
+    "This is a deliberately bounded search, not an exhaustive factory-lifetime inventory. The exact uncovered historical interval is stated under coverage.",
+    "The public archive endpoint rate-limited a complete historical event scan; partial responses were discarded rather than represented as complete.",
+    "The official Chapel configuration is dated 2025-05-14 and may omit later or unconfigured pools; it was used only as an official address seed.",
+    "All economic quantities are raw onchain units. No price, USD value, capacity, slippage, or exit-liquidity claim is made.",
+    "Recent counterparty sources and the shared EIP-1167 implementation were unavailable from Sourcify at check time; sensitive behavior therefore remains unknown and fails closed.",
+    "Sourcify exact matches prove runtime/source equivalence for the three configured mocks, not author or publisher identity.",
+    "WBNB's positive behavior review is not strict source provenance because the raw explorer compiler input and exact local rebuild are not retained.",
+    "Factory owner and LM-pool controls remain mutable protocol dependencies even when pool bytecode lineage is exact.",
+    "No ProofEra-controlled position, allowance, wallet, session, or execution authority is established by this report."
+  ]
+}

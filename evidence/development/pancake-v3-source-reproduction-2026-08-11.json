@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-08-11T14:25:41.000Z",
+  "environment": "development",
+  "chainId": 97,
+  "claimStatus": "static_reproduction_summary_incomplete_not_activation_ready",
+  "retention": {
+    "kind": "bounded_summary_not_raw_build_artifacts",
+    "rawCompilerInputRetained": false,
+    "rawCompilerSettingsRetained": false,
+    "rawBuildInfoRetainedInRepositoryEvidence": false,
+    "authenticatedIndependentApprovalRetained": false,
+    "freshObservationEvidenceRetained": false
+  },
+  "officialSource": {
+    "repository": "https://github.com/pancakeswap/pancake-v3-contracts",
+    "initialDeploymentAndSourceCommit": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+    "comparisonCommit": "986847948755cba528324d41be19480731c36c2a",
+    "comparisonFinding": "relevant_files_byte_identical",
+    "urls": [
+      "https://github.com/pancakeswap/pancake-v3-contracts/blob/986847948755cba528324d41be19480731c36c2a/deployments/bscTestnet.json",
+      "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-periphery/contracts/NonfungiblePositionManager.sol",
+      "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-periphery/contracts/base/Multicall.sol",
+      "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-periphery/hardhat.config.ts",
+      "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-periphery/scripts/deploy2.ts",
+      "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-core/contracts/PancakeV3Factory.sol",
+      "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-core/contracts/PancakeV3PoolDeployer.sol",
+      "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-core/contracts/PancakeV3Pool.sol",
+      "https://github.com/pancakeswap/pancake-v3-contracts/blob/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-core/hardhat.config.ts"
+    ]
+  },
+  "unclassifiedSourceArchive": {
+    "sha256": "fa9d8efea22eec90b3cffce9f47a602af3b3aef539d2c2258faf3b87ff510fe8",
+    "format": null,
+    "locator": null,
+    "captureCommand": null,
+    "eligibleAsDomainSourceTreeDigest": false,
+    "reason": "The returned research report did not retain the archive format, locator, or capture command."
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.7.6+commit.7338295f",
+    "officialReleaseList": "https://binaries.soliditylang.org/windows-amd64/list.json",
+    "binarySha256": "9214e06741c5cb51a61d745697c905f37480c0c8da1d5ac69e3bacda0063dfa5",
+    "binaryKeccak256": "4fbd020496c3a9e02c1eeb825d23f4d83d9198c4e21fda19deccdb7e74435edf",
+    "settings": {
+      "evmVersion": "istanbul",
+      "viaIr": false,
+      "metadataBytecodeHash": "none",
+      "optimizerRuns": {
+        "NonfungiblePositionManager": 2000,
+        "PancakeV3Factory": 1000000,
+        "PancakeV3PoolDeployer": 400,
+        "PancakeV3Pool": 400
+      }
+    },
+    "compilerInputSha256": null,
+    "compilerSettingsSha256": null
+  },
+  "managerBuild": {
+    "artifactSha256": "9e5bca807e38e9e8acadd81c5dec6668f847a7e3397d91b3afed74b066cfbb2a",
+    "buildInfoSha256": "72adeccd4f25257a89d95d3e0f1d8b9b0e5ab8400b2b828bab236b786ae2c7aa",
+    "creationByteLength": 25445,
+    "creationCodeKeccak256": "7d67b6a4c37bcd57f4daa2257fca238ed918cb6294d1e5e9b4eccf87e34e25e9",
+    "runtimeTemplateByteLength": 24466,
+    "runtimeTemplateKeccak256": "91d390a2f85270716bdc52a7782842724fee537f3f8c4e282ce31b98eea7807b",
+    "immutableLinkedRuntimeByteLength": 24466,
+    "immutableLinkedRuntimeKeccak256": "d86730989544d7a3ea034c8a322733683137cf70b0f49231fd88405eac6098d7"
+  },
+  "historicalCanonicalObservation": {
+    "blockNumber": "124471044",
+    "blockHash": "0x214d1b1b3f7c724d32812c6829034dff989ff7e61dc580e46c5134053fb5aca6",
+    "blockTimestamp": "2026-08-11T14:25:41.000Z",
+    "providerEvidenceRetained": false,
+    "reusableAsFreshObservation": false,
+    "contracts": {
+      "manager": {
+        "address": "0x427bF5b37357632377eCbEC9de3626C71A5396c1",
+        "runtimeByteLength": 24466,
+        "runtimeCodeHash": "0xd86730989544d7a3ea034c8a322733683137cf70b0f49231fd88405eac6098d7"
+      },
+      "factory": {
+        "address": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+        "runtimeByteLength": 5151,
+        "runtimeCodeHash": "0x8191d3ab1d55d3da9822199f28865415c99566b6f1aee4a4b16713f57930678c"
+      },
+      "deployer": {
+        "address": "0x41ff9AA7e16B8B1a8a8dc4f0eFacd93D02d071c9",
+        "runtimeByteLength": 24556,
+        "runtimeCodeHash": "0xedd527f11646c1912dfc51b57ffa0ee27972f8798bcaf7bc68ae6ad054b6022b"
+      }
+    },
+    "managerConstructorImmutables": {
+      "deployer": "0x41ff9AA7e16B8B1a8a8dc4f0eFacd93D02d071c9",
+      "factory": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+      "wrappedNative": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+      "tokenDescriptor": "0xb099b459887bC759dBF0293E12D3DFcD0C456cff"
+    },
+    "managerDerivedDomainHashes": {
+      "nameHash": "0xc8147ae4d95e1ae5d91d5822a926bbc8b3167bc4efcba3aad25887e8d7e1ada0",
+      "versionHash": "0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6"
+    }
+  },
+  "managerControlPathReview": {
+    "deploymentKind": "direct_non_upgradeable_contract",
+    "eip1967ImplementationSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "eip1967AdminSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "eip1967BeaconSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "minimalProxyPatternFound": false,
+    "upgradeSelectorFound": false,
+    "callcodeFound": false,
+    "selfdestructFound": false,
+    "delegatecall": {
+      "reachable": true,
+      "programCounter": 10522,
+      "source": "projects/v3-periphery/contracts/base/Multicall.sol",
+      "semantics": "self_delegatecall_for_multicall",
+      "requiredPolicy": "deny every multicall selector, nested calldata, and all unlisted selectors"
+    },
+    "compatibleWithCurrentDomainNoReachableDelegatecallAssessment": false
+  },
+  "descriptorBoundary": {
+    "address": "0xb099b459887bC759dBF0293E12D3DFcD0C456cff",
+    "kind": "eip1967_proxy",
+    "implementation": "0x769449da49D1Eb1FF44A6B366BE46960fDF46Ad6",
+    "admin": "0x2eebb51c4ee4f6013ecc9e60dca1be1603c555ea",
+    "role": "token_uri_metadata_only",
+    "metadataTrusted": false,
+    "eligibleAsManagerWriteTarget": false,
+    "implementationSourceReviewedForWrites": false
+  },
+  "thirdPartyReadFixtureBoundary": {
+    "positionId": "36761",
+    "prooferaControlsPosition": false,
+    "pool": {
+      "address": "0xe62112438bDC81d225bc35298d4829ac4fAc8945",
+      "runtimeCodeHash": "0x9d143766c2b4fe625e47e468e615fcab0317131e4634b8c3993292de8a5fcffd",
+      "writeEligible": false
+    },
+    "token0": {
+      "address": "0x3a4a356381d3061d5f29013e8e12acfed701dba6",
+      "reportedSymbol": "XYU",
+      "completeRuntimeCodeHashRetained": false,
+      "sourceProofComplete": false,
+      "writeEligible": false
+    },
+    "token1": {
+      "address": "0xddf6c57e618f267c135f0c56da88091b95c54057",
+      "reportedSymbol": "TestUSDT",
+      "completeRuntimeCodeHashRetained": false,
+      "sourceProofComplete": false,
+      "writeEligible": false
+    },
+    "activationEligible": false
+  },
+  "boundaries": {
+    "sourceReviewComplete": false,
+    "writeTargetAttestationReady": false,
+    "executionAuthorized": false,
+    "signatureRequested": false,
+    "transactionSubmitted": false,
+    "walletUsed": false,
+    "missingBeforeSourceReview": [
+      "classified reproducible source-tree digest",
+      "compiler-input SHA-256",
+      "compiler-settings SHA-256",
+      "hosted reproducible-build evidence",
+      "authenticated independent direct-scope review",
+      "fresh independent exact-block code, storage, and immutable observation"
+    ]
+  }
+}

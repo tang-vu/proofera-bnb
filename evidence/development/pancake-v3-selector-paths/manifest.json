@@ -1,0 +1,243 @@
+{
+  "activationEligible": false,
+  "analyzedAt": "2026-08-11T15:55:00.907Z",
+  "bindings": {
+    "chainId": 97,
+    "compileOnlyConfigSha256": "0xceeccf77dc8340ca344ad99bf12f710cf864c02f99400beb88e247d4191c1f5b",
+    "compilerInputSha256": "0x086382b3301a745dae7d0b66878cd1c1a4433cf7b1d7725efc546511811b3c38",
+    "compilerLongVersion": "0.7.6+commit.7338295f",
+    "compilerOutputArtifactSha256": "0x9e5bca807e38e9e8acadd81c5dec6668f847a7e3397d91b3afed74b066cfbb2a",
+    "compilerSettingsSha256": "0xa1af16a691f74364a753be9855c4f0865f1fef27a515a65ee0a866c991a6c1a1",
+    "localBuildInfoSha256": "0xff2166c707d60e451ff80e6096d9b2e792eb23a27d27964299ec203fb8d763b7",
+    "managerAddress": "0x427bf5b37357632377ecbec9de3626c71a5396c1",
+    "managerRuntimeCodeHash": "0xd86730989544d7a3ea034c8a322733683137cf70b0f49231fd88405eac6098d7",
+    "managerRuntimeLength": 24466,
+    "sourceCommit": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+    "sourceTreeSha256": "0xb3cd0b3fd4563287f587c2776eac78e5b5a4ad98f6c805a005df10727bee782d",
+    "writeScopeSha256": "0x3a80eb853ccea37b7a1d04430a015d22941fd7a7cd2d8ab9d31b896fc74d5218"
+  },
+  "buildInfoProvenance": {
+    "currentLocalSelectorReviewBuildInfoSha256": "0xff2166c707d60e451ff80e6096d9b2e792eb23a27d27964299ec203fb8d763b7",
+    "earlierRetainedBuildInfoBytesAvailableForComparison": false,
+    "earlierRetainedBuildInfoSha256": "0x72adeccd4f25257a89d95d3e0f1d8b9b0e5ab8400b2b828bab236b786ae2c7aa",
+    "explanation": "Raw Hardhat build-info is a larger compiler input/output container. The earlier raw bytes were not retained, so the byte-level cause of the different container hash is unknown and is not asserted. The earlier hash is provenance only and is not substituted for this reproduction's exact local build-info binding.",
+    "independentlyMatchingOutputs": {
+      "compilerLongVersion": "0.7.6+commit.7338295f",
+      "compilerOutputArtifactSha256": "0x9e5bca807e38e9e8acadd81c5dec6668f847a7e3397d91b3afed74b066cfbb2a",
+      "linkedRuntimeKeccak256": "0xd86730989544d7a3ea034c8a322733683137cf70b0f49231fd88405eac6098d7",
+      "runtimeTemplateKeccak256": "0x91d390a2f85270716bdc52a7782842724fee537f3f8c4e282ce31b98eea7807b"
+    },
+    "locallyVerifiedInputs": {
+      "compilerInputSha256": "0x086382b3301a745dae7d0b66878cd1c1a4433cf7b1d7725efc546511811b3c38",
+      "compilerSettingsSha256": "0xa1af16a691f74364a753be9855c4f0865f1fef27a515a65ee0a866c991a6c1a1"
+    }
+  },
+  "canonicalization": "recursive_lexicographic_object_keys_json_utf8_lf_v1",
+  "claimStatus": "local_static_analysis_not_formal_proof_not_activation_ready",
+  "files": [
+    {
+      "artifactType": "pancake_v3_direct_selector_path_local_review",
+      "byteLength": 109725,
+      "bytecodePathSha256": "0x68a21ced45b73b37bd89e8ad6421973320e1bf3b9efb492cedbe86bcd5b12d92",
+      "file": "mint.json",
+      "operation": "mint",
+      "sha256": "0x0741664264ff3a4e86fe2077a1ad03a412487309f3634025fa5c43dc7ece7f65",
+      "sourcePathSha256": "0xdddb7ad83aa59bbb306f007d8435c7a4615fa83066035d53ff26d30727974e0b"
+    },
+    {
+      "artifactType": "pancake_v3_direct_selector_path_local_review",
+      "byteLength": 87951,
+      "bytecodePathSha256": "0xd808d574ec35eca703fb9887cfa4ebdfd00f6f0c5e170554e8e824cf8b9d36d5",
+      "file": "increaseLiquidity.json",
+      "operation": "increaseLiquidity",
+      "sha256": "0x6e2a6b333f7ff6de165ac2395760f5c1d45c690d84080501e968104d7544e82c",
+      "sourcePathSha256": "0x2c1339710ad758c07126f5124f400cdaf1fc3f1fd15d0217d5c3f5656c4d303d"
+    },
+    {
+      "artifactType": "pancake_v3_direct_selector_path_local_review",
+      "byteLength": 49550,
+      "bytecodePathSha256": "0x35005375f912263e702bd734114abaa6b8f67454d8a34e52d707bc83c9964982",
+      "file": "decreaseLiquidity.json",
+      "operation": "decreaseLiquidity",
+      "sha256": "0x18aaede8efa67561ce9e8b4371d5f0b39a5e6370a7bedcf4da16ef2487b92ac9",
+      "sourcePathSha256": "0x3c3816ac37e1aab3ec55b6b670d17b4e742773eb5587488bcabd96053e949aab"
+    },
+    {
+      "artifactType": "pancake_v3_direct_selector_path_local_review",
+      "byteLength": 50384,
+      "bytecodePathSha256": "0xfcc26666a7296f25b9508305e81f96ee3f71cd1bed48cf3d5e52297ebecc3c57",
+      "file": "collect.json",
+      "operation": "collect",
+      "sha256": "0xf44d33f64e296a8c094b064bd6c09c9ec0fd75956be816447c80302c2b19e71e",
+      "sourcePathSha256": "0x2eb7bb2c824cbc2e89ddd2e2de0daffee875eb43aed00d730741555e16d04740"
+    },
+    {
+      "artifactType": "pancake_v3_denied_multicall_boundary_local_review",
+      "byteLength": 13407,
+      "bytecodePathSha256": "0xc1ccf2af8df00a47c2490812343681ec5c55a458f1101acfcaf3dddc53deac29",
+      "file": "denied-multicalls.json",
+      "operation": null,
+      "sha256": "0xb202c17f6ad5fa598a30039b84bc334c832ee67a2df03a1cc711e7786e065707",
+      "sourcePathSha256": "0x95db52d6f8db01ebb90b259db6fea01c3a4120f47f97e594e1bb4a4ebfb68ba5"
+    }
+  ],
+  "immutableLinking": {
+    "linkedReferences": [
+      {
+        "astId": 6127,
+        "byteLength": 32,
+        "byteOffset": 692,
+        "name": "WETH9",
+        "value": "0x000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd"
+      },
+      {
+        "astId": 6119,
+        "byteLength": 32,
+        "byteOffset": 2775,
+        "name": "deployer",
+        "value": "0x00000000000000000000000041ff9aa7e16b8b1a8a8dc4f0efacd93d02d071c9"
+      },
+      {
+        "astId": 6123,
+        "byteLength": 32,
+        "byteOffset": 3598,
+        "name": "factory",
+        "value": "0x0000000000000000000000000bfbcf9fa4f9c56b0f40a671ad40e0805a091865"
+      },
+      {
+        "astId": 6123,
+        "byteLength": 32,
+        "byteOffset": 3797,
+        "name": "factory",
+        "value": "0x0000000000000000000000000bfbcf9fa4f9c56b0f40a671ad40e0805a091865"
+      },
+      {
+        "astId": 5625,
+        "byteLength": 32,
+        "byteOffset": 5390,
+        "name": "nameHash",
+        "value": "0xc8147ae4d95e1ae5d91d5822a926bbc8b3167bc4efcba3aad25887e8d7e1ada0"
+      },
+      {
+        "astId": 5628,
+        "byteLength": 32,
+        "byteOffset": 5423,
+        "name": "versionHash",
+        "value": "0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6"
+      },
+      {
+        "astId": 6127,
+        "byteLength": 32,
+        "byteOffset": 5960,
+        "name": "WETH9",
+        "value": "0x000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd"
+      },
+      {
+        "astId": 6127,
+        "byteLength": 32,
+        "byteOffset": 6206,
+        "name": "WETH9",
+        "value": "0x000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd"
+      },
+      {
+        "astId": 6127,
+        "byteLength": 32,
+        "byteOffset": 6342,
+        "name": "WETH9",
+        "value": "0x000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd"
+      },
+      {
+        "astId": 6119,
+        "byteLength": 32,
+        "byteOffset": 9238,
+        "name": "deployer",
+        "value": "0x00000000000000000000000041ff9aa7e16b8b1a8a8dc4f0efacd93d02d071c9"
+      },
+      {
+        "astId": 6123,
+        "byteLength": 32,
+        "byteOffset": 10955,
+        "name": "factory",
+        "value": "0x0000000000000000000000000bfbcf9fa4f9c56b0f40a671ad40e0805a091865"
+      },
+      {
+        "astId": 4574,
+        "byteLength": 32,
+        "byteOffset": 11057,
+        "name": "_tokenDescriptor",
+        "value": "0x000000000000000000000000b099b459887bc759dbf0293e12d3dfcd0c456cff"
+      },
+      {
+        "astId": 6119,
+        "byteLength": 32,
+        "byteOffset": 11198,
+        "name": "deployer",
+        "value": "0x00000000000000000000000041ff9aa7e16b8b1a8a8dc4f0efacd93d02d071c9"
+      },
+      {
+        "astId": 6119,
+        "byteLength": 32,
+        "byteOffset": 11928,
+        "name": "deployer",
+        "value": "0x00000000000000000000000041ff9aa7e16b8b1a8a8dc4f0efacd93d02d071c9"
+      },
+      {
+        "astId": 6119,
+        "byteLength": 32,
+        "byteOffset": 14133,
+        "name": "deployer",
+        "value": "0x00000000000000000000000041ff9aa7e16b8b1a8a8dc4f0efacd93d02d071c9"
+      },
+      {
+        "astId": 6127,
+        "byteLength": 32,
+        "byteOffset": 15967,
+        "name": "WETH9",
+        "value": "0x000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd"
+      },
+      {
+        "astId": 6127,
+        "byteLength": 32,
+        "byteOffset": 16037,
+        "name": "WETH9",
+        "value": "0x000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd"
+      },
+      {
+        "astId": 6127,
+        "byteLength": 32,
+        "byteOffset": 16153,
+        "name": "WETH9",
+        "value": "0x000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd"
+      }
+    ],
+    "linkedRuntimeKeccak256": "0xd86730989544d7a3ea034c8a322733683137cf70b0f49231fd88405eac6098d7",
+    "runtimeTemplateKeccak256": "0x91d390a2f85270716bdc52a7782842724fee537f3f8c4e282ce31b98eea7807b"
+  },
+  "publicationBoundary": "No artifact in this directory satisfies the required public content-addressed HTTPS/IPFS locator until exact bytes are published and independently re-fetched.",
+  "reproduction": {
+    "checkCommand": "node scripts/pancake-selector-review/generate.mjs --source-root <clean-source-root> --check",
+    "cleanCompileCommandsPowerShell": [
+      "git clone --no-checkout https://github.com/pancakeswap/pancake-v3-contracts.git <clean-source-root>",
+      "git -C <clean-source-root> checkout --detach ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+      "Push-Location <clean-source-root>",
+      "corepack yarn@1.22.22 install --frozen-lockfile --ignore-scripts --non-interactive",
+      "Pop-Location",
+      "Copy-Item -LiteralPath <proofera-root>/scripts/pancake-selector-review/hardhat.proofera.config.cjs -Destination <clean-source-root>/projects/v3-periphery/hardhat.proofera.config.js",
+      "Push-Location <clean-source-root>/projects/v3-periphery",
+      "corepack yarn@1.22.22 hardhat compile --config hardhat.proofera.config.js",
+      "Pop-Location",
+      "node <proofera-root>/scripts/pancake-selector-review/generate.mjs --source-root <clean-source-root> --check"
+    ],
+    "compileOnlyConfigPath": "scripts/pancake-selector-review/hardhat.proofera.config.cjs",
+    "compileOnlyConfigSha256": "0xceeccf77dc8340ca344ad99bf12f710cf864c02f99400beb88e247d4191c1f5b",
+    "prerequisites": [
+      "Git",
+      "Node.js 16.19.1 (official repository pin)",
+      "Corepack Yarn 1.22.22",
+      "access to the official Solidity compiler distribution on the first uncached compile"
+    ],
+    "testCommand": "node --test scripts/pancake-selector-review/review.test.mjs",
+    "writeCommand": "node scripts/pancake-selector-review/generate.mjs --source-root <clean-source-root> --write"
+  },
+  "schemaVersion": 1
+}

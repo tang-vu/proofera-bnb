@@ -1,0 +1,436 @@
+{
+  "activationEligible": false,
+  "analyzedAt": "2026-08-11T15:55:00.907Z",
+  "artifactType": "pancake_v3_denied_multicall_boundary_local_review",
+  "bindings": {
+    "chainId": 97,
+    "compileOnlyConfigSha256": "0xceeccf77dc8340ca344ad99bf12f710cf864c02f99400beb88e247d4191c1f5b",
+    "compilerInputSha256": "0x086382b3301a745dae7d0b66878cd1c1a4433cf7b1d7725efc546511811b3c38",
+    "compilerLongVersion": "0.7.6+commit.7338295f",
+    "compilerOutputArtifactSha256": "0x9e5bca807e38e9e8acadd81c5dec6668f847a7e3397d91b3afed74b066cfbb2a",
+    "compilerSettingsSha256": "0xa1af16a691f74364a753be9855c4f0865f1fef27a515a65ee0a866c991a6c1a1",
+    "localBuildInfoSha256": "0xff2166c707d60e451ff80e6096d9b2e792eb23a27d27964299ec203fb8d763b7",
+    "managerAddress": "0x427bf5b37357632377ecbec9de3626c71a5396c1",
+    "managerRuntimeCodeHash": "0xd86730989544d7a3ea034c8a322733683137cf70b0f49231fd88405eac6098d7",
+    "managerRuntimeLength": 24466,
+    "sourceCommit": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+    "sourceTreeSha256": "0xb3cd0b3fd4563287f587c2776eac78e5b5a4ad98f6c805a005df10727bee782d",
+    "writeScopeSha256": "0x3a80eb853ccea37b7a1d04430a015d22941fd7a7cd2d8ab9d31b896fc74d5218"
+  },
+  "bytecodePath": {
+    "analysisMethod": "solc_ast_reference_closure_plus_deployed_source_map_opcode_intersection_and_dispatcher_decode",
+    "dispatcher": {
+      "abiDecoderPc": 21392,
+      "bodyPc": 10371,
+      "comparePc": 178,
+      "decoderReturnPc": 1667,
+      "jumpiPc": 187,
+      "selector": "0xac9650d8",
+      "wrapperPc": 1653
+    },
+    "effectInstructions": [
+      {
+        "jump": "-",
+        "length": 35,
+        "modifierDepth": 0,
+        "offset": 568,
+        "opcode": "DELEGATECALL",
+        "pc": 10522,
+        "sourcePath": "contracts/base/Multicall.sol"
+      }
+    ],
+    "mappedControlFlowInstructions": [
+      {
+        "jump": "i",
+        "length": 669,
+        "modifierDepth": 0,
+        "offset": 318,
+        "opcode": "JUMP",
+        "pc": 1666,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "i",
+        "length": 669,
+        "modifierDepth": 0,
+        "offset": 318,
+        "opcode": "JUMP",
+        "pc": 1671,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "i",
+        "length": 669,
+        "modifierDepth": 0,
+        "offset": 318,
+        "opcode": "JUMP",
+        "pc": 1684,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "-",
+        "length": 24,
+        "modifierDepth": 0,
+        "offset": 438,
+        "opcode": "JUMPI",
+        "pc": 10391,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "-",
+        "length": 24,
+        "modifierDepth": 0,
+        "offset": 438,
+        "opcode": "JUMPI",
+        "pc": 10422,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "-",
+        "length": 24,
+        "modifierDepth": 0,
+        "offset": 438,
+        "opcode": "JUMPI",
+        "pc": 10445,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "-",
+        "length": 507,
+        "modifierDepth": 0,
+        "offset": 473,
+        "opcode": "JUMPI",
+        "pc": 10462,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "-",
+        "length": 7,
+        "modifierDepth": 0,
+        "offset": 595,
+        "opcode": "JUMPI",
+        "pc": 10476,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "i",
+        "length": 7,
+        "modifierDepth": 0,
+        "offset": 595,
+        "opcode": "JUMP",
+        "pc": 10495,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "i",
+        "length": 35,
+        "modifierDepth": 0,
+        "offset": 568,
+        "opcode": "JUMP",
+        "pc": 10509,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "-",
+        "length": 35,
+        "modifierDepth": 0,
+        "offset": 568,
+        "opcode": "DELEGATECALL",
+        "pc": 10522,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "-",
+        "length": 35,
+        "modifierDepth": 0,
+        "offset": 568,
+        "opcode": "JUMPI",
+        "pc": 10535,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "-",
+        "length": 35,
+        "modifierDepth": 0,
+        "offset": 568,
+        "opcode": "JUMP",
+        "pc": 10568,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "-",
+        "length": 313,
+        "modifierDepth": 0,
+        "offset": 620,
+        "opcode": "JUMPI",
+        "pc": 10584,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "-",
+        "length": 32,
+        "modifierDepth": 0,
+        "offset": 734,
+        "opcode": "JUMPI",
+        "pc": 10594,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "i",
+        "length": 28,
+        "modifierDepth": 0,
+        "offset": 888,
+        "opcode": "JUMP",
+        "pc": 10624,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "i",
+        "length": 36,
+        "modifierDepth": 0,
+        "offset": 881,
+        "opcode": "JUMP",
+        "pc": 10649,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "-",
+        "length": 10,
+        "modifierDepth": 0,
+        "offset": 949,
+        "opcode": "JUMPI",
+        "pc": 10661,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "-",
+        "length": 507,
+        "modifierDepth": 0,
+        "offset": 473,
+        "opcode": "JUMP",
+        "pc": 10683,
+        "sourcePath": "contracts/base/Multicall.sol"
+      },
+      {
+        "jump": "o",
+        "length": 669,
+        "modifierDepth": 0,
+        "offset": 318,
+        "opcode": "JUMP",
+        "pc": 10690,
+        "sourcePath": "contracts/base/Multicall.sol"
+      }
+    ],
+    "mappedDelegatecalls": [
+      {
+        "length": 35,
+        "offset": 568,
+        "pc": 10522,
+        "sourcePath": "contracts/base/Multicall.sol"
+      }
+    ],
+    "mappedInstructionCount": 251,
+    "mappedInstructionSetSha256": "0x5b61d4b6e1282825ac815937be3c79f9aaf226133eeffa42add0e00c4b5a1394",
+    "mappedPcRanges": [
+      {
+        "endPc": 1684,
+        "instructionCount": 18,
+        "startPc": 1653
+      },
+      {
+        "endPc": 10628,
+        "instructionCount": 191,
+        "startPc": 10371
+      },
+      {
+        "endPc": 10674,
+        "instructionCount": 31,
+        "startPc": 10636
+      },
+      {
+        "endPc": 10690,
+        "instructionCount": 11,
+        "startPc": 10677
+      }
+    ],
+    "runtimeWideDelegatecallPcs": [
+      10522
+    ],
+    "sourceMapBoundary": {
+      "lastSourceMappedOpcode": "REVERT",
+      "lastSourceMappedPc": 23915,
+      "sourceMappedInstructionCount": 15050,
+      "trailingCompilerDataByteLength": 550
+    }
+  },
+  "claimStatus": "local_static_analysis_not_formal_proof_not_activation_ready",
+  "decision": "deny_all_multicall_selectors_and_nested_calldata",
+  "deniedMulticalls": [
+    {
+      "classification": "observed_self_delegatecall_entrypoint",
+      "currentRuntimeDispatcherEntry": {
+        "comparePc": 178,
+        "destinationPc": 1653,
+        "jumpiPc": 187
+      },
+      "currentRuntimeMethodIdentifierPresent": true,
+      "decision": "denied",
+      "rationale": "Observed entry reaches address(this).delegatecall over caller-supplied nested calldata.",
+      "selector": "0xac9650d8",
+      "signature": "multicall(bytes[])"
+    },
+    {
+      "classification": "known_multicall_signature_defense_in_depth",
+      "currentRuntimeDispatcherEntry": null,
+      "currentRuntimeMethodIdentifierPresent": false,
+      "decision": "denied",
+      "rationale": "Absent from this runtime, but denied against overload/future-target drift and selector-policy widening.",
+      "selector": "0x5ae401dc",
+      "signature": "multicall(uint256,bytes[])"
+    },
+    {
+      "classification": "known_multicall_signature_defense_in_depth",
+      "currentRuntimeDispatcherEntry": null,
+      "currentRuntimeMethodIdentifierPresent": false,
+      "decision": "denied",
+      "rationale": "Absent from this runtime, but denied against overload/future-target drift and selector-policy widening.",
+      "selector": "0x1f0464d1",
+      "signature": "multicall(bytes32,bytes[])"
+    }
+  ],
+  "digests": {
+    "bytecodePathSha256": "0xc1ccf2af8df00a47c2490812343681ec5c55a458f1101acfcaf3dddc53deac29",
+    "sourcePathSha256": "0x95db52d6f8db01ebb90b259db6fea01c3a4120f47f97e594e1bb4a4ebfb68ba5"
+  },
+  "findings": {
+    "arbitraryCalldataDispatcher": "observed",
+    "delegatecallProgramCounter": 10522,
+    "delegatecallSemantics": "address_this_delegatecall_of_each_caller_supplied_bytes_element",
+    "nestedCalldata": "deny",
+    "observedOverloadCount": 1,
+    "otherDeniedOverloadsPresentInCurrentRuntime": false,
+    "unlistedSelectors": "deny"
+  },
+  "limitations": [
+    "This is manual/static review automation, not formal verification or exhaustive symbolic execution.",
+    "Only multicall(bytes[]) is compiled into the pinned runtime; the other two selector denials are defense in depth.",
+    "A fresh exact-block runtime observation and authenticated independent review remain required.",
+    "An earlier retained build-info SHA-256 differs from this local build-info container; its raw bytes are unavailable, so no byte-level cause or equality claim is invented.",
+    "A local repository artifact is not an allowed public HTTPS/IPFS evidence locator."
+  ],
+  "method": {
+    "assurance": "manual_static_analysis_not_formal_proof",
+    "name": "manual_static_source_and_bytecode_control_flow_review",
+    "version": "proofera-pancake-v3-selector-path-v1"
+  },
+  "publication": {
+    "eligibleAsDomainEvidenceReference": false,
+    "localRepositoryPath": "evidence/development/pancake-v3-selector-paths/denied-multicalls.json",
+    "publicContentAddressedLocator": null,
+    "status": "local_artifact_not_published_or_independently_refetched",
+    "unmetRequirements": [
+      "publish these exact canonical bytes at a stable HTTPS or IPFS content-addressed locator",
+      "re-fetch the public bytes independently and verify the whole-file SHA-256",
+      "obtain authenticated independent reviewer approval bound to the exact write scope"
+    ]
+  },
+  "schemaVersion": 1,
+  "sourcePath": {
+    "branchInventory": {
+      "count": 3,
+      "nodes": [
+        {
+          "kind": "ForStatement",
+          "line": 13,
+          "nodeId": 6106,
+          "sourcePath": "contracts/base/Multicall.sol",
+          "sourceSliceSha256": "0x779b909ecc9f9e69c63afe876e7ea75f1516999c340b93037656b0f5a25bf9ac",
+          "span": {
+            "length": 507,
+            "offset": 473,
+            "sourceId": 32
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 16,
+          "nodeId": 6098,
+          "sourcePath": "contracts/base/Multicall.sol",
+          "sourceSliceSha256": "0xe4cce10937386bfba811d249ce58f94592ded4c942135fdaf481eb83a87c4647",
+          "span": {
+            "length": 313,
+            "offset": 620,
+            "sourceId": 32
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 18,
+          "nodeId": 6085,
+          "sourcePath": "contracts/base/Multicall.sol",
+          "sourceSliceSha256": "0xfadce00accb852a36159a84961bb050ced1275f912ca9a47b9090972e9948439",
+          "span": {
+            "length": 32,
+            "offset": 734,
+            "sourceId": 32
+          }
+        }
+      ],
+      "status": "manager_local_nodes_enumerated"
+    },
+    "callEdges": [],
+    "delegatecallSites": [
+      {
+        "callKind": "delegatecall",
+        "line": 14,
+        "nodeId": 6074,
+        "sourcePath": "contracts/base/Multicall.sol",
+        "sourceSliceSha256": "0xec274e29625b7f2f2f5ec3bd4e822646ef2b3334e4fe7cec816db028ed75ba40",
+        "span": {
+          "length": 35,
+          "offset": 568,
+          "sourceId": 32
+        }
+      }
+    ],
+    "directEntryDefinition": "contracts/base/Multicall.sol:Multicall.multicall#6108",
+    "lowLevelCallSites": [
+      {
+        "callKind": "delegatecall",
+        "line": 14,
+        "nodeId": 6074,
+        "sourcePath": "contracts/base/Multicall.sol",
+        "sourceSliceSha256": "0xec274e29625b7f2f2f5ec3bd4e822646ef2b3334e4fe7cec816db028ed75ba40",
+        "span": {
+          "length": 35,
+          "offset": 568,
+          "sourceId": 32
+        }
+      }
+    ],
+    "reachableDefinitions": [
+      {
+        "contract": "Multicall",
+        "definitionId": 6108,
+        "kind": "FunctionDefinition",
+        "line": 11,
+        "name": "multicall",
+        "sourcePath": "contracts/base/Multicall.sol",
+        "sourceSliceSha256": "0x7909dbedbe66060ed947de69480d321157ab8394b06fde2bd26b1280c1e456d5",
+        "span": {
+          "length": 669,
+          "offset": 318,
+          "sourceId": 32
+        },
+        "visibility": "public"
+      }
+    ],
+    "reviewedSourceFiles": [
+      {
+        "byteLength": 992,
+        "contentSha256": "0xc69ed85c9a4f11107ff9ee633263d4c6dbf4d1c2058331efd935827d2152496f",
+        "sourcePath": "contracts/base/Multicall.sol"
+      }
+    ]
+  }
+}

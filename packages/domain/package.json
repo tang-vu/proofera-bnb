@@ -1,0 +1,20 @@
+{
+  "name": "@proofera/domain",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./lp-activation-intent": "./src/lp-activation-intent.ts",
+    "./lp-activation-policy": "./src/lp-activation-policy.ts",
+    "./pancake-v3-liquidity-quote": "./src/pancake-v3-liquidity-quote.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "viem": "2.55.13",
+    "zod": "4.4.3"
+  }
+}

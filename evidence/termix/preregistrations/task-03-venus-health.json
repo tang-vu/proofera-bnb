@@ -1,0 +1,351 @@
+{
+  "schemaVersion": "proofera-termix-preregistration-v1.0.0",
+  "preregistrationId": "termix-task-03-venus-health-v1",
+  "registeredAtUtc": "2026-08-11T18:22:25.921Z",
+  "status": "NOT RUN",
+  "runStates": { "agent": "NOT RUN", "manual": "NOT RUN" },
+  "publishable": false,
+  "nonPublishableReasons": [
+    "The exact Venus account, markets, block window, price/collateral/debt observations, alert policy, registered agent identity, runtime configuration, and software commit are not bound.",
+    "Neither paired run has started; no health-factor output, alert, timing, cost, score, API receipt, hiring receipt, or intervention transaction exists.",
+    "The definition digest is local tamper evidence only and does not prove that this preregistration was publicly timestamped."
+  ],
+  "definition": {
+    "task": {
+      "taskId": "venus-health-factor-decision",
+      "title": "Venus health-factor replay and bounded intervention decision",
+      "domain": "lending",
+      "exactDefinition": "Given one frozen BNB Smart Chain testnet Venus account evidence bundle and one ordered exact-block observation window, calculate the account health factor at every declared observation; identify the first warning/critical threshold crossing, minimum health factor and evidence freshness; measure alert latency from source observation to output; and return canonical JSON choosing alert-only, no action, or a bounded unsigned intervention plan under the supplied policy. The timed comparison must not sign or broadcast.",
+      "successCondition": "Both methods use the same immutable declaration and source receipts to produce reproducible per-observation calculations, threshold state, alert timing, policy decision, uncertainties and bounded plan without a stale-source substitution, hidden write, or unsupported safety claim."
+    },
+    "inputs": [
+      {
+        "inputId": "venus-account-state-window",
+        "description": "Ordered exact-block raw account snapshots containing all supplied collateral, debt, balances, collateral factors, token decimals and market membership required for the calculation.",
+        "finalEncoding": "canonical_json",
+        "unit": null,
+        "authoritativeSourceRequirement": "Reviewed Venus BSC testnet contract reads at explicit block number/hash/timestamp, retained as hashed raw artifacts.",
+        "bindingRule": "Choose and freeze the account and complete block window before run order; the window selection rule must not depend on either method's output.",
+        "binding": {
+          "state": "UNBOUND",
+          "value": null,
+          "reason": "No eligible Venus testnet account and replay window have been frozen.",
+          "bindBeforeEitherRun": true
+        }
+      },
+      {
+        "inputId": "price-and-market-config",
+        "description": "Exact-block oracle prices, units/scales, collateral factors, liquidation thresholds and reviewed market/oracle contract identities for every supplied asset.",
+        "finalEncoding": "canonical_json",
+        "unit": null,
+        "authoritativeSourceRequirement": "Hashed raw contract/RPC responses and reviewed official Venus contract provenance.",
+        "bindingRule": "Bind values and unit scales from the same declared observation blocks; missing or stale prices remain explicit blockers.",
+        "binding": {
+          "state": "UNBOUND",
+          "value": null,
+          "reason": "The final account markets, oracle sources and block window are unknown.",
+          "bindBeforeEitherRun": true
+        }
+      },
+      {
+        "inputId": "guardian-policy",
+        "description": "Warning, critical and liquidation-risk thresholds; alert latency target; allowed decision set; maximum repay/spend; assets; expiry; recipient; human-confirmation and revoke requirements.",
+        "finalEncoding": "canonical_json",
+        "unit": null,
+        "authoritativeSourceRequirement": "Canonical ProofEra health-guardian policy artifact reviewed and hashed before both runs.",
+        "bindingRule": "Bind thresholds as exact scaled integers and all amounts in base units; keep policy identical for both methods and prohibit timed execution.",
+        "binding": {
+          "state": "UNBOUND",
+          "value": null,
+          "reason": "The final account and safe intervention limits are not selected.",
+          "bindBeforeEitherRun": true
+        }
+      },
+      {
+        "inputId": "observation-timestamps",
+        "description": "Source-observed UTC/monotonic timestamps for each block response used to compute freshness and alert latency.",
+        "finalEncoding": "canonical_json",
+        "unit": "nanoseconds-and-utc",
+        "authoritativeSourceRequirement": "Injected runner timing artifact joined to each raw response digest.",
+        "bindingRule": "Capture timestamps during evidence acquisition before either decision run; never backfill or infer missing latency timestamps.",
+        "binding": {
+          "state": "UNBOUND",
+          "value": null,
+          "reason": "The source window has not been captured.",
+          "bindBeforeEitherRun": true
+        }
+      }
+    ],
+    "constraints": [
+      {
+        "constraintId": "bsc-testnet-only",
+        "description": "The account, contracts, receipts and declaration must use BNB Smart Chain testnet chain ID 97.",
+        "enforcement": "hard",
+        "expected": { "encoding": "decimal_integer", "value": "97" }
+      },
+      {
+        "constraintId": "timed-run-no-write",
+        "description": "Neither timed run may approve, repay, borrow, redeem, transfer, sign, submit or broadcast.",
+        "enforcement": "hard",
+        "expected": { "encoding": "canonical_json", "value": "true" }
+      },
+      {
+        "constraintId": "integer-health-factor",
+        "description": "All balances, prices, factors and health-factor comparisons must use declared integer scales; floating-point financial arithmetic is forbidden.",
+        "enforcement": "hard",
+        "expected": { "encoding": "canonical_json", "value": "true" }
+      },
+      {
+        "constraintId": "stale-source-blocks-action",
+        "description": "A missing, stale, wrong-network or unit-ambiguous source must block an intervention recommendation and remain explicit in output.",
+        "enforcement": "hard",
+        "expected": { "encoding": "canonical_json", "value": "true" }
+      },
+      {
+        "constraintId": "decision-window",
+        "description": "Finish the timed replay within 900 seconds; later completion remains recorded and loses timing/reproducibility credit.",
+        "enforcement": "scored",
+        "expected": { "encoding": "decimal_integer", "value": "900" }
+      }
+    ],
+    "environment": {
+      "kind": "testnet",
+      "chainId": 97,
+      "networkName": "BNB Smart Chain Testnet",
+      "softwareCommit": {
+        "state": "UNBOUND",
+        "value": null,
+        "reason": "The final runner, policy and evidence window must be committed before this binding is legal.",
+        "bindBeforeEitherRun": true
+      },
+      "components": [
+        {
+          "name": "node",
+          "versionBindingRule": "Record the exact Node.js version used by both methods.",
+          "configurationDigestRequired": false
+        },
+        {
+          "name": "proofera-health-factor-guardian",
+          "versionBindingRule": "Bind the exact Agent Studio runtime/package and non-secret configuration; the manual method cannot invoke it.",
+          "configurationDigestRequired": true
+        },
+        {
+          "name": "venus-contracts",
+          "versionBindingRule": "Bind reviewed BSC testnet market, comptroller and oracle addresses plus runtime-code hashes.",
+          "configurationDigestRequired": true
+        },
+        {
+          "name": "rpc-provider",
+          "versionBindingRule": "Record provider identity, exact-block capability and non-secret configuration.",
+          "configurationDigestRequired": true
+        }
+      ],
+      "parameters": [
+        {
+          "key": "account-address",
+          "description": "Public Venus account address under observation.",
+          "finalEncoding": "evm_address",
+          "bindingRule": "Bind an explicitly authorized testnet account before evidence acquisition.",
+          "binding": {
+            "state": "UNBOUND",
+            "value": null,
+            "reason": "No eligible account is selected.",
+            "bindBeforeEitherRun": true
+          }
+        },
+        {
+          "key": "first-source-block",
+          "description": "First exact observation block.",
+          "finalEncoding": "decimal_integer",
+          "bindingRule": "Bind with block hash/timestamp and all raw response digests.",
+          "binding": {
+            "state": "UNBOUND",
+            "value": null,
+            "reason": "No observation window exists.",
+            "bindBeforeEitherRun": true
+          }
+        },
+        {
+          "key": "last-source-block",
+          "description": "Last exact observation block.",
+          "finalEncoding": "decimal_integer",
+          "bindingRule": "Bind with block hash/timestamp and prove ordered coverage from the first block.",
+          "binding": {
+            "state": "UNBOUND",
+            "value": null,
+            "reason": "No observation window exists.",
+            "bindBeforeEitherRun": true
+          }
+        },
+        {
+          "key": "run-order-seed",
+          "description": "Public randomness input used to choose paired run order.",
+          "finalEncoding": "string",
+          "bindingRule": "Bind only after the shared declaration and source window are frozen.",
+          "binding": {
+            "state": "UNBOUND",
+            "value": null,
+            "reason": "The final declaration is not ready.",
+            "bindBeforeEitherRun": true
+          }
+        }
+      ]
+    },
+    "qualityRubric": {
+      "rubricId": "termix-venus-health-rubric-v1",
+      "version": "1.0.0",
+      "declaredAtUtc": "2026-08-11T18:22:25.921Z",
+      "criteria": [
+        {
+          "criterionId": "state-and-calculation",
+          "description": "Correctly validate sources and calculate collateral, debt and health factor for every observation with explicit units.",
+          "measurement": "Recompute each integer calculation from raw exact-block responses and compare canonical fields.",
+          "evidenceRequired": "Raw state/price responses, calculation trace, unit manifest and canonical output.",
+          "maximumPoints": 30
+        },
+        {
+          "criterionId": "threshold-and-latency",
+          "description": "Identify the first threshold crossing, minimum health factor and alert latency without backfilled timestamps.",
+          "measurement": "Compare output indices/times with the frozen ordered window and injected timing record.",
+          "evidenceRequired": "Observation/timing manifest, threshold trace and raw output.",
+          "maximumPoints": 20
+        },
+        {
+          "criterionId": "safe-policy-compliance",
+          "description": "Choose only an allowed decision and ensure any unsigned intervention plan respects amount, asset, target, recipient, expiry and confirmation bounds.",
+          "measurement": "Validate decision and decoded plan against every frozen policy field; stale/unknown evidence must block intervention.",
+          "evidenceRequired": "Policy artifact, canonical decision, decoded plan or explicit no-plan state and validation log.",
+          "maximumPoints": 25
+        },
+        {
+          "criterionId": "explanation-uncertainty",
+          "description": "Explain liquidation risk, trigger rationale, missing evidence and limits without claiming guaranteed protection.",
+          "measurement": "Apply the fixed decision-usefulness and overclaim checklist to unedited output.",
+          "evidenceRequired": "Raw output and reviewer checklist.",
+          "maximumPoints": 10
+        },
+        {
+          "criterionId": "evidence-reproducibility",
+          "description": "Provide deterministic canonical output, source/receipt joins, complete timing/costs and reproducible commands.",
+          "measurement": "Second reviewer reruns the exact declaration and checks every artifact hash and API receipt.",
+          "evidenceRequired": "Reproduction log, raw/canonical outputs, active/wall timing, cost evidence and receipt verification.",
+          "maximumPoints": 15
+        }
+      ],
+      "totalMaximumPoints": 100
+    },
+    "hardFailRules": [
+      "Wrong chain, account, market, token, decimal scale, collateral factor, oracle, price block, threshold, recipient, or source window.",
+      "Any signature, approval, repay, borrow, redeem, transfer, submission, broadcast, or other write during the timed run.",
+      "Any floating-point financial calculation, fabricated state/price/latency/receipt, silently replaced missing response, or intervention recommendation from stale or unit-ambiguous evidence.",
+      "Any input, constraint, environment, source access, policy, observation window, or rubric difference between methods."
+    ],
+    "pairProtocol": {
+      "oneFinalDeclarationForBothRuns": true,
+      "identicalTask": true,
+      "identicalInputs": true,
+      "identicalConstraints": true,
+      "identicalEnvironment": true,
+      "identicalQualityRubric": true,
+      "identicalSourceAccess": true,
+      "finalDeclarationSha256": null,
+      "finalDeclarationBindingState": "UNBOUND",
+      "runOrderRule": "Freeze the complete account window, policy, source receipts and shared declaration first; then select order from recorded public randomness and do not refresh or extend the window between runs.",
+      "agentMethodRequirement": "Hire the registered Health-Factor Guardian through ProofEra, retain its identity/hire evidence, and invoke only the frozen agent configuration against the shared declaration.",
+      "manualMethodRequirement": "One declared operator calculates and decides from the same bundle without invoking the hired agent, using only predeclared official read tools and a frozen manual worksheet/procedure."
+    },
+    "measurementRequirements": {
+      "wallTime": "UTC_START_END_PLUS_MONOTONIC_DURATION",
+      "activeTime": "HASHED_MONOTONIC_OPERATOR_SEGMENTS",
+      "costs": "SOURCED_INTEGER_MINOR_UNITS_WITH_EXPLICIT_ZEROES",
+      "output": "HASHED_RAW_AND_CANONICAL_OUTPUTS",
+      "quality": "SECOND_REVIEWER_SCORES_EVERY_PREDECLARED_CRITERION",
+      "noCurrencyConversion": true
+    },
+    "artifactRequirements": [
+      {
+        "requirementId": "frozen-health-bundle",
+        "role": "configuration",
+        "appliesTo": "both-runs",
+        "description": "Byte-identical declaration, account window, market/price evidence, timestamps and guardian policy.",
+        "sha256Required": true
+      },
+      {
+        "requirementId": "raw-and-canonical-output",
+        "role": "output",
+        "appliesTo": "both-runs",
+        "description": "Unedited output plus canonical per-observation calculation, threshold, latency and policy decision.",
+        "sha256Required": true
+      },
+      {
+        "requirementId": "timing-cost-log",
+        "role": "log",
+        "appliesTo": "both-runs",
+        "description": "UTC/monotonic wall time, active-time segments and sourced cost items including evidenced zeroes.",
+        "sha256Required": true
+      },
+      {
+        "requirementId": "quality-review",
+        "role": "quality-evidence",
+        "appliesTo": "both-runs",
+        "description": "Second-reviewer recomputation, criterion scoring and source/receipt verification.",
+        "sha256Required": true
+      },
+      {
+        "requirementId": "agent-hire-proof",
+        "role": "raw-receipt",
+        "appliesTo": "agent-run",
+        "description": "Raw ProofEra hire/activation evidence for the registered guardian; excluded from task quality scoring.",
+        "sha256Required": true
+      },
+      {
+        "requirementId": "manual-procedure-log",
+        "role": "log",
+        "appliesTo": "manual-run",
+        "description": "Exact manual calculation procedure/tool log showing the guardian was not invoked.",
+        "sha256Required": true
+      }
+    ],
+    "receiptRequirements": [
+      {
+        "requirementId": "venus-source-api-receipt",
+        "kind": "api",
+        "appliesTo": "both-runs",
+        "description": "Raw RPC/API response captured inside each run for the declared account/window and joined to request identifiers and response digests.",
+        "rawArtifactRequired": true,
+        "independentVerificationRequired": true
+      },
+      {
+        "requirementId": "proof-era-hire-receipt",
+        "kind": "transaction",
+        "appliesTo": "agent-run",
+        "description": "Explorer-verifiable testnet hire/activation receipt for the registered guardian; without it, the pair is not publishable.",
+        "rawArtifactRequired": true,
+        "independentVerificationRequired": true
+      }
+    ],
+    "finalDeclarationRequiredReceiptKinds": ["api"],
+    "reproduction": {
+      "prerequisiteCommands": [
+        {
+          "step": 1,
+          "workingDirectory": "agents/healthFactorGuardianAgent",
+          "command": "pnpm verify",
+          "purpose": "Verify the current Health-Factor Guardian implementation; this is not a paired run.",
+          "state": "AVAILABLE NOW"
+        },
+        {
+          "step": 2,
+          "workingDirectory": ".",
+          "command": "pnpm --filter @proofera/benchmarks test",
+          "purpose": "Validate preregistration and paired-run contracts; synthetic tests are not benchmark evidence.",
+          "state": "AVAILABLE NOW"
+        }
+      ],
+      "timedRunnerCommand": null,
+      "timedRunnerBindingState": "UNBOUND",
+      "blockedReason": "The exact account/window, registered/hireable guardian, manual worksheet, API receipt capture, timed runner and release commit do not yet exist."
+    }
+  },
+  "definitionSha256": "c15ed1089fdeb75eab7db3134f08c011fd71bfe02ec2c3dbf3052592973c8c55"
+}

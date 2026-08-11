@@ -1,0 +1,15 @@
+{
+  "name": "proofera-grid-trading-agent-workspace",
+  "private": true,
+  "packageManager": "pnpm@10.24.0",
+  "scripts": {
+    "audit:prod": "pnpm --dir app/agent audit --prod",
+    "build": "pnpm --dir app/agent build",
+    "format": "pnpm --dir app/agent format",
+    "format:check": "pnpm --dir app/agent format:check",
+    "lint": "pnpm --dir app/agent lint",
+    "test": "pnpm --dir app/agent test",
+    "typecheck": "pnpm --dir app/agent typecheck",
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+  }
+}

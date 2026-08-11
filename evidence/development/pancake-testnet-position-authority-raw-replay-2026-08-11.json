@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-11T12:41:59.484Z",
+  "purpose": "exact_block_read_only_replay",
+  "provider": {
+    "id": "publicnode-bsc-testnet",
+    "origin": "https://bsc-testnet-rpc.publicnode.com",
+    "publicSourceUrl": "https://publicnode.com/",
+    "role": "untrusted_json_rpc_transport"
+  },
+  "chainId": 97,
+  "positionManager": "0x427bF5b37357632377eCbEC9de3626C71A5396c1",
+  "positionTokenId": "36761",
+  "blockSelector": {
+    "blockHash": "0x1335bfa4772fc1f6cde9ba78b6305512e87db0bb92b9260c52f4505fef7b1072",
+    "requireCanonical": true
+  },
+  "responses": {
+    "eth_getBlockByHash": {
+      "number": "0x76b0a35",
+      "hash": "0x1335bfa4772fc1f6cde9ba78b6305512e87db0bb92b9260c52f4505fef7b1072",
+      "timestamp": "0x6a7b1588"
+    },
+    "ownerOf": "0x0000000000000000000000000039739b4bd81e756716744b1e7b472b85fef3a2",
+    "getApproved": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "isApprovedForAll": "0x0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "requestPolicy": {
+    "blockDiscoveryUsed": false,
+    "latestTagUsed": false,
+    "blockNumberSelectorUsed": false,
+    "writeMethodUsed": false,
+    "fallbackUsed": false
+  },
+  "boundaries": {
+    "thirdPartyPosition": true,
+    "prooferaOwned": false,
+    "prooferaAuthorityEstablished": false,
+    "currentFreshnessEstablishedAtReplayTime": false,
+    "transactionSubmitted": false,
+    "performanceEstablished": false
+  }
+}

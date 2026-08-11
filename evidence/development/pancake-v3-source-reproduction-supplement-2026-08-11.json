@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-11T15:07:54.546Z",
+  "environment": "development",
+  "claimStatus": "local_reproduction_only_not_activation_ready",
+  "sourceArchive": {
+    "repository": "https://github.com/pancakeswap/pancake-v3-contracts.git",
+    "commit": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+    "format": "git_archive_tar",
+    "command": "git archive --format=tar --output=<output.tar> ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+    "byteLength": 9912320,
+    "sha256": "b3cd0b3fd4563287f587c2776eac78e5b5a4ad98f6c805a005df10727bee782d",
+    "repeatCount": 2,
+    "repeatHashesEqual": true
+  },
+  "publishedArtifact": {
+    "package": "@pancakeswap/v3-periphery",
+    "version": "1.0.2",
+    "registryMetadata": "https://registry.npmjs.org/%40pancakeswap%2Fv3-periphery",
+    "tarball": "https://registry.npmjs.org/@pancakeswap/v3-periphery/-/v3-periphery-1.0.2.tgz",
+    "npmIntegrity": "sha512-kWQhJsAG5Ij1cubKlX0JuJ3GEPFiPBR+NQt77SxHNjk62eallLyfbWJYk2NMnTO0crbjBFO5GKKQAXfp2n76vg==",
+    "npmShasumSha1": "f5b899c60bae0fadcfff1cc2b72c802b9d5a5596",
+    "tarballSha256": "7564db56a8db657cc15cadd0fe4ba1bb58b79d53b3e3eb71b1a9d5c2e0da1865",
+    "tarballByteLength": 135704,
+    "packageGitHead": "d6fa5610c55d09d931912d42b84a726d0299c0e0",
+    "managerArtifactPath": "package/artifacts/contracts/NonfungiblePositionManager.sol/NonfungiblePositionManager.json",
+    "managerArtifactByteLength": 127204,
+    "managerArtifactSha256": "9e5bca807e38e9e8acadd81c5dec6668f847a7e3397d91b3afed74b066cfbb2a"
+  },
+  "localReproduction": {
+    "nodeVersion": "24.14.1",
+    "repositoryRequestedNodeVersion": "16.19.1",
+    "packageManager": "yarn",
+    "packageManagerVersion": "1.22.22",
+    "installCommand": "corepack yarn@1.22.22 install --frozen-lockfile --ignore-scripts --non-interactive",
+    "dependencyLifecycleScriptsExecuted": false,
+    "compileCommand": "corepack yarn@1.22.22 hardhat compile --config hardhat.proofera.config.js",
+    "safeCompileConfigurationSha256": "a670b4250ab3ef60339a376c408544154f84eafd10ac935a4a9ce73157662abd",
+    "safeCompileConfigurationByteLength": 1237,
+    "safeCompileConfigurationBoundary": "Local compile-only configuration copied the official Solidity settings and omitted all network, account, dotenv, verification, deployment, and write configuration.",
+    "compiledSolidityFileCount": 130,
+    "compilerLongVersion": "0.7.6+commit.7338295f",
+    "managerBuildInfoSha256": "ff2166c707d60e451ff80e6096d9b2e792eb23a27d27964299ec203fb8d763b7",
+    "managerBuildInfoByteLength": 3272860,
+    "managerArtifactSha256": "9e5bca807e38e9e8acadd81c5dec6668f847a7e3397d91b3afed74b066cfbb2a",
+    "matchesPublishedArtifact": true
+  },
+  "compilerInputDigests": {
+    "canonicalization": "recursive_lexicographic_object_keys_json_stringify_v1",
+    "arrayOrder": "preserved",
+    "encoding": "utf8",
+    "compilerInputByteLength": 192035,
+    "compilerInputSha256": "086382b3301a745dae7d0b66878cd1c1a4433cf7b1d7725efc546511811b3c38",
+    "compilerSettingsByteLength": 223,
+    "compilerSettingsSha256": "a1af16a691f74364a753be9855c4f0865f1fef27a515a65ee0a866c991a6c1a1",
+    "rawParsedOrderInputSha256": "0ecee357ffa80932d056a2e7913885cfd45c6ca0195aa9fbd819a70c8db22f16",
+    "rawParsedOrderSettingsSha256": "20ae6914c7ad31de820677dbd92442590b88d8b721fee78cdbbd1dbc28dd33d8"
+  },
+  "limitations": [
+    "The local Node version was newer than the repository's pinned and Hardhat-supported version, although the compiled manager artifact matched the published artifact byte-for-byte.",
+    "The raw source archive, build-info, compiler input, and safe local configuration are not retained in the repository by this bounded summary.",
+    "Canonical input hashes are ProofEra reproduction digests; they are not publisher signatures.",
+    "The package gitHead differs from the initial deployment commit and is used only as published-artifact provenance, not as the deployed source-tree identity.",
+    "No authenticated independent review, fresh exact-block observation, selector-path proof, wallet action, signature, approval, deployment, or transaction is recorded here."
+  ],
+  "activationEligible": false
+}

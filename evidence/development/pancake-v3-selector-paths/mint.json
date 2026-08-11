@@ -1,0 +1,3893 @@
+{
+  "activationEligible": false,
+  "analyzedAt": "2026-08-11T15:55:00.907Z",
+  "artifactType": "pancake_v3_direct_selector_path_local_review",
+  "bindings": {
+    "chainId": 97,
+    "compileOnlyConfigSha256": "0xceeccf77dc8340ca344ad99bf12f710cf864c02f99400beb88e247d4191c1f5b",
+    "compilerInputSha256": "0x086382b3301a745dae7d0b66878cd1c1a4433cf7b1d7725efc546511811b3c38",
+    "compilerLongVersion": "0.7.6+commit.7338295f",
+    "compilerOutputArtifactSha256": "0x9e5bca807e38e9e8acadd81c5dec6668f847a7e3397d91b3afed74b066cfbb2a",
+    "compilerSettingsSha256": "0xa1af16a691f74364a753be9855c4f0865f1fef27a515a65ee0a866c991a6c1a1",
+    "localBuildInfoSha256": "0xff2166c707d60e451ff80e6096d9b2e792eb23a27d27964299ec203fb8d763b7",
+    "managerAddress": "0x427bf5b37357632377ecbec9de3626c71a5396c1",
+    "managerRuntimeCodeHash": "0xd86730989544d7a3ea034c8a322733683137cf70b0f49231fd88405eac6098d7",
+    "managerRuntimeLength": 24466,
+    "sourceCommit": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+    "sourceTreeSha256": "0xb3cd0b3fd4563287f587c2776eac78e5b5a4ad98f6c805a005df10727bee782d",
+    "writeScopeSha256": "0x3a80eb853ccea37b7a1d04430a015d22941fd7a7cd2d8ab9d31b896fc74d5218"
+  },
+  "bytecodePath": {
+    "analysisMethod": "solc_ast_reference_closure_plus_deployed_source_map_opcode_intersection_and_dispatcher_decode",
+    "dispatcher": {
+      "abiDecoderPc": 21929,
+      "bodyPc": 7743,
+      "comparePc": 325,
+      "decoderReturnPc": 1472,
+      "jumpiPc": 334,
+      "selector": "0x88316456",
+      "wrapperPc": 1458
+    },
+    "effectInstructions": [
+      {
+        "jump": "-",
+        "length": 27,
+        "modifierDepth": 1,
+        "offset": 5732,
+        "opcode": "STATICCALL",
+        "pc": 8286,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "-",
+        "length": 12,
+        "modifierDepth": 0,
+        "offset": 2372,
+        "opcode": "STATICCALL",
+        "pc": 14234,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "-",
+        "length": 219,
+        "modifierDepth": 0,
+        "offset": 2855,
+        "opcode": "CALL",
+        "pc": 14507,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "-",
+        "length": 37,
+        "modifierDepth": 0,
+        "offset": 2048,
+        "opcode": "CALL",
+        "pc": 16129,
+        "sourcePath": "contracts/base/PeripheryPayments.sol"
+      },
+      {
+        "jump": "-",
+        "length": 40,
+        "modifierDepth": 0,
+        "offset": 2135,
+        "opcode": "CALL",
+        "pc": 16273,
+        "sourcePath": "contracts/base/PeripheryPayments.sol"
+      },
+      {
+        "jump": "-",
+        "length": 71,
+        "modifierDepth": 0,
+        "offset": 1393,
+        "opcode": "CALL",
+        "pc": 16668,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "-",
+        "length": 81,
+        "modifierDepth": 0,
+        "offset": 767,
+        "opcode": "CALL",
+        "pc": 18617,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      }
+    ],
+    "forbiddenOpcodeFindings": {
+      "callcodePcsOnMappedPath": [],
+      "delegatecallPcsOnMappedPath": [],
+      "selfdestructPcsOnMappedPath": []
+    },
+    "mappedControlFlowInstructions": [
+      {
+        "jump": "i",
+        "length": 1941,
+        "modifierDepth": 0,
+        "offset": 4580,
+        "opcode": "JUMP",
+        "pc": 1471,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 1941,
+        "modifierDepth": 0,
+        "offset": 4580,
+        "opcode": "JUMP",
+        "pc": 1476,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 1941,
+        "modifierDepth": 0,
+        "offset": 4580,
+        "opcode": "JUMP",
+        "pc": 1492,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "-",
+        "length": 506,
+        "modifierDepth": 0,
+        "offset": 921,
+        "opcode": "JUMPI",
+        "pc": 1521,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "i",
+        "length": 506,
+        "modifierDepth": 0,
+        "offset": 921,
+        "opcode": "JUMP",
+        "pc": 1540,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "i",
+        "length": 506,
+        "modifierDepth": 0,
+        "offset": 921,
+        "opcode": "JUMP",
+        "pc": 1545,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "i",
+        "length": 17,
+        "modifierDepth": 1,
+        "offset": 230,
+        "opcode": "JUMP",
+        "pc": 2470,
+        "sourcePath": "contracts/base/PeripheryValidation.sol"
+      },
+      {
+        "jump": "-",
+        "length": 61,
+        "modifierDepth": 1,
+        "offset": 222,
+        "opcode": "JUMPI",
+        "pc": 2477,
+        "sourcePath": "contracts/base/PeripheryValidation.sol"
+      },
+      {
+        "jump": "i",
+        "length": 17,
+        "modifierDepth": 0,
+        "offset": 230,
+        "opcode": "JUMP",
+        "pc": 4380,
+        "sourcePath": "contracts/base/PeripheryValidation.sol"
+      },
+      {
+        "jump": "-",
+        "length": 61,
+        "modifierDepth": 0,
+        "offset": 222,
+        "opcode": "JUMPI",
+        "pc": 4387,
+        "sourcePath": "contracts/base/PeripheryValidation.sol"
+      },
+      {
+        "jump": "i",
+        "length": 17,
+        "modifierDepth": 0,
+        "offset": 230,
+        "opcode": "JUMP",
+        "pc": 7763,
+        "sourcePath": "contracts/base/PeripheryValidation.sol"
+      },
+      {
+        "jump": "-",
+        "length": 61,
+        "modifierDepth": 0,
+        "offset": 222,
+        "opcode": "JUMPI",
+        "pc": 7770,
+        "sourcePath": "contracts/base/PeripheryValidation.sol"
+      },
+      {
+        "jump": "i",
+        "length": 13,
+        "modifierDepth": 1,
+        "offset": 5023,
+        "opcode": "JUMP",
+        "pc": 7879,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 13,
+        "modifierDepth": 1,
+        "offset": 5063,
+        "opcode": "JUMP",
+        "pc": 7912,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 10,
+        "modifierDepth": 1,
+        "offset": 5100,
+        "opcode": "JUMP",
+        "pc": 7942,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 16,
+        "modifierDepth": 1,
+        "offset": 5183,
+        "opcode": "JUMP",
+        "pc": 7974,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 16,
+        "modifierDepth": 1,
+        "offset": 5229,
+        "opcode": "JUMP",
+        "pc": 7998,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 530,
+        "modifierDepth": 1,
+        "offset": 4950,
+        "opcode": "JUMP",
+        "pc": 8050,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 16,
+        "modifierDepth": 1,
+        "offset": 5499,
+        "opcode": "JUMP",
+        "pc": 8081,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 46,
+        "modifierDepth": 1,
+        "offset": 5493,
+        "opcode": "JUMP",
+        "pc": 8166,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 16,
+        "modifierDepth": 1,
+        "offset": 5609,
+        "opcode": "JUMP",
+        "pc": 8188,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 16,
+        "modifierDepth": 1,
+        "offset": 5627,
+        "opcode": "JUMP",
+        "pc": 8204,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 70,
+        "modifierDepth": 1,
+        "offset": 5574,
+        "opcode": "JUMP",
+        "pc": 8209,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 27,
+        "modifierDepth": 1,
+        "offset": 5732,
+        "opcode": "JUMP",
+        "pc": 8258,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "-",
+        "length": 27,
+        "modifierDepth": 1,
+        "offset": 5732,
+        "opcode": "JUMPI",
+        "pc": 8278,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "-",
+        "length": 27,
+        "modifierDepth": 1,
+        "offset": 5732,
+        "opcode": "STATICCALL",
+        "pc": 8286,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "-",
+        "length": 27,
+        "modifierDepth": 1,
+        "offset": 5732,
+        "opcode": "JUMPI",
+        "pc": 8293,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 27,
+        "modifierDepth": 1,
+        "offset": 5732,
+        "opcode": "JUMP",
+        "pc": 8338,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 13,
+        "modifierDepth": 1,
+        "offset": 5920,
+        "opcode": "JUMP",
+        "pc": 8381,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 13,
+        "modifierDepth": 1,
+        "offset": 5943,
+        "opcode": "JUMP",
+        "pc": 8414,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 10,
+        "modifierDepth": 1,
+        "offset": 5963,
+        "opcode": "JUMP",
+        "pc": 8447,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 162,
+        "modifierDepth": 1,
+        "offset": 5828,
+        "opcode": "JUMP",
+        "pc": 8459,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 16,
+        "modifierDepth": 1,
+        "offset": 6147,
+        "opcode": "JUMP",
+        "pc": 8547,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 16,
+        "modifierDepth": 1,
+        "offset": 6189,
+        "opcode": "JUMP",
+        "pc": 8571,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 55,
+        "modifierDepth": 1,
+        "offset": 6458,
+        "opcode": "JUMP",
+        "pc": 9098,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "o",
+        "length": 1941,
+        "modifierDepth": 0,
+        "offset": 4580,
+        "opcode": "JUMP",
+        "pc": 9119,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 36,
+        "modifierDepth": 0,
+        "offset": 1112,
+        "opcode": "JUMP",
+        "pc": 9230,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "i",
+        "length": 60,
+        "modifierDepth": 0,
+        "offset": 1159,
+        "opcode": "JUMP",
+        "pc": 9278,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "-",
+        "length": 88,
+        "modifierDepth": 0,
+        "offset": 1232,
+        "opcode": "JUMPI",
+        "pc": 9286,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "i",
+        "length": 67,
+        "modifierDepth": 0,
+        "offset": 1253,
+        "opcode": "JUMP",
+        "pc": 9305,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "-",
+        "length": 88,
+        "modifierDepth": 0,
+        "offset": 1331,
+        "opcode": "JUMPI",
+        "pc": 9312,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "i",
+        "length": 67,
+        "modifierDepth": 0,
+        "offset": 1352,
+        "opcode": "JUMP",
+        "pc": 9335,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "o",
+        "length": 506,
+        "modifierDepth": 0,
+        "offset": 921,
+        "opcode": "JUMP",
+        "pc": 9342,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "i",
+        "length": 30,
+        "modifierDepth": 0,
+        "offset": 10456,
+        "opcode": "JUMP",
+        "pc": 12966,
+        "sourcePath": "@openzeppelin/contracts/token/ERC721/ERC721.sol"
+      },
+      {
+        "jump": "o",
+        "length": 108,
+        "modifierDepth": 0,
+        "offset": 327,
+        "opcode": "JUMP",
+        "pc": 13262,
+        "sourcePath": "contracts/base/BlockTimestamp.sol"
+      },
+      {
+        "jump": "-",
+        "length": 32,
+        "modifierDepth": 0,
+        "offset": 1453,
+        "opcode": "JUMPI",
+        "pc": 13298,
+        "sourcePath": "contracts/libraries/PoolAddress.sol"
+      },
+      {
+        "jump": "o",
+        "length": 528,
+        "modifierDepth": 0,
+        "offset": 1343,
+        "opcode": "JUMP",
+        "pc": 13514,
+        "sourcePath": "contracts/libraries/PoolAddress.sol"
+      },
+      {
+        "jump": "o",
+        "length": 214,
+        "modifierDepth": 0,
+        "offset": 167,
+        "opcode": "JUMP",
+        "pc": 13604,
+        "sourcePath": "contracts/libraries/PositionKey.sol"
+      },
+      {
+        "jump": "-",
+        "length": 185,
+        "modifierDepth": 0,
+        "offset": 1588,
+        "opcode": "JUMPI",
+        "pc": 13635,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/FullMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 24,
+        "modifierDepth": 0,
+        "offset": 1619,
+        "opcode": "JUMPI",
+        "pc": 13643,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/FullMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 13,
+        "modifierDepth": 0,
+        "offset": 1748,
+        "opcode": "JUMP",
+        "pc": 13658,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/FullMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 28,
+        "modifierDepth": 0,
+        "offset": 1882,
+        "opcode": "JUMPI",
+        "pc": 13666,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/FullMath.sol"
+      },
+      {
+        "jump": "o",
+        "length": 3868,
+        "modifierDepth": 0,
+        "offset": 775,
+        "opcode": "JUMP",
+        "pc": 13779,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/FullMath.sol"
+      },
+      {
+        "jump": "i",
+        "length": 45,
+        "modifierDepth": 0,
+        "offset": 2220,
+        "opcode": "JUMP",
+        "pc": 14169,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "-",
+        "length": 12,
+        "modifierDepth": 0,
+        "offset": 2372,
+        "opcode": "JUMPI",
+        "pc": 14226,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "-",
+        "length": 12,
+        "modifierDepth": 0,
+        "offset": 2372,
+        "opcode": "STATICCALL",
+        "pc": 14234,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "-",
+        "length": 12,
+        "modifierDepth": 0,
+        "offset": 2372,
+        "opcode": "JUMPI",
+        "pc": 14241,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "i",
+        "length": 12,
+        "modifierDepth": 0,
+        "offset": 2372,
+        "opcode": "JUMP",
+        "pc": 14286,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "i",
+        "length": 45,
+        "modifierDepth": 0,
+        "offset": 2423,
+        "opcode": "JUMP",
+        "pc": 14309,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "i",
+        "length": 45,
+        "modifierDepth": 0,
+        "offset": 2507,
+        "opcode": "JUMP",
+        "pc": 14326,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "i",
+        "length": 229,
+        "modifierDepth": 0,
+        "offset": 2581,
+        "opcode": "JUMP",
+        "pc": 14349,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "i",
+        "length": 67,
+        "modifierDepth": 0,
+        "offset": 2996,
+        "opcode": "JUMP",
+        "pc": 14431,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "i",
+        "length": 219,
+        "modifierDepth": 0,
+        "offset": 2855,
+        "opcode": "JUMP",
+        "pc": 14478,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "-",
+        "length": 219,
+        "modifierDepth": 0,
+        "offset": 2855,
+        "opcode": "JUMPI",
+        "pc": 14499,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "-",
+        "length": 219,
+        "modifierDepth": 0,
+        "offset": 2855,
+        "opcode": "CALL",
+        "pc": 14507,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "-",
+        "length": 219,
+        "modifierDepth": 0,
+        "offset": 2855,
+        "opcode": "JUMPI",
+        "pc": 14514,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "i",
+        "length": 219,
+        "modifierDepth": 0,
+        "offset": 2855,
+        "opcode": "JUMP",
+        "pc": 14559,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "-",
+        "length": 60,
+        "modifierDepth": 0,
+        "offset": 3095,
+        "opcode": "JUMPI",
+        "pc": 14580,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "-",
+        "length": 93,
+        "modifierDepth": 0,
+        "offset": 3087,
+        "opcode": "JUMPI",
+        "pc": 14595,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "i",
+        "length": 93,
+        "modifierDepth": 0,
+        "offset": 3087,
+        "opcode": "JUMP",
+        "pc": 14618,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "o",
+        "length": 1382,
+        "modifierDepth": 0,
+        "offset": 1806,
+        "opcode": "JUMP",
+        "pc": 14626,
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "jump": "-",
+        "length": 61,
+        "modifierDepth": 0,
+        "offset": 12302,
+        "opcode": "JUMPI",
+        "pc": 15306,
+        "sourcePath": "@openzeppelin/contracts/token/ERC721/ERC721.sol"
+      },
+      {
+        "jump": "i",
+        "length": 16,
+        "modifierDepth": 0,
+        "offset": 12382,
+        "opcode": "JUMP",
+        "pc": 15391,
+        "sourcePath": "@openzeppelin/contracts/token/ERC721/ERC721.sol"
+      },
+      {
+        "jump": "-",
+        "length": 58,
+        "modifierDepth": 0,
+        "offset": 12373,
+        "opcode": "JUMPI",
+        "pc": 15397,
+        "sourcePath": "@openzeppelin/contracts/token/ERC721/ERC721.sol"
+      },
+      {
+        "jump": "i",
+        "length": 45,
+        "modifierDepth": 0,
+        "offset": 12442,
+        "opcode": "JUMP",
+        "pc": 15485,
+        "sourcePath": "@openzeppelin/contracts/token/ERC721/ERC721.sol"
+      },
+      {
+        "jump": "i",
+        "length": 30,
+        "modifierDepth": 0,
+        "offset": 12498,
+        "opcode": "JUMP",
+        "pc": 15519,
+        "sourcePath": "@openzeppelin/contracts/token/ERC721/ERC721.sol"
+      },
+      {
+        "jump": "i",
+        "length": 29,
+        "modifierDepth": 0,
+        "offset": 12539,
+        "opcode": "JUMP",
+        "pc": 15532,
+        "sourcePath": "@openzeppelin/contracts/token/ERC721/ERC721.sol"
+      },
+      {
+        "jump": "o",
+        "length": 393,
+        "modifierDepth": 0,
+        "offset": 12231,
+        "opcode": "JUMP",
+        "pc": 15593,
+        "sourcePath": "@openzeppelin/contracts/token/ERC721/ERC721.sol"
+      },
+      {
+        "jump": "-",
+        "length": 134,
+        "modifierDepth": 0,
+        "offset": 4382,
+        "opcode": "JUMPI",
+        "pc": 15636,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "o",
+        "length": 290,
+        "modifierDepth": 0,
+        "offset": 4233,
+        "opcode": "JUMP",
+        "pc": 15929,
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "jump": "i",
+        "length": 45,
+        "modifierDepth": 0,
+        "offset": 1433,
+        "opcode": "JUMP",
+        "pc": 15941,
+        "sourcePath": "contracts/libraries/CallbackValidation.sol"
+      },
+      {
+        "jump": "-",
+        "length": 36,
+        "modifierDepth": 0,
+        "offset": 1490,
+        "opcode": "JUMPI",
+        "pc": 15960,
+        "sourcePath": "contracts/libraries/CallbackValidation.sol"
+      },
+      {
+        "jump": "-",
+        "length": 48,
+        "modifierDepth": 0,
+        "offset": 1952,
+        "opcode": "JUMPI",
+        "pc": 16024,
+        "sourcePath": "contracts/base/PeripheryPayments.sol"
+      },
+      {
+        "jump": "-",
+        "length": 569,
+        "modifierDepth": 0,
+        "offset": 1948,
+        "opcode": "JUMPI",
+        "pc": 16035,
+        "sourcePath": "contracts/base/PeripheryPayments.sol"
+      },
+      {
+        "jump": "-",
+        "length": 37,
+        "modifierDepth": 0,
+        "offset": 2048,
+        "opcode": "JUMPI",
+        "pc": 16121,
+        "sourcePath": "contracts/base/PeripheryPayments.sol"
+      },
+      {
+        "jump": "-",
+        "length": 37,
+        "modifierDepth": 0,
+        "offset": 2048,
+        "opcode": "CALL",
+        "pc": 16129,
+        "sourcePath": "contracts/base/PeripheryPayments.sol"
+      },
+      {
+        "jump": "-",
+        "length": 37,
+        "modifierDepth": 0,
+        "offset": 2048,
+        "opcode": "JUMPI",
+        "pc": 16136,
+        "sourcePath": "contracts/base/PeripheryPayments.sol"
+      },
+      {
+        "jump": "-",
+        "length": 40,
+        "modifierDepth": 0,
+        "offset": 2135,
+        "opcode": "JUMPI",
+        "pc": 16265,
+        "sourcePath": "contracts/base/PeripheryPayments.sol"
+      },
+      {
+        "jump": "-",
+        "length": 40,
+        "modifierDepth": 0,
+        "offset": 2135,
+        "opcode": "CALL",
+        "pc": 16273,
+        "sourcePath": "contracts/base/PeripheryPayments.sol"
+      },
+      {
+        "jump": "-",
+        "length": 40,
+        "modifierDepth": 0,
+        "offset": 2135,
+        "opcode": "JUMPI",
+        "pc": 16280,
+        "sourcePath": "contracts/base/PeripheryPayments.sol"
+      },
+      {
+        "jump": "-",
+        "length": 40,
+        "modifierDepth": 0,
+        "offset": 2135,
+        "opcode": "JUMPI",
+        "pc": 16307,
+        "sourcePath": "contracts/base/PeripheryPayments.sol"
+      },
+      {
+        "jump": "-",
+        "length": 569,
+        "modifierDepth": 0,
+        "offset": 1948,
+        "opcode": "JUMP",
+        "pc": 16319,
+        "sourcePath": "contracts/base/PeripheryPayments.sol"
+      },
+      {
+        "jump": "-",
+        "length": 324,
+        "modifierDepth": 0,
+        "offset": 2193,
+        "opcode": "JUMPI",
+        "pc": 16337,
+        "sourcePath": "contracts/base/PeripheryPayments.sol"
+      },
+      {
+        "jump": "i",
+        "length": 52,
+        "modifierDepth": 0,
+        "offset": 2328,
+        "opcode": "JUMP",
+        "pc": 16347,
+        "sourcePath": "contracts/base/PeripheryPayments.sol"
+      },
+      {
+        "jump": "-",
+        "length": 324,
+        "modifierDepth": 0,
+        "offset": 2193,
+        "opcode": "JUMP",
+        "pc": 16352,
+        "sourcePath": "contracts/base/PeripheryPayments.sol"
+      },
+      {
+        "jump": "i",
+        "length": 63,
+        "modifierDepth": 0,
+        "offset": 2442,
+        "opcode": "JUMP",
+        "pc": 16364,
+        "sourcePath": "contracts/base/PeripheryPayments.sol"
+      },
+      {
+        "jump": "-",
+        "length": 71,
+        "modifierDepth": 0,
+        "offset": 1393,
+        "opcode": "JUMPI",
+        "pc": 16594,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "-",
+        "length": 71,
+        "modifierDepth": 0,
+        "offset": 1393,
+        "opcode": "JUMP",
+        "pc": 16616,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "-",
+        "length": 71,
+        "modifierDepth": 0,
+        "offset": 1393,
+        "opcode": "CALL",
+        "pc": 16668,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "-",
+        "length": 71,
+        "modifierDepth": 0,
+        "offset": 1393,
+        "opcode": "JUMPI",
+        "pc": 16681,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "-",
+        "length": 71,
+        "modifierDepth": 0,
+        "offset": 1393,
+        "opcode": "JUMP",
+        "pc": 16714,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "-",
+        "length": 57,
+        "modifierDepth": 0,
+        "offset": 1483,
+        "opcode": "JUMPI",
+        "pc": 16732,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "-",
+        "length": 44,
+        "modifierDepth": 0,
+        "offset": 1495,
+        "opcode": "JUMPI",
+        "pc": 16741,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "-",
+        "length": 24,
+        "modifierDepth": 0,
+        "offset": 1515,
+        "opcode": "JUMPI",
+        "pc": 16758,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "-",
+        "length": 72,
+        "modifierDepth": 0,
+        "offset": 1475,
+        "opcode": "JUMPI",
+        "pc": 16770,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "i",
+        "length": 35,
+        "modifierDepth": 0,
+        "offset": 7687,
+        "opcode": "JUMP",
+        "pc": 16858,
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableMap.sol"
+      },
+      {
+        "jump": "-",
+        "length": 57,
+        "modifierDepth": 0,
+        "offset": 1498,
+        "opcode": "JUMPI",
+        "pc": 16877,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 57,
+        "modifierDepth": 0,
+        "offset": 1498,
+        "opcode": "JUMP",
+        "pc": 16885,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 42,
+        "modifierDepth": 0,
+        "offset": 1566,
+        "opcode": "JUMPI",
+        "pc": 16907,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 93,
+        "modifierDepth": 0,
+        "offset": 1637,
+        "opcode": "JUMPI",
+        "pc": 16994,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 93,
+        "modifierDepth": 0,
+        "offset": 1637,
+        "opcode": "JUMP",
+        "pc": 17003,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 83,
+        "modifierDepth": 0,
+        "offset": 1741,
+        "opcode": "JUMPI",
+        "pc": 17052,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 83,
+        "modifierDepth": 0,
+        "offset": 1835,
+        "opcode": "JUMPI",
+        "pc": 17083,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 83,
+        "modifierDepth": 0,
+        "offset": 1929,
+        "opcode": "JUMPI",
+        "pc": 17114,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 84,
+        "modifierDepth": 0,
+        "offset": 2023,
+        "opcode": "JUMPI",
+        "pc": 17145,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 84,
+        "modifierDepth": 0,
+        "offset": 2118,
+        "opcode": "JUMPI",
+        "pc": 17176,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 84,
+        "modifierDepth": 0,
+        "offset": 2213,
+        "opcode": "JUMPI",
+        "pc": 17207,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 84,
+        "modifierDepth": 0,
+        "offset": 2308,
+        "opcode": "JUMPI",
+        "pc": 17238,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 85,
+        "modifierDepth": 0,
+        "offset": 2403,
+        "opcode": "JUMPI",
+        "pc": 17270,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 85,
+        "modifierDepth": 0,
+        "offset": 2499,
+        "opcode": "JUMPI",
+        "pc": 17302,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 85,
+        "modifierDepth": 0,
+        "offset": 2595,
+        "opcode": "JUMPI",
+        "pc": 17334,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 85,
+        "modifierDepth": 0,
+        "offset": 2691,
+        "opcode": "JUMPI",
+        "pc": 17366,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 86,
+        "modifierDepth": 0,
+        "offset": 2787,
+        "opcode": "JUMPI",
+        "pc": 17398,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 86,
+        "modifierDepth": 0,
+        "offset": 2884,
+        "opcode": "JUMPI",
+        "pc": 17430,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 86,
+        "modifierDepth": 0,
+        "offset": 2981,
+        "opcode": "JUMPI",
+        "pc": 17462,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 86,
+        "modifierDepth": 0,
+        "offset": 3078,
+        "opcode": "JUMPI",
+        "pc": 17494,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 86,
+        "modifierDepth": 0,
+        "offset": 3175,
+        "opcode": "JUMPI",
+        "pc": 17527,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 85,
+        "modifierDepth": 0,
+        "offset": 3272,
+        "opcode": "JUMPI",
+        "pc": 17560,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 83,
+        "modifierDepth": 0,
+        "offset": 3368,
+        "opcode": "JUMPI",
+        "pc": 17592,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 78,
+        "modifierDepth": 0,
+        "offset": 3462,
+        "opcode": "JUMPI",
+        "pc": 17623,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 47,
+        "modifierDepth": 0,
+        "offset": 3553,
+        "opcode": "JUMPI",
+        "pc": 17653,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 25,
+        "modifierDepth": 0,
+        "offset": 3575,
+        "opcode": "JUMPI",
+        "pc": 17662,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 30,
+        "modifierDepth": 0,
+        "offset": 3955,
+        "opcode": "JUMPI",
+        "pc": 17681,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 30,
+        "modifierDepth": 0,
+        "offset": 3955,
+        "opcode": "JUMP",
+        "pc": 17687,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "o",
+        "length": 2611,
+        "modifierDepth": 0,
+        "offset": 1384,
+        "opcode": "JUMP",
+        "pc": 17708,
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "jump": "-",
+        "length": 98,
+        "modifierDepth": 0,
+        "offset": 3284,
+        "opcode": "JUMPI",
+        "pc": 17737,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "jump": "-",
+        "length": 563,
+        "modifierDepth": 0,
+        "offset": 3395,
+        "opcode": "JUMPI",
+        "pc": 17766,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "jump": "i",
+        "length": 61,
+        "modifierDepth": 0,
+        "offset": 3457,
+        "opcode": "JUMP",
+        "pc": 17776,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "jump": "-",
+        "length": 563,
+        "modifierDepth": 0,
+        "offset": 3395,
+        "opcode": "JUMP",
+        "pc": 17783,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "jump": "-",
+        "length": 422,
+        "modifierDepth": 0,
+        "offset": 3536,
+        "opcode": "JUMPI",
+        "pc": 17810,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "jump": "i",
+        "length": 60,
+        "modifierDepth": 0,
+        "offset": 3606,
+        "opcode": "JUMP",
+        "pc": 17822,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "jump": "i",
+        "length": 60,
+        "modifierDepth": 0,
+        "offset": 3702,
+        "opcode": "JUMP",
+        "pc": 17837,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "jump": "-",
+        "length": 49,
+        "modifierDepth": 0,
+        "offset": 3791,
+        "opcode": "JUMPI",
+        "pc": 17865,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "jump": "-",
+        "length": 49,
+        "modifierDepth": 0,
+        "offset": 3791,
+        "opcode": "JUMP",
+        "pc": 17870,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "jump": "-",
+        "length": 422,
+        "modifierDepth": 0,
+        "offset": 3536,
+        "opcode": "JUMP",
+        "pc": 17881,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "jump": "i",
+        "length": 61,
+        "modifierDepth": 0,
+        "offset": 3885,
+        "opcode": "JUMP",
+        "pc": 17892,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "jump": "o",
+        "length": 920,
+        "modifierDepth": 0,
+        "offset": 3045,
+        "opcode": "JUMP",
+        "pc": 17904,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "jump": "i",
+        "length": 32,
+        "modifierDepth": 0,
+        "offset": 8150,
+        "opcode": "JUMP",
+        "pc": 17928,
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableSet.sol"
+      },
+      {
+        "jump": "i",
+        "length": 64,
+        "modifierDepth": 0,
+        "offset": 7131,
+        "opcode": "JUMP",
+        "pc": 17950,
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableMap.sol"
+      },
+      {
+        "jump": "-",
+        "length": 81,
+        "modifierDepth": 0,
+        "offset": 767,
+        "opcode": "JUMPI",
+        "pc": 18543,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "-",
+        "length": 81,
+        "modifierDepth": 0,
+        "offset": 767,
+        "opcode": "JUMP",
+        "pc": 18565,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "-",
+        "length": 81,
+        "modifierDepth": 0,
+        "offset": 767,
+        "opcode": "CALL",
+        "pc": 18617,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "-",
+        "length": 81,
+        "modifierDepth": 0,
+        "offset": 767,
+        "opcode": "JUMPI",
+        "pc": 18630,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "-",
+        "length": 81,
+        "modifierDepth": 0,
+        "offset": 767,
+        "opcode": "JUMP",
+        "pc": 18663,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "-",
+        "length": 57,
+        "modifierDepth": 0,
+        "offset": 867,
+        "opcode": "JUMPI",
+        "pc": 18681,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "-",
+        "length": 44,
+        "modifierDepth": 0,
+        "offset": 879,
+        "opcode": "JUMPI",
+        "pc": 18690,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "-",
+        "length": 24,
+        "modifierDepth": 0,
+        "offset": 899,
+        "opcode": "JUMPI",
+        "pc": 18707,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "-",
+        "length": 73,
+        "modifierDepth": 0,
+        "offset": 859,
+        "opcode": "JUMPI",
+        "pc": 18719,
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      },
+      {
+        "jump": "o",
+        "length": 123,
+        "modifierDepth": 0,
+        "offset": 4270,
+        "opcode": "JUMP",
+        "pc": 19295,
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableMap.sol"
+      },
+      {
+        "jump": "-",
+        "length": 98,
+        "modifierDepth": 0,
+        "offset": 1297,
+        "opcode": "JUMPI",
+        "pc": 19324,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "jump": "i",
+        "length": 63,
+        "modifierDepth": 0,
+        "offset": 1429,
+        "opcode": "JUMP",
+        "pc": 19371,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "jump": "i",
+        "length": 69,
+        "modifierDepth": 0,
+        "offset": 1520,
+        "opcode": "JUMP",
+        "pc": 19398,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "jump": "i",
+        "length": 80,
+        "modifierDepth": 0,
+        "offset": 1510,
+        "opcode": "JUMP",
+        "pc": 19403,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "jump": "-",
+        "length": 98,
+        "modifierDepth": 0,
+        "offset": 2227,
+        "opcode": "JUMPI",
+        "pc": 19432,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "jump": "i",
+        "length": 73,
+        "modifierDepth": 0,
+        "offset": 2353,
+        "opcode": "JUMP",
+        "pc": 19473,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "jump": "i",
+        "length": 21,
+        "modifierDepth": 0,
+        "offset": 1716,
+        "opcode": "JUMP",
+        "pc": 19683,
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableSet.sol"
+      },
+      {
+        "jump": "-",
+        "length": 319,
+        "modifierDepth": 0,
+        "offset": 1711,
+        "opcode": "JUMPI",
+        "pc": 19688,
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableSet.sol"
+      },
+      {
+        "jump": "-",
+        "length": 11,
+        "modifierDepth": 0,
+        "offset": 1965,
+        "opcode": "JUMP",
+        "pc": 19737,
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableSet.sol"
+      },
+      {
+        "jump": "-",
+        "length": 12,
+        "modifierDepth": 0,
+        "offset": 2007,
+        "opcode": "JUMP",
+        "pc": 19745,
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableSet.sol"
+      },
+      {
+        "jump": "-",
+        "length": 435,
+        "modifierDepth": 0,
+        "offset": 2065,
+        "opcode": "JUMPI",
+        "pc": 19768,
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableMap.sol"
+      },
+      {
+        "jump": "-",
+        "length": 11,
+        "modifierDepth": 0,
+        "offset": 2380,
+        "opcode": "JUMP",
+        "pc": 19846,
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableMap.sol"
+      },
+      {
+        "jump": "-",
+        "length": 26,
+        "modifierDepth": 0,
+        "offset": 2422,
+        "opcode": "JUMPI",
+        "pc": 19864,
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableMap.sol"
+      },
+      {
+        "jump": "-",
+        "length": 12,
+        "modifierDepth": 0,
+        "offset": 2477,
+        "opcode": "JUMP",
+        "pc": 19896,
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableMap.sol"
+      },
+      {
+        "jump": "-",
+        "length": 30,
+        "modifierDepth": 0,
+        "offset": 601,
+        "opcode": "JUMPI",
+        "pc": 20141,
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      }
+    ],
+    "mappedInstructionCount": 3368,
+    "mappedInstructionSetSha256": "0xe1151614a80a097d526d4820b35ab8156160c7ff941cceaf7bf6aeec39b16c3f",
+    "mappedPcRanges": [
+      {
+        "endPc": 1492,
+        "instructionCount": 21,
+        "startPc": 1458
+      },
+      {
+        "endPc": 1526,
+        "instructionCount": 10,
+        "startPc": 1514
+      },
+      {
+        "endPc": 1545,
+        "instructionCount": 9,
+        "startPc": 1528
+      },
+      {
+        "endPc": 2481,
+        "instructionCount": 12,
+        "startPc": 2463
+      },
+      {
+        "endPc": 2554,
+        "instructionCount": 28,
+        "startPc": 2489
+      },
+      {
+        "endPc": 3539,
+        "instructionCount": 7,
+        "startPc": 3533
+      },
+      {
+        "endPc": 4391,
+        "instructionCount": 12,
+        "startPc": 4373
+      },
+      {
+        "endPc": 4464,
+        "instructionCount": 28,
+        "startPc": 4399
+      },
+      {
+        "endPc": 5179,
+        "instructionCount": 6,
+        "startPc": 5174
+      },
+      {
+        "endPc": 7774,
+        "instructionCount": 21,
+        "startPc": 7743
+      },
+      {
+        "endPc": 7880,
+        "instructionCount": 50,
+        "startPc": 7782
+      },
+      {
+        "endPc": 7913,
+        "instructionCount": 18,
+        "startPc": 7889
+      },
+      {
+        "endPc": 8053,
+        "instructionCount": 94,
+        "startPc": 7922
+      },
+      {
+        "endPc": 8056,
+        "instructionCount": 2,
+        "startPc": 8055
+      },
+      {
+        "endPc": 8058,
+        "instructionCount": 1,
+        "startPc": 8058
+      },
+      {
+        "endPc": 8060,
+        "instructionCount": 1,
+        "startPc": 8060
+      },
+      {
+        "endPc": 8160,
+        "instructionCount": 33,
+        "startPc": 8062
+      },
+      {
+        "endPc": 8216,
+        "instructionCount": 35,
+        "startPc": 8162
+      },
+      {
+        "endPc": 8382,
+        "instructionCount": 114,
+        "startPc": 8225
+      },
+      {
+        "endPc": 8415,
+        "instructionCount": 18,
+        "startPc": 8391
+      },
+      {
+        "endPc": 8496,
+        "instructionCount": 43,
+        "startPc": 8424
+      },
+      {
+        "endPc": 8581,
+        "instructionCount": 48,
+        "startPc": 8506
+      },
+      {
+        "endPc": 8608,
+        "instructionCount": 16,
+        "startPc": 8590
+      },
+      {
+        "endPc": 8624,
+        "instructionCount": 6,
+        "startPc": 8618
+      },
+      {
+        "endPc": 8729,
+        "instructionCount": 57,
+        "startPc": 8634
+      },
+      {
+        "endPc": 8742,
+        "instructionCount": 5,
+        "startPc": 8738
+      },
+      {
+        "endPc": 8905,
+        "instructionCount": 101,
+        "startPc": 8751
+      },
+      {
+        "endPc": 8918,
+        "instructionCount": 5,
+        "startPc": 8914
+      },
+      {
+        "endPc": 8971,
+        "instructionCount": 35,
+        "startPc": 8927
+      },
+      {
+        "endPc": 8984,
+        "instructionCount": 5,
+        "startPc": 8980
+      },
+      {
+        "endPc": 9017,
+        "instructionCount": 19,
+        "startPc": 8993
+      },
+      {
+        "endPc": 9030,
+        "instructionCount": 5,
+        "startPc": 9026
+      },
+      {
+        "endPc": 9119,
+        "instructionCount": 43,
+        "startPc": 9039
+      },
+      {
+        "endPc": 9279,
+        "instructionCount": 21,
+        "startPc": 9217
+      },
+      {
+        "endPc": 9342,
+        "instructionCount": 46,
+        "startPc": 9281
+      },
+      {
+        "endPc": 12966,
+        "instructionCount": 7,
+        "startPc": 12954
+      },
+      {
+        "endPc": 13270,
+        "instructionCount": 10,
+        "startPc": 13259
+      },
+      {
+        "endPc": 13284,
+        "instructionCount": 5,
+        "startPc": 13279
+      },
+      {
+        "endPc": 13303,
+        "instructionCount": 8,
+        "startPc": 13293
+      },
+      {
+        "endPc": 13320,
+        "instructionCount": 14,
+        "startPc": 13305
+      },
+      {
+        "endPc": 13419,
+        "instructionCount": 53,
+        "startPc": 13329
+      },
+      {
+        "endPc": 13447,
+        "instructionCount": 12,
+        "startPc": 13434
+      },
+      {
+        "endPc": 13519,
+        "instructionCount": 36,
+        "startPc": 13481
+      },
+      {
+        "endPc": 13609,
+        "instructionCount": 67,
+        "startPc": 13534
+      },
+      {
+        "endPc": 13619,
+        "instructionCount": 7,
+        "startPc": 13613
+      },
+      {
+        "endPc": 13629,
+        "instructionCount": 9,
+        "startPc": 13621
+      },
+      {
+        "endPc": 13648,
+        "instructionCount": 12,
+        "startPc": 13631
+      },
+      {
+        "endPc": 13653,
+        "instructionCount": 4,
+        "startPc": 13650
+      },
+      {
+        "endPc": 13771,
+        "instructionCount": 107,
+        "startPc": 13655
+      },
+      {
+        "endPc": 13779,
+        "instructionCount": 6,
+        "startPc": 13774
+      },
+      {
+        "endPc": 14080,
+        "instructionCount": 18,
+        "startPc": 14056
+      },
+      {
+        "endPc": 14099,
+        "instructionCount": 9,
+        "startPc": 14089
+      },
+      {
+        "endPc": 14175,
+        "instructionCount": 26,
+        "startPc": 14108
+      },
+      {
+        "endPc": 14356,
+        "instructionCount": 127,
+        "startPc": 14184
+      },
+      {
+        "endPc": 14404,
+        "instructionCount": 29,
+        "startPc": 14365
+      },
+      {
+        "endPc": 14568,
+        "instructionCount": 117,
+        "startPc": 14413
+      },
+      {
+        "endPc": 14570,
+        "instructionCount": 1,
+        "startPc": 14570
+      },
+      {
+        "endPc": 14598,
+        "instructionCount": 20,
+        "startPc": 14572
+      },
+      {
+        "endPc": 14626,
+        "instructionCount": 16,
+        "startPc": 14606
+      },
+      {
+        "endPc": 15292,
+        "instructionCount": 1,
+        "startPc": 15292
+      },
+      {
+        "endPc": 15310,
+        "instructionCount": 7,
+        "startPc": 15301
+      },
+      {
+        "endPc": 15401,
+        "instructionCount": 40,
+        "startPc": 15318
+      },
+      {
+        "endPc": 15486,
+        "instructionCount": 35,
+        "startPc": 15409
+      },
+      {
+        "endPc": 15520,
+        "instructionCount": 18,
+        "startPc": 15495
+      },
+      {
+        "endPc": 15533,
+        "instructionCount": 7,
+        "startPc": 15522
+      },
+      {
+        "endPc": 15539,
+        "instructionCount": 4,
+        "startPc": 15535
+      },
+      {
+        "endPc": 15594,
+        "instructionCount": 14,
+        "startPc": 15548
+      },
+      {
+        "endPc": 15636,
+        "instructionCount": 18,
+        "startPc": 15603
+      },
+      {
+        "endPc": 15723,
+        "instructionCount": 29,
+        "startPc": 15638
+      },
+      {
+        "endPc": 15734,
+        "instructionCount": 3,
+        "startPc": 15732
+      },
+      {
+        "endPc": 15865,
+        "instructionCount": 58,
+        "startPc": 15737
+      },
+      {
+        "endPc": 15943,
+        "instructionCount": 36,
+        "startPc": 15871
+      },
+      {
+        "endPc": 15945,
+        "instructionCount": 1,
+        "startPc": 15945
+      },
+      {
+        "endPc": 15966,
+        "instructionCount": 10,
+        "startPc": 15954
+      },
+      {
+        "endPc": 16008,
+        "instructionCount": 2,
+        "startPc": 16007
+      },
+      {
+        "endPc": 16036,
+        "instructionCount": 16,
+        "startPc": 16017
+      },
+      {
+        "endPc": 16152,
+        "instructionCount": 56,
+        "startPc": 16077
+      },
+      {
+        "endPc": 16220,
+        "instructionCount": 17,
+        "startPc": 16193
+      },
+      {
+        "endPc": 16312,
+        "instructionCount": 67,
+        "startPc": 16229
+      },
+      {
+        "endPc": 16317,
+        "instructionCount": 2,
+        "startPc": 16314
+      },
+      {
+        "endPc": 16320,
+        "instructionCount": 2,
+        "startPc": 16319
+      },
+      {
+        "endPc": 16364,
+        "instructionCount": 24,
+        "startPc": 16329
+      },
+      {
+        "endPc": 16451,
+        "instructionCount": 4,
+        "startPc": 16447
+      },
+      {
+        "endPc": 16598,
+        "instructionCount": 71,
+        "startPc": 16460
+      },
+      {
+        "endPc": 16732,
+        "instructionCount": 107,
+        "startPc": 16602
+      },
+      {
+        "endPc": 16763,
+        "instructionCount": 23,
+        "startPc": 16734
+      },
+      {
+        "endPc": 16774,
+        "instructionCount": 7,
+        "startPc": 16765
+      },
+      {
+        "endPc": 16858,
+        "instructionCount": 34,
+        "startPc": 16782
+      },
+      {
+        "endPc": 16895,
+        "instructionCount": 23,
+        "startPc": 16863
+      },
+      {
+        "endPc": 16911,
+        "instructionCount": 8,
+        "startPc": 16901
+      },
+      {
+        "endPc": 16994,
+        "instructionCount": 34,
+        "startPc": 16919
+      },
+      {
+        "endPc": 17042,
+        "instructionCount": 8,
+        "startPc": 17000
+      },
+      {
+        "endPc": 17654,
+        "instructionCount": 218,
+        "startPc": 17044
+      },
+      {
+        "endPc": 17712,
+        "instructionCount": 39,
+        "startPc": 17658
+      },
+      {
+        "endPc": 17722,
+        "instructionCount": 2,
+        "startPc": 17721
+      },
+      {
+        "endPc": 17742,
+        "instructionCount": 10,
+        "startPc": 17731
+      },
+      {
+        "endPc": 17752,
+        "instructionCount": 2,
+        "startPc": 17751
+      },
+      {
+        "endPc": 17785,
+        "instructionCount": 17,
+        "startPc": 17761
+      },
+      {
+        "endPc": 17795,
+        "instructionCount": 2,
+        "startPc": 17794
+      },
+      {
+        "endPc": 17841,
+        "instructionCount": 26,
+        "startPc": 17804
+      },
+      {
+        "endPc": 17851,
+        "instructionCount": 2,
+        "startPc": 17850
+      },
+      {
+        "endPc": 17904,
+        "instructionCount": 35,
+        "startPc": 17860
+      },
+      {
+        "endPc": 17936,
+        "instructionCount": 12,
+        "startPc": 17917
+      },
+      {
+        "endPc": 17950,
+        "instructionCount": 4,
+        "startPc": 17945
+      },
+      {
+        "endPc": 18392,
+        "instructionCount": 4,
+        "startPc": 18388
+      },
+      {
+        "endPc": 18547,
+        "instructionCount": 78,
+        "startPc": 18401
+      },
+      {
+        "endPc": 18681,
+        "instructionCount": 107,
+        "startPc": 18551
+      },
+      {
+        "endPc": 18712,
+        "instructionCount": 23,
+        "startPc": 18683
+      },
+      {
+        "endPc": 18723,
+        "instructionCount": 7,
+        "startPc": 18714
+      },
+      {
+        "endPc": 18795,
+        "instructionCount": 27,
+        "startPc": 18731
+      },
+      {
+        "endPc": 19299,
+        "instructionCount": 23,
+        "startPc": 19272
+      },
+      {
+        "endPc": 19309,
+        "instructionCount": 2,
+        "startPc": 19308
+      },
+      {
+        "endPc": 19334,
+        "instructionCount": 12,
+        "startPc": 19318
+      },
+      {
+        "endPc": 19344,
+        "instructionCount": 2,
+        "startPc": 19343
+      },
+      {
+        "endPc": 19353,
+        "instructionCount": 1,
+        "startPc": 19353
+      },
+      {
+        "endPc": 19385,
+        "instructionCount": 12,
+        "startPc": 19368
+      },
+      {
+        "endPc": 19407,
+        "instructionCount": 9,
+        "startPc": 19394
+      },
+      {
+        "endPc": 19417,
+        "instructionCount": 2,
+        "startPc": 19416
+      },
+      {
+        "endPc": 19443,
+        "instructionCount": 12,
+        "startPc": 19426
+      },
+      {
+        "endPc": 19460,
+        "instructionCount": 3,
+        "startPc": 19458
+      },
+      {
+        "endPc": 19473,
+        "instructionCount": 3,
+        "startPc": 19469
+      },
+      {
+        "endPc": 19688,
+        "instructionCount": 10,
+        "startPc": 19672
+      },
+      {
+        "endPc": 19738,
+        "instructionCount": 43,
+        "startPc": 19690
+      },
+      {
+        "endPc": 19768,
+        "instructionCount": 20,
+        "startPc": 19740
+      },
+      {
+        "endPc": 19896,
+        "instructionCount": 107,
+        "startPc": 19771
+      },
+      {
+        "endPc": 20125,
+        "instructionCount": 2,
+        "startPc": 20124
+      },
+      {
+        "endPc": 20145,
+        "instructionCount": 9,
+        "startPc": 20134
+      }
+    ],
+    "runtimeWideDelegatecallPcs": [
+      10522
+    ],
+    "sourceMapBoundary": {
+      "lastSourceMappedOpcode": "REVERT",
+      "lastSourceMappedPc": 23915,
+      "sourceMappedInstructionCount": 15050,
+      "trailingCompilerDataByteLength": 550
+    }
+  },
+  "claimStatus": "local_static_analysis_not_formal_proof_not_activation_ready",
+  "decision": "local_path_review_complete_public_evidence_and_external_dependencies_missing",
+  "digests": {
+    "bytecodePathSha256": "0x68a21ced45b73b37bd89e8ad6421973320e1bf3b9efb492cedbe86bcd5b12d92",
+    "sourcePathSha256": "0xdddb7ad83aa59bbb306f007d8435c7a4615fa83066035d53ff26d30727974e0b"
+  },
+  "findings": {
+    "arbitraryCalldataDispatcher": "not_referenced_by_manager_local_source_path",
+    "authorization": "no_existing_position_authorization_required_new_nft_recipient_is_calldata",
+    "callbackContinuation": "canonical_pool_mint_calls_pancakeV3MintCallback_then_token_transferFrom",
+    "decisionCriticalParameters": [
+      "token0",
+      "token1",
+      "fee",
+      "tickLower",
+      "tickUpper",
+      "amount0Desired",
+      "amount1Desired",
+      "amount0Min",
+      "amount1Min",
+      "recipient",
+      "deadline"
+    ],
+    "delegatecall": "not_mapped_to_manager_local_source_path",
+    "externalContractCode": "separate_pool_and_token_review_required",
+    "formalProof": false
+  },
+  "limitations": [
+    "This is manual/static review automation, not formal verification or exhaustive symbolic execution.",
+    "Source-map intersection can include optimizer-shared instructions and does not prove every runtime state transition.",
+    "Pool and token implementations, callback-time token behavior, oracle state, position authority, and session-policy enforcement require separate exact evidence.",
+    "The manager runtime binding is a locally reconstructed immutable-linked build; a fresh exact-block observation is still required.",
+    "An earlier retained build-info SHA-256 differs from this local build-info container; its raw bytes are unavailable, so no byte-level cause or equality claim is invented.",
+    "A local repository artifact is not an allowed public HTTPS/IPFS evidence locator."
+  ],
+  "method": {
+    "assurance": "manual_static_analysis_not_formal_proof",
+    "name": "manual_static_source_and_bytecode_control_flow_review",
+    "version": "proofera-pancake-v3-selector-path-v1"
+  },
+  "operation": "mint",
+  "publication": {
+    "eligibleAsDomainEvidenceReference": false,
+    "localRepositoryPath": "evidence/development/pancake-v3-selector-paths/mint.json",
+    "publicContentAddressedLocator": null,
+    "status": "local_artifact_not_published_or_independently_refetched",
+    "unmetRequirements": [
+      "publish these exact canonical bytes at a stable HTTPS or IPFS content-addressed locator",
+      "re-fetch the public bytes independently and verify the whole-file SHA-256",
+      "obtain authenticated independent reviewer approval bound to the exact write scope"
+    ]
+  },
+  "schemaVersion": 1,
+  "selector": "0x88316456",
+  "signature": "mint((address,address,uint24,int24,int24,uint256,uint256,uint256,uint256,address,uint256))",
+  "sourcePath": {
+    "analysisBoundary": "manager_source_plus_synchronous_manager_callback_continuation_only",
+    "branchInventory": {
+      "count": 37,
+      "nodes": [
+        {
+          "kind": "IfStatement",
+          "line": 64,
+          "nodeId": 2068,
+          "sourcePath": "@openzeppelin/contracts/utils/EnumerableMap.sol",
+          "sourceSliceSha256": "0xcf0ea216302a966a4f15abc5d9dc5758bebda109b9c0c0951443291d6da8f478",
+          "span": {
+            "length": 435,
+            "offset": 2065,
+            "sourceId": 12
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 55,
+          "nodeId": 2602,
+          "sourcePath": "@openzeppelin/contracts/utils/EnumerableSet.sol",
+          "sourceSliceSha256": "0x76565ade5354f9748d4d399fd4ed23c82aa8625d45b3f4b2760ef6dc3a98c947",
+          "span": {
+            "length": 319,
+            "offset": 1711,
+            "sourceId": 13
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 33,
+          "nodeId": 3820,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/FullMath.sol",
+          "sourceSliceSha256": "0x9ad71c0b55395d35f61addb2821e87d3cb91002387d588621baab109ba525ebc",
+          "span": {
+            "length": 185,
+            "offset": 1588,
+            "sourceId": 26
+          }
+        },
+        {
+          "kind": "Conditional",
+          "line": 24,
+          "nodeId": 4007,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0x6ea4fcfffa12e9fb5d4f56e7c8a9b71388720da33c61998b7d7c0513238fbf7c",
+          "span": {
+            "length": 57,
+            "offset": 1498,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "Conditional",
+          "line": 27,
+          "nodeId": 4028,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0xd98f8060aaef2e6dea8e2de9cf6f59c1b3ed414d3538d0ac7291d12d25252b64",
+          "span": {
+            "length": 93,
+            "offset": 1637,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 28,
+          "nodeId": 4044,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0x702409e0da8258ada3645b4a13705d65c85f627e91f87985fc37cca67bb18d22",
+          "span": {
+            "length": 83,
+            "offset": 1741,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 29,
+          "nodeId": 4059,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0xb83ca245ce987562ed7b6c7396f8d2f3cdbbae337a8c75adee4ba5cafe6c8258",
+          "span": {
+            "length": 83,
+            "offset": 1835,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 30,
+          "nodeId": 4074,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0x957a3426d306bce06138a4dca0246eddf6a899aa3a47983ba8ae669365d461aa",
+          "span": {
+            "length": 83,
+            "offset": 1929,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 31,
+          "nodeId": 4089,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0x123280990cbc3413cbc77263b4ee2c2368873c9880fcd2e27854b6b3773de91f",
+          "span": {
+            "length": 84,
+            "offset": 2023,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 32,
+          "nodeId": 4104,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0x488ad2d1f1c277bca8c46ec4bb6923599b47f7f5a9b5d280154df12d056c91aa",
+          "span": {
+            "length": 84,
+            "offset": 2118,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 33,
+          "nodeId": 4119,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0x06b5640ee0b60a0824183d84c1600b3812cea2d39e9a3a0de866e9ba196bde57",
+          "span": {
+            "length": 84,
+            "offset": 2213,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 34,
+          "nodeId": 4134,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0xb0f99dac77ab3736da40d2f307c2aceb7deae7a4bb3c6f75f05c604b2338c8cb",
+          "span": {
+            "length": 84,
+            "offset": 2308,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 35,
+          "nodeId": 4149,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0x8e0b8d71663dae30df5e3d7ffb761940625abc81541e5c9310beceffbcf8093f",
+          "span": {
+            "length": 85,
+            "offset": 2403,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 36,
+          "nodeId": 4164,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0x350aa163dae5f13c1c6a54fdb4fa775d070a162c082d6688cea926934dc2000f",
+          "span": {
+            "length": 85,
+            "offset": 2499,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 37,
+          "nodeId": 4179,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0xcb1ec0d4440bf1acdbfb99065e41200e71fb6d919682e28b19ae75a3dc7c5da6",
+          "span": {
+            "length": 85,
+            "offset": 2595,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 38,
+          "nodeId": 4194,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0x9c0fb9930023c2ee3216936dc7d84c6b2368745ba1092f1e760f426780df8c03",
+          "span": {
+            "length": 85,
+            "offset": 2691,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 39,
+          "nodeId": 4209,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0xeda3b091cdaf49c517d45c0cdfb165a07e459dd7f8ba42aae2a682f66ac75ccd",
+          "span": {
+            "length": 86,
+            "offset": 2787,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 40,
+          "nodeId": 4224,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0xed90caa37f13c3e65c64a1996f6eedc75789fdb865b6e5080a293d5380f26ac9",
+          "span": {
+            "length": 86,
+            "offset": 2884,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 41,
+          "nodeId": 4239,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0xe2ec0013c9449019acbb442e60747cac603c283459e1b39ee1c9bebfcc112009",
+          "span": {
+            "length": 86,
+            "offset": 2981,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 42,
+          "nodeId": 4254,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0x6e118bbfc5502f478a3d525655316e7af81b050c8ff2713c05538fbe93cc6171",
+          "span": {
+            "length": 86,
+            "offset": 3078,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 43,
+          "nodeId": 4269,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0xdfd0f011e584f670b64ad39eec8d3f0a2db690d04a47333d7cc7cc56c6e732e0",
+          "span": {
+            "length": 86,
+            "offset": 3175,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 44,
+          "nodeId": 4284,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0xaf7a1ca7a98e4b1edd438ca9ab6463d7596d7c5fc12212b2ad9a1bb8794a9045",
+          "span": {
+            "length": 85,
+            "offset": 3272,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 45,
+          "nodeId": 4299,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0x66f5dc63ff37f7bc4e40a7bedb68bf4ca4541a1830db4aa06b85b1ae5956373c",
+          "span": {
+            "length": 83,
+            "offset": 3368,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 46,
+          "nodeId": 4314,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0x8add73474ea507865a47785d8acbfea9d4420dc365bcc0f7b2e511fd130d82c3",
+          "span": {
+            "length": 78,
+            "offset": 3462,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 48,
+          "nodeId": 4328,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0x246a261fe4e8b8f0d132eae77c6403bc3d1fbba2cc840372c203f90ad08a894c",
+          "span": {
+            "length": 47,
+            "offset": 3553,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "Conditional",
+          "line": 53,
+          "nodeId": 4346,
+          "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+          "sourceSliceSha256": "0xe338fdb34b5184d2869c4e06d9cc0bcf5bb5da8126f8ffd7bfde7d2a9362b89a",
+          "span": {
+            "length": 30,
+            "offset": 3955,
+            "sourceId": 27
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 33,
+          "nodeId": 5874,
+          "sourcePath": "contracts/base/LiquidityManagement.sol",
+          "sourceSliceSha256": "0x9e95eaedf33a69e8aa987d4cff54272d49de66cd70b168ae054b6473c394cb88",
+          "span": {
+            "length": 88,
+            "offset": 1232,
+            "sourceId": 31
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 34,
+          "nodeId": 5889,
+          "sourcePath": "contracts/base/LiquidityManagement.sol",
+          "sourceSliceSha256": "0xb461bd82912abfb0e92083fc33383825fecdc89c2b835bcd89a73f64cab171f1",
+          "span": {
+            "length": 88,
+            "offset": 1331,
+            "sourceId": 31
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 58,
+          "nodeId": 6357,
+          "sourcePath": "contracts/base/PeripheryPayments.sol",
+          "sourceSliceSha256": "0x9d213d534ba00e26636f1dc954bc3e9bcffb8fec1b2234ee0b66347555b05f1e",
+          "span": {
+            "length": 569,
+            "offset": 1948,
+            "sourceId": 34
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 62,
+          "nodeId": 6356,
+          "sourcePath": "contracts/base/PeripheryPayments.sol",
+          "sourceSliceSha256": "0xf88621aac2870f29aeb4a42e2dada680af8f40e1eb6a6cf360945ce53842372f",
+          "span": {
+            "length": 324,
+            "offset": 2193,
+            "sourceId": 34
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 28,
+          "nodeId": 7212,
+          "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+          "sourceSliceSha256": "0x3da22e9fcdf0208aedbae084316114a80257330645157d3a16d91c122f63b29f",
+          "span": {
+            "length": 98,
+            "offset": 1297,
+            "sourceId": 51
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 44,
+          "nodeId": 7258,
+          "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+          "sourceSliceSha256": "0x3da22e9fcdf0208aedbae084316114a80257330645157d3a16d91c122f63b29f",
+          "span": {
+            "length": 98,
+            "offset": 2227,
+            "sourceId": 51
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 63,
+          "nodeId": 7299,
+          "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+          "sourceSliceSha256": "0x3da22e9fcdf0208aedbae084316114a80257330645157d3a16d91c122f63b29f",
+          "span": {
+            "length": 98,
+            "offset": 3284,
+            "sourceId": 51
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 65,
+          "nodeId": 7351,
+          "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+          "sourceSliceSha256": "0x4be3f3a741f3cd0215716b4c390fd57212c2ad825ef5aa3e62561dd7c7ab5cef",
+          "span": {
+            "length": 563,
+            "offset": 3395,
+            "sourceId": 51
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 67,
+          "nodeId": 7350,
+          "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+          "sourceSliceSha256": "0x629920bc713f6a9c9800966b24e535eee9209386ce227b2159fd1d660b099099",
+          "span": {
+            "length": 422,
+            "offset": 3536,
+            "sourceId": 51
+          }
+        },
+        {
+          "kind": "Conditional",
+          "line": 71,
+          "nodeId": 7337,
+          "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+          "sourceSliceSha256": "0x9061ed294063648306635f5bb54db78bd7fff7c0c36e00def85cc972bd286f3f",
+          "span": {
+            "length": 49,
+            "offset": 3791,
+            "sourceId": 51
+          }
+        },
+        {
+          "kind": "IfStatement",
+          "line": 122,
+          "nodeId": 4717,
+          "sourcePath": "contracts/NonfungiblePositionManager.sol",
+          "sourceSliceSha256": "0x40ff204b4e18bcae55e30575b56c10cc6d14eb5e276db68f5681f7177b1f69b6",
+          "span": {
+            "length": 134,
+            "offset": 4382,
+            "sourceId": 28
+          }
+        }
+      ],
+      "status": "manager_local_nodes_enumerated_external_contract_branches_out_of_scope"
+    },
+    "callEdges": [
+      {
+        "callKind": "internal_library_call",
+        "callSite": {
+          "line": 282,
+          "sourcePath": "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+          "span": {
+            "length": 30,
+            "offset": 10456,
+            "sourceId": 5
+          }
+        },
+        "from": "@openzeppelin/contracts/token/ERC721/ERC721.sol:ERC721._exists#1068",
+        "to": "@openzeppelin/contracts/utils/EnumerableMap.sol:EnumerableMap.contains#2398"
+      },
+      {
+        "callKind": "internal_definition_call",
+        "callSite": {
+          "line": 335,
+          "sourcePath": "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+          "span": {
+            "length": 16,
+            "offset": 12382,
+            "sourceId": 5
+          }
+        },
+        "from": "@openzeppelin/contracts/token/ERC721/ERC721.sol:ERC721._mint#1213",
+        "to": "@openzeppelin/contracts/token/ERC721/ERC721.sol:ERC721._exists#1068"
+      },
+      {
+        "callKind": "internal_definition_call",
+        "callSite": {
+          "line": 337,
+          "sourcePath": "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+          "span": {
+            "length": 45,
+            "offset": 12442,
+            "sourceId": 5
+          }
+        },
+        "from": "@openzeppelin/contracts/token/ERC721/ERC721.sol:ERC721._mint#1213",
+        "to": "@openzeppelin/contracts/token/ERC721/ERC721.sol:ERC721._beforeTokenTransfer#1480"
+      },
+      {
+        "callKind": "internal_library_call",
+        "callSite": {
+          "line": 339,
+          "sourcePath": "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+          "span": {
+            "length": 30,
+            "offset": 12498,
+            "sourceId": 5
+          }
+        },
+        "from": "@openzeppelin/contracts/token/ERC721/ERC721.sol:ERC721._mint#1213",
+        "to": "@openzeppelin/contracts/utils/EnumerableSet.sol:EnumerableSet.add#2969"
+      },
+      {
+        "callKind": "internal_library_call",
+        "callSite": {
+          "line": 341,
+          "sourcePath": "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+          "span": {
+            "length": 29,
+            "offset": 12539,
+            "sourceId": 5
+          }
+        },
+        "from": "@openzeppelin/contracts/token/ERC721/ERC721.sol:ERC721._mint#1213",
+        "to": "@openzeppelin/contracts/utils/EnumerableMap.sol:EnumerableMap.set#2358"
+      },
+      {
+        "callKind": "internal_definition_call",
+        "callSite": {
+          "line": 195,
+          "sourcePath": "@openzeppelin/contracts/utils/EnumerableMap.sol",
+          "span": {
+            "length": 64,
+            "offset": 7131,
+            "sourceId": 12
+          }
+        },
+        "from": "@openzeppelin/contracts/utils/EnumerableMap.sol:EnumerableMap.set#2358",
+        "to": "@openzeppelin/contracts/utils/EnumerableMap.sol:EnumerableMap._set#2070"
+      },
+      {
+        "callKind": "internal_definition_call",
+        "callSite": {
+          "line": 211,
+          "sourcePath": "@openzeppelin/contracts/utils/EnumerableMap.sol",
+          "span": {
+            "length": 35,
+            "offset": 7687,
+            "sourceId": 12
+          }
+        },
+        "from": "@openzeppelin/contracts/utils/EnumerableMap.sol:EnumerableMap.contains#2398",
+        "to": "@openzeppelin/contracts/utils/EnumerableMap.sol:EnumerableMap._contains#2169"
+      },
+      {
+        "callKind": "internal_definition_call",
+        "callSite": {
+          "line": 55,
+          "sourcePath": "@openzeppelin/contracts/utils/EnumerableSet.sol",
+          "span": {
+            "length": 21,
+            "offset": 1716,
+            "sourceId": 13
+          }
+        },
+        "from": "@openzeppelin/contracts/utils/EnumerableSet.sol:EnumerableSet._add#2604",
+        "to": "@openzeppelin/contracts/utils/EnumerableSet.sol:EnumerableSet._contains#2702"
+      },
+      {
+        "callKind": "internal_definition_call",
+        "callSite": {
+          "line": 257,
+          "sourcePath": "@openzeppelin/contracts/utils/EnumerableSet.sol",
+          "span": {
+            "length": 32,
+            "offset": 8150,
+            "sourceId": 13
+          }
+        },
+        "from": "@openzeppelin/contracts/utils/EnumerableSet.sol:EnumerableSet.add#2969",
+        "to": "@openzeppelin/contracts/utils/EnumerableSet.sol:EnumerableSet._add#2604"
+      },
+      {
+        "callKind": "internal_library_call",
+        "callSite": {
+          "line": 31,
+          "sourcePath": "contracts/base/LiquidityManagement.sol",
+          "span": {
+            "length": 60,
+            "offset": 1159,
+            "sourceId": 31
+          }
+        },
+        "from": "contracts/base/LiquidityManagement.sol:LiquidityManagement.pancakeV3MintCallback#5891",
+        "to": "contracts/libraries/CallbackValidation.sol:CallbackValidation.verifyCallback#7150"
+      },
+      {
+        "callKind": "internal_definition_call",
+        "callSite": {
+          "line": 33,
+          "sourcePath": "contracts/base/LiquidityManagement.sol",
+          "span": {
+            "length": 67,
+            "offset": 1253,
+            "sourceId": 31
+          }
+        },
+        "from": "contracts/base/LiquidityManagement.sol:LiquidityManagement.pancakeV3MintCallback#5891",
+        "to": "contracts/base/PeripheryPayments.sol:PeripheryPayments.pay#6359"
+      },
+      {
+        "callKind": "internal_definition_call",
+        "callSite": {
+          "line": 34,
+          "sourcePath": "contracts/base/LiquidityManagement.sol",
+          "span": {
+            "length": 67,
+            "offset": 1352,
+            "sourceId": 31
+          }
+        },
+        "from": "contracts/base/LiquidityManagement.sol:LiquidityManagement.pancakeV3MintCallback#5891",
+        "to": "contracts/base/PeripheryPayments.sol:PeripheryPayments.pay#6359"
+      },
+      {
+        "callKind": "internal_library_call",
+        "callSite": {
+          "line": 63,
+          "sourcePath": "contracts/base/LiquidityManagement.sol",
+          "span": {
+            "length": 45,
+            "offset": 2220,
+            "sourceId": 31
+          }
+        },
+        "from": "contracts/base/LiquidityManagement.sol:LiquidityManagement.addLiquidity#6023",
+        "to": "contracts/libraries/PoolAddress.sol:PoolAddress.computeAddress#7594"
+      },
+      {
+        "callKind": "external_contract_call",
+        "callSite": {
+          "line": 67,
+          "sourcePath": "contracts/base/LiquidityManagement.sol",
+          "span": {
+            "length": 12,
+            "offset": 2372,
+            "sourceId": 31
+          }
+        },
+        "from": "contracts/base/LiquidityManagement.sol:LiquidityManagement.addLiquidity#6023",
+        "to": "@pancakeswap/v3-core/contracts/interfaces/pool/IPancakeV3PoolState.sol:IPancakeV3PoolState.slot0#3681"
+      },
+      {
+        "callKind": "internal_library_call",
+        "callSite": {
+          "line": 68,
+          "sourcePath": "contracts/base/LiquidityManagement.sol",
+          "span": {
+            "length": 45,
+            "offset": 2423,
+            "sourceId": 31
+          }
+        },
+        "from": "contracts/base/LiquidityManagement.sol:LiquidityManagement.addLiquidity#6023",
+        "to": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol:TickMath.getSqrtRatioAtTick#4353"
+      },
+      {
+        "callKind": "internal_library_call",
+        "callSite": {
+          "line": 69,
+          "sourcePath": "contracts/base/LiquidityManagement.sol",
+          "span": {
+            "length": 45,
+            "offset": 2507,
+            "sourceId": 31
+          }
+        },
+        "from": "contracts/base/LiquidityManagement.sol:LiquidityManagement.addLiquidity#6023",
+        "to": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol:TickMath.getSqrtRatioAtTick#4353"
+      },
+      {
+        "callKind": "internal_library_call",
+        "callSite": {
+          "line": 71,
+          "sourcePath": "contracts/base/LiquidityManagement.sol",
+          "span": {
+            "length": 229,
+            "offset": 2581,
+            "sourceId": 31
+          }
+        },
+        "from": "contracts/base/LiquidityManagement.sol:LiquidityManagement.addLiquidity#6023",
+        "to": "contracts/libraries/LiquidityAmounts.sol:LiquidityAmounts.getLiquidityForAmounts#7353"
+      },
+      {
+        "callKind": "external_contract_call",
+        "callSite": {
+          "line": 80,
+          "sourcePath": "contracts/base/LiquidityManagement.sol",
+          "span": {
+            "length": 219,
+            "offset": 2855,
+            "sourceId": 31
+          }
+        },
+        "from": "contracts/base/LiquidityManagement.sol:LiquidityManagement.addLiquidity#6023",
+        "to": "@pancakeswap/v3-core/contracts/interfaces/pool/IPancakeV3PoolActions.sol:IPancakeV3PoolActions.mint#3365"
+      },
+      {
+        "callKind": "external_contract_call",
+        "callSite": {
+          "line": 61,
+          "sourcePath": "contracts/base/PeripheryPayments.sol",
+          "span": {
+            "length": 40,
+            "offset": 2135,
+            "sourceId": 34
+          }
+        },
+        "from": "contracts/base/PeripheryPayments.sol:PeripheryPayments.pay#6359",
+        "to": "@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20.transfer#486"
+      },
+      {
+        "callKind": "internal_library_call",
+        "callSite": {
+          "line": 64,
+          "sourcePath": "contracts/base/PeripheryPayments.sol",
+          "span": {
+            "length": 52,
+            "offset": 2328,
+            "sourceId": 34
+          }
+        },
+        "from": "contracts/base/PeripheryPayments.sol:PeripheryPayments.pay#6359",
+        "to": "contracts/libraries/TransferHelper.sol:TransferHelper.safeTransfer#7718"
+      },
+      {
+        "callKind": "internal_library_call",
+        "callSite": {
+          "line": 67,
+          "sourcePath": "contracts/base/PeripheryPayments.sol",
+          "span": {
+            "length": 63,
+            "offset": 2442,
+            "sourceId": 34
+          }
+        },
+        "from": "contracts/base/PeripheryPayments.sol:PeripheryPayments.pay#6359",
+        "to": "contracts/libraries/TransferHelper.sol:TransferHelper.safeTransferFrom#7672"
+      },
+      {
+        "callKind": "internal_definition_call",
+        "callSite": {
+          "line": 8,
+          "sourcePath": "contracts/base/PeripheryValidation.sol",
+          "span": {
+            "length": 17,
+            "offset": 230,
+            "sourceId": 35
+          }
+        },
+        "from": "contracts/base/PeripheryValidation.sol:PeripheryValidation.checkDeadline#6379",
+        "to": "contracts/base/BlockTimestamp.sol:BlockTimestamp._blockTimestamp#5598"
+      },
+      {
+        "callKind": "internal_library_call",
+        "callSite": {
+          "line": 33,
+          "sourcePath": "contracts/libraries/CallbackValidation.sol",
+          "span": {
+            "length": 45,
+            "offset": 1433,
+            "sourceId": 49
+          }
+        },
+        "from": "contracts/libraries/CallbackValidation.sol:CallbackValidation.verifyCallback#7150",
+        "to": "contracts/libraries/PoolAddress.sol:PoolAddress.computeAddress#7594"
+      },
+      {
+        "callKind": "internal_library_call",
+        "callSite": {
+          "line": 29,
+          "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+          "span": {
+            "length": 63,
+            "offset": 1429,
+            "sourceId": 51
+          }
+        },
+        "from": "contracts/libraries/LiquidityAmounts.sol:LiquidityAmounts.getLiquidityForAmount0#7235",
+        "to": "@pancakeswap/v3-core/contracts/libraries/FullMath.sol:FullMath.mulDiv#3914"
+      },
+      {
+        "callKind": "internal_definition_call",
+        "callSite": {
+          "line": 30,
+          "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+          "span": {
+            "length": 80,
+            "offset": 1510,
+            "sourceId": 51
+          }
+        },
+        "from": "contracts/libraries/LiquidityAmounts.sol:LiquidityAmounts.getLiquidityForAmount0#7235",
+        "to": "contracts/libraries/LiquidityAmounts.sol:LiquidityAmounts.toUint128#7189"
+      },
+      {
+        "callKind": "internal_library_call",
+        "callSite": {
+          "line": 30,
+          "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+          "span": {
+            "length": 69,
+            "offset": 1520,
+            "sourceId": 51
+          }
+        },
+        "from": "contracts/libraries/LiquidityAmounts.sol:LiquidityAmounts.getLiquidityForAmount0#7235",
+        "to": "@pancakeswap/v3-core/contracts/libraries/FullMath.sol:FullMath.mulDiv#3914"
+      },
+      {
+        "callKind": "internal_definition_call",
+        "callSite": {
+          "line": 45,
+          "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+          "span": {
+            "length": 84,
+            "offset": 2343,
+            "sourceId": 51
+          }
+        },
+        "from": "contracts/libraries/LiquidityAmounts.sol:LiquidityAmounts.getLiquidityForAmount1#7272",
+        "to": "contracts/libraries/LiquidityAmounts.sol:LiquidityAmounts.toUint128#7189"
+      },
+      {
+        "callKind": "internal_library_call",
+        "callSite": {
+          "line": 45,
+          "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+          "span": {
+            "length": 73,
+            "offset": 2353,
+            "sourceId": 51
+          }
+        },
+        "from": "contracts/libraries/LiquidityAmounts.sol:LiquidityAmounts.getLiquidityForAmount1#7272",
+        "to": "@pancakeswap/v3-core/contracts/libraries/FullMath.sol:FullMath.mulDiv#3914"
+      },
+      {
+        "callKind": "internal_definition_call",
+        "callSite": {
+          "line": 66,
+          "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+          "span": {
+            "length": 61,
+            "offset": 3457,
+            "sourceId": 51
+          }
+        },
+        "from": "contracts/libraries/LiquidityAmounts.sol:LiquidityAmounts.getLiquidityForAmounts#7353",
+        "to": "contracts/libraries/LiquidityAmounts.sol:LiquidityAmounts.getLiquidityForAmount0#7235"
+      },
+      {
+        "callKind": "internal_definition_call",
+        "callSite": {
+          "line": 68,
+          "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+          "span": {
+            "length": 60,
+            "offset": 3606,
+            "sourceId": 51
+          }
+        },
+        "from": "contracts/libraries/LiquidityAmounts.sol:LiquidityAmounts.getLiquidityForAmounts#7353",
+        "to": "contracts/libraries/LiquidityAmounts.sol:LiquidityAmounts.getLiquidityForAmount0#7235"
+      },
+      {
+        "callKind": "internal_definition_call",
+        "callSite": {
+          "line": 69,
+          "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+          "span": {
+            "length": 60,
+            "offset": 3702,
+            "sourceId": 51
+          }
+        },
+        "from": "contracts/libraries/LiquidityAmounts.sol:LiquidityAmounts.getLiquidityForAmounts#7353",
+        "to": "contracts/libraries/LiquidityAmounts.sol:LiquidityAmounts.getLiquidityForAmount1#7272"
+      },
+      {
+        "callKind": "internal_definition_call",
+        "callSite": {
+          "line": 73,
+          "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+          "span": {
+            "length": 61,
+            "offset": 3885,
+            "sourceId": 51
+          }
+        },
+        "from": "contracts/libraries/LiquidityAmounts.sol:LiquidityAmounts.getLiquidityForAmounts#7353",
+        "to": "contracts/libraries/LiquidityAmounts.sol:LiquidityAmounts.getLiquidityForAmount1#7272"
+      },
+      {
+        "callKind": "modifier",
+        "callSite": {
+          "line": 133,
+          "sourcePath": "contracts/NonfungiblePositionManager.sol",
+          "span": {
+            "length": 30,
+            "offset": 4684,
+            "sourceId": 28
+          }
+        },
+        "from": "contracts/NonfungiblePositionManager.sol:NonfungiblePositionManager.mint#4855",
+        "to": "contracts/base/PeripheryValidation.sol:PeripheryValidation.checkDeadline#6379"
+      },
+      {
+        "callKind": "internal_definition_call",
+        "callSite": {
+          "line": 142,
+          "sourcePath": "contracts/NonfungiblePositionManager.sol",
+          "span": {
+            "length": 530,
+            "offset": 4950,
+            "sourceId": 28
+          }
+        },
+        "from": "contracts/NonfungiblePositionManager.sol:NonfungiblePositionManager.mint#4855",
+        "to": "contracts/base/LiquidityManagement.sol:LiquidityManagement.addLiquidity#6023"
+      },
+      {
+        "callKind": "internal_definition_call",
+        "callSite": {
+          "line": 157,
+          "sourcePath": "contracts/NonfungiblePositionManager.sol",
+          "span": {
+            "length": 46,
+            "offset": 5493,
+            "sourceId": 28
+          }
+        },
+        "from": "contracts/NonfungiblePositionManager.sol:NonfungiblePositionManager.mint#4855",
+        "to": "@openzeppelin/contracts/token/ERC721/ERC721.sol:ERC721._mint#1213"
+      },
+      {
+        "callKind": "internal_library_call",
+        "callSite": {
+          "line": 159,
+          "sourcePath": "contracts/NonfungiblePositionManager.sol",
+          "span": {
+            "length": 70,
+            "offset": 5574,
+            "sourceId": 28
+          }
+        },
+        "from": "contracts/NonfungiblePositionManager.sol:NonfungiblePositionManager.mint#4855",
+        "to": "contracts/libraries/PositionKey.sol:PositionKey.compute#7619"
+      },
+      {
+        "callKind": "external_contract_call",
+        "callSite": {
+          "line": 160,
+          "sourcePath": "contracts/NonfungiblePositionManager.sol",
+          "span": {
+            "length": 27,
+            "offset": 5732,
+            "sourceId": 28
+          }
+        },
+        "from": "contracts/NonfungiblePositionManager.sol:NonfungiblePositionManager.mint#4855",
+        "to": "@pancakeswap/v3-core/contracts/interfaces/pool/IPancakeV3PoolState.sol:IPancakeV3PoolState.positions#3753"
+      },
+      {
+        "callKind": "internal_definition_call",
+        "callSite": {
+          "line": 164,
+          "sourcePath": "contracts/NonfungiblePositionManager.sol",
+          "span": {
+            "length": 162,
+            "offset": 5828,
+            "sourceId": 28
+          }
+        },
+        "from": "contracts/NonfungiblePositionManager.sol:NonfungiblePositionManager.mint#4855",
+        "to": "contracts/NonfungiblePositionManager.sol:NonfungiblePositionManager.cachePoolKey#4719"
+      }
+    ],
+    "callbackContinuation": {
+      "entryDefinition": "contracts/base/LiquidityManagement.sol:LiquidityManagement.pancakeV3MintCallback#5891",
+      "reason": "IPancakeV3Pool.mint synchronously invokes pancakeV3MintCallback",
+      "separatelyReviewedExternalHopRequired": true
+    },
+    "delegatecallSites": [],
+    "directEntryDefinition": "contracts/NonfungiblePositionManager.sol:NonfungiblePositionManager.mint#4855",
+    "lowLevelCallSites": [
+      {
+        "callKind": "call",
+        "line": 34,
+        "nodeId": 7696,
+        "sourcePath": "contracts/libraries/TransferHelper.sol",
+        "sourceSliceSha256": "0xe9989999afd9203f249cfbd20ebb903ee39e58c865dff344b332357b2c286e77",
+        "span": {
+          "length": 71,
+          "offset": 1393,
+          "sourceId": 54
+        }
+      },
+      {
+        "callKind": "call",
+        "line": 20,
+        "nodeId": 7650,
+        "sourcePath": "contracts/libraries/TransferHelper.sol",
+        "sourceSliceSha256": "0xd840ede794dc3b9d20c697f5b3352d226d1fa969ae9be5ef5cf1bd7f4603902c",
+        "span": {
+          "length": 81,
+          "offset": 767,
+          "sourceId": 54
+        }
+      }
+    ],
+    "multicallDefinitionReachable": false,
+    "reachableDefinitions": [
+      {
+        "contract": "ERC721",
+        "definitionId": 1068,
+        "kind": "FunctionDefinition",
+        "line": 281,
+        "name": "_exists",
+        "sourcePath": "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "sourceSliceSha256": "0x9bf5d8e1becbdddba7dc23a7d3daa262b2b0aec50dfd480711abbf2062bfe9a3",
+        "span": {
+          "length": 125,
+          "offset": 10368,
+          "sourceId": 5
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "ERC721",
+        "definitionId": 1213,
+        "kind": "FunctionDefinition",
+        "line": 333,
+        "name": "_mint",
+        "sourcePath": "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "sourceSliceSha256": "0xd29b692d24d5fd0533114f07ac2ed35c19100b4865684e0f757a5051264d7c64",
+        "span": {
+          "length": 393,
+          "offset": 12231,
+          "sourceId": 5
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "ERC721",
+        "definitionId": 1480,
+        "kind": "FunctionDefinition",
+        "line": 477,
+        "name": "_beforeTokenTransfer",
+        "sourcePath": "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "sourceSliceSha256": "0xe05fd4054c8e37d763c6e00ab0345ec81068aa4acbd77f986da03f48daa52516",
+        "span": {
+          "length": 93,
+          "offset": 16995,
+          "sourceId": 5
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "EnumerableMap",
+        "definitionId": 2070,
+        "kind": "FunctionDefinition",
+        "line": 60,
+        "name": "_set",
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableMap.sol",
+        "sourceSliceSha256": "0x13a56c1494816de364ad87334f72ce5ac50ab27808030bbd8dcfb309e4213489",
+        "span": {
+          "length": 678,
+          "offset": 1828,
+          "sourceId": 12
+        },
+        "visibility": "private"
+      },
+      {
+        "contract": "EnumerableMap",
+        "definitionId": 2169,
+        "kind": "FunctionDefinition",
+        "line": 118,
+        "name": "_contains",
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableMap.sol",
+        "sourceSliceSha256": "0xdc0a83133b03446b05d04fd10ab4afc8acbf446884dddcdb45368d5a59f0bc99",
+        "span": {
+          "length": 123,
+          "offset": 4270,
+          "sourceId": 12
+        },
+        "visibility": "private"
+      },
+      {
+        "contract": "EnumerableMap",
+        "definitionId": 2358,
+        "kind": "FunctionDefinition",
+        "line": 194,
+        "name": "set",
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableMap.sol",
+        "sourceSliceSha256": "0xceab53cf5846e5b65f30ea50dbdd874e4253a711da18ab42ff6469ef8dd05435",
+        "span": {
+          "length": 183,
+          "offset": 7019,
+          "sourceId": 12
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "EnumerableMap",
+        "definitionId": 2398,
+        "kind": "FunctionDefinition",
+        "line": 210,
+        "name": "contains",
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableMap.sol",
+        "sourceSliceSha256": "0x3242cd7b20f6d395abac1621404e2f07c77c4308880bb1159715195b4d9110ea",
+        "span": {
+          "length": 149,
+          "offset": 7580,
+          "sourceId": 12
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "EnumerableSet",
+        "definitionId": 2604,
+        "kind": "FunctionDefinition",
+        "line": 54,
+        "name": "_add",
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableSet.sol",
+        "sourceSliceSha256": "0x72a57c46a1383073dd47f4fcd8c1d473a934211a4914d127b0ee8f49e3ef2ec8",
+        "span": {
+          "length": 404,
+          "offset": 1632,
+          "sourceId": 13
+        },
+        "visibility": "private"
+      },
+      {
+        "contract": "EnumerableSet",
+        "definitionId": 2702,
+        "kind": "FunctionDefinition",
+        "line": 109,
+        "name": "_contains",
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableSet.sol",
+        "sourceSliceSha256": "0x34aabd0f5f60a2081f749c32353f57a85c5eb6e40e5e4f9a8d3ec2f7f2b23e1a",
+        "span": {
+          "length": 127,
+          "offset": 3797,
+          "sourceId": 13
+        },
+        "visibility": "private"
+      },
+      {
+        "contract": "EnumerableSet",
+        "definitionId": 2969,
+        "kind": "FunctionDefinition",
+        "line": 256,
+        "name": "add",
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableSet.sol",
+        "sourceSliceSha256": "0x2b55d0d1221d3b9b96728e70845be5f7cb59435946ee35ca5538710af0c90ead",
+        "span": {
+          "length": 129,
+          "offset": 8060,
+          "sourceId": 13
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "FullMath",
+        "definitionId": 3914,
+        "kind": "FunctionDefinition",
+        "line": 14,
+        "name": "mulDiv",
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/FullMath.sol",
+        "sourceSliceSha256": "0xa9253c615f5b656bcac67a32828134bfa3899fe2e0911f3dee3473cf01694d29",
+        "span": {
+          "length": 3868,
+          "offset": 775,
+          "sourceId": 26
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "TickMath",
+        "definitionId": 4353,
+        "kind": "FunctionDefinition",
+        "line": 23,
+        "name": "getSqrtRatioAtTick",
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol",
+        "sourceSliceSha256": "0xc6c0dc16a7c74350a078a8c626430ccd77fd4d31156c02d1402155980b380ba9",
+        "span": {
+          "length": 2611,
+          "offset": 1384,
+          "sourceId": 27
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "NonfungiblePositionManager",
+        "definitionId": 4719,
+        "kind": "FunctionDefinition",
+        "line": 120,
+        "name": "cachePoolKey",
+        "sourcePath": "contracts/NonfungiblePositionManager.sol",
+        "sourceSliceSha256": "0x0392705eafe3477e916c354b751be71fa073a38cf2c130c875db99cfabc5febf",
+        "span": {
+          "length": 290,
+          "offset": 4233,
+          "sourceId": 28
+        },
+        "visibility": "private"
+      },
+      {
+        "contract": "NonfungiblePositionManager",
+        "definitionId": 4855,
+        "kind": "FunctionDefinition",
+        "line": 129,
+        "name": "mint",
+        "sourcePath": "contracts/NonfungiblePositionManager.sol",
+        "sourceSliceSha256": "0xcb184595d7db99a5ee2f9e03128029b42c3408cdaf34ba388f30d7f7a4fae004",
+        "span": {
+          "length": 1941,
+          "offset": 4580,
+          "sourceId": 28
+        },
+        "visibility": "external"
+      },
+      {
+        "contract": "BlockTimestamp",
+        "definitionId": 5598,
+        "kind": "FunctionDefinition",
+        "line": 9,
+        "name": "_blockTimestamp",
+        "sourcePath": "contracts/base/BlockTimestamp.sol",
+        "sourceSliceSha256": "0x6fb148f49876173339603fd90d10637d4ee259bfaf3d99e0c9af729420484a2c",
+        "span": {
+          "length": 108,
+          "offset": 327,
+          "sourceId": 29
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "LiquidityManagement",
+        "definitionId": 5891,
+        "kind": "FunctionDefinition",
+        "line": 25,
+        "name": "pancakeV3MintCallback",
+        "sourcePath": "contracts/base/LiquidityManagement.sol",
+        "sourceSliceSha256": "0xf774c20995016d92ea0e657d966a09b638f8eafd3a78f65d4a3405428bfb8e69",
+        "span": {
+          "length": 506,
+          "offset": 921,
+          "sourceId": 31
+        },
+        "visibility": "external"
+      },
+      {
+        "contract": "LiquidityManagement",
+        "definitionId": 6023,
+        "kind": "FunctionDefinition",
+        "line": 51,
+        "name": "addLiquidity",
+        "sourcePath": "contracts/base/LiquidityManagement.sol",
+        "sourceSliceSha256": "0x0fa13c4b101b38837a762331033bd317a66206990b071f841ad231f625ccaf45",
+        "span": {
+          "length": 1382,
+          "offset": 1806,
+          "sourceId": 31
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "PeripheryPayments",
+        "definitionId": 6359,
+        "kind": "FunctionDefinition",
+        "line": 52,
+        "name": "pay",
+        "sourcePath": "contracts/base/PeripheryPayments.sol",
+        "sourceSliceSha256": "0xfd053b5280a569a9c71dfe7e080e3d0278f1636b2eae2f0908e63edf496620fc",
+        "span": {
+          "length": 716,
+          "offset": 1808,
+          "sourceId": 34
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "PeripheryValidation",
+        "definitionId": 6379,
+        "kind": "ModifierDefinition",
+        "line": 7,
+        "name": "checkDeadline",
+        "sourcePath": "contracts/base/PeripheryValidation.sol",
+        "sourceSliceSha256": "0x918f9ea337e58c2f5e235bcfaa9acfb5891147eade3fb7b0469eed9c42243b90",
+        "span": {
+          "length": 133,
+          "offset": 170,
+          "sourceId": 35
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "CallbackValidation",
+        "definitionId": 7150,
+        "kind": "FunctionDefinition",
+        "line": 28,
+        "name": "verifyCallback",
+        "sourcePath": "contracts/libraries/CallbackValidation.sol",
+        "sourceSliceSha256": "0x990317edf409509cba3f84a8a6a00ec1260e07bc2898d793f4cde7027925df4d",
+        "span": {
+          "length": 288,
+          "offset": 1246,
+          "sourceId": 49
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "LiquidityAmounts",
+        "definitionId": 7189,
+        "kind": "FunctionDefinition",
+        "line": 13,
+        "name": "toUint128",
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+        "sourceSliceSha256": "0x7b55a01c2a075148b7bafeb6b2627ad053c8b824a90dbaeacbddcfbd925c4b3c",
+        "span": {
+          "length": 112,
+          "offset": 527,
+          "sourceId": 51
+        },
+        "visibility": "private"
+      },
+      {
+        "contract": "LiquidityAmounts",
+        "definitionId": 7235,
+        "kind": "FunctionDefinition",
+        "line": 23,
+        "name": "getLiquidityForAmount0",
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+        "sourceSliceSha256": "0xd1d465db7de3d638e089504ee6b659da96286ebd09e2d97149b2bed9eecb036b",
+        "span": {
+          "length": 483,
+          "offset": 1115,
+          "sourceId": 51
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "LiquidityAmounts",
+        "definitionId": 7272,
+        "kind": "FunctionDefinition",
+        "line": 39,
+        "name": "getLiquidityForAmount1",
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+        "sourceSliceSha256": "0xea4faea5cefa70a16ded27e02bd5a74f4ee02b11c6887b4964255cc053178214",
+        "span": {
+          "length": 390,
+          "offset": 2045,
+          "sourceId": 51
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "LiquidityAmounts",
+        "definitionId": 7353,
+        "kind": "FunctionDefinition",
+        "line": 56,
+        "name": "getLiquidityForAmounts",
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol",
+        "sourceSliceSha256": "0x1a36b3ebbc72fd9b2bd8b5c5f8bbf51feb8b3af9ad71a68a11ffdfa8d11f1c6f",
+        "span": {
+          "length": 920,
+          "offset": 3045,
+          "sourceId": 51
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "PoolAddress",
+        "definitionId": 7594,
+        "kind": "FunctionDefinition",
+        "line": 33,
+        "name": "computeAddress",
+        "sourcePath": "contracts/libraries/PoolAddress.sol",
+        "sourceSliceSha256": "0x9ff9120148c1cf9099edc8a9fc07e5c74dc3c6a377513ae0914206bd9bc1c537",
+        "span": {
+          "length": 528,
+          "offset": 1343,
+          "sourceId": 52
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "PositionKey",
+        "definitionId": 7619,
+        "kind": "FunctionDefinition",
+        "line": 6,
+        "name": "compute",
+        "sourcePath": "contracts/libraries/PositionKey.sol",
+        "sourceSliceSha256": "0x83ef52bf4876f791cfe7c364263a3875b4e84f008ef6a09c0b2262ceeef722f0",
+        "span": {
+          "length": 214,
+          "offset": 167,
+          "sourceId": 53
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "TransferHelper",
+        "definitionId": 7672,
+        "kind": "FunctionDefinition",
+        "line": 13,
+        "name": "safeTransferFrom",
+        "sourcePath": "contracts/libraries/TransferHelper.sol",
+        "sourceSliceSha256": "0xc36a1d8c6b03abc9b662867ca2acda7ddc4d8a004237d2e523552434233c316d",
+        "span": {
+          "length": 367,
+          "offset": 573,
+          "sourceId": 54
+        },
+        "visibility": "internal"
+      },
+      {
+        "contract": "TransferHelper",
+        "definitionId": 7718,
+        "kind": "FunctionDefinition",
+        "line": 29,
+        "name": "safeTransfer",
+        "sourcePath": "contracts/libraries/TransferHelper.sol",
+        "sourceSliceSha256": "0x6c38fd069af17faad815238f32db03f5235635cccde8e0095c05848d5782423f",
+        "span": {
+          "length": 316,
+          "offset": 1239,
+          "sourceId": 54
+        },
+        "visibility": "internal"
+      }
+    ],
+    "reviewedSourceFiles": [
+      {
+        "byteLength": 17091,
+        "contentSha256": "0x3761fa85f5174d12c310e0402496588e27091002fd2d348b43f4bf3397cb1fbc",
+        "sourcePath": "@openzeppelin/contracts/token/ERC721/ERC721.sol"
+      },
+      {
+        "byteLength": 9728,
+        "contentSha256": "0xa3470f373910a688b6535cfa84a798473b888680c6742d63992ddc47426414e2",
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableMap.sol"
+      },
+      {
+        "byteLength": 9380,
+        "contentSha256": "0xeebcb2f6efbad8c0a81b9b70e7cdb5bf319452cfd81b6a5c64483f06fcae0170",
+        "sourcePath": "@openzeppelin/contracts/utils/EnumerableSet.sol"
+      },
+      {
+        "byteLength": 5262,
+        "contentSha256": "0xa35f43afffc5587e10354f80fcea897f44895c75cfc98ac2130847202ed4bbe3",
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/FullMath.sol"
+      },
+      {
+        "byteLength": 8850,
+        "contentSha256": "0x49af6f57e194434125d27d334e6d332cee4614058be896f350d165adec15dc9d",
+        "sourcePath": "@pancakeswap/v3-core/contracts/libraries/TickMath.sol"
+      },
+      {
+        "byteLength": 15581,
+        "contentSha256": "0x0a4cd1d4c434b381ba7623d4659edf56f7c58ac58205c13252e0cdbeb6c5d1d3",
+        "sourcePath": "contracts/NonfungiblePositionManager.sol"
+      },
+      {
+        "byteLength": 440,
+        "contentSha256": "0x823aa43b7130c1eff468c45036f18c54ee309eeb245db00cf2bc6210ba991842",
+        "sourcePath": "contracts/base/BlockTimestamp.sol"
+      },
+      {
+        "byteLength": 3193,
+        "contentSha256": "0x2c877578b2253a887501ca71addee8bd158614c64f3c201f8a08575dd8c0c49f",
+        "sourcePath": "contracts/base/LiquidityManagement.sol"
+      },
+      {
+        "byteLength": 2529,
+        "contentSha256": "0x027c93c1b5228ab0a6b2124a09a06098719d41a0860c8995a6b75790d5d79916",
+        "sourcePath": "contracts/base/PeripheryPayments.sol"
+      },
+      {
+        "byteLength": 308,
+        "contentSha256": "0x87844743aa8682a3bd18411f36cde45c7f1c3373218af474bf53440540c11ec2",
+        "sourcePath": "contracts/base/PeripheryValidation.sol"
+      },
+      {
+        "byteLength": 1539,
+        "contentSha256": "0x35b20c962d7433730978fd52f80c2fbf6d4991a03112a3563844d71af94182a0",
+        "sourcePath": "contracts/libraries/CallbackValidation.sol"
+      },
+      {
+        "byteLength": 6960,
+        "contentSha256": "0x6200db0799d677e071baa2a584dbd5c244ecb5ab4578a167a654f516974ac7a6",
+        "sourcePath": "contracts/libraries/LiquidityAmounts.sol"
+      },
+      {
+        "byteLength": 1876,
+        "contentSha256": "0x70a375c0ec416bd43fb8ee3a8b7f576f869bc1b6fed17e6884eba2bfb4d27f3e",
+        "sourcePath": "contracts/libraries/PoolAddress.sol"
+      },
+      {
+        "byteLength": 386,
+        "contentSha256": "0x9b2bf1d3711455acd371608aa161bf0ed8386e75f3582ba2650d76903670d467",
+        "sourcePath": "contracts/libraries/PositionKey.sol"
+      },
+      {
+        "byteLength": 2598,
+        "contentSha256": "0x2e9e16c49fd7006e65f220e9cb42ad6f4a62fc63ac52892e9d4dfcd2e32d9756",
+        "sourcePath": "contracts/libraries/TransferHelper.sol"
+      }
+    ]
+  }
+}

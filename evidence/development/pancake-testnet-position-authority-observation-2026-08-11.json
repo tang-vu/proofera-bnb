@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-08-11T12:29:01.225Z",
+  "environment": "bsc-testnet",
+  "chainId": 97,
+  "evidenceKind": "read_only_third_party_position_authority_observation",
+  "provider": {
+    "origin": "https://bsc-testnet-rpc.publicnode.com",
+    "publicSourceUrl": "https://publicnode.com/",
+    "role": "untrusted_json_rpc_transport"
+  },
+  "position": {
+    "positionManager": "0x427bF5b37357632377eCbEC9de3626C71A5396c1",
+    "positionTokenId": "36761",
+    "owner": "0x0039739B4Bd81E756716744B1e7b472B85fef3A2",
+    "tokenApproval": "0x0000000000000000000000000000000000000000",
+    "ownerIsApprovedForAllSelf": false
+  },
+  "block": {
+    "number": "124455477",
+    "hash": "0x1335bfa4772fc1f6cde9ba78b6305512e87db0bb92b9260c52f4505fef7b1072",
+    "timestampUnix": "1786451336"
+  },
+  "readPolicy": {
+    "blockSelector": "eip1898_block_hash",
+    "requireCanonical": true,
+    "latestFallback": false,
+    "blockNumberFallback": false,
+    "writeMethodsExposedByAdapter": false
+  },
+  "adapterVerification": {
+    "command": "$env:PROOFERA_RUN_LIVE_PANCAKE_TESTS='1'; $env:BSC_TESTNET_RPC_URL='https://bsc-testnet-rpc.publicnode.com'; pnpm --filter @proofera/integrations exec vitest run src/pancake-v3-authority.live.test.ts",
+    "result": "1 passed",
+    "durationSeconds": 2.3,
+    "classificationWhenControllerIsOwner": "owner"
+  },
+  "exactReplay": {
+    "command": "$env:PROOFERA_RUN_LIVE_PANCAKE_TESTS='1'; $env:BSC_TESTNET_RPC_URL='https://bsc-testnet-rpc.publicnode.com'; $env:PROOFERA_LIVE_PANCAKE_POSITION_ID='36761'; $env:PROOFERA_LIVE_PANCAKE_BLOCK_NUMBER='124455477'; $env:PROOFERA_LIVE_PANCAKE_BLOCK_HASH='0x1335bfa4772fc1f6cde9ba78b6305512e87db0bb92b9260c52f4505fef7b1072'; $env:PROOFERA_LIVE_PANCAKE_BLOCK_TIMESTAMP='1786451336'; $env:PROOFERA_LIVE_PANCAKE_CONTROLLER='0x0039739B4Bd81E756716744B1e7b472B85fef3A2'; $env:PROOFERA_LIVE_PANCAKE_CHECKED_AT='2026-08-11T12:29:01.225Z'; pnpm --filter @proofera/integrations exec vitest run src/pancake-v3-authority.live.test.ts",
+    "result": "1 passed",
+    "durationSeconds": 2.51,
+    "clockMode": "recorded_observation_time_injected_for_deterministic_replay",
+    "rawRecord": "evidence/development/pancake-testnet-position-authority-raw-replay-2026-08-11.json",
+    "rawRecordSha256": "df854f86e863dbf85c8014d7eda5497b3efbc63661d784be55d62fc8b7baab71"
+  },
+  "deploymentEvidence": {
+    "repositoryCommit": "986847948755cba528324d41be19480731c36c2a",
+    "sourceUrl": "https://github.com/pancakeswap/pancake-v3-contracts/blob/986847948755cba528324d41be19480731c36c2a/deployments/bscTestnet.json"
+  },
+  "providerFailureRecord": {
+    "attemptedAt": "2026-08-11T12:28:20Z",
+    "origin": "https://data-seed-prebsc-1-s1.bnbchain.org:8545",
+    "result": "timeout",
+    "timeoutMilliseconds": 10000,
+    "fallbackWithinAdapter": false
+  },
+  "boundaries": {
+    "thirdPartyPosition": true,
+    "prooferaOwned": false,
+    "authorityGrantedToProofEra": false,
+    "transactionSubmitted": false,
+    "executionEnabled": false,
+    "runtimeCodeIdentityEstablishedByThisRead": false,
+    "futureAuthorityEstablished": false
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "1",
+  "environment": "development",
+  "claimStatus": "provider_capability_observation_only",
+  "chainId": 97,
+  "contractAddress": "0x427bf5b37357632377ecbec9de3626c71a5396c1",
+  "method": [
+    "eth_getBlockByNumber(latest, false) to acquire a candidate block hash for this capability probe only",
+    "eth_getCode(contract, { blockHash, requireCanonical: true }) with no retry or fallback"
+  ],
+  "observations": [
+    {
+      "rpcOrigin": "https://bsc-testnet-rpc.publicnode.com",
+      "status": "eip1898_available",
+      "blockNumber": "124453452",
+      "blockHash": "0x5d44a5f807425cd7b89123e670e9ba40466d4fdc02f64a3f40aea39e4ed24118",
+      "runtimeByteLength": 24466
+    },
+    {
+      "rpcOrigin": "https://bsc-testnet-dataseed.bnbchain.org",
+      "status": "eip1898_available",
+      "blockNumber": "124453459",
+      "blockHash": "0xd2f89196b07936cc692162805f85065de57a0e2bb1624ee1c8df420f02621778",
+      "runtimeByteLength": 24466
+    }
+  ],
+  "limitations": [
+    "This proves that each endpoint accepted one EIP-1898 canonical-hash code read at the observed time; it is not an uptime guarantee.",
+    "The latest lookup is outside the production identity reader and was used only to acquire a current block hash for this development probe.",
+    "Code presence and byte length do not prove source verification, expected code identity, proxy implementation identity, safety, or ownership.",
+    "No transaction, wallet, session, approval, or write was created."
+  ]
+}

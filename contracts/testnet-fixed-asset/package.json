@@ -1,0 +1,35 @@
+{
+  "name": "@proofera/testnet-fixed-asset",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Non-economic fixed-supply ERC-20 fixture restricted to BSC testnet",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "packageManager": "pnpm@11.20.0",
+  "scripts": {
+    "clean": "hardhat clean",
+    "clean:pool-abi": "hardhat --config hardhat.pool-abi.config.js clean",
+    "compile": "hardhat build",
+    "compile:pool-abi": "hardhat --config hardhat.pool-abi.config.js build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "node --check hardhat.config.js && node --check hardhat.pool-abi.config.js && node --check scripts/deployment-preparation.mjs && node --check scripts/official-pancake-artifacts.mjs && node --check scripts/pool-preparation.mjs && node --check scripts/prepare-deployment.mjs && node --check scripts/prepare-pool.mjs && node --check test/artifact-surface.test.mjs && node --check test/deployment-preparation.test.mjs && node --check test/pool-preparation.test.mjs",
+    "prepare:deployment": "node scripts/prepare-deployment.mjs",
+    "prepare:pool": "node scripts/prepare-pool.mjs",
+    "test": "pnpm compile && pnpm test:solidity && pnpm compile:pool-abi && pnpm test:node",
+    "test:node": "node --test test/artifact-surface.test.mjs test/deployment-preparation.test.mjs test/pool-preparation.test.mjs",
+    "test:solidity": "hardhat test solidity",
+    "verify:offline": "pnpm format:check && pnpm lint && pnpm clean && pnpm clean:pool-abi && pnpm compile && pnpm test:solidity && pnpm compile:pool-abi && pnpm test:node",
+    "verify": "pnpm verify:offline && pnpm audit --prod --audit-level moderate"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "5.7.0"
+  },
+  "devDependencies": {
+    "hardhat": "3.11.1",
+    "prettier": "3.9.6",
+    "prettier-plugin-solidity": "2.4.0"
+  }
+}

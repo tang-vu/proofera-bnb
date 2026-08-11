@@ -1,0 +1,442 @@
+{
+  "schemaVersion": 1,
+  "artifact": "pancake-v3-testnet-wbnb-source-verification",
+  "checkedAtUtc": "2026-08-11T16:24:05.791Z",
+  "scope": {
+    "chain": "BNB Smart Chain Chapel testnet",
+    "chainId": 97,
+    "contract": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+    "component": "WBNB token admission for a possible PTA/WBNB PancakeSwap V3 fixture",
+    "mode": "bounded read-only RPC, source recovery, deterministic local compilation, and static analysis",
+    "writesOrSignatures": false
+  },
+  "decision": {
+    "wbnbComponentEligible": true,
+    "ptaWbnbTokenAdmissionGate": "WBNB-side closed",
+    "basis": [
+      "The exact 1,793-byte source input, source-unit name, compiler version, optimizer setting, libraries, and remappings reproduce the complete deployment transaction input and deployed runtime byte for byte, including the 43-byte Solidity metadata trailer.",
+      "The deployed runtime has no DELEGATECALL, CALLCODE, CREATE, CREATE2, or SELFDESTRUCT instruction and does not match ERC-1167 minimal-proxy bytecode; all three ERC-1967 slots are zero at the canonical anchor.",
+      "The authenticated source has no privileged owner/admin, arbitrary mint, pause, blacklist, fee, upgrade, recovery, rebase, or transfer-hook surface. Permissionless issuance exists only through deposit/fallback backed by msg.value.",
+      "Pinned eth_call simulations confirm the advertised wrapper and BEP-20 paths, including failure for an unfunded positive transfer/withdrawal."
+    ],
+    "doesNotEstablish": [
+      "PTA token admissibility.",
+      "PancakeSwap factory/pool/deployer lineage for a future PTA/WBNB pool.",
+      "Pool liquidity, observation cardinality/history, price quality, or strategy profitability.",
+      "Any stable-value property: WBNB tracks testnet native BNB units and is not a stablecoin."
+    ]
+  },
+  "canonicalAnchor": {
+    "selection": "eth_getBlockByNumber('finalized', false) from an official BNB Chain Chapel endpoint, immediately followed by EIP-1898 reads using blockHash and requireCanonical=true",
+    "blockNumberHex": "0x76b813b",
+    "blockNumberDecimal": 124485947,
+    "blockHash": "0xfaa9aafee29a16faaf49c1afb631218ef23cdb2e4530470d06a161bc73c04467",
+    "blockTimestampHex": "0x6a7b4b18",
+    "blockTimestampUtc": "2026-08-11T16:17:28.000Z",
+    "headerCrossChecks": [
+      {
+        "url": "https://data-seed-prebsc-1-s1.bnbchain.org:8545",
+        "role": "official anchor selection and immediate EIP-1898 state reads",
+        "match": true
+      },
+      {
+        "url": "https://data-seed-prebsc-2-s1.bnbchain.org:8545",
+        "role": "official independent exact-height header",
+        "match": true
+      },
+      {
+        "url": "https://bsc-testnet-dataseed.bnbchain.org",
+        "role": "official aggregate exact-height header",
+        "match": true
+      },
+      {
+        "url": "https://bsc-testnet-rpc.publicnode.com",
+        "role": "independent exact-height header plus archive/EIP-1898 behavior reads",
+        "match": true
+      }
+    ],
+    "officialImmediateStateRead": {
+      "eip1898SupportedAtCapture": true,
+      "codeHexCharactersIncludingPrefix": 6250,
+      "nativeBalanceHex": "0x3a1b9aad014b552f5a2f",
+      "totalSupplyRaw": "0x000000000000000000000000000000000000000000003a1b9aad014b552f5a2f",
+      "totalSupplyEqualsNativeBalance": true
+    }
+  },
+  "deployment": {
+    "firstCodeBlockDiscovery": {
+      "method": "Nine bounded checkpoint eth_getCode reads followed by a 20-read binary search over blocks 1,000,000 through 2,000,000",
+      "lastBlockWithoutCode": 1585923,
+      "firstBlockWithCode": 1585924,
+      "readCount": 29
+    },
+    "blockNumberHex": "0x183304",
+    "blockNumberDecimal": 1585924,
+    "blockHash": "0x26b6b9ee92326823bb418cb469c38895b90aa9e89702c2dc41c9143e65e7a4d2",
+    "blockTimestampHex": "0x5f509ff7",
+    "blockTimestampUtc": "2020-09-03T07:49:11.000Z",
+    "transactionHash": "0x8df77b1ce87cfe5f8f35b77bf6946267dfe24ab94da2ec40d8fff1c6e1062d11",
+    "deployer": "0x4e656459ed25bf986eea1196bc1b00665401645d",
+    "deployerNonceHex": "0x1",
+    "valueHex": "0x0",
+    "receiptStatusHex": "0x1",
+    "contractAddress": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+    "gasUsedHex": "0xc23c9",
+    "creationInputBytes": 3504,
+    "constructorArgumentsBytes": 0,
+    "completeRebuildMatchesTransactionInput": true
+  },
+  "sourceAndCompiler": {
+    "explorerRecord": {
+      "url": "https://testnet.bscscan.com/address/0xae13d989dac2f0debff460ac112a837c89baa7cd#code",
+      "recordedContractName": "WBNB",
+      "recordedCompiler": "v0.4.18+commit.9cf6e910",
+      "recordedOptimizerEnabled": false,
+      "recordedOptimizerRuns": 200,
+      "recordedEvmVersion": "default",
+      "retrievalNote": "BscScan's indexed source record was inspectable, while direct scripted page retrieval returned HTTP 403. The final source bytes are independently authenticated by the complete creation/runtime match rather than by trusting an explorer label."
+    },
+    "exactInputRecovery": {
+      "boundedCandidateCount": 288,
+      "candidateDimensions": {
+        "sourceVariants": 6,
+        "sourceUnitPaths": 12,
+        "newlineForms": 2,
+        "finalNewlineForms": 2
+      },
+      "fullRuntimeMatches": 1,
+      "matchingSourceUnit": "browser/WBNB.sol",
+      "encoding": "UTF-8",
+      "bom": false,
+      "newline": "LF",
+      "finalNewline": false,
+      "sourceBytes": 1793,
+      "sourceSha256": "0x5d5321f1058680235574f06826be8ab853d89538013c3144bb8f4ee32995d874",
+      "sourceKeccak256": "0x6326feb0f89a7f5ba361a5abddae54f27e05657df4c260fda95c58f8ec80b6ae",
+      "sourceBzzrUrl": "bzzr://86685f918a03aa41ea97245fb3fd2f7ce44cc1fb3532e5d1ecbb738dae8dad27",
+      "discoveryMirror": {
+        "url": "https://gist.github.com/SibghatUllah1997/8ef24e7ee6350e422f6489521622f770",
+        "role": "Non-authoritative whitespace/source-shape discovery aid only",
+        "trustBoundary": "Not used as an admission authority; the exact official-compiler and onchain bytecode matches authenticate the recovered bytes."
+      }
+    },
+    "officialCompiler": {
+      "manifestUrl": "https://binaries.soliditylang.org/windows-amd64/list.json",
+      "archiveUrl": "https://binaries.soliditylang.org/windows-amd64/solc-windows-amd64-v0.4.18+commit.9cf6e910.zip",
+      "archivePath": "solc-windows-amd64-v0.4.18+commit.9cf6e910.zip",
+      "archiveSha256": "0xcdd99d6c9a43e87130e57ef44e03a55e38b9bb1ce4a1121b22815d5655c1653a",
+      "archiveKeccak256": "0x36749b20f7695b608e87d23db6f3750b150506da64262694b9ac6209a5542a04",
+      "extractedExecutableSha256": "0xf709c777ad5ba820200953e54b517ed1ec71542c47e9c98193d5a9c2fd3549d1",
+      "versionOutput": "Version: 0.4.18+commit.9cf6e910.Windows.msvc",
+      "invocation": "solc.exe --bin --bin-runtime --metadata browser/WBNB.sol"
+    },
+    "compilerInput": {
+      "language": "Solidity",
+      "compilerVersion": "0.4.18+commit.9cf6e910",
+      "compilationTarget": {
+        "browser/WBNB.sol": "WBNB"
+      },
+      "optimizer": {
+        "enabled": false,
+        "runs": 200
+      },
+      "evmVersion": "compiler default; absent from Solidity 0.4.18 metadata",
+      "libraries": {},
+      "remappings": [],
+      "metadataJsonBytes": 3203,
+      "metadataJsonSha256": "0x89ac26ab3eeba7f16f8b9872060e3cb509e13f4ffe801903f6a28513954cac6f"
+    },
+    "reproductionScript": "scripts/wbnb-source-verification/verify.mjs"
+  },
+  "bytecode": {
+    "creation": {
+      "bytes": 3504,
+      "keccak256": "0x7886a1cddc4249cd03bf41ce3f46b412732d7d7fd6e34a4a274a903df81f3594",
+      "sha256": "0x1dd38a19dbc4ea04b114ee330b75aba1ccea7cccd4886a0a37e0e1d11aba696a",
+      "exactMatch": true
+    },
+    "runtime": {
+      "bytes": 3124,
+      "keccak256": "0xb7d84205eaaf83ce7b3940c6beaad6d22790255e34a9a2b486aa8cdfff118fe6",
+      "sha256": "0xe96eee25c3a063ffcfbe4ae2aa2c44e5c99ddf236adb7828676f6fd7f8605742",
+      "exactMatch": true,
+      "executableBytes": 3081,
+      "executableKeccak256": "0x2ed19494e7def0c00c199c9a7b1f938de6ec4603c65492cb6f41eb41ed92e602",
+      "metadataBytes": 43,
+      "metadataHex": "0xa165627a7a72305820bcf3db16903185450bc04cb54da92f216e96710cce101fd2b4b47d5b70dc11e00029",
+      "metadataBzzr0": "0xbcf3db16903185450bc04cb54da92f216e96710cce101fd2b4b47d5b70dc11e0"
+    }
+  },
+  "proxyAndOpcodeReview": {
+    "eip1967": {
+      "implementationSlot": {
+        "slot": "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc",
+        "value": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "adminSlot": {
+        "slot": "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103",
+        "value": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "beaconSlot": {
+        "slot": "0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50",
+        "value": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    "eip1167Pattern": false,
+    "linearDisassembly": {
+      "method": "Decode executable runtime from offset zero while skipping PUSH1 through PUSH32 immediate bytes",
+      "sstore": 6,
+      "call": 1,
+      "callcode": 0,
+      "delegatecall": 0,
+      "create": 0,
+      "create2": 0,
+      "selfdestruct": 0
+    },
+    "push4Values": [
+      "0xffffffff",
+      "0x06fdde03",
+      "0x095ea7b3",
+      "0x18160ddd",
+      "0x23b872dd",
+      "0x2e1a7d4d",
+      "0x313ce567",
+      "0x70a08231",
+      "0x95d89b41",
+      "0xa9059cbb",
+      "0xd0e30db0",
+      "0xdd62ed3e"
+    ],
+    "selectorInterpretation": "The eleven non-sentinel PUSH4 values are exactly the authenticated ABI's public function selectors; 0xffffffff is the unlimited-allowance sentinel. The sole CALL is the native-BNB transfer in withdraw."
+  },
+  "abi": {
+    "functions": [
+      "name()",
+      "approve(address,uint256)",
+      "totalSupply()",
+      "transferFrom(address,address,uint256)",
+      "withdraw(uint256)",
+      "decimals()",
+      "balanceOf(address)",
+      "symbol()",
+      "transfer(address,uint256)",
+      "deposit()",
+      "allowance(address,address)"
+    ],
+    "fallback": "payable and delegates only to deposit() in the authenticated source",
+    "events": [
+      "Approval(address,address,uint256)",
+      "Transfer(address,address,uint256)",
+      "Deposit(address,uint256)",
+      "Withdrawal(address,uint256)"
+    ]
+  },
+  "pinnedCalls": {
+    "rpc": "https://bsc-testnet-rpc.publicnode.com",
+    "blockParameter": {
+      "blockHash": "0xfaa9aafee29a16faaf49c1afb631218ef23cdb2e4530470d06a161bc73c04467",
+      "requireCanonical": true
+    },
+    "readProbeAddress": "0x1234567890123456789012345678901234567890",
+    "results": [
+      {
+        "call": "name()",
+        "selector": "0x06fdde03",
+        "raw": "0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000b5772617070656420424e42000000000000000000000000000000000000000000",
+        "decoded": "Wrapped BNB"
+      },
+      {
+        "call": "symbol()",
+        "selector": "0x95d89b41",
+        "raw": "0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000457424e4200000000000000000000000000000000000000000000000000000000",
+        "decoded": "WBNB"
+      },
+      {
+        "call": "decimals()",
+        "selector": "0x313ce567",
+        "raw": "0x0000000000000000000000000000000000000000000000000000000000000012",
+        "decoded": 18
+      },
+      {
+        "call": "totalSupply()",
+        "selector": "0x18160ddd",
+        "raw": "0x000000000000000000000000000000000000000000003a1b9aad014b552f5a2f",
+        "decoded": "274406463662505455475247"
+      },
+      {
+        "call": "balanceOf(probe)",
+        "selector": "0x70a08231",
+        "raw": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "decoded": "0"
+      },
+      {
+        "call": "allowance(probe,spender)",
+        "selector": "0xdd62ed3e",
+        "raw": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "decoded": "0"
+      },
+      {
+        "call": "approve(spender,0)",
+        "selector": "0x095ea7b3",
+        "raw": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "decoded": true
+      },
+      {
+        "call": "transfer(recipient,0)",
+        "selector": "0xa9059cbb",
+        "raw": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "decoded": true
+      },
+      {
+        "call": "transfer(recipient,1) from zero-WBNB probe",
+        "selector": "0xa9059cbb",
+        "errorCode": 3,
+        "errorMessage": "execution reverted"
+      },
+      {
+        "call": "transferFrom(probe,recipient,0)",
+        "selector": "0x23b872dd",
+        "raw": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "decoded": true
+      },
+      {
+        "call": "transferFrom(probe,recipient,1) from an unapproved caller",
+        "selector": "0x23b872dd",
+        "errorCode": 3,
+        "errorMessage": "execution reverted"
+      },
+      {
+        "call": "deposit() with value 0",
+        "selector": "0xd0e30db0",
+        "raw": "0x",
+        "success": true
+      },
+      {
+        "call": "deposit() with value 1 wei from the funded deployer",
+        "selector": "0xd0e30db0",
+        "raw": "0x",
+        "success": true
+      },
+      {
+        "call": "payable fallback with value 1 wei from the funded deployer",
+        "raw": "0x",
+        "success": true
+      },
+      {
+        "call": "withdraw(0) from zero-WBNB probe",
+        "selector": "0x2e1a7d4d",
+        "raw": "0x",
+        "success": true
+      },
+      {
+        "call": "withdraw(1) from zero-WBNB probe",
+        "selector": "0x2e1a7d4d",
+        "errorCode": 3,
+        "errorMessage": "execution reverted"
+      }
+    ],
+    "unknownSelectorCaveat": {
+      "selectors": ["0x8da5cb5b", "0x5c60da1b", "0x5c975abb", "0x40c10f19"],
+      "rawResult": "0x",
+      "interpretation": "These calls succeed through the payable fallback; they are not owner/implementation/paused/mint getter results. Absence of those surfaces is established by the exact source/runtime proof, not by these dynamic probes."
+    }
+  },
+  "controlAssessment": {
+    "proxyOrUpgrade": {
+      "present": false,
+      "basis": "Exact source/runtime, zero ERC-1967 slots, no ERC-1167 pattern, and zero DELEGATECALL/CALLCODE"
+    },
+    "ownerOrAdmin": {
+      "present": false,
+      "mutableControl": null
+    },
+    "arbitraryMint": {
+      "present": false,
+      "note": "deposit/fallback issue balance only against msg.value; no privileged or unbacked mint path"
+    },
+    "pause": {
+      "present": false
+    },
+    "blacklist": {
+      "present": false
+    },
+    "transferFee": {
+      "present": false
+    },
+    "rebase": {
+      "present": false
+    },
+    "externalTransferHook": {
+      "present": false,
+      "note": "withdraw performs one native-value CALL via Solidity transfer; token transfers have no recipient hook"
+    },
+    "recovery": {
+      "present": false,
+      "consequence": "Unrelated BEP-20 assets accidentally sent to WBNB cannot be recovered by an administrator."
+    },
+    "userMutableAuthority": {
+      "allowance": "Token holders can replace allowances and can use uint256 max as an infinite-allowance sentinel.",
+      "approvalRace": "Legacy approve has the usual nonzero-to-nonzero allowance race; integrations should set zero first or use exact, short-lived allowances.",
+      "privileged": false
+    }
+  },
+  "economicAssessment": {
+    "classification": "native BNB wrapper",
+    "stableValued": false,
+    "issuance": "deposit() and payable fallback increase the caller's WBNB ledger balance by exactly msg.value",
+    "redemption": "withdraw(wad) checks and burns the caller's ledger balance before sending wad native BNB with Solidity transfer",
+    "anchorNativeBalanceWei": "274406463662505455475247",
+    "anchorTotalSupplyReturn": "274406463662505455475247",
+    "formattedUnits": "274406.463662505455475247",
+    "knownLimitations": [
+      "totalSupply() returns address(this).balance rather than summing balanceOf, so forced native-BNB transfers can create a surplus and make reported totalSupply exceed issued ledger balances.",
+      "Solidity transfer forwards a fixed gas stipend and can make withdrawal unavailable to recipient contracts whose receive path needs more gas or reverts.",
+      "Transfers to the zero address are not rejected and are economically unrecoverable.",
+      "WBNB inherits native testnet BNB price/value and chain risk; it is not stable-valued and testnet units have no asserted market value."
+    ]
+  },
+  "sources": [
+    {
+      "url": "https://testnet.bscscan.com/address/0xae13d989dac2f0debff460ac112a837c89baa7cd#code",
+      "authority": "BNB Chain's documented Chapel explorer",
+      "purpose": "source/ABI/compiler record and deployment explorer record",
+      "checkedOn": "2026-08-11"
+    },
+    {
+      "url": "https://docs.bnbchain.org/bnb-smart-chain/developers/wallet-configuration/",
+      "authority": "BNB Chain documentation",
+      "purpose": "chain ID, official testnet RPC, and explorer",
+      "checkedOn": "2026-08-11"
+    },
+    {
+      "url": "https://docs.bnbchain.org/bnb-smart-chain/developers/json_rpc/json-rpc-endpoint/",
+      "authority": "BNB Chain documentation",
+      "purpose": "official Chapel RPC endpoints",
+      "checkedOn": "2026-08-11"
+    },
+    {
+      "url": "https://binaries.soliditylang.org/windows-amd64/list.json",
+      "authority": "Solidity official compiler distribution",
+      "purpose": "compiler artifact path and cryptographic hashes",
+      "checkedOn": "2026-08-11"
+    },
+    {
+      "url": "https://docs.soliditylang.org/en/v0.4.18/metadata.html",
+      "authority": "Solidity 0.4.18 documentation",
+      "purpose": "metadata, bzzr0 trailer, and full-bytecode source verification methodology",
+      "checkedOn": "2026-08-11"
+    },
+    {
+      "url": "https://eips.ethereum.org/EIPS/eip-1967",
+      "authority": "Ethereum Improvement Proposals",
+      "purpose": "implementation, admin, and beacon slot constants",
+      "checkedOn": "2026-08-11"
+    },
+    {
+      "url": "https://eips.ethereum.org/EIPS/eip-1167",
+      "authority": "Ethereum Improvement Proposals",
+      "purpose": "minimal-proxy runtime pattern",
+      "checkedOn": "2026-08-11"
+    }
+  ]
+}

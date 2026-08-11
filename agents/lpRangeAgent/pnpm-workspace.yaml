@@ -1,0 +1,8 @@
+# Read-only LP analyzer workspace; the deployable package lives under app/agent.
+packages:
+  - app/agent
+
+# Keep dependency lifecycle scripts disabled. The pinned optional platform
+# package is sufficient for tsx tests; the production build/runtime use tsc/node.
+ignoredBuiltDependencies:
+  - esbuild

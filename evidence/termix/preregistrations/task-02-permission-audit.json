@@ -1,0 +1,369 @@
+{
+  "schemaVersion": "proofera-termix-preregistration-v1.0.0",
+  "preregistrationId": "termix-task-02-permission-audit-v1",
+  "registeredAtUtc": "2026-08-11T18:22:25.921Z",
+  "status": "NOT RUN",
+  "runStates": { "agent": "NOT RUN", "manual": "NOT RUN" },
+  "publishable": false,
+  "nonPublishableReasons": [
+    "The final activation proposal, source-bound code manifest, adversarial corpus, testnet authority receipts, agent identity, runtime configuration, and software commit are not bound.",
+    "Neither paired audit has started; no findings, timing, cost, score, output, API receipt, transaction receipt, or hiring receipt exists.",
+    "The definition digest is local tamper evidence only and does not prove that this preregistration was publicly timestamped."
+  ],
+  "definition": {
+    "task": {
+      "taskId": "autonomous-session-permission-audit",
+      "title": "Altana/Pancake autonomous-session least-authority audit",
+      "domain": "security",
+      "exactDefinition": "Given one immutable, secret-free BNB Smart Chain testnet activation review bundle containing a serialized Altana grant intent, decoded Pancake direct calls, code/selector attestation, spend and expiry policy, durable reservation/claim state, quote timestamps, authority lifecycle receipts, documented SDK 0.7.0 behavior, and a pre-frozen adversarial mutation corpus, identify every authority path and defect; assign severity and reproducible impact; and produce a corrected enforcement table split across Altana/onchain, ProofEra runtime, and explicit wallet confirmation. The timed audit is read-only.",
+      "successCondition": "Both methods inspect the byte-identical bundle and return a complete, evidence-linked finding set plus corrected least-authority policy, retry rule, revoke path, and limitations; a second reviewer can reproduce each finding without a secret or live write."
+    },
+    "inputs": [
+      {
+        "inputId": "activation-proposal",
+        "description": "Canonical serialized grant intent, direct-call plan, wallet/recipient/token/amount/deadline/slippage policy, worker bootstrap state, durable reservation identifier, and claim state with all secret material removed.",
+        "finalEncoding": "canonical_json",
+        "unit": null,
+        "authoritativeSourceRequirement": "Hashed output from the reviewed ProofEra server-only activation composition boundary.",
+        "bindingRule": "Bind one proposal that passed structural parsing but preserve any intentionally seeded policy defects in the separately indexed adversarial corpus; never include signer, passkey, private key, API key, or opaque secret handle.",
+        "binding": {
+          "state": "UNBOUND",
+          "value": null,
+          "reason": "No final judged activation bundle or agent execution environment exists.",
+          "bindBeforeEitherRun": true
+        }
+      },
+      {
+        "inputId": "code-authority-attestation",
+        "description": "Exact-block target code hashes, reviewed source provenance, selector manifest, ownership/approval state, and server-side reservation/claim catalog evidence.",
+        "finalEncoding": "canonical_json",
+        "unit": null,
+        "authoritativeSourceRequirement": "Hashed raw RPC responses, reviewed source artifacts, PostgreSQL schema/deployment proof, and canonical selector evidence.",
+        "bindingRule": "Freeze one exact block and one canonical database deployment receipt before either run; record unavailable external evidence as unavailable.",
+        "binding": {
+          "state": "UNBOUND",
+          "value": null,
+          "reason": "The final deployed database and testnet authority are not configured.",
+          "bindBeforeEitherRun": true
+        }
+      },
+      {
+        "inputId": "authority-lifecycle-receipts",
+        "description": "Raw testnet grant, authority probe, and revoke transaction/API responses for the authority under audit.",
+        "finalEncoding": "canonical_json",
+        "unit": null,
+        "authoritativeSourceRequirement": "BSC testnet explorer and RPC responses with transaction/block joins and independently checked raw artifacts.",
+        "bindingRule": "Bind only real receipts from the exact reviewed session; if grant or revoke is not complete, do not run or publish the pair.",
+        "binding": {
+          "state": "UNBOUND",
+          "value": null,
+          "reason": "No testnet grant/revoke has been approved, signed, broadcast, or observed.",
+          "bindBeforeEitherRun": true
+        }
+      },
+      {
+        "inputId": "adversarial-corpus",
+        "description": "Deterministic indexed cases covering generic dispatcher, selector mismatch, target/code substitution, recipient/wallet/token/decimal mismatch, spend-cap ambiguity, stale quote, expiry boundary, replay, double submission, unknown grant outcome, unsafe retry, revoke failure, and secret-leak markers.",
+        "finalEncoding": "canonical_json",
+        "unit": null,
+        "authoritativeSourceRequirement": "Repository artifact generated from reviewed threat-model cases and hashed before run order selection.",
+        "bindingRule": "Freeze case IDs, ground truth, severity rules and expected evidence before either method sees the corpus; do not add cases after reviewing outputs.",
+        "binding": {
+          "state": "UNBOUND",
+          "value": null,
+          "reason": "The final blind corpus and independent answer key have not been produced.",
+          "bindBeforeEitherRun": true
+        }
+      },
+      {
+        "inputId": "sdk-behavior-evidence",
+        "description": "Reviewed Altana SDK 0.7.0 grant, session, exception and revoke behavior relevant to the proposal, separated from inferred behavior.",
+        "finalEncoding": "canonical_json",
+        "unit": null,
+        "authoritativeSourceRequirement": "Pinned package source, official documentation locators, and local behavior-test artifacts with digests.",
+        "bindingRule": "Bind exact package bytes and reviewed documentation snapshot; do not infer callsId retention or retry safety when evidence is absent.",
+        "binding": {
+          "state": "UNBOUND",
+          "value": null,
+          "reason": "The final evidence bundle and configuration digest are not frozen.",
+          "bindBeforeEitherRun": true
+        }
+      }
+    ],
+    "constraints": [
+      {
+        "constraintId": "bsc-testnet-only",
+        "description": "All authority and receipt evidence must identify BNB Smart Chain testnet chain ID 97.",
+        "enforcement": "hard",
+        "expected": { "encoding": "decimal_integer", "value": "97" }
+      },
+      {
+        "constraintId": "secret-free-bundle",
+        "description": "The supplied corpus and every output must exclude private keys, passkey material, session signers, wallet passwords, API keys and opaque secret handles.",
+        "enforcement": "hard",
+        "expected": { "encoding": "canonical_json", "value": "true" }
+      },
+      {
+        "constraintId": "timed-audit-read-only",
+        "description": "Neither timed method may sign, grant, revoke, mutate a database, submit, or broadcast.",
+        "enforcement": "hard",
+        "expected": { "encoding": "canonical_json", "value": "true" }
+      },
+      {
+        "constraintId": "required-enforcement-layers",
+        "description": "Every corrected permission must name its actual enforcement layer rather than treating application validation as an onchain guarantee.",
+        "enforcement": "hard",
+        "expected": {
+          "encoding": "canonical_json",
+          "value": "[\"altana-or-onchain\",\"explicit-wallet-confirmation\",\"proofera-runtime\"]"
+        }
+      },
+      {
+        "constraintId": "audit-window",
+        "description": "Finish the timed audit within 1200 seconds; later completion remains recorded and loses the timing/reproducibility points.",
+        "enforcement": "scored",
+        "expected": { "encoding": "decimal_integer", "value": "1200" }
+      }
+    ],
+    "environment": {
+      "kind": "testnet",
+      "chainId": 97,
+      "networkName": "BNB Smart Chain Testnet",
+      "softwareCommit": {
+        "state": "UNBOUND",
+        "value": null,
+        "reason": "The benchmark must bind a release commit containing the final corpus, runner and audit boundary.",
+        "bindBeforeEitherRun": true
+      },
+      "components": [
+        {
+          "name": "node",
+          "versionBindingRule": "Record the exact Node.js version used by both methods.",
+          "configurationDigestRequired": false
+        },
+        {
+          "name": "proofera-security-auditor",
+          "versionBindingRule": "Bind the hired agent runtime and exact non-secret configuration; manual invocation of it is forbidden.",
+          "configurationDigestRequired": true
+        },
+        {
+          "name": "altana-sdk",
+          "versionBindingRule": "Pin exact package version and package-byte digest; currently researched behavior is 0.7.0 but the final run must rebind the installed version.",
+          "configurationDigestRequired": true
+        },
+        {
+          "name": "postgresql",
+          "versionBindingRule": "Record the exact canonical grant-claim deployment and server version used for source evidence.",
+          "configurationDigestRequired": true
+        },
+        {
+          "name": "rpc-and-explorer",
+          "versionBindingRule": "Record provider origins/capabilities and explorer network without credentials.",
+          "configurationDigestRequired": true
+        }
+      ],
+      "parameters": [
+        {
+          "key": "authority-source-block",
+          "description": "Exact block used for target code and authority state.",
+          "finalEncoding": "decimal_integer",
+          "bindingRule": "Bind block number with hash/timestamp and receipt confirmations before either run.",
+          "binding": {
+            "state": "UNBOUND",
+            "value": null,
+            "reason": "No live testnet authority exists.",
+            "bindBeforeEitherRun": true
+          }
+        },
+        {
+          "key": "corpus-answer-key-digest",
+          "description": "Digest of the reviewer-held finding/severity answer key.",
+          "finalEncoding": "string",
+          "bindingRule": "Bind before either method receives the corpus; keep the answer key inaccessible during both runs.",
+          "binding": {
+            "state": "UNBOUND",
+            "value": null,
+            "reason": "The final corpus and answer key do not exist.",
+            "bindBeforeEitherRun": true
+          }
+        },
+        {
+          "key": "run-order-seed",
+          "description": "Public randomness input used to choose agent-first or manual-first.",
+          "finalEncoding": "string",
+          "bindingRule": "Bind after declaration freeze and before either timed audit.",
+          "binding": {
+            "state": "UNBOUND",
+            "value": null,
+            "reason": "Run order cannot be selected yet.",
+            "bindBeforeEitherRun": true
+          }
+        }
+      ]
+    },
+    "qualityRubric": {
+      "rubricId": "termix-permission-audit-rubric-v1",
+      "version": "1.0.0",
+      "declaredAtUtc": "2026-08-11T18:22:25.921Z",
+      "criteria": [
+        {
+          "criterionId": "true-positive-coverage",
+          "description": "Find the seeded and naturally present authority, replay, freshness, retry, revoke and secret-boundary defects.",
+          "measurement": "Compare normalized finding IDs and severities with the frozen reviewer-held answer key.",
+          "evidenceRequired": "Raw report, normalized finding table, corpus digest and answer-key scoring trace.",
+          "maximumPoints": 35
+        },
+        {
+          "criterionId": "false-positive-discipline",
+          "description": "Avoid claims not supported by code, receipts, SDK evidence or the frozen proposal.",
+          "measurement": "Review every claimed issue against exact source evidence and count unsupported or duplicate findings.",
+          "evidenceRequired": "Finding-to-source join table and reviewer adjudication.",
+          "maximumPoints": 15
+        },
+        {
+          "criterionId": "impact-reproduction",
+          "description": "Explain concrete impact, preconditions and safe reproduction without exposing or using secrets.",
+          "measurement": "Execute approved read-only reproductions against the frozen corpus and compare observed states.",
+          "evidenceRequired": "Reproduction log, artifact hashes and observed read-only outputs.",
+          "maximumPoints": 15
+        },
+        {
+          "criterionId": "least-authority-correction",
+          "description": "Produce a complete corrected policy with accurate enforcement layer, spend, selector, target, expiry, retry and revoke controls.",
+          "measurement": "Apply a fixed checklist and validate the corrected canonical policy against the frozen safety schema.",
+          "evidenceRequired": "Corrected policy, schema result and reviewer checklist.",
+          "maximumPoints": 20
+        },
+        {
+          "criterionId": "evidence-reproducibility",
+          "description": "Provide complete hashes, source joins, timing, costs, limitations and deterministic normalized findings.",
+          "measurement": "Second reviewer reproduces the normalized report and validates every evidence reference.",
+          "evidenceRequired": "Raw/canonical outputs, active/wall timing, cost evidence, receipt joins and verification log.",
+          "maximumPoints": 15
+        }
+      ],
+      "totalMaximumPoints": 100
+    },
+    "hardFailRules": [
+      "Any private key, passkey material, session signer, wallet password, API key, secret handle, or usable credential appears in an input, output, log, artifact, or command.",
+      "Failure to identify a seeded generic dispatcher, session-signer leak, wrong target/recipient/token/chain, unbounded spend, unsafe unknown-outcome retry, or missing revoke path.",
+      "Any live write, signature, grant, revoke, submission, broadcast, database mutation, or corpus/answer-key change during either timed audit.",
+      "Any input, constraint, environment, source access, rubric, or answer-key difference between methods."
+    ],
+    "pairProtocol": {
+      "oneFinalDeclarationForBothRuns": true,
+      "identicalTask": true,
+      "identicalInputs": true,
+      "identicalConstraints": true,
+      "identicalEnvironment": true,
+      "identicalQualityRubric": true,
+      "identicalSourceAccess": true,
+      "finalDeclarationSha256": null,
+      "finalDeclarationBindingState": "UNBOUND",
+      "runOrderRule": "Freeze the corpus, private answer-key digest, shared declaration and source bundle first; then use recorded public randomness to choose order without changing any artifact between runs.",
+      "agentMethodRequirement": "Hire the registered security/audit service through ProofEra and invoke only its frozen configuration against the shared secret-free bundle; retain hire evidence separately from scored findings.",
+      "manualMethodRequirement": "One declared security reviewer audits the same bundle without invoking the hired agent, using only the predeclared local inspection tools and frozen documentation."
+    },
+    "measurementRequirements": {
+      "wallTime": "UTC_START_END_PLUS_MONOTONIC_DURATION",
+      "activeTime": "HASHED_MONOTONIC_OPERATOR_SEGMENTS",
+      "costs": "SOURCED_INTEGER_MINOR_UNITS_WITH_EXPLICIT_ZEROES",
+      "output": "HASHED_RAW_AND_CANONICAL_OUTPUTS",
+      "quality": "SECOND_REVIEWER_SCORES_EVERY_PREDECLARED_CRITERION",
+      "noCurrencyConversion": true
+    },
+    "artifactRequirements": [
+      {
+        "requirementId": "frozen-audit-bundle",
+        "role": "configuration",
+        "appliesTo": "both-runs",
+        "description": "Byte-identical declaration, proposal, corpus and source evidence supplied to both methods.",
+        "sha256Required": true
+      },
+      {
+        "requirementId": "raw-and-normalized-findings",
+        "role": "output",
+        "appliesTo": "both-runs",
+        "description": "Unedited report plus canonical normalized finding and corrected-policy outputs.",
+        "sha256Required": true
+      },
+      {
+        "requirementId": "timing-cost-tool-log",
+        "role": "log",
+        "appliesTo": "both-runs",
+        "description": "UTC/monotonic wall time, active-time segments, tool-use log and sourced cost items including evidenced zeroes.",
+        "sha256Required": true
+      },
+      {
+        "requirementId": "answer-key-review",
+        "role": "quality-evidence",
+        "appliesTo": "both-runs",
+        "description": "Post-run answer-key reveal, finding adjudication and second-reviewer scoring.",
+        "sha256Required": true
+      },
+      {
+        "requirementId": "agent-hire-proof",
+        "role": "raw-receipt",
+        "appliesTo": "agent-run",
+        "description": "Raw ProofEra hire/activation evidence for the registered audit service; excluded from quality scoring.",
+        "sha256Required": true
+      },
+      {
+        "requirementId": "manual-procedure-log",
+        "role": "log",
+        "appliesTo": "manual-run",
+        "description": "Exact reviewer procedure and tools showing that the hired agent was not invoked.",
+        "sha256Required": true
+      }
+    ],
+    "receiptRequirements": [
+      {
+        "requirementId": "authority-transaction-receipt",
+        "kind": "transaction",
+        "appliesTo": "both-runs",
+        "description": "The exact testnet grant/revoke transaction under audit, re-observed inside each run and joined to a hashed raw receipt artifact.",
+        "rawArtifactRequired": true,
+        "independentVerificationRequired": true
+      },
+      {
+        "requirementId": "authority-api-receipt",
+        "kind": "api",
+        "appliesTo": "both-runs",
+        "description": "Raw RPC/explorer response used to confirm target code and current/revoked authority inside each run.",
+        "rawArtifactRequired": true,
+        "independentVerificationRequired": true
+      },
+      {
+        "requirementId": "proof-era-hire-receipt",
+        "kind": "transaction",
+        "appliesTo": "agent-run",
+        "description": "Explorer-verifiable testnet hire/activation receipt for the registered audit service; without it, the pair is not publishable.",
+        "rawArtifactRequired": true,
+        "independentVerificationRequired": true
+      }
+    ],
+    "finalDeclarationRequiredReceiptKinds": ["transaction", "api"],
+    "reproduction": {
+      "prerequisiteCommands": [
+        {
+          "step": 1,
+          "workingDirectory": ".",
+          "command": "pnpm --filter @proofera/integrations exec vitest run src/altana-lp-activation-composition.server.test.ts src/altana-lp-handoff.test.ts src/altana-grant.test.ts",
+          "purpose": "Verify current activation, handoff and grant safety boundaries; this is not the paired audit.",
+          "state": "AVAILABLE NOW"
+        },
+        {
+          "step": 2,
+          "workingDirectory": ".",
+          "command": "pnpm --filter @proofera/benchmarks test",
+          "purpose": "Validate preregistration and paired-run schemas; synthetic tests are not TermiX evidence.",
+          "state": "AVAILABLE NOW"
+        }
+      ],
+      "timedRunnerCommand": null,
+      "timedRunnerBindingState": "UNBOUND",
+      "blockedReason": "The blind corpus, real testnet authority receipts, registered/hireable audit agent, manual procedure, runner and release commit do not yet exist."
+    }
+  },
+  "definitionSha256": "1191c85c4f36881be0736ced51fc6c23e24286101543bf0838346b0e2ed95645"
+}

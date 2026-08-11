@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-08-11T12:58:35.333Z",
+  "environment": "bsc-testnet",
+  "chainId": 97,
+  "evidenceKind": "read_only_third_party_pool_static_context_observation",
+  "provider": {
+    "id": "publicnode-bsc-testnet",
+    "origin": "https://bsc-testnet-rpc.publicnode.com",
+    "publicSourceUrl": "https://publicnode.com/",
+    "role": "untrusted_json_rpc_transport"
+  },
+  "block": {
+    "number": "124459420",
+    "hash": "0x3067e5b1f7e6654e0e2d6705394f96be378617b7573f2e4c6bfdaa93fda33e5e",
+    "timestampUnix": "1786453110"
+  },
+  "contracts": {
+    "positionManager": "0x427bF5b37357632377eCbEC9de3626C71A5396c1",
+    "factory": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+    "poolDeployer": "0x41ff9AA7e16B8B1a8a8dc4f0eFacd93D02d071c9",
+    "wrappedNative": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+    "token0": {
+      "address": "0x3a4a356381d3061d5f29013e8e12acfed701dba6",
+      "decimals": 18
+    },
+    "token1": {
+      "address": "0xddf6c57e618f267c135f0c56da88091b95c54057",
+      "decimals": 18
+    }
+  },
+  "rawResponses": {
+    "eth_getBlockByHash": {
+      "number": "0x76b199c",
+      "hash": "0x3067e5b1f7e6654e0e2d6705394f96be378617b7573f2e4c6bfdaa93fda33e5e",
+      "timestamp": "0x6a7b1c76"
+    },
+    "managerFactory": "0x0000000000000000000000000bfbcf9fa4f9c56b0f40a671ad40e0805a091865",
+    "managerDeployer": "0x00000000000000000000000041ff9aa7e16b8b1a8a8dc4f0efacd93d02d071c9",
+    "managerWETH9": "0x000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd",
+    "token0Decimals": "0x0000000000000000000000000000000000000000000000000000000000000012",
+    "token1Decimals": "0x0000000000000000000000000000000000000000000000000000000000000012"
+  },
+  "readPolicy": {
+    "blockSelector": "eip1898_block_hash",
+    "requireCanonical": true,
+    "latestFallback": false,
+    "blockNumberFallback": false,
+    "writeMethodsExposedByAdapter": false,
+    "freshnessOwnership": "trusted_reader_configuration"
+  },
+  "deploymentEvidence": {
+    "repositoryCommit": "986847948755cba528324d41be19480731c36c2a",
+    "sourceUrl": "https://github.com/pancakeswap/pancake-v3-contracts/blob/986847948755cba528324d41be19480731c36c2a/deployments/bscTestnet.json"
+  },
+  "adapterVerification": {
+    "command": "$env:PROOFERA_RUN_LIVE_PANCAKE_TESTS='1'; $env:BSC_TESTNET_RPC_URL='https://bsc-testnet-rpc.publicnode.com'; $env:PROOFERA_LIVE_PANCAKE_BLOCK_NUMBER='124459420'; $env:PROOFERA_LIVE_PANCAKE_BLOCK_HASH='0x3067e5b1f7e6654e0e2d6705394f96be378617b7573f2e4c6bfdaa93fda33e5e'; $env:PROOFERA_LIVE_PANCAKE_BLOCK_TIMESTAMP='1786453110'; $env:PROOFERA_LIVE_PANCAKE_CHECKED_AT='2026-08-11T12:58:35.333Z'; pnpm --filter @proofera/integrations exec vitest run src/pancake-v3-static-context.live.test.ts",
+    "result": "1 passed",
+    "durationSeconds": 2.35,
+    "clockMode": "recorded_observation_time_injected_for_deterministic_replay"
+  },
+  "boundaries": {
+    "thirdPartyPoolTokens": true,
+    "tokenSymbolsOrEconomicMeaningEstablished": false,
+    "tokenLegitimacyEstablished": false,
+    "runtimeCodeIdentityEstablishedByThisRead": false,
+    "sourceVerificationEstablished": false,
+    "prooferaAuthorityEstablished": false,
+    "transactionSubmitted": false,
+    "executionEnabled": false,
+    "currentFreshnessEstablishedAtReplayTime": false
+  }
+}

@@ -1,0 +1,6 @@
+# Single-package workspace used when app/agent is the Docker build context.
+packages:
+  - .
+# Keep dependency lifecycle scripts disabled; production uses tsc/node.
+ignoredBuiltDependencies:
+  - esbuild

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "retainedDateUtc": "2026-08-12",
+  "repository": "https://github.com/pancakeswap/pancake-v3-contracts",
+  "sourceCommit": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+  "deploymentCommit": "986847948755cba528324d41be19480731c36c2a",
+  "sourceArchive": {
+    "format": "git_archive_tar",
+    "byteLength": 9912320,
+    "sha256": "b3cd0b3fd4563287f587c2776eac78e5b5a4ad98f6c805a005df10727bee782d",
+    "evidencePath": "evidence/development/pancake-v3-source-reproduction-supplement-2026-08-11.json"
+  },
+  "artifacts": [
+    {
+      "retainedPath": "986847948755cba528324d41be19480731c36c2a/deployments/bscTestnet.json",
+      "upstreamPath": "deployments/bscTestnet.json",
+      "commit": "986847948755cba528324d41be19480731c36c2a",
+      "gitBlobSha1": "caee7134e35cc17a5c1874bd21ae2f909f3cac04",
+      "byteLength": 768,
+      "sha256": "18e6a1db8212ac187d579476c26ebcc1ae86bc11d5e6467c5fe8e8b18606c441",
+      "license": "repository deployment metadata; repository is GPL-2.0-or-later"
+    },
+    {
+      "retainedPath": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-periphery/contracts/interfaces/IPoolInitializer.sol",
+      "upstreamPath": "projects/v3-periphery/contracts/interfaces/IPoolInitializer.sol",
+      "commit": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+      "comparisonCommit": "986847948755cba528324d41be19480731c36c2a",
+      "comparisonGitBlobEqual": true,
+      "gitBlobSha1": "d2949b3d6c42d6409af4c90333b41b2410723c4d",
+      "byteLength": 1162,
+      "sha256": "1c6c3661807129156f46ac0e3a8a582a2600cbfe983751b79844981b573ac33a",
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "retainedPath": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-periphery/contracts/base/PoolInitializer.sol",
+      "upstreamPath": "projects/v3-periphery/contracts/base/PoolInitializer.sol",
+      "commit": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+      "comparisonCommit": "986847948755cba528324d41be19480731c36c2a",
+      "comparisonGitBlobEqual": true,
+      "gitBlobSha1": "2c4dd9058d8b496d62fd6dbd3f532dd9ada8fb8b",
+      "byteLength": 1190,
+      "sha256": "ed0d234b15dab205f874522cc4c76761b584ecdebd89a45cdf1edb3d5e84ab88",
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "retainedPath": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-core/contracts/interfaces/IPancakeV3Factory.sol",
+      "upstreamPath": "projects/v3-core/contracts/interfaces/IPancakeV3Factory.sol",
+      "commit": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+      "comparisonCommit": "986847948755cba528324d41be19480731c36c2a",
+      "comparisonGitBlobEqual": true,
+      "gitBlobSha1": "2665464a147e09b4760271aabb3da76278b3c3ed",
+      "byteLength": 5977,
+      "sha256": "390685b7ff3fe9d4a0895fc9a420402dd0ce01adb6dc7137c022d68c65a66bdd",
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "retainedPath": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-core/contracts/PancakeV3Factory.sol",
+      "upstreamPath": "projects/v3-core/contracts/PancakeV3Factory.sol",
+      "commit": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+      "comparisonCommit": "986847948755cba528324d41be19480731c36c2a",
+      "comparisonGitBlobEqual": true,
+      "gitBlobSha1": "e55da82dcd790cecad352b946400e9fc662ff646",
+      "byteLength": 6218,
+      "sha256": "6f4364c4b9761586f7b6eb71bf2344485e12eb01851419da4c1c81ad266d2a00",
+      "license": "GPL-2.0-or-later"
+    }
+  ],
+  "retentionMethod": "Exact LF-normalized Git blob bytes copied from the already detached local official checkout; no network access was used by the package or its tests.",
+  "limitations": [
+    "Git commit and blob identifiers plus local SHA-256 pins establish reproducible byte identity, not an authenticated publisher signature or independent reviewer approval.",
+    "Retained source bytes do not establish fresh deployed runtime identity, pool lineage, execution authority, simulation success, or transaction safety.",
+    "Only the files required to derive this offline review plan are retained; this is not a complete source-tree mirror."
+  ]
+}

@@ -1,0 +1,36 @@
+# Dependencies and build output
+node_modules/
+*.tsbuildinfo
+.next/
+out/
+dist/
+coverage/
+playwright-report/
+test-results/
+.turbo/
+production-licenses.json
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.studio/
+**/.studio/
+**/wallets/
+**/*keystore*.json
+
+# Python agent environments
+.venv/
+**/.venv/
+__pycache__/
+*.py[cod]
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
