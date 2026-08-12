@@ -44,7 +44,11 @@ import {
   type BscTestnetPtaFreshSigningCapability,
   type BscTestnetPtaSigningWorkerRequest
 } from "../packages/integrations/src/bsc-testnet-pta-one-shot-worker-protocol";
-import { createBscTestnetPtaOneShotSignerCore } from "../packages/integrations/src/bsc-testnet-pta-one-shot-signer-core";
+import {
+  BSC_TESTNET_PTA_DURABLE_CLAIM_SCHEMA_VERSION,
+  BSC_TESTNET_PTA_DURABLE_COMMIT_OPERATION,
+  createBscTestnetPtaOneShotSignerCore
+} from "../packages/integrations/src/bsc-testnet-pta-one-shot-signer-core";
 import {
   createWindowsBscTestnetPtaLocalJournal,
   type BscTestnetPtaLocalJournal
@@ -60,8 +64,8 @@ const CORROBORATOR_RPC = "https://bsc-testnet.bnbchain.org";
 const MAXIMUM_STDIN_BYTES = 20_000;
 const MAXIMUM_STDOUT_BYTES = 12_000;
 const MAXIMUM_RPC_BYTES = 1_048_576;
-const WORKER_TIMEOUT_MS = 40_000;
-const WORKER_CLEANUP_TIMEOUT_MS = 5_000;
+const WORKER_TIMEOUT_MS = 120_000;
+const WORKER_CLEANUP_TIMEOUT_MS = 10_000;
 const RPC_TIMEOUT_MS = 8_000;
 const RECEIPT_TIMEOUT_MS = 90_000;
 const POLL_INTERVAL_MS = 2_000;
@@ -279,6 +283,19 @@ async function runWorker(): Promise<void> {
     });
     const response = await worker.invokeExactSigningWorker(
       parsed.request as BscTestnetPtaSigningWorkerRequest
+    );
+    await journal.commitSignedTransaction(
+      Object.freeze({
+        schemaVersion: BSC_TESTNET_PTA_DURABLE_CLAIM_SCHEMA_VERSION,
+        operation: BSC_TESTNET_PTA_DURABLE_COMMIT_OPERATION,
+        oneShotIntentId: BSC_TESTNET_PTA_ONE_SHOT_INTENT_ID,
+        claimId: response.claimId,
+        requestHash: response.requestHash,
+        signingHash: response.signingHash,
+        signedTransaction: response.signedTransaction,
+        transactionHash: response.transactionHash,
+        recoveredSigner: BSC_TESTNET_PTA_DEPLOYER_ADDRESS
+      })
     );
     process.stdout.write(JSON.stringify(response));
   } finally {
@@ -567,8 +584,11 @@ async function validateSignedTransaction(
   transactionHash: Hex,
   capability: BscTestnetPtaFreshSigningCapability
 ): Promise<void> {
-  const validated = validateBscTestnetPtaFreshSigningCapability(capability, new Date());
-  if (validated.status !== "valid") fail("SIGNED_TRANSACTION_STALE");
+  const validated = validateBscTestnetPtaFreshSigningCapability(
+    capability,
+    new Date(capability.authenticatedAt)
+  );
+  if (validated.status !== "valid") fail("SIGNED_TRANSACTION_INVALID");
   const claimId = `pta-${validated.intent.signingHash.slice(2, 34)}`;
   const request = buildBscTestnetPtaSigningWorkerRequest(validated.intent, claimId);
   if ("code" in request) fail("WORKER_REQUEST_INVALID");
@@ -879,7 +899,7 @@ async function executeDeployment(arguments_: ExecutionArguments): Promise<void> 
     raw = initial.signedTransaction;
     transactionHash = initial.transactionHash;
     await validateRetainedSignedTransaction(raw, transactionHash);
-  } else if (initial.status === "empty") {
+  } else if (initial.status === "empty" || initial.status === "exact_recovery_available") {
     const fresh = await freshSigningPayload(deploymentData);
     const authority = new WeakSet<object>();
     authority.add(fresh.capability);

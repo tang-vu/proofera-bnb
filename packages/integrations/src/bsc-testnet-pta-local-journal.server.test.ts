@@ -53,8 +53,17 @@ const SIMULATION_RETURN_DATA = `0x${DEPLOYMENT_DATA.slice(
 const RAW_TRANSACTION = "0xf8610180808080018080" as Hex;
 const TRANSACTION_HASH = keccak256(RAW_TRANSACTION);
 const AUTHORIZATION_TOKEN = `0x${"66".repeat(32)}` as Hex;
+const INCIDENT = Object.freeze({
+  claimId: "pta-5435766f57e50ce0a2ae748336738e4e",
+  signingHash: "0x5435766f57e50ce0a2ae748336738e4e7724d85f97c4774476a10bb1a88b44c1" as Hex,
+  requestHash: "0x46297835692a5158fa1c003495321a02b450d0edebf9581fd4fc3fa2d137ec14" as Hex,
+  sourceEnvelopeHash: "0xf5bc59afcbff9a79586d011e3c080d203fce45cdff794414e0373904d7127cea" as Hex,
+  claimCreatedAt: "2026-08-12T14:52:27.146Z",
+  authorizationRecordedAt: "2026-08-12T14:52:33.110Z",
+  startedRecordedAt: "2026-08-12T14:52:41.561Z"
+});
 
-function workerRequest(): BscTestnetPtaSigningWorkerRequest {
+function workerRequest(gasEstimate = "500000"): BscTestnetPtaSigningWorkerRequest {
   const envelope = buildBscTestnetPtaDeploymentEnvelope(
     {
       schemaVersion: 1,
@@ -77,7 +86,7 @@ function workerRequest(): BscTestnetPtaSigningWorkerRequest {
         predictedContractNonce: "0",
         balanceWei: "100000000000000000",
         simulationReturnData: SIMULATION_RETURN_DATA,
-        gasEstimate: "500000",
+        gasEstimate,
         feeModel: "legacy_gas_price",
         gasPriceWei: "100000000"
       },
@@ -113,6 +122,15 @@ function workerRequest(): BscTestnetPtaSigningWorkerRequest {
 }
 
 const WORKER_REQUEST = workerRequest();
+const RECOVERY_WORKER_REQUEST = workerRequest("561809");
+if (
+  RECOVERY_WORKER_REQUEST.transaction.signingHash !== INCIDENT.signingHash ||
+  RECOVERY_WORKER_REQUEST.transaction.gasLimit !== "674171" ||
+  RECOVERY_WORKER_REQUEST.transaction.gasPriceWei !== "100000000" ||
+  RECOVERY_WORKER_REQUEST.transaction.maximumCostWei !== "67417100000000"
+) {
+  throw new Error("Recovery signing regression fixture invalid.");
+}
 const SIGNING_HASH = WORKER_REQUEST.transaction.signingHash;
 const ENVELOPE_HASH = WORKER_REQUEST.transaction.sourceEnvelopeHash;
 const CLAIM_ID = WORKER_REQUEST.claimId;
@@ -147,6 +165,17 @@ function commitRequest(): BscTestnetPtaDurableSignedCommitRequest {
 
 function memoryPorts() {
   const files = new Map<string, string>();
+  const metadata = new Map<
+    string,
+    {
+      birthtimeNanoseconds: string;
+      modifiedTimeNanoseconds: string;
+      sizeBytes: string;
+      device: string;
+      inode: string;
+      contentSha256: string;
+    }
+  >();
   const asserted: string[][] = [];
   const ports: BscTestnetPtaLocalJournalPorts = {
     now: () => new Date(NOW),
@@ -158,9 +187,94 @@ function memoryPorts() {
       files.set(name, content);
       return "created";
     },
-    readBounded: async (name) => files.get(name) ?? null
+    readBounded: async (name) => files.get(name) ?? null,
+    readMetadata: async (name) => metadata.get(name) ?? null
   };
-  return { asserted, files, ports };
+  return { asserted, files, metadata, ports };
+}
+
+function recoveryClaimRequest(): BscTestnetPtaDurableClaimRequest {
+  return Object.freeze({
+    ...claimRequest(),
+    signingHash: INCIDENT.signingHash,
+    sourceEnvelopeHash: RECOVERY_WORKER_REQUEST.transaction.sourceEnvelopeHash
+  });
+}
+
+function recoveryCommitRequest(): BscTestnetPtaDurableSignedCommitRequest {
+  return Object.freeze({
+    ...commitRequest(),
+    claimId: INCIDENT.claimId,
+    requestHash: RECOVERY_WORKER_REQUEST.requestHash,
+    signingHash: INCIDENT.signingHash
+  });
+}
+
+function seedExactIncident(memory: ReturnType<typeof memoryPorts>): void {
+  const originalClaim: BscTestnetPtaDurableClaimRequest = Object.freeze({
+    ...claimRequest(),
+    signingHash: INCIDENT.signingHash,
+    sourceEnvelopeHash: INCIDENT.sourceEnvelopeHash
+  });
+  const originalWorkerRecord = Object.freeze({
+    claimId: INCIDENT.claimId,
+    requestHash: INCIDENT.requestHash,
+    signingHash: INCIDENT.signingHash,
+    sourceEnvelopeHash: INCIDENT.sourceEnvelopeHash,
+    authorizationDigest: `0x${"ab".repeat(32)}`
+  });
+  memory.files.set(
+    "claim.v1.json",
+    `${JSON.stringify({
+      schemaVersion: 1,
+      recordType: "bsc_testnet_pta_one_shot_claim",
+      createdAt: INCIDENT.claimCreatedAt,
+      claimId: INCIDENT.claimId,
+      request: originalClaim
+    })}\n`
+  );
+  memory.files.set(
+    "worker-authorization.v1.json",
+    `${JSON.stringify({
+      schemaVersion: 1,
+      recordType: "bsc_testnet_pta_worker_authorization",
+      recordedAt: INCIDENT.authorizationRecordedAt,
+      record: originalWorkerRecord
+    })}\n`
+  );
+  memory.files.set(
+    "worker-started.v1.json",
+    `${JSON.stringify({
+      schemaVersion: 1,
+      recordType: "bsc_testnet_pta_worker_started",
+      recordedAt: INCIDENT.startedRecordedAt,
+      record: originalWorkerRecord
+    })}\n`
+  );
+  memory.metadata.set("claim.v1.json", {
+    birthtimeNanoseconds: "1786546352538688400",
+    modifiedTimeNanoseconds: "1786546352539689500",
+    sizeBytes: "677",
+    device: "1",
+    inode: "11",
+    contentSha256: "316599121ec06e0cc74a0268b693c13b41afb95bdfa37c540c385139e9f1b41b"
+  });
+  memory.metadata.set("worker-authorization.v1.json", {
+    birthtimeNanoseconds: "1786546353665026000",
+    modifiedTimeNanoseconds: "1786546353665026000",
+    sizeBytes: "519",
+    device: "1",
+    inode: "12",
+    contentSha256: "d9dc65953b0ad46f4adab1ac7d5213b36f6b4d6aff8e554206db9994f50e74eb"
+  });
+  memory.metadata.set("worker-started.v1.json", {
+    birthtimeNanoseconds: "1786546365968244600",
+    modifiedTimeNanoseconds: "1786546365969245000",
+    sizeBytes: "513",
+    device: "1",
+    inode: "13",
+    contentSha256: "37dcc7b65b8e2a44777f9545ff19fea65f865ac2f1803f89802ceede0c957b91"
+  });
 }
 
 async function authorizeAndConsume(
@@ -348,6 +462,210 @@ describe("local one-shot PTA journal", () => {
     await journal.prepareWorkerAuthorization(WORKER_REQUEST, keccak256(AUTHORIZATION_TOKEN));
     await expect(journal.readState()).resolves.toMatchObject({ status: "unknown" });
     await journal.consumeWorkerAuthorization(WORKER_REQUEST, AUTHORIZATION_TOKEN);
+    await expect(journal.readState()).resolves.toMatchObject({ status: "unknown" });
+  });
+
+  it("performs exactly one append-only recovery for the pinned pre-signature-expiry incident", async () => {
+    const memory = memoryPorts();
+    seedExactIncident(memory);
+    const originals = new Map(memory.files);
+    const journal = createBscTestnetPtaLocalJournalCore(memory.ports);
+
+    await expect(journal.readState()).resolves.toEqual({
+      status: "exact_recovery_available",
+      signedTransaction: null,
+      transactionHash: null
+    });
+    await expect(journal.claimExactDeployment(recoveryClaimRequest())).resolves.toEqual({
+      status: "claimed",
+      claimId: INCIDENT.claimId
+    });
+    await expect(
+      journal.prepareWorkerAuthorization(RECOVERY_WORKER_REQUEST, keccak256(AUTHORIZATION_TOKEN))
+    ).resolves.toEqual({ status: "authorized" });
+    await expect(journal.readState()).resolves.toMatchObject({ status: "unknown" });
+    await expect(
+      journal.consumeWorkerAuthorization(RECOVERY_WORKER_REQUEST, AUTHORIZATION_TOKEN)
+    ).resolves.toEqual({ status: "consumed" });
+    await expect(journal.commitSignedTransaction(recoveryCommitRequest())).resolves.toEqual({
+      status: "committed"
+    });
+    // The isolated child and its parent both commit the same result. This exact
+    // second commit is idempotent; no record is replaced.
+    const signed = memory.files.get("signed.v1.json");
+    await expect(journal.commitSignedTransaction(recoveryCommitRequest())).resolves.toEqual({
+      status: "committed"
+    });
+    expect(memory.files.get("signed.v1.json")).toBe(signed);
+    await expect(journal.readState()).resolves.toEqual({
+      status: "signed_committed",
+      signedTransaction: RAW_TRANSACTION,
+      transactionHash: TRANSACTION_HASH
+    });
+    for (const name of [
+      "claim.v1.json",
+      "worker-authorization.v1.json",
+      "worker-started.v1.json"
+    ]) {
+      expect(memory.files.get(name)).toBe(originals.get(name));
+    }
+    const recoveryAuthorization = JSON.parse(
+      memory.files.get("recovery-authorization.v1.json") ?? "null"
+    ) as { record: Record<string, unknown> };
+    expect(recoveryAuthorization.record).toMatchObject({
+      incidentId: "bsc-testnet-pta-pre-sign-expiry-2026-08-12",
+      attemptCommit: "94e4bc4323138ca34ce9551c87e47b3e0eb8f2e3",
+      evidenceCommit: "1537847",
+      originalRequestHash: INCIDENT.requestHash,
+      originalSourceEnvelopeHash: INCIDENT.sourceEnvelopeHash,
+      recoveryRequestHash: RECOVERY_WORKER_REQUEST.requestHash,
+      recoverySourceEnvelopeHash: RECOVERY_WORKER_REQUEST.transaction.sourceEnvelopeHash,
+      signingHash: INCIDENT.signingHash,
+      gasLimit: "674171",
+      gasPriceWei: "100000000",
+      maximumCostWei: "67417100000000"
+    });
+  });
+
+  it("rejects incident timestamp, file hash, identity, and original cross-binding drift", async () => {
+    const mutations: Array<(memory: ReturnType<typeof memoryPorts>) => void> = [
+      (memory) => {
+        const metadata = memory.metadata.get("worker-started.v1.json");
+        if (metadata !== undefined)
+          memory.metadata.set("worker-started.v1.json", {
+            ...metadata,
+            birthtimeNanoseconds: "1786546365968244700"
+          });
+      },
+      (memory) => {
+        const authorization = JSON.parse(
+          memory.files.get("worker-authorization.v1.json") ?? "null"
+        ) as { recordedAt: string };
+        authorization.recordedAt = "2026-08-12T14:52:33.111Z";
+        memory.files.set("worker-authorization.v1.json", `${JSON.stringify(authorization)}\n`);
+      },
+      (memory) => {
+        const metadata = memory.metadata.get("worker-authorization.v1.json");
+        if (metadata !== undefined)
+          memory.metadata.set("worker-authorization.v1.json", {
+            ...metadata,
+            contentSha256: "0".repeat(64)
+          });
+      },
+      (memory) => {
+        const metadata = memory.metadata.get("worker-started.v1.json");
+        if (metadata !== undefined)
+          memory.metadata.set("worker-started.v1.json", { ...metadata, inode: "12" });
+      },
+      (memory) => {
+        const started = JSON.parse(memory.files.get("worker-started.v1.json") ?? "null") as {
+          record: { requestHash: Hex };
+        };
+        started.record.requestHash = `0x${"99".repeat(32)}`;
+        memory.files.set("worker-started.v1.json", `${JSON.stringify(started)}\n`);
+      }
+    ];
+
+    for (const mutate of mutations) {
+      const memory = memoryPorts();
+      seedExactIncident(memory);
+      mutate(memory);
+      const journal = createBscTestnetPtaLocalJournalCore(memory.ports);
+      await expect(journal.readState()).resolves.toMatchObject({ status: "unknown" });
+      await expect(journal.claimExactDeployment(recoveryClaimRequest())).rejects.toThrow(
+        "PTA_LOCAL_JOURNAL_OUTCOME_UNKNOWN"
+      );
+      await expect(
+        journal.prepareWorkerAuthorization(RECOVERY_WORKER_REQUEST, keccak256(AUTHORIZATION_TOKEN))
+      ).rejects.toThrow("PTA_LOCAL_JOURNAL_CLAIM_MISMATCH");
+      expect(memory.files.has("recovery-authorization.v1.json")).toBe(false);
+      expect(memory.files.has("recovery-started.v1.json")).toBe(false);
+    }
+  });
+
+  it("makes an authorized or started recovery terminal and never creates a third attempt", async () => {
+    const memory = memoryPorts();
+    seedExactIncident(memory);
+    const journal = createBscTestnetPtaLocalJournalCore(memory.ports);
+    await journal.claimExactDeployment(recoveryClaimRequest());
+    await journal.prepareWorkerAuthorization(
+      RECOVERY_WORKER_REQUEST,
+      keccak256(AUTHORIZATION_TOKEN)
+    );
+    await expect(journal.claimExactDeployment(recoveryClaimRequest())).rejects.toThrow(
+      "PTA_LOCAL_JOURNAL_OUTCOME_UNKNOWN"
+    );
+    await expect(
+      journal.prepareWorkerAuthorization(RECOVERY_WORKER_REQUEST, keccak256(AUTHORIZATION_TOKEN))
+    ).rejects.toThrow();
+    await journal.consumeWorkerAuthorization(RECOVERY_WORKER_REQUEST, AUTHORIZATION_TOKEN);
+    await expect(journal.readState()).resolves.toMatchObject({ status: "unknown" });
+    await expect(
+      journal.consumeWorkerAuthorization(RECOVERY_WORKER_REQUEST, AUTHORIZATION_TOKEN)
+    ).rejects.toThrow("PTA_LOCAL_JOURNAL_WORKER_ALREADY_STARTED");
+    expect(
+      [...memory.files.keys()].filter((name) => name.startsWith("recovery-authorization"))
+    ).toEqual(["recovery-authorization.v1.json"]);
+    expect([...memory.files.keys()].filter((name) => name.startsWith("recovery-started"))).toEqual([
+      "recovery-started.v1.json"
+    ]);
+  });
+
+  it("allows only one recovery authorization under concurrent attempts", async () => {
+    const memory = memoryPorts();
+    seedExactIncident(memory);
+    const journal = createBscTestnetPtaLocalJournalCore(memory.ports);
+    await journal.claimExactDeployment(recoveryClaimRequest());
+    const settled = await Promise.allSettled(
+      Array.from({ length: 16 }, () =>
+        journal.prepareWorkerAuthorization(RECOVERY_WORKER_REQUEST, keccak256(AUTHORIZATION_TOKEN))
+      )
+    );
+    expect(settled.filter((result) => result.status === "fulfilled")).toHaveLength(1);
+    expect(settled.filter((result) => result.status === "rejected")).toHaveLength(15);
+    expect([...memory.files.keys()].filter((name) => name.startsWith("recovery-"))).toEqual([
+      "recovery-authorization.v1.json"
+    ]);
+  });
+
+  it("rejects same-signing-hash request field drift before writing recovery state", async () => {
+    const memory = memoryPorts();
+    seedExactIncident(memory);
+    const journal = createBscTestnetPtaLocalJournalCore(memory.ports);
+    await journal.claimExactDeployment(recoveryClaimRequest());
+    const collisionStyleDrift = {
+      ...RECOVERY_WORKER_REQUEST,
+      transaction: {
+        ...RECOVERY_WORKER_REQUEST.transaction,
+        gasLimit: "674172",
+        signingHash: INCIDENT.signingHash
+      }
+    } as BscTestnetPtaSigningWorkerRequest;
+    await expect(
+      journal.prepareWorkerAuthorization(collisionStyleDrift, keccak256(AUTHORIZATION_TOKEN))
+    ).rejects.toThrow("PTA_LOCAL_JOURNAL_INPUT_INVALID");
+    expect(memory.files.has("recovery-authorization.v1.json")).toBe(false);
+  });
+
+  it("rejects a malformed or cross-bound recovery pair before accepting a signed commit", async () => {
+    const memory = memoryPorts();
+    seedExactIncident(memory);
+    const journal = createBscTestnetPtaLocalJournalCore(memory.ports);
+    await journal.claimExactDeployment(recoveryClaimRequest());
+    await journal.prepareWorkerAuthorization(
+      RECOVERY_WORKER_REQUEST,
+      keccak256(AUTHORIZATION_TOKEN)
+    );
+    await journal.consumeWorkerAuthorization(RECOVERY_WORKER_REQUEST, AUTHORIZATION_TOKEN);
+    const started = JSON.parse(memory.files.get("recovery-started.v1.json") ?? "null") as {
+      record: { originalRequestHash: Hex };
+    };
+    started.record.originalRequestHash = `0x${"88".repeat(32)}`;
+    memory.files.set("recovery-started.v1.json", `${JSON.stringify(started)}\n`);
+    await expect(journal.commitSignedTransaction(recoveryCommitRequest())).rejects.toThrow(
+      "PTA_LOCAL_JOURNAL_WORKER_NOT_STARTED"
+    );
+    expect(memory.files.has("signed.v1.json")).toBe(false);
     await expect(journal.readState()).resolves.toMatchObject({ status: "unknown" });
   });
 });

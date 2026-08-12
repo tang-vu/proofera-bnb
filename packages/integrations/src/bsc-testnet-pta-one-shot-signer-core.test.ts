@@ -295,7 +295,7 @@ describe("BSC testnet PTA one-shot signer core", () => {
     const { core, calls } = createHarness({
       asOf: () => {
         clockCalls += 1;
-        return new Date(clockCalls === 1 ? NOW : "2026-08-12T10:00:36.000Z");
+        return new Date(clockCalls === 1 ? NOW : "2026-08-12T10:01:21.000Z");
       }
     });
     await expect(core.signOnce()).resolves.toMatchObject({

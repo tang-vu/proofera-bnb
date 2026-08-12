@@ -43,7 +43,7 @@ import {
 export const BSC_TESTNET_PTA_FRESH_SIGNING_CAPABILITY_SCHEMA_VERSION = 1 as const;
 export const BSC_TESTNET_PTA_FRESH_SIGNING_CAPABILITY_SCOPE =
   "exact_bsc_testnet_pta_deployment_after_fresh_rpc_recheck" as const;
-export const BSC_TESTNET_PTA_FRESH_SIGNING_CAPABILITY_MAX_AGE_SECONDS = 15 as const;
+export const BSC_TESTNET_PTA_FRESH_SIGNING_CAPABILITY_MAX_AGE_SECONDS = 60 as const;
 export const BSC_TESTNET_PTA_ONE_SHOT_INTENT_ID =
   "proofera:bsc-testnet:97:pta-fixed-test-asset:deployer-nonce-0:v1" as const;
 export const BSC_TESTNET_PTA_SIGNING_WORKER_PROTOCOL_VERSION = 1 as const;
@@ -552,7 +552,7 @@ export function validateBscTestnetPtaFreshSigningCapability(
         issue(
           "CAPABILITY_STALE",
           "capability.authenticatedAt",
-          "Capability is older than the fifteen-second signer-side freshness window."
+          "Capability is older than the sixty-second signer-side freshness window."
         )
       );
     }
@@ -963,7 +963,7 @@ export function validateBscTestnetPtaSigningWorkerRequest(
         issue: issue(
           "CAPABILITY_STALE",
           "request.authenticatedAt",
-          "Worker request exceeded the fifteen-second signer-side freshness window."
+          "Worker request exceeded the sixty-second signer-side freshness window."
         )
       });
     }

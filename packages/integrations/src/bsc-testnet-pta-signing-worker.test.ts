@@ -22,6 +22,7 @@ import {
 } from "./bsc-testnet-pta-one-shot-worker-protocol";
 import {
   createBscTestnetPtaSigningWorkerForInternalUse,
+  isBscTestnetPtaSigningDeadlineCurrentForInternalUse,
   signExactBscTestnetPtaEncryptedStoreForInternalUse,
   type BscTestnetPtaExactSigningTransaction,
   type BscTestnetPtaSigningWorkerPorts
@@ -127,7 +128,8 @@ function exactTransaction(): BscTestnetPtaExactSigningTransaction {
     data: payload.deployment.data,
     gasLimit: BigInt(payload.transaction.gasLimit),
     gasPriceWei: BigInt(payload.transaction.gasPriceWei),
-    nonce: 0 as const
+    nonce: 0 as const,
+    signingNotAfterMilliseconds: Date.parse("2026-08-12T10:01:15.000Z")
   });
 }
 
@@ -221,7 +223,8 @@ describe("BSC testnet PTA exact one-shot signing worker", () => {
       data: DEPLOYMENT_DATA,
       gasLimit: 600_000n,
       gasPriceWei: 100_000_000n,
-      nonce: 0
+      nonce: 0,
+      signingNotAfterMilliseconds: Date.parse("2026-08-12T10:01:15.000Z")
     });
     expect(canonicalInput().toString("utf8")).not.toContain(CUSTODY_DIRECTORY);
   });
@@ -238,6 +241,42 @@ describe("BSC testnet PTA exact one-shot signing worker", () => {
       code: "ALREADY_CLAIMED"
     });
     expect(signExactTransaction).toHaveBeenCalledTimes(1);
+  });
+
+  it("reconstructs the same exact signature deterministically and distinguishes any payload drift", async () => {
+    const account = privateKeyToAccount(SYNTHETIC_PRIVATE_KEY);
+    const transaction = exactTransaction();
+    const sign = (gasPrice: bigint) =>
+      account.signTransaction({
+        chainId: 97,
+        data: transaction.data,
+        gas: transaction.gasLimit,
+        gasPrice,
+        nonce: 0,
+        type: "legacy",
+        value: 0n
+      });
+    const first = await sign(transaction.gasPriceWei);
+    const second = await sign(transaction.gasPriceWei);
+    const drifted = await sign(transaction.gasPriceWei + 1n);
+    expect(first).toBe(second);
+    expect(drifted).not.toBe(first);
+  });
+
+  it("permits signing immediately before the bound deadline and rejects the exact boundary", () => {
+    const transaction = exactTransaction();
+    expect(
+      isBscTestnetPtaSigningDeadlineCurrentForInternalUse(
+        transaction,
+        transaction.signingNotAfterMilliseconds - 1
+      )
+    ).toBe(true);
+    expect(
+      isBscTestnetPtaSigningDeadlineCurrentForInternalUse(
+        transaction,
+        transaction.signingNotAfterMilliseconds
+      )
+    ).toBe(false);
   });
 
   it("does not consume the one-shot claim for malformed or expired input", async () => {

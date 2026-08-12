@@ -185,7 +185,7 @@ describe("BSC testnet PTA one-shot worker protocol", () => {
   it("independently rejects stale or forged worker input before any secret unlock", () => {
     const request = validatedRequest();
     expect(
-      validateBscTestnetPtaSigningWorkerRequest(request, new Date("2026-08-12T10:00:36.000Z"))
+      validateBscTestnetPtaSigningWorkerRequest(request, new Date("2026-08-12T10:01:21.000Z"))
     ).toMatchObject({ status: "invalid", issue: { code: "CAPABILITY_STALE" } });
 
     const validation = validateBscTestnetPtaFreshSigningCapability(capability(), new Date(NOW));
@@ -220,7 +220,7 @@ describe("BSC testnet PTA one-shot worker protocol", () => {
   it("rejects stale, future, expired, and proxied clocks", () => {
     expect(
       validateBscTestnetPtaFreshSigningCapability(
-        capability("2026-08-12T10:00:00.000Z"),
+        capability("2026-08-12T09:59:19.000Z"),
         new Date(NOW)
       )
     ).toMatchObject({ status: "invalid", issue: { code: "CAPABILITY_STALE" } });
@@ -236,6 +236,19 @@ describe("BSC testnet PTA one-shot worker protocol", () => {
         new Date("2026-08-12T10:03:00.000Z")
       )
     ).toMatchObject({ status: "invalid", issue: { code: "CAPABILITY_EXPIRED" } });
+
+    expect(
+      validateBscTestnetPtaFreshSigningCapability(
+        capability(),
+        new Date("2026-08-12T10:01:20.000Z")
+      )
+    ).toMatchObject({ status: "valid" });
+    expect(
+      validateBscTestnetPtaFreshSigningCapability(
+        capability(),
+        new Date("2026-08-12T10:01:20.001Z")
+      )
+    ).toMatchObject({ status: "invalid", issue: { code: "CAPABILITY_STALE" } });
 
     let traps = 0;
     const proxiedDate = new Proxy(new Date(NOW), {

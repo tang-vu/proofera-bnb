@@ -91,6 +91,7 @@ test("runner source keeps exact one-shot, child isolation, journal-before-broadc
     "createBscTestnetPtaOneShotSignerCore",
     "createWindowsBscTestnetPtaLocalJournal",
     "invokeWorker",
+    "const WORKER_TIMEOUT_MS = 120_000",
     "validateSignedTransaction",
     'rpc(PRIMARY_RPC, "eth_sendRawTransaction", [raw])',
     "waitForReceipt",
@@ -126,6 +127,9 @@ test("worker entry requires durable authorization consumption before custody com
     source.includes("journal.prepareWorkerAuthorization(request, keccak256(authorizationToken))")
   );
   assert.ok(source.includes("worker-started.v1.json") === false);
+  const childCommit = source.indexOf("await journal.commitSignedTransaction(");
+  const childOutput = source.indexOf("process.stdout.write(JSON.stringify(response))");
+  assert.ok(childCommit > custody && childOutput > childCommit);
 });
 
 test("recovery reads journal before fresh RPC and reconciles the deterministic hash", () => {
@@ -136,4 +140,5 @@ test("recovery reads journal before fresh RPC and reconciles the deterministic h
   assert.ok(source.includes("validateRetainedSignedTransaction(raw, transactionHash)"));
   assert.ok(source.includes("broadcastOrReconcile(raw, transactionHash)"));
   assert.ok(source.includes("MINT_EVENT_INVALID"));
+  assert.ok(source.includes('initial.status === "exact_recovery_available"'));
 });

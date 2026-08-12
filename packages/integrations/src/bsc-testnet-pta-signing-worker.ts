@@ -147,6 +147,7 @@ export interface BscTestnetPtaExactSigningTransaction {
   readonly gasLimit: bigint;
   readonly gasPriceWei: bigint;
   readonly nonce: 0;
+  readonly signingNotAfterMilliseconds: number;
 }
 
 type ValidatedWorkerInput = Readonly<{
@@ -310,6 +311,7 @@ function validateExactTransaction(transaction: BscTestnetPtaExactSigningTransact
     transaction.gasPriceWei <= 0n ||
     transaction.gasPriceWei > HARD_MAX_GAS_PRICE_WEI ||
     transaction.gasLimit * transaction.gasPriceWei > HARD_MAX_TOTAL_COST_WEI ||
+    !Number.isSafeInteger(transaction.signingNotAfterMilliseconds) ||
     exactLowerHex(transaction.data, BSC_TESTNET_PTA_DEPLOYMENT_DATA_BYTES) === null
   ) {
     return false;
@@ -317,6 +319,17 @@ function validateExactTransaction(transaction: BscTestnetPtaExactSigningTransact
   return (
     sha256(transaction.data).slice(2) === BSC_TESTNET_PTA_DEPLOYMENT_DATA_SHA256 &&
     keccak256(transaction.data) === BSC_TESTNET_PTA_DEPLOYMENT_DATA_KECCAK256
+  );
+}
+
+export function isBscTestnetPtaSigningDeadlineCurrentForInternalUse(
+  transaction: BscTestnetPtaExactSigningTransaction,
+  nowMilliseconds: number
+): boolean {
+  return (
+    validateExactTransaction(transaction) &&
+    Number.isSafeInteger(nowMilliseconds) &&
+    nowMilliseconds < transaction.signingNotAfterMilliseconds
   );
 }
 
@@ -395,7 +408,16 @@ function parseWorkerInput(
   ) {
     return null;
   }
-  const exactTransaction = Object.freeze({ data, gasLimit, gasPriceWei, nonce: 0 as const });
+  const exactTransaction = Object.freeze({
+    data,
+    gasLimit,
+    gasPriceWei,
+    nonce: 0 as const,
+    signingNotAfterMilliseconds: Math.min(
+      expiresAtMilliseconds,
+      authenticatedAtMilliseconds + BSC_TESTNET_PTA_FRESH_SIGNING_CAPABILITY_MAX_AGE_SECONDS * 1_000
+    )
+  });
   if (!validateExactTransaction(exactTransaction)) return null;
   if (
     getContractAddress({ from: BSC_TESTNET_PTA_DEPLOYER_ADDRESS, nonce: 0n }) !==
@@ -523,6 +545,9 @@ export async function signExactBscTestnetPtaEncryptedStoreForInternalUse(
     const decipher = createDecipheriv("aes-128-ctr", derivedKey.subarray(0, 16), parsed.iv);
     secretScalar = Buffer.concat([decipher.update(parsed.cipherText), decipher.final()]);
     if (secretScalar.byteLength !== 32) throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
+    if (!isBscTestnetPtaSigningDeadlineCurrentForInternalUse(transaction, Date.now())) {
+      throw new SigningWorkerFailure("PAYLOAD_EXPIRED");
+    }
 
     // The unavoidable immutable hex copy is confined to this short-lived worker process.
     const account = privateKeyToAccount(`0x${secretScalar.toString("hex")}`);
@@ -690,6 +715,9 @@ async function nativeWindowsSignExactTransaction(
   transaction: BscTestnetPtaExactSigningTransaction
 ): Promise<Hex> {
   if (process.platform !== "win32") throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
+  if (!isBscTestnetPtaSigningDeadlineCurrentForInternalUse(transaction, Date.now())) {
+    throw new SigningWorkerFailure("PAYLOAD_EXPIRED");
+  }
   const signal = new AbortController().signal;
   let storeBytes: Buffer | null = null;
   let protectedBytes: Buffer | null = null;
