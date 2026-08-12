@@ -509,10 +509,22 @@ async function loadDeploymentData(): Promise<Hex> {
     chainId: BSC_TESTNET_PTA_CHAIN_ID,
     recipient: BSC_TESTNET_PTA_RECIPIENT_ADDRESS
   })) as Readonly<Record<string, unknown>>;
-  const transaction = inspectRecord(preparation.transaction);
-  const data = transaction?.data;
+  const network = inspectRecord(preparation.network);
+  const contract = inspectRecord(preparation.contract);
+  const digests = inspectRecord(preparation.digests);
+  const data = preparation.unsignedDeploymentData;
   if (
+    preparation.schemaVersion !== 1 ||
     preparation.status !== "offline_unsigned_preparation_only" ||
+    network === null ||
+    network.name !== "BSC Testnet" ||
+    network.chainId !== BSC_TESTNET_PTA_CHAIN_ID ||
+    contract === null ||
+    contract.deploymentRecipient !== BSC_TESTNET_PTA_RECIPIENT_ADDRESS.toLowerCase() ||
+    contract.fixedSupplyBaseUnits !== FIXED_SUPPLY_BASE_UNITS.toString() ||
+    contract.constructorEnforcedChainId !== BSC_TESTNET_PTA_CHAIN_ID ||
+    digests === null ||
+    digests.unsignedDeploymentDataSha256 !== BSC_TESTNET_PTA_DEPLOYMENT_DATA_SHA256 ||
     typeof data !== "string" ||
     data.length !== 2 + BSC_TESTNET_PTA_DEPLOYMENT_DATA_BYTES * 2 ||
     !/^0x[0-9a-f]+$/u.test(data)

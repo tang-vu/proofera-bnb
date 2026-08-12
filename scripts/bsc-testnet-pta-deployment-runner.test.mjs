@@ -5,6 +5,8 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import test from "node:test";
 
+import { buildDeploymentPreparation } from "../contracts/testnet-fixed-asset/scripts/deployment-preparation.mjs";
+
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const ENTRY = resolve(ROOT, "scripts", "run-bsc-testnet-pta-deployment.ts");
 const LOADER = resolve(ROOT, "scripts", "typescript-extension-loader.mjs");
@@ -15,6 +17,8 @@ const NODE_ARGUMENTS = [
   pathToFileURL(LOADER).href,
   ENTRY
 ];
+const DEPLOYER = "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49";
+const DATA_SHA256 = "45f05cb4c02100cccf74c7b2e7c31d04386642309ca2b9a9614684d0341cd239";
 
 function run(arguments_, input = "") {
   return spawnSync(process.execPath, [...NODE_ARGUMENTS, ...arguments_], {
@@ -37,6 +41,19 @@ test("deployment runner refuses invocation without the exact chain-97 execution 
     code: "ARGUMENTS_INVALID"
   });
   assert.equal(result.stderr, "");
+});
+
+test("runner consumes the exact offline producer field and digest", async () => {
+  const preparation = await buildDeploymentPreparation({ chainId: 97, recipient: DEPLOYER });
+  assert.equal(preparation.status, "offline_unsigned_preparation_only");
+  assert.equal(preparation.network.chainId, 97);
+  assert.equal(preparation.contract.deploymentRecipient, DEPLOYER.toLowerCase());
+  assert.equal(preparation.unsignedDeploymentData.length, 2 + 2_947 * 2);
+  assert.equal(preparation.digests.unsignedDeploymentDataSha256, DATA_SHA256);
+
+  const source = readFileSync(ENTRY, "utf8");
+  assert.ok(source.includes("const data = preparation.unsignedDeploymentData"));
+  assert.equal(source.includes("preparation.transaction"), false);
 });
 
 test("isolated worker rejects empty stdin without touching custody or printing detail", () => {
