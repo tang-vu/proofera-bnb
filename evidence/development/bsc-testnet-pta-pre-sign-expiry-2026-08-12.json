@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "recordType": "bsc_testnet_pta_pre_signature_expiry_incident",
+  "recordedAt": "2026-08-12T15:00:44.039Z",
+  "status": "pre_signature_payload_expired",
+  "network": {
+    "name": "BSC Testnet",
+    "chainId": 97
+  },
+  "attempt": {
+    "gitCommit": "94e4bc4323138ca34ce9551c87e47b3e0eb8f2e3",
+    "runnerExitCode": "SIGNER_WORKER_OUTCOME_UNKNOWN",
+    "freshSigningCapabilityMaximumAgeSeconds": 15,
+    "signedJournalRecordPresent": false,
+    "transactionBroadcastReached": false
+  },
+  "reviewedSourceBlobs": {
+    "scripts/run-bsc-testnet-pta-deployment.ts": "0241e6fcdaebcc76e93728ddd90673e17e2c260b",
+    "packages/integrations/src/bsc-testnet-pta-signing-worker.ts": "976f884c4f62e631dbdd9007dc06872ce09f7d8b",
+    "packages/integrations/src/bsc-testnet-pta-local-journal.server.ts": "b3d4ef7b99a9c892c425a08281780e9e7dd46e96",
+    "packages/integrations/src/bsc-testnet-pta-one-shot-worker-protocol.ts": "bcf373734cf29b46525d34989d011685c471142a"
+  },
+  "publicJournalEvidence": {
+    "claim": {
+      "recordedAt": "2026-08-12T14:52:27.146Z",
+      "fileCreatedAt": "2026-08-12T14:52:32.5386884Z",
+      "fileLastWriteAt": "2026-08-12T14:52:32.5396895Z",
+      "byteLength": 677,
+      "claimId": "pta-5435766f57e50ce0a2ae748336738e4e",
+      "signingHash": "0x5435766f57e50ce0a2ae748336738e4e7724d85f97c4774476a10bb1a88b44c1",
+      "sourceEnvelopeHash": "0xf5bc59afcbff9a79586d011e3c080d203fce45cdff794414e0373904d7127cea"
+    },
+    "workerAuthorization": {
+      "recordedAt": "2026-08-12T14:52:33.110Z",
+      "fileCreatedAt": "2026-08-12T14:52:33.6650260Z",
+      "fileLastWriteAt": "2026-08-12T14:52:33.6650260Z",
+      "byteLength": 519,
+      "requestHash": "0x46297835692a5158fa1c003495321a02b450d0edebf9581fd4fc3fa2d137ec14"
+    },
+    "workerStarted": {
+      "recordedAt": "2026-08-12T14:52:41.561Z",
+      "fileCreatedAt": "2026-08-12T14:52:45.9682446Z",
+      "fileLastWriteAt": "2026-08-12T14:52:45.9692450Z",
+      "byteLength": 513,
+      "requestHash": "0x46297835692a5158fa1c003495321a02b450d0edebf9581fd4fc3fa2d137ec14"
+    }
+  },
+  "orderingProof": {
+    "authenticatedAtNoLaterThanClaimRecordedAt": true,
+    "workerStartedFileCreatedAfterFreshnessDeadline": true,
+    "millisecondsFromClaimRecordedAtToWorkerStartedFileCreation": 18822,
+    "freshnessValidationOccursAfterExclusiveWorkerStartedRecord": true,
+    "freshnessValidationOccursBeforeSecretUnlockAndSigning": true,
+    "conclusion": "The worker necessarily rejected the stale payload before signExactTransaction could be invoked."
+  },
+  "freshReadOnlyReconstruction": {
+    "providerAgreementRequired": true,
+    "signingHash": "0x5435766f57e50ce0a2ae748336738e4e7724d85f97c4774476a10bb1a88b44c1",
+    "matchesOriginalClaim": true,
+    "gasLimit": "674171",
+    "gasPriceWei": "100000000",
+    "maximumCostWei": "67417100000000"
+  },
+  "recoveryBoundary": {
+    "deleteOrOverwriteJournalAllowed": false,
+    "genericRetryAllowed": false,
+    "replacementTransactionAllowed": false,
+    "appendOnlyIncidentSpecificRecoveryMayBeReviewed": true,
+    "requiredSameSigningHash": true,
+    "maximumRecoveryStarts": 1,
+    "privateKeyRecorded": false,
+    "passwordRecorded": false,
+    "authorizationTokenOrDigestRecorded": false,
+    "rawSignedTransactionRecorded": false
+  }
+}
