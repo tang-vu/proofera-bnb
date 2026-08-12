@@ -2,7 +2,7 @@ import "server-only";
 
 import { isProxy } from "node:util/types";
 
-import { getContractAddress, keccak256, sha256, stringToHex, type Address, type Hex } from "viem";
+import { keccak256, sha256, stringToHex, type Address, type Hex } from "viem";
 
 import {
   BSC_TESTNET_PTA_CHAIN_ID_DECIMAL,
@@ -12,6 +12,7 @@ import {
   BSC_TESTNET_PTA_DEPLOYMENT_DATA_SHA256,
   BSC_TESTNET_PTA_DEPLOYMENT_ENVELOPE_SCHEMA_VERSION,
   BSC_TESTNET_PTA_DEPLOYMENT_OPERATION,
+  BSC_TESTNET_PTA_EXPECTED_CONTRACT_ADDRESS,
   BSC_TESTNET_PTA_GAS_MARGIN_BPS,
   BSC_TESTNET_PTA_HARD_MAX_GAS_LIMIT,
   BSC_TESTNET_PTA_HARD_MAX_GAS_PRICE_WEI,
@@ -642,10 +643,7 @@ export async function coordinateBscTestnetPtaDeploymentForTests(
       return unavailable("account", "provider_disagreement", attemptedAt, true);
     }
 
-    const predictedContractAddress = getContractAddress({
-      from: BSC_TESTNET_PTA_DEPLOYER_ADDRESS,
-      nonce: primaryAccount.pendingNonce
-    });
+    const predictedContractAddress = BSC_TESTNET_PTA_EXPECTED_CONTRACT_ADDRESS;
     const transaction = Object.freeze({
       from: BSC_TESTNET_PTA_DEPLOYER_ADDRESS,
       data: deploymentData,

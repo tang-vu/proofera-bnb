@@ -1,14 +1,6 @@
 import { isProxy } from "node:util/types";
 
-import {
-  getAddress,
-  getContractAddress,
-  keccak256,
-  sha256,
-  stringToHex,
-  type Address,
-  type Hex
-} from "viem";
+import { getAddress, keccak256, sha256, stringToHex, type Address, type Hex } from "viem";
 
 export const BSC_TESTNET_PTA_DEPLOYMENT_ENVELOPE_SCHEMA_VERSION = 1 as const;
 export const BSC_TESTNET_PTA_DEPLOYMENT_ENVELOPE_HASH_DOMAIN =
@@ -21,6 +13,9 @@ export const BSC_TESTNET_PTA_RPC_ORIGIN = "https://bsc-testnet-dataseed.bnbchain
 export const BSC_TESTNET_PTA_DEPLOYER_ADDRESS =
   "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49" as const satisfies Address;
 export const BSC_TESTNET_PTA_RECIPIENT_ADDRESS = BSC_TESTNET_PTA_DEPLOYER_ADDRESS;
+export const BSC_TESTNET_PTA_EXPECTED_DEPLOYER_NONCE = "0" as const;
+export const BSC_TESTNET_PTA_EXPECTED_CONTRACT_ADDRESS =
+  "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc" as const satisfies Address;
 export const BSC_TESTNET_PTA_DEPLOYMENT_DATA_BYTES = 2_947 as const;
 export const BSC_TESTNET_PTA_DEPLOYMENT_DATA_SHA256 =
   "45f05cb4c02100cccf74c7b2e7c31d04386642309ca2b9a9614684d0341cd239" as const;
@@ -73,6 +68,7 @@ export type BscTestnetPtaDeploymentEnvelopeIssueCode =
   | "ENVELOPE_LIFETIME_EXCEEDED"
   | "NONCE_INVALID"
   | "NONCE_DRIFT"
+  | "DEPLOYER_NONCE_ALREADY_USED"
   | "SIGNER_CODE_PRESENT"
   | "PREDICTED_ADDRESS_INVALID"
   | "PREDICTED_ADDRESS_MISMATCH"
@@ -199,7 +195,7 @@ type EnvelopeBody = Readonly<{
     chainId: typeof BSC_TESTNET_PTA_CHAIN_ID_DECIMAL;
     from: typeof BSC_TESTNET_PTA_DEPLOYER_ADDRESS;
     to: null;
-    nonce: string;
+    nonce: typeof BSC_TESTNET_PTA_EXPECTED_DEPLOYER_NONCE;
     data: Hex;
     valueWei: "0";
     gasLimit: string;
@@ -694,6 +690,14 @@ export function buildBscTestnetPtaDeploymentEnvelope(
           "Latest and pending nonce must match; pending transactions are not allowed."
         )
       );
+    } else if (latestNonce !== BigInt(BSC_TESTNET_PTA_EXPECTED_DEPLOYER_NONCE)) {
+      issues.push(
+        issue(
+          "DEPLOYER_NONCE_ALREADY_USED",
+          "rpc.latestNonce",
+          "The exact one-shot PTA deployment requires the unused deployer nonce 0."
+        )
+      );
     }
 
     if (rpc.signerCode !== "0x") {
@@ -703,13 +707,7 @@ export function buildBscTestnetPtaDeploymentEnvelope(
     }
 
     const suppliedPredictedAddress = canonicalAddress(rpc.predictedContractAddress);
-    let predictedContractAddress: Address | null = null;
-    if (pendingNonce !== null) {
-      predictedContractAddress = getContractAddress({
-        from: BSC_TESTNET_PTA_DEPLOYER_ADDRESS,
-        nonce: pendingNonce
-      });
-    }
+    const predictedContractAddress: Address = BSC_TESTNET_PTA_EXPECTED_CONTRACT_ADDRESS;
     if (suppliedPredictedAddress === null) {
       issues.push(
         issue(
@@ -718,15 +716,12 @@ export function buildBscTestnetPtaDeploymentEnvelope(
           "The predicted CREATE address must use its canonical checksum representation."
         )
       );
-    } else if (
-      predictedContractAddress !== null &&
-      suppliedPredictedAddress !== predictedContractAddress
-    ) {
+    } else if (suppliedPredictedAddress !== predictedContractAddress) {
       issues.push(
         issue(
           "PREDICTED_ADDRESS_MISMATCH",
           "rpc.predictedContractAddress",
-          "The supplied target does not equal CREATE(deployer, pendingNonce)."
+          "The supplied target does not equal the reviewed CREATE(deployer, nonce 0) address."
         )
       );
     }
@@ -934,7 +929,6 @@ export function buildBscTestnetPtaDeploymentEnvelope(
       latestNonce === null ||
       pendingNonce === null ||
       suppliedPredictedAddress === null ||
-      predictedContractAddress === null ||
       simulationReturnData === null ||
       maximumGasLimit === null ||
       maximumGasPriceWei === null ||
@@ -977,7 +971,7 @@ export function buildBscTestnetPtaDeploymentEnvelope(
         chainId: BSC_TESTNET_PTA_CHAIN_ID_DECIMAL,
         from: BSC_TESTNET_PTA_DEPLOYER_ADDRESS,
         to: null,
-        nonce: pendingNonce.toString(),
+        nonce: BSC_TESTNET_PTA_EXPECTED_DEPLOYER_NONCE,
         data: deploymentData,
         valueWei: "0",
         gasLimit: finances.gasLimit,

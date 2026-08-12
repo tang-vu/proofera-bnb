@@ -158,6 +158,14 @@ describe("BSC testnet PTA deployment envelope", () => {
       "NONCE_DRIFT"
     ],
     [
+      "used deployer nonce",
+      (input: ReturnType<typeof validInput>) => {
+        input.rpc.latestNonce = "1";
+        input.rpc.pendingNonce = "1";
+      },
+      "DEPLOYER_NONCE_ALREADY_USED"
+    ],
+    [
       "target collision",
       (input: ReturnType<typeof validInput>) => (input.rpc.predictedContractCode = "0x00"),
       "TARGET_CODE_PRESENT"

@@ -181,6 +181,19 @@ describe("BSC testnet PTA RPC coordinator", () => {
     expect(result.boundary.providerAgreementVerified).toBe(true);
   });
 
+  it("blocks an already-used deployer nonce even when both providers agree", async () => {
+    const result = await run(
+      { latestNonce: "0x1", pendingNonce: "0x1" },
+      { latestNonce: "0x1", pendingNonce: "0x1" }
+    ).result;
+    expect(result.status).toBe("blocked");
+    if (result.status !== "blocked") return;
+    expect(result.issues.map(({ code }) => code)).toContain("DEPLOYER_NONCE_ALREADY_USED");
+    expect(result.predictedContractAddress).toBe("0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc");
+    expect(result.envelope).toBeNull();
+    expect(result.signingReady).toBe(false);
+  });
+
   it.each([
     ["block hash", {}, { block: { ...BLOCK, hash: `0x${"34".repeat(32)}` } }, "block"],
     ["balance", {}, { balance: "0x2" }, "account"],
