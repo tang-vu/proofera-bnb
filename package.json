@@ -16,11 +16,12 @@
     "lint": "eslint . --max-warnings=0",
     "security:secrets": "pnpm security:secrets:test && node scripts/check-secret-boundaries.mjs",
     "security:secrets:test": "node --test scripts/*.test.mjs",
+    "deploy:pta:testnet": "node --no-warnings --conditions=react-server --experimental-loader ./scripts/typescript-extension-loader.mjs ./scripts/run-bsc-testnet-pta-deployment.ts --execute-exact-pta-chain-97",
     "start": "pnpm --filter @proofera/web start",
     "test": "pnpm --recursive --if-present run test && pnpm test:evidence",
     "test:evidence": "node --test scripts/pancake-selector-review/review.test.mjs scripts/wbnb-source-verification/evidence.test.mjs",
     "test:e2e": "pnpm --filter @proofera/web test:e2e",
-    "typecheck": "pnpm --recursive --if-present run typecheck",
+    "typecheck": "pnpm --recursive --if-present run typecheck && tsc -p scripts/tsconfig.pta-deployment.json",
     "verify": "pnpm format:check && pnpm lint && pnpm security:secrets && pnpm typecheck && pnpm test && pnpm build"
   },
   "devDependencies": {
