@@ -150,3 +150,13 @@ test("recovery reads journal before fresh RPC and reconciles the deterministic h
   assert.ok(source.includes("2c4df05aec5eac9f41150382b58266fdcb93523f"));
   assert.ok(source.includes('runPinnedGit(["rev-parse", "--verify", "refs/remotes/origin/main"])'));
 });
+
+test("receipt block numbers use canonical JSON-RPC quantity validation", () => {
+  const source = readFileSync(ENTRY, "utf8");
+  assert.ok(source.includes("const blockNumberHex = exactHexQuantity(receipt.blockNumber)"));
+  assert.equal(source.includes("const blockNumberHex = exactHex(receipt.blockNumber)"), false);
+  assert.ok(source.includes("function exactHexQuantity(input: unknown): Hex"));
+  assert.ok(source.includes("/^0x(?:0|[1-9a-f][0-9a-f]*)$/u.test(input)"));
+  assert.equal(/^0x(?:0|[1-9a-f][0-9a-f]*)$/u.test("0x76e8aaa"), true);
+  assert.equal(/^0x(?:0|[1-9a-f][0-9a-f]*)$/u.test("0x076e8aaa"), false);
+});

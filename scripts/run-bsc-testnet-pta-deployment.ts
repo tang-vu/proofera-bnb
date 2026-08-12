@@ -597,10 +597,14 @@ function exactHex(input: unknown, bytes?: number): Hex {
     : fail("RPC_RESPONSE_INVALID");
 }
 
-function hexQuantity(input: unknown): bigint {
+function exactHexQuantity(input: unknown): Hex {
   return typeof input === "string" && /^0x(?:0|[1-9a-f][0-9a-f]*)$/u.test(input)
-    ? BigInt(input)
+    ? (input as Hex)
     : fail("RPC_RESPONSE_INVALID");
+}
+
+function hexQuantity(input: unknown): bigint {
+  return BigInt(exactHexQuantity(input));
 }
 
 function sleep(milliseconds: number): Promise<void> {
@@ -824,7 +828,9 @@ async function verifyDeployment(
   receipt: Readonly<Record<string, unknown>>,
   raw: Hex
 ) {
-  const blockNumberHex = exactHex(receipt.blockNumber) as Hex;
+  // JSON-RPC quantities are not byte strings: canonical values may contain an odd
+  // number of nibbles (for example, the deployed receipt block is `0x76e8aaa`).
+  const blockNumberHex = exactHexQuantity(receipt.blockNumber);
   const blockHash = exactHex(receipt.blockHash, 32);
   if (
     exactHex(receipt.transactionHash, 32) !== transactionHash ||
