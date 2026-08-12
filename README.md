@@ -180,7 +180,7 @@ Read [requirements traceability](./docs/requirements-traceability.md) to see how
 
 ## Security posture
 
-ProofEra does not custody user keys. Browser passkeys remain on the user's device; the four reference analyzers contain no signing keys or transaction path; any future autonomous signer must live only in a dedicated encrypted worker/KMS. Server-only secrets never use `NEXT_PUBLIC_`. Default development targets BSC testnet. No mainnet deployment, token approval, transfer, or paid service is performed without explicit approval.
+ProofEra does not custody user keys. Browser passkeys remain on the user's device; the four reference analyzers contain no signing keys or transaction path; any future autonomous signer must live only in a dedicated encrypted worker/KMS. A separate chain-97 deployment key has a server-only, read-only custody readiness probe that returns no secret or signer and is not part of the user journey. Server-only secrets never use `NEXT_PUBLIC_`. Default development targets BSC testnet. No mainnet deployment, token approval, transfer, or paid service is performed without explicit approval.
 
 See [AGENTS.md](./AGENTS.md) for engineering invariants and `docs/security.md` as the threat model is completed.
 

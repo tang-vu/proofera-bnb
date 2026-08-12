@@ -8,6 +8,7 @@
     "./server/altana-grant-claim": "./src/altana-grant-claim-verified-store.server.ts",
     "./server/altana-lp-activation": "./src/altana-lp-activation-composition.server.ts",
     "./server/altana-lp-reservation": "./src/altana-lp-reservation.server.ts",
+    "./server/bsc-testnet-deployer-custody": "./src/bsc-testnet-deployer-custody.server.ts",
     "./server/pancake-v3-selector-artifact-review": "./src/pancake-v3-selector-artifact-review.ts"
   },
   "scripts": {
