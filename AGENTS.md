@@ -2,6 +2,12 @@
 
 This file applies to the whole repository. ProofEra is a risk-aware BNB Smart Chain agent marketplace. The governing product rule is: **never turn missing evidence into a claim**.
 
+## Communication and delivery
+
+- Always reply to the repository owner in Vietnamese, including progress reports, questions, blockers, and final handoffs.
+- After every completed repository update, run the relevant verification, create a cohesive commit, and push the current branch to `origin`.
+- Never force-push, rewrite published history, bypass a failing gate, or include secrets/generated local state merely to make a push succeed. If a commit or push is blocked, report the exact blocker in Vietnamese.
+
 ## Repository structure
 
 - `apps/web/`: Next.js marketplace and server-side API routes.
