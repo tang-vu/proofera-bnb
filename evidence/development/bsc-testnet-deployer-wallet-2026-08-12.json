@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "recordType": "local_bsc_testnet_deployer_provisioning",
+  "recordedAt": "2026-08-12T09:47:17.715Z",
+  "createdAt": "2026-08-12T09:45:30.464Z",
+  "classification": "development_local_custody_record_not_onchain_evidence",
+  "wallet": {
+    "address": "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49",
+    "accountType": "secp256k1_eoa",
+    "intendedNetwork": "BSC testnet",
+    "intendedChainId": 97,
+    "chainBindingEnforcedByKey": false,
+    "allowedUse": "ProofEra testnet deployment preparation only",
+    "altanaAdminWallet": false,
+    "altanaSessionSigner": false,
+    "userFundingWallet": false,
+    "mainnetUseAllowed": false
+  },
+  "custody": {
+    "keystoreFormat": "web3-secret-storage-v3",
+    "cipher": "aes-128-ctr",
+    "kdf": {
+      "name": "scrypt",
+      "n": 131072,
+      "r": 8,
+      "p": 1,
+      "dklen": 32
+    },
+    "passwordEntropyBytes": 48,
+    "passwordWrapping": "windows-dpapi-current-user",
+    "storageBoundary": "outside_repository_local_user_profile",
+    "directoryInheritanceProtected": true,
+    "effectiveAclCurrentWindowsUserOnly": true,
+    "encryptedStoreSha256": "2fade4c982e80078fedbffdca77035caedcc64d8bf34a021ccd04e515d0e90ab",
+    "secretArtifactsCommitted": false,
+    "privateMaterialPrinted": false
+  },
+  "verification": {
+    "initialKeystoreRoundTripValid": true,
+    "initialOfflineSignatureRecoveryValid": true,
+    "independentProcessDpapiRecoveryValid": true,
+    "independentProcessKeystoreMacValid": true,
+    "independentProcessAddressMatchValid": true,
+    "independentProcessOfflineSignatureRecoveryValid": true,
+    "artifactCount": 2
+  },
+  "onchainState": {
+    "rpcReadPerformed": false,
+    "balance": null,
+    "balanceState": "unknown_not_queried",
+    "transactionHistory": null,
+    "transactionHistoryState": "unknown_not_queried",
+    "fundingActionPerformed": false,
+    "transactionBroadcast": false,
+    "contractDeploymentPerformed": false
+  },
+  "tooling": {
+    "node": "24.14.1",
+    "viem": "2.55.13",
+    "keyGenerationMethod": "viem_noble_secp256k1_csprng",
+    "keystoreKdfImplementation": "node_crypto_scryptSync",
+    "dpapiScope": "CurrentUser"
+  },
+  "limitations": [
+    "An EVM private key is not intrinsically bound to chain 97; every future signer and deployment command must enforce chain ID 97 independently.",
+    "DPAPI CurrentUser protects against repository leakage and casual file theft, but code running as the same Windows user or a sufficiently privileged local administrator can still access the secret.",
+    "The DPAPI password blob is machine/user-profile bound and is not a durable backup or production KMS.",
+    "No RPC read was made, so this record does not claim a zero balance, empty history, deployed contract, transaction receipt, BscScan evidence, or live readiness.",
+    "This development key must never be reused for BSC mainnet, an Altana admin passkey, or a durable production agent signer."
+  ]
+}
