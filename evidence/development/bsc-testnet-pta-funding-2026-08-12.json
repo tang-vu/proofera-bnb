@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "recordType": "bsc_testnet_pta_funding_observation",
+  "status": "funded_finalized",
+  "observedAt": "2026-08-12T13:39:54.839Z",
+  "gitCommitAtObservation": "65b0b9d25b93af9d3ea084e12b44492558cbb78a",
+  "chainId": 97,
+  "transaction": {
+    "hash": "0x9da409c43ad90411990a17b87a5443d090f23fd807323f7eb5a2ff3239b6a38d",
+    "status": "success",
+    "blockNumber": "124656432",
+    "blockHash": "0x723212cfce9ffd95861173c28b15983e706a5a2bd82f898cbfe8c242f184b15a",
+    "blockTimestamp": "2026-08-12T13:36:06.000Z",
+    "from": "0x3b5f54071a4861a2c650d6e8964d8a29b51a508a",
+    "to": "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49",
+    "valueWei": "100000000000000000",
+    "valueTbnb": "0.1",
+    "input": "0x",
+    "contractAddress": null,
+    "gasUsed": "21000",
+    "effectiveGasPriceWei": "100000000",
+    "feeWei": "2100000000000"
+  },
+  "finality": {
+    "method": "eth_getFinalizedBlock",
+    "primaryFinalizedBlock": "124656835",
+    "corroboratorFinalizedBlock": "124656837",
+    "transactionCanonicalOnBothProviders": true,
+    "transactionFinalizedOnBothProviders": true
+  },
+  "currentDeployerState": {
+    "address": "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49",
+    "balanceWei": "100000000000000000",
+    "latestNonce": "0",
+    "pendingNonce": "0",
+    "runtimeCode": "0x"
+  },
+  "reviewedDeploymentTargetState": {
+    "address": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc",
+    "nonce": "0",
+    "runtimeCode": "0x",
+    "collisionObserved": false
+  },
+  "sources": [
+    {
+      "role": "primary",
+      "origin": "https://bsc-testnet-dataseed.bnbchain.org"
+    },
+    {
+      "role": "corroborator",
+      "origin": "https://bsc-testnet.bnbchain.org"
+    }
+  ],
+  "sourceDocumentation": [
+    "https://docs.bnbchain.org/bnb-smart-chain/developers/json_rpc/json-rpc-endpoint/",
+    "https://docs.bnbchain.org/bnb-smart-chain/developers/json_rpc/bsc-api-list/"
+  ],
+  "explorerReference": "https://testnet.bscscan.com/tx/0x9da409c43ad90411990a17b87a5443d090f23fd807323f7eb5a2ff3239b6a38d",
+  "boundaries": {
+    "twoOfficialRpcProvidersAgreed": true,
+    "explorerPageParsedByProofEra": false,
+    "privateKeyIncluded": false,
+    "walletPasswordIncluded": false,
+    "signerCreated": false,
+    "signatureCreated": false,
+    "deploymentTransactionCreated": false,
+    "deploymentTransactionSubmitted": false,
+    "ptaDeployed": false,
+    "deploymentReceiptIncluded": false
+  },
+  "limitations": [
+    "This record proves finalized testnet funding and the observed account/target state only.",
+    "The BscScan link is a public reference; Cloudflare prevented automated page parsing, so no explorer fields were inferred.",
+    "Funding does not authorize signing, deployment, pool creation, liquidity, activation, or any mainnet action.",
+    "A future signer must recollect fresh two-provider state and enforce the durable one-shot signing boundary."
+  ]
+}
