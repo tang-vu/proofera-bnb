@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "recordType": "bsc_testnet_pta_read_only_deployment_observation",
+  "status": "blocked",
+  "attemptedAt": "2026-08-12T11:26:03.254Z",
+  "address": "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49",
+  "chainId": 97,
+  "observation": {
+    "observedAt": "2026-08-12T11:26:03.254Z",
+    "blockNumber": "124639084",
+    "blockHash": "0x51b7ed2f84c90f58f04ae109436401c002b1b6431949ed8e5f4a177960253dea",
+    "blockTimestamp": "1786533960",
+    "blockGasLimit": "99706846",
+    "gasEstimateBlockSelection": "latest",
+    "providerAgreementVerified": true,
+    "coordinatorObservationDigest": null,
+    "sources": [
+      {
+        "role": "primary",
+        "origin": "https://bsc-testnet-dataseed.bnbchain.org",
+        "blockSelection": "finalized"
+      },
+      {
+        "role": "corroborator",
+        "origin": "https://bsc-testnet.bnbchain.org",
+        "blockSelection": "primary_exact_block_number"
+      }
+    ]
+  },
+  "finances": {
+    "balanceWei": "0",
+    "gasEstimate": "561809",
+    "gasLimitMarginBps": "2000",
+    "gasLimit": "674171",
+    "gasPriceWei": "100000000",
+    "maximumCostWei": "67417100000000"
+  },
+  "predictedContractAddress": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc",
+  "issues": [
+    {
+      "code": "INSUFFICIENT_BALANCE",
+      "path": "rpc.balanceWei"
+    }
+  ],
+  "envelopeHash": null,
+  "boundaries": {
+    "scope": "exact_bsc_testnet_pta_read_only_deployment_preparation",
+    "rpcReadPerformed": true,
+    "providerAgreementVerified": true,
+    "fallbackUsed": false,
+    "secretRead": false,
+    "signerCreated": false,
+    "signatureCreated": false,
+    "transactionSubmitted": false,
+    "blockchainWritePerformed": false,
+    "signingAuthorized": false,
+    "envelopeAloneAuthorizesSigning": false,
+    "freshRecheckRequiredBeforeSigning": true,
+    "observationDigestAuthenticatesProvider": false,
+    "executionAuthorized": false,
+    "funded": false,
+    "privateKeyIncluded": false,
+    "walletPasswordIncluded": false,
+    "signedTransactionIncluded": false,
+    "transactionHashIncluded": false,
+    "deploymentReceiptIncluded": false
+  },
+  "sourceUrls": [
+    "https://docs.bnbchain.org/bnb-smart-chain/developers/json_rpc/json-rpc-endpoint/",
+    "https://bsc-testnet-dataseed.bnbchain.org",
+    "https://bsc-testnet.bnbchain.org"
+  ],
+  "limitations": [
+    "This is a read-only two-provider observation, not authenticated provider provenance or signing authority.",
+    "The gas estimate uses each provider's latest state because the public endpoint does not retain the pinned finalized state trie.",
+    "Every signer must recollect and revalidate fresh state; the envelope and observation digest are not capabilities.",
+    "No secret, signature, transaction submission, blockchain write, deployment, or explorer receipt exists."
+  ]
+}

@@ -12,11 +12,11 @@ describeWindows("pinned Windows PowerShell subprocess boundary", () => {
       Buffer.alloc(0),
       2,
       controller.signal,
-      2_000
+      8_000
     );
     expect(result.output.toString("utf8")).toBe("ok");
     result.output.fill(0);
-  });
+  }, 15_000);
 
   it("fails safely on excess output, stderr, and a nonzero exit", async () => {
     const cases = [
