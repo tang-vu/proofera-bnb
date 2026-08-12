@@ -60,6 +60,8 @@
     "providerAgreementRequired": true,
     "signingHash": "0x5435766f57e50ce0a2ae748336738e4e7724d85f97c4774476a10bb1a88b44c1",
     "matchesOriginalClaim": true,
+    "serializedSigningPayloadBytes": 2968,
+    "serializedSigningPayloadSha256": "41555951d67d2ceae094e18246d5ea5e0bbf1a1ba2694fff1722f3df82e98076",
     "gasLimit": "674171",
     "gasPriceWei": "100000000",
     "maximumCostWei": "67417100000000"
