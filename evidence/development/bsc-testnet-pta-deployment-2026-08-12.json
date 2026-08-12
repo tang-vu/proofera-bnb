@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "recordType": "bsc_testnet_pta_deployment_receipt",
+  "status": "deployed_finalized",
+  "observedAt": "2026-08-12T17:25:27.390Z",
+  "deploymentRunnerCommit": "d9c975394b46c84ad909e11d31437399560268a0",
+  "verificationRunnerCommit": "88ad789c08b05824216016bfedbce0c6d55b89b4",
+  "chainId": 97,
+  "transaction": {
+    "hash": "0x0852f32bf54aeac58815d93a64a5d38cda2f8615f2a997b4a601a06b380168c7",
+    "status": "success",
+    "type": "legacy_eip155",
+    "nonce": "0",
+    "blockNumber": "124684970",
+    "blockHash": "0x816366c03b0aaec4a99642d75a00c5ef9a8f2545105d78dac7c26c3c7b20b36c",
+    "blockTimestamp": "2026-08-12T17:10:08.000Z",
+    "from": "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49",
+    "to": null,
+    "contractAddress": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc",
+    "valueWei": "0",
+    "deploymentDataBytes": 2947,
+    "deploymentDataSha256": "45f05cb4c02100cccf74c7b2e7c31d04386642309ca2b9a9614684d0341cd239",
+    "deploymentDataKeccak256": "0xc5f631e51c930369f41ed53660de0c5b82a025a09ad223cb8c5d7986687cd0a1",
+    "gasLimit": "674171",
+    "gasUsed": "556227",
+    "effectiveGasPriceWei": "100000000",
+    "feeWei": "55622700000000",
+    "feeTbnb": "0.0000556227"
+  },
+  "finality": {
+    "method": "eth_getFinalizedBlock",
+    "deploymentBlockCanonicalOnBothProviders": true,
+    "deploymentFinalizedOnBothProviders": true,
+    "receiptProviderAgreementVerified": true
+  },
+  "stateObservation": {
+    "blockSelection": "newest_common_finalized",
+    "blockNumber": "124686818",
+    "blockHash": "0xfd6482de9fa3337aa04f6400cf3b6983313bdfdec5e4a0f5926604c9343aafab",
+    "blockTimestamp": "2026-08-12T17:24:00.000Z",
+    "queryBinding": "eip1898_block_hash_require_canonical",
+    "providerAgreementVerified": true,
+    "deployerBalanceWei": "99944377300000000"
+  },
+  "contract": {
+    "address": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc",
+    "runtimeBytes": 1826,
+    "runtimeSha256": "e018f428a384212f11817a24f4828c1a479403d86491e256a7f79d3142395527",
+    "runtimeKeccak256": "0x2f8caecd2e51f085ab11a67e5b8a89eeab7b667bd89ec708a481b66ed756e006",
+    "runtimeProviderAgreementVerified": true
+  },
+  "token": {
+    "name": "ProofEra Test Asset",
+    "symbol": "PTA",
+    "decimals": 18,
+    "totalSupplyBaseUnits": "1000000000000000000000000",
+    "recipient": "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49",
+    "recipientBalanceBaseUnits": "1000000000000000000000000",
+    "exactSingleMintTransferVerified": true,
+    "laterMintSurfacePresent": false,
+    "adminSurfacePresent": false,
+    "surfaceReviewBasis": "exact_runtime_matches_reviewed_artifact"
+  },
+  "sources": [
+    {
+      "role": "primary",
+      "origin": "https://bsc-testnet-dataseed.bnbchain.org"
+    },
+    {
+      "role": "corroborator",
+      "origin": "https://bsc-testnet.bnbchain.org"
+    }
+  ],
+  "sourceDocumentation": [
+    "https://docs.bnbchain.org/bnb-smart-chain/developers/json_rpc/json-rpc-endpoint/",
+    "https://docs.bnbchain.org/bnb-smart-chain/developers/json_rpc/bsc-api-list/"
+  ],
+  "explorerReferences": {
+    "transaction": "https://testnet.bscscan.com/tx/0x0852f32bf54aeac58815d93a64a5d38cda2f8615f2a997b4a601a06b380168c7",
+    "contract": "https://testnet.bscscan.com/address/0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc"
+  },
+  "boundaries": {
+    "testnetOnly": true,
+    "mainnetWritePerformed": false,
+    "privateKeyIncluded": false,
+    "walletPasswordIncluded": false,
+    "rawSignedTransactionIncluded": false,
+    "oneShotNonce": "0",
+    "replacementTransactionCreated": false,
+    "verificationRunSignedAgain": false,
+    "verificationRunBroadcastAgain": false,
+    "receiptBlockHistoricalStateRequired": false,
+    "finalizedStateObservationUsed": true
+  },
+  "limitations": [
+    "PTA is a non-economic BSC testnet fixture; this record is not a price, liquidity, oracle, pool, LP-position, activation, performance, or mainnet claim.",
+    "The public RPCs retained the finalized receipt and block but had pruned the deployment-block state trie. Runtime and token state were therefore read at the exact newest common finalized block using an EIP-1898 canonical block-hash selector; the deployment receipt separately proves the contract address and one mint event.",
+    "The BscScan URLs are public references. The independently verified receipt, runtime and token-state claims come from the two official BNB testnet RPCs.",
+    "Deployment does not make a PTA/WBNB pool eligible. Pool creation, funding, oracle/liquidity review, position ownership, Altana authority and any protocol write remain separate gates."
+  ]
+}

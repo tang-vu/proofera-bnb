@@ -57,17 +57,21 @@ configuration, dependency, artifact, or bytecode drift fails verification.
 The example recipient is a format example only. It is not an authorized future
 recipient and must not be used without explicit confirmation.
 
-## Offline PTA/WBNB pool preparation
+## Deployed PTA and offline PTA/WBNB pool preparation
 
-Only after a separately approved PTA deployment has produced a real address,
-prepare the narrow Pancake V3 BSC-testnet bootstrap review:
+The separately approved chain-97 deployment is finalized at
+`0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc`; its public two-provider receipt,
+runtime and fixed-supply record is retained at
+[`../../evidence/development/bsc-testnet-pta-deployment-2026-08-12.json`](../../evidence/development/bsc-testnet-pta-deployment-2026-08-12.json).
+To prepare the narrow Pancake V3 BSC-testnet bootstrap review for that address:
 
 ```sh
 pnpm compile:pool-abi
-pnpm prepare:pool -- --chain-id 97 --pta-address 0x1111111111111111111111111111111111111111
+pnpm prepare:pool -- --chain-id 97 --pta-address 0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc
 ```
 
-The address above remains a format example, not a deployed PTA claim. The tool
+The address above is the deployed PTA fixture, but the offline tool does not
+verify it and its output is not a pool transaction or authority. The tool
 accepts only decimal chain ID `97` and an explicit nonzero PTA address distinct
 from the pinned protocol addresses. It performs no RPC or filesystem write,
 uses no environment or signer, and reads only six exact hash-pinned public
@@ -131,7 +135,7 @@ direct or bracketed environment access.
 No pool address is predicted. This package does not yet bind the exact Pancake
 pool creation-code hash and deployer derivation, so guessing a CREATE2 address
 would be unsafe. The manifest instead keeps separate open blockers for fresh
-WBNB and Pancake code, deployed PTA code/source, pool CREATE2/factory lineage,
+WBNB, Pancake and deployed-PTA code binding, pool CREATE2/factory lineage,
 oracle history, liquidity, ownership, selector publication, Altana policy and
 authority, the initializer's missing-deadline submission lifecycle, exact-call
 simulation, and user confirmation.
@@ -160,7 +164,7 @@ liquidity calldata are intentionally omitted until amount, minimum, deadline,
 slippage, capital, recipient, and authority invariants can be independently
 bound.
 
-## Exact build and future explorer-verification inputs
+## Exact build and pending explorer-verification inputs
 
 - Contract: `src/ProofEraTestAsset.sol:ProofEraTestAsset`
 - License: MIT
@@ -176,7 +180,7 @@ bound.
 - Standard JSON compiler input: retained in Hardhat's matching
   `artifacts/build-info/solc-0.8.36-*.json` after a clean compile
 
-Future API verification should use the current
+Pending API source verification should use the current
 [Etherscan API V2 source-verification endpoint](https://docs.etherscan.io/api-reference/endpoint/verifysourcecode)
 with chain ID `97`, Solidity standard JSON input, license type `3` (MIT), and the
 exact source tree, OpenZeppelin `5.7.0`, source-qualified contract name,
@@ -184,8 +188,10 @@ compiler long version, settings, and constructor arguments. The current
 [supported-chains table](https://docs.etherscan.io/supported-chains) marks BSC
 testnet `97` as paid-tier available and free-tier unavailable, so API
 verification could incur a charge and must not be attempted without explicit
-approval. A deployment address, transaction hash, block number, onchain runtime
-bytecode digest, and explorer URL do not exist yet and must not be fabricated.
+approval. The finalized deployment address, transaction, block and independently
+verified runtime digest are retained in the public deployment record linked
+above; an explorer source-verification result does not yet exist and must not be
+fabricated.
 
 ## Sources and limitations
 

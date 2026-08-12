@@ -118,11 +118,14 @@ their upstream GPL-2.0-or-later license. The provenance manifest SHA-256 is
 
 ## Explicit limitations
 
-- No deployment, RPC read, transaction, signing, explorer verification, or
-  external audit was performed.
-- Local generic EVM tests do not prove behavior of a future BSC testnet
-  deployment. A deployed address and receipt are unknown until an explicitly
-  approved deployment occurs.
+- This isolated package still performs no RPC read, signing or broadcast. A
+  separate reviewed root boundary completed the approved chain-97 deployment;
+  its finalized two-provider receipt/runtime/token-state evidence is retained at
+  [`../../evidence/development/bsc-testnet-pta-deployment-2026-08-12.json`](../../evidence/development/bsc-testnet-pta-deployment-2026-08-12.json).
+- Local generic EVM tests alone do not prove onchain behavior. For the deployed
+  fixture, the exact 1,826-byte runtime matches the reviewed artifact and the
+  receipt contains the single fixed-supply mint; explorer source verification
+  and an external audit remain absent.
 - `PTA` has no peg, redemption promise, market value, price source, liquidity,
   governance, or economic rights. It is strictly a disposable test asset.
 - The ABI test covers exact ERC-20 signatures, selectors, input/output types,
