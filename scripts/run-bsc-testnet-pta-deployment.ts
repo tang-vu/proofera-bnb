@@ -571,13 +571,10 @@ async function rpc(origin: string, method: string, params: readonly unknown[]): 
     });
     if (response.url !== origin && response.url !== `${origin}/`) fail("RPC_REDIRECTED");
     const parsed = inspectRecord(await readRpcBody(response)) as JsonRpcEnvelope | null;
-    if (
-      parsed === null ||
-      parsed.jsonrpc !== "2.0" ||
-      parsed.id !== id ||
-      parsed.error !== undefined ||
-      !("result" in parsed)
-    ) {
+    if (parsed !== null && parsed.error !== undefined) {
+      return fail("RPC_REMOTE_ERROR");
+    }
+    if (parsed === null || parsed.jsonrpc !== "2.0" || parsed.id !== id || !("result" in parsed)) {
       return fail("RPC_RESPONSE_INVALID");
     }
     return parsed.result;
@@ -772,7 +769,17 @@ async function waitForReceipt(transactionHash: Hex): Promise<Readonly<Record<str
   return fail("RECEIPT_TIMEOUT");
 }
 
-async function waitForFinality(blockNumberHex: Hex, blockHash: Hex): Promise<void> {
+type FinalizedStateObservation = Readonly<{
+  receiptBlockTimestamp: bigint;
+  stateBlockNumberHex: Hex;
+  stateBlockHash: Hex;
+  stateBlockTimestamp: bigint;
+}>;
+
+async function waitForFinality(
+  blockNumberHex: Hex,
+  blockHash: Hex
+): Promise<FinalizedStateObservation> {
   const blockNumber = hexQuantity(blockNumberHex);
   const deadline = Date.now() + RECEIPT_TIMEOUT_MS;
   while (Date.now() < deadline) {
@@ -791,31 +798,78 @@ async function waitForFinality(blockNumberHex: Hex, blockHash: Hex): Promise<voi
       rightFinalizedRecord === null ||
       leftBlockRecord === null ||
       rightBlockRecord === null ||
+      hexQuantity(leftBlockRecord.number) !== blockNumber ||
+      hexQuantity(rightBlockRecord.number) !== blockNumber ||
       exactHex(leftBlockRecord.hash, 32) !== blockHash ||
       exactHex(rightBlockRecord.hash, 32) !== blockHash
     ) {
       fail("FINALITY_PROVIDER_DISAGREEMENT");
     }
-    if (
-      hexQuantity(leftFinalizedRecord.number) >= blockNumber &&
-      hexQuantity(rightFinalizedRecord.number) >= blockNumber
-    ) {
-      return;
+    const receiptBlockTimestamp = hexQuantity(leftBlockRecord.timestamp);
+    if (hexQuantity(rightBlockRecord.timestamp) !== receiptBlockTimestamp) {
+      fail("FINALITY_PROVIDER_DISAGREEMENT");
+    }
+    const leftFinalizedNumber = hexQuantity(leftFinalizedRecord.number);
+    const rightFinalizedNumber = hexQuantity(rightFinalizedRecord.number);
+    if (leftFinalizedNumber >= blockNumber && rightFinalizedNumber >= blockNumber) {
+      // Public BSC endpoints may prune historical state even though they retain the
+      // finalized receipt and block. Bind state reads to the newest exact block
+      // finalized by both providers instead of silently falling back to `latest`.
+      const stateBlockNumber =
+        leftFinalizedNumber < rightFinalizedNumber ? leftFinalizedNumber : rightFinalizedNumber;
+      const stateBlockNumberHex = `0x${stateBlockNumber.toString(16)}` as Hex;
+      const [leftStateBlock, rightStateBlock] = await Promise.all([
+        rpc(PRIMARY_RPC, "eth_getBlockByNumber", [stateBlockNumberHex, false]),
+        rpc(CORROBORATOR_RPC, "eth_getBlockByNumber", [stateBlockNumberHex, false])
+      ]);
+      const leftStateRecord = inspectRecord(leftStateBlock);
+      const rightStateRecord = inspectRecord(rightStateBlock);
+      if (
+        leftStateRecord === null ||
+        rightStateRecord === null ||
+        hexQuantity(leftStateRecord.number) !== stateBlockNumber ||
+        hexQuantity(rightStateRecord.number) !== stateBlockNumber
+      ) {
+        fail("FINALITY_PROVIDER_DISAGREEMENT");
+      }
+      const stateBlockHash = exactHex(leftStateRecord.hash, 32);
+      const stateBlockTimestamp = hexQuantity(leftStateRecord.timestamp);
+      if (
+        exactHex(rightStateRecord.hash, 32) !== stateBlockHash ||
+        hexQuantity(rightStateRecord.timestamp) !== stateBlockTimestamp ||
+        (leftFinalizedNumber === stateBlockNumber &&
+          exactHex(leftFinalizedRecord.hash, 32) !== stateBlockHash) ||
+        (rightFinalizedNumber === stateBlockNumber &&
+          exactHex(rightFinalizedRecord.hash, 32) !== stateBlockHash)
+      ) {
+        fail("FINALITY_PROVIDER_DISAGREEMENT");
+      }
+      return Object.freeze({
+        receiptBlockTimestamp,
+        stateBlockNumberHex,
+        stateBlockHash,
+        stateBlockTimestamp
+      });
     }
     await sleep(POLL_INTERVAL_MS);
   }
   fail("FINALITY_TIMEOUT");
 }
 
-async function tokenCall(data: Hex, blockNumberHex: Hex): Promise<Hex> {
+type CanonicalBlockSelector = Readonly<{
+  blockHash: Hex;
+  requireCanonical: true;
+}>;
+
+async function tokenCall(data: Hex, blockSelector: CanonicalBlockSelector): Promise<Hex> {
   const [left, right] = await Promise.all([
     rpc(PRIMARY_RPC, "eth_call", [
       { to: BSC_TESTNET_PTA_EXPECTED_CONTRACT_ADDRESS, data },
-      blockNumberHex
+      blockSelector
     ]),
     rpc(CORROBORATOR_RPC, "eth_call", [
       { to: BSC_TESTNET_PTA_EXPECTED_CONTRACT_ADDRESS, data },
-      blockNumberHex
+      blockSelector
     ])
   ]);
   const leftHex = exactHex(left);
@@ -858,17 +912,28 @@ async function verifyDeployment(
   ) {
     return fail("BROADCAST_TRANSACTION_INVALID");
   }
-  const [leftCode, rightCode, remainingBalance] = await Promise.all([
-    rpc(PRIMARY_RPC, "eth_getCode", [BSC_TESTNET_PTA_EXPECTED_CONTRACT_ADDRESS, blockNumberHex]),
+  const finality = await waitForFinality(blockNumberHex, blockHash);
+  const stateBlockSelector = Object.freeze({
+    blockHash: finality.stateBlockHash,
+    requireCanonical: true as const
+  });
+  const [leftCode, rightCode, leftRemainingBalance, rightRemainingBalance] = await Promise.all([
+    rpc(PRIMARY_RPC, "eth_getCode", [
+      BSC_TESTNET_PTA_EXPECTED_CONTRACT_ADDRESS,
+      stateBlockSelector
+    ]),
     rpc(CORROBORATOR_RPC, "eth_getCode", [
       BSC_TESTNET_PTA_EXPECTED_CONTRACT_ADDRESS,
-      blockNumberHex
+      stateBlockSelector
     ]),
-    rpc(PRIMARY_RPC, "eth_getBalance", [BSC_TESTNET_PTA_DEPLOYER_ADDRESS, "latest"])
+    rpc(PRIMARY_RPC, "eth_getBalance", [BSC_TESTNET_PTA_DEPLOYER_ADDRESS, stateBlockSelector]),
+    rpc(CORROBORATOR_RPC, "eth_getBalance", [BSC_TESTNET_PTA_DEPLOYER_ADDRESS, stateBlockSelector])
   ]);
   const runtime = exactHex(leftCode);
+  const remainingBalance = hexQuantity(leftRemainingBalance);
   if (
     runtime !== exactHex(rightCode) ||
+    hexQuantity(rightRemainingBalance) !== remainingBalance ||
     (runtime.length - 2) / 2 !== BSC_TESTNET_PTA_RUNTIME_BYTES ||
     sha256(runtime).slice(2) !== BSC_TESTNET_PTA_RUNTIME_SHA256 ||
     keccak256(runtime) !== BSC_TESTNET_PTA_RUNTIME_KECCAK256
@@ -901,11 +966,11 @@ async function verifyDeployment(
     .padStart(64, "0");
   const [nameResult, symbolResult, decimalsResult, supplyResult, balanceResult] = await Promise.all(
     [
-      tokenCall("0x06fdde03", blockNumberHex),
-      tokenCall("0x95d89b41", blockNumberHex),
-      tokenCall("0x313ce567", blockNumberHex),
-      tokenCall("0x18160ddd", blockNumberHex),
-      tokenCall(`0x70a08231${addressArgument}`, blockNumberHex)
+      tokenCall("0x06fdde03", stateBlockSelector),
+      tokenCall("0x95d89b41", stateBlockSelector),
+      tokenCall("0x313ce567", stateBlockSelector),
+      tokenCall("0x18160ddd", stateBlockSelector),
+      tokenCall(`0x70a08231${addressArgument}`, stateBlockSelector)
     ]
   );
   const name = decodeFunctionResult({ abi: TOKEN_ABI, functionName: "name", data: nameResult });
@@ -938,7 +1003,6 @@ async function verifyDeployment(
   ) {
     return fail("DEPLOYED_TOKEN_STATE_INVALID");
   }
-  await waitForFinality(blockNumberHex, blockHash);
   return Object.freeze({
     schemaVersion: 1,
     recordType: "bsc_testnet_pta_deployment_receipt",
@@ -949,9 +1013,18 @@ async function verifyDeployment(
     deployer: BSC_TESTNET_PTA_DEPLOYER_ADDRESS,
     blockNumber: hexQuantity(blockNumberHex).toString(),
     blockHash,
+    blockTimestampUnixSeconds: finality.receiptBlockTimestamp.toString(),
     gasUsed: hexQuantity(receipt.gasUsed).toString(),
     effectiveGasPriceWei: hexQuantity(receipt.effectiveGasPrice).toString(),
-    remainingBalanceWei: hexQuantity(remainingBalance).toString(),
+    remainingBalanceWei: remainingBalance.toString(),
+    stateObservation: {
+      blockSelection: "newest_common_finalized",
+      blockNumber: hexQuantity(finality.stateBlockNumberHex).toString(),
+      blockHash: finality.stateBlockHash,
+      blockTimestampUnixSeconds: finality.stateBlockTimestamp.toString(),
+      queryBinding: "eip1898_block_hash_require_canonical",
+      providerAgreementVerified: true
+    },
     runtime: {
       bytes: BSC_TESTNET_PTA_RUNTIME_BYTES,
       sha256: BSC_TESTNET_PTA_RUNTIME_SHA256,
@@ -975,7 +1048,9 @@ async function verifyDeployment(
       walletPasswordReturned: false,
       rawSignedTransactionPrinted: false,
       mainnetWritePerformed: false,
-      finalizedByTwoOfficialProviders: true
+      finalizedByTwoOfficialProviders: true,
+      receiptBlockHistoricalStateRequired: false,
+      finalizedStateObservationUsed: true
     }
   });
 }

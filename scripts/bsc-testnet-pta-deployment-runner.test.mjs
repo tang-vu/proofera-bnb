@@ -160,3 +160,32 @@ test("receipt block numbers use canonical JSON-RPC quantity validation", () => {
   assert.equal(/^0x(?:0|[1-9a-f][0-9a-f]*)$/u.test("0x76e8aaa"), true);
   assert.equal(/^0x(?:0|[1-9a-f][0-9a-f]*)$/u.test("0x076e8aaa"), false);
 });
+
+test("deployment verification uses an exact common-finalized state snapshot", () => {
+  const source = readFileSync(ENTRY, "utf8");
+  const finality = source.indexOf(
+    "const finality = await waitForFinality(blockNumberHex, blockHash)"
+  );
+  const stateRead = source.indexOf("const stateBlockSelector = Object.freeze", finality);
+  const tokenRead = source.indexOf('tokenCall("0x06fdde03", stateBlockSelector)');
+  assert.ok(finality >= 0 && stateRead > finality && tokenRead > stateRead);
+  assert.ok(source.includes('blockSelection: "newest_common_finalized"'));
+  assert.ok(source.includes('queryBinding: "eip1898_block_hash_require_canonical"'));
+  assert.ok(source.includes("blockHash: finality.stateBlockHash"));
+  assert.ok(source.includes("requireCanonical: true as const"));
+  assert.ok(source.includes('return fail("RPC_REMOTE_ERROR")'));
+  assert.ok(source.includes("receiptBlockHistoricalStateRequired: false"));
+  assert.ok(source.includes("finalizedStateObservationUsed: true"));
+  assert.equal(
+    source.includes(
+      'rpc(PRIMARY_RPC, "eth_getCode", [BSC_TESTNET_PTA_EXPECTED_CONTRACT_ADDRESS, blockNumberHex])'
+    ),
+    false
+  );
+  assert.equal(
+    source.includes(
+      'rpc(PRIMARY_RPC, "eth_getBalance", [BSC_TESTNET_PTA_DEPLOYER_ADDRESS, "latest"])'
+    ),
+    false
+  );
+});
