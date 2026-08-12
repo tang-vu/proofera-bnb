@@ -26,6 +26,7 @@
       "fileCreatedAt": "2026-08-12T14:52:32.5386884Z",
       "fileLastWriteAt": "2026-08-12T14:52:32.5396895Z",
       "byteLength": 677,
+      "fileSha256": "316599121ec06e0cc74a0268b693c13b41afb95bdfa37c540c385139e9f1b41b",
       "claimId": "pta-5435766f57e50ce0a2ae748336738e4e",
       "signingHash": "0x5435766f57e50ce0a2ae748336738e4e7724d85f97c4774476a10bb1a88b44c1",
       "sourceEnvelopeHash": "0xf5bc59afcbff9a79586d011e3c080d203fce45cdff794414e0373904d7127cea"
@@ -35,6 +36,7 @@
       "fileCreatedAt": "2026-08-12T14:52:33.6650260Z",
       "fileLastWriteAt": "2026-08-12T14:52:33.6650260Z",
       "byteLength": 519,
+      "fileSha256": "d9dc65953b0ad46f4adab1ac7d5213b36f6b4d6aff8e554206db9994f50e74eb",
       "requestHash": "0x46297835692a5158fa1c003495321a02b450d0edebf9581fd4fc3fa2d137ec14"
     },
     "workerStarted": {
@@ -42,6 +44,7 @@
       "fileCreatedAt": "2026-08-12T14:52:45.9682446Z",
       "fileLastWriteAt": "2026-08-12T14:52:45.9692450Z",
       "byteLength": 513,
+      "fileSha256": "37dcc7b65b8e2a44777f9545ff19fea65f865ac2f1803f89802ceede0c957b91",
       "requestHash": "0x46297835692a5158fa1c003495321a02b450d0edebf9581fd4fc3fa2d137ec14"
     }
   },
