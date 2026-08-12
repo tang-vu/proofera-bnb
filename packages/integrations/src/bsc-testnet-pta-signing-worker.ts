@@ -1,17 +1,20 @@
 import "server-only";
 
-import { createDecipheriv, scrypt, timingSafeEqual } from "node:crypto";
+import { createDecipheriv, createHash, scrypt, timingSafeEqual } from "node:crypto";
 import { constants as fileConstants } from "node:fs";
 import type { BigIntStats } from "node:fs";
-import { lstat, open, realpath } from "node:fs/promises";
+import { createRequire } from "node:module";
+import { lstat, open, readdir, realpath } from "node:fs/promises";
 import { dirname, isAbsolute, join, relative, resolve, sep, win32 } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isProxy } from "node:util/types";
 
+import { secp256k1 } from "@noble/curves/secp256k1";
 import {
   getAddress,
   getContractAddress,
   keccak256,
+  numberToHex,
   parseTransaction,
   recoverTransactionAddress,
   serializeTransaction,
@@ -20,7 +23,6 @@ import {
   type Address,
   type Hex
 } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
 
 import {
   BSC_TESTNET_DEPLOYER_PROTECTED_BLOB_FILE,
@@ -80,6 +82,111 @@ const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../
 const PINNED_POWERSHELL_EXECUTABLE =
   "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
 const PINNED_POWERSHELL_SHA256 = "9785001b0dcf755eddb8af294a373c0b87b2498660f724e76c4d53f9c217c7a3";
+const PINNED_NODE_VERSION = "v24.14.1";
+const PINNED_NODE_EXECUTABLE_SHA256 =
+  "58e74bf02fc5bbacc41dcb8bef089961cd5bddd37830b87784e4fc624d145d1f";
+const PINNED_TYPESCRIPT_LOADER_SHA256 =
+  "7783710b215e30285d7a36b41a3cbefbfe9c1fafdaaba929225c42c1da7abfc1";
+const PINNED_INTEGRATIONS_PACKAGE_SHA256 =
+  "bc46e5fd4f006bd4282fa6d2033aa64da1dbc4abf8e1bc7a67599fcf718c5041";
+const PINNED_PNPM_LOCK_SHA256 = "645b67708bc22122be8fdbcda35314019599cf2c4665a12abf7d5d767b4a72b1";
+const PINNED_RUNTIME_TREE_MANIFESTS = Object.freeze({
+  abitypeForOx: Object.freeze({
+    digest: "e80d2f27751b0997a91f4c5d7a15cc122d3ae5536cd4378460c96711d89502b6",
+    files: 36,
+    bytes: 186_576
+  }),
+  abitypeForViem: Object.freeze({
+    digest: "b9afb85169f3b43c7b04d8eef5d8d1443bcdbf9ae8c1b01cc9211ba3440f2533",
+    files: 36,
+    bytes: 186_574
+  }),
+  nobleCurves: Object.freeze({
+    digest: "ead39ce3e8f73680bfc4d2eae7daa5035836b086d53b13c3e59285e2f04927bc",
+    files: 26,
+    bytes: 317_443
+  }),
+  nobleHashes: Object.freeze({
+    digest: "4fcf0fa01dad679b88ef13a350f68e754446ae0102c2aa6d52b77840c81fa65b",
+    files: 28,
+    bytes: 175_332
+  }),
+  ox: Object.freeze({
+    digest: "cb0acff895a96d3520f8875e65f9b7679cfa49f7405fc7725c607292e429d527",
+    files: 154,
+    bytes: 1_168_943
+  }),
+  serverOnly: Object.freeze({
+    digest: "03dfa375a287d93459c50e5d9ab699bc1fdd243d68b4634dfd9062912c3511f6",
+    files: 2,
+    bytes: 467
+  }),
+  typescript: Object.freeze({
+    digest: "310dc96e3ba5a379e07512ebb864d0e586b4abd24a9636fadabd4937e54489f8",
+    files: 2,
+    bytes: 9_147_743
+  }),
+  viem: Object.freeze({
+    digest: "e7b8b7334a5b6d3157b0a055eb3affa97670257c257c393a3077299839980f5a",
+    files: 1_432,
+    bytes: 3_044_800
+  })
+});
+const PINNED_RUNTIME_FILES = Object.freeze({
+  curves: Object.freeze({
+    "package.json": "d496cbba8f48a7407657170c84542e337e2fdfdc71bb7f5fd9e350daab119f31",
+    "secp256k1.js": "bc4dff82aae571c3ab3adb169b7a2e79180e49dc057735bcc1ba7b8f1dd5b6dd",
+    "_shortw_utils.js": "05961ba15139b459cadbe736312f9caf74f71130b3849a374aadd530a071803b",
+    "abstract/curve.js": "e5574e9bad071ffdaf70727b78dd115c9193fdbb41306210a436a0c8ba5c7a06",
+    "abstract/hash-to-curve.js": "530ddd976f05bac0612b8f1d020c1500190a7516cff46bb4c48c5bd82ebc41a3",
+    "abstract/modular.js": "81e61cf3c99265eb2e8696cb8673a31621172481800a0d17df4f9545c5f541a0",
+    "abstract/utils.js": "8d4b744d77e41c20307cd30dca9f9f2c5302b3832f47a180cc73e986427d56bf",
+    "abstract/weierstrass.js": "2b3212c2e6553fbcf1097da762b0474253bac2b8f6ec841546eaed22800d1368",
+    "esm/secp256k1.js": "30943ee7362d12dcbb2ec8756055aa1b2d0246e1bea56288abcbf0aeb7969216",
+    "esm/_shortw_utils.js": "094e48b0cc55194c806e67bbb039622929d1380a424c3c24007bde12cd9eaad3",
+    "esm/abstract/curve.js": "e3d7d63e98ab0911cf9d66fb4cdecabc729ef2b2bcf93dcc065cf8970f118577",
+    "esm/abstract/hash-to-curve.js":
+      "8621c317318f0a851dcf2153480be811009485dd6114727523a8ed0a8686f1a9",
+    "esm/abstract/modular.js": "85ab136f068217c8a9ec7cda62a6e429e67fe96684297075761b1005ae76bc09",
+    "esm/abstract/utils.js": "ea47b9f98a7f92f2a5d4272fb98cb8cd440dc054819b9defb30d153e4677895c",
+    "esm/abstract/weierstrass.js":
+      "cdc650e13a4b3e26699fcfd6d85b4a816f159efd16fb0905411495b57dce485f"
+  }),
+  hashes: Object.freeze({
+    "package.json": "7c4657c5e616c22cefa2691cc30670824a639dc71d97bf83925be2d239dc60e3",
+    "_md.js": "4eaf0ae8f8191c50acdab7c3de7f335bf24845e4b562bdbc3e9f61cb7a873831",
+    "_u64.js": "9b109bb57c0d8852bda12136f0f588ffea2a1a3c0f4241bdbb3727cd449976ae",
+    "crypto.js": "c5ee6d6553e69ba96f9a2a7f70e677bf69a6e2d52849a892e67b2e547dc96b28",
+    "hmac.js": "1e0e4081a255691a1bae9148d9c5795e3439980d4ecb346a5e62a9c7fb3764a4",
+    "sha2.js": "53b6dc30db76a7c4e4b9370049e7a3c01bbb5507d058c084e97ccb3ee050faa4",
+    "utils.js": "7edf19720c345e1cb76e8d3a9306f3344457d4e03576bbb0b3e1ffd0a42d0d30",
+    "esm/_md.js": "cefb1557e7715cb2117c83f82ef3e3175c7e0391c80bd5795b2d4effc45fc582",
+    "esm/_u64.js": "e48c0cfc10810439a4807b46db136ce603a3fa09b62584f513ef2f3ca496af54",
+    "esm/crypto.js": "9211d026c5d21e60e0126dd6f01150d87da5ba7261b8f468215c1264372ff5a5",
+    "esm/hmac.js": "a330af1af3fb00ebdbba2f023dd5e023aa367669081cd51c7d172eb499533d0b",
+    "esm/sha2.js": "e729088b82e5450bff54c3a0013582aa42e1fe8f58dd31f5967f6ebe34c52299",
+    "esm/sha3.js": "0260b46f92a3a94c7179958600d7f92469ef2c8f5d2e966bd9a838ff815713e9",
+    "esm/utils.js": "4cf4c1e05affedcb4fd584a43d76ae1a3711e34a36e2251b90c27e33ecc74fad"
+  }),
+  viem: Object.freeze({
+    "package.json": "8b5112e95226a77c4a65313036c219793b5a02c99592e21b11b7f52580bc3119",
+    "_esm/index.js": "ea32975364e9f2d599b10639d81985ec6a3ed87f6942fe0cb73b1bf738959057",
+    "_esm/utils/address/getAddress.js":
+      "e17499a48cfa1a8a5f9557060559fca9c09dd46883761ee1e75e618af260b434",
+    "_esm/utils/encoding/toHex.js":
+      "53fcd5ab40bcaf191735355e4d107092818a5006cf2ca75580d581e568966629",
+    "_esm/utils/hash/keccak256.js":
+      "3e3b256aa1b5537440955848234b84aa4de248225cb038c82317420279e77c14",
+    "_esm/utils/transaction/serializeTransaction.js":
+      "1cbe1acacdfdb2f409715164601f0cb1e1275fd29832968caeae27dffcfffd48",
+    [["_esm/accounts/private", "KeyToAccount.js"].join("")]:
+      "c056d3c2d9308e74476007cda3e93cd3547068778c2b6ce67809537e207e78e6",
+    "_esm/accounts/utils/sign.js":
+      "8320f27b64139ccb63dac093af688a68811924f129d1f15c83f9542dcfc12528",
+    "_esm/accounts/utils/signTransaction.js":
+      "ac5a2c356782ec961c37eb3b3007fc00a505f9f812eaed03f5ea8a635c60ae54"
+  })
+});
 
 const DPAPI_UNPROTECT_SCRIPT = String.raw`
 $ErrorActionPreference = 'Stop'
@@ -272,6 +379,18 @@ function exactLowerHex(input: unknown, bytes?: number): Hex | null {
     return null;
   }
   return input as Hex;
+}
+
+export function normalizeCanonicalSignatureScalarForInternalUse(input: unknown): Hex | null {
+  if (
+    typeof input !== "string" ||
+    !/^0x(?:[0-9a-f]{2}){1,32}$/u.test(input) ||
+    (input.length > 4 && input.startsWith("0x00"))
+  ) {
+    return null;
+  }
+  const value = BigInt(input);
+  return value > 0n && value < SECP256K1_ORDER ? numberToHex(value, { size: 32 }) : null;
 }
 
 function canonicalUint(input: unknown, maximum = UINT256_MAX): bigint | null {
@@ -513,6 +632,53 @@ function deriveKey(password: Uint8Array, salt: Uint8Array): Promise<Buffer> {
 }
 
 /**
+ * Incident-reviewed deterministic seam. noble-curves 1.9.1 uses RFC6979
+ * (HMAC-SHA256 for secp256k1); low-S is mandatory and randomized/additional
+ * entropy is explicitly disabled. The input scalar is always consumed.
+ */
+export function reconstructExactBscTestnetPtaRfc6979TransactionForInternalUse(
+  secretScalar: Buffer,
+  transaction: BscTestnetPtaExactSigningTransaction
+): Hex {
+  let signingDigest: Buffer | null = null;
+  try {
+    if (secretScalar.byteLength !== 32 || !validateExactTransaction(transaction)) {
+      throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
+    }
+    const unsignedTransaction = {
+      chainId: BSC_TESTNET_PTA_CHAIN_ID,
+      data: transaction.data,
+      gas: transaction.gasLimit,
+      gasPrice: transaction.gasPriceWei,
+      nonce: transaction.nonce,
+      type: "legacy" as const,
+      value: 0n
+    };
+    const unsigned = serializeTransaction(unsignedTransaction);
+    signingDigest = Buffer.from(keccak256(unsigned).slice(2), "hex");
+    const signature = secp256k1.sign(signingDigest, secretScalar, {
+      lowS: true,
+      extraEntropy: false,
+      prehash: false
+    });
+    if (signature.recovery !== 0 && signature.recovery !== 1) {
+      throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
+    }
+    return serializeTransaction(unsignedTransaction, {
+      r: numberToHex(signature.r, { size: 32 }),
+      s: numberToHex(signature.s, { size: 32 }),
+      v: signature.recovery === 0 ? 27n : 28n
+    });
+  } catch (error) {
+    if (error instanceof SigningWorkerFailure) throw error;
+    throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
+  } finally {
+    signingDigest?.fill(0);
+    secretScalar.fill(0);
+  }
+}
+
+/**
  * Exact-purpose cryptographic seam used by the ephemeral Windows worker. It
  * cannot sign an arbitrary target, chain, nonce, value, or bytecode.
  * Both caller-owned secret buffers are consumed and cleared on every outcome.
@@ -526,6 +692,7 @@ export async function signExactBscTestnetPtaEncryptedStoreForInternalUse(
   let secretScalar: Buffer | null = null;
   let macMaterial: Buffer | null = null;
   let calculatedMac: Buffer | null = null;
+  let publicKey: Buffer | null = null;
   let parsed: ReturnType<typeof parseBscTestnetDeployerEncryptedStore> = null;
   try {
     if (passwordBytes.byteLength !== PASSWORD_BYTES || !validateExactTransaction(transaction)) {
@@ -549,20 +716,22 @@ export async function signExactBscTestnetPtaEncryptedStoreForInternalUse(
       throw new SigningWorkerFailure("PAYLOAD_EXPIRED");
     }
 
-    // The unavoidable immutable hex copy is confined to this short-lived worker process.
-    const account = privateKeyToAccount(`0x${secretScalar.toString("hex")}`);
-    if (account.address !== BSC_TESTNET_PTA_DEPLOYER_ADDRESS) {
+    publicKey = Buffer.from(secp256k1.getPublicKey(secretScalar, false));
+    const recoveredAddress = getAddress(`0x${keccak256(publicKey.subarray(1)).slice(-40)}`);
+    publicKey.fill(0);
+    publicKey = null;
+    if (recoveredAddress !== BSC_TESTNET_PTA_DEPLOYER_ADDRESS) {
       throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
     }
-    return await account.signTransaction({
-      chainId: BSC_TESTNET_PTA_CHAIN_ID,
-      data: transaction.data,
-      gas: transaction.gasLimit,
-      gasPrice: transaction.gasPriceWei,
-      nonce: transaction.nonce,
-      type: "legacy",
-      value: 0n
-    });
+    if (!isBscTestnetPtaSigningDeadlineCurrentForInternalUse(transaction, Date.now())) {
+      throw new SigningWorkerFailure("PAYLOAD_EXPIRED");
+    }
+    const scalarForSigning = secretScalar;
+    secretScalar = null;
+    return reconstructExactBscTestnetPtaRfc6979TransactionForInternalUse(
+      scalarForSigning,
+      transaction
+    );
   } catch (error) {
     if (error instanceof SigningWorkerFailure) throw error;
     throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
@@ -573,6 +742,7 @@ export async function signExactBscTestnetPtaEncryptedStoreForInternalUse(
     secretScalar?.fill(0);
     macMaterial?.fill(0);
     calculatedMac?.fill(0);
+    publicKey?.fill(0);
     parsed?.cipherText.fill(0);
     parsed?.iv.fill(0);
     parsed?.mac.fill(0);
@@ -614,7 +784,8 @@ function sameSnapshot(left: FileSnapshot, right: FileSnapshot): boolean {
 async function readStableRegularFile(
   path: string,
   maximumBytes: number,
-  requireSingleLink = true
+  requireSingleLink = true,
+  allowEmpty = false
 ): Promise<Buffer> {
   let handle;
   try {
@@ -623,7 +794,7 @@ async function readStableRegularFile(
     if (
       !beforeMetadata.isFile() ||
       (requireSingleLink && beforeMetadata.nlink !== 1n) ||
-      beforeMetadata.size < 1n ||
+      beforeMetadata.size < (allowEmpty ? 0n : 1n) ||
       beforeMetadata.size > BigInt(maximumBytes)
     ) {
       throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
@@ -641,6 +812,189 @@ async function readStableRegularFile(
     throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
   } finally {
     await handle?.close().catch(() => undefined);
+  }
+}
+
+type RuntimeTreeManifest = Readonly<{ digest: string; files: number; bytes: number }>;
+
+async function listRuntimeJavaScriptFiles(
+  canonicalRoot: string,
+  relativeDirectory: string,
+  output: string[]
+): Promise<void> {
+  const directory = resolve(canonicalRoot, relativeDirectory);
+  const [metadata, canonicalDirectory] = await Promise.all([lstat(directory), realpath(directory)]);
+  if (
+    !metadata.isDirectory() ||
+    metadata.isSymbolicLink() ||
+    !isWithin(canonicalRoot, canonicalDirectory)
+  ) {
+    throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
+  }
+  const entries = await readdir(directory, { withFileTypes: true });
+  entries.sort((left, right) => (left.name < right.name ? -1 : left.name > right.name ? 1 : 0));
+  for (const entry of entries) {
+    const relativeName =
+      relativeDirectory === "" ? entry.name : `${relativeDirectory}/${entry.name}`;
+    if (entry.isSymbolicLink()) throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
+    if (entry.isDirectory()) {
+      await listRuntimeJavaScriptFiles(canonicalRoot, relativeName, output);
+      continue;
+    }
+    if (!entry.isFile()) throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
+    if (entry.name.endsWith(".js")) output.push(relativeName);
+  }
+}
+
+async function deriveRuntimeTreeManifest(
+  root: string,
+  subdirectories: readonly string[],
+  exactFiles: readonly string[] = ["package.json"]
+): Promise<RuntimeTreeManifest> {
+  const canonicalRoot = await realpath(root);
+  const rootMetadata = await lstat(canonicalRoot);
+  if (!rootMetadata.isDirectory() || rootMetadata.isSymbolicLink()) {
+    throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
+  }
+  const names = [...exactFiles];
+  for (const directory of subdirectories) {
+    await listRuntimeJavaScriptFiles(canonicalRoot, directory, names);
+  }
+  names.sort((left, right) => (left < right ? -1 : left > right ? 1 : 0));
+  if (names.length === 0 || new Set(names).size !== names.length) {
+    throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
+  }
+  const digest = createHash("sha256");
+  digest.update("ProofEra/BSC-Testnet/PTA/runtime-tree/v1\0", "utf8");
+  let totalBytes = 0;
+  for (const name of names) {
+    if (name.includes("\\") || name.startsWith("/") || name.includes("../")) {
+      throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
+    }
+    const path = resolve(canonicalRoot, ...name.split("/"));
+    const canonicalPath = await realpath(path);
+    if (!isWithin(canonicalRoot, canonicalPath)) {
+      throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
+    }
+    const bytes = await readStableRegularFile(path, 16 * 1024 * 1024, false, true);
+    const nameBytes = Buffer.from(name, "utf8");
+    const frame = Buffer.alloc(12);
+    frame.writeUInt32BE(nameBytes.byteLength, 0);
+    frame.writeBigUInt64BE(BigInt(bytes.byteLength), 4);
+    digest.update(frame);
+    digest.update(nameBytes);
+    digest.update(bytes);
+    totalBytes += bytes.byteLength;
+    frame.fill(0);
+    nameBytes.fill(0);
+    bytes.fill(0);
+  }
+  return Object.freeze({ digest: digest.digest("hex"), files: names.length, bytes: totalBytes });
+}
+
+function exactRuntimeManifest(actual: RuntimeTreeManifest, expected: RuntimeTreeManifest): boolean {
+  return (
+    actual.digest === expected.digest &&
+    actual.files === expected.files &&
+    actual.bytes === expected.bytes
+  );
+}
+
+export async function assertPinnedDeterministicSigningRuntimeForInternalUse(): Promise<void> {
+  if (process.version !== PINNED_NODE_VERSION) {
+    throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
+  }
+  try {
+    const curvesEntry = fileURLToPath(import.meta.resolve("@noble/curves/secp256k1"));
+    const hashesEntry = fileURLToPath(import.meta.resolve("@noble/hashes/sha2"));
+    const viemEntry = fileURLToPath(import.meta.resolve("viem"));
+    if (
+      win32.basename(curvesEntry).toLowerCase() !== "secp256k1.js" ||
+      win32.basename(win32.dirname(curvesEntry)).toLowerCase() !== "esm" ||
+      win32.basename(hashesEntry).toLowerCase() !== "sha2.js" ||
+      win32.basename(win32.dirname(hashesEntry)).toLowerCase() !== "esm" ||
+      win32.basename(viemEntry).toLowerCase() !== "index.js" ||
+      win32.basename(win32.dirname(viemEntry)).toLowerCase() !== "_esm"
+    ) {
+      throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
+    }
+    const curvesRoot = dirname(dirname(curvesEntry));
+    const hashesRoot = dirname(dirname(hashesEntry));
+    const viemRoot = dirname(dirname(viemEntry));
+    const canonicalViemEntry = await realpath(viemEntry);
+    const viemRequire = createRequire(canonicalViemEntry);
+    const abitypeForViemRoot = dirname(await realpath(viemRequire.resolve("abitype/package.json")));
+    const oxRoot = dirname(await realpath(viemRequire.resolve("ox/package.json")));
+    const oxRequire = createRequire(resolve(oxRoot, "package.json"));
+    const abitypeForOxRoot = dirname(await realpath(oxRequire.resolve("abitype/package.json")));
+    const serverOnlyRoot = await realpath(
+      resolve(REPOSITORY_ROOT, "packages/integrations/node_modules/server-only")
+    );
+    const typescriptRoot = await realpath(resolve(REPOSITORY_ROOT, "node_modules/typescript"));
+    const runtimeTreeManifests = {
+      abitypeForOx: await deriveRuntimeTreeManifest(abitypeForOxRoot, ["dist/esm"]),
+      abitypeForViem: await deriveRuntimeTreeManifest(abitypeForViemRoot, ["dist/esm"]),
+      nobleCurves: await deriveRuntimeTreeManifest(curvesRoot, ["esm"]),
+      nobleHashes: await deriveRuntimeTreeManifest(hashesRoot, ["esm"]),
+      ox: await deriveRuntimeTreeManifest(oxRoot, ["_esm"]),
+      serverOnly: await deriveRuntimeTreeManifest(serverOnlyRoot, [], ["empty.js", "package.json"]),
+      typescript: await deriveRuntimeTreeManifest(
+        typescriptRoot,
+        [],
+        ["lib/typescript.js", "package.json"]
+      ),
+      viem: await deriveRuntimeTreeManifest(viemRoot, ["_esm"])
+    };
+    for (const name of Object.keys(PINNED_RUNTIME_TREE_MANIFESTS) as Array<
+      keyof typeof PINNED_RUNTIME_TREE_MANIFESTS
+    >) {
+      if (!exactRuntimeManifest(runtimeTreeManifests[name], PINNED_RUNTIME_TREE_MANIFESTS[name])) {
+        throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
+      }
+    }
+    const moduleFiles = [
+      ...Object.entries(PINNED_RUNTIME_FILES.curves).map(([name, expectedSha256]) => ({
+        path: resolve(curvesRoot, name),
+        expectedSha256
+      })),
+      ...Object.entries(PINNED_RUNTIME_FILES.hashes).map(([name, expectedSha256]) => ({
+        path: resolve(hashesRoot, name),
+        expectedSha256
+      })),
+      ...Object.entries(PINNED_RUNTIME_FILES.viem).map(([name, expectedSha256]) => ({
+        path: resolve(viemRoot, name),
+        expectedSha256
+      })),
+      {
+        path: resolve(REPOSITORY_ROOT, "scripts/typescript-extension-loader.mjs"),
+        expectedSha256: PINNED_TYPESCRIPT_LOADER_SHA256
+      },
+      {
+        path: resolve(REPOSITORY_ROOT, "packages/integrations/package.json"),
+        expectedSha256: PINNED_INTEGRATIONS_PACKAGE_SHA256
+      },
+      {
+        path: resolve(REPOSITORY_ROOT, "pnpm-lock.yaml"),
+        expectedSha256: PINNED_PNPM_LOCK_SHA256
+      }
+    ];
+    for (const file of moduleFiles) {
+      const bytes = await readStableRegularFile(file.path, 4 * 1024 * 1024, false);
+      const actualSha256 = sha256Hex(bytes);
+      bytes.fill(0);
+      if (actualSha256 !== file.expectedSha256) {
+        throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
+      }
+    }
+    const executableBytes = await readStableRegularFile(process.execPath, 128 * 1024 * 1024, false);
+    const executableSha256 = sha256Hex(executableBytes);
+    executableBytes.fill(0);
+    if (executableSha256 !== PINNED_NODE_EXECUTABLE_SHA256) {
+      throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
+    }
+  } catch (error) {
+    if (error instanceof SigningWorkerFailure) throw error;
+    throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
   }
 }
 
@@ -724,6 +1078,7 @@ async function nativeWindowsSignExactTransaction(
   let executableBytes: Buffer | null = null;
   let passwordBytes: Buffer | null = null;
   try {
+    await assertPinnedDeterministicSigningRuntimeForInternalUse();
     const before = await probeWindowsBscTestnetDeployerCustody(custody, signal);
     if (before.status !== "ready") throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
     const paths = await inspectPinnedPaths(custody);
@@ -759,8 +1114,6 @@ async function nativeWindowsSignExactTransaction(
     );
     storeBytes = null;
     passwordBytes = null;
-    const after = await probeWindowsBscTestnetDeployerCustody(custody, signal);
-    if (after.status !== "ready") throw new SigningWorkerFailure("CUSTODY_UNAVAILABLE");
     return rawTransaction;
   } catch (error) {
     if (error instanceof SigningWorkerFailure) throw error;
@@ -787,15 +1140,15 @@ async function attestSignedTransaction(
       return null;
     }
     const parsed = parseTransaction(raw);
-    const canonicalSignedTransaction = serializeTransaction(parsed);
-    const signatureR = exactLowerHex(parsed.r, 32);
-    const signatureS = exactLowerHex(parsed.s, 32);
+    const signatureR = normalizeCanonicalSignatureScalarForInternalUse(parsed.r);
+    const signatureS = normalizeCanonicalSignatureScalarForInternalUse(parsed.s);
     const signatureRValue = signatureR === null ? null : BigInt(signatureR);
     const signatureSValue = signatureS === null ? null : BigInt(signatureS);
+    const signatureYParity = parsed.yParity === 0 || parsed.yParity === 1 ? parsed.yParity : null;
     const expectedV =
-      parsed.yParity === 0 || parsed.yParity === 1
-        ? BigInt(BSC_TESTNET_PTA_CHAIN_ID) * 2n + 35n + BigInt(parsed.yParity)
-        : null;
+      signatureYParity === null
+        ? null
+        : BigInt(BSC_TESTNET_PTA_CHAIN_ID) * 2n + 35n + BigInt(signatureYParity);
     if (
       parsed.type !== "legacy" ||
       parsed.chainId !== BSC_TESTNET_PTA_CHAIN_ID ||
@@ -805,6 +1158,8 @@ async function attestSignedTransaction(
       parsed.gas !== validated.transaction.gasLimit ||
       parsed.gasPrice !== validated.transaction.gasPriceWei ||
       parsed.data !== validated.transaction.data ||
+      signatureR === null ||
+      signatureS === null ||
       signatureRValue === null ||
       signatureSValue === null ||
       signatureRValue <= 0n ||
@@ -812,11 +1167,18 @@ async function attestSignedTransaction(
       signatureSValue <= 0n ||
       signatureSValue > SECP256K1_HALF_ORDER ||
       expectedV === null ||
-      parsed.v !== expectedV ||
-      canonicalSignedTransaction !== raw
+      signatureYParity === null ||
+      parsed.v !== expectedV
     ) {
       return null;
     }
+    const canonicalSignedTransaction = serializeTransaction(parsed, {
+      r: signatureR,
+      s: signatureS,
+      v: expectedV,
+      yParity: signatureYParity
+    });
+    if (canonicalSignedTransaction !== raw) return null;
     const unsigned = serializeTransaction({
       chainId: BSC_TESTNET_PTA_CHAIN_ID,
       data: validated.transaction.data,

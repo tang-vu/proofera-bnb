@@ -1,7 +1,17 @@
 import { createCipheriv, scryptSync } from "node:crypto";
+import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { keccak256, type Hex } from "viem";
+import {
+  keccak256,
+  parseTransaction,
+  recoverTransactionAddress,
+  serializeTransaction,
+  type Hex,
+  type TransactionSerialized
+} from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -21,8 +31,11 @@ import {
   type BscTestnetPtaSigningWorkerRequest
 } from "./bsc-testnet-pta-one-shot-worker-protocol";
 import {
+  assertPinnedDeterministicSigningRuntimeForInternalUse,
   createBscTestnetPtaSigningWorkerForInternalUse,
   isBscTestnetPtaSigningDeadlineCurrentForInternalUse,
+  normalizeCanonicalSignatureScalarForInternalUse,
+  reconstructExactBscTestnetPtaRfc6979TransactionForInternalUse,
   signExactBscTestnetPtaEncryptedStoreForInternalUse,
   type BscTestnetPtaExactSigningTransaction,
   type BscTestnetPtaSigningWorkerPorts
@@ -55,6 +68,11 @@ const SIMULATION_RETURN_DATA = `0x${DEPLOYMENT_DATA.slice(
 const NOW = "2026-08-12T10:00:20.000Z";
 const CUSTODY_DIRECTORY = "C:\\Users\\proof\\ProofEra\\wallets\\bsc-testnet";
 const SYNTHETIC_PRIVATE_KEY = `0x${"11".repeat(32)}` as const;
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
+const LOADER = resolve(ROOT, "scripts", "typescript-extension-loader.mjs");
+const WORKER_MODULE = new URL("./bsc-testnet-pta-signing-worker.ts", import.meta.url).href;
+const RFC6979_KAT_TRANSACTION_HASH =
+  "0x9cbe98be5269b6f2ff514ed61ebdca9ef3f7d2368678480f935bb482cb8cb1cd";
 
 function validObservation() {
   return {
@@ -200,6 +218,58 @@ function syntheticEncryptedStore(): Readonly<{ password: Buffer; store: Buffer }
   return Object.freeze({ password, store });
 }
 
+function runRfc6979KnownAnswerProcess(transaction: BscTestnetPtaExactSigningTransaction): string {
+  const childSource = `
+    import { reconstructExactBscTestnetPtaRfc6979TransactionForInternalUse } from ${JSON.stringify(WORKER_MODULE)};
+    let input = "";
+    for await (const chunk of process.stdin) input += chunk;
+    const parsed = JSON.parse(input);
+    const raw = reconstructExactBscTestnetPtaRfc6979TransactionForInternalUse(
+      Buffer.from(parsed.privateKeyHex, "hex"),
+      Object.freeze({
+        data: parsed.data,
+        gasLimit: BigInt(parsed.gasLimit),
+        gasPriceWei: BigInt(parsed.gasPriceWei),
+        nonce: 0,
+        signingNotAfterMilliseconds: parsed.signingNotAfterMilliseconds
+      })
+    );
+    process.stdout.write(raw);
+  `;
+  const result = spawnSync(
+    process.execPath,
+    [
+      "--no-warnings",
+      "--conditions=react-server",
+      "--experimental-loader",
+      pathToFileURL(LOADER).href,
+      "--input-type=module",
+      "--eval",
+      childSource
+    ],
+    {
+      cwd: ROOT,
+      encoding: "utf8",
+      env: { SystemRoot: "C:\\Windows", WINDIR: "C:\\Windows" },
+      input: JSON.stringify({
+        privateKeyHex: SYNTHETIC_PRIVATE_KEY.slice(2),
+        data: transaction.data,
+        gasLimit: transaction.gasLimit.toString(),
+        gasPriceWei: transaction.gasPriceWei.toString(),
+        signingNotAfterMilliseconds: transaction.signingNotAfterMilliseconds
+      }),
+      maxBuffer: 16_384,
+      shell: false,
+      timeout: 15_000,
+      windowsHide: true
+    }
+  );
+  expect({ status: result.status, stderr: result.stderr }).toEqual({ status: 0, stderr: "" });
+  expect(result.signal).toBeNull();
+  expect(result.stdout).toMatch(/^0x[0-9a-f]+$/u);
+  return result.stdout;
+}
+
 describe("BSC testnet PTA exact one-shot signing worker", () => {
   beforeAll(() => {
     expect(DEPLOYMENT_DATA.length).toBe(2 + 2_947 * 2);
@@ -262,6 +332,65 @@ describe("BSC testnet PTA exact one-shot signing worker", () => {
     expect(first).toBe(second);
     expect(drifted).not.toBe(first);
   });
+
+  it("normalizes canonically trimmed RLP signature scalars without accepting ambiguity", () => {
+    expect(normalizeCanonicalSignatureScalarForInternalUse("0x01")).toBe(`0x${"00".repeat(31)}01`);
+    expect(normalizeCanonicalSignatureScalarForInternalUse(`0x${"ff".repeat(32)}`)).toBeNull();
+    for (const invalid of ["0x", "0x00", "0x0001", "0x1", `0x01${"00".repeat(32)}`, "0xAB"]) {
+      expect(normalizeCanonicalSignatureScalarForInternalUse(invalid)).toBeNull();
+    }
+  });
+
+  it("matches the prior viem signer and pinned RFC6979 answer byte-for-byte", async () => {
+    const transaction = exactTransaction();
+    const localScalar = Buffer.from(SYNTHETIC_PRIVATE_KEY.slice(2), "hex");
+    const local = reconstructExactBscTestnetPtaRfc6979TransactionForInternalUse(
+      localScalar,
+      transaction
+    );
+    const priorViem = await signWithSyntheticKey(transaction);
+    const parsed = parseTransaction(local);
+    if (
+      parsed.r === undefined ||
+      parsed.s === undefined ||
+      parsed.v === undefined ||
+      parsed.yParity === undefined
+    ) {
+      throw new Error("The deterministic transaction did not retain its signature.");
+    }
+    expect(localScalar.every((byte) => byte === 0)).toBe(true);
+    expect(local).toBe(priorViem);
+    expect(
+      serializeTransaction(parsed, {
+        r: parsed.r,
+        s: parsed.s,
+        v: parsed.v,
+        yParity: parsed.yParity
+      })
+    ).toBe(local);
+    await expect(
+      recoverTransactionAddress({ serializedTransaction: local as TransactionSerialized })
+    ).resolves.toBe(privateKeyToAccount(SYNTHETIC_PRIVATE_KEY).address);
+    const first = runRfc6979KnownAnswerProcess(transaction);
+    const second = runRfc6979KnownAnswerProcess(transaction);
+    expect(second).toBe(first);
+    expect(local).toBe(first);
+    expect(keccak256(first as Hex)).toBe(RFC6979_KAT_TRANSACTION_HASH);
+    expect(SOURCE).toContain("extraEntropy: false");
+    expect(SOURCE).toContain("lowS: true");
+    expect(SOURCE).toContain("assertPinnedDeterministicSigningRuntimeForInternalUse");
+    expect(SOURCE).toContain("58e74bf02fc5bbacc41dcb8bef089961cd5bddd37830b87784e4fc624d145d1f");
+  }, 30_000);
+
+  it.runIf(process.platform === "win32" && process.version === "v24.14.1")(
+    "verifies every pinned signing module and executable byte hash before custody",
+    async () => {
+      await expect(
+        assertPinnedDeterministicSigningRuntimeForInternalUse()
+      ).resolves.toBeUndefined();
+    },
+    30_000
+  );
 
   it("permits signing immediately before the bound deadline and rejects the exact boundary", () => {
     const transaction = exactTransaction();

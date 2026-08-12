@@ -128,8 +128,11 @@ test("worker entry requires durable authorization consumption before custody com
   );
   assert.ok(source.includes("worker-started.v1.json") === false);
   const childCommit = source.indexOf("await journal.commitSignedTransaction(");
+  const postCommitCustody = source.indexOf("await probeWindowsBscTestnetDeployerCustody(");
   const childOutput = source.indexOf("process.stdout.write(JSON.stringify(response))");
-  assert.ok(childCommit > custody && childOutput > childCommit);
+  assert.ok(
+    childCommit > custody && postCommitCustody > childCommit && childOutput > postCommitCustody
+  );
 });
 
 test("recovery reads journal before fresh RPC and reconciles the deterministic hash", () => {
@@ -141,4 +144,9 @@ test("recovery reads journal before fresh RPC and reconciles the deterministic h
   assert.ok(source.includes("broadcastOrReconcile(raw, transactionHash)"));
   assert.ok(source.includes("MINT_EVENT_INVALID"));
   assert.ok(source.includes('initial.status === "exact_recovery_available"'));
+  assert.ok(source.includes('initial.status === "deterministic_reconstruction_available"'));
+  assert.ok(source.includes("await assertReviewedDeterministicReconstructionGitState()"));
+  assert.ok(source.includes('runPinnedGit(["status", "--porcelain=v1"'));
+  assert.ok(source.includes("2c4df05aec5eac9f41150382b58266fdcb93523f"));
+  assert.ok(source.includes('runPinnedGit(["rev-parse", "--verify", "refs/remotes/origin/main"])'));
 });

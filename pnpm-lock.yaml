@@ -114,6 +114,12 @@ importers:
       '@altananetwork/sdk':
         specifier: 0.7.0
         version: 0.7.0(@types/react@19.2.18)(@wagmi/core@3.6.4(@types/react@19.2.18)(react@19.2.8)(typescript@6.0.3)(viem@2.55.13(typescript@6.0.3)(zod@4.4.3)))(react@19.2.8)(typescript@6.0.3)(zod@4.4.3)
+      '@noble/curves':
+        specifier: 1.9.1
+        version: 1.9.1
+      '@noble/hashes':
+        specifier: 1.8.0
+        version: 1.8.0
       '@proofera/domain':
         specifier: workspace:*
         version: link:../domain

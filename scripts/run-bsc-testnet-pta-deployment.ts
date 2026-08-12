@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
-import { randomBytes } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
+import { lstat, readFile, realpath } from "node:fs/promises";
 import { dirname, resolve, win32 } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -54,7 +55,10 @@ import {
   type BscTestnetPtaLocalJournal
 } from "../packages/integrations/src/bsc-testnet-pta-local-journal.server";
 import { createWindowsBscTestnetPtaSigningWorker } from "../packages/integrations/src/bsc-testnet-pta-signing-worker";
-import { runPinnedPowerShellForInternalUse } from "../packages/integrations/src/bsc-testnet-deployer-custody-windows.server";
+import {
+  probeWindowsBscTestnetDeployerCustody,
+  runPinnedPowerShellForInternalUse
+} from "../packages/integrations/src/bsc-testnet-deployer-custody-windows.server";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const ENTRY = fileURLToPath(import.meta.url);
@@ -70,6 +74,9 @@ const RPC_TIMEOUT_MS = 8_000;
 const RECEIPT_TIMEOUT_MS = 90_000;
 const POLL_INTERVAL_MS = 2_000;
 const TASKKILL = "C:\\Windows\\System32\\taskkill.exe";
+const PINNED_GIT = "D:\\Git\\cmd\\git.exe";
+const PINNED_GIT_SHA256 = "37c5725818d602e951ba2563b870d62763322956b73373da4c33a0b566a80bc9";
+const RECONSTRUCTION_PARENT_COMMIT = "2c4df05aec5eac9f41150382b58266fdcb93523f";
 const EXACT_EXECUTION_FLAG = "--execute-exact-pta-chain-97";
 const FIXED_SUPPLY_BASE_UNITS = 1_000_000n * 10n ** 18n;
 const LOCAL_APPLICATION_DATA_SCRIPT = String.raw`
@@ -156,6 +163,80 @@ class DeploymentFailure extends Error {
 
 function fail(code: string): never {
   throw new DeploymentFailure(code);
+}
+
+async function runPinnedGit(arguments_: readonly string[]): Promise<string> {
+  const metadata = await lstat(PINNED_GIT);
+  const canonical = await realpath(PINNED_GIT);
+  if (
+    !metadata.isFile() ||
+    metadata.isSymbolicLink() ||
+    metadata.size !== 46_464 ||
+    win32.normalize(canonical).toLowerCase() !== PINNED_GIT.toLowerCase()
+  ) {
+    fail("RECONSTRUCTION_GIT_STATE_INVALID");
+  }
+  const executable = await readFile(PINNED_GIT);
+  const executableSha256 = createHash("sha256").update(executable).digest("hex");
+  executable.fill(0);
+  if (executableSha256 !== PINNED_GIT_SHA256) fail("RECONSTRUCTION_GIT_STATE_INVALID");
+  return new Promise((resolvePromise, rejectPromise) => {
+    const child = spawn(PINNED_GIT, ["-C", ROOT, ...arguments_], {
+      cwd: ROOT,
+      env: {
+        GIT_CONFIG_GLOBAL: "NUL",
+        GIT_CONFIG_NOSYSTEM: "1",
+        GIT_OPTIONAL_LOCKS: "0",
+        LC_ALL: "C",
+        SystemRoot: "C:\\Windows",
+        WINDIR: "C:\\Windows"
+      },
+      shell: false,
+      stdio: ["ignore", "pipe", "ignore"],
+      windowsHide: true
+    });
+    const chunks: Buffer[] = [];
+    let total = 0;
+    child.stdout.on("data", (untrusted: Buffer) => {
+      total += untrusted.byteLength;
+      if (total > 4_096) {
+        child.kill();
+        return;
+      }
+      chunks.push(Buffer.from(untrusted));
+    });
+    child.once("error", () =>
+      rejectPromise(new DeploymentFailure("RECONSTRUCTION_GIT_STATE_INVALID"))
+    );
+    child.once("close", (code) => {
+      if (code !== 0 || total > 4_096) {
+        rejectPromise(new DeploymentFailure("RECONSTRUCTION_GIT_STATE_INVALID"));
+        return;
+      }
+      resolvePromise(Buffer.concat(chunks, total).toString("utf8").trim());
+    });
+  });
+}
+
+async function assertReviewedDeterministicReconstructionGitState(): Promise<void> {
+  const [root, lineage, localHead, publishedHead, status] = await Promise.all([
+    runPinnedGit(["rev-parse", "--show-toplevel"]),
+    runPinnedGit(["rev-list", "--parents", "-n", "1", "HEAD"]),
+    runPinnedGit(["rev-parse", "--verify", "HEAD"]),
+    runPinnedGit(["rev-parse", "--verify", "refs/remotes/origin/main"]),
+    runPinnedGit(["status", "--porcelain=v1", "--untracked-files=normal"])
+  ]);
+  const lineageParts = lineage.split(" ");
+  if (
+    win32.normalize(root).toLowerCase() !== ROOT.toLowerCase() ||
+    lineageParts.length !== 2 ||
+    lineageParts[0] !== localHead ||
+    lineageParts[1] !== RECONSTRUCTION_PARENT_COMMIT ||
+    publishedHead !== localHead ||
+    status !== ""
+  ) {
+    fail("RECONSTRUCTION_GIT_STATE_INVALID");
+  }
 }
 
 function assertExecutionArguments(values: readonly string[]): void {
@@ -297,6 +378,11 @@ async function runWorker(): Promise<void> {
         recoveredSigner: BSC_TESTNET_PTA_DEPLOYER_ADDRESS
       })
     );
+    const postCommitCustody = await probeWindowsBscTestnetDeployerCustody(
+      { custodyDirectoryAbsolute: directories.custodyDirectoryAbsolute },
+      new AbortController().signal
+    );
+    if (postCommitCustody.status !== "ready") fail("WORKER_POST_COMMIT_CUSTODY_INVALID");
     process.stdout.write(JSON.stringify(response));
   } finally {
     input.fill(0);
@@ -899,7 +985,14 @@ async function executeDeployment(arguments_: ExecutionArguments): Promise<void> 
     raw = initial.signedTransaction;
     transactionHash = initial.transactionHash;
     await validateRetainedSignedTransaction(raw, transactionHash);
-  } else if (initial.status === "empty" || initial.status === "exact_recovery_available") {
+  } else if (
+    initial.status === "empty" ||
+    initial.status === "exact_recovery_available" ||
+    initial.status === "deterministic_reconstruction_available"
+  ) {
+    if (initial.status === "deterministic_reconstruction_available") {
+      await assertReviewedDeterministicReconstructionGitState();
+    }
     const fresh = await freshSigningPayload(deploymentData);
     const authority = new WeakSet<object>();
     authority.add(fresh.capability);

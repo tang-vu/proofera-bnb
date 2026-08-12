@@ -18,6 +18,8 @@
   },
   "dependencies": {
     "@altananetwork/sdk": "0.7.0",
+    "@noble/curves": "1.9.1",
+    "@noble/hashes": "1.8.0",
     "@proofera/domain": "workspace:*",
     "pg": "8.23.0",
     "server-only": "0.0.1",
