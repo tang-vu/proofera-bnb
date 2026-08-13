@@ -34,6 +34,7 @@ import {
 } from "./bsc-testnet-deployer-custody-core";
 import {
   probeWindowsBscTestnetDeployerCustody,
+  probeWindowsBscTestnetDeployerCustodyMetadataForInternalUse,
   runPinnedPowerShellForInternalUse
 } from "./bsc-testnet-deployer-custody-windows.server";
 import {
@@ -109,14 +110,16 @@ const WORKER_SOURCE_RELATIVE_PATH =
 const PINNED_POWERSHELL_EXECUTABLE =
   "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
 const PINNED_POWERSHELL_SHA256 = "9785001b0dcf755eddb8af294a373c0b87b2498660f724e76c4d53f9c217c7a3";
-const PINNED_GIT_EXECUTABLE = "D:\\Git\\cmd\\git.exe";
-const PINNED_GIT_EXECUTABLE_BYTES = 46_464;
-const PINNED_GIT_SHA256 = "37c5725818d602e951ba2563b870d62763322956b73373da4c33a0b566a80bc9";
+const PINNED_GIT_EXECUTABLE = "D:\\Git\\mingw64\\bin\\git.exe";
+const PINNED_GIT_EXECUTABLE_BYTES = 4_344_192;
+const PINNED_GIT_SHA256 = "c39b1b4f7a57935bbeadf246dc2466316619453a6a9da77c4a9c6bd6d8fb21d3";
 const PINNED_ORIGIN_REFERENCE = "refs/remotes/origin/main";
 const PRODUCTION_CLI_RELATIVE_PATH =
   "scripts/run-bsc-testnet-pta-wbnb-pool-initialization.ts" as const;
 const PRODUCTION_TYPESCRIPT_LOADER_RELATIVE_PATH =
   "scripts/typescript-extension-loader.mjs" as const;
+const PRODUCTION_PHASE_ZERO_RELATIVE_PATH =
+  "scripts/run-bsc-testnet-pta-wbnb-pool-phase0.mjs" as const;
 const EXPECTED_PRODUCTION_EXEC_ARGV = Object.freeze([
   "--no-warnings",
   "--conditions=react-server",
@@ -125,6 +128,7 @@ const EXPECTED_PRODUCTION_EXEC_ARGV = Object.freeze([
 ]);
 const RELEASE_SOURCE_PATHS = Object.freeze(
   [
+    ".gitattributes",
     "packages/integrations/src/bsc-testnet-deployer-custody-core.ts",
     "packages/integrations/src/bsc-testnet-deployer-custody-windows.server.ts",
     "packages/integrations/src/bsc-testnet-pta-deployment-envelope.ts",
@@ -152,9 +156,62 @@ const RELEASE_SOURCE_PATHS = Object.freeze(
     "package.json",
     "pnpm-lock.yaml",
     PRODUCTION_CLI_RELATIVE_PATH,
+    "scripts/run-bsc-testnet-pta-wbnb-pool-phase-minus-one.ps1",
+    PRODUCTION_PHASE_ZERO_RELATIVE_PATH,
     PRODUCTION_TYPESCRIPT_LOADER_RELATIVE_PATH
   ].sort()
 );
+
+const PRODUCTION_RELEASE_ARGUMENT_LABELS = Object.freeze([
+  "--release-commit",
+  "--release-tree",
+  "--runtime-manifest-sha256"
+]);
+const FORBIDDEN_PRODUCTION_ENVIRONMENT_NAMES = new Set(
+  [
+    "ALL_PROXY",
+    "HTTP_PROXY",
+    "HTTPS_PROXY",
+    "NODE_COMPILE_CACHE",
+    "NODE_EXTRA_CA_CERTS",
+    "NODE_OPTIONS",
+    "NODE_PATH",
+    "NODE_TLS_REJECT_UNAUTHORIZED",
+    "NODE_USE_ENV_PROXY",
+    "NO_PROXY",
+    "OPENSSL_CONF",
+    "SSL_CERT_DIR",
+    "SSL_CERT_FILE"
+  ].map((name) => name.toUpperCase())
+);
+const EXPECTED_PRODUCTION_ENVIRONMENT = Object.freeze({
+  HOMEDRIVE: "C:",
+  HOMEPATH: "\\Users\\tangm",
+  LOGONSERVER: "\\\\DESKTOP-1A6OPC9",
+  PATH: "C:\\Windows\\System32",
+  SYSTEMDRIVE: "C:",
+  SystemRoot: "C:\\Windows",
+  TEMP: "C:\\Users\\tangm\\AppData\\Local\\Temp",
+  USERDOMAIN: "DESKTOP-1A6OPC9",
+  USERNAME: "tangm",
+  USERPROFILE: "C:\\Users\\tangm",
+  WINDIR: "C:\\Windows",
+  WS_NO_BUFFER_UTIL: "1",
+  WS_NO_UTF_8_VALIDATE: "1"
+});
+
+function hasExactProductionEnvironment(): boolean {
+  const actualNames = Object.keys(process.env);
+  const expectedNames = Object.keys(EXPECTED_PRODUCTION_ENVIRONMENT);
+  return (
+    actualNames.length === expectedNames.length &&
+    expectedNames.every(
+      (name) =>
+        process.env[name] ===
+        EXPECTED_PRODUCTION_ENVIRONMENT[name as keyof typeof EXPECTED_PRODUCTION_ENVIRONMENT]
+    )
+  );
+}
 
 const LOCAL_APPLICATION_DATA_SCRIPT = String.raw`
 $ErrorActionPreference = 'Stop'
@@ -206,6 +263,12 @@ export interface BscTestnetPtaWbnbPoolSigningWorkerReleaseTrust {
   readonly originReference: typeof PINNED_ORIGIN_REFERENCE;
   readonly cleanPublishedHead: true;
   readonly workerSourceSha256: Hex;
+  readonly runtimeManifestSha256: Hex;
+}
+
+interface ExpectedProductionReleaseIdentity {
+  readonly releaseCommit: string;
+  readonly releaseTree: string;
   readonly runtimeManifestSha256: Hex;
 }
 
@@ -597,7 +660,7 @@ function isWithin(parent: string, candidate: string): boolean {
   return local === "" || (!local.startsWith(`..${sep}`) && local !== ".." && !isAbsolute(local));
 }
 
-async function assertExactBscTestnetPtaWbnbPoolProductionInvocation(): Promise<void> {
+async function assertExactBscTestnetPtaWbnbPoolProductionInvocation(): Promise<ExpectedProductionReleaseIdentity> {
   try {
     const expectedCli = resolve(REPOSITORY_ROOT, ...PRODUCTION_CLI_RELATIVE_PATH.split("/"));
     const expectedLoader = resolve(
@@ -606,18 +669,35 @@ async function assertExactBscTestnetPtaWbnbPoolProductionInvocation(): Promise<v
     );
     const actualExecArguments = process.execArgv;
     const actualArguments = process.argv;
+    const releaseCommit = actualArguments[3];
+    const releaseTree = actualArguments[5];
+    const runtimeManifestSha256 = actualArguments[7];
     if (
-      process.env.NODE_OPTIONS !== undefined ||
-      Object.hasOwn(process.env, "NODE_OPTIONS") ||
+      !hasExactProductionEnvironment() ||
+      Object.keys(process.env).some((name) =>
+        FORBIDDEN_PRODUCTION_ENVIRONMENT_NAMES.has(name.toUpperCase())
+      ) ||
       !Array.isArray(actualExecArguments) ||
       Object.getPrototypeOf(actualExecArguments) !== Array.prototype ||
       actualExecArguments.length !== EXPECTED_PRODUCTION_EXEC_ARGV.length ||
       actualExecArguments.some((value, index) => value !== EXPECTED_PRODUCTION_EXEC_ARGV[index]) ||
       !Array.isArray(actualArguments) ||
       Object.getPrototypeOf(actualArguments) !== Array.prototype ||
-      actualArguments.length !== 2 ||
+      actualArguments.length !== 8 ||
       typeof actualArguments[0] !== "string" ||
       typeof actualArguments[1] !== "string" ||
+      actualArguments[2] !== PRODUCTION_RELEASE_ARGUMENT_LABELS[0] ||
+      actualArguments[4] !== PRODUCTION_RELEASE_ARGUMENT_LABELS[1] ||
+      actualArguments[6] !== PRODUCTION_RELEASE_ARGUMENT_LABELS[2] ||
+      typeof releaseCommit !== "string" ||
+      typeof releaseTree !== "string" ||
+      typeof runtimeManifestSha256 !== "string" ||
+      !/^[0-9a-f]{40}$/u.test(releaseCommit) ||
+      !/^[0-9a-f]{40}$/u.test(releaseTree) ||
+      !/^0x[0-9a-f]{64}$/u.test(runtimeManifestSha256) ||
+      releaseCommit === "0".repeat(40) ||
+      releaseTree === "0".repeat(40) ||
+      runtimeManifestSha256 === `0x${"00".repeat(32)}` ||
       !samePath(actualArguments[0], process.execPath)
     ) {
       throw new PoolSigningWorkerFailure("RELEASE_TRUST_INVALID");
@@ -645,6 +725,11 @@ async function assertExactBscTestnetPtaWbnbPoolProductionInvocation(): Promise<v
     ) {
       throw new PoolSigningWorkerFailure("RELEASE_TRUST_INVALID");
     }
+    return Object.freeze({
+      releaseCommit,
+      releaseTree,
+      runtimeManifestSha256: runtimeManifestSha256 as Hex
+    });
   } catch (error) {
     if (error instanceof PoolSigningWorkerFailure) throw error;
     throw new PoolSigningWorkerFailure("RELEASE_TRUST_INVALID");
@@ -873,30 +958,53 @@ async function nativeWindowsSignExactPoolTransaction(
 }
 
 /**
- * Verifies that the fixed current Windows user owns and can unlock the exact pinned custody. This
- * creates no signer or signature and returns no path, SID, password, key, or store bytes.
+ * Verifies only fixed custody paths, file kinds, realpaths, and current-user ACL ownership.
+ * Pre-activation must not open custody artifacts, invoke DPAPI, or decrypt/reconstruct any secret.
  */
-export async function assertFixedWindowsBscTestnetPtaWbnbPoolCustodyOwnerForInternalUse(): Promise<void> {
+export async function assertFixedWindowsBscTestnetPtaWbnbPoolCustodyMetadataForInternalUse(): Promise<void> {
   if (process.platform !== "win32") throw new PoolSigningWorkerFailure("CUSTODY_UNAVAILABLE");
   const custody = await resolveFixedLocalAppDataCustody();
-  await assertReadyCustody(custody, new AbortController().signal);
+  const readiness = await probeWindowsBscTestnetDeployerCustodyMetadataForInternalUse(
+    custody,
+    new AbortController().signal
+  );
+  if (readiness.status !== "ready") throw new PoolSigningWorkerFailure("CUSTODY_UNAVAILABLE");
 }
 
 function executePinnedGit(arguments_: readonly string[]): Promise<string> {
   return new Promise((resolvePromise, rejectPromise) => {
     execFile(
       PINNED_GIT_EXECUTABLE,
-      ["-C", REPOSITORY_ROOT, ...arguments_],
+      [
+        "--no-optional-locks",
+        "-c",
+        "core.fsmonitor=false",
+        "-c",
+        "core.hooksPath=NUL",
+        "-c",
+        "core.attributesFile=NUL",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.eol=lf",
+        "-c",
+        "diff.external=",
+        "-C",
+        REPOSITORY_ROOT,
+        ...arguments_
+      ],
       {
         cwd: REPOSITORY_ROOT,
         encoding: "utf8",
         env: {
+          ...EXPECTED_PRODUCTION_ENVIRONMENT,
+          GIT_ATTR_NOSYSTEM: "1",
           GIT_CONFIG_GLOBAL: "NUL",
           GIT_CONFIG_NOSYSTEM: "1",
+          GIT_NO_REPLACE_OBJECTS: "1",
           GIT_OPTIONAL_LOCKS: "0",
-          LC_ALL: "C",
-          SystemRoot: "C:\\Windows",
-          WINDIR: "C:\\Windows"
+          GIT_TERMINAL_PROMPT: "0",
+          LC_ALL: "C"
         },
         maxBuffer: 4_096,
         shell: false,
@@ -914,6 +1022,23 @@ function executePinnedGit(arguments_: readonly string[]): Promise<string> {
   });
 }
 
+async function assertNoRepositoryAttributeOverride(): Promise<void> {
+  try {
+    await lstat(join(REPOSITORY_ROOT, ".git/info/attributes"));
+    throw new PoolSigningWorkerFailure("RELEASE_TRUST_INVALID");
+  } catch (error) {
+    if (error instanceof PoolSigningWorkerFailure) throw error;
+    if (
+      typeof error !== "object" ||
+      error === null ||
+      !Object.hasOwn(error, "code") ||
+      Reflect.get(error, "code") !== "ENOENT"
+    ) {
+      throw new PoolSigningWorkerFailure("RELEASE_TRUST_INVALID");
+    }
+  }
+}
+
 async function assertPinnedGitExecutable(): Promise<void> {
   let executable: StableFile | null = null;
   try {
@@ -929,7 +1054,7 @@ async function assertPinnedGitExecutable(): Promise<void> {
     ) {
       throw new PoolSigningWorkerFailure("RELEASE_TRUST_INVALID");
     }
-    executable = await readStableRegularFile(PINNED_GIT_EXECUTABLE, 1_048_576, false);
+    executable = await readStableRegularFile(PINNED_GIT_EXECUTABLE, 8 * 1024 * 1024, false);
     if (sha256Hex(executable.bytes) !== PINNED_GIT_SHA256) {
       throw new PoolSigningWorkerFailure("RELEASE_TRUST_INVALID");
     }
@@ -1038,12 +1163,13 @@ async function deriveReleaseSourceManifest(releaseCommit: string): Promise<
 export async function inspectBscTestnetPtaWbnbPoolSigningWorkerReleaseTrustForInternalUse(): Promise<BscTestnetPtaWbnbPoolSigningWorkerReleaseTrust> {
   try {
     await assertPinnedGitExecutable();
+    await assertNoRepositoryAttributeOverride();
     await assertPinnedDeterministicSigningRuntimeForInternalUse();
     const [root, releaseCommit, publishedCommit, status, objectFormat] = await Promise.all([
       executePinnedGit(["rev-parse", "--show-toplevel"]),
       executePinnedGit(["rev-parse", "--verify", "HEAD"]),
       executePinnedGit(["rev-parse", "--verify", PINNED_ORIGIN_REFERENCE]),
-      executePinnedGit(["status", "--porcelain=v1", "--untracked-files=normal"]),
+      executePinnedGit(["status", "--porcelain=v1", "--untracked-files=all"]),
       executePinnedGit(["rev-parse", "--show-object-format"])
     ]);
     if (
@@ -1059,7 +1185,7 @@ export async function inspectBscTestnetPtaWbnbPoolSigningWorkerReleaseTrustForIn
     const [releaseCommitAfter, publishedCommitAfter, statusAfter] = await Promise.all([
       executePinnedGit(["rev-parse", "--verify", "HEAD"]),
       executePinnedGit(["rev-parse", "--verify", PINNED_ORIGIN_REFERENCE]),
-      executePinnedGit(["status", "--porcelain=v1", "--untracked-files=normal"])
+      executePinnedGit(["status", "--porcelain=v1", "--untracked-files=all"])
     ]);
     if (
       releaseCommitAfter !== releaseCommit ||
@@ -1089,7 +1215,7 @@ async function inspectExactPublishedReleaseTree(releaseCommit: string): Promise<
       executePinnedGit(["rev-parse", "--verify", `${releaseCommit}^{tree}`]),
       executePinnedGit(["rev-parse", "--verify", "HEAD"]),
       executePinnedGit(["rev-parse", "--verify", PINNED_ORIGIN_REFERENCE]),
-      executePinnedGit(["status", "--porcelain=v1", "--untracked-files=normal"])
+      executePinnedGit(["status", "--porcelain=v1", "--untracked-files=all"])
     ]);
     if (
       !/^[0-9a-f]{40}$/u.test(headTree) ||
@@ -1127,7 +1253,7 @@ export async function inspectBscTestnetPtaWbnbPoolExactReleaseIdentityForInterna
   const [headAfter, publishedAfter, statusAfter] = await Promise.all([
     executePinnedGit(["rev-parse", "--verify", "HEAD"]),
     executePinnedGit(["rev-parse", "--verify", PINNED_ORIGIN_REFERENCE]),
-    executePinnedGit(["status", "--porcelain=v1", "--untracked-files=normal"])
+    executePinnedGit(["status", "--porcelain=v1", "--untracked-files=all"])
   ]);
   if (
     headAfter !== releaseTrust.releaseCommit ||
@@ -1185,6 +1311,17 @@ function sameReleaseIdentity(
         entry.sha256 === candidate.sha256
       );
     })
+  );
+}
+
+function releaseIdentityMatchesExpectedProductionArguments(
+  actual: BscTestnetPtaWbnbPoolExactReleaseIdentity,
+  expected: ExpectedProductionReleaseIdentity
+): boolean {
+  return (
+    actual.releaseCommit === expected.releaseCommit &&
+    actual.releaseTree === expected.releaseTree &&
+    actual.runtimeManifest.runtimeManifestSha256 === expected.runtimeManifestSha256
   );
 }
 
@@ -1911,15 +2048,21 @@ export function authenticateBscTestnetPtaWbnbPoolNativeProductionBridgeForIntern
  * privately branded confirmed command can enter phase two and activate the native signer realm.
  */
 export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeForInternalUse(): Promise<BscTestnetPtaWbnbPoolNativeProductionBridgePreparation> {
-  await assertExactBscTestnetPtaWbnbPoolProductionInvocation();
+  const expectedProductionRelease = await assertExactBscTestnetPtaWbnbPoolProductionInvocation();
   const releaseIdentity = await inspectBscTestnetPtaWbnbPoolExactReleaseIdentityForInternalUse();
   const releaseTrust = await inspectBscTestnetPtaWbnbPoolSigningWorkerReleaseTrustForInternalUse();
-  if (!releaseTrustMatchesIdentity(releaseTrust, releaseIdentity)) {
+  if (
+    !releaseIdentityMatchesExpectedProductionArguments(
+      releaseIdentity,
+      expectedProductionRelease
+    ) ||
+    !releaseTrustMatchesIdentity(releaseTrust, releaseIdentity)
+  ) {
     throw new PoolSigningWorkerFailure("RELEASE_TRUST_INVALID");
   }
   const releaseTree = releaseIdentity.releaseTree;
   const now = (): Date => new Date();
-  const localCustodyOwnerCapability = Object.freeze(Object.create(null) as object);
+  const localCustodyPathAclCapability = Object.freeze(Object.create(null) as object);
   const ceremonyCommands = new WeakMap<object, BscTestnetPtaWbnbPoolOneShotPreparedDescriptor>();
   let ceremonyAttempted = false;
   let activationAttempted = false;
@@ -1928,11 +2071,11 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
       now,
       releaseTrust,
       releaseTree,
-      authenticateLocalCustodyOwnerCapability: (value: unknown) =>
+      authenticateLocalCustodyPathAclCapability: (value: unknown) =>
         typeof value === "object" &&
         value !== null &&
         !isProxy(value) &&
-        value === localCustodyOwnerCapability
+        value === localCustodyPathAclCapability
     })
   );
 
@@ -2095,12 +2238,21 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
       ceremonyCommands.delete(command);
 
       // Release drift is rejected before the first custody or journal operation.
-      await assertExactBscTestnetPtaWbnbPoolProductionInvocation();
+      const expectedProductionReleaseAfter =
+        await assertExactBscTestnetPtaWbnbPoolProductionInvocation();
       const [actualIdentity, actualTrust] = await Promise.all([
         inspectBscTestnetPtaWbnbPoolExactReleaseIdentityForInternalUse(),
         inspectBscTestnetPtaWbnbPoolSigningWorkerReleaseTrustForInternalUse()
       ]);
       if (
+        expectedProductionReleaseAfter.releaseCommit !== expectedProductionRelease.releaseCommit ||
+        expectedProductionReleaseAfter.releaseTree !== expectedProductionRelease.releaseTree ||
+        expectedProductionReleaseAfter.runtimeManifestSha256 !==
+          expectedProductionRelease.runtimeManifestSha256 ||
+        !releaseIdentityMatchesExpectedProductionArguments(
+          actualIdentity,
+          expectedProductionReleaseAfter
+        ) ||
         !sameReleaseIdentity(actualIdentity, releaseIdentity) ||
         !sameReleaseTrust(actualTrust, releaseTrust) ||
         !releaseTrustMatchesIdentity(actualTrust, actualIdentity)
@@ -2112,12 +2264,12 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
         );
       }
 
-      await assertFixedWindowsBscTestnetPtaWbnbPoolCustodyOwnerForInternalUse();
+      await assertFixedWindowsBscTestnetPtaWbnbPoolCustodyMetadataForInternalUse();
       const signingJournal = await createWindowsBscTestnetPtaWbnbPoolLocalJournal();
       const authorization: BscTestnetPtaWbnbPoolProductionAuthorityResult = issuer.authorize(
         descriptor,
         command,
-        localCustodyOwnerCapability
+        localCustodyPathAclCapability
       );
       if (authorization.status !== "authorized") {
         return nativeActivationBlocked(
@@ -2135,12 +2287,23 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
 
       const inspectExactReleaseAndTree =
         async (): Promise<BscTestnetPtaWbnbPoolSigningWorkerReleaseTrust> => {
-          await assertExactBscTestnetPtaWbnbPoolProductionInvocation();
+          const expectedProductionReleaseForWorker =
+            await assertExactBscTestnetPtaWbnbPoolProductionInvocation();
           const [actualIdentityAfter, actualTrustAfter] = await Promise.all([
             inspectBscTestnetPtaWbnbPoolExactReleaseIdentityForInternalUse(),
             inspectBscTestnetPtaWbnbPoolSigningWorkerReleaseTrustForInternalUse()
           ]);
           if (
+            expectedProductionReleaseForWorker.releaseCommit !==
+              expectedProductionRelease.releaseCommit ||
+            expectedProductionReleaseForWorker.releaseTree !==
+              expectedProductionRelease.releaseTree ||
+            expectedProductionReleaseForWorker.runtimeManifestSha256 !==
+              expectedProductionRelease.runtimeManifestSha256 ||
+            !releaseIdentityMatchesExpectedProductionArguments(
+              actualIdentityAfter,
+              expectedProductionReleaseForWorker
+            ) ||
             !sameReleaseIdentity(actualIdentityAfter, releaseIdentity) ||
             !sameReleaseTrust(actualTrustAfter, releaseTrust) ||
             !releaseTrustMatchesIdentity(actualTrustAfter, actualIdentityAfter)

@@ -935,6 +935,9 @@ async function providerObservation(
   let receiptBlockLookup: BscTestnetPtaWbnbPoolProviderReconciliationEvidence["receiptBlockLookup"] =
     null;
   let commonFinalizedBlock: BscTestnetPtaWbnbPoolNormalizedBlock | null = null;
+  let checkpointBlockRecheck: BscTestnetPtaWbnbPoolNormalizedBlock | null = null;
+  let checkpointCanonicalAttestation: BscTestnetPtaWbnbPoolProviderReconciliationEvidence["checkpointCanonicalAttestation"] =
+    null;
   let retainedPostState: BscTestnetPtaWbnbPoolPostState | null = null;
   let receiptToCommonFinalizedAncestry: readonly BscTestnetPtaWbnbPoolNormalizedAncestryHeader[] =
     Object.freeze([]);
@@ -982,7 +985,44 @@ async function providerObservation(
       if (receipt.status === "1") {
         retainedPostState = await postState(origin, receiptBlock);
       }
+      checkpointBlockRecheck = normalizeBlock(
+        await rpc(origin, "eth_getBlockByNumber", [`0x${checkpointNumber.toString(16)}`, false])
+      );
+      if (
+        checkpointBlockRecheck === null ||
+        !sameJson(commonFinalizedBlock, checkpointBlockRecheck)
+      ) {
+        throw new Error("RPC_FINALITY_CHECKPOINT_CHANGED");
+      }
     }
+  }
+  const recheckedFinalized = await commonFinalized(origin);
+  if (
+    recheckedFinalized.rawHeadNumber < BigInt(reportedHead.number) ||
+    (recheckedFinalized.rawHeadNumber === BigInt(reportedHead.number) &&
+      !sameJson(reportedHead, recheckedFinalized.head)) ||
+    (commonFinalizedBlock !== null &&
+      recheckedFinalized.rawHeadNumber < BigInt(commonFinalizedBlock.number))
+  ) {
+    throw new Error("RPC_FINALIZED_HEAD_CHANGED");
+  }
+  if (commonFinalizedBlock !== null) {
+    const checkpointState = Object.freeze({
+      blockHash: commonFinalizedBlock.hash,
+      requireCanonical: true as const
+    });
+    const checkpointBalance = quantity(
+      await rpc(origin, "eth_getBalance", [ZERO_ADDRESS, checkpointState])
+    );
+    if (checkpointBalance === null) {
+      throw new Error("RPC_FINALITY_CANONICAL_ATTESTATION_INVALID");
+    }
+    checkpointCanonicalAttestation = Object.freeze({
+      method: "eth_getBalance" as const,
+      address: ZERO_ADDRESS,
+      eip1898Block: checkpointState,
+      resultWei: checkpointBalance.toString()
+    });
   }
   return Object.freeze({
     origin,
@@ -990,7 +1030,10 @@ async function providerObservation(
     transaction,
     receipt,
     reportedFinalizedHead: reportedHead,
+    recheckedFinalizedHead: recheckedFinalized.head,
     commonFinalizedBlock,
+    checkpointBlockRecheck,
+    checkpointCanonicalAttestation,
     receiptBlockLookup,
     receiptBlock,
     receiptToCommonFinalizedAncestry,

@@ -16,7 +16,7 @@ const PINNED_NODE_VERSION = "v24.14.1";
 const PINNED_NODE_EXECUTABLE_SHA256 =
   "58e74bf02fc5bbacc41dcb8bef089961cd5bddd37830b87784e4fc624d145d1f";
 const PINNED_TYPESCRIPT_LOADER_SHA256 =
-  "7783710b215e30285d7a36b41a3cbefbfe9c1fafdaaba929225c42c1da7abfc1";
+  "91c74ade17c12cca55e030935d59fed0838cd3ededd721417c147a097f968107";
 const CLI_PATH = fileURLToPath(import.meta.url);
 const REPOSITORY_ROOT = resolve(dirname(CLI_PATH), "..");
 const LOADER_PATH = resolve(REPOSITORY_ROOT, "scripts/typescript-extension-loader.mjs");
@@ -26,6 +26,56 @@ const EXPECTED_EXEC_ARGV = Object.freeze([
   "--experimental-loader",
   "./scripts/typescript-extension-loader.mjs"
 ]);
+const EXPECTED_RELEASE_ARGUMENT_LABELS = Object.freeze([
+  "--release-commit",
+  "--release-tree",
+  "--runtime-manifest-sha256"
+]);
+const FORBIDDEN_ENVIRONMENT_NAMES = new Set(
+  [
+    "ALL_PROXY",
+    "HTTP_PROXY",
+    "HTTPS_PROXY",
+    "NODE_COMPILE_CACHE",
+    "NODE_EXTRA_CA_CERTS",
+    "NODE_OPTIONS",
+    "NODE_PATH",
+    "NODE_TLS_REJECT_UNAUTHORIZED",
+    "NODE_USE_ENV_PROXY",
+    "NO_PROXY",
+    "OPENSSL_CONF",
+    "SSL_CERT_DIR",
+    "SSL_CERT_FILE"
+  ].map((name) => name.toUpperCase())
+);
+const EXPECTED_PRODUCTION_ENVIRONMENT = Object.freeze({
+  HOMEDRIVE: "C:",
+  HOMEPATH: "\\Users\\tangm",
+  LOGONSERVER: "\\\\DESKTOP-1A6OPC9",
+  PATH: "C:\\Windows\\System32",
+  SYSTEMDRIVE: "C:",
+  SystemRoot: "C:\\Windows",
+  TEMP: "C:\\Users\\tangm\\AppData\\Local\\Temp",
+  USERDOMAIN: "DESKTOP-1A6OPC9",
+  USERNAME: "tangm",
+  USERPROFILE: "C:\\Users\\tangm",
+  WINDIR: "C:\\Windows",
+  WS_NO_BUFFER_UTIL: "1",
+  WS_NO_UTF_8_VALIDATE: "1"
+});
+
+function hasExactProductionEnvironment(): boolean {
+  const actualNames = Object.keys(env);
+  const expectedNames = Object.keys(EXPECTED_PRODUCTION_ENVIRONMENT);
+  return (
+    actualNames.length === expectedNames.length &&
+    expectedNames.every(
+      (name) =>
+        env[name] ===
+        EXPECTED_PRODUCTION_ENVIRONMENT[name as keyof typeof EXPECTED_PRODUCTION_ENVIRONMENT]
+    )
+  );
+}
 
 function samePath(left: string, right: string): boolean {
   return resolve(left).toLowerCase() === resolve(right).toLowerCase();
@@ -86,11 +136,24 @@ function assertExactProductionBootstrap(): void {
     execArgv.every((value, index) => value === EXPECTED_EXEC_ARGV[index]);
   if (
     version !== PINNED_NODE_VERSION ||
-    Object.hasOwn(env, "NODE_OPTIONS") ||
+    !hasExactProductionEnvironment() ||
+    Object.keys(env).some((name) => FORBIDDEN_ENVIRONMENT_NAMES.has(name.toUpperCase())) ||
     !exactExecArguments ||
-    argv.length !== 2 ||
+    argv.length !== 8 ||
     typeof argv[0] !== "string" ||
     typeof argv[1] !== "string" ||
+    argv[2] !== EXPECTED_RELEASE_ARGUMENT_LABELS[0] ||
+    argv[4] !== EXPECTED_RELEASE_ARGUMENT_LABELS[1] ||
+    argv[6] !== EXPECTED_RELEASE_ARGUMENT_LABELS[2] ||
+    typeof argv[3] !== "string" ||
+    typeof argv[5] !== "string" ||
+    typeof argv[7] !== "string" ||
+    !/^[0-9a-f]{40}$/u.test(argv[3]) ||
+    !/^[0-9a-f]{40}$/u.test(argv[5]) ||
+    !/^0x[0-9a-f]{64}$/u.test(argv[7]) ||
+    argv[3] === "0".repeat(40) ||
+    argv[5] === "0".repeat(40) ||
+    argv[7] === `0x${"00".repeat(32)}` ||
     !samePath(argv[0], execPath) ||
     !samePath(argv[1], CLI_PATH) ||
     !samePath(realpathSync(REPOSITORY_ROOT), REPOSITORY_ROOT) ||

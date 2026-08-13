@@ -19,11 +19,13 @@ Owner-designated internal technical-review decision:
 This is a BNB Smart Chain testnet and PancakeSwap V3 preparation milestone. The historical observation
 used local ProofEra tooling and two official credential-free BNB Chain RPC endpoints. Capture created
 only fixed public evidence files. The later compiler and selector reviews and external-review-request
-generator ran offline. The root command now implements read-only recovery, exact-release policy
-admission, the native-TTY owner ceremony, a private one-consume authority/worker/broadcaster bridge,
-fixed-RPC rechecks, durable restart recovery, and terminal reconciliation. The public worker and
-generic raw sender remain hard-blocked. This update made no onchain RPC write, owner approval,
-signature, broadcast, pool creation, token wrapping, liquidity mint, swap, or mainnet action.
+generator ran offline. The production path now begins with an absolute Windows PowerShell 5.1
+phase-minus-one environment scrub, followed by read-only phase zero and recovery-first phase one,
+exact-release policy admission, the native-TTY owner ceremony, a private one-consume authority/worker/
+broadcaster bridge, fixed-RPC rechecks, durable restart recovery, and terminal reconciliation. Direct
+Node, the pnpm initializer, and the public worker/generic raw sender remain hard-blocked. This update
+made no onchain RPC write, owner approval, signature, broadcast, pool creation, token wrapping,
+liquidity mint, swap, or mainnet action.
 
 The evidence answers a narrow question: what exact chain-97 state and review inputs would a future
 PTA/WBNB pool initializer have to bind? It does not answer whether the pair has a market price, is
@@ -217,6 +219,44 @@ On success it can create only a 45-second, digest-bound unsigned observation env
 boundary validates that envelope and still accepts no custody, journal, signer, transport, or
 broadcast dependency.
 
+### Authoritative phase-minus-one bootstrap
+
+The only production entry is this host/path-pinned Windows PowerShell 5.1 command with the working directory exactly
+`C:\Users\tangm\Documents\GitHub\proofera-bnb`
+after a newly committed and pushed release receives exact audits. The audit supplies both nonzero
+lowercase 40-hex Git objects and the nonzero lowercase `0x`-prefixed 64-hex runtime-manifest digest;
+the placeholders below are not release values:
+
+```powershell
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File C:\Users\tangm\Documents\GitHub\proofera-bnb\scripts\run-bsc-testnet-pta-wbnb-pool-phase-minus-one.ps1 --release-commit <AUDITED40> --release-tree <AUDITED40> --runtime-manifest-sha256 <AUDITED0x64>
+```
+
+Direct invocation of the phase-zero Node script is unsupported. An ordinary ambient invocation is
+rejected by the exact-environment check, but phase zero cannot prove parent provenance against
+malicious preload or same-user code that first installs the accepted environment. The configured
+`pnpm initialize:pta-wbnb:testnet` command is a fail-only wrapper that returns nonzero. Phase minus one
+hardcodes and requires the exact repository root, its own exact absolute path, and the absolute
+phase-zero path. It clears its Process environment, installs exactly 13 pinned non-secret values
+(11 real-host values plus two WebSocket native-addon disable guards),
+name/value pairs, and starts the
+pinned Node executable. Phase zero rejects any missing, additional, or changed entry. It then uses only
+plain Node built-ins to verify the exact audit triplet, pinned Node executable and direct
+`D:\Git\mingw64\bin\git.exe`, constrained Git behavior, clean `HEAD == origin/main`, requested tree,
+enumerated release-source Git blobs—including the phase-minus-one PowerShell file—pinned dependency
+trees, and repository root. It repeats the release checks, then spawns the exact phase-one CLI and
+loader with the same 13-value environment.
+
+Phase minus one mutates only its own Process environment and performs no repository write, journal
+read, TTY ceremony, RPC access, custody-artifact access, DPAPI operation, signature, or send. Phase zero
+is read-only; recovery is phase one's first application-stateful or external operational action. This
+is bootstrap hardening, not secure boot. The trusted computing base includes both the phase-minus-one
+bytes before their later manifest check and the phase-zero bytes that execute before and during their
+own checks, every Windows PowerShell 5.1/.NET startup path and ambient environment until scrub,
+Windows/filesystem/process semantics, the pinned Node/direct-Git executable files, and the
+OS/runtime/DLL installation they load. The later self-check and Git-blob checks are evidence rather
+than a root of trust. Complete host installations are not hashed, and no active same-user,
+preload/parent-provenance, or comprehensive concurrent-tamper defense exists.
+
 A separately reviewed, server-only signing scaffold now implements the exact fixed transaction
 protocol, authorization-receipt validation, signer core, Windows signing worker, and an append-only
 operation journal rooted at
@@ -232,13 +272,18 @@ operating-system CSPRNG, and accepts only the exact digest-bound confirmation by
 window closes. The ceremony does not use argv, environment, temporary files, shell, logger, custody,
 RPC writes, signer, or broadcaster. Challenge generation alone mints no authority.
 
-The native bridge holds its current-user custody-owner capability, ceremony-command brand, and
-execution-capability state inside one closure. A capability is reserved for one worker and consumed
-only after the signing journal durably enters worker start; copied JSON/digests, test issuers, proxy
-objects, and persisted journal bytes cannot unlock the native worker. The recovery-first root command
-wires these controls, while the public production worker factory remains fail-closed. Only a
-post-commit exact-release policy, its private envelope instantiation, and the descriptor-bound owner
-ceremony can activate the native bridge.
+The native bridge holds a current-user fixed-custody-path/ACL capability, ceremony-command brand, and
+execution-capability state inside one closure. Before durable `worker_started`, its custody probe checks
+only fixed paths, `lstat`/file kind, `realpath`, and current-user ACL. It does not open the custody
+artifacts, invoke DPAPI, unlock the keystore, or reconstruct secret/key material. The resulting authority
+claim therefore identifies the ACL holder only; it does not claim key ownership or that the expected
+sender has been recovered. A capability is reserved for one worker and consumed only after the signing
+journal durably enters worker start; only then may bounded custody unlock occur, and the recovered signed
+transaction must attest the expected signer before broadcast. Copied JSON/digests, test issuers, proxy
+objects, and persisted journal bytes cannot unlock the native worker. The recovery-first phase-one child
+wires these controls, while the public production worker factory remains fail-closed. Only a post-commit
+exact-release policy, its private envelope instantiation, and the descriptor-bound owner ceremony can
+activate the native bridge.
 
 A separate local post-claim recheck core requires the authorization gate's authenticated private
 intent before making any read. It compares only the two fixed official RPC origins, finds a common
@@ -282,15 +327,24 @@ required immediately before the sole send opportunity. Expiry or drift after the
 forbids send, retry, and replacement.
 
 Terminal reconciliation requires both fixed providers to return the identical exact transaction,
-receipt and logs, plus identical EIP-1898 post-state at the receipt block. It walks exactly 128
-continuous, exact-number, parent-hash-linked blocks from the receipt to a fixed finalized checkpoint;
-both providers must match, even when their current finalized heads have advanced much farther.
-Missing, discontinuous or timestamp-regressive ancestry fails closed. The root command wires these
-controls to a closure-private sender; the public worker and generic raw sender remain unavailable.
-The command cannot activate until the exact final commit/tree/full runtime manifest receives a new
-owner-designated review policy and the owner enters the separate exact TTY confirmation. No such
-policy/confirmation, signature, send, transaction receipt, pool or LP position exists. These changed
-files are not covered by the old external-review request or retained `bc7000e` decision.
+receipt and logs, plus identical EIP-1898 post-state at the receipt block. Per provider it samples the
+first finalized head `F1`, reads the fixed receipt-plus-128 checkpoint `C1` and exactly 128 continuous,
+exact-number, parent-hash-linked ancestry blocks, rereads that checkpoint as `C2`, samples a
+non-regressing finalized head `F2`, and finally requires an EIP-1898 `requireCanonical` state read at
+`C`. The finalized heads may differ, but both providers must agree on the checkpoint, ancestry,
+receipt-block post-state, and canonical attestation. Missing, discontinuous, changed, or
+timestamp-regressive evidence fails closed. The provider-attested sandwich order is:
+
+`F1 -> C1/ancestry -> C2 -> F2 -> EIP-1898(C)`
+
+It is RPC consistency, not cryptographic proof that `C` is an ancestor of `F1`/`F2`, provider
+independence, or protection from two colluding/identically faulty Byzantine providers. The phase-one
+child wires these controls to a closure-private sender; the public worker and generic raw sender remain
+unavailable. Every release containing this path must have a committed and pushed identity, then its exact
+commit/tree/full runtime manifest must receive new owner-designated audits and a matching policy before
+the owner enters the separate exact TTY confirmation. This document supplies no such policy/confirmation,
+signature, send, transaction receipt, pool or LP position exists. These changed files are not covered
+by the old external-review request or retained `bc7000e` decision.
 
 ## Separate proposed liquidity envelope
 
@@ -323,10 +377,12 @@ The two write decisions stay separate:
 - Obtain a distinct exact owner authorization. Neither the request nor a future reviewer decision can
   substitute for it.
 - Generate the canonical runtime policy only after the final commit is pushed and two designated
-  read-only agents approve its exact commit/tree/full manifest. Admit that policy through the first
-  TTY phase, then require the owner's exact second-phase confirmation; neither may be inferred from
-  repository contents, chat, digests, or journal state. The public worker and generic raw sender stay
-  hard-blocked even when the closure-private path is used.
+  read-only agents approve its exact commit/tree/full manifest. Use that exact triplet only with the
+  absolute PowerShell phase-minus-one command; never substitute direct Node, the blocked pnpm wrapper,
+  or placeholder values.
+  Admit the matching policy through the first TTY phase, then require the owner's exact second-phase
+  confirmation; neither may be inferred from repository contents, chat, digests, or journal state. The
+  public worker and generic raw sender stay hard-blocked even when the closure-private path is used.
 - Re-run the fixed two-provider coordinator immediately before any claim, then repeat the pending nonce,
   pool, candidate-code and simulation checks after the durable claim and abort on any drift.
 - Establish post-initialization observation cardinality and elapsed oracle history before using the
@@ -336,12 +392,13 @@ The two write decisions stay separate:
 
 Until those gates close and explorer-verifiable receipts exist, the truthful state remains: PTA and
 WBNB identities are evidenced, the retained pool construction path is reproduced exactly offline,
-and a read-only non-authorizing preflight plus an exact-policy/owner-gated recovery/signing/submission/
-reconciliation path are implemented. The owner-designated internal technical-review gate is complete
-only for the exact `bc7000e` nonexecuting subject, not this changed release until its final commit is
-reviewed. **No authenticated external/third-party review is claimed, no final-release runtime policy
-or exact owner transaction approval was entered, and no signature, receipt, PTA/WBNB pool, liquidity,
-oracle, position, Pancake write, or autonomous execution is evidenced**.
+and a read-only non-authorizing preflight plus a phase-minus-one/phase-zero, exact-policy/owner-gated
+recovery/signing/submission/reconciliation path are implemented. The owner-designated internal technical-review
+gate is complete only for the exact `bc7000e` nonexecuting subject, not this changed release until its
+final commit is pushed and receives new exact audits. **No authenticated external/third-party review is
+claimed, no audited current-release triplet, final-release runtime policy, or exact owner transaction
+approval was entered, and no signature, send, receipt, PTA/WBNB pool, liquidity, oracle, position,
+Pancake write, or autonomous execution is evidenced**.
 
 The machine record is linked to the retained
 [bounded public-result RPC transcript](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json)

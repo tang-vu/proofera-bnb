@@ -188,7 +188,7 @@ function harness(now: () => Date = () => new Date(NOW)) {
       now,
       releaseTrust,
       releaseTree: RELEASE_TREE,
-      authenticateLocalCustodyOwnerCapability: (value: unknown) =>
+      authenticateLocalCustodyPathAclCapability: (value: unknown) =>
         typeof value === "object" && value !== null && localBrands.has(value)
     })
   );
@@ -344,6 +344,15 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
     expect(challenge.ownerAuthorizationText).toContain("automatedPolicyApplication=true");
     expect(challenge.ownerAuthorizationText).toContain("reviewerInspectedExactEnvelope=false");
     expect(challenge.ownerAuthorizationText).toContain("liquidityActionAuthorized=false");
+    expect(challenge.ownerAuthorizationText).toContain(
+      "ack.custodyUnlockVerifiedBeforeDurableClaim=false"
+    );
+    expect(challenge.ownerAuthorizationText).toContain(
+      "ack.custodyKeyAddressVerifiedBeforeDurableClaim=false"
+    );
+    expect(challenge.ownerAuthorizationText).toContain(
+      "ack.expectedSignerVerifiedOnlyByPostClaimSignedAttestation=true"
+    );
     expect(challenge.ownerAuthorizationTextSha256).toBe(
       `0x${createHash("sha256").update(challenge.ownerAuthorizationText).digest("hex")}`
     );
@@ -355,6 +364,11 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
     if (result.status !== "authorized") throw new Error(result.issue.message);
     expect(result.reviewDecisionDigest).toBe(INSTANTIATION_DIGEST);
     expect(result.intent.reviewerApprovalDigest).toBe(INSTANTIATION_DIGEST);
+    expect(result.boundary).toMatchObject({
+      authorityModel: "windows_current_user_fixed_custody_path_acl_object_capability",
+      custodyKeyAddressVerifiedBeforeDurableClaim: false,
+      custodyUnlockVerifiedBeforeDurableClaim: false
+    });
     expect(authority.authenticateAuthorizedIntent(result.intent)).toBe(true);
     expect(authority.authenticateExecutionCapability(result.executionCapability)).toBe(true);
     expect(reviewBrands.states.get(instantiation)?.fresh).toBe(false);

@@ -45,8 +45,16 @@ const SOURCE = readFileSync(
   new URL("./bsc-testnet-pta-wbnb-pool-signing-worker.ts", import.meta.url),
   "utf8"
 );
+const WINDOWS_CUSTODY_SOURCE = readFileSync(
+  new URL("./bsc-testnet-deployer-custody-windows.server.ts", import.meta.url),
+  "utf8"
+);
 const CLI_SOURCE = readFileSync(
   new URL("../../../scripts/run-bsc-testnet-pta-wbnb-pool-initialization.ts", import.meta.url),
+  "utf8"
+);
+const PHASE_ZERO_SOURCE = readFileSync(
+  new URL("../../../scripts/run-bsc-testnet-pta-wbnb-pool-phase0.mjs", import.meta.url),
   "utf8"
 );
 const ROOT_PACKAGE = JSON.parse(
@@ -247,17 +255,31 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     expect(SOURCE).toContain('"packages/integrations/src/bsc-testnet-pta-unsigned-transaction.ts"');
     expect(SOURCE).toContain('"scripts/run-bsc-testnet-pta-wbnb-pool-initialization.ts" as const');
     expect(SOURCE).toContain('"scripts/typescript-extension-loader.mjs" as const');
+    expect(SOURCE).toContain('"scripts/run-bsc-testnet-pta-wbnb-pool-phase0.mjs" as const');
+    expect(SOURCE).toContain('"scripts/run-bsc-testnet-pta-wbnb-pool-phase-minus-one.ps1"');
+    expect(SOURCE).toContain('".gitattributes"');
     expect(SOURCE).not.toContain('"packages/domain/src/index.ts"');
   });
 
-  it("admits only the exact pinned Node condition and sole loader before importing the stack", () => {
+  it("admits only the phase-minus-one scrubber before phase zero and the exact child stack", () => {
     expect(ROOT_PACKAGE.scripts?.["initialize:pta-wbnb:testnet"]).toBe(
-      "node --no-warnings --conditions=react-server --experimental-loader ./scripts/typescript-extension-loader.mjs ./scripts/run-bsc-testnet-pta-wbnb-pool-initialization.ts"
+      "node -e \"process.stderr.write('Blocked: use the audited phase-minus-one command in docs/deployment.md.');process.exit(1)\""
     );
-    expect(CLI_SOURCE).toContain('Object.hasOwn(env, "NODE_OPTIONS")');
+    expect(PHASE_ZERO_SOURCE).toContain('const PINNED_NODE_EXECUTABLE = "D:\\\\Node\\\\node.exe"');
+    expect(PHASE_ZERO_SOURCE).toContain("async function assertPhaseZeroReadOnlyRelease(expected)");
+    expect(PHASE_ZERO_SOURCE).toContain("assertPinnedExternalRuntimeTrees()");
+    expect(PHASE_ZERO_SOURCE).toContain('GIT_NO_REPLACE_OBJECTS: "1"');
+    expect(SOURCE).toContain('GIT_NO_REPLACE_OBJECTS: "1"');
+    expect(PHASE_ZERO_SOURCE).toContain('stdio: "inherit"');
+    expect(PHASE_ZERO_SOURCE).toContain("shell: false");
+    expect(PHASE_ZERO_SOURCE).not.toMatch(/from\s+["'](?!node:)/u);
+    expect(CLI_SOURCE).toContain("FORBIDDEN_ENVIRONMENT_NAMES");
+    expect(CLI_SOURCE).toContain("hasExactProductionEnvironment()");
+    expect(CLI_SOURCE).toContain("actualNames.length === expectedNames.length");
     expect(CLI_SOURCE).toContain('"--conditions=react-server"');
     expect(CLI_SOURCE).toContain('"--experimental-loader"');
     expect(CLI_SOURCE).toContain("execArgv.length === EXPECTED_EXEC_ARGV.length");
+    expect(CLI_SOURCE).toContain('"--runtime-manifest-sha256"');
     expect(CLI_SOURCE).toContain("stablePinnedFileSha256(execPath");
     expect(CLI_SOURCE).toContain("stablePinnedFileSha256(LOADER_PATH");
     expect(CLI_SOURCE).not.toMatch(
@@ -270,8 +292,11 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     expect(bootstrapIndex).toBeGreaterThan(0);
     expect(dynamicImportIndex).toBeGreaterThan(bootstrapIndex);
     expect(SOURCE).toContain("process.execArgv");
-    expect(SOURCE).toContain("process.env.NODE_OPTIONS");
-    expect(SOURCE).toContain('Object.hasOwn(process.env, "NODE_OPTIONS")');
+    expect(SOURCE).toContain("FORBIDDEN_PRODUCTION_ENVIRONMENT_NAMES");
+    expect(SOURCE).toContain("hasExactProductionEnvironment()");
+    expect(PHASE_ZERO_SOURCE).toContain('PATH: "C:\\\\Windows\\\\System32"');
+    expect(PHASE_ZERO_SOURCE).toContain('USERPROFILE: "C:\\\\Users\\\\tangm"');
+    expect(SOURCE).toContain("releaseIdentityMatchesExpectedProductionArguments");
   });
 
   it("reconstructs the exact deterministic low-S EIP-155 legacy transaction", async () => {
@@ -354,7 +379,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     );
     expect(SOURCE).toContain("extraEntropy: false");
     expect(SOURCE).toContain("lowS: true");
-    expect(SOURCE.match(/process\s*\.\s*env/gu)).toHaveLength(2);
+    expect(SOURCE.match(/process\s*\.\s*env/gu)).toHaveLength(3);
     expect(SOURCE.match(/process\s*\.\s*argv/gu)).toHaveLength(1);
     expect(SOURCE).not.toMatch(/\bfetch\s*\(/u);
     expect(SOURCE).not.toMatch(/\bconsole\./u);
@@ -406,7 +431,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
       "await inspectBscTestnetPtaWbnbPoolExactReleaseIdentityForInternalUse()"
     );
     const custodyIndex = nativeSource.indexOf(
-      "await assertFixedWindowsBscTestnetPtaWbnbPoolCustodyOwnerForInternalUse()"
+      "await assertFixedWindowsBscTestnetPtaWbnbPoolCustodyMetadataForInternalUse()"
     );
     const journalIndex = nativeSource.indexOf(
       "await createWindowsBscTestnetPtaWbnbPoolLocalJournal()"
@@ -417,7 +442,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     expect(custodyIndex).toBeGreaterThan(activationIndex);
     expect(journalIndex).toBeGreaterThan(custodyIndex);
     expect(nativeSource).toContain(
-      "const localCustodyOwnerCapability = Object.freeze(Object.create(null) as object)"
+      "const localCustodyPathAclCapability = Object.freeze(Object.create(null) as object)"
     );
     expect(nativeSource).toContain("const ceremonyCommands = new WeakMap<object");
     expect(nativeSource).toContain("ceremonyCommands.get(command) !== descriptor");
@@ -437,6 +462,75 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     expect(
       authenticateBscTestnetPtaWbnbPoolNativeProductionBridgeForInternalUse(Object.freeze({}))
     ).toBe(false);
+  });
+
+  it("keeps every pre-activation custody check metadata-only and places unlock behind durable start", () => {
+    const metadataProbeMarker =
+      "export const probeWindowsBscTestnetDeployerCustodyMetadataForInternalUse";
+    const fullProbeMarker = "export const probeWindowsBscTestnetDeployerCustody:";
+    const metadataProbeIndex = WINDOWS_CUSTODY_SOURCE.indexOf(metadataProbeMarker);
+    const fullProbeIndex = WINDOWS_CUSTODY_SOURCE.indexOf(fullProbeMarker);
+    expect(metadataProbeIndex).toBeGreaterThan(0);
+    expect(fullProbeIndex).toBeGreaterThan(metadataProbeIndex);
+
+    const metadataOnlySource = WINDOWS_CUSTODY_SOURCE.slice(metadataProbeIndex, fullProbeIndex);
+    expect(metadataOnlySource).toContain("const paths = await inspectPaths(configuration)");
+    expect(metadataOnlySource).toContain("await assertExactLocalAcl(configuration, paths, signal)");
+    expect(metadataOnlySource).toContain("const finalPaths = await inspectPaths(configuration)");
+    expect(metadataOnlySource).toContain(
+      "await assertExactLocalAcl(configuration, finalPaths, signal)"
+    );
+    expect(metadataOnlySource).not.toMatch(
+      /assertFinalCustodyState|readAndVerifyPinnedArtifacts|readBoundedStableRegularFile|\bopen\s*\(|\.readFile\s*\(|sha256Hex|createHash|createDecipheriv|scrypt\s*\(|DPAPI_UNPROTECT_SCRIPT|unprotectCurrentUser|unlockBscTestnetDeployerEncryptedStore|secretScalar/u
+    );
+
+    const poolMetadataMarker =
+      "export async function assertFixedWindowsBscTestnetPtaWbnbPoolCustodyMetadataForInternalUse";
+    const poolMetadataIndex = SOURCE.indexOf(poolMetadataMarker);
+    const poolMetadataEndIndex = SOURCE.indexOf("function executePinnedGit", poolMetadataIndex);
+    const poolMetadataSource = SOURCE.slice(poolMetadataIndex, poolMetadataEndIndex);
+    expect(poolMetadataSource).toContain(
+      "probeWindowsBscTestnetDeployerCustodyMetadataForInternalUse("
+    );
+    expect(poolMetadataSource).not.toMatch(
+      /probeWindowsBscTestnetDeployerCustody\s*\(|readAndVerifyPinnedCustody|readStableFile|\bopen\s*\(|\.readFile\s*\(|sha256Hex|createHash|createDecipheriv|scrypt\s*\(|DPAPI_UNPROTECT_SCRIPT|assertReadyCustody|secretScalar/u
+    );
+
+    const activationMarker = "const activateAfterCeremony = async";
+    const journalMarker = "await createWindowsBscTestnetPtaWbnbPoolLocalJournal()";
+    const activationIndex = SOURCE.indexOf(activationMarker);
+    const journalIndex = SOURCE.indexOf(journalMarker, activationIndex);
+    const preJournalActivationSource = SOURCE.slice(activationIndex, journalIndex);
+    expect(preJournalActivationSource).toContain(
+      "await assertFixedWindowsBscTestnetPtaWbnbPoolCustodyMetadataForInternalUse()"
+    );
+    expect(preJournalActivationSource).not.toMatch(
+      /probeWindowsBscTestnetDeployerCustody\s*\(|readAndVerifyPinnedArtifacts|readBoundedStableRegularFile|\bopen\s*\(|\.readFile\s*\(|DPAPI_UNPROTECT_SCRIPT|unprotectCurrentUser|unlockBscTestnetDeployerEncryptedStore|secretScalar/u
+    );
+
+    const workerMarker = "export function createBscTestnetPtaWbnbPoolSigningWorkerForInternalUse";
+    const workerIndex = SOURCE.indexOf(workerMarker);
+    const durableStartIndex = SOURCE.indexOf(
+      "await ports.consumeWorkerAuthorization(validated.request)",
+      workerIndex
+    );
+    const custodySignIndex = SOURCE.indexOf(
+      "await ports.signExactTransaction(validated.transaction)",
+      workerIndex
+    );
+    expect(durableStartIndex).toBeGreaterThan(workerIndex);
+    expect(custodySignIndex).toBeGreaterThan(durableStartIndex);
+
+    const nativeSignerMarker = "async function nativeWindowsSignExactPoolTransaction(";
+    const nativeSignerIndex = SOURCE.indexOf(nativeSignerMarker);
+    const nativeSignerEndIndex = SOURCE.indexOf(poolMetadataMarker, nativeSignerIndex);
+    const nativeSignerSource = SOURCE.slice(nativeSignerIndex, nativeSignerEndIndex);
+    expect(nativeSignerSource).toContain("await assertReadyCustody(custody, signal)");
+    expect(nativeSignerSource).toContain("DPAPI_UNPROTECT_SCRIPT");
+    expect(nativeSignerSource).toContain(
+      "await signExactBscTestnetPtaWbnbPoolEncryptedStoreForInternalUse("
+    );
+    expect(SOURCE).toContain("signExactTransaction: nativeWindowsSignExactPoolTransaction");
   });
 
   it("binds broadcast authority to the exact successfully returned worker attestation", () => {
@@ -462,7 +556,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     expect(nativeSource).toContain("nativeActivatedProductionBridges.add(bridge)");
   });
 
-  it("durably starts before signing and refuses a canonical transaction from any other signer", async () => {
+  it("durably starts before custody unlock/sign and refuses a canonical transaction from any other signer", async () => {
     const order: string[] = [];
     const consumeWorkerAuthorization = vi.fn(async () => {
       order.push("durable-start");
@@ -470,7 +564,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     });
     const signExactTransaction = vi.fn(
       async (transaction: BscTestnetPtaWbnbPoolExactSigningTransaction) => {
-        order.push("sign");
+        order.push("custody-unlock-and-sign");
         return privateKeyToAccount(SYNTHETIC_PRIVATE_KEY).signTransaction({
           chainId: 97,
           data: transaction.data,
@@ -501,7 +595,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     await expect(worker.invokeExactSigningWorker(reviewedWorkerRequest())).rejects.toThrow(
       "failed closed"
     );
-    expect(order).toEqual(["durable-start", "sign"]);
+    expect(order).toEqual(["durable-start", "custody-unlock-and-sign"]);
     expect(consumeWorkerAuthorization).toHaveBeenCalledTimes(1);
     expect(signExactTransaction).toHaveBeenCalledTimes(1);
     expect(commitSignedTransaction).not.toHaveBeenCalled();
@@ -511,7 +605,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     const consumeWorkerAuthorization = vi.fn(async () => {
       throw new Error("synthetic ambiguous durable write");
     });
-    const signExactTransaction = vi.fn(async () => "0x" as Hex);
+    const custodyUnlockAndSign = vi.fn(async () => "0x" as Hex);
     const worker = createBscTestnetPtaWbnbPoolSigningWorkerForInternalUse(
       Object.freeze({
         now: () => new Date(NOW),
@@ -519,14 +613,14 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
         consumeWorkerAuthorization,
         commitSignedTransaction: vi.fn(),
         attestExactTransaction: vi.fn(),
-        signExactTransaction
+        signExactTransaction: custodyUnlockAndSign
       })
     );
     const request = reviewedWorkerRequest();
     await expect(worker.invokeExactSigningWorker(request)).rejects.toThrow("failed closed");
     await expect(worker.invokeExactSigningWorker(request)).rejects.toThrow("failed closed");
     expect(consumeWorkerAuthorization).toHaveBeenCalledTimes(1);
-    expect(signExactTransaction).not.toHaveBeenCalled();
+    expect(custodyUnlockAndSign).not.toHaveBeenCalled();
   });
 
   it("rejects non-canonical request key order before any durable or secret action", async () => {

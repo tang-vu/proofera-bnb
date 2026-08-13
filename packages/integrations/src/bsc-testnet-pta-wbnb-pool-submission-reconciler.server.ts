@@ -359,8 +359,20 @@ export interface BscTestnetPtaWbnbPoolProviderReconciliationEvidence {
   readonly chainId: "97";
   readonly transaction: BscTestnetPtaWbnbPoolNormalizedTransaction | null;
   readonly receipt: BscTestnetPtaWbnbPoolNormalizedReceipt | null;
+  /** First finalized-tag observation, taken before the fixed checkpoint proof. */
   readonly reportedFinalizedHead: BscTestnetPtaWbnbPoolNormalizedBlock;
+  /** Second finalized-tag observation, taken before the terminal checkpoint canonicality probe. */
+  readonly recheckedFinalizedHead: BscTestnetPtaWbnbPoolNormalizedBlock;
   readonly commonFinalizedBlock: BscTestnetPtaWbnbPoolNormalizedBlock | null;
+  /** Exact-number re-read of commonFinalizedBlock after the bounded ancestry was collected. */
+  readonly checkpointBlockRecheck: BscTestnetPtaWbnbPoolNormalizedBlock | null;
+  /** Successful EIP-1898 state read proving the fixed checkpoint hash was canonical. */
+  readonly checkpointCanonicalAttestation: Readonly<{
+    method: "eth_getBalance";
+    address: typeof ZERO_ADDRESS;
+    eip1898Block: Readonly<{ blockHash: Hex; requireCanonical: true }>;
+    resultWei: string;
+  }> | null;
   readonly receiptBlockLookup: Readonly<{
     method: "eth_getBlockByNumber";
     requestedBlockNumber: string;
@@ -1567,6 +1579,8 @@ function parseProvider(
 ): BscTestnetPtaWbnbPoolProviderReconciliationEvidence | null {
   const provider = inspectRecord(input, [
     "chainId",
+    "checkpointBlockRecheck",
+    "checkpointCanonicalAttestation",
     "commonFinalizedBlock",
     "origin",
     "postState",
@@ -1574,6 +1588,7 @@ function parseProvider(
     "receiptBlock",
     "receiptBlockLookup",
     "receiptToCommonFinalizedAncestry",
+    "recheckedFinalizedHead",
     "reportedFinalizedHead",
     "transaction"
   ]);
@@ -1586,8 +1601,27 @@ function parseProvider(
       : parseNormalizedTransaction(provider.transaction, capability);
   const receipt = provider.receipt === null ? null : parseReceipt(provider.receipt, capability);
   const reportedFinalizedHead = parseBlock(provider.reportedFinalizedHead);
+  const recheckedFinalizedHead = parseBlock(provider.recheckedFinalizedHead);
   const commonFinalizedBlock =
     provider.commonFinalizedBlock === null ? null : parseBlock(provider.commonFinalizedBlock);
+  const checkpointBlockRecheck =
+    provider.checkpointBlockRecheck === null ? null : parseBlock(provider.checkpointBlockRecheck);
+  const checkpointCanonicalAttestation =
+    provider.checkpointCanonicalAttestation === null
+      ? null
+      : inspectRecord(provider.checkpointCanonicalAttestation, [
+          "address",
+          "eip1898Block",
+          "method",
+          "resultWei"
+        ]);
+  const checkpointCanonicalEip1898Block =
+    checkpointCanonicalAttestation === null
+      ? null
+      : inspectRecord(checkpointCanonicalAttestation.eip1898Block, [
+          "blockHash",
+          "requireCanonical"
+        ]);
   const receiptBlock = provider.receiptBlock === null ? null : parseBlock(provider.receiptBlock);
   const ancestryInput = inspectArray(
     provider.receiptToCommonFinalizedAncestry,
@@ -1609,7 +1643,17 @@ function parseProvider(
     (provider.transaction !== null && transaction === null) ||
     (provider.receipt !== null && receipt === null) ||
     reportedFinalizedHead === null ||
+    recheckedFinalizedHead === null ||
     (provider.commonFinalizedBlock !== null && commonFinalizedBlock === null) ||
+    (provider.checkpointBlockRecheck !== null && checkpointBlockRecheck === null) ||
+    (provider.checkpointCanonicalAttestation !== null &&
+      (checkpointCanonicalAttestation === null ||
+        checkpointCanonicalAttestation.method !== "eth_getBalance" ||
+        checkpointCanonicalAttestation.address !== ZERO_ADDRESS ||
+        checkpointCanonicalEip1898Block === null ||
+        !exactBytes32(checkpointCanonicalEip1898Block.blockHash) ||
+        checkpointCanonicalEip1898Block.requireCanonical !== true ||
+        canonicalUint(checkpointCanonicalAttestation.resultWei) === null)) ||
     (provider.receiptBlock !== null && receiptBlock === null) ||
     ancestry === null ||
     ancestry.some((block) => block === null) ||
@@ -1629,7 +1673,21 @@ function parseProvider(
     transaction,
     receipt,
     reportedFinalizedHead,
+    recheckedFinalizedHead,
     commonFinalizedBlock,
+    checkpointBlockRecheck,
+    checkpointCanonicalAttestation:
+      checkpointCanonicalAttestation === null || checkpointCanonicalEip1898Block === null
+        ? null
+        : Object.freeze({
+            method: "eth_getBalance" as const,
+            address: ZERO_ADDRESS,
+            eip1898Block: Object.freeze({
+              blockHash: checkpointCanonicalEip1898Block.blockHash as Hex,
+              requireCanonical: true as const
+            }),
+            resultWei: checkpointCanonicalAttestation.resultWei as string
+          }),
     receiptBlockLookup:
       receiptBlockLookup === null
         ? null
@@ -1840,27 +1898,59 @@ function reconcileEvidence(
 
   const primaryHead = canonicalUint(primary.reportedFinalizedHead.number);
   const corroboratorHead = canonicalUint(corroborator.reportedFinalizedHead.number);
-  if (primaryHead === null || corroboratorHead === null) {
+  const primaryRecheckedHead = canonicalUint(primary.recheckedFinalizedHead.number);
+  const corroboratorRecheckedHead = canonicalUint(corroborator.recheckedFinalizedHead.number);
+  if (
+    primaryHead === null ||
+    corroboratorHead === null ||
+    primaryRecheckedHead === null ||
+    corroboratorRecheckedHead === null
+  ) {
     return invalidReconciliation(
       "CANONICALITY_INVALID",
       "evidence.providers.reportedFinalizedHead",
-      "Finalized head quantities are invalid.",
+      "Finalized-head sandwich quantities are invalid.",
       capability.transaction.transactionHash
     );
   }
   const observedAtMilliseconds = BigInt(observedAt);
   const primaryHeadTimestamp = canonicalUint(primary.reportedFinalizedHead.timestamp);
   const corroboratorHeadTimestamp = canonicalUint(corroborator.reportedFinalizedHead.timestamp);
+  const primaryRecheckedHeadTimestamp = canonicalUint(primary.recheckedFinalizedHead.timestamp);
+  const corroboratorRecheckedHeadTimestamp = canonicalUint(
+    corroborator.recheckedFinalizedHead.timestamp
+  );
   if (
     primaryHeadTimestamp === null ||
     corroboratorHeadTimestamp === null ||
+    primaryRecheckedHeadTimestamp === null ||
+    corroboratorRecheckedHeadTimestamp === null ||
     primaryHeadTimestamp * 1_000n > observedAtMilliseconds ||
-    corroboratorHeadTimestamp * 1_000n > observedAtMilliseconds
+    corroboratorHeadTimestamp * 1_000n > observedAtMilliseconds ||
+    primaryRecheckedHeadTimestamp * 1_000n > observedAtMilliseconds ||
+    corroboratorRecheckedHeadTimestamp * 1_000n > observedAtMilliseconds
   ) {
     return invalidReconciliation(
       "CANONICALITY_INVALID",
       "evidence.providers.reportedFinalizedHead.timestamp",
-      "Finalized head timestamps are invalid or future-dated.",
+      "Finalized-head sandwich timestamps are invalid or future-dated.",
+      capability.transaction.transactionHash
+    );
+  }
+  if (
+    primaryRecheckedHead < primaryHead ||
+    corroboratorRecheckedHead < corroboratorHead ||
+    primaryRecheckedHeadTimestamp < primaryHeadTimestamp ||
+    corroboratorRecheckedHeadTimestamp < corroboratorHeadTimestamp ||
+    (primaryRecheckedHead === primaryHead &&
+      !sameJson(primary.reportedFinalizedHead, primary.recheckedFinalizedHead)) ||
+    (corroboratorRecheckedHead === corroboratorHead &&
+      !sameJson(corroborator.reportedFinalizedHead, corroborator.recheckedFinalizedHead))
+  ) {
+    return invalidReconciliation(
+      "CANONICALITY_INVALID",
+      "evidence.providers.recheckedFinalizedHead",
+      "The second finalized head regressed or changed at the same block number.",
       capability.transaction.transactionHash
     );
   }
@@ -1883,13 +1973,18 @@ function reconcileEvidence(
       capability.transaction.transactionHash
     );
   }
-  if (primaryHead < expectedCheckpointNumber || corroboratorHead < expectedCheckpointNumber) {
+  if (
+    primaryHead < expectedCheckpointNumber ||
+    corroboratorHead < expectedCheckpointNumber ||
+    primaryRecheckedHead < expectedCheckpointNumber ||
+    corroboratorRecheckedHead < expectedCheckpointNumber
+  ) {
     return pendingReconciliation(
       capability.transaction.transactionHash,
       issue(
         "FINALITY_PENDING",
         "evidence.providers.reportedFinalizedHead",
-        "The fixed receipt-plus-128 checkpoint is not yet below both finalized heads."
+        "The fixed receipt-plus-128 checkpoint is not yet below both finalized-head sandwiches."
       )
     );
   }
@@ -1925,12 +2020,47 @@ function reconcileEvidence(
     (primaryHead === expectedCheckpointNumber &&
       !sameJson(primary.reportedFinalizedHead, primary.commonFinalizedBlock)) ||
     (corroboratorHead === expectedCheckpointNumber &&
-      !sameJson(corroborator.reportedFinalizedHead, corroborator.commonFinalizedBlock))
+      !sameJson(corroborator.reportedFinalizedHead, corroborator.commonFinalizedBlock)) ||
+    (primaryRecheckedHead === expectedCheckpointNumber &&
+      !sameJson(primary.recheckedFinalizedHead, primary.commonFinalizedBlock)) ||
+    (corroboratorRecheckedHead === expectedCheckpointNumber &&
+      !sameJson(corroborator.recheckedFinalizedHead, corroborator.commonFinalizedBlock))
   ) {
     return invalidReconciliation(
       "CANONICALITY_INVALID",
       "evidence.providers.reportedFinalizedHead",
-      "A provider whose finalized head equals the fixed checkpoint did not bind that exact block.",
+      "A finalized-head sandwich endpoint at the fixed checkpoint did not bind that exact block.",
+      capability.transaction.transactionHash
+    );
+  }
+  if (
+    primary.checkpointBlockRecheck === null ||
+    corroborator.checkpointBlockRecheck === null ||
+    !sameJson(primary.commonFinalizedBlock, primary.checkpointBlockRecheck) ||
+    !sameJson(corroborator.commonFinalizedBlock, corroborator.checkpointBlockRecheck) ||
+    !sameJson(primary.checkpointBlockRecheck, corroborator.checkpointBlockRecheck)
+  ) {
+    return invalidReconciliation(
+      "CANONICALITY_INVALID",
+      "evidence.providers.checkpointBlockRecheck",
+      "The fixed checkpoint changed during its exact-number re-read.",
+      capability.transaction.transactionHash
+    );
+  }
+  if (
+    primary.checkpointCanonicalAttestation === null ||
+    corroborator.checkpointCanonicalAttestation === null ||
+    !sameJson(
+      primary.checkpointCanonicalAttestation,
+      corroborator.checkpointCanonicalAttestation
+    ) ||
+    primary.checkpointCanonicalAttestation.eip1898Block.blockHash !==
+      primary.commonFinalizedBlock.hash
+  ) {
+    return invalidReconciliation(
+      "CANONICALITY_INVALID",
+      "evidence.providers.checkpointCanonicalAttestation",
+      "Both fixed providers must attest the agreed checkpoint hash with an EIP-1898 canonical read.",
       capability.transaction.transactionHash
     );
   }
@@ -1938,7 +2068,9 @@ function reconcileEvidence(
   if (
     commonFinalizedTimestamp === null ||
     commonFinalizedTimestamp > primaryHeadTimestamp ||
-    commonFinalizedTimestamp > corroboratorHeadTimestamp
+    commonFinalizedTimestamp > corroboratorHeadTimestamp ||
+    commonFinalizedTimestamp > primaryRecheckedHeadTimestamp ||
+    commonFinalizedTimestamp > corroboratorRecheckedHeadTimestamp
   ) {
     return invalidReconciliation(
       "CANONICALITY_INVALID",

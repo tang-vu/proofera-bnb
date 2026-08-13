@@ -1,6 +1,23 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
+# Phase-zero hashes these exact release sources as Git blobs before loading the TypeScript stack.
+.gitattributes text eol=lf
+package.json text eol=lf
+pnpm-lock.yaml text eol=lf
+packages/integrations/package.json text eol=lf
+packages/integrations/src/bsc-testnet-deployer-custody-core.ts text eol=lf
+packages/integrations/src/bsc-testnet-deployer-custody-windows.server.ts text eol=lf
+packages/integrations/src/bsc-testnet-pta-deployment-envelope.ts text eol=lf
+packages/integrations/src/bsc-testnet-pta-one-shot-worker-protocol.ts text eol=lf
+packages/integrations/src/bsc-testnet-pta-signing-worker.ts text eol=lf
+packages/integrations/src/bsc-testnet-pta-unsigned-transaction.ts text eol=lf
+packages/integrations/src/bsc-testnet-pta-wbnb-pool-*.ts text eol=lf
+scripts/run-bsc-testnet-pta-wbnb-pool-initialization.ts text eol=lf
+scripts/run-bsc-testnet-pta-wbnb-pool-phase-minus-one.ps1 text eol=lf
+scripts/run-bsc-testnet-pta-wbnb-pool-phase0.mjs text eol=lf
+scripts/typescript-extension-loader.mjs text eol=lf
+
 # These files are hashed byte-for-byte by the retained pool-readiness evidence.
 scripts/collect-bsc-testnet-pta-wbnb-pool-readiness.mjs text eol=lf
 scripts/pancake-selector-review/review-lib.mjs text eol=lf

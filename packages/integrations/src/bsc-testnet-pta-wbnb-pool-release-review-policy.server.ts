@@ -434,6 +434,7 @@ function stableLabel(value: unknown): value is string {
 }
 
 function validManifestPath(value: unknown): value is string {
+  if (value === ".gitattributes") return true;
   if (typeof value !== "string" || !SAFE_PATH.test(value) || value.includes("\\")) return false;
   const segments = value.split("/");
   return (

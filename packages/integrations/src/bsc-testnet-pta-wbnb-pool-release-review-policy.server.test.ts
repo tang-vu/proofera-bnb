@@ -45,9 +45,14 @@ function releaseIdentity(): BscTestnetPtaWbnbPoolExactReleaseIdentity {
     nodeVersion: process.version,
     entries: Object.freeze([
       Object.freeze({
-        path: "package.json",
+        path: ".gitattributes",
         byteLength: 815,
         sha256: `0x${"11".repeat(32)}` as Hex
+      }),
+      Object.freeze({
+        path: "package.json",
+        byteLength: 2_048,
+        sha256: `0x${"33".repeat(32)}` as Hex
       }),
       Object.freeze({
         path: "packages/integrations/src/bsc-testnet-pta-wbnb-pool-production-runner.server.ts",

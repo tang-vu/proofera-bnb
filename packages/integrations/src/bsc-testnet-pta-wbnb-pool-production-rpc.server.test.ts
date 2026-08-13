@@ -114,9 +114,18 @@ function finalityBlockHash(number: bigint): Hex {
     : keccak256(stringToHex(`proofera.rpc-test.finality-block.${number.toString()}`));
 }
 
-function reconciliationFetch() {
+interface ReconciliationFetchOptions {
+  readonly checkpointRecheckForkOrigin?: string;
+  readonly canonicalProbeFailureOrigin?: string;
+  readonly recheckedFinalizedNumber?: bigint;
+  readonly recheckedFinalizedHash?: Hex;
+}
+
+function reconciliationFetch(options: ReconciliationFetchOptions = {}) {
   const calls: { origin: string; method: string; params: readonly unknown[] }[] = [];
   const ethCallCounts = new Map<string, number>();
+  const finalizedCounts = new Map<string, number>();
+  const checkpointCounts = new Map<string, number>();
   const uint24 = encodeAbiParameters([{ type: "uint24" }], [500]);
   const int24 = encodeAbiParameters([{ type: "int24" }], [10]);
   const uint128One = encodeAbiParameters([{ type: "uint128" }], [1n]);
@@ -166,10 +175,32 @@ function reconciliationFetch() {
         break;
       case "eth_getBlockByNumber": {
         const requested = request.params[0];
-        const number = requested === "finalized" ? 1_000n : BigInt(String(requested));
+        let number: bigint;
+        let hash: Hex;
+        if (requested === "finalized") {
+          const count = (finalizedCounts.get(origin) ?? 0) + 1;
+          finalizedCounts.set(origin, count);
+          number = count === 1 ? 1_000n : (options.recheckedFinalizedNumber ?? 1_000n);
+          hash =
+            count > 1 && options.recheckedFinalizedHash !== undefined
+              ? options.recheckedFinalizedHash
+              : finalityBlockHash(number);
+        } else {
+          number = BigInt(String(requested));
+          if (number === 228n) {
+            const count = (checkpointCounts.get(origin) ?? 0) + 1;
+            checkpointCounts.set(origin, count);
+            hash =
+              count === 2 && options.checkpointRecheckForkOrigin === origin
+                ? (`0x${"99".repeat(32)}` as Hex)
+                : finalityBlockHash(number);
+          } else {
+            hash = finalityBlockHash(number);
+          }
+        }
         result = {
           number: `0x${number.toString(16)}`,
-          hash: finalityBlockHash(number),
+          hash,
           parentHash: number === 101n ? RECEIPT_BLOCK_HASH : finalityBlockHash(number - 1n),
           timestamp: `0x${(1_786_588_500n + number * 3n).toString(16)}`,
           transactions: number === 100n ? [TRANSACTION_HASH] : []
@@ -226,6 +257,12 @@ function reconciliationFetch() {
         break;
       case "eth_getStorageAt":
         result = ZERO_WORD;
+        break;
+      case "eth_getBalance":
+        if (options.canonicalProbeFailureOrigin === origin) {
+          throw new Error("canonical checkpoint disappeared");
+        }
+        result = "0x0";
         break;
       default:
         throw new Error(`Unexpected method ${request.method}`);
@@ -321,7 +358,18 @@ describe("PTA/WBNB fixed production RPC reconciliation evidence", () => {
 
     for (const provider of [result.primary, result.corroborator]) {
       expect(provider.reportedFinalizedHead.number).toBe("1000");
+      expect(provider.recheckedFinalizedHead).toEqual(provider.reportedFinalizedHead);
       expect(provider.commonFinalizedBlock?.number).toBe("228");
+      expect(provider.checkpointBlockRecheck).toEqual(provider.commonFinalizedBlock);
+      expect(provider.checkpointCanonicalAttestation).toEqual({
+        method: "eth_getBalance",
+        address: ZERO_ADDRESS,
+        eip1898Block: {
+          blockHash: provider.commonFinalizedBlock?.hash,
+          requireCanonical: true
+        },
+        resultWei: "0"
+      });
       expect(provider.receiptToCommonFinalizedAncestry).toHaveLength(128);
       expect(provider.receiptToCommonFinalizedAncestry[0]?.number).toBe("101");
       expect(provider.receiptToCommonFinalizedAncestry.at(-1)?.number).toBe("228");
@@ -334,8 +382,30 @@ describe("PTA/WBNB fixed production RPC reconciliation evidence", () => {
     const exactBlockRequests = calls.filter(
       (call) => call.method === "eth_getBlockByNumber" && call.params[0] !== "finalized"
     );
-    expect(exactBlockRequests.filter((call) => call.params[0] === "0xe4")).toHaveLength(2);
+    expect(exactBlockRequests.filter((call) => call.params[0] === "0xe4")).toHaveLength(4);
     expect(exactBlockRequests.some((call) => call.params[0] === "0x3e8")).toBe(false);
+
+    for (const origin of [
+      BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN,
+      BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN
+    ]) {
+      const providerCalls = calls.filter((call) => call.origin === origin);
+      const finalizedIndexes = providerCalls.flatMap((call, index) =>
+        call.method === "eth_getBlockByNumber" && call.params[0] === "finalized" ? [index] : []
+      );
+      const checkpointIndexes = providerCalls.flatMap((call, index) =>
+        call.method === "eth_getBlockByNumber" && call.params[0] === "0xe4" ? [index] : []
+      );
+      const canonicalProbeIndex = providerCalls.findIndex(
+        (call) => call.method === "eth_getBalance"
+      );
+      expect(finalizedIndexes).toHaveLength(2);
+      expect(checkpointIndexes).toHaveLength(2);
+      expect(finalizedIndexes[0]).toBeLessThan(checkpointIndexes[0] ?? -1);
+      expect(checkpointIndexes[0]).toBeLessThan(checkpointIndexes[1] ?? -1);
+      expect(checkpointIndexes[1]).toBeLessThan(finalizedIndexes[1] ?? -1);
+      expect(finalizedIndexes[1]).toBeLessThan(canonicalProbeIndex);
+    }
 
     const eip1898Reads = calls.filter((call) =>
       ["eth_call", "eth_getTransactionCount", "eth_getCode", "eth_getStorageAt"].includes(
@@ -348,5 +418,52 @@ describe("PTA/WBNB fixed production RPC reconciliation evidence", () => {
       expect(state).toEqual({ blockHash: RECEIPT_BLOCK_HASH, requireCanonical: true });
     }
     expect(calls.some((call) => call.method === "eth_sendRawTransaction")).toBe(false);
+  });
+
+  it("fails closed when the exact checkpoint changes between C1 and C2", async () => {
+    const { calls } = reconciliationFetch({
+      checkpointRecheckForkOrigin: BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN
+    });
+
+    await expect(
+      observeExactBscTestnetPtaWbnbPoolTransactionForInternalUse(TRANSACTION_HASH)
+    ).rejects.toThrow("RPC_FINALITY_CHECKPOINT_CHANGED");
+    expect(calls.some((call) => call.method === "eth_sendRawTransaction")).toBe(false);
+  });
+
+  it("fails closed when the EIP-1898 canonical checkpoint probe fails", async () => {
+    const { calls } = reconciliationFetch({
+      canonicalProbeFailureOrigin: BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN
+    });
+
+    await expect(
+      observeExactBscTestnetPtaWbnbPoolTransactionForInternalUse(TRANSACTION_HASH)
+    ).rejects.toThrow("canonical checkpoint disappeared");
+    expect(calls.some((call) => call.method === "eth_sendRawTransaction")).toBe(false);
+  });
+
+  it("fails closed when the same-number finalized head changes inside the canonical sandwich", async () => {
+    const { calls } = reconciliationFetch({
+      recheckedFinalizedHash: `0x${"98".repeat(32)}` as Hex
+    });
+
+    await expect(
+      observeExactBscTestnetPtaWbnbPoolTransactionForInternalUse(TRANSACTION_HASH)
+    ).rejects.toThrow("RPC_FINALIZED_HEAD_CHANGED");
+    expect(calls.some((call) => call.method === "eth_sendRawTransaction")).toBe(false);
+  });
+
+  it("keeps the checkpoint fixed when the second finalized head advances", async () => {
+    reconciliationFetch({ recheckedFinalizedNumber: 1_001n });
+
+    const result =
+      await observeExactBscTestnetPtaWbnbPoolTransactionForInternalUse(TRANSACTION_HASH);
+
+    for (const provider of [result.primary, result.corroborator]) {
+      expect(provider.reportedFinalizedHead.number).toBe("1000");
+      expect(provider.recheckedFinalizedHead.number).toBe("1001");
+      expect(provider.commonFinalizedBlock?.number).toBe("228");
+      expect(provider.receiptToCommonFinalizedAncestry).toHaveLength(128);
+    }
   });
 });

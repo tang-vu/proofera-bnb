@@ -224,14 +224,16 @@ export interface BscTestnetPtaWbnbPoolProductionAuthorityDependencies {
   readonly now: () => Date;
   readonly releaseTrust: BscTestnetPtaWbnbPoolSigningWorkerReleaseTrust;
   readonly releaseTree: string;
-  readonly authenticateLocalCustodyOwnerCapability: (capability: unknown) => boolean;
+  readonly authenticateLocalCustodyPathAclCapability: (capability: unknown) => boolean;
 }
 
 const AUTHORITY_BOUNDARY = Object.freeze({
   environment: "bsc-testnet" as const,
   chainId: "97" as const,
   operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
-  authorityModel: "windows_current_user_custody_owner_object_capability" as const,
+  authorityModel: "windows_current_user_fixed_custody_path_acl_object_capability" as const,
+  custodyKeyAddressVerifiedBeforeDurableClaim: false as const,
+  custodyUnlockVerifiedBeforeDurableClaim: false as const,
   reviewModel: "owner_designated_release_policy_private_runtime_instantiation" as const,
   cryptographicReviewerIdentityAvailable: false as const,
   ownerMustAcknowledgeExactRuntimeInstantiationDigest: true as const,
@@ -274,7 +276,7 @@ export interface BscTestnetPtaWbnbPoolProductionAuthorityIssuer {
   readonly authorize: (
     descriptor: unknown,
     command: unknown,
-    localCustodyOwnerCapability: unknown
+    localCustodyPathAclCapability: unknown
   ) => BscTestnetPtaWbnbPoolProductionAuthorityResult;
   readonly authenticateAuthorizedIntent: (intent: unknown) => boolean;
   readonly authenticateExecutionCapability: (capability: unknown) => boolean;
@@ -721,6 +723,9 @@ function ownerAuthorizationText(
     "risk.noReplacementOrRebroadcastAfterSubmissionStarted=true",
     "liquidityActionAuthorized=false",
     "noLiquidityWillBeAddedByThisAuthorization=true",
+    "ack.custodyUnlockVerifiedBeforeDurableClaim=false",
+    "ack.custodyKeyAddressVerifiedBeforeDurableClaim=false",
+    "ack.expectedSignerVerifiedOnlyByPostClaimSignedAttestation=true",
     "ack.reviewIdentityIsNotCryptographicallyAuthenticated=true",
     "ack.reviewersDidNotInspectExactRuntimeEnvelope=true",
     "ack.reviewIsNotOwnerTransactionAuthorization=true"
@@ -1004,7 +1009,7 @@ function createBscTestnetPtaWbnbPoolAuthorityIssuer(
   untrustedDependencies: unknown
 ): BscTestnetPtaWbnbPoolProductionAuthorityIssuer {
   const dependencies = inspectRecord(untrustedDependencies, [
-    "authenticateLocalCustodyOwnerCapability",
+    "authenticateLocalCustodyPathAclCapability",
     "now",
     "releaseTree",
     "releaseTrust"
@@ -1013,8 +1018,8 @@ function createBscTestnetPtaWbnbPoolAuthorityIssuer(
     dependencies === null ||
     typeof dependencies.now !== "function" ||
     isProxy(dependencies.now) ||
-    typeof dependencies.authenticateLocalCustodyOwnerCapability !== "function" ||
-    isProxy(dependencies.authenticateLocalCustodyOwnerCapability) ||
+    typeof dependencies.authenticateLocalCustodyPathAclCapability !== "function" ||
+    isProxy(dependencies.authenticateLocalCustodyPathAclCapability) ||
     typeof dependencies.releaseTree !== "string" ||
     !TREE.test(dependencies.releaseTree) ||
     !validReleaseTrust(dependencies.releaseTrust)
@@ -1022,7 +1027,7 @@ function createBscTestnetPtaWbnbPoolAuthorityIssuer(
     const invalid = blocked(
       "CONFIGURATION_INVALID",
       "dependencies",
-      "Production authority requires a clean release and private local custody-owner capability."
+      "Production authority requires a clean release and private fixed-custody path/ACL capability."
     );
     return Object.freeze({
       boundary: AUTHORITY_BOUNDARY,
@@ -1037,7 +1042,7 @@ function createBscTestnetPtaWbnbPoolAuthorityIssuer(
   const release = dependencies.releaseTrust;
   const releaseTree = dependencies.releaseTree;
   const now = dependencies.now as () => Date;
-  const authenticateLocalOwner = dependencies.authenticateLocalCustodyOwnerCapability as (
+  const authenticateLocalPathAcl = dependencies.authenticateLocalCustodyPathAclCapability as (
     capability: unknown
   ) => boolean;
   const authorizedIntents = new WeakSet<object>();
@@ -1061,18 +1066,18 @@ function createBscTestnetPtaWbnbPoolAuthorityIssuer(
   ): BscTestnetPtaWbnbPoolProductionAuthorityResult => {
     const current = captureNow(now);
     if (current === null) return blocked("CLOCK_INVALID", "now", "Authority clock is invalid.");
-    let localOwnerAuthenticated = false;
+    let localPathAclAuthenticated = false;
     try {
-      localOwnerAuthenticated =
-        Reflect.apply(authenticateLocalOwner, undefined, [localCapability]) === true;
+      localPathAclAuthenticated =
+        Reflect.apply(authenticateLocalPathAcl, undefined, [localCapability]) === true;
     } catch {
-      localOwnerAuthenticated = false;
+      localPathAclAuthenticated = false;
     }
-    if (!localOwnerAuthenticated) {
+    if (!localPathAclAuthenticated) {
       return blocked(
-        "LOCAL_OWNER_AUTHENTICATION_FAILED",
-        "localCustodyOwnerCapability",
-        "The current Windows user/custody owner object capability was not authenticated."
+        "LOCAL_CUSTODY_PATH_ACL_AUTHENTICATION_FAILED",
+        "localCustodyPathAclCapability",
+        "The current Windows user's fixed-custody path/ACL object capability was not authenticated."
       );
     }
     if (authorizationIssued) {
@@ -1179,7 +1184,10 @@ function createBscTestnetPtaWbnbPoolAuthorityIssuer(
       releaseCommit: release.releaseCommit,
       runtimeManifestSha256: release.runtimeManifestSha256,
       reviewerApprovalDigest: instantiation.instantiationDigest,
-      ownerIdentity: `windows-current-user-custody-owner:${BSC_TESTNET_PTA_WBNB_POOL_SENDER}`,
+      // This identifies only the OS principal whose path/ACL capability was checked. The expected
+      // signer lives in the transaction; its key/address is verified only by the post-claim signed
+      // attestation after durable worker_started.
+      ownerIdentity: "windows-current-user-fixed-custody-path-acl-holder",
       authorizationTextSha256: command.ownerAuthorizationTextSha256,
       ceremonyNonce: command.ceremonyNonce as Hex,
       signingHash: transaction.signingHash,

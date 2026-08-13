@@ -372,7 +372,15 @@ function providerEvidence(
       logs
     },
     reportedFinalizedHead: finalizedBlock,
+    recheckedFinalizedHead: finalizedBlock,
     commonFinalizedBlock: finalizedBlock,
+    checkpointBlockRecheck: finalizedBlock,
+    checkpointCanonicalAttestation: {
+      method: "eth_getBalance",
+      address: ZERO_ADDRESS,
+      eip1898Block: { blockHash: FINALIZED_BLOCK_HASH, requireCanonical: true },
+      resultWei: "0"
+    },
     receiptBlockLookup: {
       method: "eth_getBlockByNumber",
       requestedBlockNumber: RECEIPT_BLOCK_NUMBER.toString(),
@@ -694,19 +702,27 @@ describe("BSC testnet exact PTA/WBNB submission reconciler", () => {
     expect(observe).not.toHaveBeenCalled();
   });
 
-  it("accepts the fixed receipt-plus-128 checkpoint after finalized heads advance far beyond it", async () => {
+  it("accepts a fixed receipt-plus-128 checkpoint with a canonical sandwich after heads advance", async () => {
     const capability = await submissionCapability();
     const exactEvidence = evidence(capability);
-    const delayedHead = Object.freeze({
+    const delayedFirstHead = Object.freeze({
       number: "500",
-      hash: `0x${"ee".repeat(32)}` as Hex,
-      parentHash: `0x${"dd".repeat(32)}` as Hex,
+      hash: finalityBlockHash(500n),
+      parentHash: finalityBlockHash(499n),
       timestamp: "1786590000",
+      transactionHashes: Object.freeze([] as Hex[])
+    });
+    const delayedSecondHead = Object.freeze({
+      number: "501",
+      hash: finalityBlockHash(501n),
+      parentHash: delayedFirstHead.hash,
+      timestamp: "1786590003",
       transactionHashes: Object.freeze([] as Hex[])
     });
     const extend = (provider: BscTestnetPtaWbnbPoolProviderReconciliationEvidence) => ({
       ...provider,
-      reportedFinalizedHead: delayedHead
+      reportedFinalizedHead: delayedFirstHead,
+      recheckedFinalizedHead: delayedSecondHead
     });
     const extended = {
       ...exactEvidence,
@@ -744,6 +760,71 @@ describe("BSC testnet exact PTA/WBNB submission reconciler", () => {
     ).toMatchObject({ status: "invalid", issue: { code: "CANONICALITY_INVALID" } });
   });
 
+  it("rejects checkpoint forks, missing canonical probes, and finalized-head sandwich races", async () => {
+    const capability = await submissionCapability();
+    const exactEvidence = evidence(capability);
+    const checkpointAttestation = exactEvidence.primary.checkpointCanonicalAttestation;
+    const checkpoint = exactEvidence.primary.commonFinalizedBlock;
+    if (checkpointAttestation === null || checkpoint === null) {
+      throw new Error("Checkpoint fixture missing.");
+    }
+    const forkedCheckpoint = {
+      ...checkpoint,
+      hash: `0x${"91".repeat(32)}` as Hex
+    };
+    const sameNumberHeadRace = {
+      ...exactEvidence.primary.recheckedFinalizedHead,
+      hash: `0x${"92".repeat(32)}` as Hex
+    };
+    const regressAfterProbe = {
+      ...exactEvidence.primary.recheckedFinalizedHead,
+      number: "227",
+      hash: finalityBlockHash(227n),
+      parentHash: finalityBlockHash(226n)
+    };
+    const mutations: readonly BscTestnetPtaWbnbPoolReconciliationEvidence[] = [
+      {
+        ...exactEvidence,
+        primary: { ...exactEvidence.primary, checkpointBlockRecheck: forkedCheckpoint }
+      },
+      {
+        ...exactEvidence,
+        primary: { ...exactEvidence.primary, checkpointCanonicalAttestation: null }
+      },
+      {
+        ...exactEvidence,
+        primary: {
+          ...exactEvidence.primary,
+          checkpointCanonicalAttestation: {
+            ...checkpointAttestation,
+            eip1898Block: {
+              blockHash: `0x${"93".repeat(32)}` as Hex,
+              requireCanonical: true
+            }
+          }
+        }
+      },
+      {
+        ...exactEvidence,
+        primary: { ...exactEvidence.primary, recheckedFinalizedHead: sameNumberHeadRace }
+      },
+      {
+        ...exactEvidence,
+        primary: { ...exactEvidence.primary, recheckedFinalizedHead: regressAfterProbe }
+      }
+    ];
+
+    for (const mutation of mutations) {
+      expect(
+        await reconcileBscTestnetPtaWbnbPoolEvidenceForInternalUse(
+          capability,
+          mutation,
+          new Date(NOW)
+        )
+      ).toMatchObject({ status: "invalid", issue: { code: "CANONICALITY_INVALID" } });
+    }
+  });
+
   it("keeps reconciliation pending until both heads finalize the fixed receipt-plus-128 checkpoint", async () => {
     const capability = await submissionCapability();
     const exactEvidence = evidence(capability);
@@ -756,7 +837,16 @@ describe("BSC testnet exact PTA/WBNB submission reconciler", () => {
         parentHash: finalityBlockHash(226n),
         timestamp: (1_786_588_800n + 127n * 3n).toString()
       },
+      recheckedFinalizedHead: {
+        ...provider.recheckedFinalizedHead,
+        number: "227",
+        hash: finalityBlockHash(227n),
+        parentHash: finalityBlockHash(226n),
+        timestamp: (1_786_588_800n + 127n * 3n).toString()
+      },
       commonFinalizedBlock: null,
+      checkpointBlockRecheck: null,
+      checkpointCanonicalAttestation: null,
       receiptToCommonFinalizedAncestry: [],
       postState: null
     });

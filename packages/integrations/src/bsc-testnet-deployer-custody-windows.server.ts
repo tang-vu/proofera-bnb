@@ -22,6 +22,7 @@ const MAXIMUM_PROTECTED_BLOB_BYTES = 4_096;
 const MAXIMUM_STORE_BYTES = 65_536;
 const PINNED_POWERSHELL_EXECUTABLE =
   "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
+const PINNED_POWERSHELL_BYTES = 455_680;
 const PINNED_POWERSHELL_SHA256 = "9785001b0dcf755eddb8af294a373c0b87b2498660f724e76c4d53f9c217c7a3";
 const POWERSHELL_TIMEOUT_MS = 8_000;
 const SUBPROCESS_CLEANUP_TIMEOUT_MS = 2_000;
@@ -112,6 +113,8 @@ type FileSnapshot = Readonly<{
   ctimeMs: number;
   device: bigint;
   inode: bigint;
+  links: bigint;
+  mode: bigint;
   modifiedMs: number;
   size: number;
 }>;
@@ -149,156 +152,167 @@ export async function runPinnedPowerShellForInternalUse(
   operationTimeoutMs = POWERSHELL_TIMEOUT_MS
 ): Promise<PowerShellResult> {
   if (signal.aborted) throw new CustodyOperationError("operation_failed");
-  return new Promise((resolvePromise, rejectPromise) => {
-    let settled = false;
-    let outputBytes = 0;
-    let errorBytes = 0;
-    let requestedFailure: Exclude<BscTestnetDeployerCustodyUnavailableReason, "closed"> | null =
-      null;
-    let cleanupTimer: NodeJS.Timeout | null = null;
-    const outputChunks: Buffer[] = [];
-    let child;
-    try {
-      child = spawn(
-        PINNED_POWERSHELL_EXECUTABLE,
-        [
-          "-NoLogo",
-          "-NoProfile",
-          "-NonInteractive",
-          "-ExecutionPolicy",
-          "Bypass",
-          "-EncodedCommand",
-          encodePowerShell(script)
-        ],
-        {
-          env: createMinimalPowerShellEnvironment(),
-          shell: false,
-          stdio: ["pipe", "pipe", "pipe"],
-          windowsHide: true
-        }
-      );
-    } catch {
-      rejectPromise(new CustodyOperationError("operation_failed"));
-      return;
-    }
-
-    const clearOutputChunks = () => {
-      for (const chunk of outputChunks) chunk.fill(0);
-      outputChunks.length = 0;
-    };
-    const destroyPipes = () => {
+  await assertPinnedPowerShellExecutableForInternalUse();
+  let result: PowerShellResult;
+  try {
+    result = await new Promise((resolvePromise, rejectPromise) => {
+      let settled = false;
+      let outputBytes = 0;
+      let errorBytes = 0;
+      let requestedFailure: Exclude<BscTestnetDeployerCustodyUnavailableReason, "closed"> | null =
+        null;
+      let cleanupTimer: NodeJS.Timeout | null = null;
+      const outputChunks: Buffer[] = [];
+      let child;
       try {
-        child.stdin.destroy();
+        child = spawn(
+          PINNED_POWERSHELL_EXECUTABLE,
+          [
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-EncodedCommand",
+            encodePowerShell(script)
+          ],
+          {
+            env: createMinimalPowerShellEnvironment(),
+            shell: false,
+            stdio: ["pipe", "pipe", "pipe"],
+            windowsHide: true
+          }
+        );
       } catch {
-        // Best-effort local process cleanup.
-      }
-      try {
-        child.stdout.destroy();
-      } catch {
-        // Best-effort local process cleanup.
-      }
-      try {
-        child.stderr.destroy();
-      } catch {
-        // Best-effort local process cleanup.
-      }
-    };
-    const finishRejected = (
-      reason: Exclude<BscTestnetDeployerCustodyUnavailableReason, "closed">
-    ) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(operationTimer);
-      if (cleanupTimer !== null) clearTimeout(cleanupTimer);
-      signal.removeEventListener("abort", abort);
-      destroyPipes();
-      clearOutputChunks();
-      rejectPromise(new CustodyOperationError(reason));
-    };
-    const requestTermination = (
-      reason: Exclude<BscTestnetDeployerCustodyUnavailableReason, "closed">
-    ) => {
-      if (settled || requestedFailure !== null) return;
-      requestedFailure = reason;
-      destroyPipes();
-      const processId = child.pid;
-      if (processId === undefined) {
-        finishRejected("subprocess_cleanup_unknown");
+        rejectPromise(new CustodyOperationError("operation_failed"));
         return;
       }
-      try {
-        const killer = spawn(SYSTEM_TASKKILL_EXECUTABLE, ["/PID", String(processId), "/T", "/F"], {
-          env: createMinimalPowerShellEnvironment(),
-          shell: false,
-          stdio: "ignore",
-          windowsHide: true
-        });
-        killer.once("error", () => {
+
+      const clearOutputChunks = () => {
+        for (const chunk of outputChunks) chunk.fill(0);
+        outputChunks.length = 0;
+      };
+      const destroyPipes = () => {
+        try {
+          child.stdin.destroy();
+        } catch {
+          // Best-effort local process cleanup.
+        }
+        try {
+          child.stdout.destroy();
+        } catch {
+          // Best-effort local process cleanup.
+        }
+        try {
+          child.stderr.destroy();
+        } catch {
+          // Best-effort local process cleanup.
+        }
+      };
+      const finishRejected = (
+        reason: Exclude<BscTestnetDeployerCustodyUnavailableReason, "closed">
+      ) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(operationTimer);
+        if (cleanupTimer !== null) clearTimeout(cleanupTimer);
+        signal.removeEventListener("abort", abort);
+        destroyPipes();
+        clearOutputChunks();
+        rejectPromise(new CustodyOperationError(reason));
+      };
+      const requestTermination = (
+        reason: Exclude<BscTestnetDeployerCustodyUnavailableReason, "closed">
+      ) => {
+        if (settled || requestedFailure !== null) return;
+        requestedFailure = reason;
+        destroyPipes();
+        const processId = child.pid;
+        if (processId === undefined) {
+          finishRejected("subprocess_cleanup_unknown");
+          return;
+        }
+        try {
+          const killer = spawn(
+            SYSTEM_TASKKILL_EXECUTABLE,
+            ["/PID", String(processId), "/T", "/F"],
+            {
+              env: createMinimalPowerShellEnvironment(),
+              shell: false,
+              stdio: "ignore",
+              windowsHide: true
+            }
+          );
+          killer.once("error", () => {
+            try {
+              child.kill();
+            } catch {
+              // Cleanup watchdog below remains authoritative.
+            }
+          });
+        } catch {
           try {
             child.kill();
           } catch {
             // Cleanup watchdog below remains authoritative.
           }
-        });
-      } catch {
-        try {
-          child.kill();
-        } catch {
-          // Cleanup watchdog below remains authoritative.
         }
-      }
-      cleanupTimer ??= setTimeout(
-        () => finishRejected("subprocess_cleanup_unknown"),
-        SUBPROCESS_CLEANUP_TIMEOUT_MS
+        cleanupTimer ??= setTimeout(
+          () => finishRejected("subprocess_cleanup_unknown"),
+          SUBPROCESS_CLEANUP_TIMEOUT_MS
+        );
+      };
+      const abort = () => requestTermination("operation_failed");
+      const operationTimer = setTimeout(
+        () => requestTermination("operation_failed"),
+        operationTimeoutMs
       );
-    };
-    const abort = () => requestTermination("operation_failed");
-    const operationTimer = setTimeout(
-      () => requestTermination("operation_failed"),
-      operationTimeoutMs
-    );
 
-    signal.addEventListener("abort", abort, { once: true });
-    child.stdout.on("data", (chunk: Buffer) => {
-      if (settled) {
+      signal.addEventListener("abort", abort, { once: true });
+      child.stdout.on("data", (chunk: Buffer) => {
+        if (settled) {
+          chunk.fill(0);
+          return;
+        }
+        outputBytes += chunk.byteLength;
+        if (outputBytes > maximumOutputBytes) {
+          chunk.fill(0);
+          requestTermination("operation_failed");
+          return;
+        }
+        outputChunks.push(chunk);
+      });
+      child.stderr.on("data", (chunk: Buffer) => {
+        errorBytes += chunk.byteLength;
         chunk.fill(0);
-        return;
-      }
-      outputBytes += chunk.byteLength;
-      if (outputBytes > maximumOutputBytes) {
-        chunk.fill(0);
+        if (errorBytes > 4_096) requestTermination("operation_failed");
+      });
+      child.once("error", () => requestTermination("operation_failed"));
+      child.once("close", (code, closeSignal) => {
+        if (settled) return;
+        if (requestedFailure !== null || code !== 0 || closeSignal !== null || errorBytes !== 0) {
+          finishRejected(requestedFailure ?? "operation_failed");
+          return;
+        }
+        settled = true;
+        clearTimeout(operationTimer);
+        if (cleanupTimer !== null) clearTimeout(cleanupTimer);
+        signal.removeEventListener("abort", abort);
+        const output = Buffer.concat(outputChunks, outputBytes);
+        clearOutputChunks();
+        resolvePromise(Object.freeze({ output, status: "ok" as const }));
+      });
+      child.stdin.once("error", () => requestTermination("operation_failed"));
+      try {
+        child.stdin.end(input);
+      } catch {
         requestTermination("operation_failed");
-        return;
       }
-      outputChunks.push(chunk);
     });
-    child.stderr.on("data", (chunk: Buffer) => {
-      errorBytes += chunk.byteLength;
-      chunk.fill(0);
-      if (errorBytes > 4_096) requestTermination("operation_failed");
-    });
-    child.once("error", () => requestTermination("operation_failed"));
-    child.once("close", (code, closeSignal) => {
-      if (settled) return;
-      if (requestedFailure !== null || code !== 0 || closeSignal !== null || errorBytes !== 0) {
-        finishRejected(requestedFailure ?? "operation_failed");
-        return;
-      }
-      settled = true;
-      clearTimeout(operationTimer);
-      if (cleanupTimer !== null) clearTimeout(cleanupTimer);
-      signal.removeEventListener("abort", abort);
-      const output = Buffer.concat(outputChunks, outputBytes);
-      clearOutputChunks();
-      resolvePromise(Object.freeze({ output, status: "ok" as const }));
-    });
-    child.stdin.once("error", () => requestTermination("operation_failed"));
-    try {
-      child.stdin.end(input);
-    } catch {
-      requestTermination("operation_failed");
-    }
-  });
+  } finally {
+    await assertPinnedPowerShellExecutableForInternalUse();
+  }
+  return result;
 }
 
 function snapshot(metadata: BigIntStats): FileSnapshot {
@@ -307,6 +321,8 @@ function snapshot(metadata: BigIntStats): FileSnapshot {
     ctimeMs: Number(metadata.ctimeMs),
     device: metadata.dev,
     inode: metadata.ino,
+    links: metadata.nlink,
+    mode: metadata.mode,
     modifiedMs: Number(metadata.mtimeMs),
     size: Number(metadata.size)
   });
@@ -318,6 +334,8 @@ function sameSnapshot(left: FileSnapshot, right: FileSnapshot): boolean {
     left.ctimeMs === right.ctimeMs &&
     left.device === right.device &&
     left.inode === right.inode &&
+    left.links === right.links &&
+    left.mode === right.mode &&
     left.modifiedMs === right.modifiedMs &&
     left.size === right.size
   );
@@ -354,6 +372,46 @@ async function readBoundedStableRegularFile(
     throw new CustodyOperationError("file_unavailable");
   } finally {
     await handle?.close().catch(() => undefined);
+  }
+}
+
+async function assertPinnedPowerShellExecutableForInternalUse(): Promise<void> {
+  let executableBytes: Buffer | null = null;
+  try {
+    const [beforeMetadata, canonicalBefore] = await Promise.all([
+      lstat(PINNED_POWERSHELL_EXECUTABLE, { bigint: true }),
+      realpath(PINNED_POWERSHELL_EXECUTABLE)
+    ]);
+    if (
+      !beforeMetadata.isFile() ||
+      beforeMetadata.isSymbolicLink() ||
+      beforeMetadata.size !== BigInt(PINNED_POWERSHELL_BYTES) ||
+      !samePath(canonicalBefore, PINNED_POWERSHELL_EXECUTABLE)
+    ) {
+      throw new CustodyOperationError("powershell_integrity_mismatch");
+    }
+    const before = snapshot(beforeMetadata);
+    executableBytes = await readBoundedStableRegularFile(
+      PINNED_POWERSHELL_EXECUTABLE,
+      1_048_576,
+      false
+    );
+    const [afterMetadata, canonicalAfter] = await Promise.all([
+      lstat(PINNED_POWERSHELL_EXECUTABLE, { bigint: true }),
+      realpath(PINNED_POWERSHELL_EXECUTABLE)
+    ]);
+    if (
+      !sameSnapshot(before, snapshot(afterMetadata)) ||
+      !samePath(canonicalAfter, PINNED_POWERSHELL_EXECUTABLE) ||
+      sha256Hex(executableBytes) !== PINNED_POWERSHELL_SHA256
+    ) {
+      throw new CustodyOperationError("powershell_integrity_mismatch");
+    }
+  } catch (error) {
+    if (error instanceof CustodyOperationError) throw error;
+    throw new CustodyOperationError("powershell_integrity_mismatch");
+  } finally {
+    executableBytes?.fill(0);
   }
 }
 
@@ -534,6 +592,39 @@ async function assertFinalCustodyState(
     storeBytes?.fill(0);
   }
 }
+
+/**
+ * Performs only fixed-path, file-kind, realpath, and current-user ACL checks that are safe before a
+ * durable signing claim exists. This probe never opens custody artifacts, invokes DPAPI, or
+ * decrypts/reconstructs custody secret material.
+ */
+export const probeWindowsBscTestnetDeployerCustodyMetadataForInternalUse: InternalCustodyProbeOperation =
+  async (configuration, signal): Promise<InternalCustodyProbeResult> => {
+    if (process.platform !== "win32") {
+      return Object.freeze({
+        reason: "unsupported_platform" as const,
+        status: "unavailable" as const
+      });
+    }
+    try {
+      const paths = await inspectPaths(configuration);
+      await assertExactLocalAcl(configuration, paths, signal);
+      const finalPaths = await inspectPaths(configuration);
+      if (
+        !samePath(finalPaths.executablePath, paths.executablePath) ||
+        !samePath(finalPaths.protectedBlobPath, paths.protectedBlobPath) ||
+        !samePath(finalPaths.storePath, paths.storePath)
+      ) {
+        throw new CustodyOperationError("file_security_invalid");
+      }
+      await assertExactLocalAcl(configuration, finalPaths, signal);
+      return Object.freeze({ status: "ready" as const });
+    } catch (error) {
+      return error instanceof CustodyOperationError
+        ? Object.freeze({ reason: error.reason, status: "unavailable" as const })
+        : Object.freeze({ reason: "operation_failed" as const, status: "unavailable" as const });
+    }
+  };
 
 export const probeWindowsBscTestnetDeployerCustody: InternalCustodyProbeOperation = async (
   configuration,
