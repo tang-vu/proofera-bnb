@@ -19,8 +19,10 @@ node scripts/pancake-initializer-review/generate.mjs --source-root <clean-compil
 node --test scripts/pancake-initializer-review/review.test.mjs
 ```
 
-Use `--write` only to regenerate the canonical evidence intentionally. A local artifact remains
-non-authorizing: it must be published at a stable content-addressed HTTPS/IPFS locator,
-independently re-fetched byte-for-byte, and bound to an authenticated independent review before it
-can satisfy the publication gate. Fresh exact-block preflight, a bounded execution envelope, and
-separate explicit user confirmation also remain mandatory.
+Use `--write` only to regenerate the canonical evidence intentionally. The retained artifact was
+later published without modification at a revision-pinned, digest-named public Gist and separately
+re-fetched byte-for-byte; those later facts are joined through the external publication manifest and
+retrieval receipt so this historical file is not rewritten. The publication records remain
+non-authorizing because no authenticated independent reviewer is bound to the exact public scope.
+Fresh exact-block preflight, a bounded execution envelope, and separate explicit user confirmation
+also remain mandatory.

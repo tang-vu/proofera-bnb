@@ -1,0 +1,65 @@
+{
+  "recordType": "pancake_v3_initializer_selector_publication_manifest_v1",
+  "recordedAt": "2026-08-13T04:56:49.274Z",
+  "status": "publication_and_exact_no_redirect_refetch_complete_reviewer_authentication_missing",
+  "canonicalSourceArtifact": {
+    "path": "evidence/development/pancake-v3-initializer-selector-review-2026-08-13.json",
+    "sourceCommit": "08926dfe69546e897ee2509d905c32a37c9502b7",
+    "gitBlobOidSha1": "72b669a0869bd79f89e8b6e6e4a8efe2508a4cd1",
+    "rawByteLength": 33327,
+    "rawSha256": "2f78e23ba4892194f2e55c99de479c5a5421329cc4cf992ed2253dd5c0512f02",
+    "historicalEmbeddedPublicationState": "The immutable source artifact was generated before publication and therefore still records null publication/retrieval fields. This external manifest records the later event without rewriting the reviewed bytes."
+  },
+  "publicArtifact": {
+    "provider": "GitHub Gist",
+    "gistId": "e983c3801247685472889075c43e263b",
+    "revision": "e26e1462df484725bbfb795a2a23aaebfc44ed9b",
+    "filename": "2f78e23ba4892194f2e55c99de479c5a5421329cc4cf992ed2253dd5c0512f02.json",
+    "locator": "https://gist.githubusercontent.com/tang-vu/e983c3801247685472889075c43e263b/raw/e26e1462df484725bbfb795a2a23aaebfc44ed9b/2f78e23ba4892194f2e55c99de479c5a5421329cc4cf992ed2253dd5c0512f02.json",
+    "publicMetadataObservedWithoutAuthentication": true,
+    "commitPinned": true,
+    "digestNamed": true,
+    "exactBytesObserved": true
+  },
+  "retrievalEvidence": {
+    "path": "evidence/development/pancake-v3-initializer-selector-public-retrieval-2026-08-13.json",
+    "rawSha256": "65e56ff4b5b2109cee954337a820acd33536c3fa5ef1a1ae7da4e2eee8c7301b",
+    "noRedirect": true,
+    "httpStatus": 200,
+    "rawByteLength": 33327,
+    "artifactRawSha256": "2f78e23ba4892194f2e55c99de479c5a5421329cc4cf992ed2253dd5c0512f02",
+    "exactSourceBytesMatched": true
+  },
+  "gateAssessment": {
+    "exactBytesPublishedAtCommitPinnedDigestNamedPublicHttpsLocator": true,
+    "separateUnauthenticatedNoRedirectRefetchMatchedExactBytes": true,
+    "authenticatedIndependentReviewer": null,
+    "authenticatedIndependentReviewVerified": false,
+    "publicationAndRefetchComplete": true,
+    "activationEligible": false,
+    "executionReady": false,
+    "authorizesWalletUse": false,
+    "authorizesSignature": false,
+    "authorizesTransaction": false,
+    "remainingBlocker": "Obtain and retain an authenticated independent reviewer approval bound to the exact public artifact, direct selector 0x13ead562, manager runtime, direct-only scope, denied multicalls, source/compiler/runtime bindings, and mutable-dependency limitations."
+  },
+  "securityBoundary": {
+    "repositoryVisibilityChanged": false,
+    "exactSourceArtifactPublishedToPublicGist": true,
+    "contentBeyondExactSourceArtifactPublished": false,
+    "secretPublished": false,
+    "rpcCalled": false,
+    "walletAccessed": false,
+    "signerAccessed": false,
+    "signatureCreated": false,
+    "transactionConstructed": false,
+    "transactionBroadcast": false,
+    "onchainWritePerformed": false
+  },
+  "limitations": [
+    "Content-addressing and exact retrieval establish the identity of published bytes, not the truth of every analysis claim inside them.",
+    "The commit-pinned Gist can still become unavailable if deleted; this manifest does not claim permanent hosting.",
+    "No authenticated independent reviewer approval is recorded, so this manifest deliberately keeps activation and execution blocked.",
+    "Fresh two-provider state, exact authorization, one-shot journal, isolated signer, broadcast and receipt/post-state reconciliation remain separate requirements before any BSC-testnet write."
+  ]
+}

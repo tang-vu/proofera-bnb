@@ -64,7 +64,7 @@ test("direct-only policy denies multicall absorption and every unlisted selector
   assert.equal(evidence.multicallAbsorptionBoundary.directOnlyPolicyAbsorbsNestedCall, false);
 });
 
-test("publication, independent review, freshness and execution stay blocked", () => {
+test("source artifact retains its historical pre-publication and execution blockers", () => {
   const evidence = verifyCommittedEvidence();
   assert.equal(evidence.publication.activationEligible, false);
   assert.equal(evidence.publication.publicContentAddressedLocator, null);

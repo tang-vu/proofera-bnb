@@ -133,10 +133,22 @@ ProofEra tuple requires native value zero, that it has no deadline, that an alre
 can make the requested price irrelevant, and that every Multicall outer selector and nested
 initializer encoding remains denied.
 
-This is deterministic manual/static analysis support, not formal verification. Its canonical bytes
-exist only in this local repository. There is no stable content-addressed public locator, independent
-no-redirect re-fetch, or authenticated independent reviewer bound to the exact direct-only scope, so
-the artifact remains ineligible for activation and authorizes no signature or transaction.
+This is deterministic manual/static analysis support, not formal verification. Its exact `33,327`
+bytes were later published unchanged as the digest-named file
+[`2f78e23...f02.json`](https://gist.githubusercontent.com/tang-vu/e983c3801247685472889075c43e263b/raw/e26e1462df484725bbfb795a2a23aaebfc44ed9b/2f78e23ba4892194f2e55c99de479c5a5421329cc4cf992ed2253dd5c0512f02.json)
+at a revision-pinned public Gist. The retained
+[retrieval receipt](../evidence/development/pancake-v3-initializer-selector-public-retrieval-2026-08-13.json)
+records a separate unauthenticated HTTPS GET with HTTP `200`, zero redirects, complete length and
+whole-file SHA-256 equality; the
+[publication manifest](../evidence/development/pancake-v3-initializer-selector-publication-manifest-2026-08-13.json)
+joins that later event to the immutable review artifact. The raw endpoint served `text/plain`, which
+is recorded rather than upgraded into an `application/json` claim, even though the exact bytes parse
+as JSON. The Gist can be deleted, so the observation is not a permanent-availability guarantee.
+
+The original review's embedded publication fields remain the historical pre-publication state and
+are not rewritten. No authenticated independent reviewer is yet bound to the exact public
+direct-only scope. Publication and exact re-fetch are therefore complete, but the artifact remains
+ineligible for activation and authorizes no wallet use, signature, or transaction.
 
 ## Server-only non-authorizing preflight boundary
 
@@ -178,7 +190,6 @@ The two write decisions stay separate:
 
 - Refresh all five runtime identities, manager/factory/deployer relationships, fee configuration,
   factory owner, LM controls, pair lookup, nonce, fee, gas, and balance at one fresh finalized block.
-- Publish and independently retrieve the exact initializer selector-path attestation.
 - Obtain an authenticated independent review bound to the exact published initializer scope.
 - Implement and independently review the durable atomic journal, external exact-authorization receipt,
   custody-isolated exact signer, signed-byte persistence, broadcast, and pending/replacement/unknown-
