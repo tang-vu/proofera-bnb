@@ -580,10 +580,10 @@ describe("PTA/WBNB post-claim dual-RPC recheck", () => {
     const productionStart = source.indexOf(
       "export function createBscTestnetPtaWbnbPoolProductionPostClaimRechecker"
     );
-    const testStart = source.indexOf(
-      "export function createBscTestnetPtaWbnbPoolPostClaimRecheckerForTests"
-    );
-    const productionBody = source.slice(productionStart, testStart);
+    const harnessStart = source.indexOf("function createBscTestnetPtaWbnbPoolPostClaimRechecker(");
+    expect(productionStart).toBeGreaterThanOrEqual(0);
+    expect(harnessStart).toBeGreaterThan(productionStart);
+    const productionBody = source.slice(productionStart, harnessStart);
     expect(productionBody).toContain('"PRODUCTION_AUTHORIZATION_UNAVAILABLE"');
     expect(productionBody).not.toMatch(/primaryClient|corroboratorClient|untrustedDependencies/u);
   });

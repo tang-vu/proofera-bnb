@@ -672,7 +672,7 @@ export function createBscTestnetPtaWbnbPoolProductionPostClaimRechecker(): BscTe
 }
 
 /** Read-only deterministic harness. Only this explicitly test-scoped constructor accepts ports. */
-export function createBscTestnetPtaWbnbPoolPostClaimRecheckerForTests(
+function createBscTestnetPtaWbnbPoolPostClaimRechecker(
   untrustedDependencies: unknown
 ): BscTestnetPtaWbnbPoolPostClaimRechecker {
   const dependencies = inspectDependencies(untrustedDependencies);
@@ -1201,4 +1201,17 @@ export function createBscTestnetPtaWbnbPoolPostClaimRecheckerForTests(
       }
     }
   });
+}
+
+/** Internal root-runner seam using only fixed official clients and a private intent brand. */
+export function createBscTestnetPtaWbnbPoolPostClaimRecheckerForInternalUse(
+  untrustedDependencies: unknown
+): BscTestnetPtaWbnbPoolPostClaimRechecker {
+  return createBscTestnetPtaWbnbPoolPostClaimRechecker(untrustedDependencies);
+}
+
+export function createBscTestnetPtaWbnbPoolPostClaimRecheckerForTests(
+  untrustedDependencies: unknown
+): BscTestnetPtaWbnbPoolPostClaimRechecker {
+  return createBscTestnetPtaWbnbPoolPostClaimRechecker(untrustedDependencies);
 }

@@ -766,6 +766,16 @@ async function nativeWindowsSignExactPoolTransaction(
   }
 }
 
+/**
+ * Verifies that the fixed current Windows user owns and can unlock the exact pinned custody. This
+ * creates no signer or signature and returns no path, SID, password, key, or store bytes.
+ */
+export async function assertFixedWindowsBscTestnetPtaWbnbPoolCustodyOwnerForInternalUse(): Promise<void> {
+  if (process.platform !== "win32") throw new PoolSigningWorkerFailure("CUSTODY_UNAVAILABLE");
+  const custody = await resolveFixedLocalAppDataCustody();
+  await assertReadyCustody(custody, new AbortController().signal);
+}
+
 function executePinnedGit(arguments_: readonly string[]): Promise<string> {
   return new Promise((resolvePromise, rejectPromise) => {
     execFile(
@@ -1465,10 +1475,32 @@ export function createBscTestnetPtaWbnbPoolSigningWorkerForInternalUse(
   });
 }
 
-// Reviewed future production building blocks remain deliberately unreachable until a nominal
-// reviewer+owner authority issuer exists. These anchors do not invoke either function.
+// Reviewed cryptographic building blocks remain deliberately unreachable from production in this
+// release. These anchors do not invoke either function.
 void nativeWindowsSignExactPoolTransaction;
 void attestSignedTransaction;
+
+/**
+ * Reviewed native production worker shape. This release deliberately has no production authority
+ * bridge: test/core capabilities can never unlock custody, signing, or a broadcast-capable worker.
+ */
+export function createBscTestnetPtaWbnbPoolProductionWorkerIssuerForInternalUse(): Readonly<{
+  issue: (
+    capability: unknown,
+    journal: Readonly<{
+      consumeWorkerAuthorization: BscTestnetPtaWbnbPoolSigningWorkerPorts["consumeWorkerAuthorization"];
+      commitWorkerSignedTransaction: BscTestnetPtaWbnbPoolSigningWorkerPorts["commitSignedTransaction"];
+    }>
+  ) => BscTestnetPtaWbnbPoolSigningWorker;
+}> {
+  return Object.freeze({
+    issue: (capability, journal) => {
+      void capability;
+      void journal;
+      throw new PoolSigningWorkerFailure("PRODUCTION_AUTHORIZATION_UNAVAILABLE");
+    }
+  });
+}
 
 /** Non-executable production boundary for this release. It accepts no path or transaction. */
 export async function createWindowsBscTestnetPtaWbnbPoolSigningWorker(): Promise<BscTestnetPtaWbnbPoolSigningWorker> {

@@ -148,7 +148,7 @@ export interface BscTestnetPtaWbnbPoolSubmissionCapability {
     corroboratorOrigin: typeof BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN;
     providerAgreementVerified: true;
     canonicalFinalizedBlockVerified: true;
-    eip1898RequireCanonical: true;
+    finalizedAnchorDualProviderExactNumberVerified: true;
     observedAt: string;
     finalizedBlockNumber: string;
     finalizedBlockHash: Hex;
@@ -642,7 +642,7 @@ const PRE_SUBMISSION_KEYS = [
   "candidateNonce",
   "canonicalFinalizedBlockVerified",
   "corroboratorOrigin",
-  "eip1898RequireCanonical",
+  "finalizedAnchorDualProviderExactNumberVerified",
   "factoryPoolForward",
   "factoryPoolReverse",
   "finalizedBlockGasLimit",
@@ -775,11 +775,10 @@ async function validateSubmissionCapability(
     preSubmission.corroboratorOrigin !== BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN ||
     preSubmission.providerAgreementVerified !== true ||
     preSubmission.canonicalFinalizedBlockVerified !== true ||
-    preSubmission.eip1898RequireCanonical !== true ||
+    preSubmission.finalizedAnchorDualProviderExactNumberVerified !== true ||
     preSubmissionObservedAt === null ||
-    preSubmissionObservedAt > authenticatedAt ||
-    authenticatedAt - preSubmissionObservedAt >
-      MAXIMUM_PRE_SUBMISSION_OBSERVATION_AGE_MILLISECONDS ||
+    preSubmissionObservedAt < authenticatedAt ||
+    preSubmissionObservedAt >= expiresAt ||
     finalizedBlockNumber === null ||
     finalizedBlockNumber === 0n ||
     !exactBytes32(preSubmission.finalizedBlockHash) ||
@@ -991,7 +990,7 @@ async function validateSubmissionCapability(
         corroboratorOrigin: BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN,
         providerAgreementVerified: true,
         canonicalFinalizedBlockVerified: true,
-        eip1898RequireCanonical: true,
+        finalizedAnchorDualProviderExactNumberVerified: true,
         observedAt: preSubmission.observedAt as string,
         finalizedBlockNumber: preSubmission.finalizedBlockNumber as string,
         finalizedBlockHash: preSubmission.finalizedBlockHash as Hex,
@@ -1112,6 +1111,34 @@ function submissionStartedRequest(
     submissionStartedDigest: keccak256(
       stringToHex(`${SUBMISSION_STARTED_DIGEST_DOMAIN}\u0000${JSON.stringify(body)}`)
     )
+  });
+}
+
+/** Strictly derives the immutable durable-journal seed from an authenticated capability's bytes. */
+export async function deriveBscTestnetPtaWbnbPoolSubmissionJournalStateForInternalUse(
+  untrustedCapability: unknown,
+  asOf: unknown
+): Promise<BscTestnetPtaWbnbPoolSubmissionJournalState | null> {
+  const milliseconds = strictDateMilliseconds(asOf);
+  if (milliseconds === null) return null;
+  const validated = await validateSubmissionCapability(untrustedCapability, milliseconds, false);
+  if (validated.status === "invalid") return null;
+  const capability = validated.capability;
+  const started = submissionStartedRequest(capability);
+  return Object.freeze({
+    schemaVersion: BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCHEMA_VERSION,
+    operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
+    claimId: capability.claimId,
+    envelopeHash: capability.envelopeHash,
+    releaseCommit: capability.releaseCommit,
+    runtimeManifestSha256: capability.runtimeManifestSha256,
+    reviewerApprovalDigest: capability.reviewerApprovalDigest,
+    ownerAuthorizationDigest: capability.ownerAuthorizationDigest,
+    signingHash: capability.transaction.signingHash,
+    transactionHash: capability.transaction.transactionHash,
+    signedTransactionKeccak256: keccak256(capability.transaction.signedTransaction),
+    submissionStartedDigest: started.submissionStartedDigest,
+    state: "signed_committed" as const
   });
 }
 
@@ -1861,12 +1888,13 @@ function reconcileEvidence(
     (commonFinalizedNumber === receiptNumber &&
       !sameJson(primary.receiptBlock, primary.commonFinalizedBlock)) ||
     (commonFinalizedNumber === receiptNumber + 1n &&
-      primary.commonFinalizedBlock.parentHash !== primary.receiptBlock.hash)
+      primary.commonFinalizedBlock.parentHash !== primary.receiptBlock.hash) ||
+    commonFinalizedNumber > receiptNumber + 1n
   ) {
     return invalidReconciliation(
       "CANONICALITY_INVALID",
       "evidence.providers.receiptBlock",
-      "Receipt block is not linked to the common finalized block at an equal or adjacent height.",
+      "Receipt block lacks an exact equal-height or adjacent parent-hash proof to the common finalized block.",
       capability.transaction.transactionHash
     );
   }
@@ -2088,7 +2116,7 @@ function terminalAckValid(
  * Test-only one-shot composition seam. The caller cannot provide transaction bytes to the returned
  * method. A future durable journal must fsync/O_EXCL `submission_started` before acknowledging it.
  */
-export function createBscTestnetPtaWbnbPoolSubmissionCoreForTests(
+function createBscTestnetPtaWbnbPoolSubmissionCore(
   dependenciesInput: BscTestnetPtaWbnbPoolSubmissionTestDependencies
 ): BscTestnetPtaWbnbPoolSubmissionCore {
   const dependencies = inspectDependencies(dependenciesInput);
@@ -2395,12 +2423,28 @@ export function createBscTestnetPtaWbnbPoolSubmissionCoreForTests(
   });
 }
 
+/**
+ * Internal root-runner seam. Its capability authenticator must be backed by a private WeakSet and
+ * its journal/broadcaster/observer must remain the fixed production implementations.
+ */
+export function createBscTestnetPtaWbnbPoolSubmissionCoreForInternalUse(
+  dependenciesInput: BscTestnetPtaWbnbPoolSubmissionTestDependencies
+): BscTestnetPtaWbnbPoolSubmissionCore {
+  return createBscTestnetPtaWbnbPoolSubmissionCore(dependenciesInput);
+}
+
+export function createBscTestnetPtaWbnbPoolSubmissionCoreForTests(
+  dependenciesInput: BscTestnetPtaWbnbPoolSubmissionTestDependencies
+): BscTestnetPtaWbnbPoolSubmissionCore {
+  return createBscTestnetPtaWbnbPoolSubmissionCore(dependenciesInput);
+}
+
 export class BscTestnetPtaWbnbPoolProductionSubmissionUnavailableError extends Error {
   readonly code = "PRODUCTION_AUTHORIZATION_UNAVAILABLE" as const;
 
   constructor() {
     super(
-      "This release has no production authenticated submission capability issuer, durable submission journal, broadcaster, or reconciler."
+      "Local journal and reconciliation scaffolds exist, but this release has no authenticated, wired executable production submission/broadcast/reconciliation path."
     );
     this.name = "BscTestnetPtaWbnbPoolProductionSubmissionUnavailableError";
   }

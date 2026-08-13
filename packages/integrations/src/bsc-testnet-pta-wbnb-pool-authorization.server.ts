@@ -26,6 +26,8 @@ export const BSC_TESTNET_PTA_WBNB_POOL_REVIEWER_APPROVAL_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.external-reviewer-approval.v1" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_OWNER_AUTHORIZATION_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.owner-envelope-authorization.v1" as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_OWNER_DESIGNATED_REVIEW_APPROVAL_DIGEST_DOMAIN =
+  "proofera.bsc-testnet.pta-wbnb-pool.owner-designated-internal-multi-agent-review.v1" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_REVIEW_ARTIFACT_SHA256 =
   "0x2f78e23ba4892194f2e55c99de479c5a5421329cc4cf992ed2253dd5c0512f02" as const satisfies Hex;
 
@@ -35,23 +37,22 @@ const BOUNDARY = Object.freeze({
   reviewerApprovalMintingExposed: false,
   ownerAuthorizationMintingExposed: false,
   selfSealedDigestAuthenticatesReceipt: false,
-  authenticatedExternalReviewerCapabilityRequired: true,
+  authenticatedReviewerOrOwnerDesignatedInternalCapabilityRequired: true,
+  ownerDesignatedInternalMultiAgentReviewAcceptedWithExplicitLimitations: true,
   authenticatedOwnerEnvelopeAuthorizationRequired: true,
   bothCapabilitiesRequired: true,
   genericSigningAuthorizationPossible: false,
   mainnetAuthorizationPossible: false
 });
 
-export interface BscTestnetPtaWbnbPoolExternalReviewerApprovalBody {
+interface BscTestnetPtaWbnbPoolReviewerApprovalCommonBody {
   readonly schemaVersion: 1;
-  readonly kind: "authenticated_independent_initializer_reviewer_approval_v1";
   readonly decision: "approve_exact_direct_initializer_only";
   readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
   readonly envelopeHash: Hex;
   readonly releaseCommit: string;
   readonly runtimeManifestSha256: Hex;
   readonly reviewerIdentity: string;
-  readonly independence: "independent_from_implementation_owner_and_rpc_rechecker";
   readonly reviewedArtifactSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_REVIEW_ARTIFACT_SHA256;
   readonly manager: typeof BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER;
   readonly selector: typeof BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_SELECTOR;
@@ -61,10 +62,32 @@ export interface BscTestnetPtaWbnbPoolExternalReviewerApprovalBody {
   readonly expiresAt: string;
 }
 
+export interface BscTestnetPtaWbnbPoolExternalReviewerApprovalBody extends BscTestnetPtaWbnbPoolReviewerApprovalCommonBody {
+  readonly kind: "authenticated_independent_initializer_reviewer_approval_v1";
+  readonly independence: "independent_from_implementation_owner_and_rpc_rechecker";
+}
+
+export interface BscTestnetPtaWbnbPoolOwnerDesignatedInternalReviewApprovalBody extends BscTestnetPtaWbnbPoolReviewerApprovalCommonBody {
+  readonly kind: "owner_designated_internal_multi_agent_initializer_review_v1";
+  readonly reviewerModel: "owner_designated_distinct_subagent_review";
+  readonly cryptographicReviewerIdentityAvailable: false;
+  readonly ownerAcknowledgementRequired: true;
+  readonly reviewIsNotTransactionAuthorization: true;
+}
+
 export interface BscTestnetPtaWbnbPoolExternalReviewerApproval extends BscTestnetPtaWbnbPoolExternalReviewerApprovalBody {
   /** Unkeyed body integrity only. Authenticity comes from the injected external-review authority. */
   readonly approvalDigest: Hex;
 }
+
+export interface BscTestnetPtaWbnbPoolOwnerDesignatedInternalReviewApproval extends BscTestnetPtaWbnbPoolOwnerDesignatedInternalReviewApprovalBody {
+  /** Unkeyed integrity only; authenticity is the owner's private designation capability. */
+  readonly approvalDigest: Hex;
+}
+
+export type BscTestnetPtaWbnbPoolReviewerApproval =
+  | BscTestnetPtaWbnbPoolExternalReviewerApproval
+  | BscTestnetPtaWbnbPoolOwnerDesignatedInternalReviewApproval;
 
 export interface BscTestnetPtaWbnbPoolOwnerEnvelopeAuthorizationBody {
   readonly schemaVersion: 1;
@@ -87,6 +110,20 @@ export interface BscTestnetPtaWbnbPoolOwnerEnvelopeAuthorizationBody {
 
 export interface BscTestnetPtaWbnbPoolOwnerEnvelopeAuthorization extends BscTestnetPtaWbnbPoolOwnerEnvelopeAuthorizationBody {
   /** Unkeyed body integrity only. Authenticity comes from the injected owner authority. */
+  readonly authorizationDigest: Hex;
+}
+
+export interface BscTestnetPtaWbnbPoolOwnerSignatureAndBroadcastAuthorizationBody extends Omit<
+  BscTestnetPtaWbnbPoolOwnerEnvelopeAuthorizationBody,
+  "kind" | "decision"
+> {
+  readonly kind: "exact_owner_signature_and_single_broadcast_authorization_v2";
+  readonly decision: "authorize_one_chain_97_pool_initialization_signature_and_single_broadcast";
+  readonly broadcastPolicy: "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity";
+  readonly liquidityActionAuthorized: false;
+}
+
+export interface BscTestnetPtaWbnbPoolOwnerSignatureAndBroadcastAuthorization extends BscTestnetPtaWbnbPoolOwnerSignatureAndBroadcastAuthorizationBody {
   readonly authorizationDigest: Hex;
 }
 
@@ -180,13 +217,12 @@ const REQUIREMENT_KEYS = [
   "journalMustPersistSignedBytesBeforeSubmission",
   "postSubmissionCanonicalReceiptReconciliationRequired"
 ] as const;
-const REVIEWER_BODY_KEYS = [
+const REVIEWER_COMMON_BODY_KEYS = [
   "dataKeccak256",
   "decision",
   "envelopeHash",
   "expectedPool",
   "expiresAt",
-  "independence",
   "kind",
   "manager",
   "operationKey",
@@ -198,7 +234,16 @@ const REVIEWER_BODY_KEYS = [
   "schemaVersion",
   "selector"
 ] as const;
-const REVIEWER_KEYS = [...REVIEWER_BODY_KEYS, "approvalDigest"] as const;
+const EXTERNAL_REVIEWER_BODY_KEYS = [...REVIEWER_COMMON_BODY_KEYS, "independence"] as const;
+const INTERNAL_REVIEWER_BODY_KEYS = [
+  ...REVIEWER_COMMON_BODY_KEYS,
+  "cryptographicReviewerIdentityAvailable",
+  "ownerAcknowledgementRequired",
+  "reviewIsNotTransactionAuthorization",
+  "reviewerModel"
+] as const;
+const EXTERNAL_REVIEWER_KEYS = [...EXTERNAL_REVIEWER_BODY_KEYS, "approvalDigest"] as const;
+const INTERNAL_REVIEWER_KEYS = [...INTERNAL_REVIEWER_BODY_KEYS, "approvalDigest"] as const;
 const OWNER_BODY_KEYS = [
   "authorizationTextSha256",
   "authorizedAt",
@@ -218,6 +263,12 @@ const OWNER_BODY_KEYS = [
   "signingHash"
 ] as const;
 const OWNER_KEYS = [...OWNER_BODY_KEYS, "authorizationDigest"] as const;
+const OWNER_V2_BODY_KEYS = [
+  ...OWNER_BODY_KEYS,
+  "broadcastPolicy",
+  "liquidityActionAuthorized"
+] as const;
+const OWNER_V2_KEYS = [...OWNER_V2_BODY_KEYS, "authorizationDigest"] as const;
 
 function inspectRecord(
   value: unknown,
@@ -351,10 +402,10 @@ function invalidGate(): BscTestnetPtaWbnbPoolAuthorizationGate {
 }
 
 /**
- * Composes two externally authenticated object capabilities. This module validates but cannot mint
+ * Composes two separately authenticated object capabilities. This module validates but cannot mint
  * either receipt; matching self-sealed digests alone never cause an authorization result.
  */
-export function createBscTestnetPtaWbnbPoolAuthorizationGateForTests(
+function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
   untrustedDependencies: unknown
 ): BscTestnetPtaWbnbPoolAuthorizationGate {
   const dependencies = inspectRecord(untrustedDependencies, DEPENDENCY_KEYS, false);
@@ -449,7 +500,20 @@ export function createBscTestnetPtaWbnbPoolAuthorizationGateForTests(
       return blocked("DESCRIPTOR_INVALID", "descriptor.exactBinding", "Transaction is invalid.");
     }
 
-    const reviewer = inspectRecord(reviewerValue, REVIEWER_KEYS);
+    const reviewerKind =
+      reviewerValue !== null && typeof reviewerValue === "object" && !isProxy(reviewerValue)
+        ? Object.getOwnPropertyDescriptor(reviewerValue, "kind")?.value
+        : null;
+    const internalReviewer =
+      reviewerKind === "owner_designated_internal_multi_agent_initializer_review_v1";
+    const reviewerKeys = internalReviewer ? INTERNAL_REVIEWER_KEYS : EXTERNAL_REVIEWER_KEYS;
+    const reviewerBodyKeys = internalReviewer
+      ? INTERNAL_REVIEWER_BODY_KEYS
+      : EXTERNAL_REVIEWER_BODY_KEYS;
+    const reviewerDomain = internalReviewer
+      ? BSC_TESTNET_PTA_WBNB_POOL_OWNER_DESIGNATED_REVIEW_APPROVAL_DIGEST_DOMAIN
+      : BSC_TESTNET_PTA_WBNB_POOL_REVIEWER_APPROVAL_DIGEST_DOMAIN;
+    const reviewer = inspectRecord(reviewerValue, reviewerKeys);
     if (reviewer === null) {
       return blocked(
         "REVIEWER_APPROVAL_INVALID",
@@ -458,8 +522,8 @@ export function createBscTestnetPtaWbnbPoolAuthorizationGateForTests(
       );
     }
     const reviewerBody = inspectRecord(
-      Object.freeze(Object.fromEntries(REVIEWER_BODY_KEYS.map((key) => [key, reviewer[key]]))),
-      REVIEWER_BODY_KEYS
+      Object.freeze(Object.fromEntries(reviewerBodyKeys.map((key) => [key, reviewer[key]]))),
+      reviewerBodyKeys
     );
     const reviewerApprovalDigest = exactHex32(reviewer.approvalDigest);
     const reviewerRuntimeManifest = exactHex32(reviewer.runtimeManifestSha256);
@@ -476,11 +540,19 @@ export function createBscTestnetPtaWbnbPoolAuthorizationGateForTests(
       reviewedAt === null ||
       reviewerExpiry === null ||
       reviewer.schemaVersion !== 1 ||
-      reviewer.kind !== "authenticated_independent_initializer_reviewer_approval_v1" ||
+      (!internalReviewer &&
+        reviewer.kind !== "authenticated_independent_initializer_reviewer_approval_v1") ||
+      (internalReviewer &&
+        (reviewer.kind !== "owner_designated_internal_multi_agent_initializer_review_v1" ||
+          reviewer.reviewerModel !== "owner_designated_distinct_subagent_review" ||
+          reviewer.cryptographicReviewerIdentityAvailable !== false ||
+          reviewer.ownerAcknowledgementRequired !== true ||
+          reviewer.reviewIsNotTransactionAuthorization !== true)) ||
       reviewer.decision !== "approve_exact_direct_initializer_only" ||
       reviewer.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
       reviewer.envelopeHash !== envelopeHash ||
-      reviewer.independence !== "independent_from_implementation_owner_and_rpc_rechecker" ||
+      (!internalReviewer &&
+        reviewer.independence !== "independent_from_implementation_owner_and_rpc_rechecker") ||
       reviewer.reviewedArtifactSha256 !==
         BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_REVIEW_ARTIFACT_SHA256 ||
       reviewer.manager !== BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER ||
@@ -489,12 +561,7 @@ export function createBscTestnetPtaWbnbPoolAuthorizationGateForTests(
       reviewer.expectedPool !== BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE ||
       reviewedAt.milliseconds > now ||
       reviewerExpiry.milliseconds !== descriptorExpiry.milliseconds ||
-      reviewerApprovalDigest !==
-        canonicalBodyDigest(
-          BSC_TESTNET_PTA_WBNB_POOL_REVIEWER_APPROVAL_DIGEST_DOMAIN,
-          reviewerBody,
-          REVIEWER_BODY_KEYS
-        )
+      reviewerApprovalDigest !== canonicalBodyDigest(reviewerDomain, reviewerBody, reviewerBodyKeys)
     ) {
       return blocked(
         "REVIEWER_APPROVAL_INVALID",
@@ -513,11 +580,17 @@ export function createBscTestnetPtaWbnbPoolAuthorizationGateForTests(
       return blocked(
         "REVIEWER_AUTHENTICATION_FAILED",
         "reviewerApproval",
-        "Self-sealed reviewer bytes are not an authenticated external reviewer capability."
+        "Self-sealed reviewer bytes are not an authenticated reviewer/designation capability."
       );
     }
 
-    const owner = inspectRecord(ownerValue, OWNER_KEYS);
+    const ownerKind =
+      ownerValue !== null && typeof ownerValue === "object" && !isProxy(ownerValue)
+        ? Object.getOwnPropertyDescriptor(ownerValue, "kind")?.value
+        : null;
+    const ownerV2 = ownerKind === "exact_owner_signature_and_single_broadcast_authorization_v2";
+    const ownerBodyKeys = ownerV2 ? OWNER_V2_BODY_KEYS : OWNER_BODY_KEYS;
+    const owner = inspectRecord(ownerValue, ownerV2 ? OWNER_V2_KEYS : OWNER_KEYS);
     if (owner === null) {
       return blocked(
         "OWNER_AUTHORIZATION_INVALID",
@@ -526,8 +599,8 @@ export function createBscTestnetPtaWbnbPoolAuthorizationGateForTests(
       );
     }
     const ownerBody = inspectRecord(
-      Object.freeze(Object.fromEntries(OWNER_BODY_KEYS.map((key) => [key, owner[key]]))),
-      OWNER_BODY_KEYS
+      Object.freeze(Object.fromEntries(ownerBodyKeys.map((key) => [key, owner[key]]))),
+      ownerBodyKeys
     );
     const ownerDigest = exactHex32(owner.authorizationDigest);
     const ownerTextDigest = exactHex32(owner.authorizationTextSha256);
@@ -546,8 +619,15 @@ export function createBscTestnetPtaWbnbPoolAuthorizationGateForTests(
       authorizedAt === null ||
       ownerExpiry === null ||
       owner.schemaVersion !== 1 ||
-      owner.kind !== "exact_owner_envelope_authorization_v1" ||
-      owner.decision !== "authorize_one_chain_97_pool_initialization_signature" ||
+      (!ownerV2 && owner.kind !== "exact_owner_envelope_authorization_v1") ||
+      (!ownerV2 && owner.decision !== "authorize_one_chain_97_pool_initialization_signature") ||
+      (ownerV2 &&
+        (owner.kind !== "exact_owner_signature_and_single_broadcast_authorization_v2" ||
+          owner.decision !==
+            "authorize_one_chain_97_pool_initialization_signature_and_single_broadcast" ||
+          owner.broadcastPolicy !==
+            "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity" ||
+          owner.liquidityActionAuthorized !== false)) ||
       owner.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
       owner.envelopeHash !== envelopeHash ||
       owner.reviewerApprovalDigest !== reviewerApprovalDigest ||
@@ -562,7 +642,7 @@ export function createBscTestnetPtaWbnbPoolAuthorizationGateForTests(
         canonicalBodyDigest(
           BSC_TESTNET_PTA_WBNB_POOL_OWNER_AUTHORIZATION_DIGEST_DOMAIN,
           ownerBody,
-          OWNER_BODY_KEYS
+          ownerBodyKeys
         )
     ) {
       return blocked(
@@ -629,6 +709,23 @@ export function createBscTestnetPtaWbnbPoolAuthorizationGateForTests(
       !isProxy(intentValue) &&
       brandedIntents.has(intentValue)
   });
+}
+
+/**
+ * Internal validation seam for deterministic compositions. A future executable runner must retain
+ * both authenticators as private object-capability checks; public JSON and matching digests are
+ * never sufficient. This file is intentionally absent from the package export map.
+ */
+export function createBscTestnetPtaWbnbPoolAuthorizationGateForInternalUse(
+  untrustedDependencies: unknown
+): BscTestnetPtaWbnbPoolAuthorizationGate {
+  return createBscTestnetPtaWbnbPoolAuthorizationGateCore(untrustedDependencies);
+}
+
+export function createBscTestnetPtaWbnbPoolAuthorizationGateForTests(
+  untrustedDependencies: unknown
+): BscTestnetPtaWbnbPoolAuthorizationGate {
+  return createBscTestnetPtaWbnbPoolAuthorizationGateCore(untrustedDependencies);
 }
 
 /**

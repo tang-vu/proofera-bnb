@@ -198,7 +198,7 @@ async function submissionCapability(
       corroboratorOrigin: BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN,
       providerAgreementVerified: true,
       canonicalFinalizedBlockVerified: true,
-      eip1898RequireCanonical: true,
+      finalizedAnchorDualProviderExactNumberVerified: true,
       observedAt: times.authenticatedAt,
       finalizedBlockNumber: "99",
       finalizedBlockHash: `0x${"55".repeat(32)}`,
@@ -1043,6 +1043,39 @@ describe("BSC testnet exact PTA/WBNB submission reconciler", () => {
           commonFinalizedBlock: {
             ...corroboratorCommon,
             parentHash: `0x${"76".repeat(32)}`
+          }
+        }
+      },
+      {
+        ...exactEvidence,
+        primary: {
+          ...exactEvidence.primary,
+          reportedFinalizedHead: {
+            ...primaryCommon,
+            number: "102",
+            hash: `0x${"77".repeat(32)}`,
+            timestamp: "1786588806"
+          },
+          commonFinalizedBlock: {
+            ...primaryCommon,
+            number: "102",
+            hash: `0x${"77".repeat(32)}`,
+            timestamp: "1786588806"
+          }
+        },
+        corroborator: {
+          ...exactEvidence.corroborator,
+          reportedFinalizedHead: {
+            ...corroboratorCommon,
+            number: "102",
+            hash: `0x${"77".repeat(32)}`,
+            timestamp: "1786588806"
+          },
+          commonFinalizedBlock: {
+            ...corroboratorCommon,
+            number: "102",
+            hash: `0x${"77".repeat(32)}`,
+            timestamp: "1786588806"
           }
         }
       }

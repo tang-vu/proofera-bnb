@@ -29,6 +29,13 @@ describe("BSC testnet PTA/WBNB pool preparation package boundary", () => {
       "createProductionBscTestnetPtaWbnbPoolSubmissionCore",
       "createWindowsBscTestnetPtaWbnbPoolLocalJournal",
       "createWindowsBscTestnetPtaWbnbPoolSigningWorker",
+      "createBscTestnetPtaWbnbPoolProductionAuthorityForInternalUse",
+      "createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse",
+      "createBscTestnetPtaWbnbPoolProductionWorkerIssuerForInternalUse",
+      "createWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUse",
+      "acquireBscTestnetPtaWbnbPoolProductionPreSubmissionForInternalUse",
+      "sendExactBscTestnetPtaWbnbPoolRawTransactionOnceForInternalUse",
+      "runBscTestnetPtaWbnbPoolProductionOnceFromStdin",
       "BscTestnetPtaWbnbPoolProductionSubmissionUnavailableError",
       "reconcileBscTestnetPtaWbnbPoolEvidenceForInternalUse"
     ]) {
@@ -36,7 +43,7 @@ describe("BSC testnet PTA/WBNB pool preparation package boundary", () => {
     }
   });
 
-  it("does not publish post-claim or submission modules as package subpaths", async () => {
+  it("does not publish post-claim, production, or submission modules as package subpaths", async () => {
     const packageJson = JSON.parse(
       await readFile(new URL("../package.json", import.meta.url), "utf8")
     ) as { exports?: Record<string, unknown> };
@@ -51,5 +58,19 @@ describe("BSC testnet PTA/WBNB pool preparation package boundary", () => {
     expect(exportTargets).not.toContain(
       "./src/bsc-testnet-pta-wbnb-pool-submission-reconciler.server.ts"
     );
+    for (const forbiddenFragment of [
+      "pool-production-authority",
+      "pool-production-composition",
+      "pool-production-rpc",
+      "pool-production-runner",
+      "pool-submission-journal"
+    ]) {
+      expect(exportKeys.some((value) => value.includes(forbiddenFragment))).toBe(false);
+      expect(
+        exportTargets.some(
+          (value) => typeof value === "string" && value.includes(forbiddenFragment)
+        )
+      ).toBe(false);
+    }
   });
 });

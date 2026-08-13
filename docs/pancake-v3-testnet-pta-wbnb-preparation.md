@@ -263,12 +263,16 @@ index is bound. Success additionally requires exactly the expected factory `Pool
 liquidity and initialized observation state. A reverted receipt is kept distinct and cannot retain
 success logs or pool post-state.
 
-This scaffold does not supply any of those ports in production. Its production factory fails before
-capability, journal, RPC or broadcast access with `PRODUCTION_AUTHORIZATION_UNAVAILABLE`. There is no
-production authenticated submission-capability issuer, durable submission journal, RPC adapter,
-broadcaster or reconciler. No send, transaction receipt, pool or LP position was created. The local
-tests are specification/validation evidence only, and these files are not covered by the old external-
-review request.
+The repository now contains local fixed-official-RPC normalization, a separate append-only durable
+submission journal, authority parsing and an unwired composition for continued review. They do not
+form an executable production path: the production runner, native worker issuer and raw broadcaster
+all fail before custody/sign/send access with `PRODUCTION_AUTHORIZATION_UNAVAILABLE`. Future wiring
+requires a same-process two-phase exact owner challenge, a closure-private one-consume capability
+bound to the exact request and fixed journal, a terminal dual-RPC reread immediately before send,
+restart-first reconciliation for started/unknown outcomes, and a bounded receipt-to-finality ancestry
+proof. No signature, send, transaction receipt, pool or LP position was created. The local tests are
+specification/validation evidence only, and these files are not covered by the old external-review
+request.
 
 ## Separate proposed liquidity envelope
 
@@ -332,5 +336,5 @@ transcript, init-code provenance, initializer review/publication, old request, o
 internal-review decision, earlier selector-path package, PTA deployment evidence, and WBNB source
 record. Passing those tests proves deterministic local consistency only; it neither sends the old
 request, refreshes chain state, authenticates a reviewer identity, nor supplies a signer, owner
-approval, transaction, or receipt. Full repository verification for the prior non-executing milestone
-passed on 2026-08-13; the internal-review lane addition requires a fresh full gate before commit.
+approval, transaction, or receipt. Fresh full repository verification for the current fail-closed
+scaffold and internal-review lane delta passed on 2026-08-13.

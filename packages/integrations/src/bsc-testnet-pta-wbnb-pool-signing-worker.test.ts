@@ -29,6 +29,7 @@ import {
   type BscTestnetPtaWbnbPoolValidatedSigningIntent
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 import {
+  createBscTestnetPtaWbnbPoolProductionWorkerIssuerForInternalUse,
   createBscTestnetPtaWbnbPoolSigningWorkerForInternalUse,
   createWindowsBscTestnetPtaWbnbPoolSigningWorker,
   isBscTestnetPtaWbnbPoolSigningDeadlineCurrentForInternalUse,
@@ -319,6 +320,21 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     expect(factorySource).not.toMatch(
       /createWindowsBscTestnetPtaWbnbPoolLocalJournal|nativeWindowsSignExactPoolTransaction|consumeWorkerAuthorization|commitWorkerSignedTransaction/u
     );
+  });
+
+  it("keeps the native production worker unavailable even with forged capabilities and callbacks", () => {
+    const consumeWorkerAuthorization = vi.fn();
+    const commitWorkerSignedTransaction = vi.fn();
+    const issuer = createBscTestnetPtaWbnbPoolProductionWorkerIssuerForInternalUse();
+
+    expect(() =>
+      issuer.issue(Object.freeze(Object.create(null) as object), {
+        consumeWorkerAuthorization,
+        commitWorkerSignedTransaction
+      })
+    ).toThrow("failed closed");
+    expect(consumeWorkerAuthorization).not.toHaveBeenCalled();
+    expect(commitWorkerSignedTransaction).not.toHaveBeenCalled();
   });
 
   it("durably starts before signing and refuses a canonical transaction from any other signer", async () => {

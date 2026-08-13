@@ -411,7 +411,7 @@ export function createBscTestnetPtaWbnbPoolProductionOneShotSignerCore(): BscTes
  * Dependency-injected protocol harness for deterministic tests and independent review only. signOnce
  * has no transaction arguments. Every ambiguous outcome after claim is terminal and non-retryable.
  */
-export function createBscTestnetPtaWbnbPoolOneShotSignerCoreForTests(
+function createBscTestnetPtaWbnbPoolOneShotSignerCore(
   untrustedDependencies: unknown
 ): BscTestnetPtaWbnbPoolOneShotSignerCore {
   const dependencies = parseDependencies(untrustedDependencies);
@@ -488,14 +488,16 @@ export function createBscTestnetPtaWbnbPoolOneShotSignerCoreForTests(
       );
     }
     if (authorizationExpiry <= firstClock.getTime()) {
-      state = "idle";
-      return blockedBeforeClaim(
-        signerIssue(
-          "AUTHORIZATION_EXPIRED",
-          "authorization",
-          "Exact owner envelope authorization expired before claim."
+      return setTerminal(
+        blockedBeforeClaim(
+          signerIssue(
+            "AUTHORIZATION_EXPIRED",
+            "authorization",
+            "Exact owner envelope authorization expired before claim."
+          ),
+          false
         ),
-        false
+        "terminal_do_not_retry"
       );
     }
 
@@ -836,4 +838,17 @@ export function createBscTestnetPtaWbnbPoolOneShotSignerCoreForTests(
   };
 
   return Object.freeze({ boundary: CORE_BOUNDARY, getState: () => state, signOnce });
+}
+
+/** Internal deterministic composition seam; the production runner remains hard-blocked. */
+export function createBscTestnetPtaWbnbPoolOneShotSignerCoreForInternalUse(
+  untrustedDependencies: unknown
+): BscTestnetPtaWbnbPoolOneShotSignerCore {
+  return createBscTestnetPtaWbnbPoolOneShotSignerCore(untrustedDependencies);
+}
+
+export function createBscTestnetPtaWbnbPoolOneShotSignerCoreForTests(
+  untrustedDependencies: unknown
+): BscTestnetPtaWbnbPoolOneShotSignerCore {
+  return createBscTestnetPtaWbnbPoolOneShotSignerCore(untrustedDependencies);
 }
