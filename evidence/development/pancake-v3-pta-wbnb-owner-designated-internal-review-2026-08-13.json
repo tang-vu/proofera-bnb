@@ -1,0 +1,383 @@
+{
+  "schemaVersion": 1,
+  "recordType": "proofera_owner_designated_internal_multi_agent_technical_review_v1",
+  "status": "owner_designated_internal_technical_review_complete",
+  "lane": {
+    "designation": "repository_owner_designated_distinct_agent_internal_technical_review",
+    "designationSource": "repository-owner instruction in the current collaboration session; not an authenticated external identity assertion",
+    "organizationalIndependenceClaimed": false,
+    "externalReviewClaimed": false,
+    "sigstoreAuthenticationClaimed": false,
+    "authenticatedThirdPartyReviewClaimed": false,
+    "publicReviewerIdentityClaimed": false,
+    "decisionEffect": "closes_only_the_owner_designated_internal_technical_review_gate_for_the_exact_nonexecuting_subject"
+  },
+  "reviewSubject": {
+    "reviewScope": "exact_nonexecuting_one_shot_chain97_pta_wbnb_pool_initialization_scaffold",
+    "release": {
+      "repository": "https://github.com/tang-vu/proofera-bnb.git",
+      "commit": "bc7000eee4d9698e272cc9deb7dda5748b34318b",
+      "parent": "00f21c405881a5dc320bddf3c757ba13599b1e71",
+      "tree": "c63821a1c7b035b0d40221ed8cd6066c69d33041",
+      "commitLocator": "https://github.com/tang-vu/proofera-bnb/commit/bc7000eee4d9698e272cc9deb7dda5748b34318b",
+      "wholeRepositoryTreeBound": true,
+      "subjectFiles": [
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-authorization.server.test.ts",
+          "byteLength": 9684,
+          "gitBlobOidSha1": "17c4c9d4f08cb76ac3bc0718f6d826083e7f6d01",
+          "rawSha256": "0x840ac3be6328576308aedc55fcb6b0dab069dc848b9205e3d774d5315dc9ff72"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-authorization.server.ts",
+          "byteLength": 23181,
+          "gitBlobOidSha1": "41a8208a63c434744dade9bd8ff43fce086bcaf5",
+          "rawSha256": "0x87f30cc2075192b2c347caeedf9ebc1a81ac2198b064e9e3ec011a0a620d8e95"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-coordinator.server.test.ts",
+          "byteLength": 21605,
+          "gitBlobOidSha1": "4b6ae176b37d1be9497098a92212d3f40cdba75b",
+          "rawSha256": "0x3518838512f3b167185ad49ee4591d6fb29f81e5dd09dac1be4ce73fc43f178b"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-coordinator.server.ts",
+          "byteLength": 49197,
+          "gitBlobOidSha1": "2a5935a5a97e162e74fc46be5c13d8c43a030843",
+          "rawSha256": "0x1ed57529391cf923e96944ca0d6b4d3b0f3b519aaeb2e12ebf8bf3952fed5e3d"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-initialization.ts",
+          "byteLength": 7701,
+          "gitBlobOidSha1": "414d1641cf2be10a632357173d6678dd640141fb",
+          "rawSha256": "0x5f8b59ea0cf4a7b4213e12439f111cfe14e2083d89eb464aca571fc6f5925bda"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-local-journal.server.test.ts",
+          "byteLength": 21852,
+          "gitBlobOidSha1": "7c68a87ef249f7139dd5da1552fe2acce66a63b8",
+          "rawSha256": "0xd07646c592478e6c8d5f403edafc711a933d6db94ffddb7c3bc816a395263cd7"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-local-journal.server.ts",
+          "byteLength": 63304,
+          "gitBlobOidSha1": "596dc8b7f285e363a891811ed3397d86279c6d7d",
+          "rawSha256": "0xb13f6d14684e247b10558102152b9611d7224ee4bf964790dba2f950bec69909"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-one-shot-boundary.server.test.ts",
+          "byteLength": 11657,
+          "gitBlobOidSha1": "77a579af4d88c959b139b916a4efa2e5cf7c9dd6",
+          "rawSha256": "0x4d30a62d9a2319e0965710d56c57faa5f11ce6b70db249527aee5aac39ea9941"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-one-shot-boundary.server.ts",
+          "byteLength": 20075,
+          "gitBlobOidSha1": "6977a56ffdf7800441d1776f4ccb9dd3e2194c88",
+          "rawSha256": "0xc7e325e6c5c8e96ee7bcafbde47813a899fc12bb5a3f5a67bb3d44ad6fdca897"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-one-shot-protocol.test.ts",
+          "byteLength": 10757,
+          "gitBlobOidSha1": "c334433c005dda961c1f413c596aa2824a5b2d65",
+          "rawSha256": "0xe832b4beab59ef862e5a93a693664a91a66f73c093658e27029d5d393b5c53fd"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-one-shot-protocol.ts",
+          "byteLength": 46973,
+          "gitBlobOidSha1": "a3930ce38e957bbaa4165503f6d7f930bff8c374",
+          "rawSha256": "0x4a223b5fc09d35a874e9d6087cc1df458963f50643cf641d8a50c5a2f137681f"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-one-shot-signer-core.test.ts",
+          "byteLength": 21510,
+          "gitBlobOidSha1": "57c867a147c2c5301cd99a74a1c5f954e81b086c",
+          "rawSha256": "0xa1073081941f16953767a8173726d23db38a34dc220c0a106e45e88947e70cad"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-one-shot-signer-core.ts",
+          "byteLength": 29340,
+          "gitBlobOidSha1": "83d482936f5a4072078f9cef59e9ef239c9eb358",
+          "rawSha256": "0x14ce2ce7ee8b84a232f191eecfc13a21d509cc120a1603c7a42c06a5957320b1"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-post-claim-recheck.server.test.ts",
+          "byteLength": 22113,
+          "gitBlobOidSha1": "f64c7a733094b341b2d3a214622f307df314814b",
+          "rawSha256": "0x1dc967a354242ada7a691139fda23ad7aa0e81eec21e202eea26563800b20d8f"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-post-claim-recheck.server.ts",
+          "byteLength": 42172,
+          "gitBlobOidSha1": "79c8b5886573fccb75a561da7bd579e8939ec0bb",
+          "rawSha256": "0x9c0e3f92d320dfe9d462557a42c5e7bbfc8c441e937f9ac9578c4ffa111dbf86"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-preparation-package-boundary.test.ts",
+          "byteLength": 2430,
+          "gitBlobOidSha1": "7778f1004f43fda39399da058cffbf3fcb42eba9",
+          "rawSha256": "0x9935877128544e008bbfbc33d325d14b5786a2378d9c30ef41c6f5a5d69ae6cb"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-preparation.server.ts",
+          "byteLength": 478,
+          "gitBlobOidSha1": "254f83f7d2d9c03494dd0e5093237760e34ecfd7",
+          "rawSha256": "0x62a5ad2b86c03995dfa52d7e9a7666d27796540c4a4cff26c5a2a1d1f870bf5d"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-signing-worker.test.ts",
+          "byteLength": 32141,
+          "gitBlobOidSha1": "a52d6ba26dc7b04cdb082f146af06d1807ca8857",
+          "rawSha256": "0x124a3c20b9f7de4672eab32b0f5caaf02df5de3d3fa931d61eb8b80447648870"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-signing-worker.ts",
+          "byteLength": 55254,
+          "gitBlobOidSha1": "c37b91120ee00e58e3541a9319515219f4033769",
+          "rawSha256": "0x235620cb8ecd26df6605a65be690bebc1a7aeed734ee73fa4bf094ebcad315c2"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-submission-reconciler.server.test.ts",
+          "byteLength": 45288,
+          "gitBlobOidSha1": "cbce70c973525e54f256e7187ddaf36ba89d4d13",
+          "rawSha256": "0xe53abc61c908e526f6e03363791e97aa60af4a1c7d1271e6f0491982f4be2e1c"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-submission-reconciler.server.ts",
+          "byteLength": 86900,
+          "gitBlobOidSha1": "704e3f92e99926a9ad66aa5f7423047decb332b0",
+          "rawSha256": "0xcb02f97dae3fff30fcd0f38b67ef364b9174f54adc40ce14d5dbdcafd1e5d512"
+        }
+      ],
+      "contextFiles": [
+        {
+          "path": "README.md",
+          "byteLength": 23867,
+          "gitBlobOidSha1": "17c3290d92e4268ac40865a6d19a6731d806ddc3",
+          "rawSha256": "0x92faca230a9dbb17175d6cc9d600a50e81e9b8f424048a5c0db2975d9f165d97"
+        },
+        {
+          "path": "docs/EXECUTION_PLAN.md",
+          "byteLength": 31371,
+          "gitBlobOidSha1": "2cc407a1908c357ab72a9ee22755a99a72690436",
+          "rawSha256": "0xa81c0b09f0307910ec8da9ecf441df43dc87502092310e3c0094f868253603fb"
+        },
+        {
+          "path": "docs/deployment.md",
+          "byteLength": 23123,
+          "gitBlobOidSha1": "4d28b66d38eccb3bb83995b86fbb03d4222f1a51",
+          "rawSha256": "0x9ed1d5848891347ca93aebaa09e26236d65311e7cd50d226f9c93a869754a06e"
+        },
+        {
+          "path": "docs/pancake-v3-testnet-pta-wbnb-preparation.md",
+          "byteLength": 23094,
+          "gitBlobOidSha1": "a8e04199c946e8f1a1a3ea319ecbfd762fc469d7",
+          "rawSha256": "0x12a64105d34a52260eb6201d40588ad32f959d1af8408e64936266f1de4a9a02"
+        },
+        {
+          "path": "docs/requirements-traceability.md",
+          "byteLength": 36669,
+          "gitBlobOidSha1": "e00416f42af52f891ca5357d9f7b971bbbab45a3",
+          "rawSha256": "0x86726e7c7d180f207a601c7132786e263854fa638aec97cc755cd111995690d9"
+        },
+        {
+          "path": "docs/research.md",
+          "byteLength": 61833,
+          "gitBlobOidSha1": "0ffafd2b267e5be19c1fcf390e2b24755259ced5",
+          "rawSha256": "0x7acf19b362d7cc16d67c55bcf139c9bbb7b5416db1c84465969a6c4644be410a"
+        },
+        {
+          "path": "docs/security.md",
+          "byteLength": 27034,
+          "gitBlobOidSha1": "6729295a80083ce5d9fb66bcb5f1e966a10f418d",
+          "rawSha256": "0xd229d8ef6569f4aa169aba105e1b38fe3e45dfa8382ff94591c9492a2c5181a4"
+        },
+        {
+          "path": "evidence/README.md",
+          "byteLength": 12792,
+          "gitBlobOidSha1": "60102ec009337b45e33c3f1fb7c8ae5e114d983f",
+          "rawSha256": "0x0cf0740e38468a58f6b0bc80e8f1cc73fc4ad6b7f062cee5d8fd3723cd76a04b"
+        },
+        {
+          "path": "evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json",
+          "byteLength": 16722,
+          "gitBlobOidSha1": "0740ff811e40be508bda47fb53eab558a236daa2",
+          "rawSha256": "0x006701223ff9c39a7df2cc6c959346f41bbe6b546a0f75680886d0b87f8f56a8"
+        },
+        {
+          "path": "evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json",
+          "byteLength": 497208,
+          "gitBlobOidSha1": "63d14d2a9cb5183c1a0c0b07a3bdc11912b6de14",
+          "rawSha256": "0xda8f495ac9fa9f5cfc55585d4d1889e4841e48ca317c3492fd5b3c3746ffe13d"
+        },
+        {
+          "path": "evidence/development/pancake-v3-pool-init-code-provenance-2026-08-13.json",
+          "byteLength": 27929,
+          "gitBlobOidSha1": "3dfa8e7d3f6ffbeb792d5b1052a60e80de1043e1",
+          "rawSha256": "0x17511aeb99584d4c03c2a5c7452986a5692296c6bfd5dbed5945937d1ee66084"
+        },
+        {
+          "path": "evidence/development/pancake-v3-pta-wbnb-external-review-request-2026-08-13.json",
+          "byteLength": 25915,
+          "gitBlobOidSha1": "84d73b4a66f8f3e5cf7fad0b35352db8eb30cb21",
+          "rawSha256": "0x22148b3aa1b097789a3fbe3de2a607ec2bd7ad34cead091a87e10b533b3f4c7d"
+        },
+        {
+          "path": "package.json",
+          "byteLength": 2139,
+          "gitBlobOidSha1": "b0e1a841a15768ff79ec23d37c52439d04ef74d3",
+          "rawSha256": "0xc94376325b740e581fbaab29932b7c8b14ed0ef1b80f68d9a5ae507c440dd39f"
+        },
+        {
+          "path": "packages/integrations/package.json",
+          "byteLength": 1208,
+          "gitBlobOidSha1": "7c882e501a3a9806cb5b7ad976592a334e128aef",
+          "rawSha256": "0x195251586fa76af6eaf0e016aa385a105103118063b78e00ebe78c16817e093b"
+        },
+        {
+          "path": "packages/integrations/src/index.ts",
+          "byteLength": 458,
+          "gitBlobOidSha1": "5aa936a346a5d49ca63d810ab23cc249b1bb54e4",
+          "rawSha256": "0x98fb3767cff7a4cfbb0a83be7eace0db6d311274208db705f040f8390d966372"
+        }
+      ]
+    },
+    "exactTransactionScope": {
+      "network": "BNB Smart Chain Testnet",
+      "chainId": 97,
+      "sender": "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49",
+      "nonce": "1",
+      "to": "0x427bF5b37357632377eCbEC9de3626C71A5396c1",
+      "valueWei": "0",
+      "signature": "createAndInitializePoolIfNecessary(address,address,uint24,uint160)",
+      "selector": "0x13ead562",
+      "calldata": "0x13ead5620000000000000000000000004ed64525d6fb06b7da926c683cbd809632c9b4cc000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd00000000000000000000000000000000000000000000000000000000000001f40000000000000000000000000000000000000000004189374bc6a7ef9db22d0e",
+      "calldataByteLength": 132,
+      "calldataKeccak256": "0x31c57c19edeae364d99d6f4fb97c75f81d9b1ec5bd8e6673d9771d9ece53b0d3",
+      "operationKey": "0xe6c943aa33e600bfc1770ee654ee6b00bf6dbcc7cc1702c58bd1caa64dadb9cc",
+      "token0": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc",
+      "token1": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+      "fee": "500",
+      "tickSpacing": "10",
+      "sqrtPriceX96": "79228162514264337593543950",
+      "expectedConditionalPool": "0x30b07e82d7181a53Ae2EA98Cd08b6733Ffd831aE",
+      "maximumTopLevelCalls": 1,
+      "nestedCalldataAllowed": false,
+      "transactionType": "legacy_eip155",
+      "maximumGasEstimate": "5000000",
+      "maximumGasLimit": "6000000",
+      "maximumGasPriceWei": "3000000000",
+      "maximumTotalCostWei": "18000000000000000"
+    }
+  },
+  "reviewSubjectCanonicalSha256": "0x4b05f7ff7f786369e9b039ade6b3d68bb4a073f9016b233ebd52ea91c9ee148b",
+  "reviewers": [
+    {
+      "taskLabel": "/root/pool_reconciler_review",
+      "role": "owner_designated_distinct_read_only_subagent",
+      "subjectImplementationContributor": false,
+      "externalReviewer": false,
+      "thirdPartyIdentityAuthenticated": false,
+      "sigstoreEvidence": null,
+      "decision": "approve_internal_technical_scope_only",
+      "p0Findings": [],
+      "p1Findings": [],
+      "p2Findings": [],
+      "retainedSummary": "The exact-commit final review reported GO with no P0/P1/P2; the complete pool-prefix suite passed 107 tests, the focused reconciler/post-claim/package boundary passed 39 tests, the old request passed 9 tests, and the evidence gate passed 58 tests. The report existed only in the owner-designated collaboration session and is not cryptographic identity evidence."
+    },
+    {
+      "taskLabel": "/root/milestone_final_audit",
+      "role": "owner_designated_distinct_read_only_subagent",
+      "subjectImplementationContributor": false,
+      "externalReviewer": false,
+      "thirdPartyIdentityAuthenticated": false,
+      "sigstoreEvidence": null,
+      "decision": "approve_internal_technical_scope_only",
+      "p0Findings": [],
+      "p1Findings": [],
+      "p2Findings": [
+        "The post-claim test core uses one bounded parallel latest/pending sample without an internal terminal reread; the separate pre-submission snapshot remains mandatory and production is hard-blocked."
+      ],
+      "retainedSummary": "The final milestone audit reported GO after exact artifact, subject, documentation, package-boundary, secret and non-authorizing checks. The report existed only in the owner-designated collaboration session and is not cryptographic identity evidence."
+    }
+  ],
+  "checklist": [
+    {
+      "id": "EXACT_RELEASE",
+      "outcome": "pass",
+      "evidence": "commit_tree_parent_and_all_subject_blob_bindings"
+    },
+    {
+      "id": "EXACT_CHAIN97_CALL",
+      "outcome": "pass",
+      "evidence": "one_fixed_sender_nonce_target_selector_calldata_and_cost_policy"
+    },
+    {
+      "id": "PRODUCTION_FAIL_CLOSED",
+      "outcome": "pass",
+      "evidence": "all_production_authority_signer_worker_recheck_and_submission_entries_unavailable"
+    },
+    {
+      "id": "PACKAGE_BOUNDARY",
+      "outcome": "pass",
+      "evidence": "post_claim_signing_and_submission_modules_not_package_exported"
+    },
+    {
+      "id": "AT_MOST_ONCE",
+      "outcome": "pass",
+      "evidence": "winner_only_submission_started_then_no_resend_or_replacement"
+    },
+    {
+      "id": "FINALIZED_RECONCILIATION",
+      "outcome": "pass",
+      "evidence": "dual_provider_transaction_receipt_logs_and_eip1898_post_state_specified"
+    },
+    {
+      "id": "NO_SECRET_OR_EXECUTION",
+      "outcome": "pass",
+      "evidence": "no_new_custody_rpc_adapter_sign_send_broadcast_or_receipt"
+    },
+    {
+      "id": "SEPARATE_OWNER_APPROVAL",
+      "outcome": "pass",
+      "evidence": "exact_transaction_owner_authorization_remains_absent_and_required"
+    }
+  ],
+  "knownLimitations": [
+    "This is an owner-designated internal multi-agent technical review, not an external review, Sigstore identity proof, authenticated third-party decision, or claim of organizational independence.",
+    "The decision binds only commit bc7000eee4d9698e272cc9deb7dda5748b34318b and the exact nonexecuting chain-97 subject. Any source, transaction, chain, policy, production composition, or execution-release change requires a new decision.",
+    "The post-claim test core observes volatile latest/pending values in one bounded parallel sample; a separate fresh pre-submission snapshot is required. No production adapter exists.",
+    "Local tests and unkeyed hashes establish reproducibility and integrity only. They do not establish reviewer identity, current chain state, transaction authority, or an onchain outcome."
+  ],
+  "authorizationBoundary": {
+    "ownerDesignatedInternalTechnicalReviewSatisfied": true,
+    "externalReviewPerformed": false,
+    "sigstoreEvidencePresent": false,
+    "authenticatedThirdPartyReviewerPresent": false,
+    "exactOwnerTransactionApprovalPresent": false,
+    "productionCompositionPresent": false,
+    "productionActivationEligible": false,
+    "authorizesCustodyAccess": false,
+    "authorizesSigning": false,
+    "authorizesBroadcast": false,
+    "authorizesOnchainWrite": false,
+    "executionReady": false
+  },
+  "executionEvidence": {
+    "walletAccessedByThisLane": false,
+    "secretReadByThisLane": false,
+    "rpcCalledByThisLane": false,
+    "signatureCreatedByThisLane": false,
+    "transactionBroadcastByThisLane": false,
+    "receiptCreatedByThisLane": false,
+    "poolCreatedByThisLane": false,
+    "liquidityCreatedByThisLane": false
+  },
+  "integrity": {
+    "canonicalization": "UTF-8 JSON after recursive lexicographic object-key sorting; array order preserved; no insignificant whitespace",
+    "algorithm": "sha256",
+    "reviewSubjectCanonicalSha256": "0x4b05f7ff7f786369e9b039ade6b3d68bb4a073f9016b233ebd52ea91c9ee148b",
+    "canonicalBodySha256": "0x8c8a4258a38dd04f8d07e0700fcea61075af7a267166069a68d1572fa6c6746d",
+    "authenticationMeaning": "none_unkeyed_integrity_only"
+  }
+}

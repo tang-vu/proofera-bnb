@@ -1,14 +1,18 @@
 # PancakeSwap V3 BSC testnet PTA/WBNB pool readiness
 
 Updated: 2026-08-13. Decision: **exact offline provenance, a non-authorizing read-only
-preflight, an old-scope unsent review request, and production-blocked signing/post-claim/submission/
-reconciliation scaffolds are recorded; no pool or write is approved**.
+preflight, an old-scope unsent request, an owner-designated internal multi-agent technical decision,
+and production-blocked signing/post-claim/submission/reconciliation scaffolds are recorded; no pool
+or write is approved**.
 
 Machine record:
 [`evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json`](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json)
 
 Non-authorizing external-review request:
 [`evidence/development/pancake-v3-pta-wbnb-external-review-request-2026-08-13.json`](../evidence/development/pancake-v3-pta-wbnb-external-review-request-2026-08-13.json)
+
+Owner-designated internal technical-review decision:
+[`evidence/development/pancake-v3-pta-wbnb-owner-designated-internal-review-2026-08-13.json`](../evidence/development/pancake-v3-pta-wbnb-owner-designated-internal-review-2026-08-13.json)
 
 ## Scope
 
@@ -172,12 +176,30 @@ Sigstore verification path would still have to bind a separately provisioned ind
 the exact canonical decision bytes, Fulcio certificate chain, and Rekor inclusion. Unkeyed request
 hashes prove local integrity only. They do not authenticate a reviewer.
 
-The request predates and excludes the post-claim recheck and submission/reconciliation files. Any
-future authenticated approval can close only the independent-review gate for the exact eight-file
-request subject. It cannot review the current or a future activation release, substitute for exact
-owner authorization, or authorize custody access, signing, broadcast, or an onchain write. Activation
-requires a new request and authenticated independent decision pinned to the complete exact release.
-The old request has not been sent, accepted, or approved, and execution readiness remains false.
+The request predates and excludes the post-claim recheck and submission/reconciliation files. It has
+not been sent, accepted, or approved and is not used to claim an external, Sigstore-authenticated, or
+third-party review. It cannot review the later subject, substitute for exact owner authorization, or
+authorize custody access, signing, broadcast, or an onchain write.
+
+## Owner-designated internal multi-agent technical review
+
+For the exact nonexecuting one-shot chain-97 scaffold, the repository owner designated two distinct
+read-only subagent tasks as the internal technical-review lane. The deterministic
+[decision](../evidence/development/pancake-v3-pta-wbnb-owner-designated-internal-review-2026-08-13.json)
+binds commit `bc7000eee4d9698e272cc9deb7dda5748b34318b`, tree
+`c63821a1c7b035b0d40221ed8cd6066c69d33041`, all 21 pool-prefixed source/test files, retained context
+files, and the one fixed sender/nonce/target/calldata/cost tuple. Both task summaries report technical
+approval with no P0/P1; the decision retains the known post-claim parallel-snapshot limitation and
+requires the separate fresh pre-submission snapshot.
+
+This is explicitly an **owner-designated internal multi-agent technical review**. It is not an
+external review, Sigstore verification, authenticated third-party attestation, public reviewer
+identity, or claim of organizational independence. Task labels and unkeyed hashes do not authenticate
+people. The decision closes only its internal technical-review gate for the exact pinned nonexecuting
+subject. It leaves exact owner transaction approval, production authorization/RPC/custody/journal/
+broadcaster/reconciler composition, signing, broadcast, receipt, pool and liquidity false or absent.
+Any implementation, release commit, transaction, chain, policy, or production-composition change
+requires a new owner-designated distinct-agent technical decision.
 
 ## Server-only non-authorizing preflight and signing scaffold
 
@@ -259,9 +281,10 @@ position authority is approved by this document.
 The two write decisions stay separate:
 
 1. Pool initialization requires its own fresh simulation, exact sender/nonce/gas/cost envelope, short
-   broadcast window, implemented and reviewed durable one-shot claim/submission journal, a new
-   authenticated full-release external review, exact owner authorization, production signer/broadcaster/
-   reconciler boundaries, receipt, exact logs, and post-state reconciliation.
+   broadcast window, implemented and reviewed durable one-shot claim/submission journal, a new exact
+   owner-designated distinct-agent technical decision for any changed production release, exact owner
+   authorization, production signer/broadcaster/reconciler boundaries, receipt, exact logs, and
+   post-state reconciliation.
 2. Only after the pool is independently re-reviewed may an LP mint be prepared. It requires separate
    bounded token approvals, explicit ticks/amounts/minima/deadline/slippage, owner/revoke authority,
    simulation, user confirmation, and receipt evidence.
@@ -270,10 +293,10 @@ The two write decisions stay separate:
 
 - Refresh all five runtime identities, manager/factory/deployer relationships, fee configuration,
   factory owner, LM controls, pair lookup, nonce, fee, gas, and balance at one fresh finalized block.
-- Generate a new deterministic request pinning the complete exact activation release, deliver it to a
-  separately provisioned independent reviewer, then verify exact Sigstore identity/signature/
-  transparency-log evidence and decision bindings. The old eight-file unsent request, public Gist and
-  byte-exact re-fetch provide no review for the later post-claim/submission files or current release.
+- Preserve the owner-designated internal decision only for exact commit `bc7000e`. Re-run the
+  deterministic distinct-agent technical-review lane for any changed implementation or production
+  release. Do not describe this lane as external, Sigstore-authenticated or third-party review. The old
+  eight-file unsent request, public Gist and byte-exact re-fetch provide no review for later code.
 - Obtain a distinct exact owner authorization. Neither the request nor a future reviewer decision can
   substitute for it.
 - Provision and independently review production authorization/RPC composition, a durable submission
@@ -290,9 +313,10 @@ The two write decisions stay separate:
 Until those gates close and explorer-verifiable receipts exist, the truthful state remains: PTA and
 WBNB identities are evidenced, the retained pool construction path is reproduced exactly offline,
 and a read-only non-authorizing preflight plus production-blocked signing/post-claim/submission/
-reconciliation scaffolds exist, but **no authenticated full-release review, owner authority,
-production submission path, PTA/WBNB pool, liquidity, oracle, position, Pancake write, or autonomous
-execution is evidenced**.
+reconciliation scaffolds exist. The owner-designated internal technical-review gate is complete only
+for the exact `bc7000e` nonexecuting subject, but **no authenticated external/third-party review is
+claimed and no owner authority, production submission path, PTA/WBNB pool, liquidity, oracle,
+position, Pancake write, or autonomous execution is evidenced**.
 
 The machine record is linked to the retained
 [bounded public-result RPC transcript](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json)
@@ -303,9 +327,10 @@ retained provider equality, selected runtime/scalar state, cross-file integrity 
 boundaries; they do not authenticate a public RPC. It is historical capture evidence, not reusable
 freshness, execution authority or permission to write.
 
-The root `pnpm test:evidence` gate now has 58 offline tests covering the retained pool-readiness
-transcript, init-code provenance, initializer review/publication, deterministic external-review
-request, earlier selector-path package, PTA deployment evidence, and WBNB source record. Passing those
-tests proves deterministic local consistency only; it neither sends the request, refreshes chain
-state, nor supplies a reviewer, signer, approval, transaction, or receipt. Full repository verification
-for this non-executing milestone passed on 2026-08-13.
+The root `pnpm test:evidence` gate now has 68 offline tests covering the retained pool-readiness
+transcript, init-code provenance, initializer review/publication, old request, owner-designated
+internal-review decision, earlier selector-path package, PTA deployment evidence, and WBNB source
+record. Passing those tests proves deterministic local consistency only; it neither sends the old
+request, refreshes chain state, authenticates a reviewer identity, nor supplies a signer, owner
+approval, transaction, or receipt. Full repository verification for the prior non-executing milestone
+passed on 2026-08-13; the internal-review lane addition requires a fresh full gate before commit.
