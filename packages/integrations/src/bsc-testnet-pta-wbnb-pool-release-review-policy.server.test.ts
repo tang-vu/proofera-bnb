@@ -45,7 +45,7 @@ function releaseIdentity(): BscTestnetPtaWbnbPoolExactReleaseIdentity {
     nodeVersion: process.version,
     entries: Object.freeze([
       Object.freeze({
-        path: "packages/integrations/package.json",
+        path: "package.json",
         byteLength: 815,
         sha256: `0x${"11".repeat(32)}` as Hex
       }),

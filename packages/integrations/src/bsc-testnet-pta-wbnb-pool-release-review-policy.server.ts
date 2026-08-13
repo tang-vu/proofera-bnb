@@ -437,7 +437,7 @@ function validManifestPath(value: unknown): value is string {
   if (typeof value !== "string" || !SAFE_PATH.test(value) || value.includes("\\")) return false;
   const segments = value.split("/");
   return (
-    segments.length >= 2 &&
+    segments.length >= 1 &&
     segments.every((segment) => segment !== "" && segment !== "." && segment !== "..") &&
     segments[0] !== ".git"
   );
