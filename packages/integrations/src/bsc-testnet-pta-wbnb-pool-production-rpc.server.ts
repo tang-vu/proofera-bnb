@@ -917,7 +917,6 @@ export async function sendExactBscTestnetPtaWbnbPoolRawTransactionOnceForInterna
 async function providerObservation(
   origin: RpcOrigin,
   transactionHash: Hex,
-  commonBlock: BscTestnetPtaWbnbPoolNormalizedBlock,
   reportedHead: BscTestnetPtaWbnbPoolNormalizedBlock
 ): Promise<BscTestnetPtaWbnbPoolProviderReconciliationEvidence> {
   const [transactionRaw, receiptRaw] = await Promise.all([
@@ -935,6 +934,7 @@ async function providerObservation(
   let receiptBlock: BscTestnetPtaWbnbPoolNormalizedBlock | null = null;
   let receiptBlockLookup: BscTestnetPtaWbnbPoolProviderReconciliationEvidence["receiptBlockLookup"] =
     null;
+  let commonFinalizedBlock: BscTestnetPtaWbnbPoolNormalizedBlock | null = null;
   let retainedPostState: BscTestnetPtaWbnbPoolPostState | null = null;
   let receiptToCommonFinalizedAncestry: readonly BscTestnetPtaWbnbPoolNormalizedAncestryHeader[] =
     Object.freeze([]);
@@ -949,28 +949,39 @@ async function providerObservation(
       exactNumberCanonicalLookup: true as const
     });
     const receiptNumber = BigInt(receipt.blockNumber);
-    const commonNumber = BigInt(commonBlock.number);
-    if (commonNumber >= receiptNumber) {
-      const gap = commonNumber - receiptNumber;
-      if (gap > BigInt(BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_FINALITY_ANCESTRY_BLOCKS)) {
-        throw new Error("RPC_FINALITY_ANCESTRY_LIMIT_EXCEEDED");
-      }
+    const checkpointNumber =
+      receiptNumber + BigInt(BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_FINALITY_ANCESTRY_BLOCKS);
+    if (checkpointNumber > (1n << 256n) - 1n) {
+      throw new Error("RPC_FINALITY_CHECKPOINT_INVALID");
+    }
+    if (BigInt(reportedHead.number) >= checkpointNumber) {
       const rawAncestry = await Promise.all(
-        Array.from({ length: Number(gap) }, (_unused, index) => {
-          const number = receiptNumber + BigInt(index) + 1n;
-          return rpc(origin, "eth_getBlockByNumber", [`0x${number.toString(16)}`, false]);
-        })
+        Array.from(
+          { length: BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_FINALITY_ANCESTRY_BLOCKS },
+          (_unused, index) => {
+            const number = receiptNumber + BigInt(index) + 1n;
+            return rpc(origin, "eth_getBlockByNumber", [`0x${number.toString(16)}`, false]);
+          }
+        )
       );
       const normalizedAncestry = rawAncestry.map((entry) => normalizeAncestryHeader(entry));
       if (normalizedAncestry.some((entry) => entry === null)) {
         throw new Error("RPC_FINALITY_ANCESTRY_INVALID");
       }
+      const checkpointRaw = rawAncestry.at(-1);
+      commonFinalizedBlock = normalizeBlock(checkpointRaw);
+      if (
+        commonFinalizedBlock === null ||
+        BigInt(commonFinalizedBlock.number) !== checkpointNumber
+      ) {
+        throw new Error("RPC_FINALITY_CHECKPOINT_INVALID");
+      }
       receiptToCommonFinalizedAncestry = Object.freeze(
         normalizedAncestry as BscTestnetPtaWbnbPoolNormalizedAncestryHeader[]
       );
-    }
-    if (receipt.status === "1" && BigInt(commonBlock.number) >= BigInt(receipt.blockNumber)) {
-      retainedPostState = await postState(origin, commonBlock);
+      if (receipt.status === "1") {
+        retainedPostState = await postState(origin, receiptBlock);
+      }
     }
   }
   return Object.freeze({
@@ -979,7 +990,7 @@ async function providerObservation(
     transaction,
     receipt,
     reportedFinalizedHead: reportedHead,
-    commonFinalizedBlock: commonBlock,
+    commonFinalizedBlock,
     receiptBlockLookup,
     receiptBlock,
     receiptToCommonFinalizedAncestry,
@@ -995,34 +1006,15 @@ export async function observeExactBscTestnetPtaWbnbPoolTransactionForInternalUse
     commonFinalized(BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN),
     commonFinalized(BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN)
   ]);
-  const commonNumber =
-    primaryHead.rawHeadNumber < corroboratorHead.rawHeadNumber
-      ? primaryHead.rawHeadNumber
-      : corroboratorHead.rawHeadNumber;
-  const commonHex = `0x${commonNumber.toString(16)}` as Hex;
-  const [primaryCommonRaw, corroboratorCommonRaw] = await Promise.all([
-    rpc(BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN, "eth_getBlockByNumber", [commonHex, false]),
-    rpc(BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN, "eth_getBlockByNumber", [
-      commonHex,
-      false
-    ])
-  ]);
-  const primaryCommon = normalizeBlock(primaryCommonRaw);
-  const corroboratorCommon = normalizeBlock(corroboratorCommonRaw);
-  if (primaryCommon === null || corroboratorCommon === null) {
-    throw new Error("RPC_OBSERVATION_INVALID");
-  }
   const [primary, corroborator] = await Promise.all([
     providerObservation(
       BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN,
       transactionHash,
-      primaryCommon,
       primaryHead.head
     ),
     providerObservation(
       BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN,
       transactionHash,
-      corroboratorCommon,
       corroboratorHead.head
     )
   ]);

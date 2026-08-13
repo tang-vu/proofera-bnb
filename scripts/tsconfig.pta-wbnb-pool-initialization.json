@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "viem": ["../packages/integrations/node_modules/viem/_types/index.d.ts"]
+    },
+    "types": ["node"]
+  },
+  "include": ["run-bsc-testnet-pta-wbnb-pool-initialization.ts"]
+}

@@ -87,9 +87,10 @@ export interface BscTestnetPtaWbnbPoolExactSigningTransaction {
 /** Content validated by the authorization server; authenticity is a separate object capability. */
 export interface BscTestnetPtaWbnbPoolAuthorizedSigningIntent extends BscTestnetPtaWbnbPoolReleaseBinding {
   readonly schemaVersion: 1;
-  readonly scope: "authenticated_reviewer_and_owner_exact_pool_initialization";
+  readonly scope: "owner_designated_internal_release_policy_and_exact_owner_pool_initialization";
   readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
   readonly envelopeHash: Hex;
+  /** Legacy wire name: this is a private runtime-policy instantiation digest, not a reviewer signature. */
   readonly reviewerApprovalDigest: Hex;
   readonly ownerAuthorizationDigest: Hex;
   readonly authenticatedAt: string;
@@ -102,6 +103,7 @@ export interface BscTestnetPtaWbnbPoolFreshRecheckCapability extends BscTestnetP
   readonly scope: typeof BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_SCOPE;
   readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
   readonly envelopeHash: Hex;
+  /** Legacy wire name: this is a private runtime-policy instantiation digest, not a reviewer signature. */
   readonly reviewerApprovalDigest: Hex;
   readonly ownerAuthorizationDigest: Hex;
   readonly claimId: string;
@@ -136,6 +138,7 @@ export interface BscTestnetPtaWbnbPoolFreshRecheckCapability extends BscTestnetP
 export interface BscTestnetPtaWbnbPoolValidatedSigningIntent extends BscTestnetPtaWbnbPoolReleaseBinding {
   readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
   readonly envelopeHash: Hex;
+  /** Legacy wire name: this is a private runtime-policy instantiation digest, not a reviewer signature. */
   readonly reviewerApprovalDigest: Hex;
   readonly ownerAuthorizationDigest: Hex;
   readonly claimId: string;
@@ -154,6 +157,7 @@ export interface BscTestnetPtaWbnbPoolSigningWorkerRequest extends BscTestnetPta
   readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
   readonly claimId: string;
   readonly journalClaimToken: Hex;
+  /** Legacy wire name: this is a private runtime-policy instantiation digest, not a reviewer signature. */
   readonly reviewerApprovalDigest: Hex;
   readonly ownerAuthorizationDigest: Hex;
   readonly authenticatedAt: string;
@@ -672,7 +676,7 @@ export function parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse(
     authenticatedAt === null ||
     expiresAt === null ||
     root.schemaVersion !== 1 ||
-    root.scope !== "authenticated_reviewer_and_owner_exact_pool_initialization" ||
+    root.scope !== "owner_designated_internal_release_policy_and_exact_owner_pool_initialization" ||
     root.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
     transaction.sourceEnvelopeHash !== envelopeHash ||
     authenticatedAt.milliseconds >= expiresAt.milliseconds ||
@@ -683,7 +687,7 @@ export function parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse(
   }
   return Object.freeze({
     schemaVersion: 1,
-    scope: "authenticated_reviewer_and_owner_exact_pool_initialization",
+    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_initialization",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash,
     reviewerApprovalDigest,

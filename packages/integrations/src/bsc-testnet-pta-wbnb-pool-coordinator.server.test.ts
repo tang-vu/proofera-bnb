@@ -5,6 +5,12 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 
 import {
+  EIP1967_ADMIN_SLOT,
+  EIP1967_BEACON_SLOT,
+  EIP1967_IMPLEMENTATION_SLOT
+} from "@proofera/domain";
+
+import {
   coordinateBscTestnetPtaWbnbPoolInitializationForTests,
   inspectBscTestnetPtaWbnbPoolRpcResponseForTests,
   type BscTestnetPtaWbnbPoolCoordinatorTestOptions,
@@ -18,6 +24,11 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_KECCAK256
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
+
+const COORDINATOR_SOURCE = readFileSync(
+  new URL("./bsc-testnet-pta-wbnb-pool-coordinator.server.ts", import.meta.url),
+  "utf8"
+);
 
 const TRANSCRIPT = JSON.parse(
   readFileSync(
@@ -237,6 +248,13 @@ function run(primaryChanges: FakeChanges = {}, corroboratorChanges: FakeChanges 
 }
 
 describe("BSC testnet PTA/WBNB pool coordinator", () => {
+  it("keeps the exact EIP-1967 slots local without evaluating the domain barrel", () => {
+    expect(COORDINATOR_SOURCE).not.toMatch(/from\s+["']@proofera\/domain["']/u);
+    expect(COORDINATOR_SOURCE).toContain(`"${EIP1967_IMPLEMENTATION_SLOT}" as const`);
+    expect(COORDINATOR_SOURCE).toContain(`"${EIP1967_ADMIN_SLOT}" as const`);
+    expect(COORDINATOR_SOURCE).toContain(`"${EIP1967_BEACON_SLOT}" as const`);
+  });
+
   it("constructs only the exact zero-value, nonce-one, non-authorizing envelope", async () => {
     const execution = run({}, { finalizedHeight: COMMON_BLOCK_NUMBER + 3n });
     const result = await execution.result;

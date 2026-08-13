@@ -66,8 +66,12 @@ const OWNER_DIGEST = `0x${"33".repeat(32)}` as Hex;
 const MANIFEST_DIGEST = `0x${"44".repeat(32)}` as Hex;
 const RECEIPT_BLOCK_HASH = `0x${"aa".repeat(32)}` as Hex;
 const RECEIPT_PARENT_HASH = `0x${"bb".repeat(32)}` as Hex;
-const FINALIZED_BLOCK_HASH = `0x${"cc".repeat(32)}` as Hex;
-const FINALIZED_PARENT_HASH = RECEIPT_BLOCK_HASH;
+const RECEIPT_BLOCK_NUMBER = 100n;
+const FINALITY_CHECKPOINT_BLOCK_NUMBER = RECEIPT_BLOCK_NUMBER + 128n;
+const finalityBlockHash = (number: bigint): Hex =>
+  keccak256(stringToHex(`proofera.test.finality-block.${number.toString()}`));
+const FINALIZED_BLOCK_HASH = finalityBlockHash(FINALITY_CHECKPOINT_BLOCK_NUMBER);
+const FINALIZED_PARENT_HASH = finalityBlockHash(FINALITY_CHECKPOINT_BLOCK_NUMBER - 1n);
 const ZERO_WORD = `0x${"00".repeat(32)}` as Hex;
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const POOL_CREATED_DATA = encodeAbiParameters(
@@ -240,7 +244,7 @@ async function submissionCapability(
 
 function postState(): BscTestnetPtaWbnbPoolPostState {
   return {
-    eip1898Block: { blockHash: FINALIZED_BLOCK_HASH, requireCanonical: true },
+    eip1898Block: { blockHash: RECEIPT_BLOCK_HASH, requireCanonical: true },
     factoryPoolForward: BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE,
     factoryPoolReverse: BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE,
     poolAccountNonce: "1",
@@ -287,17 +291,26 @@ function providerEvidence(
 ): BscTestnetPtaWbnbPoolProviderReconciliationEvidence {
   const transactionHash = capability.transaction.transactionHash;
   const receiptBlock = {
-    number: "100",
+    number: RECEIPT_BLOCK_NUMBER.toString(),
     hash: RECEIPT_BLOCK_HASH,
     parentHash: RECEIPT_PARENT_HASH,
     timestamp: "1786588800",
     transactionHashes: [transactionHash]
   } as const;
+  const ancestry = Array.from({ length: 128 }, (_unused, index) => {
+    const number = RECEIPT_BLOCK_NUMBER + BigInt(index) + 1n;
+    return Object.freeze({
+      number: number.toString(),
+      hash: finalityBlockHash(number),
+      parentHash: index === 0 ? RECEIPT_BLOCK_HASH : finalityBlockHash(number - 1n),
+      timestamp: (1_786_588_800n + BigInt(index + 1) * 3n).toString()
+    });
+  });
   const finalizedBlock = {
-    number: "101",
+    number: FINALITY_CHECKPOINT_BLOCK_NUMBER.toString(),
     hash: FINALIZED_BLOCK_HASH,
     parentHash: FINALIZED_PARENT_HASH,
-    timestamp: "1786588803",
+    timestamp: (1_786_588_800n + 128n * 3n).toString(),
     transactionHashes: []
   } as const;
   const logs = [
@@ -306,7 +319,7 @@ function providerEvidence(
       topics: [BSC_TESTNET_PTA_WBNB_POOL_CREATED_TOPIC, TOKEN0_TOPIC, TOKEN1_TOPIC, FEE_TOPIC],
       data: POOL_CREATED_DATA,
       blockHash: RECEIPT_BLOCK_HASH,
-      blockNumber: "100",
+      blockNumber: RECEIPT_BLOCK_NUMBER.toString(),
       transactionHash,
       transactionIndex: "0",
       logIndex: "3",
@@ -317,7 +330,7 @@ function providerEvidence(
       topics: [BSC_TESTNET_PTA_WBNB_POOL_INITIALIZE_TOPIC],
       data: INITIALIZE_DATA,
       blockHash: RECEIPT_BLOCK_HASH,
-      blockNumber: "100",
+      blockNumber: RECEIPT_BLOCK_NUMBER.toString(),
       transactionHash,
       transactionIndex: "0",
       logIndex: "4",
@@ -339,7 +352,7 @@ function providerEvidence(
       gasPriceWei: capability.transaction.gasPriceWei,
       input: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
       blockHash: RECEIPT_BLOCK_HASH,
-      blockNumber: "100",
+      blockNumber: RECEIPT_BLOCK_NUMBER.toString(),
       transactionIndex: "0"
     },
     receipt: {
@@ -362,19 +375,12 @@ function providerEvidence(
     commonFinalizedBlock: finalizedBlock,
     receiptBlockLookup: {
       method: "eth_getBlockByNumber",
-      requestedBlockNumber: "100",
+      requestedBlockNumber: RECEIPT_BLOCK_NUMBER.toString(),
       includeFullTransactions: false,
       exactNumberCanonicalLookup: true
     },
     receiptBlock,
-    receiptToCommonFinalizedAncestry: [
-      {
-        number: finalizedBlock.number,
-        hash: finalizedBlock.hash,
-        parentHash: finalizedBlock.parentHash,
-        timestamp: finalizedBlock.timestamp
-      }
-    ],
+    receiptToCommonFinalizedAncestry: ancestry,
     postState: state
   };
 }
@@ -688,48 +694,19 @@ describe("BSC testnet exact PTA/WBNB submission reconciler", () => {
     expect(observe).not.toHaveBeenCalled();
   });
 
-  it("accepts a bounded exact dual-provider ancestry when finality is more than one block away", async () => {
+  it("accepts the fixed receipt-plus-128 checkpoint after finalized heads advance far beyond it", async () => {
     const capability = await submissionCapability();
     const exactEvidence = evidence(capability);
-    const middle = Object.freeze({
-      number: "101",
-      hash: `0x${"dd".repeat(32)}` as Hex,
-      parentHash: RECEIPT_BLOCK_HASH,
-      timestamp: "1786588803",
-      transactionHashes: Object.freeze([] as Hex[])
-    });
-    const common = Object.freeze({
-      number: "102",
+    const delayedHead = Object.freeze({
+      number: "500",
       hash: `0x${"ee".repeat(32)}` as Hex,
-      parentHash: middle.hash,
-      timestamp: "1786588806",
+      parentHash: `0x${"dd".repeat(32)}` as Hex,
+      timestamp: "1786590000",
       transactionHashes: Object.freeze([] as Hex[])
     });
     const extend = (provider: BscTestnetPtaWbnbPoolProviderReconciliationEvidence) => ({
       ...provider,
-      reportedFinalizedHead: common,
-      commonFinalizedBlock: common,
-      receiptToCommonFinalizedAncestry: [
-        {
-          number: middle.number,
-          hash: middle.hash,
-          parentHash: middle.parentHash,
-          timestamp: middle.timestamp
-        },
-        {
-          number: common.number,
-          hash: common.hash,
-          parentHash: common.parentHash,
-          timestamp: common.timestamp
-        }
-      ],
-      postState:
-        provider.postState === null
-          ? null
-          : {
-              ...provider.postState,
-              eip1898Block: { blockHash: common.hash, requireCanonical: true as const }
-            }
+      reportedFinalizedHead: delayedHead
     });
     const extended = {
       ...exactEvidence,
@@ -749,42 +726,69 @@ describe("BSC testnet exact PTA/WBNB submission reconciler", () => {
       ...extended,
       primary: {
         ...extended.primary,
-        receiptToCommonFinalizedAncestry: [
-          {
-            number: middle.number,
-            hash: middle.hash,
-            parentHash: `0x${"99".repeat(32)}` as Hex,
-            timestamp: middle.timestamp
-          },
-          {
-            number: common.number,
-            hash: common.hash,
-            parentHash: common.parentHash,
-            timestamp: common.timestamp
-          }
-        ]
+        receiptToCommonFinalizedAncestry: extended.primary.receiptToCommonFinalizedAncestry.map(
+          (block, index) =>
+            index === 64 ? { ...block, parentHash: `0x${"99".repeat(32)}` as Hex } : block
+        )
       },
       corroborator: {
         ...extended.corroborator,
-        receiptToCommonFinalizedAncestry: [
-          {
-            number: middle.number,
-            hash: middle.hash,
-            parentHash: `0x${"99".repeat(32)}` as Hex,
-            timestamp: middle.timestamp
-          },
-          {
-            number: common.number,
-            hash: common.hash,
-            parentHash: common.parentHash,
-            timestamp: common.timestamp
-          }
-        ]
+        receiptToCommonFinalizedAncestry:
+          extended.corroborator.receiptToCommonFinalizedAncestry.map((block, index) =>
+            index === 64 ? { ...block, parentHash: `0x${"99".repeat(32)}` as Hex } : block
+          )
       }
     };
     expect(
       await reconcileBscTestnetPtaWbnbPoolEvidenceForInternalUse(capability, broken, new Date(NOW))
     ).toMatchObject({ status: "invalid", issue: { code: "CANONICALITY_INVALID" } });
+  });
+
+  it("keeps reconciliation pending until both heads finalize the fixed receipt-plus-128 checkpoint", async () => {
+    const capability = await submissionCapability();
+    const exactEvidence = evidence(capability);
+    const beforeCheckpoint = (provider: BscTestnetPtaWbnbPoolProviderReconciliationEvidence) => ({
+      ...provider,
+      reportedFinalizedHead: {
+        ...provider.reportedFinalizedHead,
+        number: "227",
+        hash: finalityBlockHash(227n),
+        parentHash: finalityBlockHash(226n),
+        timestamp: (1_786_588_800n + 127n * 3n).toString()
+      },
+      commonFinalizedBlock: null,
+      receiptToCommonFinalizedAncestry: [],
+      postState: null
+    });
+
+    expect(
+      await reconcileBscTestnetPtaWbnbPoolEvidenceForInternalUse(
+        capability,
+        {
+          ...exactEvidence,
+          primary: beforeCheckpoint(exactEvidence.primary),
+          corroborator: beforeCheckpoint(exactEvidence.corroborator)
+        },
+        new Date(NOW)
+      )
+    ).toMatchObject({ status: "pending", issue: { code: "FINALITY_PENDING" } });
+  });
+
+  it("requires successful post-state to be EIP-1898-bound to the receipt block", async () => {
+    const capability = await submissionCapability();
+    const exactEvidence = evidence(capability);
+    const anchoredToCheckpoint = mutatePostState(exactEvidence, (state) => ({
+      ...state,
+      eip1898Block: { blockHash: FINALIZED_BLOCK_HASH, requireCanonical: true as const }
+    }));
+
+    expect(
+      await reconcileBscTestnetPtaWbnbPoolEvidenceForInternalUse(
+        capability,
+        anchoredToCheckpoint,
+        new Date(NOW)
+      )
+    ).toMatchObject({ status: "invalid", issue: { code: "POST_STATE_INVALID" } });
   });
 
   it("rejects restart journal state with any immutable capability binding drift", async () => {
@@ -1257,30 +1261,30 @@ describe("BSC testnet exact PTA/WBNB submission reconciler", () => {
           ...exactEvidence.primary,
           reportedFinalizedHead: {
             ...primaryCommon,
-            number: "102",
+            number: "229",
             hash: `0x${"77".repeat(32)}`,
-            timestamp: "1786588806"
+            timestamp: "1786589187"
           },
           commonFinalizedBlock: {
             ...primaryCommon,
-            number: "102",
+            number: "229",
             hash: `0x${"77".repeat(32)}`,
-            timestamp: "1786588806"
+            timestamp: "1786589187"
           }
         },
         corroborator: {
           ...exactEvidence.corroborator,
           reportedFinalizedHead: {
             ...corroboratorCommon,
-            number: "102",
+            number: "229",
             hash: `0x${"77".repeat(32)}`,
-            timestamp: "1786588806"
+            timestamp: "1786589187"
           },
           commonFinalizedBlock: {
             ...corroboratorCommon,
-            number: "102",
+            number: "229",
             hash: `0x${"77".repeat(32)}`,
-            timestamp: "1786588806"
+            timestamp: "1786589187"
           }
         }
       }

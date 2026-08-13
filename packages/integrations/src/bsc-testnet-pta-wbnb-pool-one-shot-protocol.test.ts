@@ -55,7 +55,7 @@ function transaction() {
 function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
   return Object.freeze({
     schemaVersion: 1,
-    scope: "authenticated_reviewer_and_owner_exact_pool_initialization",
+    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_initialization",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
     reviewerApprovalDigest: REVIEWER_DIGEST,

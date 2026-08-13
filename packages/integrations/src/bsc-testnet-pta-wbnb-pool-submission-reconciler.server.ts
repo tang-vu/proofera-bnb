@@ -111,9 +111,11 @@ const BOUNDARY = Object.freeze({
   operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   exactTransactionOnly: true as const,
   callerTransactionInputAccepted: false as const,
-  productionAuthorizationIssuerPresent: false as const,
-  productionBroadcasterPresent: false as const,
-  testDependencyInjectionOnly: true as const,
+  productionAuthorizationIssuerPresent: true as const,
+  productionBroadcasterPresent: true as const,
+  genericProductionFactoryAvailable: false as const,
+  privateExactReleasePathOnly: true as const,
+  testDependencyInjectionOnly: false as const,
   durableSignedCommitRequired: true as const,
   separateAuthenticatedSubmissionCapabilityRequired: true as const,
   durableSubmissionStartedRequiredBeforeSend: true as const,
@@ -129,6 +131,8 @@ const BOUNDARY = Object.freeze({
   exactPoolCreatedAndInitializeLogsRequired: true as const,
   mainnetWritePossible: false as const
 });
+
+export const BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_BOUNDARY = BOUNDARY;
 
 export interface BscTestnetPtaWbnbPoolSubmissionCapability {
   readonly schemaVersion: typeof BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCHEMA_VERSION;
@@ -364,7 +368,7 @@ export interface BscTestnetPtaWbnbPoolProviderReconciliationEvidence {
     exactNumberCanonicalLookup: true;
   }> | null;
   readonly receiptBlock: BscTestnetPtaWbnbPoolNormalizedBlock | null;
-  /** Every canonical block strictly after receiptBlock through commonFinalizedBlock, inclusive. */
+  /** Exactly 128 canonical blocks after receiptBlock through the fixed finalized checkpoint. */
   readonly receiptToCommonFinalizedAncestry: readonly BscTestnetPtaWbnbPoolNormalizedAncestryHeader[];
   readonly postState: BscTestnetPtaWbnbPoolPostState | null;
 }
@@ -1844,53 +1848,95 @@ function reconcileEvidence(
       capability.transaction.transactionHash
     );
   }
-  const expectedCommonNumber = primaryHead < corroboratorHead ? primaryHead : corroboratorHead;
+  const observedAtMilliseconds = BigInt(observedAt);
+  const primaryHeadTimestamp = canonicalUint(primary.reportedFinalizedHead.timestamp);
+  const corroboratorHeadTimestamp = canonicalUint(corroborator.reportedFinalizedHead.timestamp);
+  if (
+    primaryHeadTimestamp === null ||
+    corroboratorHeadTimestamp === null ||
+    primaryHeadTimestamp * 1_000n > observedAtMilliseconds ||
+    corroboratorHeadTimestamp * 1_000n > observedAtMilliseconds
+  ) {
+    return invalidReconciliation(
+      "CANONICALITY_INVALID",
+      "evidence.providers.reportedFinalizedHead.timestamp",
+      "Finalized head timestamps are invalid or future-dated.",
+      capability.transaction.transactionHash
+    );
+  }
+  const receiptNumber = canonicalUint(receipt.blockNumber);
+  if (receiptNumber === null) {
+    return invalidReconciliation(
+      "CANONICALITY_INVALID",
+      "evidence.providers.receipt.blockNumber",
+      "Receipt block number is invalid.",
+      capability.transaction.transactionHash
+    );
+  }
+  const expectedCheckpointNumber =
+    receiptNumber + BigInt(BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_FINALITY_ANCESTRY_BLOCKS);
+  if (expectedCheckpointNumber > UINT256_MAX) {
+    return invalidReconciliation(
+      "CANONICALITY_INVALID",
+      "evidence.providers.receipt.blockNumber",
+      "Receipt block cannot derive the fixed finality checkpoint.",
+      capability.transaction.transactionHash
+    );
+  }
+  if (primaryHead < expectedCheckpointNumber || corroboratorHead < expectedCheckpointNumber) {
+    return pendingReconciliation(
+      capability.transaction.transactionHash,
+      issue(
+        "FINALITY_PENDING",
+        "evidence.providers.reportedFinalizedHead",
+        "The fixed receipt-plus-128 checkpoint is not yet below both finalized heads."
+      )
+    );
+  }
   if (primary.commonFinalizedBlock === null || corroborator.commonFinalizedBlock === null) {
     return pendingReconciliation(
       capability.transaction.transactionHash,
       issue(
         "FINALITY_PENDING",
         "evidence.providers.commonFinalizedBlock",
-        "A common finalized block has not been observed on both providers."
+        "The fixed receipt-plus-128 finalized checkpoint has not been observed on both providers."
       )
     );
   }
-  if (
-    primary.commonFinalizedBlock.number !== expectedCommonNumber.toString() ||
-    !sameJson(primary.commonFinalizedBlock, corroborator.commonFinalizedBlock)
-  ) {
+  if (!sameJson(primary.commonFinalizedBlock, corroborator.commonFinalizedBlock)) {
     return pendingReconciliation(
       capability.transaction.transactionHash,
       issue(
         "PROVIDER_DISAGREEMENT",
         "evidence.providers.commonFinalizedBlock",
-        "Providers do not agree on the minimum common finalized block."
+        "Providers do not agree on the fixed receipt-plus-128 finalized checkpoint."
       )
     );
   }
+  if (primary.commonFinalizedBlock.number !== expectedCheckpointNumber.toString()) {
+    return invalidReconciliation(
+      "CANONICALITY_INVALID",
+      "evidence.providers.commonFinalizedBlock",
+      "The finalized checkpoint is not exactly 128 blocks after the receipt block.",
+      capability.transaction.transactionHash
+    );
+  }
   if (
-    (primaryHead === expectedCommonNumber &&
+    (primaryHead === expectedCheckpointNumber &&
       !sameJson(primary.reportedFinalizedHead, primary.commonFinalizedBlock)) ||
-    (corroboratorHead === expectedCommonNumber &&
+    (corroboratorHead === expectedCheckpointNumber &&
       !sameJson(corroborator.reportedFinalizedHead, corroborator.commonFinalizedBlock))
   ) {
     return invalidReconciliation(
       "CANONICALITY_INVALID",
       "evidence.providers.reportedFinalizedHead",
-      "Provider reporting the minimum finalized head did not bind that exact block as common.",
+      "A provider whose finalized head equals the fixed checkpoint did not bind that exact block.",
       capability.transaction.transactionHash
     );
   }
-  const observedAtMilliseconds = BigInt(observedAt);
-  const primaryHeadTimestamp = canonicalUint(primary.reportedFinalizedHead.timestamp);
-  const corroboratorHeadTimestamp = canonicalUint(corroborator.reportedFinalizedHead.timestamp);
   const commonFinalizedTimestamp = canonicalUint(primary.commonFinalizedBlock.timestamp);
   if (
-    primaryHeadTimestamp === null ||
-    corroboratorHeadTimestamp === null ||
     commonFinalizedTimestamp === null ||
-    primaryHeadTimestamp * 1_000n > observedAtMilliseconds ||
-    corroboratorHeadTimestamp * 1_000n > observedAtMilliseconds ||
     commonFinalizedTimestamp > primaryHeadTimestamp ||
     commonFinalizedTimestamp > corroboratorHeadTimestamp
   ) {
@@ -1899,17 +1945,6 @@ function reconcileEvidence(
       "evidence.providers.reportedFinalizedHead.timestamp",
       "Finalized block timestamps are future-dated or inconsistent with the common checkpoint.",
       capability.transaction.transactionHash
-    );
-  }
-  const receiptNumber = canonicalUint(receipt.blockNumber);
-  if (receiptNumber === null || expectedCommonNumber < receiptNumber) {
-    return pendingReconciliation(
-      capability.transaction.transactionHash,
-      issue(
-        "FINALITY_PENDING",
-        "evidence.providers.commonFinalizedBlock",
-        "Receipt block is not yet below both finalized heads."
-      )
     );
   }
 
@@ -1942,8 +1977,7 @@ function reconcileEvidence(
   }
   const ancestryLength = commonFinalizedNumber - receiptNumber;
   if (
-    ancestryLength < 0n ||
-    ancestryLength > BigInt(BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_FINALITY_ANCESTRY_BLOCKS) ||
+    ancestryLength !== BigInt(BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_FINALITY_ANCESTRY_BLOCKS) ||
     primary.receiptToCommonFinalizedAncestry.length !== Number(ancestryLength) ||
     !sameJson(
       primary.receiptToCommonFinalizedAncestry,
@@ -1953,7 +1987,7 @@ function reconcileEvidence(
     return invalidReconciliation(
       "CANONICALITY_INVALID",
       "evidence.providers.receiptToCommonFinalizedAncestry",
-      "Receipt-to-finalized ancestry is absent, oversized, or not identical across providers.",
+      "The exact receipt-to-checkpoint ancestry must contain 128 identical provider-agreed blocks.",
       capability.transaction.transactionHash
     );
   }
@@ -2053,7 +2087,7 @@ function reconcileEvidence(
       );
     }
     if (
-      primary.postState.eip1898Block.blockHash !== primary.commonFinalizedBlock.hash ||
+      primary.postState.eip1898Block.blockHash !== primary.receiptBlock.hash ||
       !exactLogBindings(receipt, primary.receiptBlock, primary.postState)
     ) {
       return invalidReconciliation(
@@ -2777,13 +2811,13 @@ export class BscTestnetPtaWbnbPoolProductionSubmissionUnavailableError extends E
 
   constructor() {
     super(
-      "Local journal and reconciliation scaffolds exist, but this release has no authenticated, wired executable production submission/broadcast/reconciliation path."
+      "The generic production submission factory is intentionally unavailable; the exact root runner uses only the private release-policy, owner, journal, and attestation-bound path."
     );
     this.name = "BscTestnetPtaWbnbPoolProductionSubmissionUnavailableError";
   }
 }
 
-/** Production stays non-executable before capability, journal, RPC, or broadcast access. */
+/** The generic factory stays unavailable; production uses the separately wired exact private path. */
 export function createProductionBscTestnetPtaWbnbPoolSubmissionCore(): never {
   throw new BscTestnetPtaWbnbPoolProductionSubmissionUnavailableError();
 }

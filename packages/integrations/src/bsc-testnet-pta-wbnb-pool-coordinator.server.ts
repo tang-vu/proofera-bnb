@@ -2,11 +2,6 @@ import "server-only";
 
 import { isProxy } from "node:util/types";
 
-import {
-  EIP1967_ADMIN_SLOT,
-  EIP1967_BEACON_SLOT,
-  EIP1967_IMPLEMENTATION_SLOT
-} from "@proofera/domain";
 import { keccak256, type Address, type Hex } from "viem";
 
 import {
@@ -42,6 +37,16 @@ import {
   type BscTestnetPtaWbnbPoolInitializationEnvelope,
   type BscTestnetPtaWbnbPoolInitializationEnvelopeBody
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
+
+// Keep the three exact slots local to this executable boundary. Importing the domain package root
+// would evaluate its barrel and zod graph before release inspection, making the reviewed runtime
+// manifest incomplete even though this coordinator needs only these immutable EIP-1967 constants.
+const EIP1967_IMPLEMENTATION_SLOT =
+  "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc" as const;
+const EIP1967_ADMIN_SLOT =
+  "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103" as const;
+const EIP1967_BEACON_SLOT =
+  "0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50" as const;
 
 const UINT256_MAX = (1n << 256n) - 1n;
 const UINT64_MAX = (1n << 64n) - 1n;

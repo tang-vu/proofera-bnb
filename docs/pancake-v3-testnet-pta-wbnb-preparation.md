@@ -2,9 +2,8 @@
 
 Updated: 2026-08-13. Decision: **exact offline provenance, a non-authorizing read-only
 preflight, an old-scope unsent request, an owner-designated internal multi-agent technical decision
-for `bc7000e`, and locally reviewed production-blocked signing/ceremony/recovery/reconciliation
-hardening are recorded; no current-release decision, owner transaction approval, pool, or write
-exists**.
+for `bc7000e`, and a recovery-first exact-policy/owner-gated production path are recorded; no final
+policy for the current release, owner transaction approval, pool, or write exists**.
 
 Machine record:
 [`evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json`](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json)
@@ -20,11 +19,11 @@ Owner-designated internal technical-review decision:
 This is a BNB Smart Chain testnet and PancakeSwap V3 preparation milestone. The historical observation
 used local ProofEra tooling and two official credential-free BNB Chain RPC endpoints. Capture created
 only fixed public evidence files. The later compiler and selector reviews and external-review-request
-generator ran offline. Internal seams now implement the native-TTY owner ceremony, private one-consume
-authority/worker bridge, fixed-RPC rechecks, durable restart recovery, and terminal reconciliation,
-but the root runner and raw broadcaster deliberately hard-block. None of these paths made an onchain
-RPC write, owner approval, signature, broadcast, pool creation, token wrapping, liquidity mint, swap,
-or mainnet action.
+generator ran offline. The root command now implements read-only recovery, exact-release policy
+admission, the native-TTY owner ceremony, a private one-consume authority/worker/broadcaster bridge,
+fixed-RPC rechecks, durable restart recovery, and terminal reconciliation. The public worker and
+generic raw sender remain hard-blocked. This update made no onchain RPC write, owner approval,
+signature, broadcast, pool creation, token wrapping, liquidity mint, swap, or mainnet action.
 
 The evidence answers a narrow question: what exact chain-97 state and review inputs would a future
 PTA/WBNB pool initializer have to bind? It does not answer whether the pair has a market price, is
@@ -236,9 +235,10 @@ RPC writes, signer, or broadcaster. Challenge generation alone mints no authorit
 The native bridge holds its current-user custody-owner capability, ceremony-command brand, and
 execution-capability state inside one closure. A capability is reserved for one worker and consumed
 only after the signing journal durably enters worker start; copied JSON/digests, test issuers, proxy
-objects, and persisted journal bytes cannot unlock the native worker. These controls are locally
-implemented and reviewed, but the public production worker factory and root runner still fail closed
-with `PRODUCTION_AUTHORIZATION_UNAVAILABLE`.
+objects, and persisted journal bytes cannot unlock the native worker. The recovery-first root command
+wires these controls, while the public production worker factory remains fail-closed. Only a
+post-commit exact-release policy, its private envelope instantiation, and the descriptor-bound owner
+ceremony can activate the native bridge.
 
 A separate local post-claim recheck core requires the authorization gate's authenticated private
 intent before making any read. It compares only the two fixed official RPC origins, finds a common
@@ -247,13 +247,12 @@ sender-code, simulation, balance, gas, cost, authorization-expiry and 30-second 
 opaque in-memory capability is bound to the exact claim and intent; cloned or proxy values are not
 accepted. Seventeen focused tests exercise that behavior and its failure boundaries.
 
-The standalone public production recheck constructor remains fail-closed, while the internal
-non-executing composition binds the same strict recheck to its fixed official-RPC clients and private
-authenticated intent. No short-lived envelope or recheck capability is retained as current evidence,
-and an expired observation cannot be reused. This code supplies neither owner authority nor a
-broadcast path.
+The standalone public production recheck constructor remains fail-closed, while the root composition
+binds the same strict recheck to its fixed official-RPC clients and private authenticated intent. No
+short-lived envelope or recheck capability is retained as current evidence, and an expired
+observation cannot be reused. Review policy and owner confirmation remain distinct gates.
 
-## Local non-executing submission and reconciliation hardening
+## Gated submission and reconciliation path
 
 The server-only submission core cannot accept caller-selected transaction bytes. It parses and
 recovers the one exact legacy EIP-155 signed
@@ -283,15 +282,15 @@ required immediately before the sole send opportunity. Expiry or drift after the
 forbids send, retry, and replacement.
 
 Terminal reconciliation requires both fixed providers to return the identical exact transaction,
-receipt, logs and EIP-1898 post-state. It walks continuous, exact-number, parent-hash-linked ancestry
-from the receipt block to the common-finalized block; both providers must match, and the gap is bounded
-to 128 blocks. Oversized,
-missing, discontinuous or timestamp-regressive ancestry fails closed. These controls are local
-implementation/review evidence only: the root production runner and raw broadcaster still return or
-throw `PRODUCTION_AUTHORIZATION_UNAVAILABLE`, so no executable sign/send path exists. The public worker
-issuer also remains unavailable. No exact owner transaction confirmation was entered and no signature,
-send, transaction receipt, pool or LP position was created. These changed files are not covered by the
-old external-review request or the retained `bc7000e` owner-designated decision.
+receipt and logs, plus identical EIP-1898 post-state at the receipt block. It walks exactly 128
+continuous, exact-number, parent-hash-linked blocks from the receipt to a fixed finalized checkpoint;
+both providers must match, even when their current finalized heads have advanced much farther.
+Missing, discontinuous or timestamp-regressive ancestry fails closed. The root command wires these
+controls to a closure-private sender; the public worker and generic raw sender remain unavailable.
+The command cannot activate until the exact final commit/tree/full runtime manifest receives a new
+owner-designated review policy and the owner enters the separate exact TTY confirmation. No such
+policy/confirmation, signature, send, transaction receipt, pool or LP position exists. These changed
+files are not covered by the old external-review request or retained `bc7000e` decision.
 
 ## Separate proposed liquidity envelope
 
@@ -305,9 +304,9 @@ The two write decisions stay separate:
 
 1. Pool initialization requires its own fresh simulation, exact sender/nonce/gas/cost envelope, short
    broadcast window, durable one-shot claim/submission journal, a new exact owner-designated
-   distinct-agent technical decision for the changed release, exact owner authorization, an
-   intentionally enabled and reviewed root runner/broadcaster, receipt, exact logs, and post-state
-   reconciliation. None of those release/authority/execution outputs exists now.
+   distinct-agent technical decision and canonical policy for the exact final release, exact owner
+   authorization through the bounded TTY ceremony, receipt, exact logs, and post-state
+   reconciliation. None of those release/authority/transaction outputs exists now.
 2. Only after the pool is independently re-reviewed may an LP mint be prepared. It requires separate
    bounded token approvals, explicit ticks/amounts/minima/deadline/slippage, owner/revoke authority,
    simulation, user confirmation, and receipt evidence.
@@ -323,9 +322,11 @@ The two write decisions stay separate:
   old eight-file unsent request, public Gist and byte-exact re-fetch provide no review for later code.
 - Obtain a distinct exact owner authorization. Neither the request nor a future reviewer decision can
   substitute for it.
-- Keep the root runner and raw broadcaster hard-blocked unless a separately reviewed release change
-  intentionally opens them after the exact-release decision and exact owner ceremony. Their current
-  hard block is why the locally implemented signing/recovery seams remain non-executable.
+- Generate the canonical runtime policy only after the final commit is pushed and two designated
+  read-only agents approve its exact commit/tree/full manifest. Admit that policy through the first
+  TTY phase, then require the owner's exact second-phase confirmation; neither may be inferred from
+  repository contents, chat, digests, or journal state. The public worker and generic raw sender stay
+  hard-blocked even when the closure-private path is used.
 - Re-run the fixed two-provider coordinator immediately before any claim, then repeat the pending nonce,
   pool, candidate-code and simulation checks after the durable claim and abort on any drift.
 - Establish post-initialization observation cardinality and elapsed oracle history before using the
@@ -335,12 +336,12 @@ The two write decisions stay separate:
 
 Until those gates close and explorer-verifiable receipts exist, the truthful state remains: PTA and
 WBNB identities are evidenced, the retained pool construction path is reproduced exactly offline,
-and a read-only non-authorizing preflight plus production-blocked ceremony/signing/post-claim/journal/
-recovery/reconciliation controls are locally implemented. The owner-designated internal technical-
-review gate is complete only for the exact `bc7000e` nonexecuting subject, not the current changed code
-release. **No authenticated external/third-party review is claimed, no exact owner transaction
-approval was entered, and no executable production submission path, signature, receipt, PTA/WBNB
-pool, liquidity, oracle, position, Pancake write, or autonomous execution is evidenced**.
+and a read-only non-authorizing preflight plus an exact-policy/owner-gated recovery/signing/submission/
+reconciliation path are implemented. The owner-designated internal technical-review gate is complete
+only for the exact `bc7000e` nonexecuting subject, not this changed release until its final commit is
+reviewed. **No authenticated external/third-party review is claimed, no final-release runtime policy
+or exact owner transaction approval was entered, and no signature, receipt, PTA/WBNB pool, liquidity,
+oracle, position, Pancake write, or autonomous execution is evidenced**.
 
 The machine record is linked to the retained
 [bounded public-result RPC transcript](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json)

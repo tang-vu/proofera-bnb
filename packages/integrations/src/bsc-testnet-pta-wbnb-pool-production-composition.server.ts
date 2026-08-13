@@ -30,7 +30,7 @@ import {
   acquireBscTestnetPtaWbnbPoolProductionPreSubmissionForInternalUse,
   createFixedOfficialBscTestnetPtaWbnbPoolPostClaimRpcClientsForInternalUse,
   observeExactBscTestnetPtaWbnbPoolTransactionForInternalUse,
-  sendExactBscTestnetPtaWbnbPoolRawTransactionOnceForInternalUse
+  type BscTestnetPtaWbnbPoolProductionPreSubmissionInput
 } from "./bsc-testnet-pta-wbnb-pool-production-rpc.server";
 import {
   deriveBscTestnetPtaWbnbPoolAuthorizationReceiptSha256,
@@ -38,12 +38,10 @@ import {
   type BscTestnetPtaWbnbPoolLocalJournal,
   type BscTestnetPtaWbnbPoolLocalJournalState
 } from "./bsc-testnet-pta-wbnb-pool-local-journal.server";
-import {
-  BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_EXECUTION_FLAG,
-  type BscTestnetPtaWbnbPoolProductionExecutionCommand
-} from "./bsc-testnet-pta-wbnb-pool-production-authority.server";
+import { BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_EXECUTION_FLAG } from "./bsc-testnet-pta-wbnb-pool-production-authority.server";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_OPERATION,
+  BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_BOUNDARY,
   BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCHEMA_VERSION,
   BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCOPE,
   createBscTestnetPtaWbnbPoolSubmissionCoreForInternalUse,
@@ -58,6 +56,7 @@ import {
   type BscTestnetPtaWbnbPoolSubmissionRecoveryState
 } from "./bsc-testnet-pta-wbnb-pool-submission-journal.server";
 import type { BscTestnetPtaWbnbPoolSigningWorker } from "./bsc-testnet-pta-wbnb-pool-signing-worker";
+import type { BscTestnetPtaWbnbPoolPrivateBroadcaster } from "./bsc-testnet-pta-wbnb-pool-private-broadcaster.server";
 
 export { BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_EXECUTION_FLAG };
 
@@ -85,30 +84,16 @@ const BOUNDARY = Object.freeze({
 
 export const BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_COMPOSITION_BOUNDARY = BOUNDARY;
 
-type AuthorityResult = Readonly<{
-  status: "authorized";
-  intent: BscTestnetPtaWbnbPoolAuthorizedSigningIntent;
-  executionCapability: object;
-}>;
-
-/**
- * Fixed authority facade created by the root runner. Its implementation and private brands remain
- * in the runner module; this composition never accepts an authority authenticator callback.
- */
-export interface BscTestnetPtaWbnbPoolFixedProductionAuthority {
-  readonly authorize: (
-    descriptor: unknown,
-    command: unknown
-  ) => AuthorityResult | Readonly<{ status: "blocked"; issue: { code: string; message: string } }>;
-  readonly authenticateAuthorizedIntent: (intent: unknown) => boolean;
-}
-
 export interface BscTestnetPtaWbnbPoolFixedProductionPorts {
   readonly now: () => Date;
-  readonly authority: BscTestnetPtaWbnbPoolFixedProductionAuthority;
+  /** Already minted only by the same-process post-ceremony native activation. */
+  readonly intent: BscTestnetPtaWbnbPoolAuthorizedSigningIntent;
+  readonly executionCapability: object;
+  readonly authenticateAuthorizedIntent: (intent: unknown) => boolean;
   readonly signingJournal: BscTestnetPtaWbnbPoolLocalJournal;
   readonly submissionJournal: BscTestnetPtaWbnbPoolDurableSubmissionJournal;
   readonly issueWorker: (executionCapability: unknown) => BscTestnetPtaWbnbPoolSigningWorker;
+  readonly broadcaster: BscTestnetPtaWbnbPoolPrivateBroadcaster;
 }
 
 export type BscTestnetPtaWbnbPoolProductionRunResult =
@@ -117,13 +102,6 @@ export type BscTestnetPtaWbnbPoolProductionRunResult =
       code: string;
       message: string;
       transactionHash: Hex | null;
-      boundary: typeof BOUNDARY;
-    }>
-  | Readonly<{
-      status: "signed_committed";
-      code: "SUBMISSION_AUTHORIZATION_REFRESH_REQUIRED";
-      message: string;
-      transactionHash: Hex;
       boundary: typeof BOUNDARY;
     }>
   | BscTestnetPtaWbnbPoolSubmissionResult;
@@ -140,6 +118,10 @@ function blocked(
     transactionHash,
     boundary: BOUNDARY
   });
+}
+
+function exactBytes32(value: unknown): value is Hex {
+  return typeof value === "string" && /^0x[0-9a-f]{64}$/u.test(value);
 }
 
 function exactDate(clock: () => Date): Date | null {
@@ -195,7 +177,7 @@ function stateBinding(state: BscTestnetPtaWbnbPoolLocalJournalState): Readonly<{
 }
 
 function exactClaimRequestFromIntent(
-  intent: AuthorityResult["intent"]
+  intent: BscTestnetPtaWbnbPoolAuthorizedSigningIntent
 ): BscTestnetPtaWbnbPoolClaimRequest {
   const body = Object.freeze({
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -298,25 +280,145 @@ function signingStateMatchesRecoveryCapability(
   );
 }
 
+export type BscTestnetPtaWbnbPoolRecoveryFirstResult =
+  | Readonly<{ status: "fresh" }>
+  | Readonly<{
+      status: "handled";
+      result: BscTestnetPtaWbnbPoolProductionRunResult;
+    }>;
+
 /**
- * Narrow one-shot composition. It has no caller transaction/RPC/path/signing input; the root runner
- * supplies only already-fixed private capabilities and fixed adapters.
+ * Restart-only gate. The caller must supply the two journals returned by the fixed no-write open
+ * probes. This function never receives or constructs reviewer, owner, custody, signer, worker, or
+ * broadcaster authority. Only a matching durable submission_started/unknown state may perform the
+ * fixed dual-RPC reconciliation reads.
+ */
+export async function reconcileExistingBscTestnetPtaWbnbPoolRecoveryForInternalUse(
+  signingJournal: BscTestnetPtaWbnbPoolLocalJournal,
+  submissionJournal: BscTestnetPtaWbnbPoolDurableSubmissionJournal,
+  now: () => Date = () => new Date()
+): Promise<BscTestnetPtaWbnbPoolRecoveryFirstResult> {
+  let signingState: BscTestnetPtaWbnbPoolLocalJournalState;
+  let recoveryState: BscTestnetPtaWbnbPoolSubmissionRecoveryState;
+  try {
+    [signingState, recoveryState] = await Promise.all([
+      signingJournal.readState(),
+      submissionJournal.readRecoveryState()
+    ]);
+  } catch {
+    return Object.freeze({
+      status: "handled" as const,
+      result: blocked(
+        "RESTART_JOURNAL_READ_FAILED",
+        "Durable signing/submission state could not be read before any policy, owner, custody, signer, or write-RPC action."
+      )
+    });
+  }
+  if (signingState.status === "empty" && recoveryState.state === "empty") {
+    return Object.freeze({ status: "fresh" as const });
+  }
+  if (recoveryState.state === "confirmed" || recoveryState.state === "reverted") {
+    if (!signingStateMatchesRecoveryCapability(signingState, recoveryState.capability)) {
+      return Object.freeze({
+        status: "handled" as const,
+        result: blocked(
+          "RESTART_BINDING_UNKNOWN",
+          "The durable terminal submission does not match the retained signing evidence.",
+          recoveryState.capability.transaction.transactionHash
+        )
+      });
+    }
+    if (!exactBytes32(recoveryState.reconciliationDigest)) {
+      return Object.freeze({
+        status: "handled" as const,
+        result: blocked(
+          "RESTART_TERMINAL_EVIDENCE_INVALID",
+          "The durable terminal state is missing its exact reconciliation digest.",
+          recoveryState.capability.transaction.transactionHash
+        )
+      });
+    }
+    return Object.freeze({
+      status: "handled" as const,
+      result: Object.freeze({
+        status: recoveryState.state,
+        retryBroadcastAllowed: false as const,
+        reconciliationRetryAllowed: false as const,
+        transactionHash: recoveryState.capability.transaction.transactionHash,
+        reconciliationDigest: recoveryState.reconciliationDigest,
+        issue: null,
+        boundary: BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_BOUNDARY
+      })
+    });
+  }
+  if (recoveryState.state === "signed_committed") {
+    return Object.freeze({
+      status: "handled" as const,
+      result: blocked(
+        "RESTART_SIGNED_COMMIT_REQUIRES_NEW_AUTHORITY",
+        "A durable signed transaction exists without submission_started; persisted evidence cannot recreate owner authority, so signing and sending are forbidden.",
+        recoveryState.capability.transaction.transactionHash
+      )
+    });
+  }
+  if (recoveryState.state === "submission_started" || recoveryState.state === "unknown_outcome") {
+    const recoveryCapability = recoveryState.capability;
+    if (
+      recoveryCapability === null ||
+      !signingStateMatchesRecoveryCapability(signingState, recoveryCapability)
+    ) {
+      return Object.freeze({
+        status: "handled" as const,
+        result: blocked(
+          "RESTART_BINDING_UNKNOWN",
+          "Restart state is incomplete or signing/submission journals do not bind the same exact transaction."
+        )
+      });
+    }
+    const result = await createBscTestnetPtaWbnbPoolReconciliationRecoveryCoreForInternalUse(
+      Object.freeze({
+        now,
+        acquireRecoveryCapability: async () => recoveryCapability,
+        journal: submissionJournal,
+        observeExactTransaction: observeExactBscTestnetPtaWbnbPoolTransactionForInternalUse
+      })
+    ).submitAndReconcileOnce();
+    return Object.freeze({ status: "handled" as const, result });
+  }
+  if (signingState.status === "signed_committed") {
+    return Object.freeze({
+      status: "handled" as const,
+      result: blocked(
+        "RESTART_SIGNED_COMMIT_REQUIRES_NEW_AUTHORITY",
+        "A durable signed transaction exists without a matching durable submission start; persisted evidence cannot recreate one-send authority, so sending is forbidden.",
+        signingState.transactionHash
+      )
+    });
+  }
+  return Object.freeze({
+    status: "handled" as const,
+    result: blocked(
+      "RESTART_BINDING_UNKNOWN",
+      "A signing journal state exists without the exact matching submission recovery state."
+    )
+  });
+}
+
+/**
+ * Narrow fresh-only composition. It accepts only the already activated private native capabilities
+ * minted after the release policy and exact owner ceremony. It re-reads both durable journals and
+ * refuses any non-empty state before the first claim.
  */
 export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
   ports: BscTestnetPtaWbnbPoolFixedProductionPorts
 ): Readonly<{
-  runOnce: (
-    envelope: unknown,
-    command: BscTestnetPtaWbnbPoolProductionExecutionCommand
-  ) => Promise<BscTestnetPtaWbnbPoolProductionRunResult>;
+  runOnce: (envelope: unknown) => Promise<BscTestnetPtaWbnbPoolProductionRunResult>;
 }> {
   let active: Promise<BscTestnetPtaWbnbPoolProductionRunResult> | null = null;
   let terminal: BscTestnetPtaWbnbPoolProductionRunResult | null = null;
+  let durableSignedTransactionHash: Hex | null = null;
 
-  const run = async (
-    envelope: unknown,
-    command: BscTestnetPtaWbnbPoolProductionExecutionCommand
-  ): Promise<BscTestnetPtaWbnbPoolProductionRunResult> => {
+  const run = async (envelope: unknown): Promise<BscTestnetPtaWbnbPoolProductionRunResult> => {
     const now = exactDate(ports.now);
     if (now === null) return blocked("CLOCK_INVALID", "Production clock is invalid.");
     let signingState: BscTestnetPtaWbnbPoolLocalJournalState;
@@ -332,62 +434,44 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
         "Durable signing/submission state could not be read before any authorization or signing."
       );
     }
-    if (recoveryState.state === "confirmed" || recoveryState.state === "reverted") {
+    if (signingState.status !== "empty" || recoveryState.state !== "empty") {
       return blocked(
-        "TERMINAL_STATE_ALREADY_COMMITTED",
-        "The exact transaction already has a durable terminal state.",
-        recoveryState.capability.transaction.transactionHash
-      );
-    }
-    if (recoveryState.state === "submission_started" || recoveryState.state === "unknown_outcome") {
-      const recoveryCapability = recoveryState.capability;
-      if (
-        recoveryCapability === null ||
-        !signingStateMatchesRecoveryCapability(signingState, recoveryCapability)
-      ) {
-        return blocked(
-          "RESTART_BINDING_UNKNOWN",
-          "Restart state is incomplete or signing/submission journals do not bind the same exact transaction."
-        );
-      }
-      return createBscTestnetPtaWbnbPoolReconciliationRecoveryCoreForInternalUse(
-        Object.freeze({
-          now: ports.now,
-          acquireRecoveryCapability: async () => recoveryCapability,
-          journal: ports.submissionJournal,
-          observeExactTransaction: observeExactBscTestnetPtaWbnbPoolTransactionForInternalUse
-        })
-      ).submitAndReconcileOnce();
-    }
-    if (recoveryState.state === "signed_committed") {
-      return blocked(
-        "RESTART_SIGNED_COMMIT_REQUIRES_NEW_AUTHORITY",
-        "A durable signed transaction exists without submission_started; persisted evidence cannot recreate owner authority, so signing and sending are forbidden.",
-        recoveryState.capability.transaction.transactionHash
-      );
-    }
-    if (signingState.status !== "empty") {
-      return blocked(
-        "SIGNING_JOURNAL_NOT_FRESH",
-        "A prior signing state exists; the signer will not be entered again."
+        "FRESH_JOURNALS_CHANGED_AFTER_OWNER_CONFIRMATION",
+        "Durable state changed after the recovery probes or owner ceremony; signing and submission are forbidden."
       );
     }
     const descriptor = describeBscTestnetPtaWbnbPoolOneShotBoundary(envelope, ports.now);
     if (descriptor.status !== "prepared_non_authorizing") {
       return blocked("ENVELOPE_INVALID", "Fresh exact coordinator envelope is unavailable.");
     }
-    const authorization = ports.authority.authorize(descriptor, command);
-    if (authorization.status !== "authorized") {
-      return blocked(authorization.issue.code, authorization.issue.message);
+    const intent = ports.intent;
+    let authenticatedIntent = false;
+    try {
+      authenticatedIntent = ports.authenticateAuthorizedIntent(intent) === true;
+    } catch {
+      authenticatedIntent = false;
     }
-    const intent = authorization.intent;
+    if (
+      !authenticatedIntent ||
+      intent.operationKey !== descriptor.operationKey ||
+      intent.envelopeHash !== descriptor.envelopeHash ||
+      intent.expiresAt !== descriptor.envelopeExpiresAt ||
+      intent.transaction.sourceEnvelopeHash !== descriptor.envelopeHash ||
+      intent.transaction.gasLimit !== descriptor.exactBinding.gasLimit.toString() ||
+      intent.transaction.gasPriceWei !== descriptor.exactBinding.gasPriceWei.toString()
+    ) {
+      return blocked(
+        "ACTIVATED_INTENT_INVALID",
+        "The post-ceremony native activation is not exactly bound to the fresh envelope."
+      );
+    }
     const fixedClients =
       createFixedOfficialBscTestnetPtaWbnbPoolPostClaimRpcClientsForInternalUse();
     const rechecker = createBscTestnetPtaWbnbPoolPostClaimRecheckerForInternalUse(
       Object.freeze({
         ...fixedClients,
         now: ports.now,
-        authenticateAuthorizedIntent: ports.authority.authenticateAuthorizedIntent,
+        authenticateAuthorizedIntent: ports.authenticateAuthorizedIntent,
         issueJournalClaimToken: () => {
           const bytes = randomBytes(32);
           try {
@@ -398,12 +482,12 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
         }
       })
     );
-    const worker = ports.issueWorker(authorization.executionCapability);
+    const worker = ports.issueWorker(ports.executionCapability);
     const signer = createBscTestnetPtaWbnbPoolOneShotSignerCoreForInternalUse(
       Object.freeze({
         asOf: ports.now,
         acquireAuthorizedIntent: async () => intent,
-        authenticateAuthorizedIntent: ports.authority.authenticateAuthorizedIntent,
+        authenticateAuthorizedIntent: ports.authenticateAuthorizedIntent,
         claimExactInitialization: async (request: BscTestnetPtaWbnbPoolDurableClaimRequest) => {
           if (
             request.operation !== BSC_TESTNET_PTA_WBNB_POOL_DURABLE_CLAIM_OPERATION ||
@@ -461,6 +545,7 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
     if (signed.status !== "signed_committed") {
       return blocked(signed.issue.code, signed.issue.message, signed.transactionHash);
     }
+    durableSignedTransactionHash = signed.transactionHash;
     const signedState = await ports.signingJournal.readState();
     const preSubmission = await acquireBscTestnetPtaWbnbPoolProductionPreSubmissionForInternalUse({
       transactionHash: signed.transactionHash,
@@ -503,9 +588,13 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
         authenticateSubmissionCapability: (value: unknown) =>
           typeof value === "object" && value !== null && !isProxy(value) && branded.has(value),
         journal: ports.submissionJournal,
-        acquireTerminalPreSendRecheck:
-          acquireBscTestnetPtaWbnbPoolProductionPreSubmissionForInternalUse,
-        sendExactRawTransactionOnce: sendExactBscTestnetPtaWbnbPoolRawTransactionOnceForInternalUse,
+        acquireTerminalPreSendRecheck: (input: BscTestnetPtaWbnbPoolProductionPreSubmissionInput) =>
+          ports.broadcaster.acquireTerminalPreSendRecheck(ports.executionCapability, input),
+        sendExactRawTransactionOnce: (signedTransaction: Hex) =>
+          ports.broadcaster.sendExactRawTransactionOnce(
+            ports.executionCapability,
+            signedTransaction
+          ),
         observeExactTransaction: observeExactBscTestnetPtaWbnbPoolTransactionForInternalUse
       })
     );
@@ -513,20 +602,27 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
   };
 
   return Object.freeze({
-    runOnce: (envelope, command) => {
+    runOnce: (envelope) => {
       if (terminal !== null) return Promise.resolve(terminal);
       if (active !== null) return active;
       active = Promise.resolve()
-        .then(() => run(envelope, command))
+        .then(() => run(envelope))
         .then((result) => {
           terminal = result;
           return result;
         })
         .catch(() => {
-          const result = blocked(
-            "PRODUCTION_OUTCOME_UNKNOWN",
-            "The one-shot outcome is unknown; do not retry signing or broadcast automatically."
-          );
+          const result =
+            durableSignedTransactionHash === null
+              ? blocked(
+                  "PRODUCTION_OUTCOME_UNKNOWN",
+                  "The one-shot outcome is unknown; do not retry signing or broadcast automatically."
+                )
+              : blocked(
+                  "POST_SIGNING_OUTCOME_UNKNOWN_DO_NOT_RETRY",
+                  "A durable signed transaction exists and later progress is unknown; do not retry signing or broadcast. Restart may only inspect durable evidence and reconcile a matching submission_started state.",
+                  durableSignedTransactionHash
+                );
           terminal = result;
           return result;
         })

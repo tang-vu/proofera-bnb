@@ -1,4 +1,5 @@
-import { link, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
+import { link, lstat, mkdtemp, readdir, rm, symlink, writeFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, win32 } from "node:path";
 
@@ -43,11 +44,16 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V2_POLICY,
   createBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUse,
   createWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalAtSyntheticDirectoryForTests,
+  openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalAtSyntheticDirectoryForTests,
   type BscTestnetPtaWbnbPoolDurableSignedCommitRequest,
   type BscTestnetPtaWbnbPoolSubmissionJournalPorts
 } from "./bsc-testnet-pta-wbnb-pool-submission-journal.server";
 
 const NOW = "2026-08-13T10:00:00.000Z";
+const SOURCE = readFileSync(
+  new URL("./bsc-testnet-pta-wbnb-pool-submission-journal.server.ts", import.meta.url),
+  "utf8"
+);
 const PRIVATE_KEY = `0x${"11".repeat(32)}` as Hex;
 const bytes32 = (byte: string) => `0x${byte.repeat(64)}` as Hex;
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as const;
@@ -235,6 +241,16 @@ try {
 } catch { exit 72 }
 `;
 
+const SNAPSHOT_SYNTHETIC_ACL_SCRIPT = String.raw`
+$ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
+try {
+  $path = ([Console]::In.ReadToEnd() | ConvertFrom-Json).path
+  $acl = Get-Acl -LiteralPath $path
+  [Console]::Out.Write((@{ owner = $acl.Owner; sddl = $acl.Sddl } | ConvertTo-Json -Compress))
+} catch { exit 75 }
+`;
+
 async function runSyntheticPowerShell(script: string, path: string): Promise<void> {
   const input = Buffer.from(JSON.stringify({ path }), "utf8");
   let output: Buffer | null = null;
@@ -255,6 +271,47 @@ async function runSyntheticPowerShell(script: string, path: string): Promise<voi
     input.fill(0);
     output?.fill(0);
   }
+}
+
+async function snapshotSyntheticAcl(path: string): Promise<string> {
+  const input = Buffer.from(JSON.stringify({ path }), "utf8");
+  let output: Buffer | null = null;
+  try {
+    output = (
+      await runPinnedPowerShellForInternalUse(
+        SNAPSHOT_SYNTHETIC_ACL_SCRIPT,
+        input,
+        4_096,
+        new AbortController().signal
+      )
+    ).output;
+    return new TextDecoder("utf-8", { fatal: true }).decode(output);
+  } finally {
+    input.fill(0);
+    output?.fill(0);
+  }
+}
+
+async function snapshotSyntheticTree(directory: string): Promise<unknown> {
+  const names = (await readdir(directory)).sort();
+  const paths = [directory, ...names.map((name) => win32.join(directory, name))];
+  const snapshots = [];
+  for (const path of paths) {
+    const metadata = await lstat(path, { bigint: true });
+    snapshots.push(
+      Object.freeze({
+        path,
+        mode: metadata.mode.toString(),
+        size: metadata.size.toString(),
+        nlink: metadata.nlink.toString(),
+        mtimeNs: metadata.mtimeNs.toString(),
+        ctimeNs: metadata.ctimeNs.toString(),
+        birthtimeNs: metadata.birthtimeNs.toString(),
+        acl: await snapshotSyntheticAcl(path)
+      })
+    );
+  }
+  return Object.freeze({ names: Object.freeze(names), snapshots: Object.freeze(snapshots) });
 }
 
 async function createSyntheticWindowsDirectory(): Promise<string> {
@@ -495,11 +552,56 @@ describe("durable PTA/WBNB submission journal v2", () => {
       capability: null
     });
   });
+
+  it("keeps the fixed recovery path resolver read-only and separate from provisioning", () => {
+    expect(SOURCE).not.toContain("process.env");
+    const readOnlyStart = SOURCE.indexOf("const LOCAL_APPLICATION_DATA_READ_ONLY_PROBE_SCRIPT");
+    const provisioningStart = SOURCE.indexOf("const PREPARE_SCRIPT");
+    const readOnlyScript = SOURCE.slice(readOnlyStart, provisioningStart);
+    expect(readOnlyStart).toBeGreaterThan(0);
+    expect(provisioningStart).toBeGreaterThan(readOnlyStart);
+    expect(readOnlyScript).not.toMatch(/New-Item|SetAccessControl|Remove-Item/u);
+  });
 });
 
 describe.runIf(process.platform === "win32")(
   "Windows durable PTA/WBNB journal faults in synthetic temporary directories",
   () => {
+    it("probes an empty existing directory without changing bytes, metadata, or ACL", async () => {
+      const directory = await createSyntheticWindowsDirectory();
+      try {
+        const before = await snapshotSyntheticTree(directory);
+        await expect(
+          openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalAtSyntheticDirectoryForTests(
+            directory
+          )
+        ).resolves.toMatchObject({ status: "absent", state: { state: "empty" } });
+        expect(await snapshotSyntheticTree(directory)).toEqual(before);
+      } finally {
+        await removeSyntheticWindowsDirectory(directory);
+      }
+    }, 30_000);
+
+    it("blocks partial/order-mismatched recovery files without changing them", async () => {
+      for (const name of ["01-signed-commit.v2.json", "02-submission-started.v2.json"] as const) {
+        const directory = await createSyntheticWindowsDirectory();
+        try {
+          const path = win32.join(directory, name);
+          await writeFile(path, '{"partial":true}', { encoding: "utf8", flag: "wx" });
+          await runSyntheticPowerShell(PROTECT_SYNTHETIC_PATH_SCRIPT, path);
+          const before = await snapshotSyntheticTree(directory);
+          await expect(
+            openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalAtSyntheticDirectoryForTests(
+              directory
+            )
+          ).resolves.toMatchObject({ status: "blocked", state: null });
+          expect(await snapshotSyntheticTree(directory)).toEqual(before);
+        } finally {
+          await removeSyntheticWindowsDirectory(directory);
+        }
+      }
+    }, 45_000);
+
     it("flushes/protects an exact record and preserves signed evidence after a partial-file crash", async () => {
       const directory = await createSyntheticWindowsDirectory();
       try {
@@ -549,6 +651,13 @@ describe.runIf(process.platform === "win32")(
           WEAKEN_SYNTHETIC_ACL_SCRIPT,
           win32.join(aclDirectory, "01-signed-commit.v2.json")
         );
+        const before = await snapshotSyntheticTree(aclDirectory);
+        await expect(
+          openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalAtSyntheticDirectoryForTests(
+            aclDirectory
+          )
+        ).resolves.toMatchObject({ status: "blocked", state: null });
+        expect(await snapshotSyntheticTree(aclDirectory)).toEqual(before);
         const restarted =
           await createWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalAtSyntheticDirectoryForTests(
             aclDirectory
@@ -573,6 +682,13 @@ describe.runIf(process.platform === "win32")(
           win32.join(linkDirectory, "01-signed-commit.v2.json"),
           win32.join(linkDirectory, "02-submission-started.v2.json")
         );
+        const before = await snapshotSyntheticTree(linkDirectory);
+        await expect(
+          openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalAtSyntheticDirectoryForTests(
+            linkDirectory
+          )
+        ).resolves.toMatchObject({ status: "blocked", state: null });
+        expect(await snapshotSyntheticTree(linkDirectory)).toEqual(before);
         const restarted =
           await createWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalAtSyntheticDirectoryForTests(
             linkDirectory
@@ -591,6 +707,13 @@ describe.runIf(process.platform === "win32")(
       const target = await createSyntheticWindowsDirectory();
       try {
         await symlink(target, win32.join(directory, "01-signed-commit.v2.json"), "junction");
+        const targetBefore = await snapshotSyntheticTree(target);
+        await expect(
+          openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalAtSyntheticDirectoryForTests(
+            directory
+          )
+        ).resolves.toMatchObject({ status: "blocked", state: null });
+        expect(await snapshotSyntheticTree(target)).toEqual(targetBefore);
         const journal =
           await createWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalAtSyntheticDirectoryForTests(
             directory

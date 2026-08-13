@@ -32,9 +32,14 @@ describe("BSC testnet PTA/WBNB pool preparation package boundary", () => {
       "createBscTestnetPtaWbnbPoolProductionAuthorityForInternalUse",
       "createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse",
       "createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeForInternalUse",
+      "authenticateBscTestnetPtaWbnbPoolNativeProductionBridgeForInternalUse",
       "createBscTestnetPtaWbnbPoolProductionWorkerIssuerForInternalUse",
       "conductBscTestnetPtaWbnbPoolOwnerCeremonyForInternalUse",
+      "readBscTestnetPtaWbnbPoolReleaseReviewPolicyFromControllingTtyForInternalUse",
+      "createBscTestnetPtaWbnbPoolPrivateBroadcasterForInternalUse",
+      "openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse",
       "createWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUse",
+      "openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse",
       "acquireBscTestnetPtaWbnbPoolProductionPreSubmissionForInternalUse",
       "sendExactBscTestnetPtaWbnbPoolRawTransactionOnceForInternalUse",
       "runBscTestnetPtaWbnbPoolProductionOnceFromStdin",
@@ -65,6 +70,8 @@ describe("BSC testnet PTA/WBNB pool preparation package boundary", () => {
       "pool-production-composition",
       "pool-production-rpc",
       "pool-production-runner",
+      "pool-private-broadcaster",
+      "pool-release-review-policy",
       "pool-submission-journal"
     ]) {
       expect(exportKeys.some((value) => value.includes(forbiddenFragment))).toBe(false);

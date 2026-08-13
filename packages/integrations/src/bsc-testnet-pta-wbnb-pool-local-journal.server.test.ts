@@ -1,5 +1,8 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { link, lstat, mkdtemp, readdir, rm, symlink, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { dirname, join, win32 } from "node:path";
 
 import { describe, expect, it, vi } from "vitest";
 import { keccak256, serializeTransaction, type Hex } from "viem";
@@ -18,9 +21,11 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   createBscTestnetPtaWbnbPoolLocalJournalCore,
   deriveBscTestnetPtaWbnbPoolAuthorizationReceiptSha256,
+  openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalAtSyntheticDirectoryForTests,
   type BscTestnetPtaWbnbPoolClaimRequest,
   type BscTestnetPtaWbnbPoolLocalJournalPorts
 } from "./bsc-testnet-pta-wbnb-pool-local-journal.server";
+import { runPinnedPowerShellForInternalUse } from "./bsc-testnet-deployer-custody-windows.server";
 import {
   BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA
@@ -39,6 +44,96 @@ const SOURCE = readFileSync(
   "utf8"
 );
 const hex32 = (byte: string): Hex => `0x${byte.repeat(64)}` as Hex;
+
+const PROTECT_SYNTHETIC_PATH_SCRIPT = String.raw`
+$ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
+try {
+  $path = ([Console]::In.ReadToEnd() | ConvertFrom-Json).path
+  $current = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
+  $item = Get-Item -LiteralPath $path -Force
+  if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'reparse' }
+  if ($item.PSIsContainer) {
+    $inherit = [System.Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [System.Security.AccessControl.InheritanceFlags]::ObjectInherit
+    $acl = [System.Security.AccessControl.DirectorySecurity]::new()
+    $acl.SetOwner($current)
+    $acl.SetAccessRuleProtection($true, $false)
+    [void]$acl.AddAccessRule([System.Security.AccessControl.FileSystemAccessRule]::new($current,[System.Security.AccessControl.FileSystemRights]::FullControl,$inherit,[System.Security.AccessControl.PropagationFlags]::None,[System.Security.AccessControl.AccessControlType]::Allow))
+    [IO.Directory]::SetAccessControl($item.FullName, $acl)
+  } else {
+    $acl = [System.Security.AccessControl.FileSecurity]::new()
+    $acl.SetOwner($current)
+    $acl.SetAccessRuleProtection($true, $false)
+    [void]$acl.AddAccessRule([System.Security.AccessControl.FileSystemAccessRule]::new($current,[System.Security.AccessControl.FileSystemRights]::FullControl,[System.Security.AccessControl.AccessControlType]::Allow))
+    [IO.File]::SetAccessControl($item.FullName, $acl)
+  }
+  [Console]::Out.Write('{"ok":true}')
+} catch { exit 73 }
+`;
+
+const SNAPSHOT_SYNTHETIC_ACL_SCRIPT = String.raw`
+$ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
+try {
+  $path = ([Console]::In.ReadToEnd() | ConvertFrom-Json).path
+  $acl = Get-Acl -LiteralPath $path
+  [Console]::Out.Write((@{ owner = $acl.Owner; sddl = $acl.Sddl } | ConvertTo-Json -Compress))
+} catch { exit 74 }
+`;
+
+async function syntheticPowerShell(script: string, path: string): Promise<string> {
+  const input = Buffer.from(JSON.stringify({ path }), "utf8");
+  let output: Buffer | null = null;
+  try {
+    output = (
+      await runPinnedPowerShellForInternalUse(script, input, 4_096, new AbortController().signal)
+    ).output;
+    return new TextDecoder("utf-8", { fatal: true }).decode(output);
+  } finally {
+    input.fill(0);
+    output?.fill(0);
+  }
+}
+
+async function protectSynthetic(path: string): Promise<void> {
+  expect(await syntheticPowerShell(PROTECT_SYNTHETIC_PATH_SCRIPT, path)).toBe('{"ok":true}');
+}
+
+async function createSyntheticDirectory(): Promise<string> {
+  const directory = win32.normalize(await mkdtemp(join(tmpdir(), "proofera-local-journal-test-")));
+  await protectSynthetic(directory);
+  return directory;
+}
+
+async function cleanupSyntheticDirectory(directory: string): Promise<void> {
+  const normalized = win32.normalize(directory);
+  if (dirname(normalized).toLowerCase() !== win32.normalize(tmpdir()).toLowerCase()) {
+    throw new Error("Synthetic journal cleanup escaped the OS temporary directory.");
+  }
+  await rm(normalized, { force: true, recursive: true });
+}
+
+async function snapshotSyntheticTree(directory: string): Promise<unknown> {
+  const names = (await readdir(directory)).sort();
+  const paths = [directory, ...names.map((name) => win32.join(directory, name))];
+  const snapshots = [];
+  for (const path of paths) {
+    const metadata = await lstat(path, { bigint: true });
+    snapshots.push(
+      Object.freeze({
+        path,
+        mode: metadata.mode.toString(),
+        size: metadata.size.toString(),
+        nlink: metadata.nlink.toString(),
+        mtimeNs: metadata.mtimeNs.toString(),
+        ctimeNs: metadata.ctimeNs.toString(),
+        birthtimeNs: metadata.birthtimeNs.toString(),
+        acl: await syntheticPowerShell(SNAPSHOT_SYNTHETIC_ACL_SCRIPT, path)
+      })
+    );
+  }
+  return Object.freeze({ names: Object.freeze(names), snapshots: Object.freeze(snapshots) });
+}
 
 function exactTransaction() {
   const transaction = buildBscTestnetPtaWbnbPoolExactSigningTransaction({
@@ -561,5 +656,79 @@ describe("PTA/WBNB pool local append-only journal", () => {
     expect(SOURCE).toContain("before.mode !== after.mode");
     expect(SOURCE).toContain("before.nlink !== after.nlink");
     expect(SOURCE).toContain("after.nlink !== 1n");
+    const readOnlyStart = SOURCE.indexOf("const LOCAL_APPLICATION_DATA_READ_ONLY_PROBE_SCRIPT");
+    const provisioningStart = SOURCE.indexOf("const LOCAL_APPLICATION_DATA_PROBE_SCRIPT");
+    const readOnlyScript = SOURCE.slice(readOnlyStart, provisioningStart);
+    expect(readOnlyStart).toBeGreaterThan(0);
+    expect(provisioningStart).toBeGreaterThan(readOnlyStart);
+    expect(readOnlyScript).not.toMatch(/New-Item|SetAccessControl|Remove-Item/u);
   });
+});
+
+describe.runIf(process.platform === "win32")("read-only Windows signing recovery probe", () => {
+  it("reports an empty existing directory without changing bytes, metadata, or ACL", async () => {
+    const directory = await createSyntheticDirectory();
+    try {
+      const before = await snapshotSyntheticTree(directory);
+      await expect(
+        openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalAtSyntheticDirectoryForTests(directory)
+      ).resolves.toMatchObject({ status: "absent", state: { status: "empty" } });
+      expect(await snapshotSyntheticTree(directory)).toEqual(before);
+    } finally {
+      await cleanupSyntheticDirectory(directory);
+    }
+  }, 30_000);
+
+  it("blocks partial/mismatched files and hard links without changing retained state", async () => {
+    for (const names of [["01-claim.v1.json"], ["02-transition.v1.json"]] as const) {
+      const directory = await createSyntheticDirectory();
+      try {
+        for (const name of names) {
+          const path = win32.join(directory, name);
+          await writeFile(path, '{"partial":true}', { encoding: "utf8", flag: "wx" });
+          await protectSynthetic(path);
+        }
+        const before = await snapshotSyntheticTree(directory);
+        await expect(
+          openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalAtSyntheticDirectoryForTests(
+            directory
+          )
+        ).resolves.toMatchObject({ status: "blocked", state: null });
+        expect(await snapshotSyntheticTree(directory)).toEqual(before);
+      } finally {
+        await cleanupSyntheticDirectory(directory);
+      }
+    }
+
+    const directory = await createSyntheticDirectory();
+    try {
+      const first = win32.join(directory, "01-claim.v1.json");
+      await writeFile(first, '{"partial":true}', { encoding: "utf8", flag: "wx" });
+      await protectSynthetic(first);
+      await link(first, win32.join(directory, "02-transition.v1.json"));
+      const before = await snapshotSyntheticTree(directory);
+      await expect(
+        openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalAtSyntheticDirectoryForTests(directory)
+      ).resolves.toMatchObject({ status: "blocked", state: null });
+      expect(await snapshotSyntheticTree(directory)).toEqual(before);
+    } finally {
+      await cleanupSyntheticDirectory(directory);
+    }
+  }, 45_000);
+
+  it("blocks a reparse-point child without following or mutating it", async () => {
+    const directory = await createSyntheticDirectory();
+    const target = await createSyntheticDirectory();
+    try {
+      await symlink(target, win32.join(directory, "01-claim.v1.json"), "junction");
+      const before = await snapshotSyntheticTree(directory);
+      await expect(
+        openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalAtSyntheticDirectoryForTests(directory)
+      ).resolves.toMatchObject({ status: "blocked", state: null });
+      expect(await snapshotSyntheticTree(directory)).toEqual(before);
+    } finally {
+      await cleanupSyntheticDirectory(directory);
+      await cleanupSyntheticDirectory(target);
+    }
+  }, 30_000);
 });

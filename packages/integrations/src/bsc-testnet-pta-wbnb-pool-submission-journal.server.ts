@@ -260,6 +260,45 @@ export interface BscTestnetPtaWbnbPoolDurableSubmissionJournal extends BscTestne
   readonly readRecoveryState: () => Promise<BscTestnetPtaWbnbPoolSubmissionRecoveryState>;
 }
 
+export interface BscTestnetPtaWbnbPoolSubmissionJournalRecoveryReader extends BscTestnetPtaWbnbPoolDurableSubmissionJournal {
+  /** Null means the retained on-disk sequence is not a complete, strictly valid recovery state. */
+  readonly readStrictRecoveryState: () => Promise<BscTestnetPtaWbnbPoolSubmissionRecoveryState | null>;
+}
+
+export type BscTestnetPtaWbnbPoolSubmissionJournalRecoveryProbeResult =
+  | Readonly<{
+      status: "ready";
+      presence: "absent" | "present";
+      state: BscTestnetPtaWbnbPoolSubmissionRecoveryState;
+      issue: null;
+    }>
+  | Readonly<{
+      status: "blocked";
+      presence: "unknown";
+      state: null;
+      issue: Readonly<{ code: "RECOVERY_JOURNAL_INVALID"; message: string }>;
+    }>;
+
+export type BscTestnetPtaWbnbPoolExistingSubmissionJournalResult =
+  | Readonly<{
+      status: "absent";
+      journal: null;
+      state: Readonly<{ state: "empty" }>;
+      issue: null;
+    }>
+  | Readonly<{
+      status: "opened";
+      journal: BscTestnetPtaWbnbPoolSubmissionJournalRecoveryReader;
+      state: BscTestnetPtaWbnbPoolSubmissionRecoveryState;
+      issue: null;
+    }>
+  | Readonly<{
+      status: "blocked";
+      journal: null;
+      state: null;
+      issue: Readonly<{ code: "RECOVERY_JOURNAL_INVALID"; message: string }>;
+    }>;
+
 function inspectRecord(input: unknown, expectedKeys?: readonly string[]): DataRecord | null {
   try {
     if (input === null || typeof input !== "object" || Array.isArray(input) || isProxy(input)) {
@@ -733,7 +772,7 @@ function unknownSnapshot(
 /** Append-only protocol core; production supplies only the fixed Windows adapter below. */
 export function createBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUse(
   untrustedPorts: unknown
-): BscTestnetPtaWbnbPoolDurableSubmissionJournal {
+): BscTestnetPtaWbnbPoolSubmissionJournalRecoveryReader {
   const ports = inspectPorts(untrustedPorts);
   if (ports === null) throw new Error("PTA_WBNB_POOL_SUBMISSION_JOURNAL_CONFIGURATION_INVALID");
   let terminalUnknownSnapshot: Snapshot | null = null;
@@ -882,8 +921,9 @@ export function createBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUs
         );
   };
 
-  const readRecoveryState = async (): Promise<BscTestnetPtaWbnbPoolSubmissionRecoveryState> => {
-    const snapshot = await readSnapshot();
+  const recoveryStateFromSnapshot = (
+    snapshot: Snapshot
+  ): BscTestnetPtaWbnbPoolSubmissionRecoveryState => {
     if (snapshot.state === "empty") return Object.freeze({ state: "empty" as const });
     if (
       snapshot.state === "unknown_outcome" ||
@@ -915,6 +955,16 @@ export function createBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUs
       sendingAuthorizedByJournal: false as const
     });
   };
+
+  const readRecoveryState = async (): Promise<BscTestnetPtaWbnbPoolSubmissionRecoveryState> =>
+    recoveryStateFromSnapshot(await readSnapshot());
+
+  const readStrictRecoveryState =
+    async (): Promise<BscTestnetPtaWbnbPoolSubmissionRecoveryState | null> => {
+      const snapshot = await readSnapshot();
+      if (snapshot.state === "unknown_outcome") return null;
+      return recoveryStateFromSnapshot(snapshot);
+    };
 
   const commitSubmissionStarted = async (
     input: BscTestnetPtaWbnbPoolSubmissionStartedRequest
@@ -1052,10 +1102,25 @@ export function createBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUs
     initializeSignedCommit,
     readState,
     readRecoveryState,
+    readStrictRecoveryState,
     commitSubmissionStarted,
     commitTerminalReconciliation
   });
 }
+
+const LOCAL_APPLICATION_DATA_READ_ONLY_PROBE_SCRIPT = String.raw`
+$ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
+try {
+  $base = [Environment]::GetFolderPath([Environment+SpecialFolder]::LocalApplicationData)
+  if ([String]::IsNullOrWhiteSpace($base)) { throw 'base' }
+  $item = Get-Item -LiteralPath $base -Force
+  if (-not $item.PSIsContainer) { throw 'type' }
+  if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'reparse' }
+  if ([IO.Path]::GetFullPath($item.FullName) -ne [IO.Path]::GetFullPath($base)) { throw 'path' }
+  [Console]::Out.Write((@{ localApplicationData = $item.FullName } | ConvertTo-Json -Compress))
+} catch { exit 60 }
+`;
 
 const PREPARE_SCRIPT = String.raw`
 $ErrorActionPreference = 'Stop'
@@ -1266,7 +1331,80 @@ function expectedDirectory(value: unknown): string | null {
     : resolve(directory);
 }
 
-function createWindowsAdapter(directory: string): BscTestnetPtaWbnbPoolDurableSubmissionJournal {
+async function stableDirectoryPresence(path: string): Promise<"present" | "absent"> {
+  try {
+    const before = await lstat(path, { bigint: true });
+    const canonical = await realpath(path);
+    const after = await lstat(path, { bigint: true });
+    if (
+      !before.isDirectory() ||
+      before.isSymbolicLink() ||
+      !after.isDirectory() ||
+      after.isSymbolicLink() ||
+      before.dev !== after.dev ||
+      before.ino !== after.ino ||
+      before.birthtimeNs !== after.birthtimeNs ||
+      before.ctimeNs !== after.ctimeNs ||
+      before.mode !== after.mode ||
+      before.nlink !== after.nlink ||
+      after.nlink < 1n ||
+      win32.normalize(canonical).toLowerCase() !== win32.normalize(path).toLowerCase()
+    ) {
+      throw new Error("PTA_WBNB_POOL_SUBMISSION_JOURNAL_DIRECTORY_INVALID");
+    }
+    return "present";
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return "absent";
+    throw error;
+  }
+}
+
+async function readOnlyFixedDirectory(): Promise<string | null> {
+  const raw = inspectRecord(
+    await powershellJson(LOCAL_APPLICATION_DATA_READ_ONLY_PROBE_SCRIPT, {}, 1_024),
+    ["localApplicationData"]
+  );
+  const base = raw?.localApplicationData;
+  if (typeof base !== "string") {
+    throw new Error("PTA_WBNB_POOL_SUBMISSION_JOURNAL_CONFIGURATION_INVALID");
+  }
+  const expected = expectedDirectory({ directory: win32.join(base, ...SUBDIRECTORY) });
+  if (expected === null) {
+    throw new Error("PTA_WBNB_POOL_SUBMISSION_JOURNAL_CONFIGURATION_INVALID");
+  }
+  let cursor = resolve(base);
+  if ((await stableDirectoryPresence(cursor)) !== "present") {
+    throw new Error("PTA_WBNB_POOL_SUBMISSION_JOURNAL_CONFIGURATION_INVALID");
+  }
+  for (const segment of SUBDIRECTORY) {
+    const candidate = win32.join(cursor, segment);
+    if (win32.dirname(candidate).toLowerCase() !== win32.normalize(cursor).toLowerCase()) {
+      throw new Error("PTA_WBNB_POOL_SUBMISSION_JOURNAL_CONFIGURATION_INVALID");
+    }
+    if ((await stableDirectoryPresence(candidate)) === "absent") return null;
+    cursor = candidate;
+  }
+  if (win32.normalize(cursor).toLowerCase() !== win32.normalize(expected).toLowerCase()) {
+    throw new Error("PTA_WBNB_POOL_SUBMISSION_JOURNAL_CONFIGURATION_INVALID");
+  }
+  return expected;
+}
+
+function recoveryBlocked(): BscTestnetPtaWbnbPoolExistingSubmissionJournalResult {
+  return Object.freeze({
+    status: "blocked" as const,
+    journal: null,
+    state: null,
+    issue: Object.freeze({
+      code: "RECOVERY_JOURNAL_INVALID" as const,
+      message: "The existing submission journal could not be validated without mutation."
+    })
+  });
+}
+
+function createWindowsAdapter(
+  directory: string
+): BscTestnetPtaWbnbPoolSubmissionJournalRecoveryReader {
   return createBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUse(
     Object.freeze({
       now: () => new Date(),
@@ -1340,6 +1478,77 @@ function createWindowsAdapter(directory: string): BscTestnetPtaWbnbPoolDurableSu
   );
 }
 
+async function openExistingAtDirectory(
+  directory: string
+): Promise<BscTestnetPtaWbnbPoolExistingSubmissionJournalResult> {
+  try {
+    const entries = await readdir(directory, { withFileTypes: true });
+    const names: string[] = [];
+    for (const entry of entries) {
+      if (!entry.isFile() || !isJournalFileName(entry.name)) {
+        throw new Error("PTA_WBNB_POOL_SUBMISSION_JOURNAL_DIRECTORY_CONTAMINATED");
+      }
+      names.push(entry.name);
+    }
+    names.sort();
+    if (!(await verifyPaths(directory, names))) return recoveryBlocked();
+    if (names.length === 0) {
+      return Object.freeze({
+        status: "absent" as const,
+        journal: null,
+        state: Object.freeze({ state: "empty" as const }),
+        issue: null
+      });
+    }
+    const journal = createWindowsAdapter(directory);
+    const state = await journal.readStrictRecoveryState();
+    return state === null
+      ? recoveryBlocked()
+      : Object.freeze({ status: "opened" as const, journal, state, issue: null });
+  } catch {
+    return recoveryBlocked();
+  }
+}
+
+/**
+ * Strict no-write recovery open over the fixed LocalAppData journal. It does not provision paths,
+ * change ACLs, read custody, contact RPC, sign, or submit.
+ */
+export async function openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse(): Promise<BscTestnetPtaWbnbPoolExistingSubmissionJournalResult> {
+  if (process.platform !== "win32") return recoveryBlocked();
+  try {
+    const directory = await readOnlyFixedDirectory();
+    return directory === null
+      ? Object.freeze({
+          status: "absent" as const,
+          journal: null,
+          state: Object.freeze({ state: "empty" as const }),
+          issue: null
+        })
+      : openExistingAtDirectory(directory);
+  } catch {
+    return recoveryBlocked();
+  }
+}
+
+export async function probeWindowsBscTestnetPtaWbnbPoolSubmissionJournalRecoveryForInternalUse(): Promise<BscTestnetPtaWbnbPoolSubmissionJournalRecoveryProbeResult> {
+  const opened =
+    await openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse();
+  return opened.status === "blocked"
+    ? Object.freeze({
+        status: "blocked" as const,
+        presence: "unknown" as const,
+        state: null,
+        issue: opened.issue
+      })
+    : Object.freeze({
+        status: "ready" as const,
+        presence: opened.status === "opened" ? ("present" as const) : ("absent" as const),
+        state: opened.state,
+        issue: null
+      });
+}
+
 /** Fixed current-user-only Windows composition. No caller path or mutable storage choice exists. */
 export async function createWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUse(): Promise<BscTestnetPtaWbnbPoolDurableSubmissionJournal> {
   if (process.platform !== "win32") {
@@ -1381,4 +1590,26 @@ export async function createWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournal
     throw new Error("PTA_WBNB_POOL_SUBMISSION_JOURNAL_TEST_DIRECTORY_INVALID");
   }
   return createWindowsAdapter(directory);
+}
+
+/** Test-only no-write recovery seam over a caller-created synthetic directory. */
+export async function openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalAtSyntheticDirectoryForTests(
+  untrustedDirectory: unknown
+): Promise<BscTestnetPtaWbnbPoolExistingSubmissionJournalResult> {
+  if (process.platform !== "win32") return recoveryBlocked();
+  if (
+    typeof untrustedDirectory !== "string" ||
+    untrustedDirectory.length > 500 ||
+    !/^[A-Za-z]:\\[^\0\r\n]*$/u.test(untrustedDirectory) ||
+    untrustedDirectory.includes("/") ||
+    win32.normalize(untrustedDirectory) !== untrustedDirectory
+  ) {
+    return recoveryBlocked();
+  }
+  const directory = resolve(untrustedDirectory);
+  const relation = relative(REPOSITORY_ROOT, directory);
+  if (relation === "" || (!relation.startsWith(`..${sep}`) && relation !== "..")) {
+    return recoveryBlocked();
+  }
+  return openExistingAtDirectory(directory);
 }
