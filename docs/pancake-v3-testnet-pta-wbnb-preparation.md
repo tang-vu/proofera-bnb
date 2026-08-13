@@ -1,19 +1,24 @@
 # PancakeSwap V3 BSC testnet PTA/WBNB pool readiness
 
-Updated: 2026-08-13. Decision: **exact offline provenance and a non-authorizing read-only
-preflight boundary are recorded; no pool or write is approved**.
+Updated: 2026-08-13. Decision: **exact offline provenance, a non-authorizing read-only
+preflight, an old-scope unsent review request, and production-blocked signing/post-claim/submission/
+reconciliation scaffolds are recorded; no pool or write is approved**.
 
 Machine record:
 [`evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json`](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json)
+
+Non-authorizing external-review request:
+[`evidence/development/pancake-v3-pta-wbnb-external-review-request-2026-08-13.json`](../evidence/development/pancake-v3-pta-wbnb-external-review-request-2026-08-13.json)
 
 ## Scope
 
 This is a BNB Smart Chain testnet and PancakeSwap V3 preparation milestone. The historical observation
 used local ProofEra tooling and two official credential-free BNB Chain RPC endpoints. Capture created
-only fixed public evidence files. The later compiler and selector reviews run offline, and the new
-server-only coordinator is structurally unable to authorize signing or execution. None of these paths
-made an onchain RPC write, approval, signature, broadcast, pool creation, token wrapping, liquidity
-mint, swap, or mainnet action.
+only fixed public evidence files. The later compiler and selector reviews and external-review-request
+generator run offline. The server-only coordinator cannot authorize signing or execution, and the
+post-claim and submission production factories are deliberately unavailable. The submission core
+accepts only injected test ports. None of these paths made an onchain RPC write, approval, signature,
+broadcast, pool creation, token wrapping, liquidity mint, swap, or mainnet action.
 
 The evidence answers a narrow question: what exact chain-97 state and review inputs would a future
 PTA/WBNB pool initializer have to bind? It does not answer whether the pair has a market price, is
@@ -150,6 +155,30 @@ are not rewritten. No authenticated independent reviewer is yet bound to the exa
 direct-only scope. Publication and exact re-fetch are therefore complete, but the artifact remains
 ineligible for activation and authorizes no wallet use, signature, or transaction.
 
+## Deterministic external-review request
+
+The retained
+[external-review request](../evidence/development/pancake-v3-pta-wbnb-external-review-request-2026-08-13.json)
+pins the exact direct-only initializer subject to repository commit
+`00f21c405881a5dc320bddf3c757ba13599b1e71`, exactly the eight implementation files enumerated in
+that request, the revision-pinned digest-named Gist, the retained evidence/source blobs, calldata,
+operation key, conditional CREATE2 construction, expected runtime, and explicit review checks. Its
+deterministic generator performs no network call, environment read, wallet access, signing,
+publication, delivery, or chain write.
+
+This is a request package only. `delivery.status` is `not_sent_by_this_bundle`; recipient, reviewer,
+exact accepted reviewer identity, and Sigstore authentication evidence remain null. The defined
+Sigstore verification path would still have to bind a separately provisioned independent identity,
+the exact canonical decision bytes, Fulcio certificate chain, and Rekor inclusion. Unkeyed request
+hashes prove local integrity only. They do not authenticate a reviewer.
+
+The request predates and excludes the post-claim recheck and submission/reconciliation files. Any
+future authenticated approval can close only the independent-review gate for the exact eight-file
+request subject. It cannot review the current or a future activation release, substitute for exact
+owner authorization, or authorize custody access, signing, broadcast, or an onchain write. Activation
+requires a new request and authenticated independent decision pinned to the complete exact release.
+The old request has not been sent, accepted, or approved, and execution readiness remains false.
+
 ## Server-only non-authorizing preflight and signing scaffold
 
 The integrations package now has a fixed-purpose, server-only coordinator that reads exactly two
@@ -176,14 +205,48 @@ to submit**.
 
 This scaffold is deliberately unreachable for production use. The production authority gate,
 production signer core, and production signing-worker factory each fail closed with
-`PRODUCTION_AUTHORIZATION_UNAVAILABLE`. There is no production composition, authenticated
-post-claim RPC capability issuer, broadcast/receipt runner, or replacement/reconciliation path. No
-custody read, signature, raw transaction, RPC write, or onchain action occurred while implementing or
-testing it. The eight focused integration files now pass 70 tests across the coordinator, boundary,
-package-export barrier, exact protocol, authorization gate, journal, signer core, and worker. Those
-tests establish local behavior only; they do not supply the missing external authority or transaction
-evidence. No short-lived envelope is retained as current evidence, and an expired observation cannot
-be reused.
+`PRODUCTION_AUTHORIZATION_UNAVAILABLE`. The eight earlier focused integration files pass 70 tests
+across the coordinator, boundary, package-export barrier, exact protocol, authorization gate,
+journal, signer core, and worker.
+
+A separate test-only post-claim recheck core requires the authorization gate's authenticated private
+intent before making any read. It compares only the two fixed official RPC origins, finds a common
+finalized block, uses EIP-1898 `requireCanonical`, and repeats chain, nonce, empty-pool, empty-candidate,
+sender-code, simulation, balance, gas, cost, authorization-expiry and 30-second completion bounds. Its
+opaque in-memory capability is bound to the exact claim and intent; cloned or proxy values are not
+accepted. Seventeen focused tests exercise that behavior and its failure boundaries.
+
+The recheck production constructor also fails closed with `PRODUCTION_AUTHORIZATION_UNAVAILABLE` and
+performs no production RPC call. It has no environment, filesystem/journal, custody, signer,
+signature, submission, or broadcast path. No short-lived envelope or recheck capability is retained
+as current evidence, and an expired observation cannot be reused.
+
+## Test-only submission and reconciliation scaffold
+
+The later server-only submission core accepts only injected test ports; callers of its one-shot method
+cannot provide transaction bytes. It parses and recovers the one exact legacy EIP-155 signed
+transaction, binds the sender, nonce, target, zero value, calldata, gas/cost caps and deterministic
+transaction hash, and requires a fresh dual-RPC pre-submission snapshot with the exact transaction and
+receipt still absent.
+
+The test model requires the winner to durably commit the exact `submission_started` binding before a
+send. Only that new-start winner may invoke the injected at-most-once send port. An already-started or
+unknown outcome enters reconciliation only; an ambiguous return/transport failure, expired post-start
+window, or any later retry never resends and never creates a replacement transaction.
+
+Terminal reconciliation is content-validated only after both fixed providers agree on the exact
+transaction and receipt, the receipt block is canonical below both finalized heads, and its transaction
+index is bound. Success additionally requires exactly the expected factory `PoolCreated` and pool
+`Initialize` logs plus matching EIP-1898 factory mapping, candidate runtime/immutables, `slot0`, zero
+liquidity and initialized observation state. A reverted receipt is kept distinct and cannot retain
+success logs or pool post-state.
+
+This scaffold does not supply any of those ports in production. Its production factory fails before
+capability, journal, RPC or broadcast access with `PRODUCTION_AUTHORIZATION_UNAVAILABLE`. There is no
+production authenticated submission-capability issuer, durable submission journal, RPC adapter,
+broadcaster or reconciler. No send, transaction receipt, pool or LP position was created. The local
+tests are specification/validation evidence only, and these files are not covered by the old external-
+review request.
 
 ## Separate proposed liquidity envelope
 
@@ -196,8 +259,9 @@ position authority is approved by this document.
 The two write decisions stay separate:
 
 1. Pool initialization requires its own fresh simulation, exact sender/nonce/gas/cost envelope, short
-   broadcast window, implemented and reviewed durable one-shot claim, exact external authorization,
-   signer boundary, receipt, `PoolCreated` log, and exact post-state reconciliation.
+   broadcast window, implemented and reviewed durable one-shot claim/submission journal, a new
+   authenticated full-release external review, exact owner authorization, production signer/broadcaster/
+   reconciler boundaries, receipt, exact logs, and post-state reconciliation.
 2. Only after the pool is independently re-reviewed may an LP mint be prepared. It requires separate
    bounded token approvals, explicit ticks/amounts/minima/deadline/slippage, owner/revoke authority,
    simulation, user confirmation, and receipt evidence.
@@ -206,13 +270,16 @@ The two write decisions stay separate:
 
 - Refresh all five runtime identities, manager/factory/deployer relationships, fee configuration,
   factory owner, LM controls, pair lookup, nonce, fee, gas, and balance at one fresh finalized block.
-- Obtain an authenticated independent external review bound to the exact published initializer scope
-  and a distinct exact owner authorization. The public Gist and its byte-exact re-fetch provide
-  neither.
-- Provision and independently review a production authorization issuer/composition, authenticated
-  post-claim RPC capability, broadcast/receipt runner, and pending/replacement/unknown-outcome
-  reconciliation. The reviewed journal/protocol/signer scaffold remains deliberately unreachable and
-  non-authorizing until those pieces exist.
+- Generate a new deterministic request pinning the complete exact activation release, deliver it to a
+  separately provisioned independent reviewer, then verify exact Sigstore identity/signature/
+  transparency-log evidence and decision bindings. The old eight-file unsent request, public Gist and
+  byte-exact re-fetch provide no review for the later post-claim/submission files or current release.
+- Obtain a distinct exact owner authorization. Neither the request nor a future reviewer decision can
+  substitute for it.
+- Provision and independently review production authorization/RPC composition, a durable submission
+  journal, broadcaster, receipt handling, and pending/replacement/unknown-outcome reconciliation. The
+  signing, post-claim and submission/reconciliation scaffolds remain deliberately production-
+  unreachable and non-authorizing.
 - Re-run the fixed two-provider coordinator immediately before any claim, then repeat the pending nonce,
   pool, candidate-code and simulation checks after the durable claim and abort on any drift.
 - Establish post-initialization observation cardinality and elapsed oracle history before using the
@@ -222,9 +289,10 @@ The two write decisions stay separate:
 
 Until those gates close and explorer-verifiable receipts exist, the truthful state remains: PTA and
 WBNB identities are evidenced, the retained pool construction path is reproduced exactly offline,
-and a read-only non-authorizing initialization preflight plus unreachable signing scaffold exist, but
-**no PTA/WBNB pool, liquidity, oracle, position, Pancake write, or autonomous execution is
-evidenced**.
+and a read-only non-authorizing preflight plus production-blocked signing/post-claim/submission/
+reconciliation scaffolds exist, but **no authenticated full-release review, owner authority,
+production submission path, PTA/WBNB pool, liquidity, oracle, position, Pancake write, or autonomous
+execution is evidenced**.
 
 The machine record is linked to the retained
 [bounded public-result RPC transcript](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json)
@@ -235,7 +303,9 @@ retained provider equality, selected runtime/scalar state, cross-file integrity 
 boundaries; they do not authenticate a public RPC. It is historical capture evidence, not reusable
 freshness, execution authority or permission to write.
 
-The root evidence gate has 44 offline tests covering the retained pool-readiness transcript,
-init-code provenance, initializer review, earlier selector-path package, PTA deployment evidence, and
-WBNB source record. Passing those tests proves deterministic local consistency only; it neither
-refreshes chain state nor supplies a reviewer, signer, approval, transaction, or receipt.
+The root `pnpm test:evidence` gate now has 58 offline tests covering the retained pool-readiness
+transcript, init-code provenance, initializer review/publication, deterministic external-review
+request, earlier selector-path package, PTA deployment evidence, and WBNB source record. Passing those
+tests proves deterministic local consistency only; it neither sends the request, refreshes chain
+state, nor supplies a reviewer, signer, approval, transaction, or receipt. Full repository verification
+for this non-executing milestone passed on 2026-08-13.

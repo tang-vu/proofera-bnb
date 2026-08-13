@@ -1,0 +1,511 @@
+{
+  "schemaVersion": 1,
+  "recordType": "pancake_v3_pta_wbnb_external_review_request_v1",
+  "status": "awaiting_authenticated_external_review",
+  "reviewer": null,
+  "delivery": {
+    "status": "not_sent_by_this_bundle",
+    "recipient": null,
+    "networkCalled": false,
+    "externalWritePerformed": false
+  },
+  "reviewerAuthentication": {
+    "status": "awaiting_identity_and_cryptographic_evidence",
+    "requiredMethod": "sigstore_keyless_blob_bundle_v0_3",
+    "signedObject": "canonical_reviewer_decision_json_bytes",
+    "requiredVerification": [
+      "verify the Sigstore bundle and Fulcio certificate chain",
+      "verify Rekor transparency-log inclusion",
+      "match the certificate subjectAlternativeName and OIDC issuer to an out-of-band provisioned exact reviewer identity",
+      "verify the signature covers the exact canonical reviewer-decision bytes",
+      "verify the decision bindings equal this request's fixed subject, public artifact, and source commit"
+    ],
+    "exactReviewerIdentityProvisioned": null,
+    "authenticationEvidence": null,
+    "authenticatedIndependentReviewVerified": false
+  },
+  "reviewSubject": {
+    "reviewKind": "independent_security_and_scope_review_only",
+    "publishedInitializerArtifact": {
+      "provider": "GitHub Gist",
+      "gistId": "e983c3801247685472889075c43e263b",
+      "revision": "e26e1462df484725bbfb795a2a23aaebfc44ed9b",
+      "filename": "2f78e23ba4892194f2e55c99de479c5a5421329cc4cf992ed2253dd5c0512f02.json",
+      "contentAddressedRawUrl": "https://gist.githubusercontent.com/tang-vu/e983c3801247685472889075c43e263b/raw/e26e1462df484725bbfb795a2a23aaebfc44ed9b/2f78e23ba4892194f2e55c99de479c5a5421329cc4cf992ed2253dd5c0512f02.json",
+      "rawByteLength": 33327,
+      "rawSha256": "0x2f78e23ba4892194f2e55c99de479c5a5421329cc4cf992ed2253dd5c0512f02",
+      "localSourcePath": "evidence/development/pancake-v3-initializer-selector-review-2026-08-13.json",
+      "localSourceCommit": "08926dfe69546e897ee2509d905c32a37c9502b7",
+      "localGitBlobOidSha1": "72b669a0869bd79f89e8b6e6e4a8efe2508a4cd1",
+      "publicRetrievalReceiptRawSha256": "0x65e56ff4b5b2109cee954337a820acd33536c3fa5ef1a1ae7da4e2eee8c7301b",
+      "publicationManifestRawSha256": "0xa70b93a14494824439db1dc6c3fe5c7f046d2e30abdbdb0943f7d99d31da96e5"
+    },
+    "sourceRelease": {
+      "repository": "https://github.com/tang-vu/proofera-bnb.git",
+      "commitLocator": "https://github.com/tang-vu/proofera-bnb/commit/00f21c405881a5dc320bddf3c757ba13599b1e71",
+      "commit": "00f21c405881a5dc320bddf3c757ba13599b1e71",
+      "parent": "70795081fd4d23fb00c4c04ebffaac0f1632adcb",
+      "tree": "cb2dff273ffc85d3290e0e1a9ffab3b4e7291a1c",
+      "commitAuthoredAt": "2026-08-13T06:14:36.000Z",
+      "publicAvailabilityCheckedByThisOfflineBundle": false,
+      "implementationFiles": [
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-initialization.ts",
+          "byteLength": 7701,
+          "gitBlobOidSha1": "414d1641cf2be10a632357173d6678dd640141fb",
+          "rawSha256": "0x5f8b59ea0cf4a7b4213e12439f111cfe14e2083d89eb464aca571fc6f5925bda"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-coordinator.server.ts",
+          "byteLength": 49197,
+          "gitBlobOidSha1": "2a5935a5a97e162e74fc46be5c13d8c43a030843",
+          "rawSha256": "0x1ed57529391cf923e96944ca0d6b4d3b0f3b519aaeb2e12ebf8bf3952fed5e3d"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-one-shot-boundary.server.ts",
+          "byteLength": 20075,
+          "gitBlobOidSha1": "6977a56ffdf7800441d1776f4ccb9dd3e2194c88",
+          "rawSha256": "0xc7e325e6c5c8e96ee7bcafbde47813a899fc12bb5a3f5a67bb3d44ad6fdca897"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-authorization.server.ts",
+          "byteLength": 23181,
+          "gitBlobOidSha1": "41a8208a63c434744dade9bd8ff43fce086bcaf5",
+          "rawSha256": "0x87f30cc2075192b2c347caeedf9ebc1a81ac2198b064e9e3ec011a0a620d8e95"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-local-journal.server.ts",
+          "byteLength": 63304,
+          "gitBlobOidSha1": "596dc8b7f285e363a891811ed3397d86279c6d7d",
+          "rawSha256": "0xb13f6d14684e247b10558102152b9611d7224ee4bf964790dba2f950bec69909"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-one-shot-protocol.ts",
+          "byteLength": 46973,
+          "gitBlobOidSha1": "a3930ce38e957bbaa4165503f6d7f930bff8c374",
+          "rawSha256": "0x4a223b5fc09d35a874e9d6087cc1df458963f50643cf641d8a50c5a2f137681f"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-one-shot-signer-core.ts",
+          "byteLength": 29340,
+          "gitBlobOidSha1": "83d482936f5a4072078f9cef59e9ef239c9eb358",
+          "rawSha256": "0x14ce2ce7ee8b84a232f191eecfc13a21d509cc120a1603c7a42c06a5957320b1"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-signing-worker.ts",
+          "byteLength": 55254,
+          "gitBlobOidSha1": "c37b91120ee00e58e3541a9319515219f4033769",
+          "rawSha256": "0x235620cb8ecd26df6605a65be690bebc1a7aeed734ee73fa4bf094ebcad315c2"
+        }
+      ],
+      "focusedTestFiles": [
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-authorization.server.test.ts",
+          "byteLength": 9684,
+          "gitBlobOidSha1": "17c4c9d4f08cb76ac3bc0718f6d826083e7f6d01",
+          "rawSha256": "0x840ac3be6328576308aedc55fcb6b0dab069dc848b9205e3d774d5315dc9ff72"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-local-journal.server.test.ts",
+          "byteLength": 21852,
+          "gitBlobOidSha1": "7c68a87ef249f7139dd5da1552fe2acce66a63b8",
+          "rawSha256": "0xd07646c592478e6c8d5f403edafc711a933d6db94ffddb7c3bc816a395263cd7"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-one-shot-protocol.test.ts",
+          "byteLength": 10757,
+          "gitBlobOidSha1": "c334433c005dda961c1f413c596aa2824a5b2d65",
+          "rawSha256": "0xe832b4beab59ef862e5a93a693664a91a66f73c093658e27029d5d393b5c53fd"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-one-shot-signer-core.test.ts",
+          "byteLength": 21510,
+          "gitBlobOidSha1": "57c867a147c2c5301cd99a74a1c5f954e81b086c",
+          "rawSha256": "0xa1073081941f16953767a8173726d23db38a34dc220c0a106e45e88947e70cad"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-signing-worker.test.ts",
+          "byteLength": 32141,
+          "gitBlobOidSha1": "a52d6ba26dc7b04cdb082f146af06d1807ca8857",
+          "rawSha256": "0x124a3c20b9f7de4672eab32b0f5caaf02df5de3d3fa931d61eb8b80447648870"
+        },
+        {
+          "path": "packages/integrations/src/bsc-testnet-pta-wbnb-pool-preparation-package-boundary.test.ts",
+          "byteLength": 1188,
+          "gitBlobOidSha1": "1aac7f4a8be9c881a6dd4d0e43236ac2f067284c",
+          "rawSha256": "0x7f4cdc4afd2db6238df47fa36df3e6c81c4a96b6a01d13472ae1b9f0c50a9340"
+        }
+      ],
+      "retainedEvidenceFiles": [
+        {
+          "path": "evidence/development/pancake-v3-initializer-selector-review-2026-08-13.json",
+          "byteLength": 33327,
+          "gitBlobOidSha1": "72b669a0869bd79f89e8b6e6e4a8efe2508a4cd1",
+          "rawSha256": "0x2f78e23ba4892194f2e55c99de479c5a5421329cc4cf992ed2253dd5c0512f02"
+        },
+        {
+          "path": "evidence/development/pancake-v3-initializer-selector-publication-manifest-2026-08-13.json",
+          "byteLength": 3678,
+          "gitBlobOidSha1": "4a35e9fdc3d1ef36dbc8b742a6ac605faa8617ef",
+          "rawSha256": "0xa70b93a14494824439db1dc6c3fe5c7f046d2e30abdbdb0943f7d99d31da96e5"
+        },
+        {
+          "path": "evidence/development/pancake-v3-initializer-selector-public-retrieval-2026-08-13.json",
+          "byteLength": 6542,
+          "gitBlobOidSha1": "c5847966f2c429c02cebabc9d821b5e9797f2e7e",
+          "rawSha256": "0x65e56ff4b5b2109cee954337a820acd33536c3fa5ef1a1ae7da4e2eee8c7301b"
+        },
+        {
+          "path": "evidence/development/pancake-v3-pool-init-code-provenance-2026-08-13.json",
+          "byteLength": 27929,
+          "gitBlobOidSha1": "3dfa8e7d3f6ffbeb792d5b1052a60e80de1043e1",
+          "rawSha256": "0x17511aeb99584d4c03c2a5c7452986a5692296c6bfd5dbed5945937d1ee66084"
+        },
+        {
+          "path": "evidence/development/pancake-v3-pool-init-code-artifacts-2026-08-13.json",
+          "byteLength": 218119,
+          "gitBlobOidSha1": "2de9b6c95decfa66473e39152a1bd87329494e9c",
+          "rawSha256": "0xd47c34094d1a28e5684341380b78a8f4c7624da8c78a126fa972e9ea4519fd5a"
+        },
+        {
+          "path": "evidence/development/pancake-v3-pool-init-code-source-bindings-2026-08-13.json",
+          "byteLength": 34277,
+          "gitBlobOidSha1": "6c4af9eb544553021ad6cb16a489521d5dafb495",
+          "rawSha256": "0xee6ccc7c7e20333805760c96e7b2bb88b476ac37c8ead66689d13f08a6a9444f"
+        },
+        {
+          "path": "evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json",
+          "byteLength": 16722,
+          "gitBlobOidSha1": "0740ff811e40be508bda47fb53eab558a236daa2",
+          "rawSha256": "0x006701223ff9c39a7df2cc6c959346f41bbe6b546a0f75680886d0b87f8f56a8"
+        },
+        {
+          "path": "evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json",
+          "byteLength": 497208,
+          "gitBlobOidSha1": "63d14d2a9cb5183c1a0c0b07a3bdc11912b6de14",
+          "rawSha256": "0xda8f495ac9fa9f5cfc55585d4d1889e4841e48ca317c3492fd5b3c3746ffe13d"
+        }
+      ]
+    },
+    "exactDirectCallScope": {
+      "chain": "BNB Smart Chain Testnet",
+      "chainId": 97,
+      "networkKind": "testnet",
+      "maximumTopLevelCalls": 1,
+      "from": "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49",
+      "nonce": "1",
+      "to": "0x427bF5b37357632377eCbEC9de3626C71A5396c1",
+      "contract": "NonfungiblePositionManager",
+      "signature": "createAndInitializePoolIfNecessary(address,address,uint24,uint160)",
+      "selector": "0x13ead562",
+      "calldata": "0x13ead5620000000000000000000000004ed64525d6fb06b7da926c683cbd809632c9b4cc000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd00000000000000000000000000000000000000000000000000000000000001f40000000000000000000000000000000000000000004189374bc6a7ef9db22d0e",
+      "calldataByteLength": 132,
+      "calldataKeccak256": "0x31c57c19edeae364d99d6f4fb97c75f81d9b1ec5bd8e6673d9771d9ece53b0d3",
+      "valueWei": "0",
+      "transactionType": "legacy_eip155",
+      "operationKey": "0xe6c943aa33e600bfc1770ee654ee6b00bf6dbcc7cc1702c58bd1caa64dadb9cc",
+      "intentId": "proofera:bsc-testnet:97:pta-wbnb:pancake-v3-fee-500:sender-nonce-1:v1",
+      "nestedCalldataAllowed": false,
+      "allOtherTopLevelSelectorsAllowed": false,
+      "deniedMulticallSelectors": ["0xac9650d8", "0x5ae401dc", "0x1f0464d1"]
+    },
+    "initializerArguments": {
+      "token0": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc",
+      "token1": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+      "fee": "500",
+      "tickSpacing": "10",
+      "sqrtPriceX96": "79228162514264337593543950",
+      "impliedInitialTick": "-138163",
+      "expectedConditionalPool": "0x30b07e82d7181a53Ae2EA98Cd08b6733Ffd831aE",
+      "priceMeaning": "fixed_test_scenario_not_market_price_oracle_peg_or_valuation",
+      "addsLiquidity": false,
+      "createsLpNft": false
+    },
+    "contractIdentityAndNonProxyBoundary": {
+      "historicalCheckpoint": {
+        "blockNumber": "124767685",
+        "blockHash": "0x1657811b903d77aa58f2a6a78a9536a71e98e36d60c13a6098b75f8962e1fc7c",
+        "blockTimestampUtc": "2026-08-13T03:30:31.000Z",
+        "twoProviderAgreementRetained": true,
+        "freshForSubmission": false
+      },
+      "identities": [
+        {
+          "role": "pta",
+          "address": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc",
+          "runtimeByteLength": 1826,
+          "runtimeKeccak256": "0x2f8caecd2e51f085ab11a67e5b8a89eeab7b667bd89ec708a481b66ed756e006",
+          "historicalEip1967Slots": {
+            "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        },
+        {
+          "role": "wbnb",
+          "address": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+          "runtimeByteLength": 3124,
+          "runtimeKeccak256": "0xb7d84205eaaf83ce7b3940c6beaad6d22790255e34a9a2b486aa8cdfff118fe6",
+          "historicalEip1967Slots": {
+            "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        },
+        {
+          "role": "factory",
+          "address": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+          "runtimeByteLength": 5151,
+          "runtimeKeccak256": "0x8191d3ab1d55d3da9822199f28865415c99566b6f1aee4a4b16713f57930678c",
+          "historicalEip1967Slots": {
+            "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        },
+        {
+          "role": "poolDeployer",
+          "address": "0x41ff9AA7e16B8B1a8a8dc4f0eFacd93D02d071c9",
+          "runtimeByteLength": 24556,
+          "runtimeKeccak256": "0xedd527f11646c1912dfc51b57ffa0ee27972f8798bcaf7bc68ae6ad054b6022b",
+          "historicalEip1967Slots": {
+            "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        },
+        {
+          "role": "positionManager",
+          "address": "0x427bF5b37357632377eCbEC9de3626C71A5396c1",
+          "runtimeByteLength": 24466,
+          "runtimeKeccak256": "0xd86730989544d7a3ea034c8a322733683137cf70b0f49231fd88405eac6098d7",
+          "historicalEip1967Slots": {
+            "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        }
+      ],
+      "claimStrength": "all_three_eip1967_slots_zero_at_historical_checkpoint_not_a_timeless_non_proxy_claim",
+      "positionManagerContainsReviewedMulticallSelfDelegatecall": true,
+      "noReachableDelegatecallClaim": false,
+      "freshTwoProviderCodeSlotAndBindingRecheckRequiredBeforeAnySubmission": true
+    },
+    "poolConstruction": {
+      "factory": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+      "poolDeployer": "0x41ff9AA7e16B8B1a8a8dc4f0eFacd93D02d071c9",
+      "create2Salt": "0x5c030acd8d38b759c124229312bdac56cbc3a78d527496a161966c188174d172",
+      "poolCreationCodeByteLength": 23566,
+      "poolCreationCodeKeccak256": "0x6ce8eb472fa82df5469c6ab6d485f17c3ad13c8cd7af59b3d4a8026c5ce0f7e2",
+      "conditionalPoolAddress": "0x30b07e82d7181a53Ae2EA98Cd08b6733Ffd831aE",
+      "create2Formula": "last20(keccak256(0xff || poolDeployer || keccak256(abi.encode(token0,token1,fee)) || keccak256(PancakeV3Pool.creationCode)))",
+      "expectedImmutableLinkedRuntime": {
+        "status": "counterfactual_expected_post_creation_runtime_not_onchain_observation",
+        "observedOnchain": false,
+        "byteLength": 22962,
+        "keccak256": "0xc7187b6ca08de7a5856f7725d15e39a534b27a964fdc445abfd7663041b0e69d",
+        "templateByteLength": 22962,
+        "templateKeccak256": "0x4ef16dfd4d3a1481e945e15d2579e8fb74f78cc27678875fdee9b06eed2e86ac",
+        "immutableAstBindings": [
+          {
+            "astId": "78",
+            "name": "factory",
+            "value": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865"
+          },
+          {
+            "astId": "82",
+            "name": "token0",
+            "value": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc"
+          },
+          {
+            "astId": "86",
+            "name": "token1",
+            "value": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd"
+          },
+          {
+            "astId": "90",
+            "name": "fee",
+            "value": "500"
+          },
+          {
+            "astId": "94",
+            "name": "tickSpacing",
+            "value": "10"
+          },
+          {
+            "astId": "98",
+            "name": "maxLiquidityPerTick",
+            "value": "1917569901783203986719870431555990"
+          }
+        ]
+      },
+      "poolCreatedTopic0": "0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118",
+      "initializeTopic0": "0x98636036cb66a9c19a37435efc1e90142190214e8abeb821bdba3f2990dd4c95"
+    },
+    "boundedEnvelopePolicy": {
+      "maximumObservationAgeSeconds": 120,
+      "maximumEnvelopeLifetimeSeconds": 45,
+      "maximumPostClaimRecheckAgeSeconds": 30,
+      "gasMarginBasisPoints": "2000",
+      "maximumGasEstimate": "5000000",
+      "maximumGasLimit": "6000000",
+      "maximumGasPriceWei": "3000000000",
+      "maximumTotalCostWei": "18000000000000000"
+    },
+    "excludedActions": [
+      "wallet or custody access",
+      "message or transaction signing",
+      "transaction construction or broadcast",
+      "token approval or transfer",
+      "WBNB wrapping",
+      "liquidity minting",
+      "LP NFT creation",
+      "mainnet action",
+      "claim that the historical checkpoint is current"
+    ],
+    "reviewerRequiredChecks": [
+      {
+        "id": "PUBLIC_BYTES",
+        "requirement": "Independently retrieve the revision-pinned Gist without credentials or redirects and match the exact byte length and SHA-256."
+      },
+      {
+        "id": "SELECTOR_AND_CALLDATA",
+        "requirement": "Reproduce the selector and ABI-decode all four fixed arguments from the exact calldata; reject any wrapper or nested call."
+      },
+      {
+        "id": "SOURCE_RUNTIME_PATH",
+        "requirement": "Review the pinned source/runtime call graph, mutable dependencies, direct-only scope, and known manager self-DELEGATECALL boundary."
+      },
+      {
+        "id": "NON_PROXY_FRESHNESS",
+        "requirement": "Treat zero EIP-1967 slots as a historical observation only and require a fresh two-provider exact-block recheck before submission."
+      },
+      {
+        "id": "INIT_CODE_AND_RUNTIME",
+        "requirement": "Reproduce pool creation-code hash, CREATE2 salt/address, immutable-reference patch, expected deployed runtime hash, and post-receipt identities."
+      },
+      {
+        "id": "FAIL_CLOSED_AUTHORIZATION",
+        "requirement": "Review the pinned commit for self-issued reviewer/owner capability, self-claim, direct worker, package-export, release-binding, journal-race, custody, and broadcast bypasses; production paths must remain unavailable."
+      },
+      {
+        "id": "SEPARATE_OWNER_APPROVAL",
+        "requirement": "Confirm that a review decision can close only the external-review gate for this exact pinned subject and source commit; it does not review later post-claim, submission, or production-composition code and cannot substitute for exact owner authorization."
+      },
+      {
+        "id": "NO_EXECUTION_CLAIM",
+        "requirement": "Confirm the bundle contains no wallet access, signature, signed transaction, broadcast, receipt, deployed pool, liquidity, or execution claim."
+      }
+    ]
+  },
+  "reviewerDecisionSchema": {
+    "schemaId": "proofera_authenticated_independent_pool_initializer_review_decision_v1",
+    "canonicalization": "UTF-8 JSON encoded after recursive lexicographic object-key sorting; array order preserved; no insignificant whitespace",
+    "signedPayloadRequiredFields": [
+      "schemaVersion",
+      "reviewSubjectCanonicalSha256",
+      "publishedInitializerRawSha256",
+      "sourceCommit",
+      "reviewerIdentity",
+      "reviewerIndependenceDeclaration",
+      "reviewedAt",
+      "decision",
+      "checks",
+      "findings",
+      "limitationsAcknowledged"
+    ],
+    "fixedBindings": {
+      "schemaVersion": 1,
+      "reviewSubjectCanonicalSha256": "0x87b9e0f342cd7c4ec2be5a2754c8e3c42de9cefc6037b03a7daa758291db710d",
+      "publishedInitializerRawSha256": "0x2f78e23ba4892194f2e55c99de479c5a5421329cc4cf992ed2253dd5c0512f02",
+      "sourceCommit": "00f21c405881a5dc320bddf3c757ba13599b1e71"
+    },
+    "reviewerIdentitySchema": {
+      "requiredFields": ["subjectAlternativeName", "oidcIssuer", "publicProfileLocator"],
+      "exactIdentityMustBeProvisionedOutOfBandBeforeAcceptance": true,
+      "mustNotEqualRepositoryOwnerPublisherImplementerOrKeyCustodian": true,
+      "selfAssertedIndependenceAloneIsSufficient": false
+    },
+    "reviewerIndependenceDeclarationConst": "I am independent of the repository owner, artifact publisher, implementation authors, wallet owner, and key custodian for this review.",
+    "reviewedAtFormat": "UTC ISO 8601 with millisecond precision",
+    "decisionEnum": ["approve_review_scope_only", "reject", "needs_changes"],
+    "checksSchema": {
+      "exactOrderedIds": [
+        "PUBLIC_BYTES",
+        "SELECTOR_AND_CALLDATA",
+        "SOURCE_RUNTIME_PATH",
+        "NON_PROXY_FRESHNESS",
+        "INIT_CODE_AND_RUNTIME",
+        "FAIL_CLOSED_AUTHORIZATION",
+        "SEPARATE_OWNER_APPROVAL",
+        "NO_EXECUTION_CLAIM"
+      ],
+      "outcomeEnum": ["pass", "fail", "not_verified"],
+      "evidenceAndReasonRequiredForEveryCheck": true,
+      "approvalRequiresEveryCheckPass": true
+    },
+    "findingsSchema": {
+      "requiredFields": ["id", "severity", "summary", "evidence"],
+      "severityEnum": ["critical", "high", "medium", "low", "informational"],
+      "unresolvedCriticalOrHighPermittedForApproval": false
+    },
+    "limitationsAcknowledgedExact": [
+      "The review is not owner authorization.",
+      "The review does not authorize wallet access, signing, broadcast, or any onchain write.",
+      "The review covers only the exact pinned subject and source commit; later post-claim, submission, reconciler, broadcaster, or production-composition code requires a new exact review request and decision.",
+      "Historical observations require a fresh two-provider pre-submission recheck.",
+      "Pool initialization creates no liquidity and establishes no market price, oracle, peg, or valuation.",
+      "A self-hash, repository account, Gist owner, or internal agent label is not an authenticated independent reviewer."
+    ],
+    "authorizationEffect": "closes_external_review_gate_for_exact_pinned_subject_only_after_separate_verification",
+    "ownerApprovalEffect": "none"
+  },
+  "separateOwnerApproval": {
+    "status": "not_requested_or_recorded",
+    "owner": null,
+    "approval": null,
+    "requiredAfterAuthenticatedExternalReview": true,
+    "mustBindExactTransactionEnvelopeAndExpiry": true,
+    "reviewerDecisionCanSubstitute": false
+  },
+  "authorizationBoundary": {
+    "activationEligible": false,
+    "executionReady": false,
+    "authorizesWalletUse": false,
+    "authorizesCustodyAccess": false,
+    "authorizesSignature": false,
+    "authorizesTransactionConstruction": false,
+    "authorizesBroadcast": false,
+    "authorizesOnchainWrite": false,
+    "reviewerDecisionAloneAuthorizesExecution": false,
+    "canonicalHashesAreAuthenticationOrAuthorization": false
+  },
+  "securityBoundary": {
+    "networkCalledByGenerator": false,
+    "externalPublicationPerformed": false,
+    "environmentRead": false,
+    "walletAccessed": false,
+    "custodyMaterialAccessed": false,
+    "signerCreated": false,
+    "signatureCreated": false,
+    "signedTransactionCreated": false,
+    "transactionBroadcast": false,
+    "onchainWritePerformed": false
+  },
+  "limitations": [
+    "This deterministic bundle prepares a review request; it does not assert that a reviewer exists, accepted the request, or approved anything.",
+    "The Sigstore method is specified, but the exact accepted reviewer identity is intentionally null until provisioned and verified out of band.",
+    "The public Gist and source-commit locators are pinned inputs; this offline generator performs no availability check.",
+    "This request covers only source commit 00f21c405881a5dc320bddf3c757ba13599b1e71; later post-claim, submission, reconciler, broadcaster, or production-composition code is outside its review subject and requires a new exact request and authenticated decision.",
+    "Historical runtime and proxy-slot evidence is not current state and cannot authorize a later submission.",
+    "No review decision can replace the separate owner authorization, fresh preflight, production composition review, or receipt reconciliation."
+  ],
+  "integrity": {
+    "canonicalization": "UTF-8 JSON encoded after recursive lexicographic object-key sorting; array order preserved; no insignificant whitespace",
+    "algorithm": "sha256",
+    "reviewSubjectCanonicalSha256": "0x87b9e0f342cd7c4ec2be5a2754c8e3c42de9cefc6037b03a7daa758291db710d",
+    "reviewerDecisionSchemaCanonicalSha256": "0xeb79eeef2497c52f8cbc5d0bda3f4011b0d28eca109cf6012607f1c2356ad90b",
+    "canonicalBodySha256": "0xb11b74e793c2f02093a6dd54477a5daec3f16e88442582ec6b645d8ec7ee12a0",
+    "authenticationMeaning": "none_unkeyed_integrity_only"
+  }
+}

@@ -19,7 +19,7 @@
     "deploy:pta:testnet": "node --no-warnings --conditions=react-server --experimental-loader ./scripts/typescript-extension-loader.mjs ./scripts/run-bsc-testnet-pta-deployment.ts --execute-exact-pta-chain-97",
     "start": "pnpm --filter @proofera/web start",
     "test": "pnpm --recursive --if-present run test && pnpm test:evidence",
-    "test:evidence": "node --test scripts/bsc-testnet-pta-deployment-evidence.test.mjs scripts/bsc-testnet-pta-wbnb-pool-readiness-evidence.test.mjs scripts/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript.test.mjs scripts/pancake-initializer-publication/publication.test.mjs scripts/pancake-initializer-review/review.test.mjs scripts/pancake-pool-init-code-review/review.test.mjs scripts/pancake-selector-review/review.test.mjs scripts/wbnb-source-verification/evidence.test.mjs",
+    "test:evidence": "node --test scripts/bsc-testnet-pta-deployment-evidence.test.mjs scripts/bsc-testnet-pta-wbnb-pool-readiness-evidence.test.mjs scripts/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript.test.mjs scripts/pancake-initializer-publication/publication.test.mjs scripts/pancake-initializer-review/review.test.mjs scripts/pancake-pool-external-review-request/review-request.test.mjs scripts/pancake-pool-init-code-review/review.test.mjs scripts/pancake-selector-review/review.test.mjs scripts/wbnb-source-verification/evidence.test.mjs",
     "test:e2e": "pnpm --filter @proofera/web test:e2e",
     "typecheck": "pnpm --recursive --if-present run typecheck && tsc -p scripts/tsconfig.pta-deployment.json",
     "verify": "pnpm format:check && pnpm lint && pnpm security:secrets && pnpm typecheck && pnpm test && pnpm build"
