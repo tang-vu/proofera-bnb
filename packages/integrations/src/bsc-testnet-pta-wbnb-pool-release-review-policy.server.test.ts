@@ -20,9 +20,11 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_RUNTIME_MANIFEST_DOMAIN,
   BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_POLICY_DIGEST_DOMAIN,
   BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_SUBJECT_DOMAIN,
+  BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_FRAME_DOMAIN,
   authenticateBscTestnetPtaWbnbPoolRuntimeReviewInstantiationForInternalUse,
   consumeBscTestnetPtaWbnbPoolRuntimeReviewInstantiationForInternalUse,
   createBscTestnetPtaWbnbPoolReleaseReviewPolicyRealmForTestsOnly,
+  decodeBscTestnetPtaWbnbPoolReleaseReviewTtyTransportForTestsOnly,
   deriveBscTestnetPtaWbnbPoolProductionRuntimeManifestSha256ForInternalUse,
   deriveBscTestnetPtaWbnbPoolReleaseReviewSubjectSha256ForInternalUse,
   serializeBscTestnetPtaWbnbPoolReleaseReviewPolicyForTestsOnly,
@@ -37,6 +39,10 @@ const REVIEWED_AT = "2026-08-13T07:59:00.000Z";
 const POLICY_EXPIRES_AT = "2026-08-13T09:00:00.000Z";
 const ENVELOPE_EXPIRES_AT = "2026-08-13T08:00:30.000Z";
 const ENVELOPE_HASH = `0x${"44".repeat(32)}` as Hex;
+const TTY_NONCE = `0x${"ab".repeat(32)}` as Hex;
+const TTY_STARTED_AT = 1_000;
+const TTY_NOT_AFTER = 301_000;
+const TTY_CHUNK_CHARACTERS = 2_304;
 
 function releaseIdentity(): BscTestnetPtaWbnbPoolExactReleaseIdentity {
   const manifestBody = Object.freeze({
@@ -223,6 +229,55 @@ function expectedBinding(
     expiresAt: instantiation.expiresAt,
     instantiationDigest: instantiation.instantiationDigest
   });
+}
+
+function ttyTransportLines(policyBytes: Uint8Array, nonce: Hex = TTY_NONCE): string[] {
+  const owned = Buffer.from(policyBytes);
+  const encoded = owned.toString("base64url");
+  const policySha256 = `0x${createHash("sha256").update(owned).digest("hex")}`;
+  owned.fill(0);
+  const chunkCount = Math.ceil(encoded.length / TTY_CHUNK_CHARACTERS);
+  const metadata = `chunk-count=${chunkCount}|policy-byte-length=${policyBytes.byteLength}|policy-sha256=${policySha256}`;
+  const lines = [
+    `${BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_FRAME_DOMAIN}|nonce=${nonce}|line-index=0|kind=BEGIN|${metadata}`
+  ];
+  for (let index = 0; index < chunkCount; index += 1) {
+    const payload = encoded.slice(index * TTY_CHUNK_CHARACTERS, (index + 1) * TTY_CHUNK_CHARACTERS);
+    lines.push(
+      `${BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_FRAME_DOMAIN}|nonce=${nonce}|line-index=${index + 1}|kind=CHUNK|chunk-index=${index}|${metadata}|policy-base64url=${payload}`
+    );
+  }
+  lines.push(
+    `${BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_FRAME_DOMAIN}|nonce=${nonce}|line-index=${chunkCount + 1}|kind=END|${metadata}`
+  );
+  return lines;
+}
+
+function ttyEvents(
+  transport: Buffer,
+  splitOffsets: readonly number[] = [],
+  observedAtMilliseconds = TTY_STARTED_AT + 1
+): readonly Readonly<{ bytes: Buffer; observedAtMilliseconds: number }>[] {
+  const offsets = [0, ...splitOffsets, transport.byteLength];
+  return offsets.slice(0, -1).map((offset, index) =>
+    Object.freeze({
+      bytes: Buffer.from(transport.subarray(offset, offsets[index + 1])),
+      observedAtMilliseconds
+    })
+  );
+}
+
+function decodeTtyTransport(
+  transport: Buffer,
+  splitOffsets: readonly number[] = [],
+  observedAtMilliseconds = TTY_STARTED_AT + 1
+): Uint8Array | null {
+  return decodeBscTestnetPtaWbnbPoolReleaseReviewTtyTransportForTestsOnly(
+    ttyEvents(transport, splitOffsets, observedAtMilliseconds),
+    TTY_NONCE,
+    TTY_STARTED_AT,
+    TTY_NOT_AFTER
+  );
 }
 
 describe("BSC testnet PTA/WBNB release-review policy", () => {
@@ -610,6 +665,188 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
         false
       );
     }
+  });
+
+  it("reconstructs a 11,560-character policy across arbitrary events and mixed LF/CRLF lines", () => {
+    const policyBytes = Buffer.alloc(8_670, 0xa5);
+    expect(policyBytes.toString("base64url")).toHaveLength(11_560);
+    const lines = ttyTransportLines(policyBytes);
+    expect(lines).toHaveLength(8);
+    const transport = Buffer.from(
+      lines.map((line, index) => `${line}${index % 2 === 0 ? "\r\n" : "\n"}`).join(""),
+      "ascii"
+    );
+    const firstCarriageReturn = transport.indexOf(0x0d);
+    const splitOffsets = [
+      7,
+      firstCarriageReturn + 1,
+      Math.floor(transport.byteLength / 2),
+      transport.byteLength - 3
+    ];
+    const decoded = decodeTtyTransport(transport, splitOffsets);
+    expect(decoded).not.toBeNull();
+    expect(Buffer.from(decoded ?? []).equals(policyBytes)).toBe(true);
+  });
+
+  it("accepts the exact 65,536-byte policy boundary within the 100-KiB transport cap", () => {
+    const policyBytes = Buffer.alloc(65_536, 0x5a);
+    const lines = ttyTransportLines(policyBytes);
+    const transport = Buffer.from(`${lines.join("\r\n")}\r\n`, "ascii");
+    expect(lines).toHaveLength(40);
+    const maximumLineBytes = Math.max(...lines.map((line) => Buffer.byteLength(line, "ascii")));
+    expect(maximumLineBytes).toBe(2_618);
+    expect(maximumLineBytes).toBeLessThanOrEqual(2_700);
+    expect(transport.byteLength).toBe(99_934);
+    expect(transport.byteLength).toBeLessThanOrEqual(100 * 1_024);
+    const decoded = decodeTtyTransport(transport);
+    expect(decoded).not.toBeNull();
+    expect(Buffer.from(decoded ?? []).equals(policyBytes)).toBe(true);
+
+    const oversizedPolicy = Buffer.alloc(65_537, 0x5a);
+    const oversizedTransport = Buffer.from(
+      `${ttyTransportLines(oversizedPolicy).join("\n")}\n`,
+      "ascii"
+    );
+    expect(decodeTtyTransport(oversizedTransport)).toBeNull();
+    expect(
+      decodeTtyTransport(Buffer.from(`${ttyTransportLines(new Uint8Array(0)).join("\n")}\n`))
+    ).toBeNull();
+  });
+
+  it("rejects reordered, duplicate, missing, truncated, extra and preloaded frame lines", () => {
+    const policyBytes = Buffer.alloc(12_000, 0x36);
+    const lines = ttyTransportLines(policyBytes);
+    const valid = Buffer.from(`${lines.join("\n")}\n`, "ascii");
+    const cases = [
+      [lines[0], lines[2], lines[1], ...lines.slice(3)],
+      [lines[0], lines[1], lines[1], ...lines.slice(2)],
+      [lines[0], ...lines.slice(2)],
+      lines.slice(0, -1),
+      ["preloaded", ...lines],
+      [...lines, "trailing"]
+    ];
+    for (const malformedLines of cases) {
+      expect(decodeTtyTransport(Buffer.from(`${malformedLines.join("\n")}\n`, "ascii"))).toBeNull();
+    }
+    expect(decodeTtyTransport(valid.subarray(0, valid.byteLength - 1))).toBeNull();
+    expect(decodeTtyTransport(Buffer.concat([valid, Buffer.from("trailing\n")]))).toBeNull();
+    expect(
+      decodeBscTestnetPtaWbnbPoolReleaseReviewTtyTransportForTestsOnly(
+        [
+          Object.freeze({ bytes: valid, observedAtMilliseconds: TTY_STARTED_AT + 1 }),
+          Object.freeze({
+            bytes: Buffer.from("buffered-after-end\n"),
+            observedAtMilliseconds: TTY_STARTED_AT + 1
+          })
+        ],
+        TTY_NONCE,
+        TTY_STARTED_AT,
+        TTY_NOT_AFTER
+      )
+    ).toBeNull();
+  });
+
+  it("rejects malformed metadata, indices, hashes, payloads and the retired v1 frame", () => {
+    const policyBytes = Buffer.alloc(9_000, 0x71);
+    const lines = ttyTransportLines(policyBytes);
+    const wrongHash = `0x${"cd".repeat(32)}`;
+    const mutations = [
+      lines.map((line) =>
+        line.replace(/policy-sha256=0x[0-9a-f]{64}/u, `policy-sha256=${wrongHash}`)
+      ),
+      lines.map((line) => line.replace("policy-byte-length=9000", "policy-byte-length=9001")),
+      lines.map((line, index) =>
+        index === 0 ? line.replace("chunk-count=6", "chunk-count=06") : line
+      ),
+      lines.map((line, index) =>
+        index === 1 ? line.replace("line-index=1", "line-index=2") : line
+      ),
+      lines.map((line, index) =>
+        index === 1 ? line.replace("chunk-index=0", "chunk-index=1") : line
+      ),
+      lines.map((line, index) =>
+        index === 1 ? line.replace("policy-base64url=", "policy-base64url==") : line
+      ),
+      lines.map((line, index) => (index === 0 ? line.replace("kind=BEGIN", "kind=CHUNK") : line))
+    ];
+    for (const malformedLines of mutations) {
+      expect(decodeTtyTransport(Buffer.from(`${malformedLines.join("\n")}\n`, "ascii"))).toBeNull();
+    }
+    const wrongNonce = lines.map((line) => line.replace(TTY_NONCE, `0x${"ac".repeat(32)}`));
+    expect(decodeTtyTransport(Buffer.from(`${wrongNonce.join("\n")}\n`, "ascii"))).toBeNull();
+    const v1 = Buffer.from(
+      `ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-frame:v1|nonce=${TTY_NONCE}|policy-base64url=${policyBytes.toString("base64url")}\n`,
+      "ascii"
+    );
+    expect(decodeTtyTransport(v1)).toBeNull();
+  });
+
+  it("rejects empty lines, controls, lone CR, non-ASCII and overlong lines", () => {
+    const policyBytes = Buffer.alloc(256, 0x19);
+    const lines = ttyTransportLines(policyBytes);
+    const valid = Buffer.from(`${lines.join("\n")}\n`, "ascii");
+    const firstLf = valid.indexOf(0x0a);
+    const controlCases = [
+      Buffer.concat([
+        valid.subarray(0, firstLf + 1),
+        Buffer.from("\n"),
+        valid.subarray(firstLf + 1)
+      ]),
+      Buffer.concat([valid.subarray(0, firstLf), Buffer.from("\rX"), valid.subarray(firstLf + 1)]),
+      Buffer.concat([valid.subarray(0, 4), Buffer.from([0]), valid.subarray(4)]),
+      Buffer.concat([valid.subarray(0, 4), Buffer.from([0xc3, 0xa9]), valid.subarray(4)]),
+      Buffer.concat([valid.subarray(0, 4), Buffer.from([0x09]), valid.subarray(4)])
+    ];
+    for (const transport of controlCases) expect(decodeTtyTransport(transport)).toBeNull();
+
+    const overlongLines = [...lines];
+    overlongLines[1] = `${overlongLines[1]}${"A".repeat(4_097)}`;
+    expect(decodeTtyTransport(Buffer.from(`${overlongLines.join("\n")}\n`, "ascii"))).toBeNull();
+  });
+
+  it("enforces one absolute deadline across all transport events", () => {
+    const policyBytes = Buffer.alloc(4_000, 0x2b);
+    const lines = ttyTransportLines(policyBytes);
+    const lineEvents = lines.map((line, index) =>
+      Object.freeze({
+        bytes: Buffer.from(`${line}\n`, "ascii"),
+        observedAtMilliseconds:
+          index === lines.length - 1 ? TTY_NOT_AFTER : TTY_STARTED_AT + index + 1
+      })
+    );
+    expect(
+      decodeBscTestnetPtaWbnbPoolReleaseReviewTtyTransportForTestsOnly(
+        lineEvents,
+        TTY_NONCE,
+        TTY_STARTED_AT,
+        TTY_NOT_AFTER
+      )
+    ).toBeNull();
+    const valid = Buffer.from(`${lines.join("\n")}\n`, "ascii");
+    expect(decodeTtyTransport(valid, [], TTY_STARTED_AT - 1)).toBeNull();
+    expect(decodeTtyTransport(valid, [], TTY_NOT_AFTER + 1)).toBeNull();
+    expect(
+      decodeBscTestnetPtaWbnbPoolReleaseReviewTtyTransportForTestsOnly(
+        ttyEvents(valid),
+        TTY_NONCE,
+        TTY_STARTED_AT,
+        TTY_NOT_AFTER + 1
+      )
+    ).toBeNull();
+    const decreasingClockEvents = lines.map((line, index) =>
+      Object.freeze({
+        bytes: Buffer.from(`${line}\n`, "ascii"),
+        observedAtMilliseconds: TTY_STARTED_AT + 100 - index
+      })
+    );
+    expect(
+      decodeBscTestnetPtaWbnbPoolReleaseReviewTtyTransportForTestsOnly(
+        decreasingClockEvents,
+        TTY_NONCE,
+        TTY_STARTED_AT,
+        TTY_NOT_AFTER
+      )
+    ).toBeNull();
   });
 
   it("rejects proxy clocks and invalid Date instances without executing proxy traps", () => {

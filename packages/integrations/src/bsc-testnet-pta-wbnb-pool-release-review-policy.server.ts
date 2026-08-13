@@ -37,9 +37,9 @@ export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_POLICY_DIGEST_DOMAIN =
 export const BSC_TESTNET_PTA_WBNB_POOL_RUNTIME_REVIEW_INSTANTIATION_DIGEST_DOMAIN =
   "ProofEra:bsc-testnet-pta-wbnb-pool-runtime-review-instantiation:v1" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_CHALLENGE_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-challenge:v1" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-challenge:v2" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_FRAME_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-frame:v1" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-frame:v2" as const;
 
 const POLICY_KIND = "owner_designated_internal_multi_agent_release_review_policy_v1" as const;
 const POLICY_DECISION = "GO_EXACT_CHAIN_97_ONE_SHOT_POLICY" as const;
@@ -51,7 +51,10 @@ const UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u;
 const STABLE_LABEL = /^[A-Za-z0-9][A-Za-z0-9 ._:@/-]{0,95}$/u;
 const SAFE_PATH = /^[A-Za-z0-9][A-Za-z0-9._@/+-]{0,239}$/u;
 const MAXIMUM_POLICY_BYTES = 65_536;
-const MAXIMUM_TTY_FRAME_BYTES = 96 * 1024;
+const MAXIMUM_TTY_FRAME_BYTES = 100 * 1024;
+const MAXIMUM_TTY_LINE_BYTES = 4_096;
+const TTY_POLICY_CHUNK_CHARACTERS = 2_304;
+const MAXIMUM_TTY_POLICY_CHUNKS = 38;
 const MAXIMUM_POLICY_LIFETIME_MILLISECONDS = 24 * 60 * 60 * 1_000;
 const MAXIMUM_POLICY_AGE_MILLISECONDS = 24 * 60 * 60 * 1_000;
 const TTY_POLICY_ENTRY_WINDOW_MILLISECONDS = 5 * 60 * 1_000;
@@ -1125,29 +1128,274 @@ export function consumeBscTestnetPtaWbnbPoolRuntimeReviewInstantiationForInterna
   return consumes(productionInstantiations, value, expectedBinding);
 }
 
-function decodePolicyFrame(frame: Uint8Array, nonce: Hex): Buffer | null {
-  let owned: Buffer | null = null;
-  try {
-    owned = Buffer.from(frame);
-    const prefix = `${BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_FRAME_DOMAIN}|nonce=${nonce}|policy-base64url=`;
-    const text = new TextDecoder("utf-8", { fatal: true }).decode(owned);
-    if (!text.startsWith(prefix)) return null;
-    const encoded = text.slice(prefix.length);
-    if (encoded.length === 0 || !/^[A-Za-z0-9_-]+$/u.test(encoded)) return null;
-    const decoded = Buffer.from(encoded, "base64url");
+interface TtyPolicyFrameMetadata {
+  readonly chunkCount: number;
+  readonly policyByteLength: number;
+  readonly encodedCharacterLength: number;
+  readonly policySha256: Hex;
+}
+
+function parseCanonicalUnsignedInteger(value: string): number | null {
+  if (!/^(?:0|[1-9][0-9]*)$/u.test(value)) return null;
+  const parsed = Number(value);
+  return Number.isSafeInteger(parsed) && parsed >= 0 ? parsed : null;
+}
+
+function unpaddedBase64UrlLength(byteLength: number): number {
+  return Math.floor((byteLength * 4 + 2) / 3);
+}
+
+function exactFrameField(value: string, key: string): string | null {
+  const prefix = `${key}=`;
+  return value.startsWith(prefix) ? value.slice(prefix.length) : null;
+}
+
+/**
+ * Stateful, bounded ASCII decoder for the v2 BEGIN/CHUNK/END transport. It owns and wipes every
+ * retained transport fragment. Completing this decoder yields only untrusted policy bytes; it does
+ * not parse a policy or mint a production authority brand.
+ */
+class TtyPolicyFrameDecoder {
+  readonly #nonce: Hex;
+  readonly #startedAtMilliseconds: number;
+  readonly #notAfterMilliseconds: number;
+  readonly #line = Buffer.alloc(MAXIMUM_TTY_LINE_BYTES);
+  readonly #encodedChunks: Buffer[] = [];
+  #lineLength = 0;
+  #totalBytes = 0;
+  #pendingCarriageReturn = false;
+  #state: "begin" | "chunks" | "complete" | "invalid" = "begin";
+  #metadata: TtyPolicyFrameMetadata | null = null;
+  #nextChunkIndex = 0;
+  #result: Buffer | null = null;
+  #lastObservedAtMilliseconds: number;
+
+  constructor(
+    nonce: Hex,
+    startedAtMilliseconds: number,
+    notAfterMilliseconds: number,
+    initialObservedAtMilliseconds: number
+  ) {
+    this.#nonce = nonce;
+    this.#startedAtMilliseconds = startedAtMilliseconds;
+    this.#notAfterMilliseconds = notAfterMilliseconds;
+    this.#lastObservedAtMilliseconds = initialObservedAtMilliseconds;
+  }
+
+  get complete(): boolean {
+    return this.#state === "complete";
+  }
+
+  push(value: unknown, observedAtMilliseconds: number): boolean {
     if (
-      decoded.byteLength === 0 ||
-      decoded.byteLength > MAXIMUM_POLICY_BYTES ||
-      decoded.toString("base64url") !== encoded
+      this.#state === "invalid" ||
+      !Buffer.isBuffer(value) ||
+      value.byteLength === 0 ||
+      !Number.isSafeInteger(observedAtMilliseconds) ||
+      observedAtMilliseconds < this.#startedAtMilliseconds ||
+      observedAtMilliseconds < this.#lastObservedAtMilliseconds ||
+      observedAtMilliseconds >= this.#notAfterMilliseconds ||
+      this.#totalBytes + value.byteLength > MAXIMUM_TTY_FRAME_BYTES
     ) {
-      decoded.fill(0);
+      return this.#invalidate();
+    }
+    this.#lastObservedAtMilliseconds = observedAtMilliseconds;
+    this.#totalBytes += value.byteLength;
+    for (let offset = 0; offset < value.byteLength; offset += 1) {
+      if (this.#state === "complete") return this.#invalidate();
+      const byte = value[offset];
+      if (byte === undefined) return this.#invalidate();
+      if (this.#pendingCarriageReturn) {
+        if (byte !== 0x0a) return this.#invalidate();
+        this.#pendingCarriageReturn = false;
+        if (!this.#finishLine()) return false;
+        continue;
+      }
+      if (byte === 0x0d) {
+        this.#pendingCarriageReturn = true;
+        continue;
+      }
+      if (byte === 0x0a) {
+        if (!this.#finishLine()) return false;
+        continue;
+      }
+      if (byte < 0x20 || byte > 0x7e || this.#lineLength >= MAXIMUM_TTY_LINE_BYTES) {
+        return this.#invalidate();
+      }
+      this.#line[this.#lineLength] = byte;
+      this.#lineLength += 1;
+    }
+    return true;
+  }
+
+  takeResult(observedAtMilliseconds: number): Buffer | null {
+    if (
+      !Number.isSafeInteger(observedAtMilliseconds) ||
+      observedAtMilliseconds < this.#lastObservedAtMilliseconds ||
+      observedAtMilliseconds >= this.#notAfterMilliseconds ||
+      this.#state !== "complete" ||
+      this.#pendingCarriageReturn ||
+      this.#lineLength !== 0 ||
+      this.#result === null
+    ) {
+      this.#invalidate();
       return null;
     }
-    return decoded;
-  } catch {
-    return null;
-  } finally {
-    owned?.fill(0);
+    this.#lastObservedAtMilliseconds = observedAtMilliseconds;
+    const result = this.#result;
+    this.#result = null;
+    return result;
+  }
+
+  destroy(): void {
+    this.#line.fill(0);
+    for (const chunk of this.#encodedChunks) chunk.fill(0);
+    this.#encodedChunks.length = 0;
+    this.#result?.fill(0);
+    this.#result = null;
+    this.#metadata = null;
+    this.#state = "invalid";
+  }
+
+  #finishLine(): boolean {
+    if (this.#lineLength === 0) return this.#invalidate();
+    const line = this.#line.subarray(0, this.#lineLength).toString("ascii");
+    this.#line.fill(0, 0, this.#lineLength);
+    this.#lineLength = 0;
+    return this.#acceptLine(line);
+  }
+
+  #acceptLine(line: string): boolean {
+    const fields = line.split("|");
+    if (
+      fields[0] !== BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_FRAME_DOMAIN ||
+      fields[1] !== `nonce=${this.#nonce}`
+    ) {
+      return this.#invalidate();
+    }
+    if (this.#state === "begin") return this.#acceptBegin(fields);
+    if (this.#state !== "chunks" || this.#metadata === null) return this.#invalidate();
+    return this.#nextChunkIndex < this.#metadata.chunkCount
+      ? this.#acceptChunk(fields, this.#metadata)
+      : this.#acceptEnd(fields, this.#metadata);
+  }
+
+  #acceptBegin(fields: string[]): boolean {
+    if (fields.length !== 7 || fields[2] !== "line-index=0" || fields[3] !== "kind=BEGIN") {
+      return this.#invalidate();
+    }
+    const chunkCountText = exactFrameField(fields[4] ?? "", "chunk-count");
+    const policyByteLengthText = exactFrameField(fields[5] ?? "", "policy-byte-length");
+    const policySha256 = exactFrameField(fields[6] ?? "", "policy-sha256");
+    if (chunkCountText === null || policyByteLengthText === null || policySha256 === null) {
+      return this.#invalidate();
+    }
+    const chunkCount = parseCanonicalUnsignedInteger(chunkCountText);
+    const policyByteLength = parseCanonicalUnsignedInteger(policyByteLengthText);
+    if (
+      chunkCount === null ||
+      policyByteLength === null ||
+      policyByteLength < 1 ||
+      policyByteLength > MAXIMUM_POLICY_BYTES ||
+      !BYTES32.test(policySha256)
+    ) {
+      return this.#invalidate();
+    }
+    const encodedCharacterLength = unpaddedBase64UrlLength(policyByteLength);
+    const exactChunkCount = Math.ceil(encodedCharacterLength / TTY_POLICY_CHUNK_CHARACTERS);
+    if (chunkCount !== exactChunkCount || exactChunkCount > MAXIMUM_TTY_POLICY_CHUNKS) {
+      return this.#invalidate();
+    }
+    this.#metadata = Object.freeze({
+      chunkCount,
+      policyByteLength,
+      encodedCharacterLength,
+      policySha256: policySha256 as Hex
+    });
+    this.#state = "chunks";
+    return true;
+  }
+
+  #acceptChunk(fields: string[], metadata: TtyPolicyFrameMetadata): boolean {
+    if (
+      fields.length !== 9 ||
+      fields[2] !== `line-index=${this.#nextChunkIndex + 1}` ||
+      fields[3] !== "kind=CHUNK" ||
+      fields[4] !== `chunk-index=${this.#nextChunkIndex}` ||
+      fields[5] !== `chunk-count=${metadata.chunkCount}` ||
+      fields[6] !== `policy-byte-length=${metadata.policyByteLength}` ||
+      fields[7] !== `policy-sha256=${metadata.policySha256}`
+    ) {
+      return this.#invalidate();
+    }
+    const payload = exactFrameField(fields[8] ?? "", "policy-base64url");
+    const expectedLength = Math.min(
+      TTY_POLICY_CHUNK_CHARACTERS,
+      metadata.encodedCharacterLength - this.#nextChunkIndex * TTY_POLICY_CHUNK_CHARACTERS
+    );
+    if (
+      payload === null ||
+      payload.length !== expectedLength ||
+      !/^[A-Za-z0-9_-]+$/u.test(payload)
+    ) {
+      return this.#invalidate();
+    }
+    this.#encodedChunks.push(Buffer.from(payload, "ascii"));
+    this.#nextChunkIndex += 1;
+    return true;
+  }
+
+  #acceptEnd(fields: string[], metadata: TtyPolicyFrameMetadata): boolean {
+    if (
+      fields.length !== 7 ||
+      fields[2] !== `line-index=${metadata.chunkCount + 1}` ||
+      fields[3] !== "kind=END" ||
+      fields[4] !== `chunk-count=${metadata.chunkCount}` ||
+      fields[5] !== `policy-byte-length=${metadata.policyByteLength}` ||
+      fields[6] !== `policy-sha256=${metadata.policySha256}`
+    ) {
+      return this.#invalidate();
+    }
+    const encoded = Buffer.concat(this.#encodedChunks, metadata.encodedCharacterLength);
+    let decoded: Buffer | null = null;
+    let actualSha256: Buffer | null = null;
+    try {
+      const encodedText = encoded.toString("ascii");
+      decoded = Buffer.from(encodedText, "base64url");
+      actualSha256 = createHash("sha256").update(decoded).digest();
+      const expectedSha256 = Buffer.from(metadata.policySha256.slice(2), "hex");
+      try {
+        if (
+          decoded.byteLength !== metadata.policyByteLength ||
+          decoded.toString("base64url") !== encodedText ||
+          actualSha256.byteLength !== expectedSha256.byteLength ||
+          !timingSafeEqual(actualSha256, expectedSha256)
+        ) {
+          decoded.fill(0);
+          decoded = null;
+          return this.#invalidate();
+        }
+      } finally {
+        expectedSha256.fill(0);
+      }
+      this.#result = decoded;
+      decoded = null;
+      this.#state = "complete";
+      return true;
+    } catch {
+      decoded?.fill(0);
+      return this.#invalidate();
+    } finally {
+      encoded.fill(0);
+      actualSha256?.fill(0);
+      for (const chunk of this.#encodedChunks) chunk.fill(0);
+      this.#encodedChunks.length = 0;
+    }
+  }
+
+  #invalidate(): false {
+    this.destroy();
+    return false;
   }
 }
 
@@ -1160,10 +1408,18 @@ async function writeTtyChallenge(challenge: Uint8Array): Promise<void> {
   });
 }
 
-async function readOneExactTtyLine(notAfterMilliseconds: number): Promise<Buffer> {
-  const remaining = notAfterMilliseconds - Date.now();
+async function readExactTtyPolicyFrame(
+  nonce: Hex,
+  startedAtMilliseconds: number,
+  notAfterMilliseconds: number
+): Promise<Buffer> {
+  const observedAtMilliseconds = Date.now();
+  const remaining = notAfterMilliseconds - observedAtMilliseconds;
   if (
+    !Number.isSafeInteger(observedAtMilliseconds) ||
+    observedAtMilliseconds < startedAtMilliseconds ||
     remaining <= 0 ||
+    remaining > TTY_POLICY_ENTRY_WINDOW_MILLISECONDS ||
     stdin.isTTY !== true ||
     stdout.isTTY !== true ||
     stdin.readableEncoding !== null ||
@@ -1175,53 +1431,66 @@ async function readOneExactTtyLine(notAfterMilliseconds: number): Promise<Buffer
     throw new Error("TTY_UNAVAILABLE");
   }
   return new Promise<Buffer>((resolvePromise, rejectPromise) => {
-    const chunks: Buffer[] = [];
-    let retainedBytes = 0;
+    const decoder = new TtyPolicyFrameDecoder(
+      nonce,
+      startedAtMilliseconds,
+      notAfterMilliseconds,
+      observedAtMilliseconds
+    );
     let settled = false;
+    let finishScheduled = false;
     const cleanup = (): void => {
       clearTimeout(timer);
       stdin.off("data", onData);
       stdin.off("error", onError);
+      stdin.off("end", onEnd);
       stdin.pause();
     };
-    const wipe = (): void => {
-      for (const chunk of chunks) chunk.fill(0);
-    };
-    const fail = (): void => {
+    const fail = (code = "TTY_FRAME_INVALID"): void => {
       if (settled) return;
       settled = true;
       cleanup();
-      wipe();
-      rejectPromise(new Error("TTY_FRAME_INVALID"));
+      decoder.destroy();
+      rejectPromise(new Error(code));
     };
     const finish = (): void => {
       if (settled) return;
-      settled = true;
-      cleanup();
-      const result = Buffer.concat(chunks, retainedBytes);
-      wipe();
-      resolvePromise(result);
-    };
-    const onError = (): void => fail();
-    const onData = (value: unknown): void => {
-      if (settled || !Buffer.isBuffer(value)) return fail();
-      const newlineIndex = value.indexOf(0x0a);
-      let contentLength = newlineIndex === -1 ? value.byteLength : newlineIndex;
-      if (newlineIndex !== -1 && contentLength > 0 && value[contentLength - 1] === 0x0d) {
-        contentLength -= 1;
-      }
+      const observedAtMilliseconds = Date.now();
       if (
-        retainedBytes + contentLength > MAXIMUM_TTY_FRAME_BYTES ||
-        (newlineIndex !== -1 && newlineIndex + 1 !== value.byteLength)
+        !Number.isSafeInteger(observedAtMilliseconds) ||
+        observedAtMilliseconds < startedAtMilliseconds
       ) {
         return fail();
       }
-      chunks.push(Buffer.from(value.subarray(0, contentLength)));
-      retainedBytes += contentLength;
-      if (newlineIndex !== -1) finish();
+      if (observedAtMilliseconds >= notAfterMilliseconds) return fail("TTY_FRAME_EXPIRED");
+      if (stdin.readableLength !== 0) return fail();
+      const result = decoder.takeResult(observedAtMilliseconds);
+      if (result === null) return fail();
+      settled = true;
+      cleanup();
+      decoder.destroy();
+      resolvePromise(result);
     };
-    const timer = setTimeout(fail, remaining);
+    const onError = (): void => fail("TTY_IO_FAILED");
+    const onEnd = (): void => fail("TTY_IO_FAILED");
+    const onData = (value: unknown): void => {
+      const observedAtMilliseconds = Date.now();
+      if (
+        !Number.isSafeInteger(observedAtMilliseconds) ||
+        observedAtMilliseconds < startedAtMilliseconds
+      ) {
+        return fail();
+      }
+      if (observedAtMilliseconds >= notAfterMilliseconds) return fail("TTY_FRAME_EXPIRED");
+      if (settled || !decoder.push(value, observedAtMilliseconds)) return fail();
+      if (decoder.complete && !finishScheduled) {
+        finishScheduled = true;
+        setImmediate(finish);
+      }
+    };
+    const timer = setTimeout(() => fail("TTY_FRAME_EXPIRED"), remaining);
     stdin.once("error", onError);
+    stdin.once("end", onEnd);
     stdin.on("data", onData);
     stdin.resume();
   });
@@ -1282,13 +1551,16 @@ export async function readBscTestnetPtaWbnbPoolReleaseReviewPolicyFromControllin
       `releaseCommit=${expectedRelease.releaseCommit}`,
       `releaseTree=${expectedRelease.releaseTree}`,
       `runtimeManifestSha256=${expectedRelease.runtimeManifest.runtimeManifestSha256}`,
-      `frame=${BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_FRAME_DOMAIN}|nonce=${nonce}|policy-base64url=<CANONICAL_POLICY_BYTES>`,
+      `protocol=${BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_FRAME_DOMAIN}`,
+      `limits=ASCII only; LF or CRLF; each line <= ${MAXIMUM_TTY_LINE_BYTES} bytes; total <= ${MAXIMUM_TTY_FRAME_BYTES} bytes; policy <= ${MAXIMUM_POLICY_BYTES} bytes; chunk count <= ${MAXIMUM_TTY_POLICY_CHUNKS}; chunk payload = ${TTY_POLICY_CHUNK_CHARACTERS} base64url characters except the final chunk.`,
+      `BEGIN=${BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_FRAME_DOMAIN}|nonce=${nonce}|line-index=0|kind=BEGIN|chunk-count=<N>|policy-byte-length=<B>|policy-sha256=<0x-lowercase-sha256>`,
+      `CHUNK=${BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_FRAME_DOMAIN}|nonce=${nonce}|line-index=<I+1>|kind=CHUNK|chunk-index=<I>|chunk-count=<N>|policy-byte-length=<B>|policy-sha256=<0x-lowercase-sha256>|policy-base64url=<CHUNK>`,
+      `END=${BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_FRAME_DOMAIN}|nonce=${nonce}|line-index=<N+1>|kind=END|chunk-count=<N>|policy-byte-length=<B>|policy-sha256=<0x-lowercase-sha256>`,
       "This owner-designated internal review is not external, cryptographically identified, Sigstore-attested, or transaction authorization.",
-      "Paste exactly one nonce-bound UTF-8 frame, then press Enter.",
+      `Encode the exact canonical policy bytes once as unpadded base64url. Set N=ceil(encoded characters/${TTY_POLICY_CHUNK_CHARACTERS}); use exact ordered chunk indices 0..N-1; then enter BEGIN, every CHUNK, and END before the single five-minute deadline.`,
       ""
     ].join("\n")
   );
-  let frame: Buffer | null = null;
   let policyBytes: Buffer | null = null;
   try {
     await writeTtyChallenge(challenge);
@@ -1299,13 +1571,15 @@ export async function readBscTestnetPtaWbnbPoolReleaseReviewPolicyFromControllin
         "TTY input became buffered before the nonce challenge was ready."
       );
     }
-    frame = await readOneExactTtyLine(notAfterMilliseconds);
-    policyBytes = decodePolicyFrame(frame, nonce);
-    if (policyBytes === null) {
+    policyBytes = await readExactTtyPolicyFrame(nonce, startedAt, notAfterMilliseconds);
+    await new Promise<void>((resolvePromise) => {
+      setImmediate(resolvePromise);
+    });
+    if (stdin.readableLength !== 0 || stdin.listenerCount("data") !== 0) {
       return blocked(
-        "POLICY_FRAME_INVALID",
-        "policy",
-        "The exact nonce-bound canonical policy frame is invalid."
+        "PRELOADED_TTY_INPUT_REJECTED",
+        "tty",
+        "TTY input remained buffered after the exact terminal END line."
       );
     }
     const now = Date.now();
@@ -1321,7 +1595,17 @@ export async function readBscTestnetPtaWbnbPoolReleaseReviewPolicyFromControllin
       );
     }
     return ready(buildRealm(policy, () => new Date(), productionInstantiations));
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message === "TTY_FRAME_EXPIRED") {
+      return blocked("POLICY_FRAME_EXPIRED", "policy", "The bounded TTY policy frame expired.");
+    }
+    if (error instanceof Error && error.message === "TTY_FRAME_INVALID") {
+      return blocked(
+        "POLICY_FRAME_INVALID",
+        "policy",
+        "The exact nonce-bound canonical policy frame is invalid."
+      );
+    }
     return blocked(
       "POLICY_TTY_IO_FAILED",
       "tty",
@@ -1329,8 +1613,65 @@ export async function readBscTestnetPtaWbnbPoolReleaseReviewPolicyFromControllin
     );
   } finally {
     challenge.fill(0);
-    frame?.fill(0);
     policyBytes?.fill(0);
+  }
+}
+
+/**
+ * Exercises only the untrusted v2 transport decoder in adversarial tests. It cannot parse or admit
+ * a policy, access the production WeakMap, or create an authority-bearing realm.
+ */
+export function decodeBscTestnetPtaWbnbPoolReleaseReviewTtyTransportForTestsOnly(
+  untrustedEvents: unknown,
+  untrustedNonce: unknown,
+  untrustedStartedAtMilliseconds: unknown,
+  untrustedNotAfterMilliseconds: unknown
+): Uint8Array | null {
+  const events = inspectExactArray(untrustedEvents, 1, 256);
+  if (
+    events === null ||
+    typeof untrustedNonce !== "string" ||
+    !BYTES32.test(untrustedNonce) ||
+    typeof untrustedStartedAtMilliseconds !== "number" ||
+    !Number.isSafeInteger(untrustedStartedAtMilliseconds) ||
+    untrustedStartedAtMilliseconds < 0 ||
+    typeof untrustedNotAfterMilliseconds !== "number" ||
+    !Number.isSafeInteger(untrustedNotAfterMilliseconds) ||
+    untrustedNotAfterMilliseconds <= untrustedStartedAtMilliseconds ||
+    untrustedNotAfterMilliseconds - untrustedStartedAtMilliseconds >
+      TTY_POLICY_ENTRY_WINDOW_MILLISECONDS
+  ) {
+    return null;
+  }
+  const decoder = new TtyPolicyFrameDecoder(
+    untrustedNonce as Hex,
+    untrustedStartedAtMilliseconds,
+    untrustedNotAfterMilliseconds,
+    untrustedStartedAtMilliseconds
+  );
+  let result: Buffer | null = null;
+  let lastObservedAtMilliseconds = untrustedStartedAtMilliseconds;
+  try {
+    for (const untrustedEvent of events) {
+      const event = inspectExactRecord(untrustedEvent, ["bytes", "observedAtMilliseconds"]);
+      if (
+        event === null ||
+        !Buffer.isBuffer(event.bytes) ||
+        typeof event.observedAtMilliseconds !== "number" ||
+        !Number.isSafeInteger(event.observedAtMilliseconds) ||
+        !decoder.push(event.bytes, event.observedAtMilliseconds)
+      ) {
+        return null;
+      }
+      lastObservedAtMilliseconds = event.observedAtMilliseconds;
+    }
+    result = decoder.takeResult(lastObservedAtMilliseconds);
+    return result === null ? null : Uint8Array.from(result);
+  } catch {
+    return null;
+  } finally {
+    result?.fill(0);
+    decoder.destroy();
   }
 }
 

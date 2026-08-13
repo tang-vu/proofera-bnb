@@ -285,6 +285,36 @@ wires these controls, while the public production worker factory remains fail-cl
 exact-release policy, its private envelope instantiation, and the descriptor-bound owner ceremony can
 activate the native bridge.
 
+The first production policy-TTY exercise targeted exact audited release commit
+`1a89ddae5e1f575b39dda6134d3ccedaddda0adf`, tree
+`b28a12f78861183ece5ff1c3fce36c0abf094239`, and runtime-manifest SHA-256
+`0xd5212c7563d5d3e3b10d461b5dedcc1552766262c1c87a7057b4dc2876ed0ce0`; both exact-release audits
+returned `GO`. The canonical policy digest was
+`0x9357b560a91b1c41ef8ef84ea39001c206f50fc9839a55102f7916152160a189`. Its `8,670` bytes encoded to
+`11,560` unpadded-base64url characters, producing a complete `11,713`-character v1 line. Windows
+Console truncated that line and the reader rejected it fail-closed. The policy was not admitted and
+owner confirmation was not reached. Only read-only recovery/journal inspection may have occurred;
+there was no fresh RPC, custody-artifact access, DPAPI operation, custody unlock, signature, new
+transaction hash, send, receipt, pool, or liquidity. The source then changed, so this exact triplet and
+policy are historical v1 evidence only and cannot authorize v2.
+
+The replacement v2 transport is a strict nonce-bound ASCII `BEGIN`/`CHUNK`/`END` state machine under
+one absolute five-minute deadline. Every line binds its exact line index, chunk count, policy byte
+length, and lowercase raw policy-byte SHA-256; each `CHUNK` also binds its exact zero-based chunk
+index. Lines must be exact-order LF or CRLF with no blank/control/trailing data. The hard content-line
+cap is `4,096` bytes, while maximum valid worst-case construction is exactly `2,618` bytes and is
+tested conservatively at no more than `2,700`. Total transport is capped at `102,400` bytes. Policy
+length is `1..65,536` bytes; every non-final payload is exactly `2,304` unpadded-base64url characters,
+and the derived chunk count is at most `38`. The historical `11,560`-character payload maps to six
+chunks/eight total v2 lines without becoming authority. A one-off local Windows Console observation
+motivated these conservative constants, but its harness and result are not retained and it is not
+reproducible repository evidence. Repository unit tests establish only the transport arithmetic and
+parser behavior. The reader reconstructs the policy once, verifies exact
+count/order, declared length/hash, and canonical base64url, and rejects v1, truncation,
+missing/duplicate/reordered chunks, malformed terminators, and buffered trailing input before policy
+admission, fresh RPC, custody access, or owner authority. This invariant does not
+prove that the OS queue had no earlier input and does not protect against malicious same-user preload.
+
 A separate local post-claim recheck core requires the authorization gate's authenticated private
 intent before making any read. It compares only the two fixed official RPC origins, finds a common
 finalized block, uses EIP-1898 `requireCanonical`, and repeats chain, nonce, empty-pool, empty-candidate,
@@ -360,7 +390,8 @@ The two write decisions stay separate:
    broadcast window, durable one-shot claim/submission journal, a new exact owner-designated
    distinct-agent technical decision and canonical policy for the exact final release, exact owner
    authorization through the bounded TTY ceremony, receipt, exact logs, and post-state
-   reconciliation. None of those release/authority/transaction outputs exists now.
+   reconciliation. This preparation record supplies none of those release, authority, or transaction
+   outputs.
 2. Only after the pool is independently re-reviewed may an LP mint be prepared. It requires separate
    bounded token approvals, explicit ticks/amounts/minima/deadline/slippage, owner/revoke authority,
    simulation, user confirmation, and receipt evidence.
@@ -376,12 +407,13 @@ The two write decisions stay separate:
   old eight-file unsent request, public Gist and byte-exact re-fetch provide no review for later code.
 - Obtain a distinct exact owner authorization. Neither the request nor a future reviewer decision can
   substitute for it.
-- Generate the canonical runtime policy only after the final commit is pushed and two designated
+- Generate the canonical v2 runtime policy only after the final commit is pushed and two designated
   read-only agents approve its exact commit/tree/full manifest. Use that exact triplet only with the
   absolute PowerShell phase-minus-one command; never substitute direct Node, the blocked pnpm wrapper,
-  or placeholder values.
-  Admit the matching policy through the first TTY phase, then require the owner's exact second-phase
-  confirmation; neither may be inferred from repository contents, chat, digests, or journal state. The
+  placeholder values, or the historical v1 triplet/policy.
+  Admit the matching policy through the strict nonce-bound v2 `BEGIN`/ordered `CHUNK`/`END` TTY phase.
+  Then require the owner's exact second-phase confirmation; neither gate may be inferred from repository
+  contents, chat, digests, or journal state. The
   public worker and generic raw sender stay hard-blocked even when the closure-private path is used.
 - Re-run the fixed two-provider coordinator immediately before any claim, then repeat the pending nonce,
   pool, candidate-code and simulation checks after the durable claim and abort on any drift.
@@ -396,9 +428,9 @@ and a read-only non-authorizing preflight plus a phase-minus-one/phase-zero, exa
 recovery/signing/submission/reconciliation path are implemented. The owner-designated internal technical-review
 gate is complete only for the exact `bc7000e` nonexecuting subject, not this changed release until its
 final commit is pushed and receives new exact audits. **No authenticated external/third-party review is
-claimed, no audited current-release triplet, final-release runtime policy, or exact owner transaction
-approval was entered, and no signature, send, receipt, PTA/WBNB pool, liquidity, oracle, position,
-Pancake write, or autonomous execution is evidenced**.
+claimed. This preparation record contains no audited v2 release triplet, matching runtime policy, exact
+owner transaction approval, signature, send, receipt, PTA/WBNB pool, liquidity, oracle, position,
+Pancake write, or autonomous-execution evidence**.
 
 The machine record is linked to the retained
 [bounded public-result RPC transcript](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json)
