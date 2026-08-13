@@ -18,7 +18,11 @@ describe("BSC testnet PTA/WBNB pool preparation package boundary", () => {
     for (const forbidden of [
       "prepareBscTestnetPtaWbnbPoolInitializationEnvelope",
       "coordinateBscTestnetPtaWbnbPoolInitializationForTests",
-      "describeBscTestnetPtaWbnbPoolOneShotBoundary"
+      "describeBscTestnetPtaWbnbPoolOneShotBoundary",
+      "createBscTestnetPtaWbnbPoolProductionAuthorizationGate",
+      "createBscTestnetPtaWbnbPoolProductionOneShotSignerCore",
+      "createWindowsBscTestnetPtaWbnbPoolLocalJournal",
+      "createWindowsBscTestnetPtaWbnbPoolSigningWorker"
     ]) {
       expect(rootKeys).not.toContain(forbidden);
     }

@@ -150,7 +150,7 @@ are not rewritten. No authenticated independent reviewer is yet bound to the exa
 direct-only scope. Publication and exact re-fetch are therefore complete, but the artifact remains
 ineligible for activation and authorizes no wallet use, signature, or transaction.
 
-## Server-only non-authorizing preflight boundary
+## Server-only non-authorizing preflight and signing scaffold
 
 The integrations package now has a fixed-purpose, server-only coordinator that reads exactly two
 official BNB Chain testnet RPC origins and fails closed. It finds their common finalized block and uses
@@ -162,12 +162,28 @@ balance, and fixed estimate/gas-price/total-cost caps.
 
 On success it can create only a 45-second, digest-bound unsigned observation envelope whose
 `signingReady`, `signingAuthorized`, and `executionAuthorized` flags are always false. The one-shot
-module validates that envelope and describes the exact future atomic-claim/signing requirements, but
-it accepts no custody, signer, journal, transport, or broadcast dependency. Its journal and signer
-types are specification-only: no durable pool-initialization journal, authorization receipt issuer, or
-signer implementation exists. The 25 focused integration tests exercise the coordinator, fail-closed
-preparation export, and non-authorizing one-shot boundary. No short-lived envelope is retained as
-current evidence, and an expired observation cannot be reused.
+boundary validates that envelope and still accepts no custody, journal, signer, transport, or
+broadcast dependency.
+
+A separately reviewed, server-only signing scaffold now implements the exact fixed transaction
+protocol, authorization-receipt validation, signer core, Windows signing worker, and an append-only
+operation journal rooted at
+`%LOCALAPPDATA%\ProofEra\operations\bsc-testnet-pta-wbnb-pool-v1`. Journal directory/file creation is
+restricted to the current Windows user with protected ACL checks, and every state transition is
+append-only and exact-operation-bound. The journal receipt self-hash detects local mutation only; it
+is **integrity evidence, not reviewer identity, owner authorization, signing authority, or permission
+to submit**.
+
+This scaffold is deliberately unreachable for production use. The production authority gate,
+production signer core, and production signing-worker factory each fail closed with
+`PRODUCTION_AUTHORIZATION_UNAVAILABLE`. There is no production composition, authenticated
+post-claim RPC capability issuer, broadcast/receipt runner, or replacement/reconciliation path. No
+custody read, signature, raw transaction, RPC write, or onchain action occurred while implementing or
+testing it. The eight focused integration files now pass 70 tests across the coordinator, boundary,
+package-export barrier, exact protocol, authorization gate, journal, signer core, and worker. Those
+tests establish local behavior only; they do not supply the missing external authority or transaction
+evidence. No short-lived envelope is retained as current evidence, and an expired observation cannot
+be reused.
 
 ## Separate proposed liquidity envelope
 
@@ -190,11 +206,13 @@ The two write decisions stay separate:
 
 - Refresh all five runtime identities, manager/factory/deployer relationships, fee configuration,
   factory owner, LM controls, pair lookup, nonce, fee, gas, and balance at one fresh finalized block.
-- Obtain an authenticated independent review bound to the exact published initializer scope.
-- Implement and independently review the durable atomic journal, external exact-authorization receipt,
-  custody-isolated exact signer, signed-byte persistence, broadcast, and pending/replacement/unknown-
-  outcome reconciliation. The current one-shot module specifies these contracts but implements none
-  of them.
+- Obtain an authenticated independent external review bound to the exact published initializer scope
+  and a distinct exact owner authorization. The public Gist and its byte-exact re-fetch provide
+  neither.
+- Provision and independently review a production authorization issuer/composition, authenticated
+  post-claim RPC capability, broadcast/receipt runner, and pending/replacement/unknown-outcome
+  reconciliation. The reviewed journal/protocol/signer scaffold remains deliberately unreachable and
+  non-authorizing until those pieces exist.
 - Re-run the fixed two-provider coordinator immediately before any claim, then repeat the pending nonce,
   pool, candidate-code and simulation checks after the durable claim and abort on any drift.
 - Establish post-initialization observation cardinality and elapsed oracle history before using the
@@ -204,8 +222,9 @@ The two write decisions stay separate:
 
 Until those gates close and explorer-verifiable receipts exist, the truthful state remains: PTA and
 WBNB identities are evidenced, the retained pool construction path is reproduced exactly offline,
-and a read-only non-authorizing initialization preflight exists, but **no PTA/WBNB pool, liquidity,
-oracle, position, Pancake write, or autonomous execution is evidenced**.
+and a read-only non-authorizing initialization preflight plus unreachable signing scaffold exist, but
+**no PTA/WBNB pool, liquidity, oracle, position, Pancake write, or autonomous execution is
+evidenced**.
 
 The machine record is linked to the retained
 [bounded public-result RPC transcript](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json)
