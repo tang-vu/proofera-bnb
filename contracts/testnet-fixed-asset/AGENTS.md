@@ -52,8 +52,10 @@ Run commands from `contracts/testnet-fixed-asset/`:
   an unsigned nor signed transaction envelope. Keep all four negative flags
   explicit in plan JSON and tests.
 - Keep pool creation-code/CREATE2 output unresolved until an independently
-  bound init-code hash and deployer derivation exist. A technical 1:1 raw-unit
-  seed is non-economic and is never a price, peg, quote, oracle, or valuation.
+  bound init-code hash and deployer derivation exist. The fixed test-scenario
+  seed of `1 PTA = 0.000001 WBNB` is non-economic and is never a market price,
+  peg, quote, oracle, or valuation; preserve its order-dependent Q64.96
+  rounding disclosure.
 - Never infer a returned address from an ordinary transaction receipt. For the
   new-pool-only plan, post-receipt evidence must reconcile the independently
   predicted address, fresh factory/pool getters, and exactly one decoded

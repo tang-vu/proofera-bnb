@@ -24,10 +24,14 @@ import {
   POOL_CREATED_EVENT_SIGNATURE,
   POOL_CREATED_EVENT_TOPIC0,
   POOL_INITIALIZER_SELECTOR,
-  RAW_UNIT_ONE_TO_ONE_SQRT_PRICE_X96,
+  PTA_TOKEN0_TEST_SCENARIO_EXPECTED_TICK,
+  PTA_TOKEN0_TEST_SCENARIO_SQRT_PRICE_X96,
+  PTA_TOKEN1_TEST_SCENARIO_EXPECTED_TICK,
+  PTA_TOKEN1_TEST_SCENARIO_SQRT_PRICE_X96,
   assertPoolPreparationChainId,
   assertPtaDeploymentAddress,
   buildPoolPreparation,
+  buildTestScenarioSeedPrice,
   canonicalTokenOrder,
   decodePoolInitializationCalldata,
   encodePoolInitializationCalldata,
@@ -43,7 +47,7 @@ const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const EXPECTED_PROVENANCE_MANIFEST_SHA256 =
   "8f8cf45cae3d3a8cc51bfb27f6602a7cd43220d4793f1c7a8801a42250758dc1";
 const EXPECTED_GOLDEN_EVIDENCE_SHA256 =
-  "2b0e40632d8704672304d38c64c9583b722a56618d07a5ee3f13cc199cd8a455";
+  "29fbff5f65266241ea4f21a252bd476e1aa421cc798ebe8573b9787a1170b8ce";
 const EXPECTED_GOLDEN_CASES = Object.freeze([
   Object.freeze({
     id: "pta_lower_than_wbnb",
@@ -51,15 +55,18 @@ const EXPECTED_GOLDEN_CASES = Object.freeze([
     token0: LOWER_PTA,
     token1: BSC_TESTNET_WBNB,
     ptaIsToken0: true,
+    sqrtPriceX96: "79228162514264337593543950",
+    expectedInitialTick: "-138163",
+    encodedRatioRelationToTarget: "slightly_below_target_due_to_floor_rounding",
     canonicalInputSha256:
       "cb898e3b65d263c532a22b3fa6cc5664556b55a75973806c99b45c084f6faace",
     canonicalPlanBodySha256:
-      "c53f3ae460f8068fd682a54d6a0b1058cd42f9df38cb1721e8e30b036f2212c5",
+      "5421aca90929bdf708793a4c2618f62343e0cda1f6de675910c07e1711ffc3b0",
     calldataSha256:
-      "cafedb0e8b5372db3a27914c5f99005046f643480ba89c2962a614b34dde4143",
-    serializedCliOutputByteLength: 22194,
+      "ff25ae25a993892037f0e5241ea3bedb31292cee8e360c46511613feb66fa258",
+    serializedCliOutputByteLength: 22750,
     serializedCliOutputSha256:
-      "a0ec4b965c6d61243c2ba8155db22d187ebfb7acf8d55d8a40d993472fb1b786",
+      "772613d5b44486f118367b56c6b1f6f27ea250d45a38bc9434f638fde5e2cb03",
   }),
   Object.freeze({
     id: "pta_higher_than_wbnb",
@@ -67,15 +74,18 @@ const EXPECTED_GOLDEN_CASES = Object.freeze([
     token0: BSC_TESTNET_WBNB,
     token1: HIGHER_PTA,
     ptaIsToken0: false,
+    sqrtPriceX96: "79228162514264337593543950336000",
+    expectedInitialTick: "138162",
+    encodedRatioRelationToTarget: "exact_target",
     canonicalInputSha256:
       "44ce5f69418145571957e3a67fe11b0136a9004f254bf86d1b184f9db088581f",
     canonicalPlanBodySha256:
-      "3e842451516f3a410d0dfc696f51376ca1fb24854c80b228539207b4fca0a729",
+      "4f67cfaadbc98e91b2a00d15afd2b0659d64a3e09665db833ec04d93a053ad34",
     calldataSha256:
-      "4ce16a5002cbfaac8a58db426838d2a4770a7ab1c79e02b3e3f1ba6d320efb20",
-    serializedCliOutputByteLength: 22195,
+      "ab7113a7b87b467ab8cf29bb48a84e1089b1c6e7b0a6008bf7039cb542446c2e",
+    serializedCliOutputByteLength: 22722,
     serializedCliOutputSha256:
-      "b75a8975ccbd8f4d1a2511e97174d9a283aecbca6b30ec6db08d49a61e7e9ff8",
+      "358734fc2c2608be4a914ab6f8535bb35bc543a5fe6e7042f40207b67bf67eda",
   }),
 ]);
 const EXPECTED_OFFICIAL_ARTIFACTS = Object.freeze([
@@ -756,22 +766,98 @@ test("canonical ordering compares exact address bytes in both directions", () =>
   });
 });
 
-test("initializer calldata round-trips the exact static ABI values", () => {
-  const { token0, token1 } = canonicalTokenOrder(LOWER_PTA);
-  const calldata = encodePoolInitializationCalldata({ token0, token1 });
-
-  assert.equal(calldata.slice(0, 10), POOL_INITIALIZER_SELECTOR);
-  assert.equal(calldata.length, 2 + 8 + 4 * 64);
-  assert.deepEqual(decodePoolInitializationCalldata(calldata), {
-    token0,
-    token1,
-    fee: String(PANCAKE_V3_FEE),
-    sqrtPriceX96: RAW_UNIT_ONE_TO_ONE_SQRT_PRICE_X96.toString(),
-  });
+test("test-scenario seed preserves 1 PTA = 0.000001 WBNB across both token orders", () => {
   assert.equal(
-    calldata,
-    "0x13ead5620000000000000000000000001111111111111111111111111111111111111111000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd00000000000000000000000000000000000000000000000000000000000001f40000000000000000000000000000000000000001000000000000000000000000",
+    PTA_TOKEN0_TEST_SCENARIO_SQRT_PRICE_X96,
+    79228162514264337593543950n,
   );
+  assert.equal(
+    PTA_TOKEN1_TEST_SCENARIO_SQRT_PRICE_X96,
+    79228162514264337593543950336000n,
+  );
+  assert.equal(PTA_TOKEN0_TEST_SCENARIO_EXPECTED_TICK, -138163);
+  assert.equal(PTA_TOKEN1_TEST_SCENARIO_EXPECTED_TICK, 138162);
+
+  const ptaToken0 = buildTestScenarioSeedPrice(true);
+  const ptaToken1 = buildTestScenarioSeedPrice(false);
+
+  for (const price of [ptaToken0, ptaToken1]) {
+    assert.equal(price.scenario, "fixed_non_economic_test_scenario");
+    assert.equal(price.targetRatio, "1 PTA = 0.000001 WBNB");
+    assert.match(price.targetRatioStatus, /not observed or market-derived/);
+    assert.match(price.economicMeaning, /not a market price/);
+    assert.match(price.economicMeaning, /peg/);
+    assert.match(price.economicMeaning, /valuation/);
+    assert.match(price.economicMeaning, /oracle observation/);
+  }
+
+  assert.deepEqual(
+    {
+      sqrtPriceX96: ptaToken0.sqrtPriceX96,
+      expectedInitialTick: ptaToken0.expectedInitialTick,
+      numerator: ptaToken0.rawToken1PerToken0TargetNumerator,
+      denominator: ptaToken0.rawToken1PerToken0TargetDenominator,
+      rounding: ptaToken0.encodedRatioRelationToTarget,
+    },
+    {
+      sqrtPriceX96: PTA_TOKEN0_TEST_SCENARIO_SQRT_PRICE_X96.toString(),
+      expectedInitialTick: String(PTA_TOKEN0_TEST_SCENARIO_EXPECTED_TICK),
+      numerator: "1",
+      denominator: "1000000",
+      rounding: "slightly_below_target_due_to_floor_rounding",
+    },
+  );
+  assert.deepEqual(
+    {
+      sqrtPriceX96: ptaToken1.sqrtPriceX96,
+      expectedInitialTick: ptaToken1.expectedInitialTick,
+      numerator: ptaToken1.rawToken1PerToken0TargetNumerator,
+      denominator: ptaToken1.rawToken1PerToken0TargetDenominator,
+      rounding: ptaToken1.encodedRatioRelationToTarget,
+    },
+    {
+      sqrtPriceX96: PTA_TOKEN1_TEST_SCENARIO_SQRT_PRICE_X96.toString(),
+      expectedInitialTick: String(PTA_TOKEN1_TEST_SCENARIO_EXPECTED_TICK),
+      numerator: "1000000",
+      denominator: "1",
+      rounding: "exact_target",
+    },
+  );
+});
+
+test("initializer calldata round-trips exact scenario bytes in both token orders", () => {
+  const cases = [
+    {
+      order: canonicalTokenOrder(LOWER_PTA),
+      sqrtPriceX96: PTA_TOKEN0_TEST_SCENARIO_SQRT_PRICE_X96,
+      expectedCalldata:
+        "0x13ead5620000000000000000000000001111111111111111111111111111111111111111000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd00000000000000000000000000000000000000000000000000000000000001f40000000000000000000000000000000000000000004189374bc6a7ef9db22d0e",
+    },
+    {
+      order: canonicalTokenOrder(HIGHER_PTA),
+      sqrtPriceX96: PTA_TOKEN1_TEST_SCENARIO_SQRT_PRICE_X96,
+      expectedCalldata:
+        "0x13ead562000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd000000000000000000000000ffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000001f400000000000000000000000000000000000003e8000000000000000000000000",
+    },
+  ];
+
+  for (const { order, sqrtPriceX96, expectedCalldata } of cases) {
+    const calldata = encodePoolInitializationCalldata({
+      token0: order.token0,
+      token1: order.token1,
+      sqrtPriceX96,
+    });
+
+    assert.equal(calldata.slice(0, 10), POOL_INITIALIZER_SELECTOR);
+    assert.equal(calldata.length, 2 + 8 + 4 * 64);
+    assert.deepEqual(decodePoolInitializationCalldata(calldata), {
+      token0: order.token0,
+      token1: order.token1,
+      fee: String(PANCAKE_V3_FEE),
+      sqrtPriceX96: sqrtPriceX96.toString(),
+    });
+    assert.equal(calldata, expectedCalldata);
+  }
 });
 
 test("calldata encoder and decoder fail closed on noncanonical and out-of-range values", () => {
@@ -797,10 +883,27 @@ test("calldata encoder and decoder fail closed on noncanonical and out-of-range 
       sqrtPriceX96: 1n << 160n,
     }),
   );
+  assert.throws(() =>
+    encodePoolInitializationCalldata({
+      token0: LOWER_PTA,
+      token1: BSC_TESTNET_WBNB,
+    }),
+  );
+  assert.throws(() =>
+    encodePoolInitializationCalldata({
+      token0: LOWER_PTA,
+      token1: BSC_TESTNET_WBNB,
+      sqrtPriceX96: Number(PTA_TOKEN0_TEST_SCENARIO_SQRT_PRICE_X96),
+    }),
+  );
+  for (const rejected of [undefined, null, 0, 1, "true", "false"]) {
+    assert.throws(() => buildTestScenarioSeedPrice(rejected));
+  }
 
   const valid = encodePoolInitializationCalldata({
     token0: LOWER_PTA,
     token1: BSC_TESTNET_WBNB,
+    sqrtPriceX96: PTA_TOKEN0_TEST_SCENARIO_SQRT_PRICE_X96,
   });
   for (const rejected of [
     valid.toUpperCase().replace("0X", "0x"),
@@ -826,15 +929,31 @@ test("deterministic address corpus preserves ordering and calldata values", () =
   for (const ptaAddress of candidates) {
     const order = canonicalTokenOrder(ptaAddress);
     assert.ok(BigInt(order.token0) < BigInt(order.token1));
+    const price = buildTestScenarioSeedPrice(order.ptaIsToken0);
     const decoded = decodePoolInitializationCalldata(
-      encodePoolInitializationCalldata(order),
+      encodePoolInitializationCalldata({
+        token0: order.token0,
+        token1: order.token1,
+        sqrtPriceX96: BigInt(price.sqrtPriceX96),
+      }),
     );
     assert.equal(decoded.token0, order.token0);
     assert.equal(decoded.token1, order.token1);
     assert.equal(decoded.fee, "500");
     assert.equal(
       decoded.sqrtPriceX96,
-      RAW_UNIT_ONE_TO_ONE_SQRT_PRICE_X96.toString(),
+      order.ptaIsToken0
+        ? PTA_TOKEN0_TEST_SCENARIO_SQRT_PRICE_X96.toString()
+        : PTA_TOKEN1_TEST_SCENARIO_SQRT_PRICE_X96.toString(),
+    );
+    assert.equal(price.targetRatio, "1 PTA = 0.000001 WBNB");
+    assert.equal(
+      price.expectedInitialTick,
+      String(
+        order.ptaIsToken0
+          ? PTA_TOKEN0_TEST_SCENARIO_EXPECTED_TICK
+          : PTA_TOKEN1_TEST_SCENARIO_EXPECTED_TICK,
+      ),
     );
   }
 });
@@ -847,7 +966,7 @@ test("plan is deterministic, canonical, explicitly blocked, and emits no liquidi
   });
 
   assert.deepEqual(first, second);
-  assert.equal(first.schemaVersion, 2);
+  assert.equal(first.schemaVersion, 3);
   assert.equal(first.executionReady, false);
   assert.equal(first.signatureRequested, false);
   assert.equal(first.reviewCallTupleEmitted, true);
@@ -866,7 +985,19 @@ test("plan is deterministic, canonical, explicitly blocked, and emits no liquidi
     "unresolved_not_guessed",
   );
   assert.equal(first.initialization.nativeValueBaseUnits, "0");
-  assert.equal(first.initialization.price.expectedInitialTick, "0");
+  assert.equal(
+    first.initialization.price.sqrtPriceX96,
+    PTA_TOKEN0_TEST_SCENARIO_SQRT_PRICE_X96.toString(),
+  );
+  assert.equal(
+    first.initialization.price.expectedInitialTick,
+    String(PTA_TOKEN0_TEST_SCENARIO_EXPECTED_TICK),
+  );
+  assert.equal(first.initialization.price.targetRatio, "1 PTA = 0.000001 WBNB");
+  assert.equal(
+    first.initialization.price.encodedRatioRelationToTarget,
+    "slightly_below_target_due_to_floor_rounding",
+  );
   assert.match(first.initialization.price.economicMeaning, /^none:/);
   assert.equal(first.safety.networkCalls, false);
   assert.equal(first.safety.signsTransactions, false);
@@ -1010,14 +1141,17 @@ test("golden plans and actual CLI bytes are pinned on both sides of WBNB orderin
   const goldenRaw = await readFile(
     resolve(
       PACKAGE_ROOT,
-      "evidence/pool-preparation-golden-digests-2026-08-12.json",
+      "evidence/pool-preparation-golden-digests-2026-08-13.json",
     ),
   );
   const golden = JSON.parse(goldenRaw.toString("utf8"));
 
   assert.equal(sha256(goldenRaw), EXPECTED_GOLDEN_EVIDENCE_SHA256);
+  assert.equal(golden.schemaVersion, 2);
   assert.equal(golden.status, "fixture_only_offline_unsigned_golden_digests");
   assert.equal(golden.scope.chainId, BSC_TESTNET_CHAIN_ID);
+  assert.equal(golden.scope.testScenarioTargetRatio, "1 PTA = 0.000001 WBNB");
+  assert.equal(golden.scope.testScenarioIsMarketPegOracleOrValuation, false);
   assert.equal(golden.scope.fixtureAddressesAreDeployedOrAuthorized, false);
   assert.equal(golden.scope.networkRpcSigningOrBroadcastUsed, false);
   assert.equal(golden.cases.length, EXPECTED_GOLDEN_CASES.length);
@@ -1031,6 +1165,11 @@ test("golden plans and actual CLI bytes are pinned on both sides of WBNB orderin
       token1: expected.token1,
       ptaIsToken0: expected.ptaIsToken0,
     });
+    assert.deepEqual(retained.initialization, {
+      sqrtPriceX96: expected.sqrtPriceX96,
+      expectedInitialTick: expected.expectedInitialTick,
+      encodedRatioRelationToTarget: expected.encodedRatioRelationToTarget,
+    });
 
     const plan = buildPoolPreparation({
       chainId: BSC_TESTNET_CHAIN_ID,
@@ -1039,6 +1178,19 @@ test("golden plans and actual CLI bytes are pinned on both sides of WBNB orderin
     assert.equal(plan.pair.token0, expected.token0);
     assert.equal(plan.pair.token1, expected.token1);
     assert.equal(plan.pair.ptaIsToken0, expected.ptaIsToken0);
+    assert.equal(
+      plan.initialization.price.targetRatio,
+      "1 PTA = 0.000001 WBNB",
+    );
+    assert.equal(plan.initialization.price.sqrtPriceX96, expected.sqrtPriceX96);
+    assert.equal(
+      plan.initialization.price.expectedInitialTick,
+      expected.expectedInitialTick,
+    );
+    assert.equal(
+      plan.initialization.price.encodedRatioRelationToTarget,
+      expected.encodedRatioRelationToTarget,
+    );
     assert.equal(
       plan.digests.canonicalInputSha256,
       expected.canonicalInputSha256,

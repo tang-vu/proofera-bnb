@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import test from "node:test";
@@ -240,7 +241,7 @@ test("offline preparation is deterministic and binds source, compiler, recipient
 test("retained local-build evidence matches a fresh clean-build preparation", async () => {
   const recorded = JSON.parse(
     await readFile(
-      resolve(PACKAGE_ROOT, "evidence/local-build-2026-08-11.json"),
+      resolve(PACKAGE_ROOT, "evidence/local-build-2026-08-13.json"),
       "utf8",
     ),
   );
@@ -249,7 +250,12 @@ test("retained local-build evidence matches a fresh clean-build preparation", as
     recipient: RECIPIENT,
   });
 
-  assert.equal(recorded.status, "local_build_only_not_deployed");
+  assert.equal(
+    recorded.status,
+    "local_verification_only_not_transaction_evidence",
+  );
+  assert.equal(recorded.checkedDateUtc, "2026-08-13");
+  assert.equal(recorded.results.nodeTestsPassed, 26);
   assert.equal(
     recorded.examplePreparation.recipientIsAuthorizedForDeployment,
     false,
@@ -259,4 +265,14 @@ test("retained local-build evidence matches a fresh clean-build preparation", as
     current.compiler.longVersion,
   );
   assert.deepEqual(recorded.digests, current.digests);
+  const poolGoldenRaw = await readFile(
+    resolve(
+      PACKAGE_ROOT,
+      recorded.poolPreparationEvidence.fixtureOnlyGoldenEvidencePath,
+    ),
+  );
+  assert.equal(
+    createHash("sha256").update(poolGoldenRaw).digest("hex"),
+    recorded.poolPreparationEvidence.fixtureOnlyGoldenEvidenceSha256,
+  );
 });

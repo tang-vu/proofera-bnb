@@ -15,7 +15,14 @@ export const PANCAKE_V3_TICK_SPACING =
   OFFICIAL_PANCAKE_V3_ARTIFACTS.feeTiers.find(
     ({ fee }) => fee === PANCAKE_V3_FEE,
   )?.tickSpacing;
-export const RAW_UNIT_ONE_TO_ONE_SQRT_PRICE_X96 = 2n ** 96n;
+const Q96 = 2n ** 96n;
+const TEST_SCENARIO_SQRT_RATIO_SCALE = 1000n;
+export const PTA_TOKEN0_TEST_SCENARIO_SQRT_PRICE_X96 =
+  Q96 / TEST_SCENARIO_SQRT_RATIO_SCALE;
+export const PTA_TOKEN1_TEST_SCENARIO_SQRT_PRICE_X96 =
+  Q96 * TEST_SCENARIO_SQRT_RATIO_SCALE;
+export const PTA_TOKEN0_TEST_SCENARIO_EXPECTED_TICK = -138163;
+export const PTA_TOKEN1_TEST_SCENARIO_EXPECTED_TICK = 138162;
 
 export const POOL_INITIALIZER_SIGNATURE =
   OFFICIAL_PANCAKE_V3_ARTIFACTS.initializer.signature;
@@ -196,11 +203,54 @@ export function canonicalTokenOrder(ptaAddress) {
     : { token0: wbnb, token1: pta, ptaIsToken0: false };
 }
 
+export function buildTestScenarioSeedPrice(ptaIsToken0) {
+  if (typeof ptaIsToken0 !== "boolean") {
+    throw new Error(
+      "Test-scenario seed construction requires an explicit PTA token-order boolean.",
+    );
+  }
+
+  const sqrtPriceX96 = ptaIsToken0
+    ? PTA_TOKEN0_TEST_SCENARIO_SQRT_PRICE_X96
+    : PTA_TOKEN1_TEST_SCENARIO_SQRT_PRICE_X96;
+
+  return {
+    scenario: "fixed_non_economic_test_scenario",
+    targetRatio: "1 PTA = 0.000001 WBNB",
+    targetRatioStatus:
+      "declared test-scenario input only; not observed or market-derived",
+    tokenDecimals: {
+      pta: 18,
+      wbnb: 18,
+    },
+    priceConvention: "raw token1 units per raw token0 unit",
+    sqrtPriceX96: sqrtPriceX96.toString(),
+    expectedInitialTick: String(
+      ptaIsToken0
+        ? PTA_TOKEN0_TEST_SCENARIO_EXPECTED_TICK
+        : PTA_TOKEN1_TEST_SCENARIO_EXPECTED_TICK,
+    ),
+    rawToken1PerToken0TargetNumerator: ptaIsToken0 ? "1" : "1000000",
+    rawToken1PerToken0TargetDenominator: ptaIsToken0 ? "1000000" : "1",
+    sqrtPriceX96Derivation: ptaIsToken0
+      ? "floor(2^96 / 1000) because token1/token0 is WBNB/PTA = 1/1,000,000"
+      : "2^96 * 1000 because token1/token0 is PTA/WBNB = 1,000,000",
+    sqrtPriceX96Rounding: ptaIsToken0
+      ? "floored to uint160; the encoded squared ratio is slightly below the declared target"
+      : "exact integer Q64.96 encoding; the encoded squared ratio equals the declared target",
+    encodedRatioRelationToTarget: ptaIsToken0
+      ? "slightly_below_target_due_to_floor_rounding"
+      : "exact_target",
+    economicMeaning:
+      "none: this target is an arbitrary test-scenario ratio, not a market price, peg, quote, valuation, oracle observation, or performance input",
+  };
+}
+
 export function encodePoolInitializationCalldata({
   token0,
   token1,
   fee = PANCAKE_V3_FEE,
-  sqrtPriceX96 = RAW_UNIT_ONE_TO_ONE_SQRT_PRICE_X96,
+  sqrtPriceX96,
 }) {
   const first = assertAddress(token0, "token0");
   const second = assertAddress(token1, "token1");
@@ -211,8 +261,7 @@ export function encodePoolInitializationCalldata({
   }
 
   const feeValue = typeof fee === "number" ? BigInt(fee) : fee;
-  const sqrtPriceValue =
-    typeof sqrtPriceX96 === "number" ? BigInt(sqrtPriceX96) : sqrtPriceX96;
+  const sqrtPriceValue = sqrtPriceX96;
 
   return encodeStaticCall(POOL_INITIALIZER_SELECTOR, [
     encodeAddressWord(first),
@@ -419,16 +468,18 @@ export function buildPoolPreparation({ chainId, ptaAddress }) {
   const validatedChainId = assertPoolPreparationChainId(chainId);
   const validatedPtaAddress = assertPtaDeploymentAddress(ptaAddress);
   const tokenOrder = canonicalTokenOrder(validatedPtaAddress);
+  const seedPrice = buildTestScenarioSeedPrice(tokenOrder.ptaIsToken0);
   const calldata = encodePoolInitializationCalldata({
     token0: tokenOrder.token0,
     token1: tokenOrder.token1,
+    sqrtPriceX96: BigInt(seedPrice.sqrtPriceX96),
   });
   const decoded = decodePoolInitializationCalldata(calldata);
   const expectedDecoded = {
     token0: tokenOrder.token0,
     token1: tokenOrder.token1,
     fee: String(PANCAKE_V3_FEE),
-    sqrtPriceX96: RAW_UNIT_ONE_TO_ONE_SQRT_PRICE_X96.toString(),
+    sqrtPriceX96: seedPrice.sqrtPriceX96,
   };
   if (stableJson(decoded) !== stableJson(expectedDecoded)) {
     throw new Error(
@@ -441,7 +492,7 @@ export function buildPoolPreparation({ chainId, ptaAddress }) {
     ptaAddress: validatedPtaAddress,
   };
   const planBody = {
-    schemaVersion: 2,
+    schemaVersion: 3,
     kind: "pancake_v3_bsc_testnet_pta_wbnb_pool_preparation",
     status: "offline_unsigned_preparation_only",
     executionReady: false,
@@ -531,16 +582,7 @@ export function buildPoolPreparation({ chainId, ptaAddress }) {
       arguments: expectedDecoded,
       calldata,
       nativeValueBaseUnits: "0",
-      price: {
-        sqrtPriceX96: RAW_UNIT_ONE_TO_ONE_SQRT_PRICE_X96.toString(),
-        expectedInitialTick: "0",
-        rawToken1PerToken0Numerator: "1",
-        rawToken1PerToken0Denominator: "1",
-        methodology:
-          "sqrt(1 raw token1 unit / 1 raw token0 unit) * 2^96; both reviewed token definitions expect 18 decimals",
-        economicMeaning:
-          "none: this arbitrary technical seed is not a quote, market price, peg, valuation, oracle, or performance input",
-      },
+      price: seedPrice,
       poolAddress: null,
       poolAddressStatus: "unresolved_not_guessed",
       poolAddressReason:

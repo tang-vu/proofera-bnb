@@ -1,6 +1,6 @@
 # ProofEra submission draft
 
-Updated: 2026-08-12. Status: copy in progress; the PTA fixture receipt is public, while marketplace/agent/Altana/Pancake/TermiX evidence remains incomplete.
+Updated: 2026-08-13. Status: copy in progress; the PTA fixture receipt is public, while marketplace/agent/Altana/Pancake/TermiX evidence remains incomplete.
 
 ## Core copy
 
@@ -20,7 +20,7 @@ Users begin with a financial job—protect a Venus loan, manage Pancake concentr
 
 ## Partner-track story
 
-**PancakeSwap:** the current slice performs atomic-latest position reads and deterministic, non-executing LP analysis. A bounded review rejected all 14 inspected WBNB pools rather than promoting unsafe mocks. Canonical WBNB has exact source/creation/runtime/control proof, and the isolated fixed PTA fallback is now finalized on chain 97 with exact runtime, supply and single-mint evidence. PTA still has no price or liquidity. An offline tool prepares only a zero-value initializer review call tuple and retains twelve blockers; it is neither a complete pool transaction nor pool evidence. These are separate token-component proofs, not an eligible pair. The submission claim will add a bounded direct V3 LP operation only after an eligible PTA/WBNB pool, a controlled position, scoped authority, a real Pancake testnet receipt and a manual baseline net of gas, protocol fees, slippage and estimated IL exist.
+**PancakeSwap:** the current slice performs atomic-latest position reads and deterministic, non-executing LP analysis. A bounded review rejected all 14 inspected WBNB pools rather than promoting unsafe mocks. Canonical WBNB has exact source/creation/runtime/control proof, and the isolated fixed PTA fallback is finalized on chain 97 with exact runtime, supply and single-mint evidence. A later two-provider snapshot at finalized block `124767685` found no PTA/WBNB pool at fee tiers `100`, `500`, `2500`, or `10000`; all five retained token/core runtime hashes matched, and a bounded public-result transcript is replayed offline. The fee-500 CREATE2 result `0x30b07e82d7181a53Ae2EA98Cd08b6733Ffd831aE` is a conditional candidate, not a pool, until the init-code compiler artifact and deployed derivation are independently bound. Factory owner/LM controls remain mutable. The offline initializer scenario uses the arbitrary test ratio `1 PTA = 0.000001 WBNB`, not a market/peg/oracle/valuation claim. No pool, price, liquidity, or Pancake receipt is evidenced. Initialization and a later LP mint—including the unapproved proposal capped at `1,000 PTA` plus `0.001 WBNB`—require separate explicit approvals. The submission claim will add a bounded direct V3 LP operation only after an eligible pool, a controlled position, scoped authority, a real Pancake testnet receipt and a manual baseline net of gas, protocol fees, slippage and estimated IL exist.
 
 **Altana:** strict local boundaries now cover context-schema-v3 complete intent/quote binding, selector-scoped write-target attestation, public-descriptor grant intent, exact call rows, token caps, expiry, authority verification, lifecycle display and revoke semantics. The handoff requires an exact atomic `consumeOrRead` receipt. Its reservation ledger passes 10 real PostgreSQL 17.9 cases. The separate canonical one-shot grant-claim ledger passes 68 focused and 18 real PostgreSQL 17 cases; its migration and semantic-contract SHA-256 values are recorded in the [deployment runbook](./deployment.md#postgresql-grant-claim-gate). Both ledgers are local implementation evidence only. No deployed database, worker-held live signer, authority, passkey ceremony, grant, execute/revoke transaction, Keystore record or explorer receipt exists. An ambiguous SDK grant is never blind-retried.
 
@@ -41,6 +41,7 @@ Users begin with a financial job—protect a Venus loan, manage Pancake concentr
 | Demo video                    | NOT RECORDED                             |
 | CI/public smoke evidence      | LOCAL GATES IN PROGRESS                  |
 | PTA fixture deployment        | FINALIZED CHAIN 97; NOT POOL/LP EVIDENCE |
+| PTA/WBNB pool readiness       | READ-ONLY SNAPSHOT; NO POOL OR WRITE     |
 
 ## Required final validation
 

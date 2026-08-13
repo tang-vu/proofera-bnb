@@ -1,2 +1,7 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# These files are hashed byte-for-byte by the retained pool-readiness evidence.
+scripts/collect-bsc-testnet-pta-wbnb-pool-readiness.mjs text eol=lf
+scripts/pancake-selector-review/review-lib.mjs text eol=lf
+evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json text eol=lf

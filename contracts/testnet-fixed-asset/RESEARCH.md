@@ -1,7 +1,8 @@
 # Test asset research record
 
-Checked on 2026-08-11 UTC. Only primary project and chain documentation was
-used for implementation decisions.
+Source facts checked on 2026-08-11 UTC; the non-economic pool scenario and
+offline evidence were updated on 2026-08-13 UTC. Only primary project and chain
+documentation was used for implementation decisions.
 
 ## Findings and decisions
 
@@ -99,9 +100,15 @@ their upstream GPL-2.0-or-later license. The provenance manifest SHA-256 is
 - For fee tier `500`, retained Pancake configuration expects tick spacing `10`.
   The plan does not treat that constant as fresh chain state: its exact
   preflight read must decode the factory result to signed `int24(10)`.
-- `sqrtPriceX96 = 2^96` represents a raw token1/token0 ratio of exactly `1` and
-  initial tick `0`. Because PTA has no economic value, this is only a technical
-  initialization seed. It supplies no market or oracle evidence.
+- The declared test-scenario target is fixed at `1 PTA = 0.000001 WBNB`
+  regardless of address ordering. With PTA as `token0`, `sqrtPriceX96` is
+  `floor(2^96 / 1000) = 79228162514264337593543950`; its squared encoded ratio
+  is slightly below the target because of Q64.96 flooring, and the expected
+  initialized tick is `-138163`. With PTA as `token1`, `sqrtPriceX96` is
+  `2^96 * 1000 = 79228162514264337593543950336000`; this encoding represents
+  the target exactly, and the expected initialized tick is `138162`. These are
+  non-economic test-scenario inputs, not market prices, pegs, quotes,
+  valuations, oracle observations, or expected returns.
 - Pool address prediction is withheld. It requires an independently bound pool
   creation-code hash, CREATE2 salt derivation, exact deployer, and subsequent
   factory/immutable agreement. A familiar or remembered init-code hash is not
@@ -112,7 +119,7 @@ their upstream GPL-2.0-or-later license. The provenance manifest SHA-256 is
   separate bounded plan is required before any approval or liquidity mint.
 - Fixture-only golden outputs cover a PTA address below and above WBNB. The
   retained evidence file SHA-256 is
-  `2b0e40632d8704672304d38c64c9583b722a56618d07a5ee3f13cc199cd8a455`;
+  `29fbff5f65266241ea4f21a252bd476e1aa421cc798ebe8573b9787a1170b8ce`;
   tests pin canonical plan/calldata digests and the exact bytes emitted by the
   real CLI without treating either fixture as deployed or authorized.
 

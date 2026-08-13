@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 2,
+  "status": "fixture_only_offline_unsigned_golden_digests",
+  "checkedDateUtc": "2026-08-13",
+  "scope": {
+    "chainId": 97,
+    "planSchemaVersion": 3,
+    "command": "node scripts/prepare-pool.mjs --chain-id 97 --pta-address <fixture-address>",
+    "serialization": "UTF-8 JSON.stringify(plan, null, 2) followed by one LF byte",
+    "testScenarioTargetRatio": "1 PTA = 0.000001 WBNB",
+    "testScenarioIsMarketPegOracleOrValuation": false,
+    "fixtureAddressesAreDeployedOrAuthorized": false,
+    "networkRpcSigningOrBroadcastUsed": false
+  },
+  "cases": [
+    {
+      "id": "pta_lower_than_wbnb",
+      "ptaAddress": "0x1111111111111111111111111111111111111111",
+      "ordering": {
+        "token0": "0x1111111111111111111111111111111111111111",
+        "token1": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+        "ptaIsToken0": true
+      },
+      "initialization": {
+        "sqrtPriceX96": "79228162514264337593543950",
+        "expectedInitialTick": "-138163",
+        "encodedRatioRelationToTarget": "slightly_below_target_due_to_floor_rounding"
+      },
+      "digests": {
+        "canonicalInputSha256": "cb898e3b65d263c532a22b3fa6cc5664556b55a75973806c99b45c084f6faace",
+        "canonicalPlanBodySha256": "5421aca90929bdf708793a4c2618f62343e0cda1f6de675910c07e1711ffc3b0",
+        "calldataSha256": "ff25ae25a993892037f0e5241ea3bedb31292cee8e360c46511613feb66fa258",
+        "serializedCliOutputSha256": "772613d5b44486f118367b56c6b1f6f27ea250d45a38bc9434f638fde5e2cb03"
+      },
+      "calldata": "0x13ead5620000000000000000000000001111111111111111111111111111111111111111000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd00000000000000000000000000000000000000000000000000000000000001f40000000000000000000000000000000000000000004189374bc6a7ef9db22d0e",
+      "serializedCliOutputByteLength": 22750
+    },
+    {
+      "id": "pta_higher_than_wbnb",
+      "ptaAddress": "0xffffffffffffffffffffffffffffffffffffffff",
+      "ordering": {
+        "token0": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+        "token1": "0xffffffffffffffffffffffffffffffffffffffff",
+        "ptaIsToken0": false
+      },
+      "initialization": {
+        "sqrtPriceX96": "79228162514264337593543950336000",
+        "expectedInitialTick": "138162",
+        "encodedRatioRelationToTarget": "exact_target"
+      },
+      "digests": {
+        "canonicalInputSha256": "44ce5f69418145571957e3a67fe11b0136a9004f254bf86d1b184f9db088581f",
+        "canonicalPlanBodySha256": "4f67cfaadbc98e91b2a00d15afd2b0659d64a3e09665db833ec04d93a053ad34",
+        "calldataSha256": "ab7113a7b87b467ab8cf29bb48a84e1089b1c6e7b0a6008bf7039cb542446c2e",
+        "serializedCliOutputSha256": "358734fc2c2608be4a914ab6f8535bb35bc543a5fe6e7042f40207b67bf67eda"
+      },
+      "calldata": "0x13ead562000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd000000000000000000000000ffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000001f400000000000000000000000000000000000003e8000000000000000000000000",
+      "serializedCliOutputByteLength": 22722
+    }
+  ],
+  "limitations": [
+    "The target ratio is a declared non-economic test scenario, not a market price, peg, quote, valuation, oracle observation, or expected return.",
+    "The token0-PTA Q64.96 value is floored, so its encoded squared ratio is slightly below the declared target; the expected tick records the actual encoded initialization outcome.",
+    "The two PTA addresses are inert format fixtures used only to pin deterministic ordering and bytes; neither is claimed deployed or authorized.",
+    "A matching golden digest proves deterministic offline generation for retained inputs, not current onchain state or execution safety.",
+    "Every plan remains executionReady false and signatureRequested false."
+  ]
+}

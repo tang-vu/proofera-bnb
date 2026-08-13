@@ -1,0 +1,359 @@
+{
+  "schemaVersion": 1,
+  "recordType": "bsc_testnet_pta_wbnb_pool_readiness_snapshot",
+  "status": "historical_after_capture_read_only_not_submission_ready",
+  "observedAt": "2026-08-13T03:30:36.176Z",
+  "scope": {
+    "chain": "BNB Smart Chain Testnet",
+    "chainId": 97,
+    "pair": "PTA/WBNB",
+    "feeTierReviewed": "500",
+    "mode": "two-provider finalized EIP-1898 read-only observation with retained bounded public-result transcript",
+    "purpose": "Record whether the pinned PTA/WBNB PancakeSwap V3 pool identities and empty CREATE2 target were consistent at one historical checkpoint.",
+    "networkReadsPerformed": true,
+    "onchainWritesPerformed": false,
+    "localEvidenceFileWritten": true,
+    "signaturesRequested": false,
+    "transactionsBroadcast": false,
+    "boundedRpcResultPayloadsRetained": true,
+    "jsonRpcEnvelopesAndRequestIdsRetained": false,
+    "retentionBoundary": "Both providers' normalized public block, runtime-code, ABI, storage, and nonce result payloads are retained; JSON-RPC envelopes, request IDs, and headers are not retained.",
+    "rawTranscript": "evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json",
+    "rawTranscriptCanonicalBodySha256": "4ef67e0aaa3b64b665e86b224fce0c3327b3d55102cc6e7752f959d1486026bd",
+    "collectorSourceSha256": "3e05ad6f6cab1b6323c37c8945ad6a8c40c06a4d087138c3b96fd2b3d9c4c04b",
+    "collectorKeccakDependencySha256": "9882a0adc797eddcb10376c1a0eed5418a1774a0f4762730052dda4d829d9e6c"
+  },
+  "decision": {
+    "poolCreationReadiness": "blocked",
+    "fee500CandidateStatus": "counterfactual_address_empty_at_historical_checkpoint",
+    "authorizesTransaction": false,
+    "isPoolCreationReceipt": false,
+    "poolExistsAtReviewedFeeTiers": false,
+    "poolActive": false,
+    "executionReady": false,
+    "freshness": "historical_snapshot_requires_complete_refresh_before_any_confirmation",
+    "establishes": [
+      "At the exact checkpoint, two official BNB Chain testnet RPCs agreed on the canonical finalized block and every retained read.",
+      "At that checkpoint, the five reviewed token and Pancake protocol addresses had the retained runtime identities and zero EIP-1967 implementation, admin, and beacon slots.",
+      "At that checkpoint, factory getPool returned the zero address for PTA/WBNB at fee tiers 100, 500, 2500, and 10000.",
+      "At that checkpoint, the fee-500 CREATE2 candidate had empty code and account nonce zero."
+    ],
+    "doesNotEstablish": [
+      "A current or future empty pool address; another transaction can win the creation or initialization race.",
+      "A submitted, signed, mined, successful, or finalized pool-creation transaction.",
+      "A pool creation receipt, PoolCreated log, or deployed pool runtime.",
+      "An economic price, quote, peg, valuation, stable-value property, or oracle.",
+      "Liquidity, observation history, manipulation resistance, an LP NFT, position ownership, performance, activation, or automation authority.",
+      "Permission to sign, broadcast, spend tBNB, approve tokens, mint liquidity, or perform any mainnet action."
+    ]
+  },
+  "checkpoint": {
+    "selection": "newest block finalized by both pinned official providers during the bounded observation",
+    "finalityMethod": "eth_getFinalizedBlock",
+    "blockNumber": "124767685",
+    "blockNumberHex": "0x76fcdc5",
+    "blockHash": "0x1657811b903d77aa58f2a6a78a9536a71e98e36d60c13a6098b75f8962e1fc7c",
+    "blockTimestampUnix": "1786591831",
+    "blockTimestampUtc": "2026-08-13T03:30:31.000Z",
+    "stateSelector": {
+      "blockHash": "0x1657811b903d77aa58f2a6a78a9536a71e98e36d60c13a6098b75f8962e1fc7c",
+      "requireCanonical": true
+    },
+    "latestTagUsedForEvidence": false,
+    "providerAgreementVerified": true,
+    "providerFinalizedHeads": [
+      {
+        "role": "primary",
+        "blockNumber": "124767685",
+        "blockHash": "0x1657811b903d77aa58f2a6a78a9536a71e98e36d60c13a6098b75f8962e1fc7c"
+      },
+      {
+        "role": "corroborator",
+        "blockNumber": "124767685",
+        "blockHash": "0x1657811b903d77aa58f2a6a78a9536a71e98e36d60c13a6098b75f8962e1fc7c"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "role": "primary",
+      "origin": "https://bsc-testnet-dataseed.bnbchain.org",
+      "credentialFreePublicOrigin": true
+    },
+    {
+      "role": "corroborator",
+      "origin": "https://bsc-testnet.bnbchain.org",
+      "credentialFreePublicOrigin": true
+    }
+  ],
+  "proxySlotDefinitions": {
+    "implementation": "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc",
+    "admin": "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103",
+    "beacon": "0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50"
+  },
+  "contracts": {
+    "pta": {
+      "address": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc",
+      "runtimeBytes": 1826,
+      "runtimeKeccak256": "0x2f8caecd2e51f085ab11a67e5b8a89eeab7b667bd89ec708a481b66ed756e006",
+      "accountNonce": "1",
+      "providerAgreementVerified": true,
+      "proxySlotValues": {
+        "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "tokenState": {
+        "name": "ProofEra Test Asset",
+        "symbol": "PTA",
+        "decimals": 18,
+        "totalSupplyBaseUnits": "1000000000000000000000000"
+      },
+      "retainedProof": "evidence/development/bsc-testnet-pta-deployment-2026-08-12.json"
+    },
+    "wbnb": {
+      "address": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+      "runtimeBytes": 3124,
+      "runtimeKeccak256": "0xb7d84205eaaf83ce7b3940c6beaad6d22790255e34a9a2b486aa8cdfff118fe6",
+      "accountNonce": "1",
+      "providerAgreementVerified": true,
+      "proxySlotValues": {
+        "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "tokenState": {
+        "name": "Wrapped BNB",
+        "symbol": "WBNB",
+        "decimals": 18,
+        "totalSupplyBaseUnits": "274497234179431013975965"
+      },
+      "retainedProof": "evidence/development/pancake-v3-testnet-wbnb-source-verification-2026-08-11.json"
+    },
+    "factory": {
+      "address": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+      "runtimeBytes": 5151,
+      "runtimeKeccak256": "0x8191d3ab1d55d3da9822199f28865415c99566b6f1aee4a4b16713f57930678c",
+      "accountNonce": "1",
+      "providerAgreementVerified": true,
+      "proxySlotValues": {
+        "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    "poolDeployer": {
+      "address": "0x41ff9AA7e16B8B1a8a8dc4f0eFacd93D02d071c9",
+      "runtimeBytes": 24556,
+      "runtimeKeccak256": "0xedd527f11646c1912dfc51b57ffa0ee27972f8798bcaf7bc68ae6ad054b6022b",
+      "accountNonce": "20176",
+      "providerAgreementVerified": true,
+      "proxySlotValues": {
+        "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    "positionManager": {
+      "address": "0x427bF5b37357632377eCbEC9de3626C71A5396c1",
+      "runtimeBytes": 24466,
+      "runtimeKeccak256": "0xd86730989544d7a3ea034c8a322733683137cf70b0f49231fd88405eac6098d7",
+      "accountNonce": "1",
+      "providerAgreementVerified": true,
+      "proxySlotValues": {
+        "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "noReachableDelegatecallClaim": false,
+      "knownDelegatecallBoundary": "Reviewed runtime contains the official Multicall self-DELEGATECALL; zero proxy slots do not support a no-reachable-DELEGATECALL claim."
+    }
+  },
+  "protocolBindings": {
+    "positionManager": {
+      "factory": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+      "deployer": "0x41ff9AA7e16B8B1a8a8dc4f0eFacd93D02d071c9",
+      "wrappedNative": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd"
+    },
+    "factory": {
+      "poolDeployer": "0x41ff9AA7e16B8B1a8a8dc4f0eFacd93D02d071c9",
+      "owner": "0x261AF0030618a52FA767997ed310174b3Bc3B77F",
+      "lmPoolDeployer": "0x7F1745eb74D26877EC54dd9A317CC930Ad01350c"
+    },
+    "poolDeployer": {
+      "factoryAddress": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+      "transientParameters": {
+        "factory": "0x0000000000000000000000000000000000000000",
+        "token0": "0x0000000000000000000000000000000000000000",
+        "token1": "0x0000000000000000000000000000000000000000",
+        "fee": "0",
+        "tickSpacing": "0"
+      }
+    }
+  },
+  "mutableControls": {
+    "factoryOwner": {
+      "address": "0x261AF0030618a52FA767997ed310174b3Bc3B77F",
+      "observedRuntimeBytes": 0,
+      "observedAccountNonce": "1569",
+      "classificationAtCheckpoint": "empty_code_account_ownership_type_unproven",
+      "reviewedCapabilities": [
+        "setOwner(address)",
+        "enableFeeAmount(uint24,int24)",
+        "setWhiteListAddress(address,bool)",
+        "setFeeAmountExtraInfo(uint24,bool,bool)",
+        "setLmPoolDeployer(address)",
+        "setFeeProtocol(address,uint32,uint32)",
+        "collectProtocol(address,address,uint128,uint128)",
+        "setLmPool(address,address)"
+      ]
+    },
+    "lmPoolDeployer": {
+      "address": "0x7F1745eb74D26877EC54dd9A317CC930Ad01350c",
+      "observedRuntimeBytes": 7965,
+      "observedRuntimeKeccak256": "0xa67e11e02fe13db93c99031a765ce45a1dd90dc020ef654ed3045b5a200766b5",
+      "observedAccountNonce": "3",
+      "reviewedCapability": "setLmPool(address,address) through the factory owner-or-LM-deployer gate",
+      "sourceIdentityReviewedForThisSnapshot": false
+    },
+    "risk": "The owner can change fee-tier enabled and whitelist flags and protocol/LM controls after this checkpoint. The LM deployer is observed but not source-admitted by this snapshot."
+  },
+  "feeTierReads": [
+    {
+      "fee": "100",
+      "tickSpacing": "1",
+      "whitelistRequested": false,
+      "enabled": true,
+      "factoryGetPool": "0x0000000000000000000000000000000000000000"
+    },
+    {
+      "fee": "500",
+      "tickSpacing": "10",
+      "whitelistRequested": false,
+      "enabled": true,
+      "factoryGetPool": "0x0000000000000000000000000000000000000000"
+    },
+    {
+      "fee": "2500",
+      "tickSpacing": "50",
+      "whitelistRequested": false,
+      "enabled": true,
+      "factoryGetPool": "0x0000000000000000000000000000000000000000"
+    },
+    {
+      "fee": "10000",
+      "tickSpacing": "200",
+      "whitelistRequested": false,
+      "enabled": true,
+      "factoryGetPool": "0x0000000000000000000000000000000000000000"
+    }
+  ],
+  "fee500Create2Candidate": {
+    "derivation": "last20(keccak256(0xff || poolDeployer || keccak256(abi.encode(token0,token1,fee)) || poolInitCodeHash))",
+    "poolDeployer": "0x41ff9AA7e16B8B1a8a8dc4f0eFacd93D02d071c9",
+    "poolInitCodeKeccak256": "0x6ce8eb472fa82df5469c6ab6d485f17c3ad13c8cd7af59b3d4a8026c5ce0f7e2",
+    "token0": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc",
+    "token1": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+    "ordering": "ascending unsigned 20-byte address value",
+    "fee": "500",
+    "salt": "0x5c030acd8d38b759c124229312bdac56cbc3a78d527496a161966c188174d172",
+    "candidateAddress": "0x30b07e82d7181a53Ae2EA98Cd08b6733Ffd831aE",
+    "factoryGetPool": "0x0000000000000000000000000000000000000000",
+    "observedRuntimeBytes": 0,
+    "observedRuntimeKeccak256": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+    "observedAccountNonce": "0",
+    "providerAgreementVerified": true,
+    "candidateExists": false,
+    "addressIsReservation": false,
+    "crossCheck": {
+      "method": "same derivation reproduced the retained factory-authenticated CAKE/WBNB fee-500 pool",
+      "retainedSalt": "0x9f4899b3fcc0331140c69ffc65ca544db9f89d1b2f889dfb1ed16c427cd7ad99",
+      "predictedAddress": "0xeaf78e3AA2C19dF9495318Cd9EA2aD83Be7D5015",
+      "retainedObservedAddress": "0xeaf78e3AA2C19dF9495318Cd9EA2aD83Be7D5015",
+      "matches": true,
+      "retainedProof": "evidence/development/pancake-v3-testnet-cake-wbnb-verification-2026-08-11.json"
+    }
+  },
+  "prospectiveInitializerBoundary": {
+    "target": "0x427bF5b37357632377eCbEC9de3626C71A5396c1",
+    "signature": "createAndInitializePoolIfNecessary(address,address,uint24,uint160)",
+    "selector": "0x13ead562",
+    "nativeValueBaseUnits": "0",
+    "calldataIncluded": false,
+    "transactionEnvelopeIncluded": false,
+    "authorizationMeaning": "none"
+  },
+  "blockers": [
+    {
+      "id": "fresh_complete_preflight",
+      "status": "open",
+      "blocks": "pool_submission",
+      "resolution": "Repeat both-provider chain, finalized-block, code, proxy-slot, binding, fee-state, getPool, predicted-code, nonce, and owner-control reads at one fresh canonical block immediately before confirmation."
+    },
+    {
+      "id": "factory_mutable_control",
+      "status": "open",
+      "blocks": "pool_submission",
+      "resolution": "Treat any fee enabled or whitelist drift as a hard abort and disclose that the factory owner retains protocol and LM controls."
+    },
+    {
+      "id": "pool_initializer_selector_attestation",
+      "status": "open",
+      "blocks": "pool_submission",
+      "resolution": "Publish and independently retrieve a source/runtime/control-path attestation for direct selector 0x13ead562; existing LP selector artifacts do not authorize it."
+    },
+    {
+      "id": "initialization_price",
+      "status": "open",
+      "blocks": "pool_submission",
+      "resolution": "Select and explicitly approve the exact sqrtPriceX96 with its token ordering and non-economic test-fixture meaning; do not present an arbitrary seed as a market price."
+    },
+    {
+      "id": "inclusion_time_race",
+      "status": "open",
+      "blocks": "pool_submission",
+      "resolution": "Reconcile a matching PoolCreated log, predicted address, post-receipt getPool, runtime immutables, and slot0. Reject a raced or differently initialized result."
+    },
+    {
+      "id": "simulation_and_execution_envelope",
+      "status": "open",
+      "blocks": "pool_submission",
+      "resolution": "Simulate exact target, calldata, sender, and zero value; bind one nonce, gas and fee caps, short external broadcast window, durable one-shot claim, and replacement reconciliation."
+    },
+    {
+      "id": "explicit_user_confirmation",
+      "status": "open",
+      "blocks": "pool_submission",
+      "resolution": "Show chain 97, target, selector, ordered tokens, fee, sqrtPriceX96, zero native value, gas cap, total tBNB cap, race caveat, and no-liquidity outcome before requesting explicit confirmation."
+    },
+    {
+      "id": "liquidity_oracle_and_ownership",
+      "status": "open",
+      "blocks": "lp_activation",
+      "resolution": "Create and verify a separate bounded mint plan, exact approvals, amounts/minima/deadline, NFT recipient and owner, oracle cardinality/history, manipulation limits, and revoke path."
+    },
+    {
+      "id": "scoped_automation_authority",
+      "status": "open",
+      "blocks": "automated_execution",
+      "resolution": "Verify exact chain, contract, selector, spend cap, expiry, session signer, durable grant outcome, and immediate revoke path before any autonomous execution."
+    }
+  ],
+  "retainedReferences": [
+    "evidence/development/bsc-testnet-pta-deployment-2026-08-12.json",
+    "evidence/development/pancake-v3-testnet-wbnb-source-verification-2026-08-11.json",
+    "evidence/development/pancake-v3-source-reproduction-2026-08-11.json",
+    "evidence/development/pancake-v3-testnet-cake-wbnb-verification-2026-08-11.json"
+  ],
+  "securityBoundary": {
+    "testnetOnly": true,
+    "mainnetActionPerformed": false,
+    "privateKeyIncluded": false,
+    "walletPasswordIncluded": false,
+    "mnemonicIncluded": false,
+    "signerIncluded": false,
+    "rawSignedTransactionIncluded": false,
+    "authenticatedRpcUrlIncluded": false,
+    "poolReceiptIncluded": false
+  }
+}

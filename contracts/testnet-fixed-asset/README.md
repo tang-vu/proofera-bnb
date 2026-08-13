@@ -49,8 +49,8 @@ deployment data plus SHA-256 digests for the source, config, lockfile, Hardhat
 artifact, build info, compiler settings, deployment bytecode, and recipient-
 bound deployment data.
 
-The last clean local result is retained as
-[`evidence/local-build-2026-08-11.json`](./evidence/local-build-2026-08-11.json).
+The latest clean local result is retained as
+[`evidence/local-build-2026-08-13.json`](./evidence/local-build-2026-08-13.json).
 The test suite recomputes and compares every recorded digest, so source,
 configuration, dependency, artifact, or bytecode drift fails verification.
 
@@ -105,11 +105,17 @@ These retained bytes are reproducible provenance, not fresh runtime identity.
 
 It sorts PTA/WBNB by their exact address bytes and encodes only
 `createAndInitializePoolIfNecessary(address,address,uint24,uint160)` at selector
-`0x13ead562`, fee `500`, tick spacing `10`, zero native value, and
-`sqrtPriceX96 = 2^96`. That square-root ratio means exactly one raw token1 unit
-per raw token0 unit. Both reviewed token definitions expect 18 decimals, but
-the ratio is still an arbitrary non-economic seed: it is not a market price,
-peg, quote, valuation, oracle observation, or expected return.
+`0x13ead562`, fee `500`, tick spacing `10`, and zero native value. The declared
+test-scenario target is always `1 PTA = 0.000001 WBNB`, independent of address
+ordering. Both reviewed token definitions expect 18 decimals. When PTA is
+`token0`, the plan encodes `floor(2^96 / 1000) =
+79228162514264337593543950`, records expected initial tick `-138163`, and
+discloses that squaring the floored Q64.96 value produces a ratio slightly
+below the target. When PTA is `token1`, it encodes `2^96 * 1000 =
+79228162514264337593543950336000`, which represents the target exactly, and
+records expected initial tick `138162`. This is an arbitrary non-economic test
+scenario, not a market price, peg, quote, valuation, oracle observation, or
+expected return.
 
 The package separately compiles the exact retained official Solidity interfaces
 and a narrow local pool-read interface, then tests compiler-derived selectors
@@ -122,9 +128,9 @@ formatting never inspect generated declaration files.
 Two inert, explicitly undeployed PTA address fixtures exercise both sides of
 WBNB ordering. Their canonical plan digests, calldata digests, exact CLI byte
 lengths, and CLI-output SHA-256 values are pinned in
-[`evidence/pool-preparation-golden-digests-2026-08-12.json`](./evidence/pool-preparation-golden-digests-2026-08-12.json)
+[`evidence/pool-preparation-golden-digests-2026-08-13.json`](./evidence/pool-preparation-golden-digests-2026-08-13.json)
 (file SHA-256
-`2b0e40632d8704672304d38c64c9583b722a56618d07a5ee3f13cc199cd8a455`).
+`29fbff5f65266241ea4f21a252bd476e1aa421cc798ebe8573b9787a1170b8ce`).
 Tests run the real CLI with an empty child environment and require byte-for-byte
 equality with in-process serialization. The runtime-source gate exact-
 allowlists ordinary and bare static imports plus named/wildcard re-exports,
