@@ -46,6 +46,7 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_OPERATION,
   BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCOPE,
   BscTestnetPtaWbnbPoolProductionSubmissionUnavailableError,
+  createBscTestnetPtaWbnbPoolReconciliationRecoveryCoreForInternalUse,
   createBscTestnetPtaWbnbPoolSubmissionCoreForTests,
   createProductionBscTestnetPtaWbnbPoolSubmissionCore,
   reconcileBscTestnetPtaWbnbPoolEvidenceForInternalUse,
@@ -366,6 +367,14 @@ function providerEvidence(
       exactNumberCanonicalLookup: true
     },
     receiptBlock,
+    receiptToCommonFinalizedAncestry: [
+      {
+        number: finalizedBlock.number,
+        hash: finalizedBlock.hash,
+        parentHash: finalizedBlock.parentHash,
+        timestamp: finalizedBlock.timestamp
+      }
+    ],
     postState: state
   };
 }
@@ -440,10 +449,16 @@ function dependencies(
     submissionStartedDigest: request.submissionStartedDigest,
     transactionHash
   }));
+  const terminalPreSubmission = Object.freeze({
+    ...capability.preSubmission,
+    observedAt: NOW,
+    finalizedBlockTimestamp: Math.floor(Date.parse(NOW) / 1_000).toString()
+  });
   return {
     now: () => new Date(NOW),
     acquireSubmissionCapability: async () => capability,
     authenticateSubmissionCapability: (candidate: unknown) => candidate === capability,
+    acquireTerminalPreSendRecheck: vi.fn(async () => terminalPreSubmission),
     journal: {
       readState: async () => journalState(capability),
       commitSubmissionStarted,
@@ -480,6 +495,7 @@ describe("BSC testnet exact PTA/WBNB submission reconciler", () => {
 
     expect(result.status).toBe("confirmed");
     expect(ports.journal.commitSubmissionStarted).toHaveBeenCalledTimes(1);
+    expect(ports.acquireTerminalPreSendRecheck).toHaveBeenCalledTimes(1);
     expect(ports.sendExactRawTransactionOnce).toHaveBeenCalledTimes(1);
     expect(ports.sendExactRawTransactionOnce).toHaveBeenCalledWith(
       capability.transaction.signedTransaction
@@ -487,7 +503,10 @@ describe("BSC testnet exact PTA/WBNB submission reconciler", () => {
     expect(ports.journal.commitTerminalReconciliation).toHaveBeenCalledTimes(1);
     expect(
       vi.mocked(ports.journal.commitSubmissionStarted).mock.invocationCallOrder[0]
-    ).toBeLessThan(vi.mocked(ports.sendExactRawTransactionOnce).mock.invocationCallOrder[0] ?? 0);
+    ).toBeLessThan(vi.mocked(ports.acquireTerminalPreSendRecheck).mock.invocationCallOrder[0] ?? 0);
+    expect(vi.mocked(ports.acquireTerminalPreSendRecheck).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(ports.sendExactRawTransactionOnce).mock.invocationCallOrder[0] ?? 0
+    );
     expect(vi.mocked(ports.sendExactRawTransactionOnce).mock.invocationCallOrder[0]).toBeLessThan(
       vi.mocked(ports.journal.commitTerminalReconciliation).mock.invocationCallOrder[0] ?? 0
     );
@@ -555,6 +574,34 @@ describe("BSC testnet exact PTA/WBNB submission reconciler", () => {
     expect(observe).not.toHaveBeenCalled();
   });
 
+  it("fails closed when the post-ack dual-RPC reread drifts and never reaches the broadcaster", async () => {
+    const capability = await submissionCapability();
+    const exactEvidence = evidence(capability);
+    const send = vi.fn(async () => capability.transaction.transactionHash);
+    const terminal = vi.fn(async () => ({
+      ...capability.preSubmission,
+      observedAt: NOW,
+      pendingNonce: "2"
+    }));
+    const ports = dependencies(capability, exactEvidence, {
+      acquireTerminalPreSendRecheck: terminal,
+      sendExactRawTransactionOnce: send
+    });
+
+    expect(
+      await createBscTestnetPtaWbnbPoolSubmissionCoreForTests(ports).submitAndReconcileOnce()
+    ).toMatchObject({
+      status: "do_not_retry",
+      retryBroadcastAllowed: false,
+      reconciliationRetryAllowed: true,
+      issue: { code: "TERMINAL_PRE_SEND_RECHECK_INVALID" }
+    });
+    expect(ports.journal.commitSubmissionStarted).toHaveBeenCalledTimes(1);
+    expect(terminal).toHaveBeenCalledTimes(1);
+    expect(send).not.toHaveBeenCalled();
+    expect(ports.observeExactTransaction).not.toHaveBeenCalled();
+  });
+
   it("skips send on restart after submission_started even when capability has expired", async () => {
     const capability = await submissionCapability({
       authenticatedAt: "2026-08-13T07:59:00.000Z",
@@ -579,7 +626,165 @@ describe("BSC testnet exact PTA/WBNB submission reconciler", () => {
     expect(
       await createBscTestnetPtaWbnbPoolSubmissionCoreForTests(ports).submitAndReconcileOnce()
     ).toMatchObject({ status: "confirmed", retryBroadcastAllowed: false });
+    expect(ports.acquireTerminalPreSendRecheck).not.toHaveBeenCalled();
     expect(send).not.toHaveBeenCalled();
+  });
+
+  it("offers a restart-only core with no signer or broadcaster port", async () => {
+    const capability = await submissionCapability({
+      authenticatedAt: "2026-08-13T07:59:00.000Z",
+      expiresAt: "2026-08-13T07:59:30.000Z"
+    });
+    const exactEvidence = evidence(capability);
+    const start = vi.fn();
+    const observe = vi.fn(async () => exactEvidence);
+    const commitTerminal = vi.fn(async (request) => ({
+      status: request.outcome,
+      reconciliationDigest: request.reconciliationDigest,
+      submissionStartedDigest: request.submissionStartedDigest,
+      transactionHash: request.transactionHash
+    }));
+    const recovery = createBscTestnetPtaWbnbPoolReconciliationRecoveryCoreForInternalUse({
+      now: () => new Date(NOW),
+      acquireRecoveryCapability: async () => capability,
+      journal: {
+        readState: async () => journalState(capability, "submission_started"),
+        commitSubmissionStarted: start,
+        commitTerminalReconciliation: commitTerminal
+      },
+      observeExactTransaction: observe
+    });
+
+    expect(await recovery.submitAndReconcileOnce()).toMatchObject({
+      status: "confirmed",
+      retryBroadcastAllowed: false,
+      reconciliationRetryAllowed: false
+    });
+    expect(start).not.toHaveBeenCalled();
+    expect(observe).toHaveBeenCalledTimes(1);
+    expect(commitTerminal).toHaveBeenCalledTimes(1);
+  });
+
+  it("restart-only core refuses a signed_committed state instead of signing or starting it", async () => {
+    const capability = await submissionCapability();
+    const observe = vi.fn();
+    const start = vi.fn();
+    const recovery = createBscTestnetPtaWbnbPoolReconciliationRecoveryCoreForInternalUse({
+      now: () => new Date(NOW),
+      acquireRecoveryCapability: async () => capability,
+      journal: {
+        readState: async () => journalState(capability, "signed_committed"),
+        commitSubmissionStarted: start,
+        commitTerminalReconciliation: vi.fn()
+      },
+      observeExactTransaction: observe
+    });
+
+    expect(await recovery.submitAndReconcileOnce()).toMatchObject({
+      status: "do_not_retry",
+      issue: { code: "RECOVERY_REQUIRES_DURABLE_SUBMISSION_START" }
+    });
+    expect(start).not.toHaveBeenCalled();
+    expect(observe).not.toHaveBeenCalled();
+  });
+
+  it("accepts a bounded exact dual-provider ancestry when finality is more than one block away", async () => {
+    const capability = await submissionCapability();
+    const exactEvidence = evidence(capability);
+    const middle = Object.freeze({
+      number: "101",
+      hash: `0x${"dd".repeat(32)}` as Hex,
+      parentHash: RECEIPT_BLOCK_HASH,
+      timestamp: "1786588803",
+      transactionHashes: Object.freeze([] as Hex[])
+    });
+    const common = Object.freeze({
+      number: "102",
+      hash: `0x${"ee".repeat(32)}` as Hex,
+      parentHash: middle.hash,
+      timestamp: "1786588806",
+      transactionHashes: Object.freeze([] as Hex[])
+    });
+    const extend = (provider: BscTestnetPtaWbnbPoolProviderReconciliationEvidence) => ({
+      ...provider,
+      reportedFinalizedHead: common,
+      commonFinalizedBlock: common,
+      receiptToCommonFinalizedAncestry: [
+        {
+          number: middle.number,
+          hash: middle.hash,
+          parentHash: middle.parentHash,
+          timestamp: middle.timestamp
+        },
+        {
+          number: common.number,
+          hash: common.hash,
+          parentHash: common.parentHash,
+          timestamp: common.timestamp
+        }
+      ],
+      postState:
+        provider.postState === null
+          ? null
+          : {
+              ...provider.postState,
+              eip1898Block: { blockHash: common.hash, requireCanonical: true as const }
+            }
+    });
+    const extended = {
+      ...exactEvidence,
+      primary: extend(exactEvidence.primary),
+      corroborator: extend(exactEvidence.corroborator)
+    };
+
+    expect(
+      await reconcileBscTestnetPtaWbnbPoolEvidenceForInternalUse(
+        capability,
+        extended,
+        new Date(NOW)
+      )
+    ).toMatchObject({ status: "confirmed", issue: null });
+
+    const broken = {
+      ...extended,
+      primary: {
+        ...extended.primary,
+        receiptToCommonFinalizedAncestry: [
+          {
+            number: middle.number,
+            hash: middle.hash,
+            parentHash: `0x${"99".repeat(32)}` as Hex,
+            timestamp: middle.timestamp
+          },
+          {
+            number: common.number,
+            hash: common.hash,
+            parentHash: common.parentHash,
+            timestamp: common.timestamp
+          }
+        ]
+      },
+      corroborator: {
+        ...extended.corroborator,
+        receiptToCommonFinalizedAncestry: [
+          {
+            number: middle.number,
+            hash: middle.hash,
+            parentHash: `0x${"99".repeat(32)}` as Hex,
+            timestamp: middle.timestamp
+          },
+          {
+            number: common.number,
+            hash: common.hash,
+            parentHash: common.parentHash,
+            timestamp: common.timestamp
+          }
+        ]
+      }
+    };
+    expect(
+      await reconcileBscTestnetPtaWbnbPoolEvidenceForInternalUse(capability, broken, new Date(NOW))
+    ).toMatchObject({ status: "invalid", issue: { code: "CANONICALITY_INVALID" } });
   });
 
   it("rejects restart journal state with any immutable capability binding drift", async () => {

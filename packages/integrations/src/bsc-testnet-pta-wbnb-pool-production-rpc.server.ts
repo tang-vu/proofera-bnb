@@ -25,15 +25,17 @@ import {
   BSC_TESTNET_WBNB_ADDRESS
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import { BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
-import type {
-  BscTestnetPtaWbnbPoolNormalizedBlock,
-  BscTestnetPtaWbnbPoolNormalizedLog,
-  BscTestnetPtaWbnbPoolNormalizedReceipt,
-  BscTestnetPtaWbnbPoolNormalizedTransaction,
-  BscTestnetPtaWbnbPoolPostState,
-  BscTestnetPtaWbnbPoolProviderReconciliationEvidence,
-  BscTestnetPtaWbnbPoolReconciliationEvidence,
-  BscTestnetPtaWbnbPoolSubmissionCapability
+import {
+  BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_FINALITY_ANCESTRY_BLOCKS,
+  type BscTestnetPtaWbnbPoolNormalizedAncestryHeader,
+  type BscTestnetPtaWbnbPoolNormalizedBlock,
+  type BscTestnetPtaWbnbPoolNormalizedLog,
+  type BscTestnetPtaWbnbPoolNormalizedReceipt,
+  type BscTestnetPtaWbnbPoolNormalizedTransaction,
+  type BscTestnetPtaWbnbPoolPostState,
+  type BscTestnetPtaWbnbPoolProviderReconciliationEvidence,
+  type BscTestnetPtaWbnbPoolReconciliationEvidence,
+  type BscTestnetPtaWbnbPoolSubmissionCapability
 } from "./bsc-testnet-pta-wbnb-pool-submission-reconciler.server";
 import type {
   BscTestnetPtaWbnbPoolPostClaimRpcClient,
@@ -293,6 +295,31 @@ function normalizeBlock(input: unknown): BscTestnetPtaWbnbPoolNormalizedBlock | 
     parentHash,
     timestamp: timestamp.toString(),
     transactionHashes: Object.freeze(transactions as Hex[])
+  });
+}
+
+function normalizeAncestryHeader(
+  input: unknown
+): BscTestnetPtaWbnbPoolNormalizedAncestryHeader | null {
+  const block = inspectRecord(input);
+  const number = quantity(block?.number);
+  const timestamp = quantity(block?.timestamp);
+  const hash = exactBytes32(block?.hash);
+  const parentHash = exactBytes32(block?.parentHash);
+  if (
+    block === null ||
+    number === null ||
+    timestamp === null ||
+    hash === null ||
+    parentHash === null
+  ) {
+    return null;
+  }
+  return Object.freeze({
+    number: number.toString(),
+    hash,
+    parentHash,
+    timestamp: timestamp.toString()
   });
 }
 
@@ -909,6 +936,8 @@ async function providerObservation(
   let receiptBlockLookup: BscTestnetPtaWbnbPoolProviderReconciliationEvidence["receiptBlockLookup"] =
     null;
   let retainedPostState: BscTestnetPtaWbnbPoolPostState | null = null;
+  let receiptToCommonFinalizedAncestry: readonly BscTestnetPtaWbnbPoolNormalizedAncestryHeader[] =
+    Object.freeze([]);
   if (receipt !== null) {
     const numberHex = `0x${BigInt(receipt.blockNumber).toString(16)}` as Hex;
     receiptBlock = normalizeBlock(await rpc(origin, "eth_getBlockByNumber", [numberHex, false]));
@@ -919,6 +948,27 @@ async function providerObservation(
       includeFullTransactions: false as const,
       exactNumberCanonicalLookup: true as const
     });
+    const receiptNumber = BigInt(receipt.blockNumber);
+    const commonNumber = BigInt(commonBlock.number);
+    if (commonNumber >= receiptNumber) {
+      const gap = commonNumber - receiptNumber;
+      if (gap > BigInt(BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_FINALITY_ANCESTRY_BLOCKS)) {
+        throw new Error("RPC_FINALITY_ANCESTRY_LIMIT_EXCEEDED");
+      }
+      const rawAncestry = await Promise.all(
+        Array.from({ length: Number(gap) }, (_unused, index) => {
+          const number = receiptNumber + BigInt(index) + 1n;
+          return rpc(origin, "eth_getBlockByNumber", [`0x${number.toString(16)}`, false]);
+        })
+      );
+      const normalizedAncestry = rawAncestry.map((entry) => normalizeAncestryHeader(entry));
+      if (normalizedAncestry.some((entry) => entry === null)) {
+        throw new Error("RPC_FINALITY_ANCESTRY_INVALID");
+      }
+      receiptToCommonFinalizedAncestry = Object.freeze(
+        normalizedAncestry as BscTestnetPtaWbnbPoolNormalizedAncestryHeader[]
+      );
+    }
     if (receipt.status === "1" && BigInt(commonBlock.number) >= BigInt(receipt.blockNumber)) {
       retainedPostState = await postState(origin, commonBlock);
     }
@@ -932,6 +982,7 @@ async function providerObservation(
     commonFinalizedBlock: commonBlock,
     receiptBlockLookup,
     receiptBlock,
+    receiptToCommonFinalizedAncestry,
     postState: retainedPostState
   });
 }

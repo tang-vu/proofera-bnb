@@ -67,6 +67,7 @@ const MAXIMUM_CAPABILITY_LIFETIME_MILLISECONDS = 45_000;
 const MAXIMUM_PRE_SUBMISSION_OBSERVATION_AGE_MILLISECONDS = 30_000;
 const MAXIMUM_SIGNED_TRANSACTION_BYTES = 2_048;
 const MAXIMUM_BLOCK_TRANSACTION_HASHES = 100_000;
+export const BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_FINALITY_ANCESTRY_BLOCKS = 128 as const;
 const SECP256K1_ORDER = BigInt(
   "0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
 );
@@ -116,12 +117,14 @@ const BOUNDARY = Object.freeze({
   durableSignedCommitRequired: true as const,
   separateAuthenticatedSubmissionCapabilityRequired: true as const,
   durableSubmissionStartedRequiredBeforeSend: true as const,
+  terminalDualRpcRecheckAfterDurableStartRequired: true as const,
   rawTransactionMayBeSentAtMostOnce: true as const,
   replacementTransactionAllowed: false as const,
   resendAfterAmbiguousSubmissionAllowed: false as const,
   reconciliationOnlyRetryAllowedAfterSubmissionStarted: true as const,
   dualProviderTransactionAndReceiptRequired: true as const,
   commonFinalizedCanonicalityRequired: true as const,
+  boundedExactHeaderAncestryRequired: true as const,
   eip1898PostStateRequired: true as const,
   exactPoolCreatedAndInitializeLogsRequired: true as const,
   mainnetWritePossible: false as const
@@ -300,6 +303,13 @@ export interface BscTestnetPtaWbnbPoolNormalizedBlock {
   readonly transactionHashes: readonly Hex[];
 }
 
+export interface BscTestnetPtaWbnbPoolNormalizedAncestryHeader {
+  readonly number: string;
+  readonly hash: Hex;
+  readonly parentHash: Hex;
+  readonly timestamp: string;
+}
+
 export interface BscTestnetPtaWbnbPoolPostState {
   readonly eip1898Block: Readonly<{ blockHash: Hex; requireCanonical: true }>;
   readonly factoryPoolForward: typeof BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE;
@@ -354,6 +364,8 @@ export interface BscTestnetPtaWbnbPoolProviderReconciliationEvidence {
     exactNumberCanonicalLookup: true;
   }> | null;
   readonly receiptBlock: BscTestnetPtaWbnbPoolNormalizedBlock | null;
+  /** Every canonical block strictly after receiptBlock through commonFinalizedBlock, inclusive. */
+  readonly receiptToCommonFinalizedAncestry: readonly BscTestnetPtaWbnbPoolNormalizedAncestryHeader[];
   readonly postState: BscTestnetPtaWbnbPoolPostState | null;
 }
 
@@ -453,7 +465,18 @@ export interface BscTestnetPtaWbnbPoolSubmissionTestDependencies {
   readonly acquireSubmissionCapability: () => Promise<unknown>;
   readonly authenticateSubmissionCapability: (capability: unknown) => boolean;
   readonly journal: BscTestnetPtaWbnbPoolSubmissionJournal;
+  readonly acquireTerminalPreSendRecheck: (
+    input: Readonly<{ transactionHash: Hex; gasLimit: string; gasPriceWei: string }>
+  ) => Promise<unknown>;
   readonly sendExactRawTransactionOnce: (signedTransaction: Hex) => Promise<unknown>;
+  readonly observeExactTransaction: (transactionHash: Hex) => Promise<unknown>;
+}
+
+/** Read-only restart seam: deliberately has no authenticator, signer, or broadcaster dependency. */
+export interface BscTestnetPtaWbnbPoolReconciliationRecoveryDependencies {
+  readonly now: () => Date;
+  readonly acquireRecoveryCapability: () => Promise<unknown>;
+  readonly journal: BscTestnetPtaWbnbPoolSubmissionJournal;
   readonly observeExactTransaction: (transactionHash: Hex) => Promise<unknown>;
 }
 
@@ -1188,6 +1211,27 @@ function parseBlock(input: unknown): BscTestnetPtaWbnbPoolNormalizedBlock | null
   });
 }
 
+function parseAncestryHeader(input: unknown): BscTestnetPtaWbnbPoolNormalizedAncestryHeader | null {
+  const header = inspectRecord(input, ["hash", "number", "parentHash", "timestamp"]);
+  const number = header === null ? null : canonicalUint(header.number);
+  const timestamp = header === null ? null : canonicalUint(header.timestamp);
+  if (
+    header === null ||
+    number === null ||
+    timestamp === null ||
+    !exactBytes32(header.hash) ||
+    !exactBytes32(header.parentHash)
+  ) {
+    return null;
+  }
+  return Object.freeze({
+    number: number.toString(),
+    hash: header.hash,
+    parentHash: header.parentHash,
+    timestamp: timestamp.toString()
+  });
+}
+
 function parseNormalizedTransaction(
   input: unknown,
   capability: BscTestnetPtaWbnbPoolSubmissionCapability
@@ -1525,6 +1569,7 @@ function parseProvider(
     "receipt",
     "receiptBlock",
     "receiptBlockLookup",
+    "receiptToCommonFinalizedAncestry",
     "reportedFinalizedHead",
     "transaction"
   ]);
@@ -1540,6 +1585,12 @@ function parseProvider(
   const commonFinalizedBlock =
     provider.commonFinalizedBlock === null ? null : parseBlock(provider.commonFinalizedBlock);
   const receiptBlock = provider.receiptBlock === null ? null : parseBlock(provider.receiptBlock);
+  const ancestryInput = inspectArray(
+    provider.receiptToCommonFinalizedAncestry,
+    BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_FINALITY_ANCESTRY_BLOCKS
+  );
+  const ancestry =
+    ancestryInput === null ? null : ancestryInput.map((entry) => parseAncestryHeader(entry));
   const receiptBlockLookup =
     provider.receiptBlockLookup === null
       ? null
@@ -1556,6 +1607,8 @@ function parseProvider(
     reportedFinalizedHead === null ||
     (provider.commonFinalizedBlock !== null && commonFinalizedBlock === null) ||
     (provider.receiptBlock !== null && receiptBlock === null) ||
+    ancestry === null ||
+    ancestry.some((block) => block === null) ||
     (provider.receiptBlockLookup !== null &&
       (receiptBlockLookup === null ||
         receiptBlockLookup.method !== "eth_getBlockByNumber" ||
@@ -1583,6 +1636,9 @@ function parseProvider(
             exactNumberCanonicalLookup: true as const
           }),
     receiptBlock,
+    receiptToCommonFinalizedAncestry: Object.freeze(
+      ancestry as BscTestnetPtaWbnbPoolNormalizedAncestryHeader[]
+    ),
     postState
   });
 }
@@ -1884,17 +1940,63 @@ function reconcileEvidence(
       capability.transaction.transactionHash
     );
   }
+  const ancestryLength = commonFinalizedNumber - receiptNumber;
   if (
-    (commonFinalizedNumber === receiptNumber &&
-      !sameJson(primary.receiptBlock, primary.commonFinalizedBlock)) ||
-    (commonFinalizedNumber === receiptNumber + 1n &&
-      primary.commonFinalizedBlock.parentHash !== primary.receiptBlock.hash) ||
-    commonFinalizedNumber > receiptNumber + 1n
+    ancestryLength < 0n ||
+    ancestryLength > BigInt(BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_FINALITY_ANCESTRY_BLOCKS) ||
+    primary.receiptToCommonFinalizedAncestry.length !== Number(ancestryLength) ||
+    !sameJson(
+      primary.receiptToCommonFinalizedAncestry,
+      corroborator.receiptToCommonFinalizedAncestry
+    )
   ) {
     return invalidReconciliation(
       "CANONICALITY_INVALID",
-      "evidence.providers.receiptBlock",
-      "Receipt block lacks an exact equal-height or adjacent parent-hash proof to the common finalized block.",
+      "evidence.providers.receiptToCommonFinalizedAncestry",
+      "Receipt-to-finalized ancestry is absent, oversized, or not identical across providers.",
+      capability.transaction.transactionHash
+    );
+  }
+  let ancestryParent: BscTestnetPtaWbnbPoolNormalizedAncestryHeader = Object.freeze({
+    number: primary.receiptBlock.number,
+    hash: primary.receiptBlock.hash,
+    parentHash: primary.receiptBlock.parentHash,
+    timestamp: primary.receiptBlock.timestamp
+  });
+  for (const [index, block] of primary.receiptToCommonFinalizedAncestry.entries()) {
+    const number = canonicalUint(block.number);
+    const parentNumber = canonicalUint(ancestryParent.number);
+    const parentTimestamp = canonicalUint(ancestryParent.timestamp);
+    const timestamp = canonicalUint(block.timestamp);
+    if (
+      number === null ||
+      parentNumber === null ||
+      parentTimestamp === null ||
+      timestamp === null ||
+      number !== receiptNumber + BigInt(index) + 1n ||
+      number !== parentNumber + 1n ||
+      block.parentHash !== ancestryParent.hash ||
+      timestamp < parentTimestamp
+    ) {
+      return invalidReconciliation(
+        "CANONICALITY_INVALID",
+        `evidence.providers.receiptToCommonFinalizedAncestry[${index}]`,
+        "A bounded exact-number ancestry header is discontinuous or timestamp-regressive.",
+        capability.transaction.transactionHash
+      );
+    }
+    ancestryParent = block;
+  }
+  if (
+    ancestryParent.number !== primary.commonFinalizedBlock.number ||
+    ancestryParent.hash !== primary.commonFinalizedBlock.hash ||
+    ancestryParent.parentHash !== primary.commonFinalizedBlock.parentHash ||
+    ancestryParent.timestamp !== primary.commonFinalizedBlock.timestamp
+  ) {
+    return invalidReconciliation(
+      "CANONICALITY_INVALID",
+      "evidence.providers.receiptToCommonFinalizedAncestry",
+      "Receipt-to-finalized ancestry does not terminate at the common finalized block.",
       capability.transaction.transactionHash
     );
   }
@@ -2040,6 +2142,7 @@ function inspectDependencies(
   input: unknown
 ): BscTestnetPtaWbnbPoolSubmissionTestDependencies | null {
   const dependencies = inspectRecord(input, [
+    "acquireTerminalPreSendRecheck",
     "acquireSubmissionCapability",
     "authenticateSubmissionCapability",
     "journal",
@@ -2054,6 +2157,7 @@ function inspectDependencies(
     "readState"
   ]);
   const functions = [
+    dependencies.acquireTerminalPreSendRecheck,
     dependencies.acquireSubmissionCapability,
     dependencies.authenticateSubmissionCapability,
     dependencies.now,
@@ -2075,6 +2179,9 @@ function inspectDependencies(
     authenticateSubmissionCapability: dependencies.authenticateSubmissionCapability as (
       capability: unknown
     ) => boolean,
+    acquireTerminalPreSendRecheck: dependencies.acquireTerminalPreSendRecheck as (
+      input: Readonly<{ transactionHash: Hex; gasLimit: string; gasPriceWei: string }>
+    ) => Promise<unknown>,
     journal: Object.freeze({
       readState: journal.readState as () => Promise<unknown>,
       commitSubmissionStarted: journal.commitSubmissionStarted as (
@@ -2087,6 +2194,53 @@ function inspectDependencies(
     sendExactRawTransactionOnce: dependencies.sendExactRawTransactionOnce as (
       signedTransaction: Hex
     ) => Promise<unknown>,
+    observeExactTransaction: dependencies.observeExactTransaction as (
+      transactionHash: Hex
+    ) => Promise<unknown>
+  });
+}
+
+function inspectRecoveryDependencies(
+  input: unknown
+): BscTestnetPtaWbnbPoolReconciliationRecoveryDependencies | null {
+  const dependencies = inspectRecord(input, [
+    "acquireRecoveryCapability",
+    "journal",
+    "now",
+    "observeExactTransaction"
+  ]);
+  if (dependencies === null) return null;
+  const journal = inspectRecord(dependencies.journal, [
+    "commitSubmissionStarted",
+    "commitTerminalReconciliation",
+    "readState"
+  ]);
+  const functions = [
+    dependencies.acquireRecoveryCapability,
+    dependencies.now,
+    dependencies.observeExactTransaction,
+    journal?.commitSubmissionStarted,
+    journal?.commitTerminalReconciliation,
+    journal?.readState
+  ];
+  if (
+    journal === null ||
+    functions.some((entry) => typeof entry !== "function" || isProxy(entry))
+  ) {
+    return null;
+  }
+  return Object.freeze({
+    now: dependencies.now as () => Date,
+    acquireRecoveryCapability: dependencies.acquireRecoveryCapability as () => Promise<unknown>,
+    journal: Object.freeze({
+      readState: journal.readState as () => Promise<unknown>,
+      commitSubmissionStarted: journal.commitSubmissionStarted as (
+        request: BscTestnetPtaWbnbPoolSubmissionStartedRequest
+      ) => Promise<unknown>,
+      commitTerminalReconciliation: journal.commitTerminalReconciliation as (
+        request: BscTestnetPtaWbnbPoolTerminalReconciliationRequest
+      ) => Promise<unknown>
+    }),
     observeExactTransaction: dependencies.observeExactTransaction as (
       transactionHash: Hex
     ) => Promise<unknown>
@@ -2285,24 +2439,77 @@ function createBscTestnetPtaWbnbPoolSubmissionCore(
       }
 
       if (!submissionWasAlreadyStarted) {
-        const preSendMilliseconds = validClock(dependencies.now);
+        const durableStartMilliseconds = validClock(dependencies.now);
         const expiresAt = exactUtc(capability.expiresAt);
-        const preSubmissionObservedAt = exactUtc(capability.preSubmission.observedAt);
         if (
-          preSendMilliseconds === null ||
-          preSendMilliseconds < nowMilliseconds ||
+          durableStartMilliseconds === null ||
+          durableStartMilliseconds < nowMilliseconds ||
           expiresAt === null ||
-          preSubmissionObservedAt === null ||
-          preSubmissionObservedAt > preSendMilliseconds ||
-          preSendMilliseconds >= expiresAt ||
-          preSendMilliseconds - preSubmissionObservedAt >
-            MAXIMUM_PRE_SUBMISSION_OBSERVATION_AGE_MILLISECONDS
+          durableStartMilliseconds >= expiresAt
         ) {
           return submissionFailure(
             "do_not_retry",
             "SUBMISSION_WINDOW_CLOSED_AFTER_DURABLE_START",
             "submission",
-            "The fresh submission window closed after durable submission_started; sending and rebroadcast are forbidden.",
+            "The original owner authorization expired after durable submission_started; sending and rebroadcast are forbidden.",
+            transactionHash,
+            true
+          );
+        }
+        let terminalPreSendEvidence: unknown;
+        try {
+          terminalPreSendEvidence = await dependencies.acquireTerminalPreSendRecheck(
+            Object.freeze({
+              transactionHash,
+              gasLimit: capability.transaction.gasLimit,
+              gasPriceWei: capability.transaction.gasPriceWei
+            })
+          );
+        } catch {
+          return submissionFailure(
+            "do_not_retry",
+            "TERMINAL_PRE_SEND_RECHECK_FAILED",
+            "submission",
+            "Fresh fixed-origin dual-RPC state could not be re-read after durable submission_started; sending is forbidden.",
+            transactionHash,
+            true
+          );
+        }
+        const preSendMilliseconds = validClock(dependencies.now);
+        if (
+          preSendMilliseconds === null ||
+          preSendMilliseconds < durableStartMilliseconds ||
+          preSendMilliseconds >= expiresAt
+        ) {
+          return submissionFailure(
+            "do_not_retry",
+            "SUBMISSION_WINDOW_CLOSED_AFTER_DURABLE_START",
+            "submission",
+            "The original owner authorization expired during the terminal dual-RPC recheck; sending and rebroadcast are forbidden.",
+            transactionHash,
+            true
+          );
+        }
+        const terminalCapability = await validateSubmissionCapability(
+          Object.freeze({ ...capability, preSubmission: terminalPreSendEvidence }),
+          preSendMilliseconds,
+          true
+        );
+        const terminalObservedAt =
+          terminalCapability.status === "valid"
+            ? exactUtc(terminalCapability.capability.preSubmission.observedAt)
+            : null;
+        if (
+          terminalCapability.status === "invalid" ||
+          terminalObservedAt === null ||
+          terminalObservedAt < durableStartMilliseconds ||
+          terminalObservedAt > preSendMilliseconds
+        ) {
+          return submissionFailure(
+            "do_not_retry",
+            "TERMINAL_PRE_SEND_RECHECK_INVALID",
+            "submission",
+            "Post-ack dual-RPC evidence is not exact, current, or ordered after durable submission_started; sending is forbidden.",
             transactionHash,
             true
           );
@@ -2320,105 +2527,231 @@ function createBscTestnetPtaWbnbPoolSubmissionCore(
         }
       }
 
-      let rawEvidence: unknown;
-      try {
-        rawEvidence = await dependencies.observeExactTransaction(transactionHash);
-      } catch {
-        return Object.freeze({
-          status: "reconciliation_pending" as const,
-          retryBroadcastAllowed: false as const,
-          reconciliationRetryAllowed: true as const,
-          transactionHash,
-          issue: issue(
-            "INPUT_INVALID",
-            "evidence",
-            "Reconciliation observation is currently unavailable."
-          ),
-          boundary: BOUNDARY
-        });
+      return reconcileFromDurableStartedState(dependencies, capability, nowMilliseconds);
+    }
+  });
+}
+
+async function reconcileFromDurableStartedState(
+  dependencies: Pick<
+    BscTestnetPtaWbnbPoolReconciliationRecoveryDependencies,
+    "journal" | "now" | "observeExactTransaction"
+  >,
+  capability: BscTestnetPtaWbnbPoolSubmissionCapability,
+  notBeforeMilliseconds: number
+): Promise<BscTestnetPtaWbnbPoolSubmissionResult> {
+  const transactionHash = capability.transaction.transactionHash;
+  let rawEvidence: unknown;
+  try {
+    rawEvidence = await dependencies.observeExactTransaction(transactionHash);
+  } catch {
+    return Object.freeze({
+      status: "reconciliation_pending" as const,
+      retryBroadcastAllowed: false as const,
+      reconciliationRetryAllowed: true as const,
+      transactionHash,
+      issue: issue(
+        "INPUT_INVALID",
+        "evidence",
+        "Reconciliation observation is currently unavailable."
+      ),
+      boundary: BOUNDARY
+    });
+  }
+  const reconciledAt = validClock(dependencies.now);
+  if (reconciledAt === null || reconciledAt < notBeforeMilliseconds) {
+    return submissionFailure(
+      "do_not_retry",
+      "CLOCK_INVALID",
+      "reconciliation",
+      "Reconciliation clock moved backward or became invalid.",
+      transactionHash,
+      true
+    );
+  }
+  const reconciliation = reconcileEvidence(rawEvidence, capability, reconciledAt);
+  if (reconciliation.status === "pending") {
+    return Object.freeze({
+      status: "reconciliation_pending" as const,
+      retryBroadcastAllowed: false as const,
+      reconciliationRetryAllowed: true as const,
+      transactionHash,
+      issue: reconciliation.issue,
+      boundary: BOUNDARY
+    });
+  }
+  if (reconciliation.status === "invalid") {
+    return submissionFailure(
+      "do_not_retry",
+      reconciliation.issue.code,
+      "reconciliation",
+      reconciliation.issue.message,
+      transactionHash,
+      true
+    );
+  }
+  const terminalRequest = Object.freeze({
+    schemaVersion: BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCHEMA_VERSION,
+    operation: BSC_TESTNET_PTA_WBNB_POOL_RECONCILIATION_OPERATION,
+    operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
+    claimId: capability.claimId,
+    envelopeHash: capability.envelopeHash,
+    releaseCommit: capability.releaseCommit,
+    runtimeManifestSha256: capability.runtimeManifestSha256,
+    reviewerApprovalDigest: capability.reviewerApprovalDigest,
+    ownerAuthorizationDigest: capability.ownerAuthorizationDigest,
+    signingHash: capability.transaction.signingHash,
+    transactionHash,
+    signedTransactionKeccak256: keccak256(capability.transaction.signedTransaction),
+    submissionStartedDigest: submissionStartedRequest(capability).submissionStartedDigest,
+    outcome: reconciliation.status,
+    reconciliationDigest: reconciliation.reconciliationDigest
+  });
+  let terminalAck: unknown;
+  try {
+    terminalAck = await dependencies.journal.commitTerminalReconciliation(terminalRequest);
+  } catch {
+    return submissionFailure(
+      "do_not_retry",
+      "TERMINAL_COMMIT_OUTCOME_UNKNOWN",
+      "journal",
+      "Validated terminal reconciliation could not be durably committed.",
+      transactionHash,
+      true
+    );
+  }
+  if (!terminalAckValid(terminalAck, terminalRequest)) {
+    return submissionFailure(
+      "do_not_retry",
+      "TERMINAL_COMMIT_OUTCOME_UNKNOWN",
+      "journal",
+      "Journal did not attest the exact terminal reconciliation digest.",
+      transactionHash,
+      true
+    );
+  }
+  return Object.freeze({
+    status: reconciliation.status,
+    retryBroadcastAllowed: false,
+    reconciliationRetryAllowed: false,
+    transactionHash,
+    reconciliationDigest: reconciliation.reconciliationDigest,
+    issue: null,
+    boundary: BOUNDARY
+  });
+}
+
+/**
+ * Restart-only reconciliation. It cannot sign, start submission, send, resend, or replace because
+ * none of those capabilities exist on this dependency boundary.
+ */
+export function createBscTestnetPtaWbnbPoolReconciliationRecoveryCoreForInternalUse(
+  dependenciesInput: BscTestnetPtaWbnbPoolReconciliationRecoveryDependencies
+): BscTestnetPtaWbnbPoolSubmissionCore {
+  const dependencies = inspectRecoveryDependencies(dependenciesInput);
+  let invoked = false;
+  return Object.freeze({
+    boundary: BOUNDARY,
+    async submitAndReconcileOnce(): Promise<BscTestnetPtaWbnbPoolSubmissionResult> {
+      if (invoked) {
+        return submissionFailure(
+          "do_not_retry",
+          "ONE_SHOT_CORE_ALREADY_USED",
+          "configuration",
+          "This recovery core instance has already been used.",
+          null,
+          false
+        );
       }
-      const reconciledAt = validClock(dependencies.now);
-      if (reconciledAt === null || reconciledAt < nowMilliseconds) {
+      invoked = true;
+      if (dependencies === null) {
+        return submissionFailure(
+          "do_not_retry",
+          "CONFIGURATION_INVALID",
+          "configuration",
+          "Recovery dependency boundary is not exact plain data.",
+          null,
+          false
+        );
+      }
+      const nowMilliseconds = validClock(dependencies.now);
+      if (nowMilliseconds === null) {
         return submissionFailure(
           "do_not_retry",
           "CLOCK_INVALID",
-          "reconciliation",
-          "Reconciliation clock moved backward or became invalid.",
-          transactionHash,
-          true
+          "configuration",
+          "Recovery clock is invalid.",
+          null,
+          false
         );
       }
-      const reconciliation = reconcileEvidence(rawEvidence, capability, reconciledAt);
-      if (reconciliation.status === "pending") {
-        return Object.freeze({
-          status: "reconciliation_pending" as const,
-          retryBroadcastAllowed: false as const,
-          reconciliationRetryAllowed: true as const,
-          transactionHash,
-          issue: reconciliation.issue,
-          boundary: BOUNDARY
-        });
-      }
-      if (reconciliation.status === "invalid") {
-        return submissionFailure(
-          "do_not_retry",
-          reconciliation.issue.code,
-          "reconciliation",
-          reconciliation.issue.message,
-          transactionHash,
-          true
-        );
-      }
-
-      const terminalRequest = Object.freeze({
-        schemaVersion: BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCHEMA_VERSION,
-        operation: BSC_TESTNET_PTA_WBNB_POOL_RECONCILIATION_OPERATION,
-        operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
-        claimId: capability.claimId,
-        envelopeHash: capability.envelopeHash,
-        releaseCommit: capability.releaseCommit,
-        runtimeManifestSha256: capability.runtimeManifestSha256,
-        reviewerApprovalDigest: capability.reviewerApprovalDigest,
-        ownerAuthorizationDigest: capability.ownerAuthorizationDigest,
-        signingHash: capability.transaction.signingHash,
-        transactionHash,
-        signedTransactionKeccak256: keccak256(capability.transaction.signedTransaction),
-        submissionStartedDigest: submissionStartedRequest(capability).submissionStartedDigest,
-        outcome: reconciliation.status,
-        reconciliationDigest: reconciliation.reconciliationDigest
-      });
-      let terminalAck: unknown;
+      let rawCapability: unknown;
       try {
-        terminalAck = await dependencies.journal.commitTerminalReconciliation(terminalRequest);
+        rawCapability = await dependencies.acquireRecoveryCapability();
       } catch {
         return submissionFailure(
           "do_not_retry",
-          "TERMINAL_COMMIT_OUTCOME_UNKNOWN",
-          "journal",
-          "Validated terminal reconciliation could not be durably committed.",
-          transactionHash,
-          true
+          "RECOVERY_CAPABILITY_UNAVAILABLE",
+          "recovery",
+          "Durable recovery material is unavailable.",
+          null,
+          false
         );
       }
-      if (!terminalAckValid(terminalAck, terminalRequest)) {
+      const capabilityResult = await validateSubmissionCapability(
+        rawCapability,
+        nowMilliseconds,
+        false
+      );
+      if (capabilityResult.status === "invalid") {
         return submissionFailure(
           "do_not_retry",
-          "TERMINAL_COMMIT_OUTCOME_UNKNOWN",
-          "journal",
-          "Journal did not attest the exact terminal reconciliation digest.",
-          transactionHash,
-          true
+          capabilityResult.issue.code,
+          "recovery",
+          capabilityResult.issue.message,
+          null,
+          false
         );
       }
-      return Object.freeze({
-        status: reconciliation.status,
-        retryBroadcastAllowed: false,
-        reconciliationRetryAllowed: false,
-        transactionHash,
-        reconciliationDigest: reconciliation.reconciliationDigest,
-        issue: null,
-        boundary: BOUNDARY
-      });
+      const capability = capabilityResult.capability;
+      const transactionHash = capability.transaction.transactionHash;
+      let journalState: BscTestnetPtaWbnbPoolSubmissionJournalState | null;
+      try {
+        journalState = parseJournalState(await dependencies.journal.readState(), capability);
+      } catch {
+        journalState = null;
+      }
+      if (journalState === null) {
+        return submissionFailure(
+          "do_not_retry",
+          "JOURNAL_STATE_UNKNOWN",
+          "journal",
+          "Durable submission journal state could not be authenticated or parsed.",
+          transactionHash,
+          false
+        );
+      }
+      if (journalState.state === "confirmed" || journalState.state === "reverted") {
+        return submissionFailure(
+          "do_not_retry",
+          "TERMINAL_STATE_ALREADY_COMMITTED",
+          "journal",
+          "The exact transaction already has a durable terminal state.",
+          transactionHash,
+          false
+        );
+      }
+      if (journalState.state !== "submission_started" && journalState.state !== "unknown_outcome") {
+        return submissionFailure(
+          "do_not_retry",
+          "RECOVERY_REQUIRES_DURABLE_SUBMISSION_START",
+          "journal",
+          "Recovery cannot sign or begin a submission from this journal state.",
+          transactionHash,
+          false
+        );
+      }
+      return reconcileFromDurableStartedState(dependencies, capability, nowMilliseconds);
     }
   });
 }

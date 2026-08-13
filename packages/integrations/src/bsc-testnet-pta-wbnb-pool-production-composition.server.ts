@@ -47,15 +47,17 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCHEMA_VERSION,
   BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCOPE,
   createBscTestnetPtaWbnbPoolSubmissionCoreForInternalUse,
+  createBscTestnetPtaWbnbPoolReconciliationRecoveryCoreForInternalUse,
   deriveBscTestnetPtaWbnbPoolSubmissionJournalStateForInternalUse,
   type BscTestnetPtaWbnbPoolSubmissionCapability,
   type BscTestnetPtaWbnbPoolSubmissionResult
 } from "./bsc-testnet-pta-wbnb-pool-submission-reconciler.server";
-import type { BscTestnetPtaWbnbPoolDurableSubmissionJournal } from "./bsc-testnet-pta-wbnb-pool-submission-journal.server";
-import type {
-  BscTestnetPtaWbnbPoolSigningWorker,
-  BscTestnetPtaWbnbPoolSigningWorkerReleaseTrust
-} from "./bsc-testnet-pta-wbnb-pool-signing-worker";
+import {
+  BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V2_POLICY,
+  type BscTestnetPtaWbnbPoolDurableSubmissionJournal,
+  type BscTestnetPtaWbnbPoolSubmissionRecoveryState
+} from "./bsc-testnet-pta-wbnb-pool-submission-journal.server";
+import type { BscTestnetPtaWbnbPoolSigningWorker } from "./bsc-testnet-pta-wbnb-pool-signing-worker";
 
 export { BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_EXECUTION_FLAG };
 
@@ -96,18 +98,14 @@ type AuthorityResult = Readonly<{
 export interface BscTestnetPtaWbnbPoolFixedProductionAuthority {
   readonly authorize: (
     descriptor: unknown,
-    command: unknown,
-    localCustodyOwnerCapability: unknown
+    command: unknown
   ) => AuthorityResult | Readonly<{ status: "blocked"; issue: { code: string; message: string } }>;
   readonly authenticateAuthorizedIntent: (intent: unknown) => boolean;
-  readonly authenticateExecutionCapability: (capability: unknown) => boolean;
 }
 
 export interface BscTestnetPtaWbnbPoolFixedProductionPorts {
   readonly now: () => Date;
-  readonly releaseTrust: BscTestnetPtaWbnbPoolSigningWorkerReleaseTrust;
   readonly authority: BscTestnetPtaWbnbPoolFixedProductionAuthority;
-  readonly localCustodyOwnerCapability: object;
   readonly signingJournal: BscTestnetPtaWbnbPoolLocalJournal;
   readonly submissionJournal: BscTestnetPtaWbnbPoolDurableSubmissionJournal;
   readonly issueWorker: (executionCapability: unknown) => BscTestnetPtaWbnbPoolSigningWorker;
@@ -275,6 +273,31 @@ function signingCapabilityFromState(
   });
 }
 
+function signingStateMatchesRecoveryCapability(
+  state: BscTestnetPtaWbnbPoolLocalJournalState,
+  capability: BscTestnetPtaWbnbPoolSubmissionCapability
+): boolean {
+  const binding = stateBinding(state);
+  return (
+    binding !== null &&
+    (state.status === "signed_committed" || state.status === "unknown_outcome") &&
+    state.serializedTransaction === capability.transaction.signedTransaction &&
+    state.transactionHash === capability.transaction.transactionHash &&
+    state.gasLimit === capability.transaction.gasLimit &&
+    state.gasPriceWei === capability.transaction.gasPriceWei &&
+    state.maxCostWei === capability.transaction.maximumCostWei &&
+    state.authorizedAt === capability.authenticatedAt &&
+    state.expiresAt === capability.expiresAt &&
+    binding.claimId === capability.claimId &&
+    binding.envelopeHash === capability.envelopeHash &&
+    binding.releaseCommit === capability.releaseCommit &&
+    binding.runtimeManifestSha256 === capability.runtimeManifestSha256 &&
+    binding.reviewerApprovalDigest === capability.reviewerApprovalDigest &&
+    binding.ownerAuthorizationDigest === capability.ownerAuthorizationDigest &&
+    binding.signingHash === capability.transaction.signingHash
+  );
+}
+
 /**
  * Narrow one-shot composition. It has no caller transaction/RPC/path/signing input; the root runner
  * supplies only already-fixed private capabilities and fixed adapters.
@@ -296,15 +319,64 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
   ): Promise<BscTestnetPtaWbnbPoolProductionRunResult> => {
     const now = exactDate(ports.now);
     if (now === null) return blocked("CLOCK_INVALID", "Production clock is invalid.");
+    let signingState: BscTestnetPtaWbnbPoolLocalJournalState;
+    let recoveryState: BscTestnetPtaWbnbPoolSubmissionRecoveryState;
+    try {
+      [signingState, recoveryState] = await Promise.all([
+        ports.signingJournal.readState(),
+        ports.submissionJournal.readRecoveryState()
+      ]);
+    } catch {
+      return blocked(
+        "RESTART_JOURNAL_READ_FAILED",
+        "Durable signing/submission state could not be read before any authorization or signing."
+      );
+    }
+    if (recoveryState.state === "confirmed" || recoveryState.state === "reverted") {
+      return blocked(
+        "TERMINAL_STATE_ALREADY_COMMITTED",
+        "The exact transaction already has a durable terminal state.",
+        recoveryState.capability.transaction.transactionHash
+      );
+    }
+    if (recoveryState.state === "submission_started" || recoveryState.state === "unknown_outcome") {
+      const recoveryCapability = recoveryState.capability;
+      if (
+        recoveryCapability === null ||
+        !signingStateMatchesRecoveryCapability(signingState, recoveryCapability)
+      ) {
+        return blocked(
+          "RESTART_BINDING_UNKNOWN",
+          "Restart state is incomplete or signing/submission journals do not bind the same exact transaction."
+        );
+      }
+      return createBscTestnetPtaWbnbPoolReconciliationRecoveryCoreForInternalUse(
+        Object.freeze({
+          now: ports.now,
+          acquireRecoveryCapability: async () => recoveryCapability,
+          journal: ports.submissionJournal,
+          observeExactTransaction: observeExactBscTestnetPtaWbnbPoolTransactionForInternalUse
+        })
+      ).submitAndReconcileOnce();
+    }
+    if (recoveryState.state === "signed_committed") {
+      return blocked(
+        "RESTART_SIGNED_COMMIT_REQUIRES_NEW_AUTHORITY",
+        "A durable signed transaction exists without submission_started; persisted evidence cannot recreate owner authority, so signing and sending are forbidden.",
+        recoveryState.capability.transaction.transactionHash
+      );
+    }
+    if (signingState.status !== "empty") {
+      return blocked(
+        "SIGNING_JOURNAL_NOT_FRESH",
+        "A prior signing state exists; the signer will not be entered again."
+      );
+    }
     const descriptor = describeBscTestnetPtaWbnbPoolOneShotBoundary(envelope, ports.now);
     if (descriptor.status !== "prepared_non_authorizing") {
       return blocked("ENVELOPE_INVALID", "Fresh exact coordinator envelope is unavailable.");
     }
-    const authorization = ports.authority.authorize(
-      descriptor,
-      command,
-      ports.localCustodyOwnerCapability
-    );
+    const authorization = ports.authority.authorize(descriptor, command);
     if (authorization.status !== "authorized") {
       return blocked(authorization.issue.code, authorization.issue.message);
     }
@@ -414,7 +486,14 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
         signed.transactionHash
       );
     }
-    await ports.submissionJournal.initializeSignedCommit(seed);
+    await ports.submissionJournal.initializeSignedCommit(
+      Object.freeze({
+        schemaVersion: 1 as const,
+        kind: "authenticated_owner_v2_signed_submission_commit_v1" as const,
+        ownerAuthorizationPolicy: BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V2_POLICY,
+        capability
+      })
+    );
     const branded = new WeakSet<object>();
     branded.add(capability);
     const submission = createBscTestnetPtaWbnbPoolSubmissionCoreForInternalUse(
@@ -424,6 +503,8 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
         authenticateSubmissionCapability: (value: unknown) =>
           typeof value === "object" && value !== null && !isProxy(value) && branded.has(value),
         journal: ports.submissionJournal,
+        acquireTerminalPreSendRecheck:
+          acquireBscTestnetPtaWbnbPoolProductionPreSubmissionForInternalUse,
         sendExactRawTransactionOnce: sendExactBscTestnetPtaWbnbPoolRawTransactionOnceForInternalUse,
         observeExactTransaction: observeExactBscTestnetPtaWbnbPoolTransactionForInternalUse
       })

@@ -30,6 +30,9 @@ describe("PTA/WBNB production execution hard block", () => {
     expect(RUNNER_SOURCE).not.toMatch(
       /process\.stdin|process\.argv|\bfetch\s*\(|eth_sendRawTransaction|createWindowsBscTestnetPtaWbnbPoolLocalJournal|assertFixedWindows/u
     );
+    expect(RUNNER_SOURCE).not.toContain(
+      "createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeForInternalUse"
+    );
     await expect(
       sendExactBscTestnetPtaWbnbPoolRawTransactionOnceForInternalUse("0x01")
     ).rejects.toThrow("PRODUCTION_AUTHORIZATION_UNAVAILABLE");

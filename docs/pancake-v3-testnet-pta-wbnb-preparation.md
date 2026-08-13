@@ -1,9 +1,10 @@
 # PancakeSwap V3 BSC testnet PTA/WBNB pool readiness
 
 Updated: 2026-08-13. Decision: **exact offline provenance, a non-authorizing read-only
-preflight, an old-scope unsent request, an owner-designated internal multi-agent technical decision,
-and production-blocked signing/post-claim/submission/reconciliation scaffolds are recorded; no pool
-or write is approved**.
+preflight, an old-scope unsent request, an owner-designated internal multi-agent technical decision
+for `bc7000e`, and locally reviewed production-blocked signing/ceremony/recovery/reconciliation
+hardening are recorded; no current-release decision, owner transaction approval, pool, or write
+exists**.
 
 Machine record:
 [`evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json`](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json)
@@ -19,10 +20,11 @@ Owner-designated internal technical-review decision:
 This is a BNB Smart Chain testnet and PancakeSwap V3 preparation milestone. The historical observation
 used local ProofEra tooling and two official credential-free BNB Chain RPC endpoints. Capture created
 only fixed public evidence files. The later compiler and selector reviews and external-review-request
-generator run offline. The server-only coordinator cannot authorize signing or execution, and the
-post-claim and submission production factories are deliberately unavailable. The submission core
-accepts only injected test ports. None of these paths made an onchain RPC write, approval, signature,
-broadcast, pool creation, token wrapping, liquidity mint, swap, or mainnet action.
+generator ran offline. Internal seams now implement the native-TTY owner ceremony, private one-consume
+authority/worker bridge, fixed-RPC rechecks, durable restart recovery, and terminal reconciliation,
+but the root runner and raw broadcaster deliberately hard-block. None of these paths made an onchain
+RPC write, owner approval, signature, broadcast, pool creation, token wrapping, liquidity mint, swap,
+or mainnet action.
 
 The evidence answers a narrow question: what exact chain-97 state and review inputs would a future
 PTA/WBNB pool initializer have to bind? It does not answer whether the pair has a market price, is
@@ -225,28 +227,36 @@ append-only and exact-operation-bound. The journal receipt self-hash detects loc
 is **integrity evidence, not reviewer identity, owner authorization, signing authority, or permission
 to submit**.
 
-This scaffold is deliberately unreachable for production use. The production authority gate,
-production signer core, and production signing-worker factory each fail closed with
-`PRODUCTION_AUTHORIZATION_UNAVAILABLE`. The eight earlier focused integration files pass 70 tests
-across the coordinator, boundary, package-export barrier, exact protocol, authorization gate,
-journal, signer core, and worker.
+The local authority hardening now implements a two-phase ceremony in the same process: it writes the
+complete decoded release/review/envelope challenge to a native TTY, adds a fresh 32-byte nonce from the
+operating-system CSPRNG, and accepts only the exact digest-bound confirmation bytes before the bounded
+window closes. The ceremony does not use argv, environment, temporary files, shell, logger, custody,
+RPC writes, signer, or broadcaster. Challenge generation alone mints no authority.
 
-A separate test-only post-claim recheck core requires the authorization gate's authenticated private
+The native bridge holds its current-user custody-owner capability, ceremony-command brand, and
+execution-capability state inside one closure. A capability is reserved for one worker and consumed
+only after the signing journal durably enters worker start; copied JSON/digests, test issuers, proxy
+objects, and persisted journal bytes cannot unlock the native worker. These controls are locally
+implemented and reviewed, but the public production worker factory and root runner still fail closed
+with `PRODUCTION_AUTHORIZATION_UNAVAILABLE`.
+
+A separate local post-claim recheck core requires the authorization gate's authenticated private
 intent before making any read. It compares only the two fixed official RPC origins, finds a common
 finalized block, uses EIP-1898 `requireCanonical`, and repeats chain, nonce, empty-pool, empty-candidate,
 sender-code, simulation, balance, gas, cost, authorization-expiry and 30-second completion bounds. Its
 opaque in-memory capability is bound to the exact claim and intent; cloned or proxy values are not
 accepted. Seventeen focused tests exercise that behavior and its failure boundaries.
 
-The recheck production constructor also fails closed with `PRODUCTION_AUTHORIZATION_UNAVAILABLE` and
-performs no production RPC call. It has no environment, filesystem/journal, custody, signer,
-signature, submission, or broadcast path. No short-lived envelope or recheck capability is retained
-as current evidence, and an expired observation cannot be reused.
+The standalone public production recheck constructor remains fail-closed, while the internal
+non-executing composition binds the same strict recheck to its fixed official-RPC clients and private
+authenticated intent. No short-lived envelope or recheck capability is retained as current evidence,
+and an expired observation cannot be reused. This code supplies neither owner authority nor a
+broadcast path.
 
-## Test-only submission and reconciliation scaffold
+## Local non-executing submission and reconciliation hardening
 
-The later server-only submission core accepts only injected test ports; callers of its one-shot method
-cannot provide transaction bytes. It parses and recovers the one exact legacy EIP-155 signed
+The server-only submission core cannot accept caller-selected transaction bytes. It parses and
+recovers the one exact legacy EIP-155 signed
 transaction, binds the sender, nonce, target, zero value, calldata, gas/cost caps and deterministic
 transaction hash, and requires a fresh dual-RPC pre-submission snapshot with the exact transaction and
 receipt still absent.
@@ -263,16 +273,25 @@ index is bound. Success additionally requires exactly the expected factory `Pool
 liquidity and initialized observation state. A reverted receipt is kept distinct and cannot retain
 success logs or pool post-state.
 
-The repository now contains local fixed-official-RPC normalization, a separate append-only durable
-submission journal, authority parsing and an unwired composition for continued review. They do not
-form an executable production path: the production runner, native worker issuer and raw broadcaster
-all fail before custody/sign/send access with `PRODUCTION_AUTHORIZATION_UNAVAILABLE`. Future wiring
-requires a same-process two-phase exact owner challenge, a closure-private one-consume capability
-bound to the exact request and fixed journal, a terminal dual-RPC reread immediately before send,
-restart-first reconciliation for started/unknown outcomes, and a bounded receipt-to-finality ancestry
-proof. No signature, send, transaction receipt, pool or LP position was created. The local tests are
-specification/validation evidence only, and these files are not covered by the old external-review
-request.
+The repository now locally implements those formerly pending controls. Its append-only submission
+journal v2 persists the exact owner-v2 one-signature/one-broadcast policy and transaction binding.
+Composition reads both journals before any authorization or signing: terminal state stops; durable
+`submission_started`/`unknown_outcome` enters recovery-only reconciliation; a signed commit without a
+durable start cannot recreate owner authority; and mismatched restart state fails closed. A fresh
+attempt must win durable `submission_started`, after which a second fixed dual-RPC state snapshot is
+required immediately before the sole send opportunity. Expiry or drift after the acknowledgement
+forbids send, retry, and replacement.
+
+Terminal reconciliation requires both fixed providers to return the identical exact transaction,
+receipt, logs and EIP-1898 post-state. It walks continuous, exact-number, parent-hash-linked ancestry
+from the receipt block to the common-finalized block; both providers must match, and the gap is bounded
+to 128 blocks. Oversized,
+missing, discontinuous or timestamp-regressive ancestry fails closed. These controls are local
+implementation/review evidence only: the root production runner and raw broadcaster still return or
+throw `PRODUCTION_AUTHORIZATION_UNAVAILABLE`, so no executable sign/send path exists. The public worker
+issuer also remains unavailable. No exact owner transaction confirmation was entered and no signature,
+send, transaction receipt, pool or LP position was created. These changed files are not covered by the
+old external-review request or the retained `bc7000e` owner-designated decision.
 
 ## Separate proposed liquidity envelope
 
@@ -285,10 +304,10 @@ position authority is approved by this document.
 The two write decisions stay separate:
 
 1. Pool initialization requires its own fresh simulation, exact sender/nonce/gas/cost envelope, short
-   broadcast window, implemented and reviewed durable one-shot claim/submission journal, a new exact
-   owner-designated distinct-agent technical decision for any changed production release, exact owner
-   authorization, production signer/broadcaster/reconciler boundaries, receipt, exact logs, and
-   post-state reconciliation.
+   broadcast window, durable one-shot claim/submission journal, a new exact owner-designated
+   distinct-agent technical decision for the changed release, exact owner authorization, an
+   intentionally enabled and reviewed root runner/broadcaster, receipt, exact logs, and post-state
+   reconciliation. None of those release/authority/execution outputs exists now.
 2. Only after the pool is independently re-reviewed may an LP mint be prepared. It requires separate
    bounded token approvals, explicit ticks/amounts/minima/deadline/slippage, owner/revoke authority,
    simulation, user confirmation, and receipt evidence.
@@ -297,16 +316,16 @@ The two write decisions stay separate:
 
 - Refresh all five runtime identities, manager/factory/deployer relationships, fee configuration,
   factory owner, LM controls, pair lookup, nonce, fee, gas, and balance at one fresh finalized block.
-- Preserve the owner-designated internal decision only for exact commit `bc7000e`. Re-run the
-  deterministic distinct-agent technical-review lane for any changed implementation or production
-  release. Do not describe this lane as external, Sigstore-authenticated or third-party review. The old
-  eight-file unsent request, public Gist and byte-exact re-fetch provide no review for later code.
+- Preserve the owner-designated internal decision only for exact commit `bc7000e`. Obtain a final
+  distinct-agent technical decision bound to the exact changed release, including the ceremony/bridge/
+  journal/recovery/ancestry delta. Local implementation review does not replace that release-bound
+  decision. Do not describe this lane as external, Sigstore-authenticated or third-party review. The
+  old eight-file unsent request, public Gist and byte-exact re-fetch provide no review for later code.
 - Obtain a distinct exact owner authorization. Neither the request nor a future reviewer decision can
   substitute for it.
-- Provision and independently review production authorization/RPC composition, a durable submission
-  journal, broadcaster, receipt handling, and pending/replacement/unknown-outcome reconciliation. The
-  signing, post-claim and submission/reconciliation scaffolds remain deliberately production-
-  unreachable and non-authorizing.
+- Keep the root runner and raw broadcaster hard-blocked unless a separately reviewed release change
+  intentionally opens them after the exact-release decision and exact owner ceremony. Their current
+  hard block is why the locally implemented signing/recovery seams remain non-executable.
 - Re-run the fixed two-provider coordinator immediately before any claim, then repeat the pending nonce,
   pool, candidate-code and simulation checks after the durable claim and abort on any drift.
 - Establish post-initialization observation cardinality and elapsed oracle history before using the
@@ -316,11 +335,12 @@ The two write decisions stay separate:
 
 Until those gates close and explorer-verifiable receipts exist, the truthful state remains: PTA and
 WBNB identities are evidenced, the retained pool construction path is reproduced exactly offline,
-and a read-only non-authorizing preflight plus production-blocked signing/post-claim/submission/
-reconciliation scaffolds exist. The owner-designated internal technical-review gate is complete only
-for the exact `bc7000e` nonexecuting subject, but **no authenticated external/third-party review is
-claimed and no owner authority, production submission path, PTA/WBNB pool, liquidity, oracle,
-position, Pancake write, or autonomous execution is evidenced**.
+and a read-only non-authorizing preflight plus production-blocked ceremony/signing/post-claim/journal/
+recovery/reconciliation controls are locally implemented. The owner-designated internal technical-
+review gate is complete only for the exact `bc7000e` nonexecuting subject, not the current changed code
+release. **No authenticated external/third-party review is claimed, no exact owner transaction
+approval was entered, and no executable production submission path, signature, receipt, PTA/WBNB
+pool, liquidity, oracle, position, Pancake write, or autonomous execution is evidenced**.
 
 The machine record is linked to the retained
 [bounded public-result RPC transcript](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json)
@@ -336,5 +356,5 @@ transcript, init-code provenance, initializer review/publication, old request, o
 internal-review decision, earlier selector-path package, PTA deployment evidence, and WBNB source
 record. Passing those tests proves deterministic local consistency only; it neither sends the old
 request, refreshes chain state, authenticates a reviewer identity, nor supplies a signer, owner
-approval, transaction, or receipt. Fresh full repository verification for the current fail-closed
-scaffold and internal-review lane delta passed on 2026-08-13.
+approval, transaction, or receipt. Full repository verification is only a local consistency gate; it
+cannot extend the retained `bc7000e` decision to a changed release or authorize a transaction.

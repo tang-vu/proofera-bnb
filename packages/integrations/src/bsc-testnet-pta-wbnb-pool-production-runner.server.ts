@@ -7,16 +7,16 @@ import { BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_COMPOSITION_BOUNDARY } from "./bsc
  * Fail-closed production boundary for this release.
  *
  * The reviewed protocol, journal, RPC normalization, authority parser, and composition are retained
- * as non-executable building blocks. They are intentionally not wired to native custody or the
- * broadcaster until a same-process two-phase owner challenge and a closure-private, one-consume
- * production execution capability have been implemented and independently reviewed.
+ * as non-executable building blocks. A same-process TTY ceremony and closure-private one-consume
+ * native worker bridge now exist behind internal seams, but this root entry remains unwired until
+ * the exact changed release and complete restart/reconciliation composition receive final review.
  */
 export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise<BscTestnetPtaWbnbPoolProductionRunResult> {
   return Object.freeze({
     status: "blocked" as const,
     code: "PRODUCTION_AUTHORIZATION_UNAVAILABLE",
     message:
-      "Production execution remains disabled: the two-phase exact owner challenge and private one-consume custody authority bridge are not available in this release.",
+      "Production execution remains disabled: the exact changed release and complete production composition have not received a final owner-designated technical GO.",
     transactionHash: null,
     boundary: BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_COMPOSITION_BOUNDARY
   });

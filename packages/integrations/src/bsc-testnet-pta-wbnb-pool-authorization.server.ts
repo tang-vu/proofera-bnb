@@ -115,12 +115,14 @@ export interface BscTestnetPtaWbnbPoolOwnerEnvelopeAuthorization extends BscTest
 
 export interface BscTestnetPtaWbnbPoolOwnerSignatureAndBroadcastAuthorizationBody extends Omit<
   BscTestnetPtaWbnbPoolOwnerEnvelopeAuthorizationBody,
-  "kind" | "decision"
+  "schemaVersion" | "kind" | "decision"
 > {
+  readonly schemaVersion: 2;
   readonly kind: "exact_owner_signature_and_single_broadcast_authorization_v2";
   readonly decision: "authorize_one_chain_97_pool_initialization_signature_and_single_broadcast";
   readonly broadcastPolicy: "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity";
   readonly liquidityActionAuthorized: false;
+  readonly ceremonyNonce: Hex;
 }
 
 export interface BscTestnetPtaWbnbPoolOwnerSignatureAndBroadcastAuthorization extends BscTestnetPtaWbnbPoolOwnerSignatureAndBroadcastAuthorizationBody {
@@ -266,6 +268,7 @@ const OWNER_KEYS = [...OWNER_BODY_KEYS, "authorizationDigest"] as const;
 const OWNER_V2_BODY_KEYS = [
   ...OWNER_BODY_KEYS,
   "broadcastPolicy",
+  "ceremonyNonce",
   "liquidityActionAuthorized"
 ] as const;
 const OWNER_V2_KEYS = [...OWNER_V2_BODY_KEYS, "authorizationDigest"] as const;
@@ -604,6 +607,7 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
     );
     const ownerDigest = exactHex32(owner.authorizationDigest);
     const ownerTextDigest = exactHex32(owner.authorizationTextSha256);
+    const ceremonyNonce = ownerV2 ? exactHex32(owner.ceremonyNonce) : null;
     const ownerRuntimeManifest = exactHex32(owner.runtimeManifestSha256);
     const ownerCommit = releaseCommit(owner.releaseCommit);
     const ownerIdentity = identity(owner.ownerIdentity);
@@ -618,7 +622,8 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
       ownerIdentity === null ||
       authorizedAt === null ||
       ownerExpiry === null ||
-      owner.schemaVersion !== 1 ||
+      (!ownerV2 && owner.schemaVersion !== 1) ||
+      (ownerV2 && owner.schemaVersion !== 2) ||
       (!ownerV2 && owner.kind !== "exact_owner_envelope_authorization_v1") ||
       (!ownerV2 && owner.decision !== "authorize_one_chain_97_pool_initialization_signature") ||
       (ownerV2 &&
@@ -627,6 +632,7 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
             "authorize_one_chain_97_pool_initialization_signature_and_single_broadcast" ||
           owner.broadcastPolicy !==
             "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity" ||
+          ceremonyNonce === null ||
           owner.liquidityActionAuthorized !== false)) ||
       owner.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
       owner.envelopeHash !== envelopeHash ||

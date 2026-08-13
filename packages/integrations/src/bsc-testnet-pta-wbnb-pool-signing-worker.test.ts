@@ -222,6 +222,18 @@ async function signSyntheticExact(
 }
 
 describe("PTA/WBNB exact pool signing worker cryptography", () => {
+  it("byte-binds every production authority source loaded before custody", () => {
+    expect(SOURCE).toContain(
+      '"packages/integrations/src/bsc-testnet-pta-wbnb-pool-authorization.server.ts"'
+    );
+    expect(SOURCE).toContain(
+      '"packages/integrations/src/bsc-testnet-pta-wbnb-pool-one-shot-boundary.server.ts"'
+    );
+    expect(SOURCE).toContain(
+      '"packages/integrations/src/bsc-testnet-pta-wbnb-pool-production-authority.server.ts"'
+    );
+  });
+
   it("reconstructs the exact deterministic low-S EIP-155 legacy transaction", async () => {
     const transaction = exactTransaction({ signingNotAfterMilliseconds: 9_000_000_000_000_000 });
     const firstScalar = Buffer.from(SYNTHETIC_PRIVATE_KEY.slice(2), "hex");
@@ -316,7 +328,9 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
       "failed closed"
     );
     expect(SOURCE).toContain('"PRODUCTION_AUTHORIZATION_UNAVAILABLE"');
-    const factorySource = SOURCE.slice(SOURCE.indexOf("export async function createWindows"));
+    const hardBlockedFactoryMarker =
+      "export async function createWindowsBscTestnetPtaWbnbPoolSigningWorker";
+    const factorySource = SOURCE.slice(SOURCE.indexOf(hardBlockedFactoryMarker));
     expect(factorySource).not.toMatch(
       /createWindowsBscTestnetPtaWbnbPoolLocalJournal|nativeWindowsSignExactPoolTransaction|consumeWorkerAuthorization|commitWorkerSignedTransaction/u
     );
@@ -335,6 +349,32 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     ).toThrow("failed closed");
     expect(consumeWorkerAuthorization).not.toHaveBeenCalled();
     expect(commitWorkerSignedTransaction).not.toHaveBeenCalled();
+  });
+
+  it("keeps the native realm private and consumes authority only after durable worker start", () => {
+    const nativeMarker =
+      "export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeForInternalUse";
+    const nativeSource = SOURCE.slice(
+      SOURCE.indexOf(nativeMarker),
+      SOURCE.indexOf("/** Non-executable production boundary", SOURCE.indexOf(nativeMarker))
+    );
+    expect(nativeSource).toContain(
+      "const localCustodyOwnerCapability = Object.freeze(Object.create(null) as object)"
+    );
+    expect(nativeSource).toContain("const ceremonyCommands = new WeakSet<object>()");
+    expect(nativeSource).toContain(
+      "issuer.reserveExecutionCapabilityForWorker(executionCapability)"
+    );
+    const durableIndex = nativeSource.indexOf(
+      "await signingJournal.consumeWorkerAuthorization(request)"
+    );
+    const authorityIndex = nativeSource.indexOf(
+      "issuer.consumeExecutionCapabilityAfterDurableStart(executionCapability, request)"
+    );
+    expect(durableIndex).toBeGreaterThan(0);
+    expect(authorityIndex).toBeGreaterThan(durableIndex);
+    expect(nativeSource).not.toContain("authenticateExecutionCapability:");
+    expect(nativeSource).not.toMatch(/process\s*\.\s*(?:env|argv)/u);
   });
 
   it("durably starts before signing and refuses a canonical transaction from any other signer", async () => {

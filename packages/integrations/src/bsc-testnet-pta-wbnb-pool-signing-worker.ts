@@ -6,6 +6,7 @@ import { constants as fileConstants } from "node:fs";
 import type { BigIntStats } from "node:fs";
 import { lstat, open, realpath } from "node:fs/promises";
 import { dirname, isAbsolute, join, relative, resolve, sep, win32 } from "node:path";
+import { stdin, stdout } from "node:process";
 import { fileURLToPath } from "node:url";
 import { isProxy } from "node:util/types";
 
@@ -52,6 +53,10 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_SENDER
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
+  createWindowsBscTestnetPtaWbnbPoolLocalJournal,
+  type BscTestnetPtaWbnbPoolLocalJournal
+} from "./bsc-testnet-pta-wbnb-pool-local-journal.server";
+import {
   BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_OPERATION,
@@ -62,6 +67,15 @@ import {
   type BscTestnetPtaWbnbPoolSigningWorkerRequest,
   type BscTestnetPtaWbnbPoolSigningWorkerResponse
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
+import {
+  conductBscTestnetPtaWbnbPoolOwnerCeremonyForInternalUse,
+  createBscTestnetPtaWbnbPoolAuthorityIssuerForInternalUse,
+  type BscTestnetPtaWbnbPoolOwnerCeremonyPorts,
+  type BscTestnetPtaWbnbPoolOwnerCeremonyResult,
+  type BscTestnetPtaWbnbPoolOwnerDesignatedReviewDecision,
+  type BscTestnetPtaWbnbPoolProductionAuthorityResult
+} from "./bsc-testnet-pta-wbnb-pool-production-authority.server";
+import type { BscTestnetPtaWbnbPoolOneShotPreparedDescriptor } from "./bsc-testnet-pta-wbnb-pool-one-shot-boundary.server";
 
 const MAXIMUM_STDIN_BYTES = 32_768;
 const MAXIMUM_JSON_DEPTH = 12;
@@ -95,9 +109,12 @@ const RELEASE_SOURCE_PATHS = Object.freeze([
   "packages/integrations/src/bsc-testnet-deployer-custody-core.ts",
   "packages/integrations/src/bsc-testnet-deployer-custody-windows.server.ts",
   "packages/integrations/src/bsc-testnet-pta-signing-worker.ts",
+  "packages/integrations/src/bsc-testnet-pta-wbnb-pool-authorization.server.ts",
   "packages/integrations/src/bsc-testnet-pta-wbnb-pool-initialization.ts",
   "packages/integrations/src/bsc-testnet-pta-wbnb-pool-local-journal.server.ts",
+  "packages/integrations/src/bsc-testnet-pta-wbnb-pool-one-shot-boundary.server.ts",
   "packages/integrations/src/bsc-testnet-pta-wbnb-pool-one-shot-protocol.ts",
+  "packages/integrations/src/bsc-testnet-pta-wbnb-pool-production-authority.server.ts",
   WORKER_SOURCE_RELATIVE_PATH,
   "packages/integrations/package.json",
   "pnpm-lock.yaml",
@@ -954,6 +971,31 @@ export async function inspectBscTestnetPtaWbnbPoolSigningWorkerReleaseTrustForIn
   }
 }
 
+async function inspectExactPublishedReleaseTree(releaseCommit: string): Promise<string> {
+  try {
+    const [headTree, releaseTree, headAfter, publishedAfter, statusAfter] = await Promise.all([
+      executePinnedGit(["rev-parse", "--verify", "HEAD^{tree}"]),
+      executePinnedGit(["rev-parse", "--verify", `${releaseCommit}^{tree}`]),
+      executePinnedGit(["rev-parse", "--verify", "HEAD"]),
+      executePinnedGit(["rev-parse", "--verify", PINNED_ORIGIN_REFERENCE]),
+      executePinnedGit(["status", "--porcelain=v1", "--untracked-files=normal"])
+    ]);
+    if (
+      !/^[0-9a-f]{40}$/u.test(headTree) ||
+      releaseTree !== headTree ||
+      headAfter !== releaseCommit ||
+      publishedAfter !== releaseCommit ||
+      statusAfter !== ""
+    ) {
+      throw new PoolSigningWorkerFailure("RELEASE_TRUST_INVALID");
+    }
+    return releaseTree;
+  } catch (error) {
+    if (error instanceof PoolSigningWorkerFailure) throw error;
+    throw new PoolSigningWorkerFailure("RELEASE_TRUST_INVALID");
+  }
+}
+
 function sameReleaseTrust(
   left: BscTestnetPtaWbnbPoolSigningWorkerReleaseTrust,
   right: BscTestnetPtaWbnbPoolSigningWorkerReleaseTrust
@@ -1499,6 +1541,263 @@ export function createBscTestnetPtaWbnbPoolProductionWorkerIssuerForInternalUse(
       void journal;
       throw new PoolSigningWorkerFailure("PRODUCTION_AUTHORIZATION_UNAVAILABLE");
     }
+  });
+}
+
+export interface BscTestnetPtaWbnbPoolNativeProductionBridge {
+  readonly releaseTrust: BscTestnetPtaWbnbPoolSigningWorkerReleaseTrust;
+  readonly releaseTree: string;
+  readonly authority: Readonly<{
+    readonly authorize: (
+      descriptor: unknown,
+      command: unknown
+    ) => BscTestnetPtaWbnbPoolProductionAuthorityResult;
+    readonly authenticateAuthorizedIntent: (intent: unknown) => boolean;
+  }>;
+  readonly signingJournal: BscTestnetPtaWbnbPoolLocalJournal;
+  readonly conductOwnerCeremony: (
+    descriptor: BscTestnetPtaWbnbPoolOneShotPreparedDescriptor,
+    review: BscTestnetPtaWbnbPoolOwnerDesignatedReviewDecision
+  ) => Promise<BscTestnetPtaWbnbPoolOwnerCeremonyResult>;
+  readonly issueWorker: (executionCapability: unknown) => BscTestnetPtaWbnbPoolSigningWorker;
+}
+
+/**
+ * Builds the only native authority/worker realm. The current-user owner capability, ceremony-command
+ * brand, and one-consume execution-capability lifecycle never leave this closure. Merely importing
+ * the test issuer, reproducing JSON/digests, or possessing a journal file cannot open native custody.
+ */
+export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeForInternalUse(): Promise<BscTestnetPtaWbnbPoolNativeProductionBridge> {
+  const releaseTrust = await inspectBscTestnetPtaWbnbPoolSigningWorkerReleaseTrustForInternalUse();
+  const releaseTree = await inspectExactPublishedReleaseTree(releaseTrust.releaseCommit);
+  await assertFixedWindowsBscTestnetPtaWbnbPoolCustodyOwnerForInternalUse();
+  const signingJournal = await createWindowsBscTestnetPtaWbnbPoolLocalJournal();
+  const now = (): Date => new Date();
+  const localCustodyOwnerCapability = Object.freeze(Object.create(null) as object);
+  const ceremonyCommands = new WeakSet<object>();
+  let ceremonyAttempted = false;
+  const issuer = createBscTestnetPtaWbnbPoolAuthorityIssuerForInternalUse(
+    Object.freeze({
+      now,
+      releaseTrust,
+      releaseTree,
+      authenticateLocalCustodyOwnerCapability: (value: unknown) =>
+        typeof value === "object" &&
+        value !== null &&
+        !isProxy(value) &&
+        value === localCustodyOwnerCapability
+    })
+  );
+
+  const nativeTtyPorts: BscTestnetPtaWbnbPoolOwnerCeremonyPorts = Object.freeze({
+    now,
+    writeChallenge: async (challenge: Uint8Array): Promise<void> => {
+      if (
+        stdin.isTTY !== true ||
+        stdout.isTTY !== true ||
+        isProxy(challenge) ||
+        !(challenge instanceof Uint8Array) ||
+        challenge.byteLength === 0 ||
+        challenge.byteLength > 8_192
+      ) {
+        throw new PoolSigningWorkerFailure("PRODUCTION_AUTHORIZATION_UNAVAILABLE");
+      }
+      await new Promise<void>((resolvePromise, rejectPromise) => {
+        stdout.write(challenge, (error) => {
+          if (error === null || error === undefined) resolvePromise();
+          else rejectPromise(new PoolSigningWorkerFailure("PRODUCTION_AUTHORIZATION_UNAVAILABLE"));
+        });
+      });
+    },
+    readExactConfirmation: async (
+      limits: Parameters<BscTestnetPtaWbnbPoolOwnerCeremonyPorts["readExactConfirmation"]>[0]
+    ): Promise<Uint8Array> => {
+      if (
+        stdin.isTTY !== true ||
+        stdout.isTTY !== true ||
+        stdin.readableEncoding !== null ||
+        stdin.listenerCount("data") !== 0 ||
+        stdin.listenerCount("readable") !== 0
+      ) {
+        throw new PoolSigningWorkerFailure("PRODUCTION_AUTHORIZATION_UNAVAILABLE");
+      }
+      const remaining = limits.notAfterMilliseconds - Date.now();
+      if (remaining <= 0) {
+        throw new PoolSigningWorkerFailure("PRODUCTION_AUTHORIZATION_UNAVAILABLE");
+      }
+      return new Promise<Uint8Array>((resolvePromise, rejectPromise) => {
+        const chunks: Buffer[] = [];
+        let retainedBytes = 0;
+        let settled = false;
+        const cleanup = (): void => {
+          clearTimeout(timer);
+          stdin.off("data", onData);
+          stdin.off("error", onError);
+          stdin.pause();
+        };
+        const fail = (): void => {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          for (const chunk of chunks) chunk.fill(0);
+          rejectPromise(new PoolSigningWorkerFailure("PRODUCTION_AUTHORIZATION_UNAVAILABLE"));
+        };
+        const finish = (): void => {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          const result = Buffer.concat(chunks, retainedBytes);
+          for (const chunk of chunks) chunk.fill(0);
+          resolvePromise(result);
+        };
+        const onError = (): void => fail();
+        const onData = (untrustedChunk: unknown): void => {
+          if (!Buffer.isBuffer(untrustedChunk) || settled) return fail();
+          const newlineIndex = untrustedChunk.indexOf(0x0a);
+          const framedLength = newlineIndex === -1 ? untrustedChunk.byteLength : newlineIndex;
+          let contentLength = framedLength;
+          if (
+            newlineIndex !== -1 &&
+            contentLength > 0 &&
+            untrustedChunk[contentLength - 1] === 0x0d
+          ) {
+            contentLength -= 1;
+          }
+          if (
+            retainedBytes + contentLength > limits.maximumBytes ||
+            (newlineIndex !== -1 && newlineIndex + 1 !== untrustedChunk.byteLength)
+          ) {
+            return fail();
+          }
+          const owned = Buffer.from(untrustedChunk.subarray(0, contentLength));
+          chunks.push(owned);
+          retainedBytes += owned.byteLength;
+          if (newlineIndex !== -1) finish();
+        };
+        const timer = setTimeout(fail, remaining);
+        stdin.once("error", onError);
+        stdin.on("data", onData);
+        stdin.resume();
+      });
+    }
+  });
+
+  const authority = Object.freeze({
+    authorize: (
+      descriptor: unknown,
+      command: unknown
+    ): BscTestnetPtaWbnbPoolProductionAuthorityResult => {
+      try {
+        if (
+          typeof command !== "object" ||
+          command === null ||
+          isProxy(command) ||
+          !ceremonyCommands.has(command)
+        ) {
+          return Object.freeze({
+            status: "blocked" as const,
+            intent: null,
+            executionCapability: null,
+            reviewDecisionDigest: null,
+            ownerAuthorizationDigest: null,
+            issue: Object.freeze({
+              code: "OWNER_CEREMONY_REQUIRED",
+              path: "command",
+              message: "Only the exact command confirmed in this process may authorize execution."
+            }),
+            boundary: issuer.boundary
+          });
+        }
+        ceremonyCommands.delete(command);
+        return issuer.authorize(descriptor, command, localCustodyOwnerCapability);
+      } catch {
+        return Object.freeze({
+          status: "blocked" as const,
+          intent: null,
+          executionCapability: null,
+          reviewDecisionDigest: null,
+          ownerAuthorizationDigest: null,
+          issue: Object.freeze({
+            code: "OWNER_CEREMONY_REQUIRED",
+            path: "command",
+            message: "The same-process owner ceremony command failed closed."
+          }),
+          boundary: issuer.boundary
+        });
+      }
+    },
+    authenticateAuthorizedIntent: issuer.authenticateAuthorizedIntent
+  });
+
+  const conductOwnerCeremony = async (
+    descriptor: BscTestnetPtaWbnbPoolOneShotPreparedDescriptor,
+    review: BscTestnetPtaWbnbPoolOwnerDesignatedReviewDecision
+  ): Promise<BscTestnetPtaWbnbPoolOwnerCeremonyResult> => {
+    if (ceremonyAttempted) {
+      return Object.freeze({
+        status: "blocked" as const,
+        command: null,
+        issue: Object.freeze({
+          code: "CEREMONY_ALREADY_ATTEMPTED",
+          path: "ceremony",
+          message: "This native authority realm permits only one owner ceremony attempt."
+        })
+      });
+    }
+    ceremonyAttempted = true;
+    const result = await conductBscTestnetPtaWbnbPoolOwnerCeremonyForInternalUse(
+      descriptor,
+      review,
+      releaseTrust,
+      releaseTree,
+      nativeTtyPorts
+    );
+    if (result.status === "confirmed") ceremonyCommands.add(result.command);
+    return result;
+  };
+
+  const issueWorker = (executionCapability: unknown): BscTestnetPtaWbnbPoolSigningWorker => {
+    if (!issuer.reserveExecutionCapabilityForWorker(executionCapability)) {
+      throw new PoolSigningWorkerFailure("PRODUCTION_AUTHORIZATION_UNAVAILABLE");
+    }
+    const inspectExactReleaseAndTree =
+      async (): Promise<BscTestnetPtaWbnbPoolSigningWorkerReleaseTrust> => {
+        const actual = await inspectBscTestnetPtaWbnbPoolSigningWorkerReleaseTrustForInternalUse();
+        const actualTree = await inspectExactPublishedReleaseTree(actual.releaseCommit);
+        if (actualTree !== releaseTree || !sameReleaseTrust(actual, releaseTrust)) {
+          throw new PoolSigningWorkerFailure("RELEASE_TRUST_INVALID");
+        }
+        return actual;
+      };
+    return createBscTestnetPtaWbnbPoolSigningWorkerForInternalUse(
+      Object.freeze({
+        now,
+        inspectReleaseTrust: inspectExactReleaseAndTree,
+        consumeWorkerAuthorization: async (request: BscTestnetPtaWbnbPoolSigningWorkerRequest) => {
+          const durable = await signingJournal.consumeWorkerAuthorization(request);
+          if (!issuer.consumeExecutionCapabilityAfterDurableStart(executionCapability, request)) {
+            throw new PoolSigningWorkerFailure("PRODUCTION_AUTHORIZATION_UNAVAILABLE");
+          }
+          return durable;
+        },
+        commitSignedTransaction: signingJournal.commitWorkerSignedTransaction,
+        attestExactTransaction: async (
+          rawTransaction: Hex,
+          request: BscTestnetPtaWbnbPoolSigningWorkerRequest,
+          transaction: BscTestnetPtaWbnbPoolExactSigningTransaction
+        ) => attestSignedTransaction(rawTransaction, Object.freeze({ request, transaction })),
+        signExactTransaction: nativeWindowsSignExactPoolTransaction
+      })
+    );
+  };
+
+  return Object.freeze({
+    releaseTrust,
+    releaseTree,
+    authority,
+    signingJournal,
+    conductOwnerCeremony,
+    issueWorker
   });
 }
 

@@ -141,6 +141,38 @@ function ownerAuthorization(reviewerDigest: Hex) {
   });
 }
 
+function ownerV2Authorization(reviewerDigest: Hex, ceremonyNonce = `0x${"44".repeat(32)}` as Hex) {
+  const legacy = ownerAuthorization(reviewerDigest);
+  const body = {
+    schemaVersion: 2,
+    kind: "exact_owner_signature_and_single_broadcast_authorization_v2",
+    decision: "authorize_one_chain_97_pool_initialization_signature_and_single_broadcast",
+    broadcastPolicy: "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity",
+    liquidityActionAuthorized: false,
+    operationKey: legacy.operationKey,
+    envelopeHash: legacy.envelopeHash,
+    releaseCommit: legacy.releaseCommit,
+    runtimeManifestSha256: legacy.runtimeManifestSha256,
+    reviewerApprovalDigest: legacy.reviewerApprovalDigest,
+    ownerIdentity: legacy.ownerIdentity,
+    authorizationTextSha256: legacy.authorizationTextSha256,
+    ceremonyNonce,
+    signingHash: legacy.signingHash,
+    gasLimit: legacy.gasLimit,
+    gasPriceWei: legacy.gasPriceWei,
+    maximumCostWei: legacy.maximumCostWei,
+    authorizedAt: legacy.authorizedAt,
+    expiresAt: legacy.expiresAt
+  } as const;
+  return deeplyFreeze({
+    ...body,
+    authorizationDigest: canonicalDigest(
+      BSC_TESTNET_PTA_WBNB_POOL_OWNER_AUTHORIZATION_DIGEST_DOMAIN,
+      body
+    )
+  });
+}
+
 function harness(options: { reviewer?: boolean; owner?: boolean } = {}) {
   const reviewer = reviewerApproval();
   const owner = ownerAuthorization(reviewer.approvalDigest);
@@ -204,6 +236,53 @@ describe("PTA/WBNB pool exact authorization composition", () => {
         }
       });
     }
+  });
+
+  it("binds the CSPRNG ceremony nonce into exact owner v2 receipt bytes", () => {
+    const reviewer = reviewerApproval();
+    const owner = ownerV2Authorization(reviewer.approvalDigest);
+    const ownerBrands = new WeakSet<object>([owner]);
+    const gate = createBscTestnetPtaWbnbPoolAuthorizationGateForTests({
+      asOf: () => new Date("2026-08-13T04:30:00.000Z"),
+      authenticateExternalReviewerApproval: (value: unknown) => value === reviewer,
+      authenticateOwnerEnvelopeAuthorization: (value: unknown) =>
+        typeof value === "object" && value !== null && ownerBrands.has(value)
+    });
+    expect(gate.authorize(descriptor(), reviewer, owner)).toMatchObject({ status: "authorized" });
+    for (const mutation of [
+      { ...owner, ceremonyNonce: `0x${"55".repeat(32)}` },
+      { ...owner, ceremonyNonce: `0x${"00".repeat(32)}` },
+      Object.fromEntries(Object.entries(owner).filter(([key]) => key !== "ceremonyNonce"))
+    ]) {
+      expect(gate.authorize(descriptor(), reviewer, deeplyFreeze(mutation))).toMatchObject({
+        status: "blocked",
+        issue: { code: "OWNER_AUTHORIZATION_INVALID" }
+      });
+    }
+
+    const wrongVersionBody = Object.fromEntries(
+      Object.entries(owner)
+        .filter(([key]) => key !== "authorizationDigest")
+        .map(([key, value]) => [key, key === "schemaVersion" ? 1 : value])
+    );
+    const wrongVersion = deeplyFreeze({
+      ...wrongVersionBody,
+      authorizationDigest: canonicalDigest(
+        BSC_TESTNET_PTA_WBNB_POOL_OWNER_AUTHORIZATION_DIGEST_DOMAIN,
+        wrongVersionBody
+      )
+    });
+    const wrongVersionBrands = new WeakSet<object>([wrongVersion]);
+    const wrongVersionGate = createBscTestnetPtaWbnbPoolAuthorizationGateForTests({
+      asOf: () => new Date("2026-08-13T04:30:00.000Z"),
+      authenticateExternalReviewerApproval: (value: unknown) => value === reviewer,
+      authenticateOwnerEnvelopeAuthorization: (value: unknown) =>
+        typeof value === "object" && value !== null && wrongVersionBrands.has(value)
+    });
+    expect(wrongVersionGate.authorize(descriptor(), reviewer, wrongVersion)).toMatchObject({
+      status: "blocked",
+      issue: { code: "OWNER_AUTHORIZATION_INVALID" }
+    });
   });
 
   it("rejects release/digest mutations, owner-reviewer identity reuse, accessors, symbols, and proxies", () => {
