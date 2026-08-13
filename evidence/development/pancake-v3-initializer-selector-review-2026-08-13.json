@@ -1,0 +1,867 @@
+{
+  "activationEligible": false,
+  "analyzedAt": "2026-08-13T04:07:11.940Z",
+  "artifactType": "pancake_v3_initializer_direct_selector_local_review",
+  "bindings": {
+    "compiler": {
+      "compilerInputSha256": "0x086382b3301a745dae7d0b66878cd1c1a4433cf7b1d7725efc546511811b3c38",
+      "compilerSettingsSha256": "0xa1af16a691f74364a753be9855c4f0865f1fef27a515a65ee0a866c991a6c1a1",
+      "evmVersion": "istanbul",
+      "longVersion": "0.7.6+commit.7338295f",
+      "metadata": {
+        "bytecodeHash": "none"
+      },
+      "name": "solc",
+      "optimizer": {
+        "enabled": true,
+        "runs": 2000
+      }
+    },
+    "historicalObservation": {
+      "blockHash": "0x1657811b903d77aa58f2a6a78a9536a71e98e36d60c13a6098b75f8962e1fc7c",
+      "blockNumber": "124767685",
+      "blockTimestampUtc": "2026-08-13T03:30:31.000Z",
+      "freshness": "historical_snapshot_requires_complete_refresh_before_any_confirmation",
+      "managerProxySlotsZeroAtCheckpoint": true,
+      "providerAgreementVerified": true,
+      "providerRoles": ["primary", "corroborator"],
+      "source": "evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json"
+    },
+    "managerRuntime": {
+      "byteLength": 24466,
+      "exactRetainedRuntimeBytesEqual": true,
+      "immutableLinkedRuntimeKeccak256": "0xd86730989544d7a3ea034c8a322733683137cf70b0f49231fd88405eac6098d7",
+      "immutableReferences": [
+        {
+          "astId": 6127,
+          "byteLength": 32,
+          "byteOffset": 692,
+          "name": "WETH9",
+          "value": "0x000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd"
+        },
+        {
+          "astId": 6119,
+          "byteLength": 32,
+          "byteOffset": 2775,
+          "name": "deployer",
+          "value": "0x00000000000000000000000041ff9aa7e16b8b1a8a8dc4f0efacd93d02d071c9"
+        },
+        {
+          "astId": 6123,
+          "byteLength": 32,
+          "byteOffset": 3598,
+          "name": "factory",
+          "value": "0x0000000000000000000000000bfbcf9fa4f9c56b0f40a671ad40e0805a091865"
+        },
+        {
+          "astId": 6123,
+          "byteLength": 32,
+          "byteOffset": 3797,
+          "name": "factory",
+          "value": "0x0000000000000000000000000bfbcf9fa4f9c56b0f40a671ad40e0805a091865"
+        },
+        {
+          "astId": 5625,
+          "byteLength": 32,
+          "byteOffset": 5390,
+          "name": "nameHash",
+          "value": "0xc8147ae4d95e1ae5d91d5822a926bbc8b3167bc4efcba3aad25887e8d7e1ada0"
+        },
+        {
+          "astId": 5628,
+          "byteLength": 32,
+          "byteOffset": 5423,
+          "name": "versionHash",
+          "value": "0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6"
+        },
+        {
+          "astId": 6127,
+          "byteLength": 32,
+          "byteOffset": 5960,
+          "name": "WETH9",
+          "value": "0x000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd"
+        },
+        {
+          "astId": 6127,
+          "byteLength": 32,
+          "byteOffset": 6206,
+          "name": "WETH9",
+          "value": "0x000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd"
+        },
+        {
+          "astId": 6127,
+          "byteLength": 32,
+          "byteOffset": 6342,
+          "name": "WETH9",
+          "value": "0x000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd"
+        },
+        {
+          "astId": 6119,
+          "byteLength": 32,
+          "byteOffset": 9238,
+          "name": "deployer",
+          "value": "0x00000000000000000000000041ff9aa7e16b8b1a8a8dc4f0efacd93d02d071c9"
+        },
+        {
+          "astId": 6123,
+          "byteLength": 32,
+          "byteOffset": 10955,
+          "name": "factory",
+          "value": "0x0000000000000000000000000bfbcf9fa4f9c56b0f40a671ad40e0805a091865"
+        },
+        {
+          "astId": 4574,
+          "byteLength": 32,
+          "byteOffset": 11057,
+          "name": "_tokenDescriptor",
+          "value": "0x000000000000000000000000b099b459887bc759dbf0293e12d3dfcd0c456cff"
+        },
+        {
+          "astId": 6119,
+          "byteLength": 32,
+          "byteOffset": 11198,
+          "name": "deployer",
+          "value": "0x00000000000000000000000041ff9aa7e16b8b1a8a8dc4f0efacd93d02d071c9"
+        },
+        {
+          "astId": 6119,
+          "byteLength": 32,
+          "byteOffset": 11928,
+          "name": "deployer",
+          "value": "0x00000000000000000000000041ff9aa7e16b8b1a8a8dc4f0efacd93d02d071c9"
+        },
+        {
+          "astId": 6119,
+          "byteLength": 32,
+          "byteOffset": 14133,
+          "name": "deployer",
+          "value": "0x00000000000000000000000041ff9aa7e16b8b1a8a8dc4f0efacd93d02d071c9"
+        },
+        {
+          "astId": 6127,
+          "byteLength": 32,
+          "byteOffset": 15967,
+          "name": "WETH9",
+          "value": "0x000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd"
+        },
+        {
+          "astId": 6127,
+          "byteLength": 32,
+          "byteOffset": 16037,
+          "name": "WETH9",
+          "value": "0x000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd"
+        },
+        {
+          "astId": 6127,
+          "byteLength": 32,
+          "byteOffset": 16153,
+          "name": "WETH9",
+          "value": "0x000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd"
+        }
+      ],
+      "runtimeTemplateKeccak256": "0x91d390a2f85270716bdc52a7782842724fee537f3f8c4e282ce31b98eea7807b"
+    },
+    "protocolImmutables": {
+      "factory": "0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865",
+      "poolDeployer": "0x41ff9aa7e16b8b1a8a8dc4f0efacd93d02d071c9",
+      "wrappedNative": "0xae13d989dac2f0debff460ac112a837c89baa7cd"
+    },
+    "retainedInputs": [
+      {
+        "name": "coreVerification",
+        "path": "evidence/development/pancake-v3-testnet-cake-wbnb-verification-2026-08-11.json",
+        "sha256": "0x9e8ef430166ede762685c25315e4907fbdafe44317ffea21a0366242cafed0f7"
+      },
+      {
+        "name": "deniedMulticalls",
+        "path": "evidence/development/pancake-v3-selector-paths/denied-multicalls.json",
+        "sha256": "0xb202c17f6ad5fa598a30039b84bc334c832ee67a2df03a1cc711e7786e065707"
+      },
+      {
+        "name": "factoryVendor",
+        "path": "contracts/testnet-fixed-asset/vendor/pancake-v3/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-core/contracts/PancakeV3Factory.sol",
+        "sha256": "0x6f4364c4b9761586f7b6eb71bf2344485e12eb01851419da4c1c81ad266d2a00"
+      },
+      {
+        "name": "initializerVendor",
+        "path": "contracts/testnet-fixed-asset/vendor/pancake-v3/ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57/projects/v3-periphery/contracts/base/PoolInitializer.sol",
+        "sha256": "0xed0d234b15dab205f874522cc4c76761b584ecdebd89a45cdf1edb3d5e84ab88"
+      },
+      {
+        "name": "readinessSummary",
+        "path": "evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json",
+        "sha256": "0x006701223ff9c39a7df2cc6c959346f41bbe6b546a0f75680886d0b87f8f56a8"
+      },
+      {
+        "name": "readinessTranscript",
+        "path": "evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json",
+        "sha256": "0xda8f495ac9fa9f5cfc55585d4d1889e4841e48ca317c3492fd5b3c3746ffe13d"
+      },
+      {
+        "name": "selectorManifest",
+        "path": "evidence/development/pancake-v3-selector-paths/manifest.json",
+        "sha256": "0xb3be7598147f254493ef42f3ce855835c77a3c6007dd03d24eb9e55cb74f81c0"
+      },
+      {
+        "name": "selectorReviewLibrary",
+        "path": "scripts/pancake-selector-review/review-lib.mjs",
+        "sha256": "0x9882a0adc797eddcb10376c1a0eed5418a1774a0f4762730052dda4d829d9e6c"
+      },
+      {
+        "name": "sourceReproduction",
+        "path": "evidence/development/pancake-v3-source-reproduction-2026-08-11.json",
+        "sha256": "0x4f20e42da5e141ebe94a1d79470efd6e9dd7d7b12df99389a1fd360dccfceaca"
+      },
+      {
+        "name": "sourceSupplement",
+        "path": "evidence/development/pancake-v3-source-reproduction-supplement-2026-08-11.json",
+        "sha256": "0x3b5d642bc62799d3fd95746e5063fb34cd0c066679a851cbe54a7e54cfad451e"
+      }
+    ],
+    "source": {
+      "buildInfoSha256": "0xff2166c707d60e451ff80e6096d9b2e792eb23a27d27964299ec203fb8d763b7",
+      "commit": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+      "compiledSourceBindings": [
+        {
+          "compilerPath": "contracts/NonfungiblePositionManager.sol",
+          "repositoryPath": "projects/v3-periphery/contracts/NonfungiblePositionManager.sol",
+          "sha256": "0xf49775d339101d0ab836bc68fb283fc87f24ddcb73d9f70a777003b6e82f3e88"
+        },
+        {
+          "compilerPath": "contracts/base/PoolInitializer.sol",
+          "repositoryPath": "projects/v3-periphery/contracts/base/PoolInitializer.sol",
+          "sha256": "0xed0d234b15dab205f874522cc4c76761b584ecdebd89a45cdf1edb3d5e84ab88"
+        },
+        {
+          "compilerPath": "contracts/base/Multicall.sol",
+          "repositoryPath": "projects/v3-periphery/contracts/base/Multicall.sol",
+          "sha256": "0x029ad0bcade48ff32da51094a3fb245fd7d8324c4fb4dd20fb4b2614efc9618c"
+        },
+        {
+          "compilerPath": "contracts/interfaces/IPoolInitializer.sol",
+          "repositoryPath": "projects/v3-periphery/contracts/interfaces/IPoolInitializer.sol",
+          "sha256": "0x1c6c3661807129156f46ac0e3a8a582a2600cbfe983751b79844981b573ac33a"
+        },
+        {
+          "compilerPath": "@pancakeswap/v3-core/contracts/interfaces/IPancakeV3Factory.sol",
+          "repositoryPath": "projects/v3-core/contracts/interfaces/IPancakeV3Factory.sol",
+          "sha256": "0x390685b7ff3fe9d4a0895fc9a420402dd0ce01adb6dc7137c022d68c65a66bdd"
+        },
+        {
+          "compilerPath": "@pancakeswap/v3-core/contracts/interfaces/IPancakeV3Pool.sol",
+          "repositoryPath": "projects/v3-core/contracts/interfaces/IPancakeV3Pool.sol",
+          "sha256": "0x9e6d78a58ddc4b62ecc5e048f50c74daf084b4b035b4073c190864d09dfc05f9"
+        },
+        {
+          "compilerPath": "@pancakeswap/v3-core/contracts/interfaces/pool/IPancakeV3PoolActions.sol",
+          "repositoryPath": "projects/v3-core/contracts/interfaces/pool/IPancakeV3PoolActions.sol",
+          "sha256": "0x362a9ee3ca6dbfd3d53129113ddc400f297fe35d1be88fc1ec6ea24da44eb696"
+        },
+        {
+          "compilerPath": "@pancakeswap/v3-core/contracts/interfaces/pool/IPancakeV3PoolState.sol",
+          "repositoryPath": "projects/v3-core/contracts/interfaces/pool/IPancakeV3PoolState.sol",
+          "sha256": "0x927132adb0fea744a5f88fefdbca7e1a0f518c58f8cdbb74475fe0f83f863e58"
+        }
+      ],
+      "gitArchiveSha256": "0xb3cd0b3fd4563287f587c2776eac78e5b5a4ad98f6c805a005df10727bee782d",
+      "managerArtifactSha256": "0x9e5bca807e38e9e8acadd81c5dec6668f847a7e3397d91b3afed74b066cfbb2a",
+      "repository": "https://github.com/pancakeswap/pancake-v3-contracts.git"
+    }
+  },
+  "blockers": [
+    {
+      "blocks": "pool_submission",
+      "id": "public_content_addressed_initializer_attestation",
+      "resolution": "Publish and independently re-fetch these exact canonical bytes, then retain authenticated independent approval for this direct-only scope.",
+      "status": "open"
+    },
+    {
+      "blocks": "pool_submission",
+      "id": "fresh_complete_exact_block_preflight",
+      "resolution": "Repeat the two-provider finalized manager/factory/deployer runtime, proxy, immutable, fee-tier, getPool, candidate-code, nonce, owner, LM and sender-state reads immediately before confirmation.",
+      "status": "open"
+    },
+    {
+      "blocks": "accepting_pool_creation",
+      "id": "dynamic_pool_runtime_and_receipt_reconciliation",
+      "resolution": "After a separately approved transaction, require the exact PoolCreated log, factory getPool, CREATE2 address, deployed runtime/immutables, slot0, token ordering and receipt finality; reject any raced or differently initialized result.",
+      "status": "open"
+    },
+    {
+      "blocks": "pool_submission",
+      "id": "bounded_execution_envelope_and_explicit_confirmation",
+      "resolution": "Separately bind sender, nonce, exact calldata, zero value, gas/fee/tBNB caps, short external broadcast window, one-shot state, replacement reconciliation and explicit user confirmation.",
+      "status": "open"
+    }
+  ],
+  "claimStatus": "local_control_path_review_complete_public_attestation_and_fresh_preflight_missing",
+  "decision": {
+    "authorizesMulticall": false,
+    "authorizesSignature": false,
+    "authorizesTransaction": false,
+    "authorizesWalletUse": false,
+    "directSelectorLocallyReviewed": true,
+    "executionReady": false,
+    "publicAttestationReady": false,
+    "status": "blocked"
+  },
+  "directWriteScope": {
+    "allUnlistedSelectorsDenied": true,
+    "allowedDirectSelectors": ["0x13ead562"],
+    "allowedDirectSignatures": [
+      "createAndInitializePoolIfNecessary(address,address,uint24,uint160)"
+    ],
+    "doesNotInclude": [
+      "token approvals",
+      "token transfers",
+      "liquidity minting",
+      "LP NFT creation",
+      "position authority",
+      "a market-price assertion",
+      "a transaction envelope",
+      "a signature or broadcast"
+    ],
+    "exactNativeValueBaseUnits": "0",
+    "externalEffects": [
+      {
+        "condition": "always",
+        "effect": "read_only",
+        "signature": "getPool(address,address,uint24)",
+        "target": "0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865"
+      },
+      {
+        "condition": "factory getPool returns zero",
+        "effect": "factory mappings plus CREATE2 deployment through the pinned pool deployer",
+        "signature": "createPool(address,address,uint24)",
+        "target": "0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865"
+      },
+      {
+        "condition": "factory returned or created pool",
+        "effect": "read slot0; initialize pool slot0 and first oracle observation only when uninitialized",
+        "signatures": ["slot0()", "initialize(uint160)"],
+        "target": "dynamic_factory_authenticated_pool"
+      }
+    ],
+    "managerStorageWritesOnSourcePath": [],
+    "maxTopLevelCalls": 1,
+    "nestedCalldataDenied": true,
+    "requiredDynamicTargetValidation": "The pool address must equal the same-block factory getPool result and, on creation, the independently compiler-bound CREATE2 derivation before any receipt is accepted.",
+    "targetAddress": "0x427bf5b37357632377ecbec9de3626c71a5396c1",
+    "targetChainId": 97
+  },
+  "integrity": {
+    "canonicalBodySha256": "0x948ce9f79c2fb76a4c0b97cb0630770398b39a7a12f335501b902b3a744e8661",
+    "canonicalization": "recursive_lexicographic_object_keys_json_stringify_v1"
+  },
+  "limitations": [
+    "This is deterministic manual/static analysis support, not formal verification or exhaustive symbolic execution.",
+    "Source-map intersection can include optimizer-shared instructions and does not alone prove every runtime transition.",
+    "Core write effects are bounded to exact source-function hashes plus retained historical runtime evidence; this artifact does not claim a fresh deployed candidate pool.",
+    "The retained exact-block observation is historical and cannot establish current state.",
+    "A local repository artifact is not an eligible public HTTPS/IPFS attestation.",
+    "No authenticated independent reviewer or public-byte retrieval is recorded."
+  ],
+  "multicallAbsorptionBoundary": {
+    "allUnlistedSelectorsDenied": true,
+    "decision": "deny_every_multicall_outer_selector_and_any_nested_initializer_calldata",
+    "deniedOuterSelectors": [
+      {
+        "selector": "0xac9650d8",
+        "signature": "multicall(bytes[])"
+      },
+      {
+        "selector": "0x5ae401dc",
+        "signature": "multicall(uint256,bytes[])"
+      },
+      {
+        "selector": "0x1f0464d1",
+        "signature": "multicall(bytes32,bytes[])"
+      }
+    ],
+    "directOnlyPolicyAbsorbsNestedCall": false,
+    "initializerDirectSourceMappedDelegatecallPcs": [],
+    "nestedCalldataDenied": true,
+    "reason": "The manager runtime contains the official self-DELEGATECALL multicall entrypoint; therefore an outer multicall could execute this initializer unless the outer selector and nested calldata are rejected before signing.",
+    "retainedBoundaryArtifact": "evidence/development/pancake-v3-selector-paths/denied-multicalls.json",
+    "runtimeWideSelfDelegatecallPc": 10522
+  },
+  "mutableDependencies": {
+    "candidatePool": {
+      "address": "0x30b07e82d7181a53ae2ea98cd08b6733ffd831ae",
+      "runtimeSourceIdentityAvailableNow": false,
+      "status": "historically_empty_counterfactual_address_not_a_reservation"
+    },
+    "factory": {
+      "address": "0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865",
+      "feeTierStateMutable": true,
+      "lmPoolDeployer": "0x7f1745eb74d26877ec54dd9a317cc930ad01350c",
+      "owner": "0x261af0030618a52fa767997ed310174b3bc3b77f",
+      "ownerCapabilities": [
+        "setOwner(address)",
+        "enableFeeAmount(uint24,int24)",
+        "setWhiteListAddress(address,bool)",
+        "setFeeAmountExtraInfo(uint24,bool,bool)",
+        "setLmPoolDeployer(address)",
+        "setFeeProtocol(address,uint32,uint32)",
+        "collectProtocol(address,address,uint128,uint128)",
+        "setLmPool(address,address)"
+      ],
+      "poolDeployer": "0x41ff9aa7e16b8b1a8a8dc4f0efacd93d02d071c9",
+      "runtimeKeccak256": "0x8191d3ab1d55d3da9822199f28865415c99566b6f1aee4a4b16713f57930678c"
+    },
+    "lmPoolDeployer": {
+      "address": "0x7f1745eb74d26877ec54dd9a317cc930ad01350c",
+      "capability": "setLmPool(address,address) through the factory owner-or-LM-deployer gate",
+      "sourceIdentityReviewedForThisArtifact": false
+    },
+    "observedAtHistoricalBlock": "124767685",
+    "poolDeployer": {
+      "address": "0x41ff9aa7e16b8b1a8a8dc4f0efacd93d02d071c9",
+      "deployCallerRestrictedToFactory": true,
+      "factoryAddress": "0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865",
+      "historicalSetterBoundary": "setFactoryAddress was unrestricted but one-shot; retained state shows it already bound to the expected factory. A fresh read is still required.",
+      "runtimeKeccak256": "0xedd527f11646c1912dfc51b57ffa0ee27972f8798bcaf7bc68ae6ad054b6022b"
+    },
+    "risk": "The owner can change fee-tier enabled and whitelist flags and protocol/LM controls after this checkpoint. The LM deployer is observed but not source-admitted by this snapshot."
+  },
+  "publication": {
+    "activationEligible": false,
+    "authenticatedIndependentReviewer": null,
+    "eligibleAsDomainEvidenceReference": false,
+    "independentRetrieval": null,
+    "publicContentAddressedLocator": null,
+    "status": "blocked_local_bytes_not_published_or_independently_refetched",
+    "unmetRequirements": [
+      "Publish the exact canonical artifact bytes at a stable content-addressed HTTPS or IPFS locator.",
+      "Independently re-fetch those public bytes without redirects and bind the whole-file SHA-256.",
+      "Retain an authenticated independent reviewer identity and approval bound to this exact direct-only scope."
+    ]
+  },
+  "reproduction": {
+    "acceptsCallerSelectedOutputPath": false,
+    "checkCommand": "node scripts/pancake-initializer-review/generate.mjs --source-root <clean-compiled-source-root> --check",
+    "prerequisites": [
+      "Pinned PancakeSwap source checkout at ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+      "Existing compile-only Position Manager artifact and build-info matching the recorded digests",
+      "Git and Node.js"
+    ],
+    "readsEnvironmentConfiguration": false,
+    "readsNetwork": false,
+    "testCommand": "node --test scripts/pancake-initializer-review/review.test.mjs",
+    "writeCommand": "node scripts/pancake-initializer-review/generate.mjs --source-root <clean-compiled-source-root> --write",
+    "writesOnlyFixedEvidencePath": "evidence/development/pancake-v3-initializer-selector-review-2026-08-13.json"
+  },
+  "schemaVersion": 1,
+  "securityBoundary": {
+    "environmentConfigurationRead": false,
+    "networkReadPerformedByGenerator": false,
+    "onchainWritePerformed": false,
+    "privateKeyRead": false,
+    "secretIncluded": false,
+    "signatureRequested": false,
+    "signerLoaded": false,
+    "testnetOnly": true,
+    "transactionBroadcast": false,
+    "transactionConstructed": false,
+    "walletUsed": false
+  },
+  "selectorPath": {
+    "abi": {
+      "inputs": ["address", "address", "uint24", "uint160"],
+      "output": "address",
+      "payable": true,
+      "selectorDerivation": "first4(keccak256(utf8(canonical signature)))"
+    },
+    "bytecodeAnalysis": {
+      "dispatcherEntry": {
+        "comparePc": 564,
+        "destinationPc": 1019,
+        "jumpiPc": 573,
+        "selector": "0x13ead562"
+      },
+      "initializerMappedEffectInstructions": [
+        {
+          "jump": "-",
+          "length": 55,
+          "modifierDepth": 0,
+          "offset": 735,
+          "opcode": "STATICCALL",
+          "pc": 3738,
+          "sourcePath": "contracts/base/PoolInitializer.sol"
+        },
+        {
+          "jump": "-",
+          "length": 58,
+          "modifierDepth": 0,
+          "offset": 849,
+          "opcode": "CALL",
+          "pc": 3939,
+          "sourcePath": "contracts/base/PoolInitializer.sol"
+        },
+        {
+          "jump": "-",
+          "length": 45,
+          "modifierDepth": 0,
+          "offset": 922,
+          "opcode": "CALL",
+          "pc": 4086,
+          "sourcePath": "contracts/base/PoolInitializer.sol"
+        },
+        {
+          "jump": "-",
+          "length": 28,
+          "modifierDepth": 0,
+          "offset": 1045,
+          "opcode": "STATICCALL",
+          "pc": 4174,
+          "sourcePath": "contracts/base/PoolInitializer.sol"
+        },
+        {
+          "jump": "-",
+          "length": 45,
+          "modifierDepth": 0,
+          "offset": 1138,
+          "opcode": "CALL",
+          "pc": 4313,
+          "sourcePath": "contracts/base/PoolInitializer.sol"
+        }
+      ],
+      "initializerMappedInstructionCount": 438,
+      "initializerMappedInstructionSetSha256": "0xebfed88e80350553f9faabec4c3b1cd7a28ec46a3df1fecfd6dffbc92f35f95e",
+      "initializerMappedPcRanges": [
+        {
+          "endPc": 1037,
+          "instructionCount": 10,
+          "startPc": 1019
+        },
+        {
+          "endPc": 3567,
+          "instructionCount": 3,
+          "startPc": 3564
+        },
+        {
+          "endPc": 3577,
+          "instructionCount": 2,
+          "startPc": 3576
+        },
+        {
+          "endPc": 3597,
+          "instructionCount": 9,
+          "startPc": 3586
+        },
+        {
+          "endPc": 3666,
+          "instructionCount": 18,
+          "startPc": 3638
+        },
+        {
+          "endPc": 3681,
+          "instructionCount": 6,
+          "startPc": 3675
+        },
+        {
+          "endPc": 3777,
+          "instructionCount": 69,
+          "startPc": 3690
+        },
+        {
+          "endPc": 3780,
+          "instructionCount": 2,
+          "startPc": 3779
+        },
+        {
+          "endPc": 3796,
+          "instructionCount": 5,
+          "startPc": 3790
+        },
+        {
+          "endPc": 3865,
+          "instructionCount": 18,
+          "startPc": 3837
+        },
+        {
+          "endPc": 3880,
+          "instructionCount": 6,
+          "startPc": 3874
+        },
+        {
+          "endPc": 3978,
+          "instructionCount": 70,
+          "startPc": 3889
+        },
+        {
+          "endPc": 4019,
+          "instructionCount": 7,
+          "startPc": 3980
+        },
+        {
+          "endPc": 4039,
+          "instructionCount": 11,
+          "startPc": 4028
+        },
+        {
+          "endPc": 4056,
+          "instructionCount": 11,
+          "startPc": 4041
+        },
+        {
+          "endPc": 4067,
+          "instructionCount": 8,
+          "startPc": 4060
+        },
+        {
+          "endPc": 4115,
+          "instructionCount": 37,
+          "startPc": 4069
+        },
+        {
+          "endPc": 4213,
+          "instructionCount": 65,
+          "startPc": 4124
+        },
+        {
+          "endPc": 4216,
+          "instructionCount": 2,
+          "startPc": 4215
+        },
+        {
+          "endPc": 4232,
+          "instructionCount": 5,
+          "startPc": 4226
+        },
+        {
+          "endPc": 4267,
+          "instructionCount": 16,
+          "startPc": 4241
+        },
+        {
+          "endPc": 4344,
+          "instructionCount": 58,
+          "startPc": 4276
+        }
+      ],
+      "runtimeWideCallcodePcs": [],
+      "runtimeWideDelegatecallPcs": [10522],
+      "runtimeWideSelfdestructPcs": [],
+      "sourceMapBoundary": {
+        "lastSourceMappedOpcode": "REVERT",
+        "lastSourceMappedPc": 23915,
+        "sourceMappedInstructionCount": 15050,
+        "trailingCompilerDataByteLength": 550
+      },
+      "wrapper": {
+        "abiDecoderPc": 20823,
+        "bodyPc": 3564,
+        "decoderReturnPc": 1033,
+        "wrapperPc": 1019
+      }
+    },
+    "callGraph": {
+      "coreWriteFunctions": [
+        {
+          "contract": "PancakeV3Factory",
+          "functionName": "createPool",
+          "functionSliceSha256": "0xe640d51eb6e912168c08854f70253a769c85b2f07d3f0aba489af84cd3f419a0",
+          "lineEnd": 80,
+          "lineStart": 60,
+          "repositoryPath": "projects/v3-core/contracts/PancakeV3Factory.sol",
+          "sourceSha256": "0x6f4364c4b9761586f7b6eb71bf2344485e12eb01851419da4c1c81ad266d2a00"
+        },
+        {
+          "contract": "PancakeV3PoolDeployer",
+          "functionName": "deploy",
+          "functionSliceSha256": "0x9fc0907236ff253d9477e4eaa73f499d2c9de489ec3ef4a4009c96f861f31f00",
+          "lineEnd": 55,
+          "lineStart": 45,
+          "repositoryPath": "projects/v3-core/contracts/PancakeV3PoolDeployer.sol",
+          "sourceSha256": "0x2189a9d27ee5726c9a863b8b0576055bb13356676264638709ffddf7d6077fad"
+        },
+        {
+          "contract": "PancakeV3Pool",
+          "functionName": "initialize",
+          "functionSliceSha256": "0x81e3a96ca71cb16b229e858052f13b361c218b84eeb7127ab594e51c424c300c",
+          "lineEnd": 309,
+          "lineStart": 281,
+          "repositoryPath": "projects/v3-core/contracts/PancakeV3Pool.sol",
+          "sourceSha256": "0x674c5cedce8dd511108b8d104d6332113dc1ba9ab6da9b3498b5896e97a33265"
+        }
+      ],
+      "edges": [
+        "PositionManager.createAndInitializePoolIfNecessary -> Factory.getPool",
+        "PositionManager.createAndInitializePoolIfNecessary -> Factory.createPool [only when getPool is zero]",
+        "Factory.createPool -> PoolDeployer.deploy [only when creation branch passes factory checks]",
+        "PoolDeployer.deploy -> PancakeV3Pool.constructor [CREATE2]",
+        "PositionManager.createAndInitializePoolIfNecessary -> Pool.initialize [new pool]",
+        "PositionManager.createAndInitializePoolIfNecessary -> Pool.slot0 [existing pool]",
+        "PositionManager.createAndInitializePoolIfNecessary -> Pool.initialize [existing but uninitialized pool]"
+      ],
+      "nodes": [
+        "PositionManager.createAndInitializePoolIfNecessary",
+        "Factory.getPool",
+        "Factory.createPool",
+        "PoolDeployer.deploy",
+        "PancakeV3Pool.constructor",
+        "Pool.slot0",
+        "Pool.initialize"
+      ]
+    },
+    "pathSemantics": [
+      "token0 must be strictly lower than token1 or the direct call reverts.",
+      "The manager first reads factory.getPool(token0, token1, fee).",
+      "If absent, the factory may create a CREATE2 pool through its pinned pool deployer, records both getPool directions, and the manager initializes the new pool.",
+      "If a pool exists, the manager reads slot0 and initializes only when the existing sqrt price is zero.",
+      "If an existing pool is already initialized, the requested sqrtPriceX96 is ignored and no re-price is enforced.",
+      "The initializer has no deadline and no onchain block-time or block-height check."
+    ],
+    "sourceAnalysis": {
+      "blockTimeOrHeightReadNodes": [],
+      "branchConditions": [
+        {
+          "conditionSha256": "0x16336c4bdd35a7206137eab98cc258384bb0861dfb4080a4c3ad58166ad2f8c9",
+          "line": 22,
+          "nodeId": 6469,
+          "span": {
+            "length": 18,
+            "offset": 807,
+            "sourceId": 36
+          }
+        },
+        {
+          "conditionSha256": "0x18f59476b6045f6e2dc18d5c9e70b3a8fbf089a4375166539d9482282a234c11",
+          "line": 27,
+          "nodeId": 6467,
+          "span": {
+            "length": 25,
+            "offset": 1092,
+            "sourceId": 36
+          }
+        }
+      ],
+      "explicitCallOptionNodes": [],
+      "externalCalls": [
+        {
+          "callSiteSha256": "0xb74a479af26369723c6cf017bff8c33d78c157c51123c352fc0a78789ca6c9c2",
+          "line": 20,
+          "memberName": "getPool",
+          "nodeId": 6420,
+          "receiverType": "contract IPancakeV3Factory",
+          "signature": "getPool(address,address,uint24)",
+          "span": {
+            "length": 55,
+            "offset": 735,
+            "sourceId": 36
+          },
+          "stateMutability": "view",
+          "targetDefinitionId": 3221,
+          "targetSourcePath": "@pancakeswap/v3-core/contracts/interfaces/IPancakeV3Factory.sol"
+        },
+        {
+          "callSiteSha256": "0xa3710b1edd22ac87b014df0a3c58823651b2c8ad54925dad9e093297ad7564c0",
+          "line": 23,
+          "memberName": "createPool",
+          "nodeId": 6437,
+          "receiverType": "contract IPancakeV3Factory",
+          "signature": "createPool(address,address,uint24)",
+          "span": {
+            "length": 58,
+            "offset": 849,
+            "sourceId": 36
+          },
+          "stateMutability": "nonpayable",
+          "targetDefinitionId": 3233,
+          "targetSourcePath": "@pancakeswap/v3-core/contracts/interfaces/IPancakeV3Factory.sol"
+        },
+        {
+          "callSiteSha256": "0x80e1a9cc43ef1c8bd474bc6f6ad4985a73a6dff1699dfe4afba3f12dfce0e513",
+          "line": 24,
+          "memberName": "initialize",
+          "nodeId": 6445,
+          "receiverType": "contract IPancakeV3Pool",
+          "signature": "initialize(uint160)",
+          "span": {
+            "length": 45,
+            "offset": 922,
+            "sourceId": 36
+          },
+          "stateMutability": "nonpayable",
+          "targetDefinitionId": 3347,
+          "targetSourcePath": "@pancakeswap/v3-core/contracts/interfaces/pool/IPancakeV3PoolActions.sol"
+        },
+        {
+          "callSiteSha256": "0x040ace5847438e09fefeb124f74a3048b385680667dd6bb003212ed4bf54750e",
+          "line": 26,
+          "memberName": "slot0",
+          "nodeId": 6454,
+          "receiverType": "contract IPancakeV3Pool",
+          "signature": "slot0()",
+          "span": {
+            "length": 28,
+            "offset": 1045,
+            "sourceId": 36
+          },
+          "stateMutability": "view",
+          "targetDefinitionId": 3681,
+          "targetSourcePath": "@pancakeswap/v3-core/contracts/interfaces/pool/IPancakeV3PoolState.sol"
+        },
+        {
+          "callSiteSha256": "0x80e1a9cc43ef1c8bd474bc6f6ad4985a73a6dff1699dfe4afba3f12dfce0e513",
+          "line": 28,
+          "memberName": "initialize",
+          "nodeId": 6464,
+          "receiverType": "contract IPancakeV3Pool",
+          "signature": "initialize(uint160)",
+          "span": {
+            "length": 45,
+            "offset": 1138,
+            "sourceId": 36
+          },
+          "stateMutability": "nonpayable",
+          "targetDefinitionId": 3347,
+          "targetSourcePath": "@pancakeswap/v3-core/contracts/interfaces/pool/IPancakeV3PoolActions.sol"
+        }
+      ],
+      "function": {
+        "definitionId": 6471,
+        "line": 13,
+        "signature": "createAndInitializePoolIfNecessary(address,address,uint24,uint160)",
+        "sourcePath": "contracts/base/PoolInitializer.sol",
+        "sourceSliceSha256": "0x6456a743b454f41a31c5642a6da87394c4a5eef2178ce496ac0f5793ea88d626",
+        "span": {
+          "length": 737,
+          "offset": 480,
+          "sourceId": 36
+        },
+        "stateMutability": "payable",
+        "visibility": "external"
+      },
+      "guardConditions": [
+        {
+          "conditionSha256": "0xb040ec060db242d445424581985a18ccccd04ba09126a450461338a85a3e4825",
+          "line": 19,
+          "nodeId": 6410,
+          "span": {
+            "length": 15,
+            "offset": 701,
+            "sourceId": 36
+          }
+        }
+      ],
+      "lowLevelCallNodes": [],
+      "managerStateWriteNodes": []
+    }
+  },
+  "target": {
+    "address": "0x427bf5b37357632377ecbec9de3626c71a5396c1",
+    "chain": "BNB Smart Chain Testnet",
+    "chainId": 97,
+    "contract": "NonfungiblePositionManager",
+    "requiredNativeValueBaseUnits": "0",
+    "selector": "0x13ead562",
+    "signature": "createAndInitializePoolIfNecessary(address,address,uint24,uint160)"
+  },
+  "tooling": {
+    "generatorSha256": "0xcb25489069b0c1dc8557f9acdab388ad5f549a45fd44711ec0c495cd408193c0",
+    "reviewLibrarySha256": "0xc27f645b8498ec9cb56c026bcfbaa111aa0bd82094e444a6c4ad608190e95647",
+    "selectorReviewKeccakDependencySha256": "0x9882a0adc797eddcb10376c1a0eed5418a1774a0f4762730052dda4d829d9e6c"
+  }
+}

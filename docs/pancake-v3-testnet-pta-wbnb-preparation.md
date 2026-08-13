@@ -1,17 +1,19 @@
 # PancakeSwap V3 BSC testnet PTA/WBNB pool readiness
 
-Updated: 2026-08-13. Decision: **read-only preparation recorded; no pool or write is
-approved**.
+Updated: 2026-08-13. Decision: **exact offline provenance and a non-authorizing read-only
+preflight boundary are recorded; no pool or write is approved**.
 
 Machine record:
 [`evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json`](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json)
 
 ## Scope
 
-This is a BNB Smart Chain testnet and PancakeSwap V3 preparation milestone. The observation used local
-ProofEra tooling and two official credential-free BNB Chain RPC endpoints. Capture created only the
-fixed public evidence file; it made no onchain RPC write, approval, signature, broadcast, pool
-creation, token wrapping, liquidity mint, swap, or mainnet action.
+This is a BNB Smart Chain testnet and PancakeSwap V3 preparation milestone. The historical observation
+used local ProofEra tooling and two official credential-free BNB Chain RPC endpoints. Capture created
+only fixed public evidence files. The later compiler and selector reviews run offline, and the new
+server-only coordinator is structurally unable to authorize signing or execution. None of these paths
+made an onchain RPC write, approval, signature, broadcast, pool creation, token wrapping, liquidity
+mint, swap, or mainnet action.
 
 The evidence answers a narrow question: what exact chain-97 state and review inputs would a future
 PTA/WBNB pool initializer have to bind? It does not answer whether the pair has a market price, is
@@ -77,15 +79,24 @@ For PTA as `token0`, WBNB as `token1`, and fee `500`, the retained derivation in
 | Retained init-code hash    | `0x6ce8eb472fa82df5469c6ab6d485f17c3ad13c8cd7af59b3d4a8026c5ce0f7e2` |
 | Conditional pool candidate | `0x30b07e82d7181a53Ae2EA98Cd08b6733Ffd831aE`                         |
 
-The candidate is deterministic only if the retained pool creation-code hash and deployer derivation
-are the exact deployed construction path. That compiler/artifact proof has not yet been independently
-bound, so ProofEra does **not** promote the candidate to a verified pool address. The factory returned
-zero for fee `500`, and the candidate returned empty code and account nonce zero at the checkpoint; no
-receipt or `PoolCreated` event is claimed for it.
+The exact compiler/artifact blocker is now closed for the retained construction path. The offline
+[init-code provenance record](../evidence/development/pancake-v3-pool-init-code-provenance-2026-08-13.json)
+binds official PancakeSwap commit `ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57`, its source archive and
+individual source blobs, the complete standard-JSON compiler inputs, and the SHA-256-pinned native
+`solc 0.7.6+commit.7338295f` binary. The exact native rerun matches the retained Hardhat artifacts. It
+reproduces the 23,566-byte `PancakeV3Pool` creation code and its Keccak-256
+`0x6ce8eb472fa82df5469c6ab6d485f17c3ad13c8cd7af59b3d4a8026c5ce0f7e2`, matches the
+24,556-byte pool-deployer runtime to the retained chain-97 runtime, matches the immutable-patched
+factory runtime, and cross-checks the same CREATE2 formula against the retained CAKE/WBNB fee-500
+pool.
 
-Before any initializer submission, an independent retained compiler/artifact reproduction must bind
-the init code hash, then the predicted address, factory `getPool`, candidate code, deployer lineage,
-and eventual `PoolCreated` receipt must all agree.
+That makes `0x30b07e82d7181a53Ae2EA98Cd08b6733Ffd831aE` the exact **conditional** address for
+the retained source/compiler/deployer path. It does not turn the address into a reservation or an
+existing pool. The historical factory result remained zero, and the candidate had empty code and
+account nonce zero at that checkpoint. No current-state freshness, receipt, `PoolCreated` event, pool
+runtime, or ownership claim follows from the offline reproduction. Before accepting any initializer
+outcome, fresh factory/candidate state, deployed lineage, the receipt, event, and post-state must all
+agree.
 
 ## Proposed non-economic initialization scenario
 
@@ -109,6 +120,43 @@ initialization fixes starting state but adds no liquidity and creates no LP NFT.
 `createAndInitializePoolIfNecessary` to observe a pool initialized by another party, so the requested
 price cannot be treated as the mined outcome without receipt and post-state reconciliation.
 
+## Local initializer selector review
+
+The retained
+[initializer selector review](../evidence/development/pancake-v3-initializer-selector-review-2026-08-13.json)
+locally binds direct selector `0x13ead562` to
+`createAndInitializePoolIfNecessary(address,address,uint24,uint160)` on the exact chain-97 Position
+Manager. It connects the pinned source slice, ABI, compiler artifact, source map, dispatcher entry,
+runtime instructions, and direct call graph through factory `getPool`/`createPool`, pool-deployer
+CREATE2, and pool `slot0`/`initialize`. The review also records that the function is payable but the
+ProofEra tuple requires native value zero, that it has no deadline, that an already initialized pool
+can make the requested price irrelevant, and that every Multicall outer selector and nested
+initializer encoding remains denied.
+
+This is deterministic manual/static analysis support, not formal verification. Its canonical bytes
+exist only in this local repository. There is no stable content-addressed public locator, independent
+no-redirect re-fetch, or authenticated independent reviewer bound to the exact direct-only scope, so
+the artifact remains ineligible for activation and authorizes no signature or transaction.
+
+## Server-only non-authorizing preflight boundary
+
+The integrations package now has a fixed-purpose, server-only coordinator that reads exactly two
+official BNB Chain testnet RPC origins and fails closed. It finds their common finalized block and uses
+EIP-1898 `{blockHash, requireCanonical: true}` selectors for finalized runtime, EIP-1967 proxy-slot,
+factory/deployer/manager relationship, fee-tier, candidate, sender-code, and nonce checks. It then
+requires matching latest/pending nonce and empty-pool state, candidate code/nonce absence, the exact
+zero-value initializer simulation returning the conditional address, two-provider agreement, sender
+balance, and fixed estimate/gas-price/total-cost caps.
+
+On success it can create only a 45-second, digest-bound unsigned observation envelope whose
+`signingReady`, `signingAuthorized`, and `executionAuthorized` flags are always false. The one-shot
+module validates that envelope and describes the exact future atomic-claim/signing requirements, but
+it accepts no custody, signer, journal, transport, or broadcast dependency. Its journal and signer
+types are specification-only: no durable pool-initialization journal, authorization receipt issuer, or
+signer implementation exists. The 25 focused integration tests exercise the coordinator, fail-closed
+preparation export, and non-authorizing one-shot boundary. No short-lived envelope is retained as
+current evidence, and an expired observation cannot be reused.
+
 ## Separate proposed liquidity envelope
 
 A later test-only LP mint may be designed with desired-amount caps of at most `1,000 PTA` and
@@ -120,29 +168,33 @@ position authority is approved by this document.
 The two write decisions stay separate:
 
 1. Pool initialization requires its own fresh simulation, exact sender/nonce/gas/cost envelope, short
-   broadcast window, durable one-shot claim, explicit user confirmation, receipt, `PoolCreated` log,
-   and exact post-state reconciliation.
+   broadcast window, implemented and reviewed durable one-shot claim, exact external authorization,
+   signer boundary, receipt, `PoolCreated` log, and exact post-state reconciliation.
 2. Only after the pool is independently re-reviewed may an LP mint be prepared. It requires separate
    bounded token approvals, explicit ticks/amounts/minima/deadline/slippage, owner/revoke authority,
    simulation, user confirmation, and receipt evidence.
 
 ## Remaining blockers
 
-- Independently reproduce and bind the pool compiler artifact, creation bytecode, init-code hash, and
-  deployed CREATE2 derivation.
 - Refresh all five runtime identities, manager/factory/deployer relationships, fee configuration,
   factory owner, LM controls, pair lookup, nonce, fee, gas, and balance at one fresh finalized block.
 - Publish and independently retrieve the exact initializer selector-path attestation.
-- Bind the intended sender and enforce one nonce, a maximum tBNB cost, a short external broadcast
-  window, pending/replacement reconciliation, and an immediate abort on any state drift.
+- Obtain an authenticated independent review bound to the exact published initializer scope.
+- Implement and independently review the durable atomic journal, external exact-authorization receipt,
+  custody-isolated exact signer, signed-byte persistence, broadcast, and pending/replacement/unknown-
+  outcome reconciliation. The current one-shot module specifies these contracts but implements none
+  of them.
+- Re-run the fixed two-provider coordinator immediately before any claim, then repeat the pending nonce,
+  pool, candidate-code and simulation checks after the durable claim and abort on any drift.
 - Establish post-initialization observation cardinality and elapsed oracle history before using the
   pool for analysis; a new pool has no decision-useful history merely because it exists.
 - Review actual liquidity depth, price-manipulation exposure, token funding, LP range, ownership,
   bounded approvals, Altana policy/authority, and revoke behavior before activation.
 
 Until those gates close and explorer-verifiable receipts exist, the truthful state remains: PTA and
-WBNB identities are evidenced, a read-only initialization scenario is prepared, and **no PTA/WBNB
-pool, liquidity, oracle, position, Pancake write, or autonomous execution is evidenced**.
+WBNB identities are evidenced, the retained pool construction path is reproduced exactly offline,
+and a read-only non-authorizing initialization preflight exists, but **no PTA/WBNB pool, liquidity,
+oracle, position, Pancake write, or autonomous execution is evidenced**.
 
 The machine record is linked to the retained
 [bounded public-result RPC transcript](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json)
@@ -152,3 +204,8 @@ selector. It deliberately omits JSON-RPC envelopes, request IDs and headers. Off
 retained provider equality, selected runtime/scalar state, cross-file integrity and non-authorization
 boundaries; they do not authenticate a public RPC. It is historical capture evidence, not reusable
 freshness, execution authority or permission to write.
+
+The root evidence gate has 44 offline tests covering the retained pool-readiness transcript,
+init-code provenance, initializer review, earlier selector-path package, PTA deployment evidence, and
+WBNB source record. Passing those tests proves deterministic local consistency only; it neither
+refreshes chain state nor supplies a reviewer, signer, approval, transaction, or receipt.

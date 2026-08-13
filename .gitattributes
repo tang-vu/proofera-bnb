@@ -5,3 +5,13 @@
 scripts/collect-bsc-testnet-pta-wbnb-pool-readiness.mjs text eol=lf
 scripts/pancake-selector-review/review-lib.mjs text eol=lf
 evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json text eol=lf
+
+# These sources and evidence records contain byte-for-byte SHA-256 bindings.
+scripts/pancake-initializer-review/*.mjs text eol=lf
+scripts/pancake-pool-init-code-review/* text eol=lf
+evidence/development/pancake-v3-initializer-selector-review-2026-08-13.json text eol=lf
+evidence/development/pancake-v3-factory-compiler-input-2026-08-13.json text eol=lf
+evidence/development/pancake-v3-pool-and-deployer-compiler-input-2026-08-13.json text eol=lf
+evidence/development/pancake-v3-pool-init-code-artifacts-2026-08-13.json text eol=lf
+evidence/development/pancake-v3-pool-init-code-provenance-2026-08-13.json text eol=lf
+evidence/development/pancake-v3-pool-init-code-source-bindings-2026-08-13.json text eol=lf

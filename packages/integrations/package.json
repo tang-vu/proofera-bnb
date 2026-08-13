@@ -10,6 +10,7 @@
     "./server/altana-lp-reservation": "./src/altana-lp-reservation.server.ts",
     "./server/bsc-testnet-deployer-custody": "./src/bsc-testnet-deployer-custody.server.ts",
     "./server/bsc-testnet-pta-deployment-observation": "./src/bsc-testnet-pta-deployment-observation.server.ts",
+    "./server/bsc-testnet-pta-wbnb-pool-preparation": "./src/bsc-testnet-pta-wbnb-pool-preparation.server.ts",
     "./server/pancake-v3-selector-artifact-review": "./src/pancake-v3-selector-artifact-review.ts"
   },
   "scripts": {

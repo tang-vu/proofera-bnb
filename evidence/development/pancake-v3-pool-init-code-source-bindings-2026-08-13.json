@@ -1,0 +1,641 @@
+{
+  "schemaVersion": 1,
+  "evidenceId": "pancake-v3-pool-init-code-source-bindings-2026-08-13",
+  "sourceRepository": "https://github.com/pancakeswap/pancake-v3-contracts",
+  "sourceCommit": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+  "sourceTree": "a5f9c90fce18ca4cdb0716322f254881aa626ed0",
+  "compilerInputFiles": [
+    {
+      "path": "evidence/development/pancake-v3-pool-and-deployer-compiler-input-2026-08-13.json",
+      "sha256": "4577068ddd94002be02dabc5473d1cc7755dc2dc1b661b550bbf39ce73f16aaa"
+    },
+    {
+      "path": "evidence/development/pancake-v3-factory-compiler-input-2026-08-13.json",
+      "sha256": "358f3ad79a6d60420381a7508af6d6358ca4b92a15799d54777c3b5f011b0b7a"
+    }
+  ],
+  "mappingRule": {
+    "contracts/*": "projects/v3-core/contracts/*",
+    "@pancakeswap/v3-lm-pool/*": "projects/v3-lm-pool/*"
+  },
+  "entryCount": 61,
+  "entries": [
+    {
+      "compilerSourceName": "@pancakeswap/v3-lm-pool/contracts/interfaces/IPancakeV3LmPool.sol",
+      "upstreamPath": "projects/v3-lm-pool/contracts/interfaces/IPancakeV3LmPool.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 233,
+      "compilerInputSha256": "304fb91f61dc8689aef4b143c1039ed611b2714846892c6cb0c43f5f51b1d103",
+      "lfNormalizedByteLength": 225,
+      "lfNormalizedSha256": "6a75de888fc355cad5dd2c0b2899c1209fd24c81e54b7ecc96133cf0f40599e4",
+      "gitBlobSha1": "794b814c29ce5896f9af034f942cbb47333933ab"
+    },
+    {
+      "compilerSourceName": "contracts/interfaces/callback/IPancakeV3FlashCallback.sol",
+      "upstreamPath": "projects/v3-core/contracts/interfaces/callback/IPancakeV3FlashCallback.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 1000,
+      "compilerInputSha256": "1ef21fe3ee5f14a95baeb7c2db619803b3345241422b4c5b2514a001921a4486",
+      "lfNormalizedByteLength": 982,
+      "lfNormalizedSha256": "76374f55d3f72a771114166ccff80240cc5f90e96ab1a38fd5179240f6274286",
+      "gitBlobSha1": "899de89a4580696c38a2f7f0d38d289c133b2473"
+    },
+    {
+      "compilerSourceName": "contracts/interfaces/callback/IPancakeV3MintCallback.sol",
+      "upstreamPath": "projects/v3-core/contracts/interfaces/callback/IPancakeV3MintCallback.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 998,
+      "compilerInputSha256": "730f64ed1fb2a544dc17add941ae296467b755e644fa78799f5bf277cacd48d1",
+      "lfNormalizedByteLength": 980,
+      "lfNormalizedSha256": "a81c1a51b5323002b24d32b9a255df411d66b9f965d92a3aaf7c2aad42439eb8",
+      "gitBlobSha1": "5b940e1491ba1df60d0b9a572352890c7ede93e5"
+    },
+    {
+      "compilerSourceName": "contracts/interfaces/callback/IPancakeV3SwapCallback.sol",
+      "upstreamPath": "projects/v3-core/contracts/interfaces/callback/IPancakeV3SwapCallback.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 1314,
+      "compilerInputSha256": "d3f0f6e8aeeda5b30f9b2996c537da5d370c65f9cc0ec8112eb475776103e8be",
+      "lfNormalizedByteLength": 1293,
+      "lfNormalizedSha256": "b416735205854ca1d71d92e40426b2986b38ff438387b9ab2554d2e441e64ef6",
+      "gitBlobSha1": "92bf5dff90ba3b1ca7d0d1ea50bdcbb13ec15bfd"
+    },
+    {
+      "compilerSourceName": "contracts/interfaces/IERC20Minimal.sol",
+      "upstreamPath": "projects/v3-core/contracts/interfaces/IERC20Minimal.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 3134,
+      "compilerInputSha256": "03e32096b1cbeb72fcd787b387d8028aa9224b817a60235c2516700b057bee6d",
+      "lfNormalizedByteLength": 3082,
+      "lfNormalizedSha256": "0c604dff5bacdabd495d87655d920c2ff4331b54b437184a656aefe35ea4d492",
+      "gitBlobSha1": "7b3f079f6d381228a96ba9254a3daec9f3a0c0ce"
+    },
+    {
+      "compilerSourceName": "contracts/interfaces/IPancakeV3Factory.sol",
+      "upstreamPath": "projects/v3-core/contracts/interfaces/IPancakeV3Factory.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 6101,
+      "compilerInputSha256": "ccb37f3bdc80dfc96fce0c9fe0e75aa5def74738904006ded371fb50ceed779b",
+      "lfNormalizedByteLength": 5977,
+      "lfNormalizedSha256": "390685b7ff3fe9d4a0895fc9a420402dd0ce01adb6dc7137c022d68c65a66bdd",
+      "gitBlobSha1": "2665464a147e09b4760271aabb3da76278b3c3ed"
+    },
+    {
+      "compilerSourceName": "contracts/interfaces/IPancakeV3Pool.sol",
+      "upstreamPath": "projects/v3-core/contracts/interfaces/IPancakeV3Pool.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 841,
+      "compilerInputSha256": "81c29a8e5013ed86384207ab640ee9c21319d063434b87321e709780a3be21cc",
+      "lfNormalizedByteLength": 817,
+      "lfNormalizedSha256": "9e6d78a58ddc4b62ecc5e048f50c74daf084b4b035b4073c190864d09dfc05f9",
+      "gitBlobSha1": "c9063aecdf3d3f3c4c18787388d04f588f93689d"
+    },
+    {
+      "compilerSourceName": "contracts/interfaces/IPancakeV3PoolDeployer.sol",
+      "upstreamPath": "projects/v3-core/contracts/interfaces/IPancakeV3PoolDeployer.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 1518,
+      "compilerInputSha256": "1ae74bd7d9d23dae02b2f80ff26b12995cc37ac29872f366be7c41837c226ce4",
+      "lfNormalizedByteLength": 1484,
+      "lfNormalizedSha256": "2cdc99e2eb9745537c869d00397aedb970255db43446bd45b1bb3ac28b142645",
+      "gitBlobSha1": "4a9ea4b7701ee7c087dd8a83dd8054349db1123f"
+    },
+    {
+      "compilerSourceName": "contracts/interfaces/pool/IPancakeV3PoolActions.sol",
+      "upstreamPath": "projects/v3-core/contracts/interfaces/pool/IPancakeV3PoolActions.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 6407,
+      "compilerInputSha256": "ca14d1e89c843bfde379749eb7ec0a5b721a5c0e08c04435d204f63cf7a65b82",
+      "lfNormalizedByteLength": 6304,
+      "lfNormalizedSha256": "362a9ee3ca6dbfd3d53129113ddc400f297fe35d1be88fc1ec6ea24da44eb696",
+      "gitBlobSha1": "3ed07361bca14640e46aac80c80e86f5ed37b25c"
+    },
+    {
+      "compilerSourceName": "contracts/interfaces/pool/IPancakeV3PoolDerivedState.sol",
+      "upstreamPath": "projects/v3-core/contracts/interfaces/pool/IPancakeV3PoolDerivedState.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 2642,
+      "compilerInputSha256": "84b83f59c808c5524102003d156461b8b27e151fcb98edc04142047cda652708",
+      "lfNormalizedByteLength": 2602,
+      "lfNormalizedSha256": "96c66ce5dcbd2c3a3f40c27206012daa0a370d024f6abf2623485737177b4157",
+      "gitBlobSha1": "1dd16830ea0b1309424d2b5612fb49fed381028e"
+    },
+    {
+      "compilerSourceName": "contracts/interfaces/pool/IPancakeV3PoolEvents.sol",
+      "upstreamPath": "projects/v3-core/contracts/interfaces/pool/IPancakeV3PoolEvents.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 6354,
+      "compilerInputSha256": "1cbe4f4f4d9c0c5fd575d939e54ded7972e8197e2ee989f33a183c4aa6686fd7",
+      "lfNormalizedByteLength": 6224,
+      "lfNormalizedSha256": "c9979f9c2678921e77f3cc4484c24438267c2aa0c289c4199a59455899d56930",
+      "gitBlobSha1": "b668fcf4b585c7557c5384c8f9f016689170cc25"
+    },
+    {
+      "compilerSourceName": "contracts/interfaces/pool/IPancakeV3PoolImmutables.sol",
+      "upstreamPath": "projects/v3-core/contracts/interfaces/pool/IPancakeV3PoolImmutables.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 1846,
+      "compilerInputSha256": "9c36ee95014de854bd526767a9bee274b175711fdecefb4bb71a081706d74679",
+      "lfNormalizedByteLength": 1811,
+      "lfNormalizedSha256": "6c28e27b8ea34d9adce7fb604e291a9cd454990886293c3c9abb460cec26cd6f",
+      "gitBlobSha1": "d09aba18f9a72bb8a6d446dd958e6e3e32844334"
+    },
+    {
+      "compilerSourceName": "contracts/interfaces/pool/IPancakeV3PoolOwnerActions.sol",
+      "upstreamPath": "projects/v3-core/contracts/interfaces/pool/IPancakeV3PoolOwnerActions.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 1325,
+      "compilerInputSha256": "60c2041c6b89e2b24bc35b830f7a3a35fc113d57c3a45da7ba259ce399dfa4f1",
+      "lfNormalizedByteLength": 1299,
+      "lfNormalizedSha256": "3b7226c2813484ee5a67401ebaacae57b5e9a3b6b17d825a3aeda79153dc758f",
+      "gitBlobSha1": "7b58f4c7d0157da5c3190cc504ec0df34a3c06cf"
+    },
+    {
+      "compilerSourceName": "contracts/interfaces/pool/IPancakeV3PoolState.sol",
+      "upstreamPath": "projects/v3-core/contracts/interfaces/pool/IPancakeV3PoolState.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 6627,
+      "compilerInputSha256": "06cc5f6790f07940e76349e5f8296d8e8629b6465a3331a6c6b846b0e4a3fdb2",
+      "lfNormalizedByteLength": 6511,
+      "lfNormalizedSha256": "927132adb0fea744a5f88fefdbca7e1a0f518c58f8cdbb74475fe0f83f863e58",
+      "gitBlobSha1": "954649394f46bca0eca20a70df12adfacf6f00fe"
+    },
+    {
+      "compilerSourceName": "contracts/libraries/BitMath.sol",
+      "upstreamPath": "projects/v3-core/contracts/libraries/BitMath.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 2884,
+      "compilerInputSha256": "91e3df3dcd241eb0101f40b188e4d36cad91fde6ac596ba5df537d2c555ecd38",
+      "lfNormalizedByteLength": 2790,
+      "lfNormalizedSha256": "32f71ea9156f55572a72efb0b2a913df88de66ff33d042043fb3e51a6050a557",
+      "gitBlobSha1": "3a7216c7bd5e9d124957c7f7e487dafff7c8855c"
+    },
+    {
+      "compilerSourceName": "contracts/libraries/FixedPoint128.sol",
+      "upstreamPath": "projects/v3-core/contracts/libraries/FixedPoint128.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 319,
+      "compilerInputSha256": "0812b2e30b96c5959403b3fe3e0948e7e1c1ce75679bf835bc3de42345038a2f",
+      "lfNormalizedByteLength": 311,
+      "lfNormalizedSha256": "cfc3aef8851f183492547dccc168bf72398fba2aad4c4d9d4784f542a8ccda34",
+      "gitBlobSha1": "6d6948b106003cf35f8f877b7913cbc933133ed9"
+    },
+    {
+      "compilerSourceName": "contracts/libraries/FixedPoint96.sol",
+      "upstreamPath": "projects/v3-core/contracts/libraries/FixedPoint96.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 390,
+      "compilerInputSha256": "8f08799ec2b6a29c68c978eccd472ddbaa4b0517d83a3c8ec4edc821da7b4252",
+      "lfNormalizedByteLength": 380,
+      "lfNormalizedSha256": "219deb88ffbcdefa482be35051db586378e8523062bee592dd2c5fa7fb47ebd6",
+      "gitBlobSha1": "63b42c294e821eb038793b7f1afb9ae0427f0691"
+    },
+    {
+      "compilerSourceName": "contracts/libraries/FullMath.sol",
+      "upstreamPath": "projects/v3-core/contracts/libraries/FullMath.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 5262,
+      "compilerInputSha256": "a35f43afffc5587e10354f80fcea897f44895c75cfc98ac2130847202ed4bbe3",
+      "lfNormalizedByteLength": 5138,
+      "lfNormalizedSha256": "0a18f00afc2b99b3226898303319bf0a9108ace44c8871491571f53de2f0bf0d",
+      "gitBlobSha1": "ea612be1ef3e595508ed2df86fe38483048a0fba"
+    },
+    {
+      "compilerSourceName": "contracts/libraries/LiquidityMath.sol",
+      "upstreamPath": "projects/v3-core/contracts/libraries/LiquidityMath.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 639,
+      "compilerInputSha256": "d127f3f1c3af2a5d3dfc06be36eb881af21a6da8ae9072b86efafee526554bcb",
+      "lfNormalizedByteLength": 622,
+      "lfNormalizedSha256": "84d20a16d5346f6ec4c12dff4df23dda5d46e52d33f18aaaaac2e9e36ce4a072",
+      "gitBlobSha1": "d5e23032e8b9323de3df2b8d71d9bcc516cc5d6e"
+    },
+    {
+      "compilerSourceName": "contracts/libraries/LowGasSafeMath.sol",
+      "upstreamPath": "projects/v3-core/contracts/libraries/LowGasSafeMath.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 1742,
+      "compilerInputSha256": "a6860cfe14900f1a4c4cb555c4061429ea4c50b89a7c80f69f9bf67fcdb8e3b8",
+      "lfNormalizedByteLength": 1696,
+      "lfNormalizedSha256": "394107ff2dbbaded5612452af5e77b4af9d0871b096c1514b0ea659b862fc46f",
+      "gitBlobSha1": "dbc817c2ec806775b7c9b213c6db0dffe00ea8cd"
+    },
+    {
+      "compilerSourceName": "contracts/libraries/Oracle.sol",
+      "upstreamPath": "projects/v3-core/contracts/libraries/Oracle.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 16837,
+      "compilerInputSha256": "5178301ab1d1f5b8b0248c9c6f23fb4d77ad10d6d2d7cf6976d400cc5ec4b81e",
+      "lfNormalizedByteLength": 16505,
+      "lfNormalizedSha256": "e77c590445158e991b377da4ce33d42c98d5ac842cdd1ad6cf1c7ba4c541a457",
+      "gitBlobSha1": "eb9f651cd6a3b9e9b801d96749e17a96b31dcbc9"
+    },
+    {
+      "compilerSourceName": "contracts/libraries/Position.sol",
+      "upstreamPath": "projects/v3-core/contracts/libraries/Position.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 3472,
+      "compilerInputSha256": "3fd1c9e23554f20b631b8af7812a31be5eac129fcf9d720ffffe0b18963be847",
+      "lfNormalizedByteLength": 3394,
+      "lfNormalizedSha256": "d87d5ecd8531d9311e0953462b56ccd6453b65107cc62f43602f59a4edccb806",
+      "gitBlobSha1": "a22810faf60d59f117dccaf6ab623f0e21b633d4"
+    },
+    {
+      "compilerSourceName": "contracts/libraries/SafeCast.sol",
+      "upstreamPath": "projects/v3-core/contracts/libraries/SafeCast.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 1076,
+      "compilerInputSha256": "bb5337b1976bc3c937490d27bfbb13a8eb691e3211581287cfa025fe201e7651",
+      "lfNormalizedByteLength": 1048,
+      "lfNormalizedSha256": "9aed494b56d3dd16b7d6535583ded2cdfb03dc80aaa919347b13d35fd597e8bf",
+      "gitBlobSha1": "a8ea22987877b615fcf3a557512b240eff1b77c7"
+    },
+    {
+      "compilerSourceName": "contracts/libraries/SqrtPriceMath.sol",
+      "upstreamPath": "projects/v3-core/contracts/libraries/SqrtPriceMath.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 10943,
+      "compilerInputSha256": "70f52820c3c5bf6b41fbbaf753e96f8f96e95d0e657e43dc989e20511bc2563f",
+      "lfNormalizedByteLength": 10718,
+      "lfNormalizedSha256": "36eeb343e0b1809cd76b2ec72a336923aa24f857965966543b065e660b2ebc6e",
+      "gitBlobSha1": "11db273015ad3cd8b635bb1c22c2e3a10def7d3f"
+    },
+    {
+      "compilerSourceName": "contracts/libraries/SwapMath.sol",
+      "upstreamPath": "projects/v3-core/contracts/libraries/SwapMath.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 4739,
+      "compilerInputSha256": "8089ac4c4dab1b43eae515240113bc79c659f1c06c8af7fb2e46d86fe8bd896b",
+      "lfNormalizedByteLength": 4641,
+      "lfNormalizedSha256": "cdb205f8790e6c8a3587bd3db6eec6fba874afca1c0c6e890d87452f7aadc902",
+      "gitBlobSha1": "bf6598ba19274f84d18e23bef54a9a29f31ca3dd"
+    },
+    {
+      "compilerSourceName": "contracts/libraries/Tick.sol",
+      "upstreamPath": "projects/v3-core/contracts/libraries/Tick.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 9901,
+      "compilerInputSha256": "a57adbf4ca4186dff2b64ed4ecc1357b835c3140fa5e735d7f3e540842d80e69",
+      "lfNormalizedByteLength": 9716,
+      "lfNormalizedSha256": "d938c31db4532ea087d90c38379ddc0a4ee5709b44a421abf87961e0730d008c",
+      "gitBlobSha1": "a8cef076bb7b2dc3e2a3b10024a0196eae28d637"
+    },
+    {
+      "compilerSourceName": "contracts/libraries/TickBitmap.sol",
+      "upstreamPath": "projects/v3-core/contracts/libraries/TickBitmap.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 4198,
+      "compilerInputSha256": "9e85725f0dd6a5f656b9c62fd85bb2e161f0bc2ab4ab22dea5015baa9ca5c2f8",
+      "lfNormalizedByteLength": 4120,
+      "lfNormalizedSha256": "8452c484e6caad95411358d8c1763810e715b3d13697c83665657619472d3b0a",
+      "gitBlobSha1": "099b033f9ede7f9004c283113362a0395b714cbb"
+    },
+    {
+      "compilerSourceName": "contracts/libraries/TickMath.sol",
+      "upstreamPath": "projects/v3-core/contracts/libraries/TickMath.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 8850,
+      "compilerInputSha256": "49af6f57e194434125d27d334e6d332cee4614058be896f350d165adec15dc9d",
+      "lfNormalizedByteLength": 8645,
+      "lfNormalizedSha256": "e68d3c6c8c847d16c287c1f17f684d11cf0f6267a8d8dc29e81656bccf68f062",
+      "gitBlobSha1": "ee48fee54c309f20244e910b2f97a2466e879765"
+    },
+    {
+      "compilerSourceName": "contracts/libraries/TransferHelper.sol",
+      "upstreamPath": "projects/v3-core/contracts/libraries/TransferHelper.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 967,
+      "compilerInputSha256": "249a12bb7d5d457ff96239e11de800dafde5416e7c9d510e2c2624a8f98a31fe",
+      "lfNormalizedByteLength": 943,
+      "lfNormalizedSha256": "ccb87429b290eb6ed429648a7131f68ce0151a74f3ed27de78aacd28015e4590",
+      "gitBlobSha1": "4e217320e4a05d98ae490b6df0de12e36854bfb1"
+    },
+    {
+      "compilerSourceName": "contracts/libraries/UnsafeMath.sol",
+      "upstreamPath": "projects/v3-core/contracts/libraries/UnsafeMath.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 677,
+      "compilerInputSha256": "c88ded0621b6a4058b5ca0d3e9ef6dc6beb679de3f5988e5af19559bf48aa850",
+      "lfNormalizedByteLength": 660,
+      "lfNormalizedSha256": "4d02353eb503e3111e25bd50104ac9b279f99e88d848e455262a3fbeb55c50e7",
+      "gitBlobSha1": "f62f84676fa39f98b4ae1f7a073fc767ecf78aaa"
+    },
+    {
+      "compilerSourceName": "contracts/PancakeV3Factory.sol",
+      "upstreamPath": "projects/v3-core/contracts/PancakeV3Factory.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 6365,
+      "compilerInputSha256": "e6173fa56742684700f769a5024859e49694e47ec17150da984a56eeac01aa9f",
+      "lfNormalizedByteLength": 6218,
+      "lfNormalizedSha256": "6f4364c4b9761586f7b6eb71bf2344485e12eb01851419da4c1c81ad266d2a00",
+      "gitBlobSha1": "e55da82dcd790cecad352b946400e9fc662ff646"
+    },
+    {
+      "compilerSourceName": "contracts/PancakeV3Pool.sol",
+      "upstreamPath": "projects/v3-core/contracts/PancakeV3Pool.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 37715,
+      "compilerInputSha256": "19055e39fb3f8179c1fbb5d24a64426221354d6f7e92c4f9da6f85ad5d73852a",
+      "lfNormalizedByteLength": 36809,
+      "lfNormalizedSha256": "674c5cedce8dd511108b8d104d6332113dc1ba9ab6da9b3498b5896e97a33265",
+      "gitBlobSha1": "537d45654c76637941c37d12d3240ca23e2809c0"
+    },
+    {
+      "compilerSourceName": "contracts/PancakeV3PoolDeployer.sol",
+      "upstreamPath": "projects/v3-core/contracts/PancakeV3PoolDeployer.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 2003,
+      "compilerInputSha256": "7f91f75daf937712169c4cf7dfdeacf772e6a8dd526f63995044ba560f2d30b2",
+      "lfNormalizedByteLength": 1947,
+      "lfNormalizedSha256": "2189a9d27ee5726c9a863b8b0576055bb13356676264638709ffddf7d6077fad",
+      "gitBlobSha1": "69886751e6ff33bbd243582f98b1e92b83e60a4a"
+    },
+    {
+      "compilerSourceName": "contracts/test/BitMathEchidnaTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/BitMathEchidnaTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 624,
+      "compilerInputSha256": "9aea7d395e19fbd8b2043a861ed5df32a678ed9594cb0b8e2d3537de908f204a",
+      "lfNormalizedByteLength": 606,
+      "lfNormalizedSha256": "238ffa27f0b614be29c2582f9da1d5319dda309c2f623a21f7c0594bf99d0d5a",
+      "gitBlobSha1": "ca7d34f12ad24d1c4a261fd850a43839788bee2f"
+    },
+    {
+      "compilerSourceName": "contracts/test/BitMathTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/BitMathTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 838,
+      "compilerInputSha256": "945624d2bc1829e09ead2bba4d6ecfa080f1636611af0b5a04f5e868b043dfdc",
+      "lfNormalizedByteLength": 812,
+      "lfNormalizedSha256": "97bc2142c2c435383483e7cad875e8bd0a8ccb00d312ceb21546c5770f802772",
+      "gitBlobSha1": "2b387be1fe66b951e1f2508284a65db4101b39e6"
+    },
+    {
+      "compilerSourceName": "contracts/test/FullMathEchidnaTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/FullMathEchidnaTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 1810,
+      "compilerInputSha256": "1a093912fe2f8a0c50d66798efb0f2ec038a920aea603fa008fd68c2970fa347",
+      "lfNormalizedByteLength": 1743,
+      "lfNormalizedSha256": "01692b56f2a7260b937144285a864f25041543b98a7ef82ed871de02902e91fe",
+      "gitBlobSha1": "9e1063d704bfb82a32e01dd46d6cd98294572314"
+    },
+    {
+      "compilerSourceName": "contracts/test/FullMathTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/FullMathTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 498,
+      "compilerInputSha256": "243d54580afd844d809b52c259db27531a6c4745397cd482c0da5eccc2104e08",
+      "lfNormalizedByteLength": 476,
+      "lfNormalizedSha256": "984b41fd602397935cd9bbff0aaaa2a0d7169852926a6ed695d82098dea42fa7",
+      "gitBlobSha1": "ec59bc9f2acb005af1a2cdccd2d87a115dd1fb8d"
+    },
+    {
+      "compilerSourceName": "contracts/test/LiquidityMathTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/LiquidityMathTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 494,
+      "compilerInputSha256": "6524a93e5538ec97b77fabf873f6c622c28ab620cc88f8361599d3d4bef1e9db",
+      "lfNormalizedByteLength": 478,
+      "lfNormalizedSha256": "1e18051bfd31eef49ade1207d0517cbf96e8e57ed9ffa404ad4a717d504b1a07",
+      "gitBlobSha1": "d85e0f113e2f02b1e1ad4255c92e7bfc9dddb4b8"
+    },
+    {
+      "compilerSourceName": "contracts/test/LowGasSafeMathEchidnaTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/LowGasSafeMathEchidnaTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 1076,
+      "compilerInputSha256": "50f67a80345f126605e9ca295d4407260f0dfe2eb3e06feb29d1aa61d5835974",
+      "lfNormalizedByteLength": 1040,
+      "lfNormalizedSha256": "c8ec5e6f12c3b981e37638ea4498750331d063468360a95f8a79de581727642c",
+      "gitBlobSha1": "315531d70965314e350bf7729403d65f6ba0d085"
+    },
+    {
+      "compilerSourceName": "contracts/test/MockTimePancakeV3Pool.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/MockTimePancakeV3Pool.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 772,
+      "compilerInputSha256": "52fbe46df8e84357ec6ff59bdabd481042925214dd90c508589555f5fae59a22",
+      "lfNormalizedByteLength": 746,
+      "lfNormalizedSha256": "fd967957aa6f3a65e9aeb6a5047ada9ec274c187a64b7cd6208ded966b404097",
+      "gitBlobSha1": "41e7e581de97b10db633362ee93d06bb094cae97"
+    },
+    {
+      "compilerSourceName": "contracts/test/MockTimePancakeV3PoolDeployer.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/MockTimePancakeV3PoolDeployer.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 1013,
+      "compilerInputSha256": "36cfa1e196b6f6b81515c2f1ea987f4822095c1119c4fd8aba41c9bc48d6a5cb",
+      "lfNormalizedByteLength": 978,
+      "lfNormalizedSha256": "b00b18fc8975fe25c8706152c84c1ec367b71a11d973dd7924fc37e18357fff8",
+      "gitBlobSha1": "5fb3e197b5eb8e020c97515d11b1e02b4d0e9b73"
+    },
+    {
+      "compilerSourceName": "contracts/test/OracleEchidnaTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/OracleEchidnaTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 5409,
+      "compilerInputSha256": "e33dc9511cc1f6477bdb4a04bdf7c05f950f72722a3b3d450db8002354ac9441",
+      "lfNormalizedByteLength": 5271,
+      "lfNormalizedSha256": "5521a55ae4c67ad51a9ad379233fc4fced804daefb61dc354ef40c54c6f95a90",
+      "gitBlobSha1": "4e0a7dfc4e1b766f6a70b19af0fcdc4dbfd9b338"
+    },
+    {
+      "compilerSourceName": "contracts/test/OracleTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/OracleTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 3179,
+      "compilerInputSha256": "e5d5a8fc32f1dd8da7c9bcb29fd45962b150fb35b0821d6c8911147584f2c2c0",
+      "lfNormalizedByteLength": 3079,
+      "lfNormalizedSha256": "f002ab197bb03a8fea55df1fda686e8bea2d3cc0624a63dd0e50936c2a89840d",
+      "gitBlobSha1": "c0c83b1a30c9c73c2308d50497c99d267ce477b8"
+    },
+    {
+      "compilerSourceName": "contracts/test/PancakeV3PoolSwapTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/PancakeV3PoolSwapTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 1515,
+      "compilerInputSha256": "e3795e6705bf4b61de937009ff626a3eccf3b68d2aa9178f47dcfed1d25b4f32",
+      "lfNormalizedByteLength": 1465,
+      "lfNormalizedSha256": "6f00f1b2c434f4d71ebc2671a9e9ccd0bfdf75f155099f7b871ac404f967f595",
+      "gitBlobSha1": "9200e22d758b3b0df625077de9a6adb750871aec"
+    },
+    {
+      "compilerSourceName": "contracts/test/SqrtPriceMathEchidnaTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/SqrtPriceMathEchidnaTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 7815,
+      "compilerInputSha256": "8b797cb45946e68f2b376ed761d407a01796ac4d9ddd2d8b655754d544d4a9b9",
+      "lfNormalizedByteLength": 7584,
+      "lfNormalizedSha256": "1ec234fa0f550dd4b836e0d5ce055bb66eb2b19fb8f88c72761484a1d8446a34",
+      "gitBlobSha1": "1e569acb440fe7b3cf853440a0dd78b1ee43c6a3"
+    },
+    {
+      "compilerSourceName": "contracts/test/SqrtPriceMathTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/SqrtPriceMathTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 2786,
+      "compilerInputSha256": "dfffdf08c7d3a5efb46cd84bd8cd762f99330c88e8b5cdccf7a5b1ff818a7fa7",
+      "lfNormalizedByteLength": 2700,
+      "lfNormalizedSha256": "9c54eb4416d104e22de17e0fbc2452e79784ea7a9805f0ceeb4d4e64e216d9e1",
+      "gitBlobSha1": "41fec2f54ed7ec9b0c6a5700a08df314a14dac4d"
+    },
+    {
+      "compilerSourceName": "contracts/test/SwapMathEchidnaTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/SwapMathEchidnaTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 1871,
+      "compilerInputSha256": "627460fe55df8c838723af5af2f079e717d7a7141533c04638e0ccc8bf5c4068",
+      "lfNormalizedByteLength": 1814,
+      "lfNormalizedSha256": "b9870b34f317ab6c2f3a926998a3613aaa1a10eb17c6b3596b7a0004794e8e80",
+      "gitBlobSha1": "0be6b0b87b71fbf60a40828bd038c32bd3b7d505"
+    },
+    {
+      "compilerSourceName": "contracts/test/SwapMathTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/SwapMathTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 1011,
+      "compilerInputSha256": "30def1ae564fce5deac4a1cccff612010c6ff43db1a88a3171304afd76ca62c8",
+      "lfNormalizedByteLength": 974,
+      "lfNormalizedSha256": "2fb38323b667211aad2c48e96602730579b2540e093b9823c4b52476025ff9b8",
+      "gitBlobSha1": "b0f59df12ac6a7b0d1f3db00692283d1718b1fba"
+    },
+    {
+      "compilerSourceName": "contracts/test/TestERC20.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/TestERC20.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 2230,
+      "compilerInputSha256": "88a7a6dc37ab7c28c94d26cd1834206482a92817e5bcc622664b045ec5bae8d8",
+      "lfNormalizedByteLength": 2171,
+      "lfNormalizedSha256": "0e9cd08bba16760eb1cdb2095a2d72840d98201cf8bd7e0bd3ecf36a929969f6",
+      "gitBlobSha1": "411e0ea27ee0cb567067dfb7a3935b67cdc3c740"
+    },
+    {
+      "compilerSourceName": "contracts/test/TestPancakeV3Callee.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/TestPancakeV3Callee.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 4818,
+      "compilerInputSha256": "710aaef7285b210c840ce337e18b89122d0375b6cbff75396f2631011dd69600",
+      "lfNormalizedByteLength": 4676,
+      "lfNormalizedSha256": "69f331f435a0d4113d865dc01b39b213525931a66648421d5846fae41f37ef9a",
+      "gitBlobSha1": "d2d151d5ce1f6eaa180d94efaa0dfa39a0104dc5"
+    },
+    {
+      "compilerSourceName": "contracts/test/TestPancakeV3ReentrantCallee.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/TestPancakeV3ReentrantCallee.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 2227,
+      "compilerInputSha256": "2aa3a5dd7e457ffb2880ae4613b4734b466f63bc6a5e559b24b87ac2d7d68895",
+      "lfNormalizedByteLength": 2171,
+      "lfNormalizedSha256": "aec04a2fefbaad0cd6694670bfde8493e42d8daad5bc9db75fa6d6a47832dfee",
+      "gitBlobSha1": "f646efe12f674a4d0f9f6053f83922bd59813bf0"
+    },
+    {
+      "compilerSourceName": "contracts/test/TestPancakeV3Router.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/TestPancakeV3Router.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 3112,
+      "compilerInputSha256": "7ad70d24bfddcdf9311732c67d63cde3df08ac599ff4f5aad4d32054a9a3182c",
+      "lfNormalizedByteLength": 3020,
+      "lfNormalizedSha256": "31fd864d3de6605495a789c92bfdd5147fd9c2495884ff16dd84cd457205b69b",
+      "gitBlobSha1": "c788f7c7a002c99e48c3d3b1642e9ee81545c81f"
+    },
+    {
+      "compilerSourceName": "contracts/test/TestPancakeV3SwapPay.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/TestPancakeV3SwapPay.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 1249,
+      "compilerInputSha256": "ee692abebb308466ff24dbc7d19734235060d4204252ec8c68c9bd1ac8fd9769",
+      "lfNormalizedByteLength": 1208,
+      "lfNormalizedSha256": "18c76ef792d3acf3b18702c89d22b6dc41bf39aa7cf1b32d95119833e0cee475",
+      "gitBlobSha1": "9f22dd612c00b644f4c90ec0153bc3dcafdc5de0"
+    },
+    {
+      "compilerSourceName": "contracts/test/TickBitmapEchidnaTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/TickBitmapEchidnaTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 1800,
+      "compilerInputSha256": "1c0be8d82d034267c7355b620853e4bdf48cab6739efcc32e5e5ba7d95857329",
+      "lfNormalizedByteLength": 1753,
+      "lfNormalizedSha256": "155a0404d5ca1cf23450d497f74da08f31a9987e51dc405219405d9eb62317af",
+      "gitBlobSha1": "675798aa494811fb40d83b04e8c47bdcad412516"
+    },
+    {
+      "compilerSourceName": "contracts/test/TickBitmapTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/TickBitmapTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 1315,
+      "compilerInputSha256": "7f5fa94b74d4d8e6854c20da3919bb0faab1a80e6ff66e1d0b703eb64dff16c6",
+      "lfNormalizedByteLength": 1275,
+      "lfNormalizedSha256": "4e23c71da8170103a507deec49905b7489febd7e9c860d5857b9e0ffbbf49bab",
+      "gitBlobSha1": "c6fb6b0001fa1866cd73d5c4960e9182cf43ae27"
+    },
+    {
+      "compilerSourceName": "contracts/test/TickEchidnaTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/TickEchidnaTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 993,
+      "compilerInputSha256": "b8259ebe5c95f9a15fea50642934e3148532a8b03a4d6402d5677e064ab0dd28",
+      "lfNormalizedByteLength": 966,
+      "lfNormalizedSha256": "f10b6ddb736b69285a86c0ce3d0b390e11457beb2660c27266a3ba17c3c3f46d",
+      "gitBlobSha1": "1d5514fc78fc6be0496c804e221c74feeec125fd"
+    },
+    {
+      "compilerSourceName": "contracts/test/TickMathEchidnaTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/TickMathEchidnaTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 960,
+      "compilerInputSha256": "c54cbd3368b6d328f81cf0ac1931fb8147d3c24763cfce5c2a6e8f21a629928f",
+      "lfNormalizedByteLength": 938,
+      "lfNormalizedSha256": "08b5c9a946a43469d0288b92a4aa706dd9791b8e16e8c36f07cf06670fd0b53f",
+      "gitBlobSha1": "91064b0bbfef3b9ffc8c8efdca5cd8f97838cd29"
+    },
+    {
+      "compilerSourceName": "contracts/test/TickMathTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/TickMathTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 1120,
+      "compilerInputSha256": "df54463c7e940442152db93fb20b0461b2b3b748d51448d7c9cbc53531fda793",
+      "lfNormalizedByteLength": 1086,
+      "lfNormalizedSha256": "2ef2996652f273ec850ea4f77459dd1d176177b0599477b7a91da53d8b44548b",
+      "gitBlobSha1": "2816e57c51a0f90de49066db3d83672323d52fa7"
+    },
+    {
+      "compilerSourceName": "contracts/test/TickOverflowSafetyEchidnaTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/TickOverflowSafetyEchidnaTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 3664,
+      "compilerInputSha256": "e7c8cc19a2fa338da1f29435a098c95417a1f9dfc1bdb79a6da5aef48871637a",
+      "lfNormalizedByteLength": 3555,
+      "lfNormalizedSha256": "e6f784b424f9c08e98f749d9af678b17c27485ec8bbf9f0033cf489e0244f22c",
+      "gitBlobSha1": "f1b8ec1a42264ea0cd3343ac4e4755edc11f80bd"
+    },
+    {
+      "compilerSourceName": "contracts/test/TickTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/TickTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 2340,
+      "compilerInputSha256": "2467e42a6ed1dc7fad52e5f653703630ca6bde05f2526478168c3dab7dad7597",
+      "lfNormalizedByteLength": 2261,
+      "lfNormalizedSha256": "cc9f0b4e3a326b4dd2afe15e5595d8ce50ea1e40208096141ba0eae6f96c518e",
+      "gitBlobSha1": "d9fa7cbdadcef12bf8ad20eab661f32095dd944c"
+    },
+    {
+      "compilerSourceName": "contracts/test/UnsafeMathEchidnaTest.sol",
+      "upstreamPath": "projects/v3-core/contracts/test/UnsafeMathEchidnaTest.sol",
+      "compilerInputLineEndings": "crlf",
+      "compilerInputByteLength": 458,
+      "compilerInputSha256": "662199822c679ba5945bc8f6ed87297ecea018b6783eb2a2cd3fce79a78d0b45",
+      "lfNormalizedByteLength": 441,
+      "lfNormalizedSha256": "495bbc05b0788f0b8cb16b5c51a0c05ae06f618a052373c68d4852f3fa342035",
+      "gitBlobSha1": "0a44d7ee8b43bc6b3a7302ef3fa0e9848d72632e"
+    }
+  ],
+  "boundary": "The Windows compiler inputs contain exact CRLF checkout text. LF normalization is byte-equal to each named Git blob at the pinned official commit; no claim of an authenticated publisher signature is made.",
+  "securityBoundary": {
+    "rpcPerformed": false,
+    "processEnvironmentDumped": false,
+    "signerUsed": false,
+    "transactionBroadcast": false
+  }
+}

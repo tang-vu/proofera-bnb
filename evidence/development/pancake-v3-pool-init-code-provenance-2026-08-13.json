@@ -1,0 +1,645 @@
+{
+  "schemaVersion": 1,
+  "evidenceId": "pancake-v3-pool-init-code-provenance-2026-08-13",
+  "capturedAt": "2026-08-13T04:15:15.465Z",
+  "environment": "development_offline_reproduction",
+  "chain": {
+    "name": "BNB Smart Chain testnet",
+    "chainId": 97
+  },
+  "decision": {
+    "status": "pass_exact_compiler_artifact_and_historical_deployer_binding",
+    "compilerArtifactBlocker": "closed_exact_reproduction",
+    "executionAuthorized": false,
+    "currentStateFreshnessEstablished": false
+  },
+  "officialSource": {
+    "repository": "https://github.com/pancakeswap/pancake-v3-contracts",
+    "commit": "ffa4fb2cef38cf4769ff88e1cc5551c4af4f6c57",
+    "tree": "a5f9c90fce18ca4cdb0716322f254881aa626ed0",
+    "archiveFormat": "git_archive_tar",
+    "archiveByteLength": 9912320,
+    "archiveSha256": "b3cd0b3fd4563287f587c2776eac78e5b5a4ad98f6c805a005df10727bee782d",
+    "license": "GPL-2.0-or-later",
+    "publisherSignatureAuthenticated": false,
+    "publisherBoundary": "The official-organization GitHub location and exact Git object IDs are provenance, not a cryptographic publisher signature.",
+    "yarnLockSha256": "0ea72eb976bdc96f72b2c6e21d06a92ce6af8c858715936c927610d79923183f",
+    "hardhatVersion": "2.13.0",
+    "captureNodeVersion": "v24.14.1",
+    "repositoryRequestedNodeVersion": "16.19.1",
+    "nodeBoundary": "Hardhat warned that the capture Node version was unsupported; the separately pinned native solc rerun matched every retained bytecode exactly.",
+    "reproductionConfig": {
+      "path": "scripts/pancake-pool-init-code-review/hardhat.reproduction.config.cjs",
+      "sha256": "4877d90429af24dadd3dc4f98ecae1aa5dca12e6d87068d1c820c1a092243db0",
+      "networkConfigurationIncluded": false,
+      "accountsIncluded": false,
+      "dotenvIncluded": false
+    }
+  },
+  "compiler": {
+    "version": "0.7.6",
+    "longVersion": "0.7.6+commit.7338295f",
+    "platform": "windows-amd64",
+    "fileName": "solc-windows-amd64-v0.7.6+commit.7338295f.exe",
+    "releaseManifestUrl": "https://binaries.soliditylang.org/windows-amd64/list.json",
+    "binaryUrl": "https://binaries.soliditylang.org/windows-amd64/solc-windows-amd64-v0.7.6+commit.7338295f.exe",
+    "sha256": "9214e06741c5cb51a61d745697c905f37480c0c8da1d5ac69e3bacda0063dfa5",
+    "keccak256": "0x4fbd020496c3a9e02c1eeb825d23f4d83d9198c4e21fda19deccdb7e74435edf"
+  },
+  "compilerInputs": {
+    "poolAndDeployer": {
+      "canonicalSha256": "56f4a6aa554a4480d46d359e49a3aa570bcc3d6e373b599f00591b456ff6d66c",
+      "canonicalSettingsSha256": "87a5fecad1294a4400cb04e12e79d584400d89527258d3a011f8e8e3a16b0680",
+      "optimizerRuns": 400,
+      "sourceCount": 32,
+      "sources": [
+        {
+          "sourceName": "@pancakeswap/v3-lm-pool/contracts/interfaces/IPancakeV3LmPool.sol",
+          "byteLength": 233,
+          "sha256": "304fb91f61dc8689aef4b143c1039ed611b2714846892c6cb0c43f5f51b1d103"
+        },
+        {
+          "sourceName": "contracts/interfaces/callback/IPancakeV3FlashCallback.sol",
+          "byteLength": 1000,
+          "sha256": "1ef21fe3ee5f14a95baeb7c2db619803b3345241422b4c5b2514a001921a4486"
+        },
+        {
+          "sourceName": "contracts/interfaces/callback/IPancakeV3MintCallback.sol",
+          "byteLength": 998,
+          "sha256": "730f64ed1fb2a544dc17add941ae296467b755e644fa78799f5bf277cacd48d1"
+        },
+        {
+          "sourceName": "contracts/interfaces/callback/IPancakeV3SwapCallback.sol",
+          "byteLength": 1314,
+          "sha256": "d3f0f6e8aeeda5b30f9b2996c537da5d370c65f9cc0ec8112eb475776103e8be"
+        },
+        {
+          "sourceName": "contracts/interfaces/IERC20Minimal.sol",
+          "byteLength": 3134,
+          "sha256": "03e32096b1cbeb72fcd787b387d8028aa9224b817a60235c2516700b057bee6d"
+        },
+        {
+          "sourceName": "contracts/interfaces/IPancakeV3Factory.sol",
+          "byteLength": 6101,
+          "sha256": "ccb37f3bdc80dfc96fce0c9fe0e75aa5def74738904006ded371fb50ceed779b"
+        },
+        {
+          "sourceName": "contracts/interfaces/IPancakeV3Pool.sol",
+          "byteLength": 841,
+          "sha256": "81c29a8e5013ed86384207ab640ee9c21319d063434b87321e709780a3be21cc"
+        },
+        {
+          "sourceName": "contracts/interfaces/IPancakeV3PoolDeployer.sol",
+          "byteLength": 1518,
+          "sha256": "1ae74bd7d9d23dae02b2f80ff26b12995cc37ac29872f366be7c41837c226ce4"
+        },
+        {
+          "sourceName": "contracts/interfaces/pool/IPancakeV3PoolActions.sol",
+          "byteLength": 6407,
+          "sha256": "ca14d1e89c843bfde379749eb7ec0a5b721a5c0e08c04435d204f63cf7a65b82"
+        },
+        {
+          "sourceName": "contracts/interfaces/pool/IPancakeV3PoolDerivedState.sol",
+          "byteLength": 2642,
+          "sha256": "84b83f59c808c5524102003d156461b8b27e151fcb98edc04142047cda652708"
+        },
+        {
+          "sourceName": "contracts/interfaces/pool/IPancakeV3PoolEvents.sol",
+          "byteLength": 6354,
+          "sha256": "1cbe4f4f4d9c0c5fd575d939e54ded7972e8197e2ee989f33a183c4aa6686fd7"
+        },
+        {
+          "sourceName": "contracts/interfaces/pool/IPancakeV3PoolImmutables.sol",
+          "byteLength": 1846,
+          "sha256": "9c36ee95014de854bd526767a9bee274b175711fdecefb4bb71a081706d74679"
+        },
+        {
+          "sourceName": "contracts/interfaces/pool/IPancakeV3PoolOwnerActions.sol",
+          "byteLength": 1325,
+          "sha256": "60c2041c6b89e2b24bc35b830f7a3a35fc113d57c3a45da7ba259ce399dfa4f1"
+        },
+        {
+          "sourceName": "contracts/interfaces/pool/IPancakeV3PoolState.sol",
+          "byteLength": 6627,
+          "sha256": "06cc5f6790f07940e76349e5f8296d8e8629b6465a3331a6c6b846b0e4a3fdb2"
+        },
+        {
+          "sourceName": "contracts/libraries/BitMath.sol",
+          "byteLength": 2884,
+          "sha256": "91e3df3dcd241eb0101f40b188e4d36cad91fde6ac596ba5df537d2c555ecd38"
+        },
+        {
+          "sourceName": "contracts/libraries/FixedPoint128.sol",
+          "byteLength": 319,
+          "sha256": "0812b2e30b96c5959403b3fe3e0948e7e1c1ce75679bf835bc3de42345038a2f"
+        },
+        {
+          "sourceName": "contracts/libraries/FixedPoint96.sol",
+          "byteLength": 390,
+          "sha256": "8f08799ec2b6a29c68c978eccd472ddbaa4b0517d83a3c8ec4edc821da7b4252"
+        },
+        {
+          "sourceName": "contracts/libraries/FullMath.sol",
+          "byteLength": 5262,
+          "sha256": "a35f43afffc5587e10354f80fcea897f44895c75cfc98ac2130847202ed4bbe3"
+        },
+        {
+          "sourceName": "contracts/libraries/LiquidityMath.sol",
+          "byteLength": 639,
+          "sha256": "d127f3f1c3af2a5d3dfc06be36eb881af21a6da8ae9072b86efafee526554bcb"
+        },
+        {
+          "sourceName": "contracts/libraries/LowGasSafeMath.sol",
+          "byteLength": 1742,
+          "sha256": "a6860cfe14900f1a4c4cb555c4061429ea4c50b89a7c80f69f9bf67fcdb8e3b8"
+        },
+        {
+          "sourceName": "contracts/libraries/Oracle.sol",
+          "byteLength": 16837,
+          "sha256": "5178301ab1d1f5b8b0248c9c6f23fb4d77ad10d6d2d7cf6976d400cc5ec4b81e"
+        },
+        {
+          "sourceName": "contracts/libraries/Position.sol",
+          "byteLength": 3472,
+          "sha256": "3fd1c9e23554f20b631b8af7812a31be5eac129fcf9d720ffffe0b18963be847"
+        },
+        {
+          "sourceName": "contracts/libraries/SafeCast.sol",
+          "byteLength": 1076,
+          "sha256": "bb5337b1976bc3c937490d27bfbb13a8eb691e3211581287cfa025fe201e7651"
+        },
+        {
+          "sourceName": "contracts/libraries/SqrtPriceMath.sol",
+          "byteLength": 10943,
+          "sha256": "70f52820c3c5bf6b41fbbaf753e96f8f96e95d0e657e43dc989e20511bc2563f"
+        },
+        {
+          "sourceName": "contracts/libraries/SwapMath.sol",
+          "byteLength": 4739,
+          "sha256": "8089ac4c4dab1b43eae515240113bc79c659f1c06c8af7fb2e46d86fe8bd896b"
+        },
+        {
+          "sourceName": "contracts/libraries/Tick.sol",
+          "byteLength": 9901,
+          "sha256": "a57adbf4ca4186dff2b64ed4ecc1357b835c3140fa5e735d7f3e540842d80e69"
+        },
+        {
+          "sourceName": "contracts/libraries/TickBitmap.sol",
+          "byteLength": 4198,
+          "sha256": "9e85725f0dd6a5f656b9c62fd85bb2e161f0bc2ab4ab22dea5015baa9ca5c2f8"
+        },
+        {
+          "sourceName": "contracts/libraries/TickMath.sol",
+          "byteLength": 8850,
+          "sha256": "49af6f57e194434125d27d334e6d332cee4614058be896f350d165adec15dc9d"
+        },
+        {
+          "sourceName": "contracts/libraries/TransferHelper.sol",
+          "byteLength": 967,
+          "sha256": "249a12bb7d5d457ff96239e11de800dafde5416e7c9d510e2c2624a8f98a31fe"
+        },
+        {
+          "sourceName": "contracts/libraries/UnsafeMath.sol",
+          "byteLength": 677,
+          "sha256": "c88ded0621b6a4058b5ca0d3e9ef6dc6beb679de3f5988e5af19559bf48aa850"
+        },
+        {
+          "sourceName": "contracts/PancakeV3Pool.sol",
+          "byteLength": 37715,
+          "sha256": "19055e39fb3f8179c1fbb5d24a64426221354d6f7e92c4f9da6f85ad5d73852a"
+        },
+        {
+          "sourceName": "contracts/PancakeV3PoolDeployer.sol",
+          "byteLength": 2003,
+          "sha256": "7f91f75daf937712169c4cf7dfdeacf772e6a8dd526f63995044ba560f2d30b2"
+        }
+      ],
+      "hardhatBuildInfoSha256": "e8b9d4ed4eb68b70523800e2c463e030e713130e463ad5fefe46300ad6f30274"
+    },
+    "factory": {
+      "canonicalSha256": "74bb2f58facb94e6f95b383dbb2c80a0ee5a7a54a11a03d287045b49354a1516",
+      "canonicalSettingsSha256": "9e00cb07c6a848d7c90d9722f5fa9c5bbd777a06589906fad7ede013ed1786ef",
+      "optimizerRuns": 1000000,
+      "sourceCount": 60,
+      "sources": [
+        {
+          "sourceName": "@pancakeswap/v3-lm-pool/contracts/interfaces/IPancakeV3LmPool.sol",
+          "byteLength": 233,
+          "sha256": "304fb91f61dc8689aef4b143c1039ed611b2714846892c6cb0c43f5f51b1d103"
+        },
+        {
+          "sourceName": "contracts/interfaces/callback/IPancakeV3FlashCallback.sol",
+          "byteLength": 1000,
+          "sha256": "1ef21fe3ee5f14a95baeb7c2db619803b3345241422b4c5b2514a001921a4486"
+        },
+        {
+          "sourceName": "contracts/interfaces/callback/IPancakeV3MintCallback.sol",
+          "byteLength": 998,
+          "sha256": "730f64ed1fb2a544dc17add941ae296467b755e644fa78799f5bf277cacd48d1"
+        },
+        {
+          "sourceName": "contracts/interfaces/callback/IPancakeV3SwapCallback.sol",
+          "byteLength": 1314,
+          "sha256": "d3f0f6e8aeeda5b30f9b2996c537da5d370c65f9cc0ec8112eb475776103e8be"
+        },
+        {
+          "sourceName": "contracts/interfaces/IERC20Minimal.sol",
+          "byteLength": 3134,
+          "sha256": "03e32096b1cbeb72fcd787b387d8028aa9224b817a60235c2516700b057bee6d"
+        },
+        {
+          "sourceName": "contracts/interfaces/IPancakeV3Factory.sol",
+          "byteLength": 6101,
+          "sha256": "ccb37f3bdc80dfc96fce0c9fe0e75aa5def74738904006ded371fb50ceed779b"
+        },
+        {
+          "sourceName": "contracts/interfaces/IPancakeV3Pool.sol",
+          "byteLength": 841,
+          "sha256": "81c29a8e5013ed86384207ab640ee9c21319d063434b87321e709780a3be21cc"
+        },
+        {
+          "sourceName": "contracts/interfaces/IPancakeV3PoolDeployer.sol",
+          "byteLength": 1518,
+          "sha256": "1ae74bd7d9d23dae02b2f80ff26b12995cc37ac29872f366be7c41837c226ce4"
+        },
+        {
+          "sourceName": "contracts/interfaces/pool/IPancakeV3PoolActions.sol",
+          "byteLength": 6407,
+          "sha256": "ca14d1e89c843bfde379749eb7ec0a5b721a5c0e08c04435d204f63cf7a65b82"
+        },
+        {
+          "sourceName": "contracts/interfaces/pool/IPancakeV3PoolDerivedState.sol",
+          "byteLength": 2642,
+          "sha256": "84b83f59c808c5524102003d156461b8b27e151fcb98edc04142047cda652708"
+        },
+        {
+          "sourceName": "contracts/interfaces/pool/IPancakeV3PoolEvents.sol",
+          "byteLength": 6354,
+          "sha256": "1cbe4f4f4d9c0c5fd575d939e54ded7972e8197e2ee989f33a183c4aa6686fd7"
+        },
+        {
+          "sourceName": "contracts/interfaces/pool/IPancakeV3PoolImmutables.sol",
+          "byteLength": 1846,
+          "sha256": "9c36ee95014de854bd526767a9bee274b175711fdecefb4bb71a081706d74679"
+        },
+        {
+          "sourceName": "contracts/interfaces/pool/IPancakeV3PoolOwnerActions.sol",
+          "byteLength": 1325,
+          "sha256": "60c2041c6b89e2b24bc35b830f7a3a35fc113d57c3a45da7ba259ce399dfa4f1"
+        },
+        {
+          "sourceName": "contracts/interfaces/pool/IPancakeV3PoolState.sol",
+          "byteLength": 6627,
+          "sha256": "06cc5f6790f07940e76349e5f8296d8e8629b6465a3331a6c6b846b0e4a3fdb2"
+        },
+        {
+          "sourceName": "contracts/libraries/BitMath.sol",
+          "byteLength": 2884,
+          "sha256": "91e3df3dcd241eb0101f40b188e4d36cad91fde6ac596ba5df537d2c555ecd38"
+        },
+        {
+          "sourceName": "contracts/libraries/FixedPoint128.sol",
+          "byteLength": 319,
+          "sha256": "0812b2e30b96c5959403b3fe3e0948e7e1c1ce75679bf835bc3de42345038a2f"
+        },
+        {
+          "sourceName": "contracts/libraries/FixedPoint96.sol",
+          "byteLength": 390,
+          "sha256": "8f08799ec2b6a29c68c978eccd472ddbaa4b0517d83a3c8ec4edc821da7b4252"
+        },
+        {
+          "sourceName": "contracts/libraries/FullMath.sol",
+          "byteLength": 5262,
+          "sha256": "a35f43afffc5587e10354f80fcea897f44895c75cfc98ac2130847202ed4bbe3"
+        },
+        {
+          "sourceName": "contracts/libraries/LiquidityMath.sol",
+          "byteLength": 639,
+          "sha256": "d127f3f1c3af2a5d3dfc06be36eb881af21a6da8ae9072b86efafee526554bcb"
+        },
+        {
+          "sourceName": "contracts/libraries/LowGasSafeMath.sol",
+          "byteLength": 1742,
+          "sha256": "a6860cfe14900f1a4c4cb555c4061429ea4c50b89a7c80f69f9bf67fcdb8e3b8"
+        },
+        {
+          "sourceName": "contracts/libraries/Oracle.sol",
+          "byteLength": 16837,
+          "sha256": "5178301ab1d1f5b8b0248c9c6f23fb4d77ad10d6d2d7cf6976d400cc5ec4b81e"
+        },
+        {
+          "sourceName": "contracts/libraries/Position.sol",
+          "byteLength": 3472,
+          "sha256": "3fd1c9e23554f20b631b8af7812a31be5eac129fcf9d720ffffe0b18963be847"
+        },
+        {
+          "sourceName": "contracts/libraries/SafeCast.sol",
+          "byteLength": 1076,
+          "sha256": "bb5337b1976bc3c937490d27bfbb13a8eb691e3211581287cfa025fe201e7651"
+        },
+        {
+          "sourceName": "contracts/libraries/SqrtPriceMath.sol",
+          "byteLength": 10943,
+          "sha256": "70f52820c3c5bf6b41fbbaf753e96f8f96e95d0e657e43dc989e20511bc2563f"
+        },
+        {
+          "sourceName": "contracts/libraries/SwapMath.sol",
+          "byteLength": 4739,
+          "sha256": "8089ac4c4dab1b43eae515240113bc79c659f1c06c8af7fb2e46d86fe8bd896b"
+        },
+        {
+          "sourceName": "contracts/libraries/Tick.sol",
+          "byteLength": 9901,
+          "sha256": "a57adbf4ca4186dff2b64ed4ecc1357b835c3140fa5e735d7f3e540842d80e69"
+        },
+        {
+          "sourceName": "contracts/libraries/TickBitmap.sol",
+          "byteLength": 4198,
+          "sha256": "9e85725f0dd6a5f656b9c62fd85bb2e161f0bc2ab4ab22dea5015baa9ca5c2f8"
+        },
+        {
+          "sourceName": "contracts/libraries/TickMath.sol",
+          "byteLength": 8850,
+          "sha256": "49af6f57e194434125d27d334e6d332cee4614058be896f350d165adec15dc9d"
+        },
+        {
+          "sourceName": "contracts/libraries/TransferHelper.sol",
+          "byteLength": 967,
+          "sha256": "249a12bb7d5d457ff96239e11de800dafde5416e7c9d510e2c2624a8f98a31fe"
+        },
+        {
+          "sourceName": "contracts/libraries/UnsafeMath.sol",
+          "byteLength": 677,
+          "sha256": "c88ded0621b6a4058b5ca0d3e9ef6dc6beb679de3f5988e5af19559bf48aa850"
+        },
+        {
+          "sourceName": "contracts/PancakeV3Factory.sol",
+          "byteLength": 6365,
+          "sha256": "e6173fa56742684700f769a5024859e49694e47ec17150da984a56eeac01aa9f"
+        },
+        {
+          "sourceName": "contracts/PancakeV3Pool.sol",
+          "byteLength": 37715,
+          "sha256": "19055e39fb3f8179c1fbb5d24a64426221354d6f7e92c4f9da6f85ad5d73852a"
+        },
+        {
+          "sourceName": "contracts/test/BitMathEchidnaTest.sol",
+          "byteLength": 624,
+          "sha256": "9aea7d395e19fbd8b2043a861ed5df32a678ed9594cb0b8e2d3537de908f204a"
+        },
+        {
+          "sourceName": "contracts/test/BitMathTest.sol",
+          "byteLength": 838,
+          "sha256": "945624d2bc1829e09ead2bba4d6ecfa080f1636611af0b5a04f5e868b043dfdc"
+        },
+        {
+          "sourceName": "contracts/test/FullMathEchidnaTest.sol",
+          "byteLength": 1810,
+          "sha256": "1a093912fe2f8a0c50d66798efb0f2ec038a920aea603fa008fd68c2970fa347"
+        },
+        {
+          "sourceName": "contracts/test/FullMathTest.sol",
+          "byteLength": 498,
+          "sha256": "243d54580afd844d809b52c259db27531a6c4745397cd482c0da5eccc2104e08"
+        },
+        {
+          "sourceName": "contracts/test/LiquidityMathTest.sol",
+          "byteLength": 494,
+          "sha256": "6524a93e5538ec97b77fabf873f6c622c28ab620cc88f8361599d3d4bef1e9db"
+        },
+        {
+          "sourceName": "contracts/test/LowGasSafeMathEchidnaTest.sol",
+          "byteLength": 1076,
+          "sha256": "50f67a80345f126605e9ca295d4407260f0dfe2eb3e06feb29d1aa61d5835974"
+        },
+        {
+          "sourceName": "contracts/test/MockTimePancakeV3Pool.sol",
+          "byteLength": 772,
+          "sha256": "52fbe46df8e84357ec6ff59bdabd481042925214dd90c508589555f5fae59a22"
+        },
+        {
+          "sourceName": "contracts/test/MockTimePancakeV3PoolDeployer.sol",
+          "byteLength": 1013,
+          "sha256": "36cfa1e196b6f6b81515c2f1ea987f4822095c1119c4fd8aba41c9bc48d6a5cb"
+        },
+        {
+          "sourceName": "contracts/test/OracleEchidnaTest.sol",
+          "byteLength": 5409,
+          "sha256": "e33dc9511cc1f6477bdb4a04bdf7c05f950f72722a3b3d450db8002354ac9441"
+        },
+        {
+          "sourceName": "contracts/test/OracleTest.sol",
+          "byteLength": 3179,
+          "sha256": "e5d5a8fc32f1dd8da7c9bcb29fd45962b150fb35b0821d6c8911147584f2c2c0"
+        },
+        {
+          "sourceName": "contracts/test/PancakeV3PoolSwapTest.sol",
+          "byteLength": 1515,
+          "sha256": "e3795e6705bf4b61de937009ff626a3eccf3b68d2aa9178f47dcfed1d25b4f32"
+        },
+        {
+          "sourceName": "contracts/test/SqrtPriceMathEchidnaTest.sol",
+          "byteLength": 7815,
+          "sha256": "8b797cb45946e68f2b376ed761d407a01796ac4d9ddd2d8b655754d544d4a9b9"
+        },
+        {
+          "sourceName": "contracts/test/SqrtPriceMathTest.sol",
+          "byteLength": 2786,
+          "sha256": "dfffdf08c7d3a5efb46cd84bd8cd762f99330c88e8b5cdccf7a5b1ff818a7fa7"
+        },
+        {
+          "sourceName": "contracts/test/SwapMathEchidnaTest.sol",
+          "byteLength": 1871,
+          "sha256": "627460fe55df8c838723af5af2f079e717d7a7141533c04638e0ccc8bf5c4068"
+        },
+        {
+          "sourceName": "contracts/test/SwapMathTest.sol",
+          "byteLength": 1011,
+          "sha256": "30def1ae564fce5deac4a1cccff612010c6ff43db1a88a3171304afd76ca62c8"
+        },
+        {
+          "sourceName": "contracts/test/TestERC20.sol",
+          "byteLength": 2230,
+          "sha256": "88a7a6dc37ab7c28c94d26cd1834206482a92817e5bcc622664b045ec5bae8d8"
+        },
+        {
+          "sourceName": "contracts/test/TestPancakeV3Callee.sol",
+          "byteLength": 4818,
+          "sha256": "710aaef7285b210c840ce337e18b89122d0375b6cbff75396f2631011dd69600"
+        },
+        {
+          "sourceName": "contracts/test/TestPancakeV3ReentrantCallee.sol",
+          "byteLength": 2227,
+          "sha256": "2aa3a5dd7e457ffb2880ae4613b4734b466f63bc6a5e559b24b87ac2d7d68895"
+        },
+        {
+          "sourceName": "contracts/test/TestPancakeV3Router.sol",
+          "byteLength": 3112,
+          "sha256": "7ad70d24bfddcdf9311732c67d63cde3df08ac599ff4f5aad4d32054a9a3182c"
+        },
+        {
+          "sourceName": "contracts/test/TestPancakeV3SwapPay.sol",
+          "byteLength": 1249,
+          "sha256": "ee692abebb308466ff24dbc7d19734235060d4204252ec8c68c9bd1ac8fd9769"
+        },
+        {
+          "sourceName": "contracts/test/TickBitmapEchidnaTest.sol",
+          "byteLength": 1800,
+          "sha256": "1c0be8d82d034267c7355b620853e4bdf48cab6739efcc32e5e5ba7d95857329"
+        },
+        {
+          "sourceName": "contracts/test/TickBitmapTest.sol",
+          "byteLength": 1315,
+          "sha256": "7f5fa94b74d4d8e6854c20da3919bb0faab1a80e6ff66e1d0b703eb64dff16c6"
+        },
+        {
+          "sourceName": "contracts/test/TickEchidnaTest.sol",
+          "byteLength": 993,
+          "sha256": "b8259ebe5c95f9a15fea50642934e3148532a8b03a4d6402d5677e064ab0dd28"
+        },
+        {
+          "sourceName": "contracts/test/TickMathEchidnaTest.sol",
+          "byteLength": 960,
+          "sha256": "c54cbd3368b6d328f81cf0ac1931fb8147d3c24763cfce5c2a6e8f21a629928f"
+        },
+        {
+          "sourceName": "contracts/test/TickMathTest.sol",
+          "byteLength": 1120,
+          "sha256": "df54463c7e940442152db93fb20b0461b2b3b748d51448d7c9cbc53531fda793"
+        },
+        {
+          "sourceName": "contracts/test/TickOverflowSafetyEchidnaTest.sol",
+          "byteLength": 3664,
+          "sha256": "e7c8cc19a2fa338da1f29435a098c95417a1f9dfc1bdb79a6da5aef48871637a"
+        },
+        {
+          "sourceName": "contracts/test/TickTest.sol",
+          "byteLength": 2340,
+          "sha256": "2467e42a6ed1dc7fad52e5f653703630ca6bde05f2526478168c3dab7dad7597"
+        },
+        {
+          "sourceName": "contracts/test/UnsafeMathEchidnaTest.sol",
+          "byteLength": 458,
+          "sha256": "662199822c679ba5945bc8f6ed87297ecea018b6783eb2a2cd3fce79a78d0b45"
+        }
+      ],
+      "hardhatBuildInfoSha256": "683326f6490b1a9850d5e62f48b6b946b2aebd6b0c2ac6bcc084e33e6c5e4b2c"
+    },
+    "gitBlobBindings": {
+      "path": "evidence/development/pancake-v3-pool-init-code-source-bindings-2026-08-13.json",
+      "entryCount": 61,
+      "compilerInputLineEndings": "crlf",
+      "normalizedIdentity": "exact_lf_bytes_equal_pinned_git_blobs"
+    },
+    "boundary": "The exact Standard JSON source contents and settings required for these three contracts are retained; the full checkout, node_modules, compiler binary and complete Hardhat outputs are not committed."
+  },
+  "artifactBindings": {
+    "pool": {
+      "creationByteLength": 23566,
+      "creationCodeKeccak256": "0x6ce8eb472fa82df5469c6ab6d485f17c3ad13c8cd7af59b3d4a8026c5ce0f7e2",
+      "runtimeTemplateByteLength": 22962,
+      "exactSolcRerunMatchedSnapshot": true
+    },
+    "poolDeployer": {
+      "creationByteLength": 24588,
+      "runtimeByteLength": 24556,
+      "runtimeKeccak256": "0xedd527f11646c1912dfc51b57ffa0ee27972f8798bcaf7bc68ae6ad054b6022b",
+      "exactSolcRerunMatchedSnapshot": true,
+      "exactCompiledRuntimeMatchedRetainedChain97Runtime": true
+    },
+    "factory": {
+      "creationByteLength": 6261,
+      "runtimeTemplateByteLength": 5151,
+      "patchedRuntimeKeccak256": "0x8191d3ab1d55d3da9822199f28865415c99566b6f1aee4a4b16713f57930678c",
+      "immutablePoolDeployer": "0x41ff9aa7e16b8b1a8a8dc4f0efacd93d02d071c9",
+      "exactPatchedRuntimeMatchedRetainedChain97Runtime": true
+    }
+  },
+  "deployerProvenance": {
+    "officialDeploymentCommit": "986847948755cba528324d41be19480731c36c2a",
+    "officialDeploymentManifestSha256": "18e6a1db8212ac187d579476c26ebcc1ae86bc11d5e6467c5fe8e8b18606c441",
+    "factory": "0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865",
+    "poolDeployer": "0x41ff9aa7e16b8b1a8a8dc4f0efacd93d02d071c9",
+    "sourceControlPath": {
+      "deployRestrictedToInitializedFactory": true,
+      "factorySetterCallerRestricted": false,
+      "factorySetterOneTimeZeroGuard": true,
+      "historicalInitializationRaceBoundary": "setFactoryAddress(address) was initially callable by anyone until the first nonzero assignment; the retained chain-97 getter is already bound to the official factory.",
+      "transientParametersSetBeforeCreate2AndDeletedAfter": true,
+      "create2SaltExpression": "keccak256(abi.encode(token0, token1, fee))",
+      "create2InitCode": "type(PancakeV3Pool).creationCode"
+    },
+    "historicalCheckpoint": {
+      "blockNumber": "124767685",
+      "blockHash": "0x1657811b903d77aa58f2a6a78a9536a71e98e36d60c13a6098b75f8962e1fc7c",
+      "twoProviderAgreementRetained": true,
+      "freshForFutureSubmission": false
+    }
+  },
+  "create2CrossChecks": {
+    "formula": "last20(keccak256(0xff || poolDeployer || keccak256(abi.encode(token0,token1,fee)) || keccak256(PancakeV3Pool.creationCode)))",
+    "knownCakeWbnbFee500": {
+      "token0": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+      "token1": "0xfa60d973f7642b748046464e165a65b7323b0dee",
+      "salt": "0x9f4899b3fcc0331140c69ffc65ca544db9f89d1b2f889dfb1ed16c427cd7ad99",
+      "derivedAddress": "0xeaf78e3aa2c19df9495318cd9ea2ad83be7d5015",
+      "retainedFactoryAuthenticatedAddress": "0xeaf78e3aa2c19df9495318cd9ea2ad83be7d5015",
+      "exact": true
+    },
+    "ptaWbnbFee500": {
+      "token0": "0x4ed64525d6fb06b7da926c683cbd809632c9b4cc",
+      "token1": "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+      "salt": "0x5c030acd8d38b759c124229312bdac56cbc3a78d527496a161966c188174d172",
+      "conditionalCandidate": "0x30b07e82d7181a53ae2ea98cd08b6733ffd831ae",
+      "exactGivenRetainedConstructionPath": true
+    }
+  },
+  "boundaries": {
+    "compilerArtifactProofScope": "Exact retained source/compiler inputs reproduce the pool creation code, deployer runtime and factory runtime template. Retained exact-block chain bytes bind that construction path historically.",
+    "ptaCandidateIsExistingPool": false,
+    "ptaPoolReceiptIncluded": false,
+    "ptaPoolCreatedEventIncluded": false,
+    "freshRuntimeOrFactoryStateIncluded": false,
+    "marketPriceClaimed": false,
+    "liquidityClaimed": false,
+    "remainingBeforeAnyWrite": "A fresh two-provider preflight, exact initializer selector attestation, simulation, nonce/gas/cost envelope, explicit transaction confirmation, mined receipt and post-state reconciliation remain separate gates."
+  },
+  "securityBoundary": {
+    "testnetOnly": true,
+    "networkConfigurationRead": false,
+    "processEnvironmentDumped": false,
+    "rpcPerformed": false,
+    "walletUsed": false,
+    "privateKeyUsed": false,
+    "signerUsed": false,
+    "signatureRequested": false,
+    "transactionBroadcast": false,
+    "mainnetActionPerformed": false
+  },
+  "integrity": {
+    "files": {
+      "poolAndDeployerInput": {
+        "path": "evidence/development/pancake-v3-pool-and-deployer-compiler-input-2026-08-13.json",
+        "sha256": "4577068ddd94002be02dabc5473d1cc7755dc2dc1b661b550bbf39ce73f16aaa"
+      },
+      "factoryInput": {
+        "path": "evidence/development/pancake-v3-factory-compiler-input-2026-08-13.json",
+        "sha256": "358f3ad79a6d60420381a7508af6d6358ca4b92a15799d54777c3b5f011b0b7a"
+      },
+      "sourceBindings": {
+        "path": "evidence/development/pancake-v3-pool-init-code-source-bindings-2026-08-13.json",
+        "sha256": "ee6ccc7c7e20333805760c96e7b2bb88b476ac37c8ead66689d13f08a6a9444f"
+      },
+      "artifacts": {
+        "path": "evidence/development/pancake-v3-pool-init-code-artifacts-2026-08-13.json",
+        "sha256": "d47c34094d1a28e5684341380b78a8f4c7624da8c78a126fa972e9ea4519fd5a"
+      },
+      "report": {
+        "path": "evidence/development/pancake-v3-pool-init-code-provenance-2026-08-13.json",
+        "sha256": null,
+        "reason": "self-referential digest intentionally omitted"
+      }
+    },
+    "canonicalBodySha256": "774ddaf9a6417685f9edc31fc7b7bf4a84552d7f24c1c4eb2acfaf8d45190336"
+  }
+}
