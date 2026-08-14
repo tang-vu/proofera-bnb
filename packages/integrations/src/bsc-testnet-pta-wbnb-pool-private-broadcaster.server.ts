@@ -4,7 +4,10 @@ import { isProxy } from "node:util/types";
 
 import { keccak256, stringToHex, type Hex } from "viem";
 
-import { BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
+import {
+  BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS,
+  BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY
+} from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 import { BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import { acquireBscTestnetPtaWbnbPoolProductionPreSubmissionForInternalUse } from "./bsc-testnet-pta-wbnb-pool-production-rpc.server";
 import {
@@ -13,10 +16,10 @@ import {
   type BscTestnetPtaWbnbPoolSubmissionJournalState
 } from "./bsc-testnet-pta-wbnb-pool-submission-reconciler.server";
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V2_POLICY,
+  BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V3_POLICY,
   createWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUse,
   type BscTestnetPtaWbnbPoolDurableSubmissionJournal,
-  type BscTestnetPtaWbnbPoolDurableOwnerV2Policy,
+  type BscTestnetPtaWbnbPoolDurableOwnerV3Policy,
   type BscTestnetPtaWbnbPoolSubmissionRecoveryState
 } from "./bsc-testnet-pta-wbnb-pool-submission-journal.server";
 import {
@@ -27,9 +30,11 @@ import {
 const BROADCAST_OPERATION =
   "consume_exact_bsc_testnet_pta_wbnb_pool_broadcast_authorization_after_durable_start" as const;
 const TERMINAL_PREFLIGHT_DIGEST_DOMAIN =
-  "proofera.bsc-testnet.pta-wbnb-pool.terminal-pre-send.v1" as const;
+  "proofera.bsc-testnet.pta-wbnb-pool.terminal-pre-send.v2" as const;
 const MAXIMUM_RPC_RESPONSE_BYTES = 32_768;
 const RPC_TIMEOUT_MILLISECONDS = 8_000;
+const MAXIMUM_TERMINAL_PRE_SUBMISSION_AGE_MILLISECONDS =
+  BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS * 1_000;
 const BYTES32 = /^0x[0-9a-f]{64}$/u;
 const ARM_INPUT_KEYS = ["gasLimit", "gasPriceWei", "transactionHash"] as const;
 const PRE_SUBMISSION_KEYS = [
@@ -62,6 +67,7 @@ const JOURNAL_STATE_KEYS = [
   "envelopeHash",
   "operationKey",
   "ownerAuthorizationDigest",
+  "recovery",
   "releaseCommit",
   "reviewerApprovalDigest",
   "runtimeManifestSha256",
@@ -74,7 +80,7 @@ const JOURNAL_STATE_KEYS = [
 ] as const;
 
 export interface BscTestnetPtaWbnbPoolExactBroadcastAuthorizationRequest {
-  readonly schemaVersion: 1;
+  readonly schemaVersion: 2;
   readonly operation: typeof BROADCAST_OPERATION;
   readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
   readonly claimId: string;
@@ -83,6 +89,7 @@ export interface BscTestnetPtaWbnbPoolExactBroadcastAuthorizationRequest {
   readonly runtimeManifestSha256: Hex;
   readonly reviewerApprovalDigest: Hex;
   readonly ownerAuthorizationDigest: Hex;
+  readonly recovery: BscTestnetPtaWbnbPoolSubmissionCapability["recovery"];
   readonly signingHash: Hex;
   readonly transactionHash: Hex;
   readonly signedTransactionKeccak256: Hex;
@@ -178,6 +185,25 @@ function exactNow(clock: () => Date): Date | null {
   }
 }
 
+function exactUtcMilliseconds(input: unknown): number | null {
+  if (typeof input !== "string") return null;
+  const milliseconds = Date.parse(input);
+  return Number.isSafeInteger(milliseconds) &&
+    milliseconds >= 0 &&
+    new Date(milliseconds).toISOString() === input
+    ? milliseconds
+    : null;
+}
+
+function terminalPreSubmissionIsFreshAt(observedAt: unknown, nowMilliseconds: number): boolean {
+  const observedAtMilliseconds = exactUtcMilliseconds(observedAt);
+  return (
+    observedAtMilliseconds !== null &&
+    observedAtMilliseconds <= nowMilliseconds &&
+    nowMilliseconds - observedAtMilliseconds <= MAXIMUM_TERMINAL_PRE_SUBMISSION_AGE_MILLISECONDS
+  );
+}
+
 function sameJson(left: unknown, right: unknown): boolean {
   try {
     return JSON.stringify(left) === JSON.stringify(right);
@@ -193,7 +219,13 @@ function sameRecordValues(
 ): boolean {
   const rightSnapshot = snapshotPlainRecord(right, keys);
   return (
-    left !== null && rightSnapshot !== null && keys.every((key) => left[key] === rightSnapshot[key])
+    left !== null &&
+    rightSnapshot !== null &&
+    keys.every((key) =>
+      key === "recovery"
+        ? sameJson(left[key], rightSnapshot[key])
+        : left[key] === rightSnapshot[key]
+    )
   );
 }
 
@@ -251,8 +283,8 @@ function snapshotPreSubmission(
     BscTestnetPtaWbnbPoolSubmissionCapability["preSubmission"] | null;
 }
 
-function exactOwnerPolicy(value: unknown): value is BscTestnetPtaWbnbPoolDurableOwnerV2Policy {
-  return sameJson(value, BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V2_POLICY);
+function exactOwnerPolicy(value: unknown): value is BscTestnetPtaWbnbPoolDurableOwnerV3Policy {
+  return sameJson(value, BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V3_POLICY);
 }
 
 function startedState(
@@ -274,7 +306,7 @@ function authorizationRequest(
   terminalPreSubmission: BscTestnetPtaWbnbPoolSubmissionCapability["preSubmission"]
 ): BscTestnetPtaWbnbPoolExactBroadcastAuthorizationRequest {
   return Object.freeze({
-    schemaVersion: 1 as const,
+    schemaVersion: 2 as const,
     operation: BROADCAST_OPERATION,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     claimId: capability.claimId,
@@ -283,6 +315,7 @@ function authorizationRequest(
     runtimeManifestSha256: capability.runtimeManifestSha256,
     reviewerApprovalDigest: capability.reviewerApprovalDigest,
     ownerAuthorizationDigest: capability.ownerAuthorizationDigest,
+    recovery: capability.recovery,
     signingHash: capability.transaction.signingHash,
     transactionHash: capability.transaction.transactionHash,
     signedTransactionKeccak256: keccak256(capability.transaction.signedTransaction),
@@ -293,7 +326,9 @@ function authorizationRequest(
     terminalPreSubmissionObservedAt: terminalPreSubmission.observedAt,
     terminalPreSubmissionDigest: keccak256(
       stringToHex(
-        `${TERMINAL_PREFLIGHT_DIGEST_DOMAIN}\u0000${JSON.stringify(terminalPreSubmission)}`
+        `${TERMINAL_PREFLIGHT_DIGEST_DOMAIN}\u0000${JSON.stringify(
+          Object.freeze({ recovery: capability.recovery, terminalPreSubmission })
+        )}`
       )
     )
   });
@@ -399,9 +434,9 @@ function createPrivateBroadcaster(
       ) {
         throw new BscTestnetPtaWbnbPoolPrivateBroadcastFailure("TERMINAL_PRE_SEND_RECHECK_INVALID");
       }
-      const observedAt = Date.parse(terminalPreSubmission.observedAt);
+      const observedAt = exactUtcMilliseconds(terminalPreSubmission.observedAt);
       if (
-        !Number.isSafeInteger(observedAt) ||
+        observedAt === null ||
         observedAt < initialNow.getTime() ||
         observedAt > afterPreflight.getTime()
       ) {
@@ -436,6 +471,14 @@ function createPrivateBroadcaster(
       if (beforeConsumption === null || beforeConsumption.getTime() >= retained.originalExpiry) {
         throw new BscTestnetPtaWbnbPoolPrivateBroadcastFailure("OWNER_AUTHORIZATION_EXPIRED");
       }
+      if (
+        !terminalPreSubmissionIsFreshAt(
+          retained.request.terminalPreSubmissionObservedAt,
+          beforeConsumption.getTime()
+        )
+      ) {
+        throw new BscTestnetPtaWbnbPoolPrivateBroadcastFailure("TERMINAL_PRE_SEND_RECHECK_INVALID");
+      }
       let authorityConsumed = false;
       try {
         authorityConsumed =
@@ -455,6 +498,14 @@ function createPrivateBroadcaster(
         immediatelyBeforeSend.getTime() >= retained.originalExpiry
       ) {
         throw new BscTestnetPtaWbnbPoolPrivateBroadcastFailure("OWNER_AUTHORIZATION_EXPIRED");
+      }
+      if (
+        !terminalPreSubmissionIsFreshAt(
+          retained.request.terminalPreSubmissionObservedAt,
+          immediatelyBeforeSend.getTime()
+        )
+      ) {
+        throw new BscTestnetPtaWbnbPoolPrivateBroadcastFailure("TERMINAL_PRE_SEND_RECHECK_INVALID");
       }
       try {
         const result = await dependencies.sendFixedRawTransaction(
@@ -599,6 +650,7 @@ export async function createBscTestnetPtaWbnbPoolPrivateBroadcasterForInternalUs
 
 export interface BscTestnetPtaWbnbPoolPrivateBroadcasterTestScenario {
   readonly now: string;
+  readonly nowSequence?: readonly string[];
   readonly recoveryState: BscTestnetPtaWbnbPoolSubmissionRecoveryState;
   readonly journalState: unknown;
   readonly terminalPreSubmission: unknown;
@@ -619,9 +671,15 @@ export function createBscTestnetPtaWbnbPoolPrivateBroadcasterTestRealmForTests(
   let authorityCalls = 0;
   let transportCalls = 0;
   let authorityConsumed = false;
+  const clockValues =
+    scenario.nowSequence !== undefined && scenario.nowSequence.length > 0
+      ? scenario.nowSequence
+      : [scenario.now];
+  let clockIndex = 0;
   const broadcaster = createPrivateBroadcaster(
     Object.freeze({
-      now: () => new Date(scenario.now),
+      now: () =>
+        new Date(clockValues[Math.min(clockIndex++, clockValues.length - 1)] ?? scenario.now),
       journal: Object.freeze({
         readRecoveryState: async () => scenario.recoveryState,
         readState: async () => scenario.journalState

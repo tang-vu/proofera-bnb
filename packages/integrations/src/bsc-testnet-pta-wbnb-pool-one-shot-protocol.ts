@@ -36,16 +36,22 @@ import {
 export const BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY =
   "0xe6c943aa33e600bfc1770ee654ee6b00bf6dbcc7cc1702c58bd1caa64dadb9cc" as const satisfies Hex;
 export const BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID =
-  "proofera:bsc-testnet:97:pta-wbnb:pancake-v3-fee-500:sender-nonce-1:v1" as const;
-export const BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_SCHEMA_VERSION = 1 as const;
+  "proofera:bsc-testnet:97:pta-wbnb:pancake-v3-fee-500:sender-nonce-1:v2" as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION = 2 as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE = "superseded_before_worker" as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_ATTEMPT_ID_DOMAIN =
+  "proofera.bsc-testnet.pta-wbnb-pool.recovery-attempt.v2" as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256 =
+  "0xf10e90eb836a94446ace100bbc9a6fc5de6cc35b1d82e4d10fb4736ef8559e32" as const satisfies Hex;
+export const BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_SCHEMA_VERSION = 2 as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_SCOPE =
-  "exact_pta_wbnb_pool_initialization_after_atomic_claim_and_dual_rpc_recheck" as const;
+  "exact_pta_wbnb_pool_recovery_generation_2_after_atomic_claim_and_dual_rpc_recheck" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS = 30 as const;
-export const BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_PROTOCOL_VERSION = 1 as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_PROTOCOL_VERSION = 2 as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_OPERATION =
   "sign_exact_bsc_testnet_pta_wbnb_pool_initialization" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_REQUEST_HASH_DOMAIN =
-  "proofera.bsc-testnet.pta-wbnb-pool-signing-worker-request.v1" as const;
+  "proofera.bsc-testnet.pta-wbnb-pool-signing-worker-request.v2" as const;
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as const;
 const UINT256_MAX = (1n << 256n) - 1n;
@@ -84,10 +90,55 @@ export interface BscTestnetPtaWbnbPoolExactSigningTransaction {
   readonly sourceEnvelopeHash: Hex;
 }
 
+export interface BscTestnetPtaWbnbPoolRecoveryAttemptBinding {
+  readonly generation: typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
+  readonly predecessorState: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE;
+  readonly predecessorFenceSha256: Hex;
+  readonly attemptId: Hex;
+}
+
+export function deriveBscTestnetPtaWbnbPoolRecoveryAttemptId(
+  input: Readonly<{
+    generation: typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
+    predecessorFenceSha256: Hex;
+    envelopeHash: Hex;
+    runtimeReviewInstantiationDigest: Hex;
+    releaseCommit: string;
+    releaseTree: string;
+    runtimeManifestSha256: Hex;
+  }>
+): Hex | null {
+  if (
+    input.generation !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION ||
+    nonzeroHex32(input.predecessorFenceSha256) === null ||
+    nonzeroHex32(input.envelopeHash) === null ||
+    nonzeroHex32(input.runtimeReviewInstantiationDigest) === null ||
+    exactReleaseCommit(input.releaseCommit) === null ||
+    exactReleaseTree(input.releaseTree) === null ||
+    nonzeroHex32(input.runtimeManifestSha256) === null
+  ) {
+    return null;
+  }
+  const canonical = {
+    generation: input.generation,
+    predecessorFenceSha256: input.predecessorFenceSha256,
+    envelopeHash: input.envelopeHash,
+    runtimeReviewInstantiationDigest: input.runtimeReviewInstantiationDigest,
+    releaseCommit: input.releaseCommit,
+    releaseTree: input.releaseTree,
+    runtimeManifestSha256: input.runtimeManifestSha256
+  };
+  return keccak256(
+    stringToHex(
+      `${BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_ATTEMPT_ID_DOMAIN}\u0000${JSON.stringify(canonical)}`
+    )
+  );
+}
+
 /** Content validated by the authorization server; authenticity is a separate object capability. */
 export interface BscTestnetPtaWbnbPoolAuthorizedSigningIntent extends BscTestnetPtaWbnbPoolReleaseBinding {
-  readonly schemaVersion: 1;
-  readonly scope: "owner_designated_internal_release_policy_and_exact_owner_pool_initialization";
+  readonly schemaVersion: 2;
+  readonly scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_2";
   readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
   readonly envelopeHash: Hex;
   /** Legacy wire name: this is a private runtime-policy instantiation digest, not a reviewer signature. */
@@ -95,6 +146,7 @@ export interface BscTestnetPtaWbnbPoolAuthorizedSigningIntent extends BscTestnet
   readonly ownerAuthorizationDigest: Hex;
   readonly authenticatedAt: string;
   readonly expiresAt: string;
+  readonly recovery: BscTestnetPtaWbnbPoolRecoveryAttemptBinding;
   readonly transaction: BscTestnetPtaWbnbPoolExactSigningTransaction;
 }
 
@@ -110,6 +162,7 @@ export interface BscTestnetPtaWbnbPoolFreshRecheckCapability extends BscTestnetP
   readonly journalClaimToken: Hex;
   readonly authenticatedAt: string;
   readonly expiresAt: string;
+  readonly recovery: BscTestnetPtaWbnbPoolRecoveryAttemptBinding;
   readonly freshPostClaimDualRpcRecheckPerformed: true;
   readonly rpc: Readonly<{
     primaryOrigin: typeof BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN;
@@ -145,6 +198,7 @@ export interface BscTestnetPtaWbnbPoolValidatedSigningIntent extends BscTestnetP
   readonly journalClaimToken: Hex;
   readonly authenticatedAt: string;
   readonly expiresAt: string;
+  readonly recovery: BscTestnetPtaWbnbPoolRecoveryAttemptBinding;
   readonly transaction: BscTestnetPtaWbnbPoolExactSigningTransaction;
 }
 
@@ -162,6 +216,7 @@ export interface BscTestnetPtaWbnbPoolSigningWorkerRequest extends BscTestnetPta
   readonly ownerAuthorizationDigest: Hex;
   readonly authenticatedAt: string;
   readonly expiresAt: string;
+  readonly recovery: BscTestnetPtaWbnbPoolRecoveryAttemptBinding;
   readonly transaction: BscTestnetPtaWbnbPoolExactSigningTransaction;
   readonly requestHashDomain: typeof BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_REQUEST_HASH_DOMAIN;
   readonly requestHash: Hex;
@@ -260,6 +315,7 @@ const FRESH_CAPABILITY_KEYS = [
   "ownerAuthorizationDigest",
   "releaseCommit",
   "reviewerApprovalDigest",
+  "recovery",
   "rpc",
   "runtimeManifestSha256",
   "schemaVersion",
@@ -302,6 +358,7 @@ const WORKER_REQUEST_KEYS = [
   "requestHash",
   "requestHashDomain",
   "reviewerApprovalDigest",
+  "recovery",
   "runtimeManifestSha256",
   "schemaVersion",
   "transaction"
@@ -329,10 +386,17 @@ const AUTHORIZED_INTENT_KEYS = [
   "ownerAuthorizationDigest",
   "releaseCommit",
   "reviewerApprovalDigest",
+  "recovery",
   "runtimeManifestSha256",
   "schemaVersion",
   "scope",
   "transaction"
+] as const;
+const RECOVERY_KEYS = [
+  "attemptId",
+  "generation",
+  "predecessorFenceSha256",
+  "predecessorState"
 ] as const;
 
 function issue(
@@ -444,6 +508,42 @@ function exactReleaseCommit(value: unknown): string | null {
   return typeof value === "string" && /^[0-9a-f]{40}$/u.test(value) && !/^0{40}$/u.test(value)
     ? value
     : null;
+}
+
+function exactReleaseTree(value: unknown): string | null {
+  return exactReleaseCommit(value);
+}
+
+function inspectRecoveryAttemptBinding(
+  input: unknown
+): BscTestnetPtaWbnbPoolRecoveryAttemptBinding | null {
+  const recovery = inspectDataRecord(input, RECOVERY_KEYS);
+  const predecessorFenceSha256 =
+    recovery === null ? null : nonzeroHex32(recovery.predecessorFenceSha256);
+  const attemptId = recovery === null ? null : nonzeroHex32(recovery.attemptId);
+  if (
+    recovery === null ||
+    !Object.isFrozen(input) ||
+    recovery.generation !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION ||
+    recovery.predecessorState !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE ||
+    predecessorFenceSha256 === null ||
+    attemptId === null
+  ) {
+    return null;
+  }
+  return Object.freeze({
+    generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
+    predecessorState: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
+    predecessorFenceSha256,
+    attemptId
+  });
+}
+
+function sameRecoveryAttemptBinding(
+  left: BscTestnetPtaWbnbPoolRecoveryAttemptBinding,
+  right: BscTestnetPtaWbnbPoolRecoveryAttemptBinding
+): boolean {
+  return RECOVERY_KEYS.every((key) => left[key] === right[key]);
 }
 
 function exactClaimId(value: unknown): string | null {
@@ -661,6 +761,7 @@ export function parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse(
   const envelopeHash = nonzeroHex32(root.envelopeHash);
   const reviewerApprovalDigest = nonzeroHex32(root.reviewerApprovalDigest);
   const ownerAuthorizationDigest = nonzeroHex32(root.ownerAuthorizationDigest);
+  const recovery = inspectRecoveryAttemptBinding(root.recovery);
   const runtimeManifestSha256 = nonzeroHex32(root.runtimeManifestSha256);
   const releaseCommit = exactReleaseCommit(root.releaseCommit);
   const authenticatedAt = canonicalUtc(root.authenticatedAt);
@@ -671,12 +772,14 @@ export function parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse(
     envelopeHash === null ||
     reviewerApprovalDigest === null ||
     ownerAuthorizationDigest === null ||
+    recovery === null ||
     runtimeManifestSha256 === null ||
     releaseCommit === null ||
     authenticatedAt === null ||
     expiresAt === null ||
-    root.schemaVersion !== 1 ||
-    root.scope !== "owner_designated_internal_release_policy_and_exact_owner_pool_initialization" ||
+    root.schemaVersion !== 2 ||
+    root.scope !==
+      "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_2" ||
     root.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
     transaction.sourceEnvelopeHash !== envelopeHash ||
     expiresAt.milliseconds - authenticatedAt.milliseconds !==
@@ -685,8 +788,8 @@ export function parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse(
     return null;
   }
   return Object.freeze({
-    schemaVersion: 1,
-    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_initialization",
+    schemaVersion: 2,
+    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_2",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash,
     reviewerApprovalDigest,
@@ -695,6 +798,7 @@ export function parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse(
     runtimeManifestSha256,
     authenticatedAt: authenticatedAt.iso,
     expiresAt: expiresAt.iso,
+    recovery,
     transaction
   });
 }
@@ -711,6 +815,7 @@ function inspectFreshCapability(
   const envelopeHash = nonzeroHex32(root.envelopeHash);
   const reviewerApprovalDigest = nonzeroHex32(root.reviewerApprovalDigest);
   const ownerAuthorizationDigest = nonzeroHex32(root.ownerAuthorizationDigest);
+  const recovery = inspectRecoveryAttemptBinding(root.recovery);
   const journalClaimToken = nonzeroHex32(root.journalClaimToken);
   const claimId = exactClaimId(root.claimId);
   const authenticatedAt = canonicalUtc(root.authenticatedAt);
@@ -743,6 +848,7 @@ function inspectFreshCapability(
     envelopeHash === null ||
     reviewerApprovalDigest === null ||
     ownerAuthorizationDigest === null ||
+    recovery === null ||
     journalClaimToken === null ||
     claimId === null ||
     authenticatedAt === null ||
@@ -800,6 +906,7 @@ function inspectFreshCapability(
     runtimeManifestSha256,
     authenticatedAt: authenticatedAt.iso,
     expiresAt: expiresAt.iso,
+    recovery,
     freshPostClaimDualRpcRecheckPerformed: true,
     rpc: Object.freeze({
       primaryOrigin: BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN,
@@ -918,6 +1025,7 @@ export function validateBscTestnetPtaWbnbPoolFreshRecheckCapability(
       capability.runtimeManifestSha256 !== authorizedIntent.runtimeManifestSha256 ||
       capability.reviewerApprovalDigest !== authorizedIntent.reviewerApprovalDigest ||
       capability.ownerAuthorizationDigest !== authorizedIntent.ownerAuthorizationDigest ||
+      !sameRecoveryAttemptBinding(capability.recovery, authorizedIntent.recovery) ||
       capability.claimId !== expectedClaimId ||
       capability.transaction.sourceEnvelopeHash !== authorizedIntent.envelopeHash ||
       JSON.stringify(capability.transaction) !== JSON.stringify(authorizedIntent.transaction) ||
@@ -947,6 +1055,7 @@ export function validateBscTestnetPtaWbnbPoolFreshRecheckCapability(
         runtimeManifestSha256: capability.runtimeManifestSha256,
         authenticatedAt: capability.authenticatedAt,
         expiresAt: capability.expiresAt,
+        recovery: capability.recovery,
         transaction: capability.transaction
       }),
       issue: null
@@ -982,6 +1091,7 @@ export function buildBscTestnetPtaWbnbPoolSigningWorkerRequest(
     ownerAuthorizationDigest: intent.ownerAuthorizationDigest,
     authenticatedAt: intent.authenticatedAt,
     expiresAt: intent.expiresAt,
+    recovery: intent.recovery,
     transaction: intent.transaction,
     requestHashDomain: BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_REQUEST_HASH_DOMAIN
   };
@@ -1000,6 +1110,7 @@ function inspectWorkerRequest(input: unknown): BscTestnetPtaWbnbPoolSigningWorke
   const journalClaimToken = nonzeroHex32(root.journalClaimToken);
   const reviewerApprovalDigest = nonzeroHex32(root.reviewerApprovalDigest);
   const ownerAuthorizationDigest = nonzeroHex32(root.ownerAuthorizationDigest);
+  const recovery = inspectRecoveryAttemptBinding(root.recovery);
   const claimId = exactClaimId(root.claimId);
   const authenticatedAt = canonicalUtc(root.authenticatedAt);
   const expiresAt = canonicalUtc(root.expiresAt);
@@ -1011,6 +1122,7 @@ function inspectWorkerRequest(input: unknown): BscTestnetPtaWbnbPoolSigningWorke
     journalClaimToken === null ||
     reviewerApprovalDigest === null ||
     ownerAuthorizationDigest === null ||
+    recovery === null ||
     claimId === null ||
     authenticatedAt === null ||
     expiresAt === null ||
@@ -1044,6 +1156,7 @@ function inspectWorkerRequest(input: unknown): BscTestnetPtaWbnbPoolSigningWorke
     ownerAuthorizationDigest,
     authenticatedAt: authenticatedAt.iso,
     expiresAt: expiresAt.iso,
+    recovery,
     transaction,
     requestHashDomain: BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_REQUEST_HASH_DOMAIN
   };

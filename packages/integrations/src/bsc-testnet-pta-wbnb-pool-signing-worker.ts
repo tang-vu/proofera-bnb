@@ -55,12 +55,16 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
   createWindowsBscTestnetPtaWbnbPoolLocalJournal,
-  type BscTestnetPtaWbnbPoolLocalJournal
+  openExistingWindowsBscTestnetPtaWbnbPoolLegacyLocalJournalForRecoveryForInternalUse,
+  openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse,
+  type BscTestnetPtaWbnbPoolLocalJournal,
+  type BscTestnetPtaWbnbPoolLocalJournalState
 } from "./bsc-testnet-pta-wbnb-pool-local-journal.server";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
+  BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
   BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_OPERATION,
   BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_PROTOCOL_VERSION,
   BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_REQUEST_HASH_DOMAIN,
@@ -88,6 +92,7 @@ import {
   type BscTestnetPtaWbnbPoolProductionRuntimeManifestEntry,
   type BscTestnetPtaWbnbPoolRuntimeReviewInstantiation
 } from "./bsc-testnet-pta-wbnb-pool-release-review-policy.server";
+import { openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse } from "./bsc-testnet-pta-wbnb-pool-submission-journal.server";
 
 const MAXIMUM_STDIN_BYTES = 32_768;
 const MAXIMUM_JSON_DEPTH = 12;
@@ -1357,9 +1362,17 @@ const WORKER_REQUEST_KEYS = [
   "ownerAuthorizationDigest",
   "authenticatedAt",
   "expiresAt",
+  "recovery",
   "transaction",
   "requestHashDomain",
   "requestHash"
+] as const;
+
+const WORKER_RECOVERY_KEYS = [
+  "generation",
+  "predecessorState",
+  "predecessorFenceSha256",
+  "attemptId"
 ] as const;
 
 const WORKER_TRANSACTION_KEYS = [
@@ -1387,11 +1400,14 @@ function canonicalRequestSnapshot(
   input: unknown
 ): BscTestnetPtaWbnbPoolSigningWorkerRequest | null {
   const root = dataRecord(input);
+  const recovery = root === null ? null : dataRecord(root.recovery);
   const transaction = root === null ? null : dataRecord(root.transaction);
   if (
     root === null ||
+    recovery === null ||
     transaction === null ||
     !hasExactKeys(root, WORKER_REQUEST_KEYS) ||
+    !hasExactKeys(recovery, WORKER_RECOVERY_KEYS) ||
     !hasExactKeys(transaction, WORKER_TRANSACTION_KEYS)
   ) {
     return null;
@@ -1399,8 +1415,18 @@ function canonicalRequestSnapshot(
   const transactionSnapshot = Object.fromEntries(
     WORKER_TRANSACTION_KEYS.map((key) => [key, transaction[key]])
   );
+  const recoverySnapshot = Object.freeze(
+    Object.fromEntries(WORKER_RECOVERY_KEYS.map((key) => [key, recovery[key]]))
+  );
   const requestSnapshot = Object.fromEntries(
-    WORKER_REQUEST_KEYS.map((key) => [key, key === "transaction" ? transactionSnapshot : root[key]])
+    WORKER_REQUEST_KEYS.map((key) => [
+      key,
+      key === "recovery"
+        ? recoverySnapshot
+        : key === "transaction"
+          ? transactionSnapshot
+          : root[key]
+    ])
   );
   return requestSnapshot as unknown as BscTestnetPtaWbnbPoolSigningWorkerRequest;
 }
@@ -1751,8 +1777,10 @@ function canonicalizeWorkerRequest(input: unknown): Buffer {
   }
 }
 
-/** Test composition only; it cannot select a transaction or custody path. */
-/** Test-only composition: injected signers cannot reach the private production custody function. */
+/**
+ * Exact-key-validated worker core. Tests inject non-custody ports; the closure-private production
+ * issuer below supplies native custody only after its authority and durable-start gates.
+ */
 export function createBscTestnetPtaWbnbPoolSigningWorkerForInternalUse(
   untrustedPorts: unknown
 ): BscTestnetPtaWbnbPoolSigningWorker {
@@ -1846,14 +1874,14 @@ export function createBscTestnetPtaWbnbPoolSigningWorkerForInternalUse(
   });
 }
 
-// Reviewed cryptographic building blocks remain deliberately unreachable from production in this
-// release. These anchors do not invoke either function.
+// Keep the reviewed cryptographic function identities explicitly anchored. The closure-private
+// production issuer below supplies them only after its authority and durable-start gates.
 void nativeWindowsSignExactPoolTransaction;
 void attestSignedTransaction;
 
 /**
- * Reviewed native production worker shape. This release deliberately has no production authority
- * bridge: test/core capabilities can never unlock custody, signing, or a broadcast-capable worker.
+ * Reviewed native production worker issuer. It creates no authority from copied data: only the
+ * closure-private execution capability and exact durable journal can issue one native worker.
  */
 export function createBscTestnetPtaWbnbPoolProductionWorkerIssuerForInternalUse(): Readonly<{
   issue: (
@@ -1885,6 +1913,7 @@ const EXACT_BROADCAST_REQUEST_KEYS = [
   "runtimeManifestSha256",
   "reviewerApprovalDigest",
   "ownerAuthorizationDigest",
+  "recovery",
   "signingHash",
   "transactionHash",
   "signedTransactionKeccak256",
@@ -1894,6 +1923,13 @@ const EXACT_BROADCAST_REQUEST_KEYS = [
   "signedTransaction",
   "terminalPreSubmissionObservedAt",
   "terminalPreSubmissionDigest"
+] as const;
+
+const EXACT_BROADCAST_RECOVERY_KEYS = [
+  "generation",
+  "predecessorState",
+  "predecessorFenceSha256",
+  "attemptId"
 ] as const;
 
 const nativeActivatedProductionBridges = new WeakSet<object>();
@@ -1998,6 +2034,7 @@ export function matchesBscTestnetPtaWbnbPoolExactBroadcastToSuccessfulSigningFor
   response: BscTestnetPtaWbnbPoolSigningWorkerResponse
 ): boolean {
   const record = dataRecord(value);
+  const recovery = record === null ? null : dataRecord(record.recovery);
   const recordAuthenticatedAt =
     record === null ? null : exactUtcMilliseconds(record.authenticatedAt);
   const recordExpiresAt = record === null ? null : exactUtcMilliseconds(record.expiresAt);
@@ -2018,13 +2055,16 @@ export function matchesBscTestnetPtaWbnbPoolExactBroadcastToSuccessfulSigningFor
     requestAuthenticatedAt === null ||
     requestExpiresAt === null ||
     parsedIntent === null ||
+    recovery === null ||
     validateBscTestnetPtaWbnbPoolSigningWorkerRequest(
       request,
       new Date(requestAuthenticatedAt ?? Number.NaN)
     ).status !== "valid" ||
     !Object.isFrozen(value) ||
+    !Object.isFrozen(record.recovery) ||
     !hasExactKeys(record, EXACT_BROADCAST_REQUEST_KEYS) ||
-    record.schemaVersion !== 1 ||
+    !hasExactKeys(recovery, EXACT_BROADCAST_RECOVERY_KEYS) ||
+    record.schemaVersion !== 2 ||
     record.operation !== EXACT_BROADCAST_OPERATION ||
     record.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
     record.claimId !== request.claimId ||
@@ -2033,6 +2073,9 @@ export function matchesBscTestnetPtaWbnbPoolExactBroadcastToSuccessfulSigningFor
     record.runtimeManifestSha256 !== request.runtimeManifestSha256 ||
     record.reviewerApprovalDigest !== request.reviewerApprovalDigest ||
     record.ownerAuthorizationDigest !== request.ownerAuthorizationDigest ||
+    EXACT_BROADCAST_RECOVERY_KEYS.some(
+      (key) => recovery[key] !== intent.recovery[key] || recovery[key] !== request.recovery[key]
+    ) ||
     record.signingHash !== request.transaction.signingHash ||
     record.transactionHash !== response.transactionHash ||
     record.signedTransactionKeccak256 !== response.transactionHash ||
@@ -2073,6 +2116,44 @@ export function authenticateBscTestnetPtaWbnbPoolNativeProductionBridgeForIntern
 }
 
 /**
+ * Verification-only recovery gate used before the first custody-metadata operation. It cannot
+ * create a journal, authority, worker, signer, or broadcaster.
+ */
+export function matchesBscTestnetPtaWbnbPoolExactPreCustodyRecoveryForInternalUse(
+  legacyState: Pick<BscTestnetPtaWbnbPoolLocalJournalState, "status" | "supersessionFence">,
+  activeStatus: unknown,
+  submissionStatus: unknown,
+  instantiation: Pick<BscTestnetPtaWbnbPoolRuntimeReviewInstantiation, "recovery">
+): boolean {
+  try {
+    const retained = legacyState.supersessionFence;
+    const expected = instantiation.recovery.predecessorFence;
+    return (
+      legacyState.status === "superseded_before_worker" &&
+      retained !== null &&
+      activeStatus === "absent" &&
+      submissionStatus === "absent" &&
+      instantiation.recovery.generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION &&
+      retained.status === expected.status &&
+      retained.terminalCode === expected.terminalCode &&
+      retained.workerAuthorizationOutcome === expected.workerAuthorizationOutcome &&
+      retained.workerStartOutcome === expected.workerStartOutcome &&
+      retained.signatureOutcome === expected.signatureOutcome &&
+      retained.submissionOutcome === expected.submissionOutcome &&
+      retained.submissionJournalState === expected.submissionJournalState &&
+      retained.fenceRecordedAt === expected.fenceRecordedAt &&
+      retained.legacyClaimRawSha256 === expected.legacyClaimRawSha256 &&
+      retained.noEffectProofDigest === expected.noEffectProofDigest &&
+      retained.noEffectEnvelopeHash === expected.noEffectEnvelopeHash &&
+      retained.noEffectObservedAt === expected.noEffectObservedAt &&
+      retained.predecessorFenceSha256 === expected.predecessorFenceSha256
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Phase one is release inspection only: it does not touch custody, journals, TTY input, RPC, or any
  * write boundary. The returned preparation can conduct exactly one owner ceremony. Only its exact
  * privately branded confirmed command can enter phase two and activate the native signer realm.
@@ -2093,7 +2174,13 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
   const releaseTree = releaseIdentity.releaseTree;
   const now = (): Date => new Date();
   const localCustodyPathAclCapability = Object.freeze(Object.create(null) as object);
-  const ceremonyCommands = new WeakMap<object, BscTestnetPtaWbnbPoolOneShotPreparedDescriptor>();
+  const ceremonyCommands = new WeakMap<
+    object,
+    Readonly<{
+      descriptor: BscTestnetPtaWbnbPoolOneShotPreparedDescriptor;
+      instantiation: BscTestnetPtaWbnbPoolRuntimeReviewInstantiation;
+    }>
+  >();
   let ceremonyAttempted = false;
   let activationAttempted = false;
   const issuer = createBscTestnetPtaWbnbPoolAuthorityIssuerForInternalUse(
@@ -2236,7 +2323,12 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
       releaseTree,
       nativeTtyPorts
     );
-    if (result.status === "confirmed") ceremonyCommands.set(result.command, descriptor);
+    if (result.status === "confirmed") {
+      ceremonyCommands.set(
+        result.command,
+        Object.freeze({ descriptor, instantiation: runtimeReviewInstantiation })
+      );
+    }
     return result;
   };
 
@@ -2253,11 +2345,16 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
     }
     activationAttempted = true;
     try {
+      const ceremonyBinding =
+        typeof command === "object" && command !== null && !isProxy(command)
+          ? ceremonyCommands.get(command)
+          : undefined;
       if (
         typeof command !== "object" ||
         command === null ||
         isProxy(command) ||
-        ceremonyCommands.get(command) !== descriptor
+        ceremonyBinding === undefined ||
+        ceremonyBinding.descriptor !== descriptor
       ) {
         return nativeActivationBlocked(
           "NATIVE_OWNER_CEREMONY_REQUIRED",
@@ -2266,6 +2363,7 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
         );
       }
       ceremonyCommands.delete(command);
+      const runtimeReviewInstantiation = ceremonyBinding.instantiation;
 
       // Release drift is rejected before the first custody or journal operation.
       const expectedProductionReleaseAfter =
@@ -2291,6 +2389,31 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
           "RELEASE_TRUST_INVALID",
           "release",
           "The exact clean published release changed before native activation."
+        );
+      }
+
+      const [legacyRecovery, activeRecovery, submissionRecovery] = await Promise.all([
+        openExistingWindowsBscTestnetPtaWbnbPoolLegacyLocalJournalForRecoveryForInternalUse(),
+        openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse(),
+        openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse()
+      ]);
+      const legacyState =
+        legacyRecovery.status === "opened"
+          ? await legacyRecovery.journal.readStrictRecoveryState()
+          : null;
+      if (
+        legacyState === null ||
+        !matchesBscTestnetPtaWbnbPoolExactPreCustodyRecoveryForInternalUse(
+          legacyState,
+          activeRecovery.status,
+          submissionRecovery.status,
+          runtimeReviewInstantiation
+        )
+      ) {
+        return nativeActivationBlocked(
+          "NATIVE_RECOVERY_STATE_INVALID",
+          "recovery",
+          "The exact predecessor fence or empty generation-2 durable namespaces changed before custody metadata access."
         );
       }
 

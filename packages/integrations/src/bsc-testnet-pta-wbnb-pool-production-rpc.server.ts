@@ -27,6 +27,7 @@ import {
 import { BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_FINALITY_ANCESTRY_BLOCKS,
+  BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCHEMA_VERSION,
   type BscTestnetPtaWbnbPoolNormalizedAncestryHeader,
   type BscTestnetPtaWbnbPoolNormalizedBlock,
   type BscTestnetPtaWbnbPoolNormalizedLog,
@@ -904,8 +905,8 @@ export async function acquireBscTestnetPtaWbnbPoolProductionPreSubmissionForInte
 }
 
 /**
- * Non-executable broadcaster boundary. The fixed read adapters are retained for review, but this
- * release has no production one-consume authority bridge and therefore cannot send raw bytes.
+ * Generic raw-sender export is deliberately fail-only. The private production broadcaster owns a
+ * separate fixed one-consume RPC port; copied callers cannot route bytes through this function.
  */
 export async function sendExactBscTestnetPtaWbnbPoolRawTransactionOnceForInternalUse(
   signedTransaction: Hex
@@ -1062,7 +1063,7 @@ export async function observeExactBscTestnetPtaWbnbPoolTransactionForInternalUse
     )
   ]);
   return Object.freeze({
-    schemaVersion: 1,
+    schemaVersion: BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCHEMA_VERSION,
     operation: "reconcile_exact_bsc_testnet_pta_wbnb_pool_initialization",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     transactionHash,

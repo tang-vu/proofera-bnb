@@ -1061,7 +1061,7 @@ export async function coordinateBscTestnetPtaWbnbPoolInitializationForTests(
     }
 
     const body: BscTestnetPtaWbnbPoolInitializationEnvelopeBody = Object.freeze({
-      schemaVersion: 1 as const,
+      schemaVersion: 2 as const,
       operation: "create_and_initialize_exact_pta_wbnb_pancake_v3_pool_once" as const,
       chainId: "97" as const,
       transaction: Object.freeze({
@@ -1093,6 +1093,8 @@ export async function coordinateBscTestnetPtaWbnbPoolInitializationForTests(
         latestNonce: "1" as const,
         pendingNonce: "1" as const,
         pendingPool: ZERO_ADDRESS,
+        candidateCode: "0x" as const,
+        candidateNonce: "0" as const,
         providerAgreementVerified: true as const,
         allRuntimeIdentitiesVerified: true as const,
         allEip1967SlotsZero: true as const,

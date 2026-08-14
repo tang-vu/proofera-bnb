@@ -29,6 +29,8 @@ import {
 const ENVELOPE_HASH = `0x${"11".repeat(32)}` as Hex;
 const REVIEWER_DIGEST = `0x${"22".repeat(32)}` as Hex;
 const OWNER_DIGEST = `0x${"33".repeat(32)}` as Hex;
+const PREDECESSOR_FENCE = `0x${"34".repeat(32)}` as Hex;
+const ATTEMPT_ID = `0x${"35".repeat(32)}` as Hex;
 const CLAIM_TOKEN = `0x${"44".repeat(32)}` as Hex;
 const MANIFEST = `0x${"55".repeat(32)}` as Hex;
 const BLOCK_HASH = `0x${"66".repeat(32)}` as Hex;
@@ -59,8 +61,8 @@ function transaction() {
 
 function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
   return Object.freeze({
-    schemaVersion: 1,
-    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_initialization",
+    schemaVersion: 2,
+    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_2",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
     reviewerApprovalDigest: REVIEWER_DIGEST,
@@ -69,6 +71,12 @@ function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
     runtimeManifestSha256: MANIFEST,
     authenticatedAt: "2026-08-13T04:29:45.000Z",
     expiresAt: "2026-08-13T04:30:30.000Z",
+    recovery: Object.freeze({
+      generation: 2,
+      predecessorState: "superseded_before_worker",
+      predecessorFenceSha256: PREDECESSOR_FENCE,
+      attemptId: ATTEMPT_ID
+    }),
     transaction: transaction()
   });
 }
@@ -255,6 +263,12 @@ describe("PTA/WBNB post-claim dual-RPC recheck", () => {
       journalClaimToken: CLAIM_TOKEN,
       authenticatedAt: COMPLETE,
       expiresAt: "2026-08-13T04:30:30.000Z",
+      recovery: {
+        generation: 2,
+        predecessorState: "superseded_before_worker",
+        predecessorFenceSha256: PREDECESSOR_FENCE,
+        attemptId: ATTEMPT_ID
+      },
       rpc: {
         finalizedBlockNumber: COMMON_HEIGHT.toString(),
         finalizedBlockHash: BLOCK_HASH,
@@ -277,6 +291,20 @@ describe("PTA/WBNB post-claim dual-RPC recheck", () => {
         new Date("2026-08-13T04:30:02.000Z")
       )
     ).toMatchObject({ status: "valid" });
+    const mutatedRecovery = Object.freeze({
+      ...result.capability,
+      recovery: Object.freeze({
+        ...result.capability.recovery,
+        attemptId: `0x${"36".repeat(32)}` as Hex
+      })
+    });
+    expect(
+      validateBscTestnetPtaWbnbPoolFreshRecheckCapability(
+        mutatedRecovery,
+        { authorizedIntent: request.authorizedIntent, claimId: request.claimId },
+        new Date("2026-08-13T04:30:02.000Z")
+      )
+    ).toMatchObject({ status: "invalid", issue: { code: "CLAIM_BINDING_INVALID" } });
     expect(execution.rechecker.authenticateFreshPostClaimRecheck(result.capability)).toBe(true);
     expect(
       execution.rechecker.authenticateFreshPostClaimRecheck(structuredClone(result.capability))

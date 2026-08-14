@@ -12,13 +12,18 @@ import { keccak256, type Address, type Hex } from "viem";
 import { runPinnedPowerShellForInternalUse } from "./bsc-testnet-deployer-custody-windows.server";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS,
+  BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_LIMIT,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_PRICE_WEI,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_TOTAL_COST_WEI,
+  BSC_TESTNET_PTA_WBNB_POOL_MAX_OBSERVATION_AGE_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_SENDER
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
+  BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
+  BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
+  BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
   parseBscTestnetPtaWbnbPoolSigningWorkerRequestForInternalUse,
   validateBscTestnetPtaWbnbPoolSigningWorkerRequest,
   validateBscTestnetPtaWbnbPoolSigningWorkerResponse,
@@ -27,9 +32,33 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 
 const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
-const JOURNAL_SUBDIRECTORY = ["ProofEra", "operations", "bsc-testnet-pta-wbnb-pool-v1"] as const;
-const SCHEMA_VERSION = "bsc_testnet_pta_wbnb_pool_local_journal_v1" as const;
-const AUTHORIZATION_KIND = "exact_pta_wbnb_pool_initialization_user_authorization_v1" as const;
+const LEGACY_JOURNAL_SUBDIRECTORY = [
+  "ProofEra",
+  "operations",
+  "bsc-testnet-pta-wbnb-pool-v1"
+] as const;
+const ACTIVE_JOURNAL_SUBDIRECTORY = [
+  "ProofEra",
+  "operations",
+  "bsc-testnet-pta-wbnb-pool-v2"
+] as const;
+const LEGACY_SCHEMA_VERSION = "bsc_testnet_pta_wbnb_pool_local_journal_v1" as const;
+const ACTIVE_SCHEMA_VERSION = "bsc_testnet_pta_wbnb_pool_local_journal_v2" as const;
+const SUPERSESSION_FENCE_SCHEMA_VERSION =
+  "bsc_testnet_pta_wbnb_pool_pre_worker_supersession_fence_v1" as const;
+const LEGACY_AUTHORIZATION_KIND =
+  "exact_pta_wbnb_pool_initialization_user_authorization_v1" as const;
+const ACTIVE_AUTHORIZATION_KIND =
+  "exact_pta_wbnb_pool_recovery_generation_2_user_authorization_v2" as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN =
+  "proofera.bsc-testnet.pta-wbnb-pool.authorization-receipt.v2" as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_CLAIM_ID_DIGEST_DOMAIN =
+  "proofera.bsc-testnet.pta-wbnb-pool.claim-id.v2" as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_SUPERSESSION_FENCE_DIGEST_DOMAIN =
+  "proofera.bsc-testnet.pta-wbnb-pool.pre-worker-supersession-fence.v1" as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_NO_EFFECT_PROOF_DIGEST_DOMAIN =
+  "proofera.bsc-testnet.pta-wbnb-pool.pre-worker-no-effect-proof.v1" as const;
+export { BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256 };
 const MAXIMUM_RECORD_BYTES = 32_768;
 const MAXIMUM_AUTHORIZATION_LIFETIME_MILLISECONDS =
   BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS * 1_000;
@@ -39,18 +68,36 @@ const CANONICAL_UINT = /^(?:0|[1-9][0-9]*)$/u;
 const CANONICAL_UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u;
 const RELEASE_COMMIT = /^[0-9a-f]{40}$/u;
 const ZERO_BYTES32 = `0x${"00".repeat(32)}` as Hex;
+const UINT64_MAX = (1n << 64n) - 1n;
 
-const SLOT_FILES = Object.freeze([
+const LEGACY_SLOT_FILES = Object.freeze([
   "01-claim.v1.json",
   "02-transition.v1.json",
   "03-transition.v1.json",
   "04-transition.v1.json",
   "05-transition.v1.json"
 ]);
+const ACTIVE_SLOT_FILES = Object.freeze([
+  "01-claim.v2.json",
+  "02-transition.v2.json",
+  "03-transition.v2.json",
+  "04-transition.v2.json",
+  "05-transition.v2.json"
+]);
 
 export { BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY };
 
-export interface BscTestnetPtaWbnbPoolClaimRequest {
+type JournalGeneration = 1 | typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
+
+export interface BscTestnetPtaWbnbPoolRecoveryJournalBinding {
+  readonly generation: typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
+  readonly predecessorState: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE;
+  readonly predecessorFenceSha256: Hex;
+  readonly attemptId: Hex;
+}
+
+/** Exact generation-1 wire shape, exported only for deterministic legacy-fixture tests. */
+export interface BscTestnetPtaWbnbPoolLegacyClaimRequestForTests {
   readonly operationKey: Hex;
   readonly envelopeHash: Hex;
   readonly signingHash: Hex;
@@ -68,6 +115,36 @@ export interface BscTestnetPtaWbnbPoolClaimRequest {
   readonly authorizationReceiptSha256: Hex;
 }
 
+export interface BscTestnetPtaWbnbPoolGeneration2ClaimRequest
+  extends
+    BscTestnetPtaWbnbPoolLegacyClaimRequestForTests,
+    BscTestnetPtaWbnbPoolRecoveryJournalBinding {
+  readonly generation: typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
+  readonly predecessorState: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE;
+  readonly predecessorFenceSha256: Hex;
+  readonly attemptId: Hex;
+}
+
+type AnyClaimRequest =
+  BscTestnetPtaWbnbPoolLegacyClaimRequestForTests | BscTestnetPtaWbnbPoolGeneration2ClaimRequest;
+type LegacyClaimBody = Omit<
+  BscTestnetPtaWbnbPoolLegacyClaimRequestForTests,
+  "authorizationReceiptSha256"
+>;
+type Generation2ClaimBody = Omit<
+  BscTestnetPtaWbnbPoolGeneration2ClaimRequest,
+  "authorizationReceiptSha256"
+>;
+type AnyClaimBody = LegacyClaimBody | Generation2ClaimBody;
+
+function isGeneration2Claim(
+  request: AnyClaimRequest | AnyClaimBody
+): request is BscTestnetPtaWbnbPoolGeneration2ClaimRequest | Generation2ClaimBody {
+  return (
+    "generation" in request && request.generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+  );
+}
+
 interface JournalBinding {
   readonly claimId: string;
   readonly operationKey: Hex;
@@ -79,6 +156,10 @@ interface JournalBinding {
   readonly ownerAuthorizationDigest: Hex;
   readonly releaseCommit: string;
   readonly runtimeManifestSha256: Hex;
+  readonly generation?: typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
+  readonly predecessorState?: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE;
+  readonly predecessorFenceSha256?: Hex;
+  readonly attemptId?: Hex;
 }
 
 export interface BscTestnetPtaWbnbPoolWorkerAuthorizationRequest extends JournalBinding {
@@ -109,12 +190,64 @@ export interface BscTestnetPtaWbnbPoolTerminalRequest extends JournalBinding {
   readonly transactionHash?: Hex;
 }
 
+export interface BscTestnetPtaWbnbPoolNoEffectProof {
+  readonly schemaVersion: 1;
+  readonly kind: "exact_fixed_dual_rpc_no_onchain_effect_after_claim_v1";
+  readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
+  readonly envelopeHash: Hex;
+  readonly observedAt: string;
+  readonly finalizedBlockNumber: string;
+  readonly finalizedBlockHash: Hex;
+  readonly finalizedBlockTimestamp: string;
+  readonly latestNonce: "1";
+  readonly pendingNonce: "1";
+  readonly pendingPool: "0x0000000000000000000000000000000000000000";
+  readonly candidateCode: "0x";
+  readonly candidateNonce: "0";
+  readonly providerAgreementVerified: true;
+  readonly allRuntimeIdentitiesVerified: true;
+  readonly allEip1967SlotsZero: true;
+  readonly allProtocolBindingsVerified: true;
+  readonly feeTierVerified: true;
+  readonly simulationReturnPool: typeof BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE;
+  readonly submissionJournalPresence: "absent";
+}
+
+export interface BscTestnetPtaWbnbPoolClaimOnlyRecoveryCandidate extends JournalBinding {
+  readonly status: "claimed";
+  readonly legacyClaimRawSha256: Hex;
+  readonly legacyClaimRecordedAt: string;
+  readonly legacyAuthorizationExpiresAt: string;
+}
+
+export interface BscTestnetPtaWbnbPoolSupersessionFenceState {
+  readonly status: "superseded_before_worker";
+  readonly terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN";
+  readonly workerAuthorizationOutcome: "not_attempted";
+  readonly workerStartOutcome: "not_attempted";
+  readonly signatureOutcome: "not_attempted";
+  readonly submissionOutcome: "not_attempted";
+  readonly submissionJournalState: "exact_empty";
+  readonly legacyClaimRawSha256: Hex;
+  readonly noEffectProofDigest: Hex;
+  readonly noEffectEnvelopeHash: Hex;
+  readonly noEffectObservedAt: string;
+  readonly fenceRecordedAt: string;
+  readonly predecessorFenceSha256: Hex;
+}
+
+export interface BscTestnetPtaWbnbPoolFenceClaimBeforeWorkerRequest {
+  readonly expectedLegacyClaimRawSha256: Hex;
+  readonly proof: BscTestnetPtaWbnbPoolNoEffectProof;
+}
+
 export type BscTestnetPtaWbnbPoolLocalJournalStatus =
   | "empty"
   | "claimed"
   | "worker_authorized"
   | "worker_started"
   | "signed_committed"
+  | "superseded_before_worker"
   | "failed_before_submission"
   | "unknown_outcome";
 
@@ -130,6 +263,10 @@ export interface BscTestnetPtaWbnbPoolLocalJournalState {
   readonly ownerAuthorizationDigest: Hex | null;
   readonly releaseCommit: string | null;
   readonly runtimeManifestSha256: Hex | null;
+  readonly generation: JournalGeneration | null;
+  readonly predecessorState: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE | null;
+  readonly predecessorFenceSha256: Hex | null;
+  readonly attemptId: Hex | null;
   readonly gasLimit: string | null;
   readonly gasPriceWei: string | null;
   readonly maxCostWei: string | null;
@@ -137,10 +274,13 @@ export interface BscTestnetPtaWbnbPoolLocalJournalState {
   readonly expiresAt: string | null;
   readonly serializedTransaction: Hex | null;
   readonly transactionHash: Hex | null;
+  readonly supersessionFence: BscTestnetPtaWbnbPoolSupersessionFenceState | null;
 }
 
 export interface BscTestnetPtaWbnbPoolLocalJournal {
-  readonly claimExactInitialization: (request: BscTestnetPtaWbnbPoolClaimRequest) => Promise<
+  readonly claimExactInitialization: (
+    request: BscTestnetPtaWbnbPoolGeneration2ClaimRequest
+  ) => Promise<
     | Readonly<{ status: "claimed"; claimId: string }>
     | Readonly<{
         status: "already_claimed";
@@ -172,9 +312,29 @@ export interface BscTestnetPtaWbnbPoolLocalJournal {
   readonly readState: () => Promise<BscTestnetPtaWbnbPoolLocalJournalState>;
 }
 
-/** Read-only recovery view. A null result means the retained byte sequence was not strictly valid. */
-export interface BscTestnetPtaWbnbPoolLocalJournalRecoveryReader extends BscTestnetPtaWbnbPoolLocalJournal {
+/** Read-only active-generation recovery view; it deliberately exposes no mutation method. */
+export interface BscTestnetPtaWbnbPoolLocalJournalRecoveryReader {
+  readonly readState: () => Promise<BscTestnetPtaWbnbPoolLocalJournalState>;
   readonly readStrictRecoveryState: () => Promise<BscTestnetPtaWbnbPoolLocalJournalState | null>;
+}
+
+export interface BscTestnetPtaWbnbPoolLegacyLocalJournalRecoveryReader {
+  readonly readClaimOnlyRecoveryCandidate: () => Promise<BscTestnetPtaWbnbPoolClaimOnlyRecoveryCandidate | null>;
+  readonly fenceClaimBeforeWorker: (
+    request: BscTestnetPtaWbnbPoolFenceClaimBeforeWorkerRequest
+  ) => Promise<BscTestnetPtaWbnbPoolSupersessionFenceState>;
+  readonly readState: () => Promise<BscTestnetPtaWbnbPoolLocalJournalState>;
+  readonly readStrictRecoveryState: () => Promise<BscTestnetPtaWbnbPoolLocalJournalState | null>;
+}
+
+interface BscTestnetPtaWbnbPoolLocalJournalCore
+  extends
+    BscTestnetPtaWbnbPoolLocalJournal,
+    BscTestnetPtaWbnbPoolLocalJournalRecoveryReader,
+    BscTestnetPtaWbnbPoolLegacyLocalJournalRecoveryReader {
+  readonly claimExactInitialization: (
+    request: AnyClaimRequest
+  ) => ReturnType<BscTestnetPtaWbnbPoolLocalJournal["claimExactInitialization"]>;
 }
 
 export type BscTestnetPtaWbnbPoolLocalJournalRecoveryProbeResult =
@@ -211,6 +371,26 @@ export type BscTestnetPtaWbnbPoolExistingLocalJournalResult =
       issue: Readonly<{ code: "RECOVERY_JOURNAL_INVALID"; message: string }>;
     }>;
 
+export type BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult =
+  | Readonly<{
+      status: "absent";
+      journal: null;
+      state: BscTestnetPtaWbnbPoolLocalJournalState;
+      issue: null;
+    }>
+  | Readonly<{
+      status: "opened";
+      journal: BscTestnetPtaWbnbPoolLegacyLocalJournalRecoveryReader;
+      state: BscTestnetPtaWbnbPoolLocalJournalState;
+      issue: null;
+    }>
+  | Readonly<{
+      status: "blocked";
+      journal: null;
+      state: null;
+      issue: Readonly<{ code: "RECOVERY_JOURNAL_INVALID"; message: string }>;
+    }>;
+
 export interface BscTestnetPtaWbnbPoolJournalSecurityMetadata {
   readonly verified: true;
   readonly ownerSid: string;
@@ -224,6 +404,11 @@ export interface BscTestnetPtaWbnbPoolLocalJournalPorts {
   readonly listNames: () => Promise<readonly string[]>;
   readonly readBounded: (name: string) => Promise<string | null>;
   readonly createExclusive: (name: string, content: string) => Promise<"created" | "exists">;
+  /** Legacy slot-2 only: the adapter reserves O_EXCL before invoking the synchronous factory. */
+  readonly createExclusiveFenceFromFactory: (
+    name: string,
+    contentFactory: () => string
+  ) => Promise<"created" | "exists">;
   readonly assertSecure: (
     existingFiles: readonly string[]
   ) => Promise<BscTestnetPtaWbnbPoolJournalSecurityMetadata>;
@@ -235,20 +420,22 @@ type RecordKind =
   | "worker_authorized"
   | "worker_started"
   | "signed_committed"
+  | "superseded_before_worker"
   | "failed_before_submission"
   | "unknown_outcome";
 
 interface ParsedRecord extends JournalBinding {
-  readonly schemaVersion: typeof SCHEMA_VERSION;
+  readonly schemaVersion: typeof LEGACY_SCHEMA_VERSION | typeof ACTIVE_SCHEMA_VERSION;
   readonly kind: RecordKind;
   readonly recordedAt: string;
-  readonly claim?: BscTestnetPtaWbnbPoolClaimRequest;
+  readonly claim?: AnyClaimRequest;
   readonly workerRequestHash?: Hex;
   readonly authorizationTokenDigest?: Hex;
   readonly serializedTransaction?: Hex;
   readonly transactionHash?: Hex;
   readonly recoveredSigner?: Address;
   readonly outcomeDigest?: Hex;
+  readonly supersessionFence?: BscTestnetPtaWbnbPoolSupersessionFenceState;
 }
 
 function dataRecord(input: unknown): DataRecord | null {
@@ -337,11 +524,135 @@ function sha256HexBytes(value: Hex): Hex {
     .digest("hex")}`;
 }
 
-function receiptBody(
-  request: Omit<BscTestnetPtaWbnbPoolClaimRequest, "authorizationReceiptSha256">
+const NO_EFFECT_PROOF_KEYS = [
+  "schemaVersion",
+  "kind",
+  "operationKey",
+  "envelopeHash",
+  "observedAt",
+  "finalizedBlockNumber",
+  "finalizedBlockHash",
+  "finalizedBlockTimestamp",
+  "latestNonce",
+  "pendingNonce",
+  "pendingPool",
+  "candidateCode",
+  "candidateNonce",
+  "providerAgreementVerified",
+  "allRuntimeIdentitiesVerified",
+  "allEip1967SlotsZero",
+  "allProtocolBindingsVerified",
+  "feeTierVerified",
+  "simulationReturnPool",
+  "submissionJournalPresence"
+] as const;
+
+function inspectNoEffectProof(input: unknown): BscTestnetPtaWbnbPoolNoEffectProof | null {
+  const record = dataRecord(input);
+  const observedAt = record === null ? null : canonicalDate(record.observedAt);
+  const finalizedBlockNumber =
+    record === null ? null : canonicalPositiveUint(record.finalizedBlockNumber, UINT64_MAX);
+  const finalizedBlockTimestamp =
+    record === null ? null : canonicalPositiveUint(record.finalizedBlockTimestamp, UINT64_MAX);
+  if (
+    record === null ||
+    !Object.isFrozen(input) ||
+    !exactKeys(record, NO_EFFECT_PROOF_KEYS) ||
+    record.schemaVersion !== 1 ||
+    record.kind !== "exact_fixed_dual_rpc_no_onchain_effect_after_claim_v1" ||
+    record.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
+    !exactBytes32(record.envelopeHash) ||
+    observedAt === null ||
+    finalizedBlockNumber === null ||
+    !exactBytes32(record.finalizedBlockHash) ||
+    finalizedBlockTimestamp === null ||
+    finalizedBlockTimestamp * 1_000n > BigInt(Date.parse(observedAt)) ||
+    record.latestNonce !== "1" ||
+    record.pendingNonce !== "1" ||
+    record.pendingPool !== "0x0000000000000000000000000000000000000000" ||
+    record.candidateCode !== "0x" ||
+    record.candidateNonce !== "0" ||
+    record.providerAgreementVerified !== true ||
+    record.allRuntimeIdentitiesVerified !== true ||
+    record.allEip1967SlotsZero !== true ||
+    record.allProtocolBindingsVerified !== true ||
+    record.feeTierVerified !== true ||
+    record.simulationReturnPool !== BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE ||
+    record.submissionJournalPresence !== "absent"
+  ) {
+    return null;
+  }
+  return Object.freeze({
+    schemaVersion: 1 as const,
+    kind: "exact_fixed_dual_rpc_no_onchain_effect_after_claim_v1" as const,
+    operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
+    envelopeHash: record.envelopeHash,
+    observedAt,
+    finalizedBlockNumber: finalizedBlockNumber.toString(),
+    finalizedBlockHash: record.finalizedBlockHash,
+    finalizedBlockTimestamp: finalizedBlockTimestamp.toString(),
+    latestNonce: "1" as const,
+    pendingNonce: "1" as const,
+    pendingPool: "0x0000000000000000000000000000000000000000" as const,
+    candidateCode: "0x" as const,
+    candidateNonce: "0" as const,
+    providerAgreementVerified: true as const,
+    allRuntimeIdentitiesVerified: true as const,
+    allEip1967SlotsZero: true as const,
+    allProtocolBindingsVerified: true as const,
+    feeTierVerified: true as const,
+    simulationReturnPool: BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE,
+    submissionJournalPresence: "absent" as const
+  });
+}
+
+export function deriveBscTestnetPtaWbnbPoolNoEffectProofDigest(input: unknown): Hex | null {
+  const proof = inspectNoEffectProof(input);
+  return proof === null
+    ? null
+    : sha256Hex(
+        `${BSC_TESTNET_PTA_WBNB_POOL_NO_EFFECT_PROOF_DIGEST_DOMAIN}\u0000${JSON.stringify(proof)}`
+      );
+}
+
+function supersessionFenceDigestBody(
+  input: Readonly<{
+    binding: JournalBinding;
+    legacyClaimRawSha256: Hex;
+    noEffectProofDigest: Hex;
+    noEffectEnvelopeHash: Hex;
+    noEffectObservedAt: string;
+    recordedAt: string;
+  }>
 ) {
   return {
-    kind: AUTHORIZATION_KIND,
+    schemaVersion: SUPERSESSION_FENCE_SCHEMA_VERSION,
+    kind: "superseded_before_worker",
+    ...input.binding,
+    terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
+    workerAuthorizationOutcome: "not_attempted",
+    workerStartOutcome: "not_attempted",
+    signatureOutcome: "not_attempted",
+    submissionOutcome: "not_attempted",
+    submissionJournalState: "exact_empty",
+    legacyClaimRawSha256: input.legacyClaimRawSha256,
+    noEffectProofDigest: input.noEffectProofDigest,
+    noEffectEnvelopeHash: input.noEffectEnvelopeHash,
+    noEffectObservedAt: input.noEffectObservedAt,
+    recordedAt: input.recordedAt
+  };
+}
+
+function deriveSupersessionFenceSha256(input: Parameters<typeof supersessionFenceDigestBody>[0]) {
+  return sha256Hex(
+    `${BSC_TESTNET_PTA_WBNB_POOL_SUPERSESSION_FENCE_DIGEST_DOMAIN}\u0000${JSON.stringify(
+      supersessionFenceDigestBody(input)
+    )}`
+  );
+}
+
+function receiptBody(request: AnyClaimBody) {
+  const common = {
     operationKey: request.operationKey,
     envelopeHash: request.envelopeHash,
     signingHash: request.signingHash,
@@ -356,19 +667,36 @@ function receiptBody(
     authorizedAt: request.authorizedAt,
     expiresAt: request.expiresAt
   };
+  return isGeneration2Claim(request)
+    ? {
+        schemaVersion: 2 as const,
+        kind: ACTIVE_AUTHORIZATION_KIND,
+        ...common,
+        generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
+        predecessorState: request.predecessorState,
+        predecessorFenceSha256: request.predecessorFenceSha256,
+        attemptId: request.attemptId
+      }
+    : { kind: LEGACY_AUTHORIZATION_KIND, ...common };
 }
 
 /** Deterministic integrity digest only; callers must authenticate both capability digests elsewhere. */
-export function deriveBscTestnetPtaWbnbPoolAuthorizationReceiptSha256(
-  request: Omit<BscTestnetPtaWbnbPoolClaimRequest, "authorizationReceiptSha256">
-): Hex {
-  return sha256Hex(JSON.stringify(receiptBody(request)));
+export function deriveBscTestnetPtaWbnbPoolAuthorizationReceiptSha256(request: AnyClaimBody): Hex {
+  const body = receiptBody(request);
+  return isGeneration2Claim(request)
+    ? sha256Hex(
+        `${BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN}\u0000${JSON.stringify(
+          body
+        )}`
+      )
+    : sha256Hex(JSON.stringify(body));
 }
 
 function inspectClaimRequest(
   input: unknown,
-  now: string | null
-): BscTestnetPtaWbnbPoolClaimRequest | null {
+  now: string | null,
+  generation: JournalGeneration
+): AnyClaimRequest | null {
   const record = dataRecord(input);
   const expected = [
     "operationKey",
@@ -384,7 +712,10 @@ function inspectClaimRequest(
     "runtimeManifestSha256",
     "authorizedAt",
     "expiresAt",
-    "authorizationReceiptSha256"
+    "authorizationReceiptSha256",
+    ...(generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+      ? ["generation", "predecessorState", "predecessorFenceSha256", "attemptId"]
+      : [])
   ];
   if (record === null || !exactKeys(record, expected)) return null;
   const gasLimit = canonicalPositiveUint(record.gasLimit, BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_LIMIT);
@@ -413,6 +744,11 @@ function inspectClaimRequest(
     !RELEASE_COMMIT.test(record.releaseCommit) ||
     !exactBytes32(record.runtimeManifestSha256) ||
     !exactBytes32(record.authorizationReceiptSha256) ||
+    (generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION &&
+      (record.generation !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION ||
+        record.predecessorState !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE ||
+        !exactBytes32(record.predecessorFenceSha256) ||
+        !exactBytes32(record.attemptId))) ||
     gasLimit === null ||
     gasPrice === null ||
     maxCost === null ||
@@ -440,21 +776,41 @@ function inspectClaimRequest(
     runtimeManifestSha256: record.runtimeManifestSha256,
     authorizedAt,
     expiresAt,
-    authorizationReceiptSha256: record.authorizationReceiptSha256
-  }) satisfies BscTestnetPtaWbnbPoolClaimRequest;
+    authorizationReceiptSha256: record.authorizationReceiptSha256,
+    ...(generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+      ? {
+          generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
+          predecessorState: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
+          predecessorFenceSha256: record.predecessorFenceSha256 as Hex,
+          attemptId: record.attemptId as Hex
+        }
+      : {})
+  }) satisfies AnyClaimRequest;
   return deriveBscTestnetPtaWbnbPoolAuthorizationReceiptSha256(inspected) ===
     inspected.authorizationReceiptSha256
     ? inspected
     : null;
 }
 
-function claimIdFor(request: BscTestnetPtaWbnbPoolClaimRequest): string {
-  return `pta-wbnb-pool-${request.operationKey.slice(2, 34)}`;
+function claimIdFor(request: AnyClaimRequest, generation: JournalGeneration): string {
+  if (generation === 1 || !isGeneration2Claim(request)) {
+    return `pta-wbnb-pool-${request.operationKey.slice(2, 34)}`;
+  }
+  const digest = sha256Hex(
+    `${BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_CLAIM_ID_DIGEST_DOMAIN}\u0000${JSON.stringify({
+      operationKey: request.operationKey,
+      generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
+      predecessorState: request.predecessorState,
+      predecessorFenceSha256: request.predecessorFenceSha256,
+      attemptId: request.attemptId
+    })}`
+  );
+  return `pta-wbnb-pool-v2-${digest.slice(2, 34)}`;
 }
 
-function bindingFromClaim(request: BscTestnetPtaWbnbPoolClaimRequest): JournalBinding {
+function bindingFromClaim(request: AnyClaimRequest, generation: JournalGeneration): JournalBinding {
   return Object.freeze({
-    claimId: claimIdFor(request),
+    claimId: claimIdFor(request, generation),
     operationKey: request.operationKey,
     envelopeHash: request.envelopeHash,
     authorizationReceiptSha256: request.authorizationReceiptSha256,
@@ -463,11 +819,30 @@ function bindingFromClaim(request: BscTestnetPtaWbnbPoolClaimRequest): JournalBi
     reviewerApprovalDigest: request.reviewerApprovalDigest,
     ownerAuthorizationDigest: request.ownerAuthorizationDigest,
     releaseCommit: request.releaseCommit,
-    runtimeManifestSha256: request.runtimeManifestSha256
+    runtimeManifestSha256: request.runtimeManifestSha256,
+    ...(generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION && isGeneration2Claim(request)
+      ? {
+          generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
+          predecessorState: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
+          predecessorFenceSha256: request.predecessorFenceSha256,
+          attemptId: request.attemptId
+        }
+      : {})
   });
 }
 
-function inspectBinding(input: unknown, extras: readonly string[]): DataRecord | null {
+const RECOVERY_BINDING_KEYS = [
+  "generation",
+  "predecessorState",
+  "predecessorFenceSha256",
+  "attemptId"
+] as const;
+
+function inspectBinding(
+  input: unknown,
+  extras: readonly string[],
+  generation: JournalGeneration
+): DataRecord | null {
   const record = dataRecord(input);
   if (
     record === null ||
@@ -482,10 +857,15 @@ function inspectBinding(input: unknown, extras: readonly string[]): DataRecord |
       "ownerAuthorizationDigest",
       "releaseCommit",
       "runtimeManifestSha256",
+      ...(generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+        ? RECOVERY_BINDING_KEYS
+        : []),
       ...extras
     ]) ||
     typeof record.claimId !== "string" ||
-    !/^pta-wbnb-pool-[0-9a-f]{32}$/u.test(record.claimId) ||
+    !(generation === 1 ? /^pta-wbnb-pool-[0-9a-f]{32}$/u : /^pta-wbnb-pool-v2-[0-9a-f]{32}$/u).test(
+      record.claimId
+    ) ||
     record.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
     !exactBytes32(record.envelopeHash) ||
     !exactBytes32(record.authorizationReceiptSha256) ||
@@ -496,7 +876,12 @@ function inspectBinding(input: unknown, extras: readonly string[]): DataRecord |
     record.reviewerApprovalDigest === record.ownerAuthorizationDigest ||
     typeof record.releaseCommit !== "string" ||
     !RELEASE_COMMIT.test(record.releaseCommit) ||
-    !exactBytes32(record.runtimeManifestSha256)
+    !exactBytes32(record.runtimeManifestSha256) ||
+    (generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION &&
+      (record.generation !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION ||
+        record.predecessorState !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE ||
+        !exactBytes32(record.predecessorFenceSha256) ||
+        !exactBytes32(record.attemptId)))
   ) {
     return null;
   }
@@ -514,7 +899,11 @@ function sameBinding(left: JournalBinding, right: JournalBinding): boolean {
     left.reviewerApprovalDigest === right.reviewerApprovalDigest &&
     left.ownerAuthorizationDigest === right.ownerAuthorizationDigest &&
     left.releaseCommit === right.releaseCommit &&
-    left.runtimeManifestSha256 === right.runtimeManifestSha256
+    left.runtimeManifestSha256 === right.runtimeManifestSha256 &&
+    left.generation === right.generation &&
+    left.predecessorState === right.predecessorState &&
+    left.predecessorFenceSha256 === right.predecessorFenceSha256 &&
+    left.attemptId === right.attemptId
   );
 }
 
@@ -529,7 +918,15 @@ function bindingOf(record: DataRecord | JournalBinding): JournalBinding {
     reviewerApprovalDigest: record.reviewerApprovalDigest as Hex,
     ownerAuthorizationDigest: record.ownerAuthorizationDigest as Hex,
     releaseCommit: record.releaseCommit as string,
-    runtimeManifestSha256: record.runtimeManifestSha256 as Hex
+    runtimeManifestSha256: record.runtimeManifestSha256 as Hex,
+    ...(record.generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+      ? {
+          generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
+          predecessorState: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
+          predecessorFenceSha256: record.predecessorFenceSha256 as Hex,
+          attemptId: record.attemptId as Hex
+        }
+      : {})
   });
 }
 
@@ -550,9 +947,17 @@ function transactionFields(record: DataRecord): RetainedTransactionBinding | nul
   });
 }
 
-function commonRecord(kind: RecordKind, binding: JournalBinding, recordedAt: string) {
+function commonRecord(
+  kind: RecordKind,
+  binding: JournalBinding,
+  recordedAt: string,
+  generation: JournalGeneration = binding.generation ===
+  BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+    ? 2
+    : 1
+) {
   return {
-    schemaVersion: SCHEMA_VERSION,
+    schemaVersion: generation === 1 ? LEGACY_SCHEMA_VERSION : ACTIVE_SCHEMA_VERSION,
     kind,
     ...binding,
     recordedAt
@@ -575,28 +980,53 @@ const BINDING_KEYS = [
   "releaseCommit",
   "runtimeManifestSha256"
 ] as const;
-const STORED_COMMON_KEYS = ["schemaVersion", "kind", ...BINDING_KEYS, "recordedAt"] as const;
 const CLAIM_EXTRA_KEYS = ["gasLimit", "gasPriceWei", "maxCostWei", "authorizedAt", "expiresAt"];
 const WORKER_EXTRA_KEYS = ["workerRequestHash", "authorizationTokenDigest"];
 const TRANSACTION_EXTRA_KEYS = ["serializedTransaction", "transactionHash"];
+const SUPERSESSION_FENCE_KEYS = [
+  "schemaVersion",
+  "kind",
+  ...BINDING_KEYS,
+  "terminalCode",
+  "workerAuthorizationOutcome",
+  "workerStartOutcome",
+  "signatureOutcome",
+  "submissionOutcome",
+  "submissionJournalState",
+  "legacyClaimRawSha256",
+  "noEffectProofDigest",
+  "noEffectEnvelopeHash",
+  "noEffectObservedAt",
+  "recordedAt",
+  "predecessorFenceSha256"
+] as const;
 
 function inspectStoredCommon(
   record: DataRecord,
-  extraKeys: readonly string[]
+  extraKeys: readonly string[],
+  generation: JournalGeneration
 ): JournalBinding | null {
+  const bindingKeys = [
+    ...BINDING_KEYS,
+    ...(generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION ? RECOVERY_BINDING_KEYS : [])
+  ];
   if (
-    !exactKeys(record, [...STORED_COMMON_KEYS, ...extraKeys]) ||
-    record.schemaVersion !== SCHEMA_VERSION ||
+    !exactKeys(record, ["schemaVersion", "kind", ...bindingKeys, "recordedAt", ...extraKeys]) ||
+    record.schemaVersion !== (generation === 1 ? LEGACY_SCHEMA_VERSION : ACTIVE_SCHEMA_VERSION) ||
     canonicalDate(record.recordedAt) === null
   ) {
     return null;
   }
   const candidate: Record<string, unknown> = Object.create(null) as Record<string, unknown>;
-  for (const key of BINDING_KEYS) candidate[key] = record[key];
-  return inspectBinding(candidate, []) === null ? null : bindingOf(record);
+  for (const key of bindingKeys) candidate[key] = record[key];
+  return inspectBinding(candidate, [], generation) === null ? null : bindingOf(record);
 }
 
-function parseStored(content: string | null, slot: number): ParsedRecord | null {
+function parseStored(
+  content: string | null,
+  slot: number,
+  generation: JournalGeneration
+): ParsedRecord | null {
   if (content === null || content.length > MAXIMUM_RECORD_BYTES) return null;
   let record: DataRecord | null = null;
   try {
@@ -608,15 +1038,89 @@ function parseStored(content: string | null, slot: number): ParsedRecord | null 
   const kind = record.kind as RecordKind;
   const allowed: Readonly<Record<number, readonly RecordKind[]>> = {
     1: ["claim"],
-    2: ["worker_authorized", "failed_before_submission", "unknown_outcome"],
+    2: [
+      "worker_authorized",
+      "superseded_before_worker",
+      "failed_before_submission",
+      "unknown_outcome"
+    ],
     3: ["worker_started", "failed_before_submission", "unknown_outcome"],
     4: ["signed_committed", "failed_before_submission", "unknown_outcome"],
     5: ["failed_before_submission", "unknown_outcome"]
   };
   if (!allowed[slot]?.includes(kind)) return null;
 
+  if (kind === "superseded_before_worker") {
+    const noEffectObservedAt = canonicalDate(record.noEffectObservedAt);
+    const fenceRecordedAt = canonicalDate(record.recordedAt);
+    if (
+      generation !== 1 ||
+      !exactKeys(record, SUPERSESSION_FENCE_KEYS) ||
+      record.schemaVersion !== SUPERSESSION_FENCE_SCHEMA_VERSION ||
+      record.terminalCode !== "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" ||
+      record.workerAuthorizationOutcome !== "not_attempted" ||
+      record.workerStartOutcome !== "not_attempted" ||
+      record.signatureOutcome !== "not_attempted" ||
+      record.submissionOutcome !== "not_attempted" ||
+      record.submissionJournalState !== "exact_empty" ||
+      record.legacyClaimRawSha256 !== BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256 ||
+      !exactBytes32(record.noEffectProofDigest) ||
+      !exactBytes32(record.noEffectEnvelopeHash) ||
+      noEffectObservedAt === null ||
+      fenceRecordedAt === null ||
+      !exactBytes32(record.predecessorFenceSha256)
+    ) {
+      return null;
+    }
+    const bindingCandidate: Record<string, unknown> = Object.create(null) as Record<
+      string,
+      unknown
+    >;
+    for (const key of BINDING_KEYS) bindingCandidate[key] = record[key];
+    const binding = inspectBinding(bindingCandidate, [], 1);
+    if (binding === null) return null;
+    const digestInput = Object.freeze({
+      binding: bindingOf(binding),
+      legacyClaimRawSha256: record.legacyClaimRawSha256,
+      noEffectProofDigest: record.noEffectProofDigest,
+      noEffectEnvelopeHash: record.noEffectEnvelopeHash,
+      noEffectObservedAt,
+      recordedAt: fenceRecordedAt
+    });
+    if (deriveSupersessionFenceSha256(digestInput) !== record.predecessorFenceSha256) return null;
+    const supersessionFence = Object.freeze({
+      status: "superseded_before_worker" as const,
+      terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" as const,
+      workerAuthorizationOutcome: "not_attempted" as const,
+      workerStartOutcome: "not_attempted" as const,
+      signatureOutcome: "not_attempted" as const,
+      submissionOutcome: "not_attempted" as const,
+      submissionJournalState: "exact_empty" as const,
+      legacyClaimRawSha256: record.legacyClaimRawSha256,
+      noEffectProofDigest: record.noEffectProofDigest,
+      noEffectEnvelopeHash: record.noEffectEnvelopeHash,
+      noEffectObservedAt,
+      fenceRecordedAt,
+      predecessorFenceSha256: record.predecessorFenceSha256
+    });
+    const parsed: ParsedRecord = Object.freeze({
+      schemaVersion: LEGACY_SCHEMA_VERSION,
+      kind,
+      ...bindingOf(binding),
+      recordedAt: fenceRecordedAt,
+      supersessionFence
+    });
+    return content ===
+      serialize({
+        ...supersessionFenceDigestBody(digestInput),
+        predecessorFenceSha256: supersessionFence.predecessorFenceSha256
+      })
+      ? parsed
+      : null;
+  }
+
   if (kind === "claim") {
-    const binding = inspectStoredCommon(record, CLAIM_EXTRA_KEYS);
+    const binding = inspectStoredCommon(record, CLAIM_EXTRA_KEYS, generation);
     if (binding === null) return null;
     const claimCandidate = {
       operationKey: record.operationKey,
@@ -632,22 +1136,30 @@ function parseStored(content: string | null, slot: number): ParsedRecord | null 
       runtimeManifestSha256: record.runtimeManifestSha256,
       authorizedAt: record.authorizedAt,
       expiresAt: record.expiresAt,
-      authorizationReceiptSha256: record.authorizationReceiptSha256
+      authorizationReceiptSha256: record.authorizationReceiptSha256,
+      ...(generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+        ? {
+            generation: record.generation,
+            predecessorState: record.predecessorState,
+            predecessorFenceSha256: record.predecessorFenceSha256,
+            attemptId: record.attemptId
+          }
+        : {})
     };
-    const claim = inspectClaimRequest(claimCandidate, null);
-    if (claim === null || binding.claimId !== claimIdFor(claim)) return null;
+    const claim = inspectClaimRequest(claimCandidate, null, generation);
+    if (claim === null || binding.claimId !== claimIdFor(claim, generation)) return null;
     const parsed: ParsedRecord = Object.freeze({
-      schemaVersion: SCHEMA_VERSION,
+      schemaVersion: generation === 1 ? LEGACY_SCHEMA_VERSION : ACTIVE_SCHEMA_VERSION,
       kind,
       ...binding,
       recordedAt: record.recordedAt as string,
       claim
     });
-    return content === claimRecord(claim, parsed.recordedAt) ? parsed : null;
+    return content === claimRecord(claim, parsed.recordedAt, generation) ? parsed : null;
   }
 
   if (kind === "worker_authorized" || kind === "worker_started") {
-    const binding = inspectStoredCommon(record, WORKER_EXTRA_KEYS);
+    const binding = inspectStoredCommon(record, WORKER_EXTRA_KEYS, generation);
     if (
       binding === null ||
       !exactBytes32(record.workerRequestHash) ||
@@ -656,7 +1168,7 @@ function parseStored(content: string | null, slot: number): ParsedRecord | null 
       return null;
     }
     const parsed: ParsedRecord = Object.freeze({
-      schemaVersion: SCHEMA_VERSION,
+      schemaVersion: generation === 1 ? LEGACY_SCHEMA_VERSION : ACTIVE_SCHEMA_VERSION,
       kind,
       ...binding,
       recordedAt: record.recordedAt as string,
@@ -674,11 +1186,11 @@ function parseStored(content: string | null, slot: number): ParsedRecord | null 
   }
 
   if (kind === "signed_committed") {
-    const binding = inspectStoredCommon(record, [
-      "workerRequestHash",
-      ...TRANSACTION_EXTRA_KEYS,
-      "recoveredSigner"
-    ]);
+    const binding = inspectStoredCommon(
+      record,
+      ["workerRequestHash", ...TRANSACTION_EXTRA_KEYS, "recoveredSigner"],
+      generation
+    );
     const transaction = transactionFields(record);
     if (
       binding === null ||
@@ -689,7 +1201,7 @@ function parseStored(content: string | null, slot: number): ParsedRecord | null 
       return null;
     }
     const parsed: ParsedRecord = Object.freeze({
-      schemaVersion: SCHEMA_VERSION,
+      schemaVersion: generation === 1 ? LEGACY_SCHEMA_VERSION : ACTIVE_SCHEMA_VERSION,
       kind,
       ...binding,
       recordedAt: record.recordedAt as string,
@@ -710,18 +1222,18 @@ function parseStored(content: string | null, slot: number): ParsedRecord | null 
       : null;
   }
 
-  const binding = inspectStoredCommon(record, [
-    "outcomeDigest",
-    "serializedTransaction",
-    "transactionHash"
-  ]);
+  const binding = inspectStoredCommon(
+    record,
+    ["outcomeDigest", "serializedTransaction", "transactionHash"],
+    generation
+  );
   if (binding === null || !exactBytes32(record.outcomeDigest)) return null;
   const transactionIsAbsent =
     record.serializedTransaction === null && record.transactionHash === null;
   const transaction = transactionIsAbsent ? null : transactionFields(record);
   if (!transactionIsAbsent && transaction === null) return null;
   const parsed: ParsedRecord = Object.freeze({
-    schemaVersion: SCHEMA_VERSION,
+    schemaVersion: generation === 1 ? LEGACY_SCHEMA_VERSION : ACTIVE_SCHEMA_VERSION,
     kind,
     ...binding,
     recordedAt: record.recordedAt as string,
@@ -744,8 +1256,12 @@ function parseStored(content: string | null, slot: number): ParsedRecord | null 
     : null;
 }
 
-function claimRecord(request: BscTestnetPtaWbnbPoolClaimRequest, recordedAt: string): string {
-  const binding = bindingFromClaim(request);
+function claimRecord(
+  request: AnyClaimRequest,
+  recordedAt: string,
+  generation: JournalGeneration
+): string {
+  const binding = bindingFromClaim(request, generation);
   return serialize({
     ...commonRecord("claim", binding, recordedAt),
     gasLimit: request.gasLimit,
@@ -759,7 +1275,8 @@ function claimRecord(request: BscTestnetPtaWbnbPoolClaimRequest, recordedAt: str
 function stateFrom(
   status: BscTestnetPtaWbnbPoolLocalJournalStatus,
   claim: ParsedRecord | null,
-  transaction: ParsedRecord | null = null
+  transaction: ParsedRecord | null = null,
+  fence: ParsedRecord | null = null
 ): BscTestnetPtaWbnbPoolLocalJournalState {
   return Object.freeze({
     status,
@@ -773,13 +1290,23 @@ function stateFrom(
     ownerAuthorizationDigest: claim?.ownerAuthorizationDigest ?? null,
     releaseCommit: claim?.releaseCommit ?? null,
     runtimeManifestSha256: claim?.runtimeManifestSha256 ?? null,
+    generation:
+      claim === null
+        ? null
+        : claim.generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+          ? BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+          : 1,
+    predecessorState: claim?.predecessorState ?? null,
+    predecessorFenceSha256: claim?.predecessorFenceSha256 ?? null,
+    attemptId: claim?.attemptId ?? null,
     gasLimit: claim?.claim?.gasLimit ?? null,
     gasPriceWei: claim?.claim?.gasPriceWei ?? null,
     maxCostWei: claim?.claim?.maxCostWei ?? null,
     authorizedAt: claim?.claim?.authorizedAt ?? null,
     expiresAt: claim?.claim?.expiresAt ?? null,
     serializedTransaction: transaction?.serializedTransaction ?? null,
-    transactionHash: transaction?.transactionHash ?? null
+    transactionHash: transaction?.transactionHash ?? null,
+    supersessionFence: fence?.supersessionFence ?? null
   });
 }
 
@@ -807,11 +1334,25 @@ function inspectPorts(input: unknown): BscTestnetPtaWbnbPoolLocalJournalPorts | 
   const record = dataRecord(input);
   if (
     record === null ||
-    !exactKeys(record, ["now", "listNames", "readBounded", "createExclusive", "assertSecure"])
+    !exactKeys(record, [
+      "now",
+      "listNames",
+      "readBounded",
+      "createExclusive",
+      "createExclusiveFenceFromFactory",
+      "assertSecure"
+    ])
   ) {
     return null;
   }
-  for (const key of ["now", "listNames", "readBounded", "createExclusive", "assertSecure"]) {
+  for (const key of [
+    "now",
+    "listNames",
+    "readBounded",
+    "createExclusive",
+    "createExclusiveFenceFromFactory",
+    "assertSecure"
+  ]) {
     if (typeof record[key] !== "function" || isProxy(record[key])) return null;
   }
   return record as unknown as BscTestnetPtaWbnbPoolLocalJournalPorts;
@@ -830,7 +1371,10 @@ function statusFor(kind: RecordKind): Exclude<BscTestnetPtaWbnbPoolLocalJournalS
   return kind === "claim" ? "claimed" : kind;
 }
 
-function inspectSecurityNames(value: unknown): readonly string[] | null {
+function inspectSecurityNames(
+  value: unknown,
+  slotFiles: readonly string[]
+): readonly string[] | null {
   try {
     if (
       !Array.isArray(value) ||
@@ -840,7 +1384,7 @@ function inspectSecurityNames(value: unknown): readonly string[] | null {
       return null;
     }
     const names = value.map((entry) =>
-      typeof entry === "string" && SLOT_FILES.some((allowed) => allowed === entry) ? entry : null
+      typeof entry === "string" && slotFiles.some((allowed) => allowed === entry) ? entry : null
     );
     if (names.some((entry) => entry === null)) return null;
     const sorted = [...(names as string[])].sort();
@@ -856,27 +1400,36 @@ function inspectSecurityNames(value: unknown): readonly string[] | null {
  * Windows adapter below. No method offers generic CAS, overwrite, delete, or retry semantics.
  */
 export function createBscTestnetPtaWbnbPoolLocalJournalCore(
-  untrustedPorts: unknown
-): BscTestnetPtaWbnbPoolLocalJournalRecoveryReader {
+  untrustedPorts: unknown,
+  untrustedGeneration: unknown = 1
+): BscTestnetPtaWbnbPoolLocalJournalCore {
   const ports = inspectPorts(untrustedPorts);
-  if (ports === null) throw new Error("PTA_WBNB_POOL_JOURNAL_CONFIGURATION_INVALID");
+  if (
+    ports === null ||
+    (untrustedGeneration !== 1 &&
+      untrustedGeneration !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION)
+  ) {
+    throw new Error("PTA_WBNB_POOL_JOURNAL_CONFIGURATION_INVALID");
+  }
+  const generation: JournalGeneration = untrustedGeneration;
+  const slotFiles = generation === 1 ? LEGACY_SLOT_FILES : ACTIVE_SLOT_FILES;
 
   const readSnapshot = async (): Promise<JournalSnapshot> => {
-    const listed = inspectSecurityNames(await ports.listNames());
+    const listed = inspectSecurityNames(await ports.listNames(), slotFiles);
     if (listed === null) return unknownSnapshot();
     const security = await ports.assertSecure(listed);
     if (!securityMetadata(security, listed.length + 1)) return unknownSnapshot();
     if (listed.length === 0) {
       return Object.freeze({ state: stateFrom("empty", null), records: Object.freeze([]) });
     }
-    const highest = Math.max(...listed.map((name) => SLOT_FILES.indexOf(name) + 1));
+    const highest = Math.max(...listed.map((name) => slotFiles.indexOf(name) + 1));
     if (highest !== listed.length) return unknownSnapshot();
     const records: ParsedRecord[] = [];
     for (let index = 0; index < listed.length; index += 1) {
-      if (listed[index] !== SLOT_FILES[index]) return unknownSnapshot(records[0] ?? null);
-      const slotFile = SLOT_FILES[index];
+      if (listed[index] !== slotFiles[index]) return unknownSnapshot(records[0] ?? null);
+      const slotFile = slotFiles[index];
       if (slotFile === undefined) return unknownSnapshot(records[0] ?? null);
-      const parsed = parseStored(await ports.readBounded(slotFile), index + 1);
+      const parsed = parseStored(await ports.readBounded(slotFile), index + 1, generation);
       if (parsed === null) return unknownSnapshot(records[0] ?? null);
       records.push(parsed);
     }
@@ -894,6 +1447,27 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
     const workerAuthorized = records.find((record) => record.kind === "worker_authorized");
     const workerStarted = records.find((record) => record.kind === "worker_started");
     const signed = records.find((record) => record.kind === "signed_committed");
+    const fence = records.find((record) => record.kind === "superseded_before_worker");
+    if (
+      fence !== undefined &&
+      (records.length !== 2 ||
+        records.at(-1) !== fence ||
+        generation !== 1 ||
+        fence.supersessionFence === undefined ||
+        fence.supersessionFence.legacyClaimRawSha256 !==
+          BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256 ||
+        sha256Hex(claimRecord(claim.claim, claim.recordedAt, 1)) !==
+          fence.supersessionFence.legacyClaimRawSha256 ||
+        Date.parse(fence.supersessionFence.noEffectObservedAt) <
+          Date.parse(claim.claim.expiresAt) ||
+        Date.parse(fence.supersessionFence.fenceRecordedAt) <=
+          Date.parse(fence.supersessionFence.noEffectObservedAt) ||
+        Date.parse(fence.supersessionFence.fenceRecordedAt) -
+          Date.parse(fence.supersessionFence.noEffectObservedAt) >
+          BSC_TESTNET_PTA_WBNB_POOL_MAX_OBSERVATION_AGE_SECONDS * 1_000)
+    ) {
+      return unknownSnapshot(claim);
+    }
     if (
       workerStarted !== undefined &&
       (workerAuthorized === undefined ||
@@ -926,6 +1500,7 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
       worker_authorized: ["claim", "worker_authorized"],
       worker_started: ["claim", "worker_authorized", "worker_started"],
       signed_committed: ["claim", "worker_authorized", "worker_started", "signed_committed"],
+      superseded_before_worker: ["claim", "superseded_before_worker"],
       failed_before_submission: kinds,
       unknown_outcome: kinds
     };
@@ -934,7 +1509,7 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
       return unknownSnapshot(claim);
     }
     return Object.freeze({
-      state: stateFrom(statusFor(last.kind), claim, signed ?? null),
+      state: stateFrom(statusFor(last.kind), claim, signed ?? null, fence ?? null),
       records: Object.freeze(records)
     });
   };
@@ -983,7 +1558,7 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
     binding: JournalBinding
   ): Promise<void> => {
     await requireSnapshot(expectedStatus, binding);
-    const name = SLOT_FILES[slot - 1];
+    const name = slotFiles[slot - 1];
     if (name === undefined) throw new Error("PTA_WBNB_POOL_JOURNAL_CONFIGURATION_INVALID");
     if ((await ports.createExclusive(name, content)) !== "created") {
       throw new Error("PTA_WBNB_POOL_JOURNAL_OUTCOME_UNKNOWN");
@@ -995,7 +1570,7 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
   };
 
   const claimExactInitialization = async (
-    untrustedRequest: BscTestnetPtaWbnbPoolClaimRequest
+    untrustedRequest: AnyClaimRequest
   ): Promise<
     | Readonly<{ status: "claimed"; claimId: string }>
     | Readonly<{
@@ -1005,12 +1580,13 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
       }>
   > => {
     const recordedAt = captureNow(ports.now);
-    const request = recordedAt === null ? null : inspectClaimRequest(untrustedRequest, recordedAt);
+    const request =
+      recordedAt === null ? null : inspectClaimRequest(untrustedRequest, recordedAt, generation);
     if (request === null || recordedAt === null) {
       throw new Error("PTA_WBNB_POOL_JOURNAL_INPUT_INVALID");
     }
     const initial = await readSnapshot();
-    const binding = bindingFromClaim(request);
+    const binding = bindingFromClaim(request, generation);
     if (initial.state.status !== "empty") {
       const existing = initial.records[0];
       if (existing === undefined || !sameBinding(existing, binding)) {
@@ -1022,9 +1598,12 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
         state: initial.state.status as Exclude<BscTestnetPtaWbnbPoolLocalJournalStatus, "empty">
       });
     }
-    const claimFile = SLOT_FILES[0];
+    const claimFile = slotFiles[0];
     if (claimFile === undefined) throw new Error("PTA_WBNB_POOL_JOURNAL_CONFIGURATION_INVALID");
-    const outcome = await ports.createExclusive(claimFile, claimRecord(request, recordedAt));
+    const outcome = await ports.createExclusive(
+      claimFile,
+      claimRecord(request, recordedAt, generation)
+    );
     const retained = await readSnapshot();
     const retainedClaim = retained.records[0];
     if (retainedClaim === undefined || !sameBinding(retainedClaim, binding)) {
@@ -1040,14 +1619,159 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
     });
   };
 
+  const readClaimOnlyRecoveryCandidate =
+    async (): Promise<BscTestnetPtaWbnbPoolClaimOnlyRecoveryCandidate | null> => {
+      const snapshot = await readSnapshot();
+      const claim = snapshot.records[0];
+      if (
+        generation !== 1 ||
+        snapshot.state.status !== "claimed" ||
+        snapshot.records.length !== 1 ||
+        claim === undefined ||
+        claim.kind !== "claim" ||
+        claim.claim === undefined
+      ) {
+        return null;
+      }
+      const rawSha256 = sha256Hex(claimRecord(claim.claim, claim.recordedAt, 1));
+      if (rawSha256 !== BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256) return null;
+      return Object.freeze({
+        status: "claimed" as const,
+        ...bindingOf(claim),
+        legacyClaimRawSha256: rawSha256,
+        legacyClaimRecordedAt: claim.recordedAt,
+        legacyAuthorizationExpiresAt: claim.claim.expiresAt
+      });
+    };
+
+  const fenceClaimBeforeWorker = async (
+    untrustedRequest: BscTestnetPtaWbnbPoolFenceClaimBeforeWorkerRequest
+  ): Promise<BscTestnetPtaWbnbPoolSupersessionFenceState> => {
+    const request = dataRecord(untrustedRequest);
+    const proof = request === null ? null : inspectNoEffectProof(request.proof);
+    const proofDigest =
+      proof === null ? null : deriveBscTestnetPtaWbnbPoolNoEffectProofDigest(proof);
+    if (
+      request === null ||
+      !Object.isFrozen(untrustedRequest) ||
+      !exactKeys(request, ["expectedLegacyClaimRawSha256", "proof"]) ||
+      request.expectedLegacyClaimRawSha256 !== BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256 ||
+      proof === null ||
+      proofDigest === null
+    ) {
+      throw new Error("PTA_WBNB_POOL_JOURNAL_SUPERSESSION_INPUT_INVALID");
+    }
+    const snapshot = await readSnapshot();
+    const claim = snapshot.records[0];
+    if (
+      snapshot.state.status !== "claimed" ||
+      snapshot.records.length !== 1 ||
+      claim === undefined ||
+      claim.kind !== "claim" ||
+      claim.claim === undefined
+    ) {
+      throw new Error("PTA_WBNB_POOL_JOURNAL_SUPERSESSION_PERMANENTLY_BLOCKED");
+    }
+    if (generation !== 1) {
+      throw new Error("PTA_WBNB_POOL_JOURNAL_SUPERSESSION_PERMANENTLY_BLOCKED");
+    }
+    const legacyClaimRawSha256 = sha256Hex(claimRecord(claim.claim, claim.recordedAt, 1));
+    const legacyExpiresAt = Date.parse(claim.claim.expiresAt);
+    const noEffectObservedAt = Date.parse(proof.observedAt);
+    if (
+      legacyClaimRawSha256 !== BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256 ||
+      request.expectedLegacyClaimRawSha256 !== legacyClaimRawSha256 ||
+      noEffectObservedAt < legacyExpiresAt
+    ) {
+      throw new Error("PTA_WBNB_POOL_JOURNAL_SUPERSESSION_PROOF_INVALID");
+    }
+    const binding = bindingOf(claim);
+    const fenceFile = slotFiles[1];
+    if (fenceFile === undefined) {
+      throw new Error("PTA_WBNB_POOL_JOURNAL_CONFIGURATION_INVALID");
+    }
+    let recordedAt: string | null = null;
+    let predecessorFenceSha256: Hex | null = null;
+    // Avoid permanently reserving slot 2 when the proof is already known to be stale. This check
+    // is synchronous and immediately precedes the adapter call; the factory repeats it after the
+    // kernel O_EXCL reservation so a stall or clock jump between these two checks still fails closed.
+    const preReservationAt = captureNow(ports.now);
+    if (preReservationAt === null) {
+      throw new Error("PTA_WBNB_POOL_JOURNAL_SUPERSESSION_PROOF_INVALID");
+    }
+    const preReservationMilliseconds = Date.parse(preReservationAt);
+    if (
+      preReservationMilliseconds < legacyExpiresAt ||
+      noEffectObservedAt >= preReservationMilliseconds ||
+      preReservationMilliseconds - noEffectObservedAt >
+        BSC_TESTNET_PTA_WBNB_POOL_MAX_OBSERVATION_AGE_SECONDS * 1_000
+    ) {
+      throw new Error("PTA_WBNB_POOL_JOURNAL_SUPERSESSION_PROOF_INVALID");
+    }
+    const outcome = await ports.createExclusiveFenceFromFactory(fenceFile, () => {
+      // The adapter has already reserved legacy slot 2 with O_EXCL. No awaited preflight or stale
+      // worker authorization can occur between this clock capture and ownership of that slot.
+      const reservedAt = captureNow(ports.now);
+      if (reservedAt === null) {
+        throw new Error("PTA_WBNB_POOL_JOURNAL_SUPERSESSION_PROOF_INVALID");
+      }
+      const fenceRecordedAt = Date.parse(reservedAt);
+      if (
+        fenceRecordedAt < legacyExpiresAt ||
+        noEffectObservedAt >= fenceRecordedAt ||
+        fenceRecordedAt - noEffectObservedAt >
+          BSC_TESTNET_PTA_WBNB_POOL_MAX_OBSERVATION_AGE_SECONDS * 1_000
+      ) {
+        throw new Error("PTA_WBNB_POOL_JOURNAL_SUPERSESSION_PROOF_INVALID");
+      }
+      const digestInput = Object.freeze({
+        binding,
+        legacyClaimRawSha256,
+        noEffectProofDigest: proofDigest,
+        noEffectEnvelopeHash: proof.envelopeHash,
+        noEffectObservedAt: proof.observedAt,
+        recordedAt: reservedAt
+      });
+      const derivedFenceSha256 = deriveSupersessionFenceSha256(digestInput);
+      recordedAt = reservedAt;
+      predecessorFenceSha256 = derivedFenceSha256;
+      return serialize({
+        ...supersessionFenceDigestBody(digestInput),
+        predecessorFenceSha256: derivedFenceSha256
+      });
+    });
+    const retained = await readSnapshot();
+    const retainedFence = retained.state.supersessionFence;
+    if (
+      recordedAt === null ||
+      predecessorFenceSha256 === null ||
+      retained.state.status !== "superseded_before_worker" ||
+      retained.records.length !== 2 ||
+      retainedFence === null ||
+      retainedFence.legacyClaimRawSha256 !== legacyClaimRawSha256 ||
+      retainedFence.noEffectProofDigest !== proofDigest ||
+      retainedFence.noEffectEnvelopeHash !== proof.envelopeHash ||
+      retainedFence.noEffectObservedAt !== proof.observedAt ||
+      retainedFence.fenceRecordedAt !== recordedAt ||
+      retainedFence.predecessorFenceSha256 !== predecessorFenceSha256
+    ) {
+      throw new Error("PTA_WBNB_POOL_JOURNAL_SUPERSESSION_OUTCOME_UNKNOWN");
+    }
+    if (outcome !== "created") {
+      throw new Error("PTA_WBNB_POOL_JOURNAL_SUPERSESSION_OUTCOME_UNKNOWN");
+    }
+    return retainedFence;
+  };
+
   const authorizeWorker = async (
     untrustedRequest: BscTestnetPtaWbnbPoolWorkerAuthorizationRequest
   ): Promise<Readonly<{ status: "worker_authorized" }>> => {
     const recordedAt = captureNow(ports.now);
-    const record = inspectBinding(untrustedRequest, [
-      "workerRequestHash",
-      "authorizationTokenDigest"
-    ]);
+    const record = inspectBinding(
+      untrustedRequest,
+      ["workerRequestHash", "authorizationTokenDigest"],
+      generation
+    );
     if (
       recordedAt === null ||
       record === null ||
@@ -1075,7 +1799,11 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
     untrustedRequest: BscTestnetPtaWbnbPoolWorkerStartRequest
   ): Promise<Readonly<{ status: "worker_started" }>> => {
     const recordedAt = captureNow(ports.now);
-    const record = inspectBinding(untrustedRequest, ["workerRequestHash", "authorizationToken"]);
+    const record = inspectBinding(
+      untrustedRequest,
+      ["workerRequestHash", "authorizationToken"],
+      generation
+    );
     if (
       recordedAt === null ||
       record === null ||
@@ -1136,7 +1864,12 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
       workerRequest.reviewerApprovalDigest !== binding.reviewerApprovalDigest ||
       workerRequest.ownerAuthorizationDigest !== binding.ownerAuthorizationDigest ||
       workerRequest.releaseCommit !== binding.releaseCommit ||
-      workerRequest.runtimeManifestSha256 !== binding.runtimeManifestSha256
+      workerRequest.runtimeManifestSha256 !== binding.runtimeManifestSha256 ||
+      (generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION &&
+        (workerRequest.recovery.generation !== binding.generation ||
+          workerRequest.recovery.predecessorState !== binding.predecessorState ||
+          workerRequest.recovery.predecessorFenceSha256 !== binding.predecessorFenceSha256 ||
+          workerRequest.recovery.attemptId !== binding.attemptId))
     ) {
       throw new Error("PTA_WBNB_POOL_JOURNAL_CLAIM_MISMATCH");
     }
@@ -1151,12 +1884,11 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
     untrustedRequest: ValidatedWorkerSignedCommit
   ): Promise<Readonly<{ status: "signed_committed" }>> => {
     const recordedAt = captureNow(ports.now);
-    const record = inspectBinding(untrustedRequest, [
-      "workerRequestHash",
-      "serializedTransaction",
-      "transactionHash",
-      "recoveredSigner"
-    ]);
+    const record = inspectBinding(
+      untrustedRequest,
+      ["workerRequestHash", "serializedTransaction", "transactionHash", "recoveredSigner"],
+      generation
+    );
     const transaction = record === null ? null : transactionFields(record);
     if (
       recordedAt === null ||
@@ -1255,7 +1987,7 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
     const extras = hasTransaction
       ? ["outcomeDigest", ...TRANSACTION_EXTRA_KEYS]
       : ["outcomeDigest"];
-    const record = inspectBinding(untrustedRequest, extras);
+    const record = inspectBinding(untrustedRequest, extras, generation);
     const transaction = record === null || !hasTransaction ? null : transactionFields(record);
     if (
       recordedAt === null ||
@@ -1272,9 +2004,10 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
     const signed = snapshot.records.find((entry) => entry.kind === "signed_committed");
     if (
       expected === "empty" ||
+      expected === "superseded_before_worker" ||
       expected === "unknown_outcome" ||
       expected === "failed_before_submission" ||
-      slot > SLOT_FILES.length ||
+      slot > slotFiles.length ||
       (signed === undefined && transaction !== null) ||
       (signed !== undefined &&
         (transaction === null ||
@@ -1309,6 +2042,8 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
 
   return Object.freeze({
     claimExactInitialization,
+    readClaimOnlyRecoveryCandidate,
+    fenceClaimBeforeWorker,
     authorizeWorker,
     startWorker,
     consumeWorkerAuthorization,
@@ -1379,7 +2114,7 @@ try {
   if ([IO.Path]::GetFullPath($baseItem.FullName) -ne [IO.Path]::GetFullPath($base)) { throw 'base-path' }
 
   $cursor = $baseItem.FullName
-  foreach ($segment in @('ProofEra', 'operations', 'bsc-testnet-pta-wbnb-pool-v1')) {
+  foreach ($segment in @('ProofEra', 'operations', 'bsc-testnet-pta-wbnb-pool-v2')) {
     $candidate = [IO.Path]::GetFullPath([IO.Path]::Combine($cursor, $segment))
     if ([IO.Path]::GetDirectoryName($candidate) -ne [IO.Path]::GetFullPath($cursor)) { throw 'escape' }
     if (Test-Path -LiteralPath $candidate) {
@@ -1397,8 +2132,8 @@ try {
 
   # All ancestors have been validated before the first ACL mutation.
   $allowed = @(
-     '01-claim.v1.json', '02-transition.v1.json', '03-transition.v1.json',
-     '04-transition.v1.json', '05-transition.v1.json'
+     '01-claim.v2.json', '02-transition.v2.json', '03-transition.v2.json',
+     '04-transition.v2.json', '05-transition.v2.json'
   )
   $retainedFiles = @()
   foreach ($child in @(Get-ChildItem -LiteralPath $cursor -Force)) {
@@ -1481,7 +2216,10 @@ try {
 } catch { exit 45 }
 `;
 
-function expectedJournalDirectoryFromLocalAppData(input: unknown): string | null {
+function expectedJournalDirectoryFromLocalAppData(
+  input: unknown,
+  subdirectory: readonly string[]
+): string | null {
   if (
     typeof input !== "string" ||
     input.length < 3 ||
@@ -1492,7 +2230,13 @@ function expectedJournalDirectoryFromLocalAppData(input: unknown): string | null
   ) {
     return null;
   }
-  const directory = win32.join(input, ...JOURNAL_SUBDIRECTORY);
+  if (
+    subdirectory !== LEGACY_JOURNAL_SUBDIRECTORY &&
+    subdirectory !== ACTIVE_JOURNAL_SUBDIRECTORY
+  ) {
+    return null;
+  }
+  const directory = win32.join(input, ...subdirectory);
   const resolved = resolve(directory);
   const relation = relative(REPOSITORY_ROOT, resolved);
   return relation === "" || (!relation.startsWith(`..${sep}`) && relation !== "..")
@@ -1528,7 +2272,9 @@ async function stableDirectoryPresence(path: string): Promise<"present" | "absen
   }
 }
 
-async function readOnlyFixedJournalDirectory(): Promise<string | null> {
+async function readOnlyFixedJournalDirectory(
+  subdirectory: readonly string[]
+): Promise<string | null> {
   const input = Buffer.alloc(0);
   let output: Buffer | null = null;
   try {
@@ -1543,7 +2289,10 @@ async function readOnlyFixedJournalDirectory(): Promise<string | null> {
     if (parsed === null || !exactKeys(parsed, ["localApplicationData"])) {
       throw new Error("PTA_WBNB_POOL_JOURNAL_CONFIGURATION_INVALID");
     }
-    const expected = expectedJournalDirectoryFromLocalAppData(parsed.localApplicationData);
+    const expected = expectedJournalDirectoryFromLocalAppData(
+      parsed.localApplicationData,
+      subdirectory
+    );
     if (expected === null || typeof parsed.localApplicationData !== "string") {
       throw new Error("PTA_WBNB_POOL_JOURNAL_CONFIGURATION_INVALID");
     }
@@ -1551,7 +2300,7 @@ async function readOnlyFixedJournalDirectory(): Promise<string | null> {
     if ((await stableDirectoryPresence(cursor)) !== "present") {
       throw new Error("PTA_WBNB_POOL_JOURNAL_CONFIGURATION_INVALID");
     }
-    for (const segment of JOURNAL_SUBDIRECTORY) {
+    for (const segment of subdirectory) {
       const candidate = win32.join(cursor, segment);
       if (win32.dirname(candidate).toLowerCase() !== win32.normalize(cursor).toLowerCase()) {
         throw new Error("PTA_WBNB_POOL_JOURNAL_CONFIGURATION_INVALID");
@@ -1573,7 +2322,12 @@ function emptyLocalJournalState(): BscTestnetPtaWbnbPoolLocalJournalState {
   return stateFrom("empty", null);
 }
 
-function recoveryBlocked(): BscTestnetPtaWbnbPoolExistingLocalJournalResult {
+function recoveryBlocked(): Readonly<{
+  status: "blocked";
+  journal: null;
+  state: null;
+  issue: Readonly<{ code: "RECOVERY_JOURNAL_INVALID"; message: string }>;
+}> {
   return Object.freeze({
     status: "blocked" as const,
     journal: null,
@@ -1623,7 +2377,11 @@ async function readBoundedFile(path: string): Promise<string | null> {
   }
 }
 
-async function verifyPaths(directory: string, files: readonly string[]): Promise<void> {
+async function verifyPaths(
+  directory: string,
+  files: readonly string[],
+  slotFiles: readonly string[]
+): Promise<void> {
   const directoryBefore = await lstat(directory, { bigint: true });
   const canonicalDirectory = await realpath(directory);
   const directoryAfter = await lstat(directory, { bigint: true });
@@ -1644,7 +2402,7 @@ async function verifyPaths(directory: string, files: readonly string[]): Promise
     throw new Error("PTA_WBNB_POOL_JOURNAL_DIRECTORY_INVALID");
   }
   for (const name of files) {
-    if (!SLOT_FILES.some((allowed) => allowed === name)) {
+    if (!slotFiles.some((allowed) => allowed === name)) {
       throw new Error("PTA_WBNB_POOL_JOURNAL_FILE_INVALID");
     }
     const path = win32.join(directory, name);
@@ -1674,9 +2432,10 @@ async function verifyPaths(directory: string, files: readonly string[]): Promise
 
 async function assertWindowsJournalSecure(
   directory: string,
-  files: readonly string[]
+  files: readonly string[],
+  slotFiles: readonly string[]
 ): Promise<BscTestnetPtaWbnbPoolJournalSecurityMetadata> {
-  await verifyPaths(directory, files);
+  await verifyPaths(directory, files, slotFiles);
   const input = Buffer.from(
     JSON.stringify({ paths: [directory, ...files.map((name) => win32.join(directory, name))] }),
     "utf8"
@@ -1724,7 +2483,44 @@ async function protectWindowsJournalRecord(directory: string, path: string): Pro
   }
 }
 
-function createWindowsAdapter(directory: string): BscTestnetPtaWbnbPoolLocalJournalRecoveryReader {
+function createWindowsAdapter(
+  directory: string,
+  generation: JournalGeneration
+): BscTestnetPtaWbnbPoolLocalJournalCore {
+  const slotFiles = generation === 1 ? LEGACY_SLOT_FILES : ACTIVE_SLOT_FILES;
+  const createExclusiveRecord = async (
+    name: string,
+    contentFactory: () => string
+  ): Promise<"created" | "exists"> => {
+    if (!slotFiles.some((allowed) => allowed === name)) {
+      throw new Error("PTA_WBNB_POOL_JOURNAL_FILE_INVALID");
+    }
+    let handle;
+    try {
+      const path = win32.join(directory, name);
+      handle = await open(path, "wx", 0o600);
+      // For the predecessor fence, this callback captures time and derives bytes only after the
+      // kernel has atomically reserved slot 2. A throw/crash leaves an empty or partial file that
+      // every strict restart probe rejects; it is never deleted or overwritten.
+      const content = contentFactory();
+      await handle.writeFile(content, "utf8");
+      await handle.sync();
+      const retained = await handle.stat({ bigint: true });
+      if (!retained.isFile() || retained.nlink !== 1n) {
+        throw new Error("PTA_WBNB_POOL_JOURNAL_FILE_INVALID");
+      }
+      await handle.close();
+      handle = undefined;
+      await protectWindowsJournalRecord(directory, path);
+      await assertWindowsJournalSecure(directory, [name], slotFiles);
+      return "created" as const;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "EEXIST") return "exists" as const;
+      throw error;
+    } finally {
+      await handle?.close().catch(() => undefined);
+    }
+  };
   return createBscTestnetPtaWbnbPoolLocalJournalCore(
     Object.freeze({
       now: () => new Date(),
@@ -1732,7 +2528,7 @@ function createWindowsAdapter(directory: string): BscTestnetPtaWbnbPoolLocalJour
         const entries = await readdir(directory, { withFileTypes: true });
         const names: string[] = [];
         for (const entry of entries) {
-          if (!entry.isFile() || !SLOT_FILES.some((allowed) => allowed === entry.name)) {
+          if (!entry.isFile() || !slotFiles.some((allowed) => allowed === entry.name)) {
             throw new Error("PTA_WBNB_POOL_JOURNAL_DIRECTORY_CONTAMINATED");
           }
           names.push(entry.name);
@@ -1740,49 +2536,90 @@ function createWindowsAdapter(directory: string): BscTestnetPtaWbnbPoolLocalJour
         return Object.freeze(names.sort());
       },
       readBounded: (name: string) => readBoundedFile(win32.join(directory, name)),
-      createExclusive: async (name: string, content: string) => {
-        if (!SLOT_FILES.some((allowed) => allowed === name)) {
+      createExclusive: (name: string, content: string) =>
+        createExclusiveRecord(name, () => content),
+      createExclusiveFenceFromFactory: (name: string, contentFactory: () => string) => {
+        if (generation !== 1 || name !== LEGACY_SLOT_FILES[1]) {
           throw new Error("PTA_WBNB_POOL_JOURNAL_FILE_INVALID");
         }
-        let handle;
-        try {
-          const path = win32.join(directory, name);
-          handle = await open(path, "wx", 0o600);
-          await handle.writeFile(content, "utf8");
-          await handle.sync();
-          const retained = await handle.stat({ bigint: true });
-          if (!retained.isFile() || retained.nlink !== 1n) {
-            throw new Error("PTA_WBNB_POOL_JOURNAL_FILE_INVALID");
-          }
-          await handle.close();
-          handle = undefined;
-          await protectWindowsJournalRecord(directory, path);
-          await assertWindowsJournalSecure(directory, [name]);
-          return "created" as const;
-        } catch (error) {
-          if ((error as NodeJS.ErrnoException).code === "EEXIST") return "exists" as const;
-          throw error;
-        } finally {
-          await handle?.close().catch(() => undefined);
-        }
+        return createExclusiveRecord(name, contentFactory);
       },
-      assertSecure: (files: readonly string[]) => assertWindowsJournalSecure(directory, files)
-    })
+      assertSecure: (files: readonly string[]) =>
+        assertWindowsJournalSecure(directory, files, slotFiles)
+    }),
+    generation
   );
 }
 
+function activeJournalFacade(
+  core: BscTestnetPtaWbnbPoolLocalJournalCore
+): BscTestnetPtaWbnbPoolLocalJournal {
+  return Object.freeze({
+    claimExactInitialization: core.claimExactInitialization,
+    authorizeWorker: core.authorizeWorker,
+    startWorker: core.startWorker,
+    consumeWorkerAuthorization: core.consumeWorkerAuthorization,
+    commitWorkerSignedTransaction: core.commitWorkerSignedTransaction,
+    failBeforeSubmission: core.failBeforeSubmission,
+    recordUnknownOutcome: core.recordUnknownOutcome,
+    readState: core.readState
+  });
+}
+
+function activeRecoveryFacade(
+  core: BscTestnetPtaWbnbPoolLocalJournalCore
+): BscTestnetPtaWbnbPoolLocalJournalRecoveryReader {
+  return Object.freeze({
+    readState: core.readState,
+    readStrictRecoveryState: core.readStrictRecoveryState
+  });
+}
+
+function legacyRecoveryFacade(
+  core: BscTestnetPtaWbnbPoolLocalJournalCore
+): BscTestnetPtaWbnbPoolLegacyLocalJournalRecoveryReader {
+  return Object.freeze({
+    readClaimOnlyRecoveryCandidate: core.readClaimOnlyRecoveryCandidate,
+    fenceClaimBeforeWorker: core.fenceClaimBeforeWorker,
+    readState: core.readState,
+    readStrictRecoveryState: core.readStrictRecoveryState
+  });
+}
+
+type ExistingCoreJournalResult =
+  | Readonly<{
+      status: "absent";
+      journal: null;
+      state: BscTestnetPtaWbnbPoolLocalJournalState;
+      issue: null;
+    }>
+  | Readonly<{
+      status: "opened";
+      journal: BscTestnetPtaWbnbPoolLocalJournalCore;
+      state: BscTestnetPtaWbnbPoolLocalJournalState;
+      issue: null;
+    }>
+  | Readonly<{
+      status: "blocked";
+      journal: null;
+      state: null;
+      issue: Readonly<{ code: "RECOVERY_JOURNAL_INVALID"; message: string }>;
+    }>;
+
 async function openExistingLocalAtDirectory(
-  directory: string
-): Promise<BscTestnetPtaWbnbPoolExistingLocalJournalResult> {
+  directory: string,
+  generation: JournalGeneration
+): Promise<ExistingCoreJournalResult> {
   try {
+    const slotFiles = generation === 1 ? LEGACY_SLOT_FILES : ACTIVE_SLOT_FILES;
     const names = (await readdir(directory, { withFileTypes: true })).map((entry) => {
-      if (!entry.isFile() || !SLOT_FILES.some((allowed) => allowed === entry.name)) {
+      if (!entry.isFile() || !slotFiles.some((allowed) => allowed === entry.name)) {
         throw new Error("PTA_WBNB_POOL_JOURNAL_DIRECTORY_CONTAMINATED");
       }
       return entry.name;
     });
-    await verifyPaths(directory, names);
-    await assertWindowsJournalSecure(directory, names);
+    await verifyPaths(directory, names, slotFiles);
+    await assertWindowsJournalSecure(directory, names, slotFiles);
     if (names.length === 0) {
       return Object.freeze({
         status: "absent" as const,
@@ -1791,7 +2628,7 @@ async function openExistingLocalAtDirectory(
         issue: null
       });
     }
-    const journal = createWindowsAdapter(directory);
+    const journal = createWindowsAdapter(directory, generation);
     const state = await journal.readStrictRecoveryState();
     return state === null
       ? recoveryBlocked()
@@ -1828,9 +2665,14 @@ export async function createWindowsBscTestnetPtaWbnbPoolLocalJournal(): Promise<
   } finally {
     output?.fill(0);
   }
-  const directory = expectedJournalDirectoryFromLocalAppData(localApplicationData);
+  const directory = expectedJournalDirectoryFromLocalAppData(
+    localApplicationData,
+    ACTIVE_JOURNAL_SUBDIRECTORY
+  );
   if (directory === null) throw new Error("PTA_WBNB_POOL_JOURNAL_CONFIGURATION_INVALID");
-  return createWindowsAdapter(directory);
+  return activeJournalFacade(
+    createWindowsAdapter(directory, BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION)
+  );
 }
 
 /**
@@ -1840,7 +2682,7 @@ export async function createWindowsBscTestnetPtaWbnbPoolLocalJournal(): Promise<
 export async function openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse(): Promise<BscTestnetPtaWbnbPoolExistingLocalJournalResult> {
   if (process.platform !== "win32") return recoveryBlocked();
   try {
-    const directory = await readOnlyFixedJournalDirectory();
+    const directory = await readOnlyFixedJournalDirectory(ACTIVE_JOURNAL_SUBDIRECTORY);
     if (directory === null) {
       return Object.freeze({
         status: "absent" as const,
@@ -1849,7 +2691,39 @@ export async function openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRec
         issue: null
       });
     }
-    return openExistingLocalAtDirectory(directory);
+    const opened = await openExistingLocalAtDirectory(
+      directory,
+      BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+    );
+    return opened.status === "opened"
+      ? Object.freeze({ ...opened, journal: activeRecoveryFacade(opened.journal) })
+      : opened;
+  } catch {
+    return recoveryBlocked();
+  }
+}
+
+/**
+ * Opens the immutable generation-1 predecessor journal for read/fence recovery only. It never
+ * provisions that namespace. A stale generation-1 worker therefore competes for the same slot-2
+ * O_EXCL fence and cannot cross a retained supersession record.
+ */
+export async function openExistingWindowsBscTestnetPtaWbnbPoolLegacyLocalJournalForRecoveryForInternalUse(): Promise<BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult> {
+  if (process.platform !== "win32") return recoveryBlocked();
+  try {
+    const directory = await readOnlyFixedJournalDirectory(LEGACY_JOURNAL_SUBDIRECTORY);
+    if (directory === null) {
+      return Object.freeze({
+        status: "absent" as const,
+        journal: null,
+        state: emptyLocalJournalState(),
+        issue: null
+      });
+    }
+    const opened = await openExistingLocalAtDirectory(directory, 1);
+    return opened.status === "opened"
+      ? Object.freeze({ ...opened, journal: legacyRecoveryFacade(opened.journal) })
+      : opened;
   } catch {
     return recoveryBlocked();
   }
@@ -1877,6 +2751,31 @@ export async function probeWindowsBscTestnetPtaWbnbPoolLocalJournalRecoveryForIn
 /** Test-only no-write recovery seam over a caller-created synthetic directory. */
 export async function openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalAtSyntheticDirectoryForTests(
   untrustedDirectory: unknown
+): Promise<BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult> {
+  if (process.platform !== "win32") return recoveryBlocked();
+  if (
+    typeof untrustedDirectory !== "string" ||
+    untrustedDirectory.length > 500 ||
+    !/^[A-Za-z]:\\[^\0\r\n]*$/u.test(untrustedDirectory) ||
+    untrustedDirectory.includes("/") ||
+    win32.normalize(untrustedDirectory) !== untrustedDirectory
+  ) {
+    return recoveryBlocked();
+  }
+  const directory = resolve(untrustedDirectory);
+  const relation = relative(REPOSITORY_ROOT, directory);
+  if (relation === "" || (!relation.startsWith(`..${sep}`) && relation !== "..")) {
+    return recoveryBlocked();
+  }
+  const opened = await openExistingLocalAtDirectory(directory, 1);
+  return opened.status === "opened"
+    ? Object.freeze({ ...opened, journal: legacyRecoveryFacade(opened.journal) })
+    : opened;
+}
+
+/** Test-only active-generation no-write recovery seam over a caller-created temp directory. */
+export async function openExistingWindowsBscTestnetPtaWbnbPoolActiveLocalJournalAtSyntheticDirectoryForTests(
+  untrustedDirectory: unknown
 ): Promise<BscTestnetPtaWbnbPoolExistingLocalJournalResult> {
   if (process.platform !== "win32") return recoveryBlocked();
   if (
@@ -1893,5 +2792,11 @@ export async function openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalAtSynt
   if (relation === "" || (!relation.startsWith(`..${sep}`) && relation !== "..")) {
     return recoveryBlocked();
   }
-  return openExistingLocalAtDirectory(directory);
+  const opened = await openExistingLocalAtDirectory(
+    directory,
+    BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+  );
+  return opened.status === "opened"
+    ? Object.freeze({ ...opened, journal: activeRecoveryFacade(opened.journal) })
+    : opened;
 }

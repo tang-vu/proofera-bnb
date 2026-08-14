@@ -18,12 +18,16 @@ vi.mock("viem", async (importOriginal) => {
 });
 
 import {
+  BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   createBscTestnetPtaWbnbPoolLocalJournalCore,
   deriveBscTestnetPtaWbnbPoolAuthorizationReceiptSha256,
+  deriveBscTestnetPtaWbnbPoolNoEffectProofDigest,
+  openExistingWindowsBscTestnetPtaWbnbPoolActiveLocalJournalAtSyntheticDirectoryForTests,
   openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalAtSyntheticDirectoryForTests,
-  type BscTestnetPtaWbnbPoolClaimRequest,
-  type BscTestnetPtaWbnbPoolLocalJournalPorts
+  type BscTestnetPtaWbnbPoolLegacyClaimRequestForTests,
+  type BscTestnetPtaWbnbPoolLocalJournalPorts,
+  type BscTestnetPtaWbnbPoolNoEffectProof
 } from "./bsc-testnet-pta-wbnb-pool-local-journal.server";
 import { runPinnedPowerShellForInternalUse } from "./bsc-testnet-deployer-custody-windows.server";
 import {
@@ -39,6 +43,8 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 
 const NOW = "2026-08-13T10:00:30.000Z";
+const LEGACY_CLAIM_RECORD =
+  '{"schemaVersion":"bsc_testnet_pta_wbnb_pool_local_journal_v1","kind":"claim","claimId":"pta-wbnb-pool-e6c943aa33e600bfc1770ee654ee6b00","operationKey":"0xe6c943aa33e600bfc1770ee654ee6b00bf6dbcc7cc1702c58bd1caa64dadb9cc","envelopeHash":"0xeaf31374f49546dc2d02f351cf5872b9460b57fabaf94f39189411f45772d869","authorizationReceiptSha256":"0x3a69c8469b0a5f3bc2397975437969aec6ac144880992c3acae15a51d426c1b3","signingHash":"0xc1fde3400b68f5870d8f19d253fd58e9529a4aa440cecf4c3c1bf0de85f3efdc","serializedUnsignedSha256":"0x0ffa2338744fbb372a0b41df9551326c7de216e5381d4887dbbb29861880e76e","reviewerApprovalDigest":"0x330786388229f20ac735e394e0705395fcf130f1e241e11ab1080bf9e1d961f3","ownerAuthorizationDigest":"0xda498ee67ef685b6b47b7e3e2749db234c4951f6c9b15e376e18e7659d4188af","releaseCommit":"336af2967286795dc7703fff85034c71b8e84b5c","runtimeManifestSha256":"0xa1cda6fcf00f8a7d2b9a679cfb9b3fc28aa60674dae89c7dbfc032bdbcff5bdd","recordedAt":"2026-08-14T14:12:04.474Z","gasLimit":"5983857","gasPriceWei":"100000000","maxCostWei":"598385700000000","authorizedAt":"2026-08-14T14:11:35.280Z","expiresAt":"2026-08-14T14:12:20.280Z"}\n';
 const SOURCE = readFileSync(
   new URL("./bsc-testnet-pta-wbnb-pool-local-journal.server.ts", import.meta.url),
   "utf8"
@@ -151,7 +157,16 @@ function unsignedSha256(transaction: ReturnType<typeof exactTransaction>): Hex {
     .digest("hex")}`;
 }
 
-function claim(overrides: Partial<BscTestnetPtaWbnbPoolClaimRequest> = {}) {
+function claim(
+  overrides: Partial<
+    BscTestnetPtaWbnbPoolLegacyClaimRequestForTests & {
+      generation: 2;
+      predecessorState: "superseded_before_worker";
+      predecessorFenceSha256: Hex;
+      attemptId: Hex;
+    }
+  > = {}
+) {
   const transaction = exactTransaction();
   const body = {
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -175,7 +190,13 @@ function claim(overrides: Partial<BscTestnetPtaWbnbPoolClaimRequest> = {}) {
   });
 }
 
-function workerExchange(request: BscTestnetPtaWbnbPoolClaimRequest, token: Hex) {
+function workerExchange(request: BscTestnetPtaWbnbPoolLegacyClaimRequestForTests, token: Hex) {
+  const recovery = Object.freeze({
+    generation: 2 as const,
+    predecessorState: "superseded_before_worker" as const,
+    predecessorFenceSha256: hex32("9"),
+    attemptId: hex32("a")
+  });
   const intent = Object.freeze({
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: request.envelopeHash,
@@ -187,6 +208,7 @@ function workerExchange(request: BscTestnetPtaWbnbPoolClaimRequest, token: Hex) 
     runtimeManifestSha256: request.runtimeManifestSha256,
     authenticatedAt: NOW,
     expiresAt: request.expiresAt,
+    recovery,
     transaction: exactTransaction()
   }) satisfies BscTestnetPtaWbnbPoolValidatedSigningIntent;
   const workerRequest = buildBscTestnetPtaWbnbPoolSigningWorkerRequest(intent);
@@ -206,7 +228,7 @@ function workerExchange(request: BscTestnetPtaWbnbPoolClaimRequest, token: Hex) 
   return Object.freeze({
     workerRequest,
     workerResponse: Object.freeze({
-      schemaVersion: 1 as const,
+      schemaVersion: 2 as const,
       operation: BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_OPERATION,
       status: "signed" as const,
       oneShotIntentId: BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
@@ -223,17 +245,24 @@ function workerExchange(request: BscTestnetPtaWbnbPoolClaimRequest, token: Hex) 
   });
 }
 
-function memoryPorts(initial: Readonly<Record<string, string>> = {}) {
+function memoryPorts(initial: Readonly<Record<string, string>> = {}, now = NOW) {
   const files = new Map(Object.entries(initial));
   const calls: string[] = [];
   const ports: BscTestnetPtaWbnbPoolLocalJournalPorts = Object.freeze({
-    now: () => new Date(NOW),
+    now: () => new Date(now),
     listNames: async () => Object.freeze([...files.keys()].sort()),
     readBounded: async (name: string) => files.get(name) ?? null,
     createExclusive: async (name: string, content: string) => {
       calls.push(name);
       if (files.has(name)) return "exists" as const;
       files.set(name, content);
+      return "created" as const;
+    },
+    createExclusiveFenceFromFactory: async (name: string, contentFactory: () => string) => {
+      calls.push(name);
+      if (files.has(name)) return "exists" as const;
+      files.set(name, "");
+      files.set(name, contentFactory());
       return "created" as const;
     },
     assertSecure: async (names: readonly string[]) =>
@@ -248,7 +277,48 @@ function memoryPorts(initial: Readonly<Record<string, string>> = {}) {
   return { ports, files, calls };
 }
 
-function binding(request: BscTestnetPtaWbnbPoolClaimRequest) {
+function exactNoEffectProof(
+  overrides: Partial<BscTestnetPtaWbnbPoolNoEffectProof> = {}
+): BscTestnetPtaWbnbPoolNoEffectProof {
+  return Object.freeze({
+    schemaVersion: 1,
+    kind: "exact_fixed_dual_rpc_no_onchain_effect_after_claim_v1",
+    operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
+    envelopeHash: hex32("b"),
+    observedAt: "2026-08-14T14:12:21.000Z",
+    finalizedBlockNumber: "1",
+    finalizedBlockHash: hex32("c"),
+    finalizedBlockTimestamp: "1",
+    latestNonce: "1",
+    pendingNonce: "1",
+    pendingPool: "0x0000000000000000000000000000000000000000",
+    candidateCode: "0x",
+    candidateNonce: "0",
+    providerAgreementVerified: true,
+    allRuntimeIdentitiesVerified: true,
+    allEip1967SlotsZero: true,
+    allProtocolBindingsVerified: true,
+    feeTierVerified: true,
+    simulationReturnPool: "0x30b07e82d7181a53Ae2EA98Cd08b6733Ffd831aE",
+    submissionJournalPresence: "absent",
+    ...overrides
+  });
+}
+
+function binding(
+  request: Pick<
+    BscTestnetPtaWbnbPoolLegacyClaimRequestForTests,
+    | "operationKey"
+    | "envelopeHash"
+    | "authorizationReceiptSha256"
+    | "signingHash"
+    | "serializedUnsignedSha256"
+    | "reviewerApprovalDigest"
+    | "ownerAuthorizationDigest"
+    | "releaseCommit"
+    | "runtimeManifestSha256"
+  >
+) {
   return {
     claimId: `pta-wbnb-pool-${request.operationKey.slice(2, 34)}`,
     operationKey: request.operationKey,
@@ -308,6 +378,297 @@ async function driveTo(target: DrivenStatus) {
 }
 
 describe("PTA/WBNB pool local append-only journal", () => {
+  it("fences only the exact incident claim after expiry and makes the predecessor terminal", async () => {
+    expect(Buffer.byteLength(LEGACY_CLAIM_RECORD, "utf8")).toBe(1_123);
+    expect(`0x${createHash("sha256").update(LEGACY_CLAIM_RECORD, "utf8").digest("hex")}`).toBe(
+      BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256
+    );
+
+    const memory = memoryPorts(
+      { "01-claim.v1.json": LEGACY_CLAIM_RECORD },
+      "2026-08-14T14:12:22.000Z"
+    );
+    const journal = createBscTestnetPtaWbnbPoolLocalJournalCore(memory.ports, 1);
+    const candidate = await journal.readClaimOnlyRecoveryCandidate();
+    expect(candidate).toMatchObject({
+      status: "claimed",
+      legacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+      legacyAuthorizationExpiresAt: "2026-08-14T14:12:20.280Z"
+    });
+    if (candidate === null) throw new TypeError("exact incident fixture was not recognized");
+    const proof = exactNoEffectProof();
+    const proofDigest = deriveBscTestnetPtaWbnbPoolNoEffectProofDigest(proof);
+    const fence = await journal.fenceClaimBeforeWorker(
+      Object.freeze({
+        expectedLegacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+        proof
+      })
+    );
+    expect(fence).toMatchObject({
+      status: "superseded_before_worker",
+      terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
+      workerAuthorizationOutcome: "not_attempted",
+      workerStartOutcome: "not_attempted",
+      signatureOutcome: "not_attempted",
+      submissionOutcome: "not_attempted",
+      submissionJournalState: "exact_empty",
+      legacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+      noEffectProofDigest: proofDigest,
+      noEffectEnvelopeHash: proof.envelopeHash,
+      noEffectObservedAt: proof.observedAt,
+      fenceRecordedAt: "2026-08-14T14:12:22.000Z"
+    });
+    await expect(journal.readClaimOnlyRecoveryCandidate()).resolves.toBeNull();
+    await expect(
+      journal.authorizeWorker({
+        ...binding(candidate),
+        workerRequestHash: hex32("d"),
+        authorizationTokenDigest: hex32("e")
+      })
+    ).rejects.toThrow("STATE_MISMATCH");
+    await expect(
+      journal.recordUnknownOutcome({ ...binding(candidate), outcomeDigest: hex32("f") })
+    ).rejects.toThrow("STATE_MISMATCH");
+    expect(memory.files.size).toBe(2);
+    await expect(journal.readStrictRecoveryState()).resolves.toMatchObject({
+      status: "superseded_before_worker",
+      supersessionFence: fence
+    });
+  });
+
+  it("lets a stale worker authorization win slot 2 only by permanently blocking supersession", async () => {
+    const memory = memoryPorts(
+      { "01-claim.v1.json": LEGACY_CLAIM_RECORD },
+      "2026-08-14T14:12:22.000Z"
+    );
+    const journal = createBscTestnetPtaWbnbPoolLocalJournalCore(memory.ports, 1);
+    const candidate = await journal.readClaimOnlyRecoveryCandidate();
+    if (candidate === null) throw new TypeError("exact incident fixture was not recognized");
+    await journal.authorizeWorker({
+      ...binding(candidate),
+      workerRequestHash: hex32("d"),
+      authorizationTokenDigest: hex32("e")
+    });
+    await expect(
+      journal.fenceClaimBeforeWorker(
+        Object.freeze({
+          expectedLegacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+          proof: exactNoEffectProof()
+        })
+      )
+    ).rejects.toThrow("PERMANENTLY_BLOCKED");
+    await expect(journal.readState()).resolves.toMatchObject({ status: "worker_authorized" });
+    expect(memory.calls).toEqual(["02-transition.v1.json"]);
+  });
+
+  it("aborts the current fence caller on O_EXCL exists even when retained bytes are exact", async () => {
+    const memory = memoryPorts(
+      { "01-claim.v1.json": LEGACY_CLAIM_RECORD },
+      "2026-08-14T14:12:22.000Z"
+    );
+    const racingPorts: BscTestnetPtaWbnbPoolLocalJournalPorts = Object.freeze({
+      ...memory.ports,
+      createExclusiveFenceFromFactory: async (name: string, contentFactory: () => string) => {
+        if (name !== "02-transition.v1.json") throw new TypeError("unexpected slot");
+        memory.files.set(name, contentFactory());
+        return "exists" as const;
+      }
+    });
+    const journal = createBscTestnetPtaWbnbPoolLocalJournalCore(racingPorts, 1);
+    await expect(
+      journal.fenceClaimBeforeWorker(
+        Object.freeze({
+          expectedLegacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+          proof: exactNoEffectProof()
+        })
+      )
+    ).rejects.toThrow("OUTCOME_UNKNOWN");
+    await expect(journal.readStrictRecoveryState()).resolves.toMatchObject({
+      status: "superseded_before_worker"
+    });
+  });
+
+  it("rejects an already-stale proof before reserving slot 2", async () => {
+    const memory = memoryPorts(
+      { "01-claim.v1.json": LEGACY_CLAIM_RECORD },
+      "2026-08-14T14:12:22.000Z"
+    );
+    let stalled = false;
+    const createFence = vi.fn(memory.ports.createExclusiveFenceFromFactory);
+    const staleBeforeReservation: BscTestnetPtaWbnbPoolLocalJournalPorts = Object.freeze({
+      ...memory.ports,
+      now: () => new Date(stalled ? "2026-08-14T14:14:21.001Z" : "2026-08-14T14:12:22.000Z"),
+      assertSecure: async (names: readonly string[]) => {
+        const result = await memory.ports.assertSecure(names);
+        // Simulates the strict snapshot/ACL read completing only after snapshot A has become stale.
+        stalled = true;
+        return result;
+      },
+      createExclusiveFenceFromFactory: createFence
+    });
+    const journal = createBscTestnetPtaWbnbPoolLocalJournalCore(staleBeforeReservation, 1);
+
+    await expect(
+      journal.fenceClaimBeforeWorker(
+        Object.freeze({
+          expectedLegacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+          proof: exactNoEffectProof()
+        })
+      )
+    ).rejects.toThrow("PROOF_INVALID");
+    expect(createFence).not.toHaveBeenCalled();
+    expect(memory.files.has("02-transition.v1.json")).toBe(false);
+    expect(memory.calls).toEqual([]);
+    await expect(journal.readStrictRecoveryState()).resolves.toMatchObject({ status: "claimed" });
+    await expect(journal.readClaimOnlyRecoveryCandidate()).resolves.not.toBeNull();
+  });
+
+  it("rechecks proof age after O_EXCL reservation and blocks a stale resumed proof", async () => {
+    const memory = memoryPorts(
+      { "01-claim.v1.json": LEGACY_CLAIM_RECORD },
+      "2026-08-14T14:12:22.000Z"
+    );
+    let reserved = false;
+    let clockCalls = 0;
+    const stalledBeforeReservation: BscTestnetPtaWbnbPoolLocalJournalPorts = Object.freeze({
+      ...memory.ports,
+      now: () => {
+        clockCalls += 1;
+        return new Date(reserved ? "2026-08-14T14:14:21.001Z" : "2026-08-14T14:12:22.000Z");
+      },
+      createExclusiveFenceFromFactory: async (name: string, contentFactory: () => string) => {
+        if (name !== "02-transition.v1.json") throw new TypeError("unexpected slot");
+        memory.calls.push(name);
+        if (memory.files.has(name)) return "exists" as const;
+        // Simulates a process suspended after the precheck but before the kernel reservation. The
+        // decisive fence time is recaptured after this point, so stale proof bytes cannot survive.
+        reserved = true;
+        memory.files.set(name, "");
+        memory.files.set(name, contentFactory());
+        return "created" as const;
+      }
+    });
+    const journal = createBscTestnetPtaWbnbPoolLocalJournalCore(stalledBeforeReservation, 1);
+    const request = Object.freeze({
+      expectedLegacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+      proof: exactNoEffectProof()
+    });
+
+    await expect(journal.fenceClaimBeforeWorker(request)).rejects.toThrow("PROOF_INVALID");
+    expect(clockCalls).toBe(2);
+    expect(memory.files.has("02-transition.v1.json")).toBe(true);
+    expect(memory.files.get("02-transition.v1.json")).toBe("");
+    expect(memory.calls).toEqual(["02-transition.v1.json"]);
+    await expect(journal.readStrictRecoveryState()).resolves.toBeNull();
+    const restarted = createBscTestnetPtaWbnbPoolLocalJournalCore(memory.ports, 1);
+    await expect(restarted.readStrictRecoveryState()).resolves.toBeNull();
+  });
+
+  it("leaves a crash after O_EXCL reservation as a strict restart block", async () => {
+    const memory = memoryPorts(
+      { "01-claim.v1.json": LEGACY_CLAIM_RECORD },
+      "2026-08-14T14:12:22.000Z"
+    );
+    const crashAfterReservation: BscTestnetPtaWbnbPoolLocalJournalPorts = Object.freeze({
+      ...memory.ports,
+      createExclusiveFenceFromFactory: async (name: string) => {
+        if (name !== "02-transition.v1.json") throw new TypeError("unexpected slot");
+        memory.calls.push(name);
+        memory.files.set(name, "");
+        throw new Error("synthetic-crash-after-reservation");
+      }
+    });
+    const journal = createBscTestnetPtaWbnbPoolLocalJournalCore(crashAfterReservation, 1);
+
+    await expect(
+      journal.fenceClaimBeforeWorker(
+        Object.freeze({
+          expectedLegacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+          proof: exactNoEffectProof()
+        })
+      )
+    ).rejects.toThrow("synthetic-crash-after-reservation");
+    expect(memory.files.get("02-transition.v1.json")).toBe("");
+    expect(memory.calls).toEqual(["02-transition.v1.json"]);
+    const restarted = createBscTestnetPtaWbnbPoolLocalJournalCore(memory.ports, 1);
+    await expect(restarted.readStrictRecoveryState()).resolves.toBeNull();
+    await expect(restarted.readClaimOnlyRecoveryCandidate()).resolves.toBeNull();
+  });
+
+  it("rejects noncanonical, stale, pre-expiry, or unbounded no-effect proof fields", async () => {
+    const invalidProofs = [
+      exactNoEffectProof({ observedAt: "2026-08-14T14:12:20.000Z" }),
+      exactNoEffectProof({ candidateNonce: "1" as "0" }),
+      exactNoEffectProof({ submissionJournalPresence: "present" as "absent" }),
+      exactNoEffectProof({ finalizedBlockNumber: "18446744073709551616" }),
+      exactNoEffectProof({ finalizedBlockTimestamp: "9999999999999999999" })
+    ];
+    for (const proof of invalidProofs) {
+      const memory = memoryPorts(
+        { "01-claim.v1.json": LEGACY_CLAIM_RECORD },
+        "2026-08-14T14:12:22.000Z"
+      );
+      const journal = createBscTestnetPtaWbnbPoolLocalJournalCore(memory.ports, 1);
+      await expect(
+        journal.fenceClaimBeforeWorker(
+          Object.freeze({
+            expectedLegacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+            proof
+          })
+        )
+      ).rejects.toThrow();
+      expect(memory.files.size).toBe(1);
+    }
+  });
+
+  it("uses a distinct generation-2 schema, receipt domain, recovery binding, and claim id", async () => {
+    const recovery = Object.freeze({
+      generation: 2 as const,
+      predecessorState: "superseded_before_worker" as const,
+      predecessorFenceSha256: hex32("9"),
+      attemptId: hex32("a")
+    });
+    const request = claim(recovery);
+    const memory = memoryPorts();
+    const journal = createBscTestnetPtaWbnbPoolLocalJournalCore(memory.ports, 2);
+    const result = await journal.claimExactInitialization(request);
+    expect(result).toMatchObject({ status: "claimed" });
+    expect(result.claimId).toMatch(/^pta-wbnb-pool-v2-[0-9a-f]{32}$/u);
+    expect(result.claimId).not.toBe(binding(claim()).claimId);
+    expect(request.authorizationReceiptSha256).not.toBe(claim().authorizationReceiptSha256);
+    expect(memory.files.get("01-claim.v2.json")).toContain(
+      '"schemaVersion":"bsc_testnet_pta_wbnb_pool_local_journal_v2"'
+    );
+    await expect(journal.readState()).resolves.toMatchObject({
+      status: "claimed",
+      generation: 2,
+      predecessorState: recovery.predecessorState,
+      predecessorFenceSha256: recovery.predecessorFenceSha256,
+      attemptId: recovery.attemptId
+    });
+    await expect(
+      createBscTestnetPtaWbnbPoolLocalJournalCore(memoryPorts().ports, 2).claimExactInitialization(
+        claim()
+      )
+    ).rejects.toThrow("INPUT_INVALID");
+    await expect(
+      createBscTestnetPtaWbnbPoolLocalJournalCore(memoryPorts().ports, 1).claimExactInitialization(
+        request
+      )
+    ).rejects.toThrow("INPUT_INVALID");
+
+    for (const changed of [
+      claim({ ...recovery, attemptId: hex32("b") }),
+      claim({ ...recovery, predecessorFenceSha256: hex32("c") })
+    ]) {
+      const changedResult = await createBscTestnetPtaWbnbPoolLocalJournalCore(
+        memoryPorts().ports,
+        2
+      ).claimExactInitialization(changed);
+      expect(changedResult.claimId).not.toBe(result.claimId);
+    }
+  });
+
   it("claims once and returns every immutable recovery binding", async () => {
     const memory = memoryPorts();
     const journal = createBscTestnetPtaWbnbPoolLocalJournalCore(memory.ports);
@@ -319,13 +680,18 @@ describe("PTA/WBNB pool local append-only journal", () => {
     await expect(journal.readState()).resolves.toEqual({
       status: "claimed",
       ...binding(request),
+      generation: 1,
+      predecessorState: null,
+      predecessorFenceSha256: null,
+      attemptId: null,
       gasLimit: request.gasLimit,
       gasPriceWei: request.gasPriceWei,
       maxCostWei: request.maxCostWei,
       authorizedAt: request.authorizedAt,
       expiresAt: request.expiresAt,
       serializedTransaction: null,
-      transactionHash: null
+      transactionHash: null,
+      supersessionFence: null
     });
     await expect(journal.claimExactInitialization(request)).resolves.toMatchObject({
       status: "already_claimed",
@@ -644,7 +1010,8 @@ describe("PTA/WBNB pool local append-only journal", () => {
   it("keeps the Windows adapter fixed, env-free, and validates ancestors before ACL mutation", () => {
     expect(SOURCE).not.toContain("process.env");
     expect(SOURCE).toContain("GetFolderPath([Environment+SpecialFolder]::LocalApplicationData)");
-    expect(SOURCE).toContain('["ProofEra", "operations", "bsc-testnet-pta-wbnb-pool-v1"] as const');
+    expect(SOURCE).toContain('"bsc-testnet-pta-wbnb-pool-v1"');
+    expect(SOURCE).toContain('"bsc-testnet-pta-wbnb-pool-v2"');
     const validation = SOURCE.indexOf(
       "# All ancestors have been validated before the first ACL mutation."
     );
@@ -662,13 +1029,76 @@ describe("PTA/WBNB pool local append-only journal", () => {
     const readOnlyStart = SOURCE.indexOf("const LOCAL_APPLICATION_DATA_READ_ONLY_PROBE_SCRIPT");
     const provisioningStart = SOURCE.indexOf("const LOCAL_APPLICATION_DATA_PROBE_SCRIPT");
     const readOnlyScript = SOURCE.slice(readOnlyStart, provisioningStart);
+    const protectRecordStart = SOURCE.indexOf("const PROTECT_RECORD_SCRIPT");
+    const provisioningScript = SOURCE.slice(provisioningStart, protectRecordStart);
     expect(readOnlyStart).toBeGreaterThan(0);
     expect(provisioningStart).toBeGreaterThan(readOnlyStart);
+    expect(protectRecordStart).toBeGreaterThan(provisioningStart);
     expect(readOnlyScript).not.toMatch(/New-Item|SetAccessControl|Remove-Item/u);
+    expect(provisioningScript).toContain("01-claim.v2.json");
+    expect(provisioningScript).not.toContain("01-claim.v1.json");
   });
 });
 
 describe.runIf(process.platform === "win32")("read-only Windows signing recovery probe", () => {
+  it("exposes narrow generation-specific restart facades and accepts active v2 slots", async () => {
+    const legacyDirectory = await createSyntheticDirectory();
+    const activeDirectory = await createSyntheticDirectory();
+    try {
+      const legacyPath = win32.join(legacyDirectory, "01-claim.v1.json");
+      await writeFile(legacyPath, LEGACY_CLAIM_RECORD, { encoding: "utf8", flag: "wx" });
+      await protectSynthetic(legacyPath);
+      const legacy =
+        await openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalAtSyntheticDirectoryForTests(
+          legacyDirectory
+        );
+      expect(legacy.status).toBe("opened");
+      if (legacy.status !== "opened") throw new TypeError("legacy fixture did not open");
+      expect(Object.keys(legacy.journal).sort()).toEqual(
+        [
+          "fenceClaimBeforeWorker",
+          "readClaimOnlyRecoveryCandidate",
+          "readState",
+          "readStrictRecoveryState"
+        ].sort()
+      );
+      expect("authorizeWorker" in legacy.journal).toBe(false);
+      expect("claimExactInitialization" in legacy.journal).toBe(false);
+
+      const recovery = Object.freeze({
+        generation: 2 as const,
+        predecessorState: "superseded_before_worker" as const,
+        predecessorFenceSha256: hex32("9"),
+        attemptId: hex32("a")
+      });
+      const activeMemory = memoryPorts();
+      await createBscTestnetPtaWbnbPoolLocalJournalCore(
+        activeMemory.ports,
+        2
+      ).claimExactInitialization(claim(recovery));
+      const activeContent = activeMemory.files.get("01-claim.v2.json");
+      if (activeContent === undefined) throw new TypeError("active v2 fixture was not created");
+      const activePath = win32.join(activeDirectory, "01-claim.v2.json");
+      await writeFile(activePath, activeContent, { encoding: "utf8", flag: "wx" });
+      await protectSynthetic(activePath);
+      const active =
+        await openExistingWindowsBscTestnetPtaWbnbPoolActiveLocalJournalAtSyntheticDirectoryForTests(
+          activeDirectory
+        );
+      expect(active.status).toBe("opened");
+      if (active.status !== "opened") throw new TypeError("active fixture did not open");
+      expect(active.state).toMatchObject({ status: "claimed", generation: 2 });
+      expect(Object.keys(active.journal).sort()).toEqual(
+        ["readState", "readStrictRecoveryState"].sort()
+      );
+      expect("claimExactInitialization" in active.journal).toBe(false);
+      expect("authorizeWorker" in active.journal).toBe(false);
+    } finally {
+      await cleanupSyntheticDirectory(legacyDirectory);
+      await cleanupSyntheticDirectory(activeDirectory);
+    }
+  }, 45_000);
+
   it("reports an empty existing directory without changing bytes, metadata, or ACL", async () => {
     const directory = await createSyntheticDirectory();
     try {

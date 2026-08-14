@@ -20,8 +20,12 @@ import {
   BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
+import type { BscTestnetPtaWbnbPoolSupersessionFenceState } from "./bsc-testnet-pta-wbnb-pool-local-journal.server";
 import {
+  BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
+  BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
+  BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
   buildBscTestnetPtaWbnbPoolExactSigningTransaction,
   buildBscTestnetPtaWbnbPoolSigningWorkerRequest,
   deriveBscTestnetPtaWbnbPoolSigningWorkerRequestHash,
@@ -37,6 +41,7 @@ import {
   createWindowsBscTestnetPtaWbnbPoolSigningWorker,
   isBscTestnetPtaWbnbPoolSigningDeadlineCurrentForInternalUse,
   matchesBscTestnetPtaWbnbPoolExactBroadcastToSuccessfulSigningForInternalUse,
+  matchesBscTestnetPtaWbnbPoolExactPreCustodyRecoveryForInternalUse,
   reconstructExactBscTestnetPtaWbnbPoolRfc6979TransactionForInternalUse,
   signExactBscTestnetPtaWbnbPoolEncryptedStoreForInternalUse,
   signExactBscTestnetPtaWbnbPoolEncryptedStoreWithExpectedSignerForInternalUse,
@@ -69,6 +74,12 @@ const SECP256K1_HALF_ORDER =
 const NOW = "2026-08-13T05:00:10.000Z";
 const RELEASE_COMMIT = "70".repeat(20);
 const RUNTIME_MANIFEST_SHA256 = `0x${"22".repeat(32)}` as const;
+const RECOVERY = Object.freeze({
+  generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
+  predecessorState: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
+  predecessorFenceSha256: `0x${"23".repeat(32)}` as Hex,
+  attemptId: `0x${"24".repeat(32)}` as Hex
+});
 const RFC6979_KAT_TRANSACTION_HASH =
   "0x5fb4c8d0538d62767b9108d2344b400f666fb67e4c38c8b0eeace73fcd61f363";
 
@@ -149,6 +160,7 @@ function reviewedWorkerRequest() {
     runtimeManifestSha256: RUNTIME_MANIFEST_SHA256,
     authenticatedAt: "2026-08-13T05:00:00.000Z",
     expiresAt: "2026-08-13T05:00:30.000Z",
+    recovery: RECOVERY,
     transaction
   });
   return buildBscTestnetPtaWbnbPoolSigningWorkerRequest(intent);
@@ -444,11 +456,32 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     expect(releaseIndex).toBeGreaterThan(invocationIndex);
     expect(custodyIndex).toBeGreaterThan(activationIndex);
     expect(journalIndex).toBeGreaterThan(custodyIndex);
+    const legacyRecoveryIndex = nativeSource.indexOf(
+      "openExistingWindowsBscTestnetPtaWbnbPoolLegacyLocalJournalForRecoveryForInternalUse()"
+    );
+    const activeRecoveryIndex = nativeSource.indexOf(
+      "openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse()"
+    );
+    const submissionRecoveryIndex = nativeSource.indexOf(
+      "openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse()"
+    );
+    const exactRecoveryIndex = nativeSource.indexOf(
+      "matchesBscTestnetPtaWbnbPoolExactPreCustodyRecoveryForInternalUse("
+    );
+    expect(legacyRecoveryIndex).toBeGreaterThan(releaseIndex);
+    expect(activeRecoveryIndex).toBeGreaterThan(releaseIndex);
+    expect(submissionRecoveryIndex).toBeGreaterThan(releaseIndex);
+    expect(exactRecoveryIndex).toBeGreaterThan(submissionRecoveryIndex);
+    expect(custodyIndex).toBeGreaterThan(exactRecoveryIndex);
     expect(nativeSource).toContain(
       "const localCustodyPathAclCapability = Object.freeze(Object.create(null) as object)"
     );
-    expect(nativeSource).toContain("const ceremonyCommands = new WeakMap<object");
-    expect(nativeSource).toContain("ceremonyCommands.get(command) !== descriptor");
+    expect(nativeSource).toContain("const ceremonyCommands = new WeakMap<");
+    expect(nativeSource).toContain("ceremonyCommands.get(command)");
+    expect(nativeSource).toContain("ceremonyBinding.descriptor !== descriptor");
+    expect(nativeSource).toContain(
+      "const runtimeReviewInstantiation = ceremonyBinding.instantiation"
+    );
     expect(nativeSource).toContain(
       "issuer.reserveExecutionCapabilityForWorker(candidateCapability)"
     );
@@ -464,6 +497,93 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     expect(nativeSource).not.toMatch(/process\s*\.\s*(?:env|argv)/u);
     expect(
       authenticateBscTestnetPtaWbnbPoolNativeProductionBridgeForInternalUse(Object.freeze({}))
+    ).toBe(false);
+  });
+
+  it("requires the exact retained fence and two empty generation-2 namespaces before custody metadata", () => {
+    const fence = Object.freeze({
+      status: "superseded_before_worker",
+      terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
+      workerAuthorizationOutcome: "not_attempted",
+      workerStartOutcome: "not_attempted",
+      signatureOutcome: "not_attempted",
+      submissionOutcome: "not_attempted",
+      submissionJournalState: "exact_empty",
+      legacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+      noEffectProofDigest: `0x${"26".repeat(32)}`,
+      noEffectEnvelopeHash: `0x${"27".repeat(32)}`,
+      noEffectObservedAt: "2026-08-14T14:20:26.034Z",
+      fenceRecordedAt: "2026-08-14T14:21:00.000Z",
+      predecessorFenceSha256: `0x${"28".repeat(32)}` as Hex
+    }) satisfies BscTestnetPtaWbnbPoolSupersessionFenceState;
+    const legacyState = Object.freeze({
+      status: "superseded_before_worker" as const,
+      supersessionFence: fence
+    });
+    const instantiation = Object.freeze({
+      recovery: Object.freeze({
+        generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
+        predecessorFence: Object.freeze({ ...fence })
+      })
+    });
+
+    expect(
+      matchesBscTestnetPtaWbnbPoolExactPreCustodyRecoveryForInternalUse(
+        legacyState,
+        "absent",
+        "absent",
+        instantiation
+      )
+    ).toBe(true);
+
+    const changedFenceFields: readonly (keyof BscTestnetPtaWbnbPoolSupersessionFenceState)[] = [
+      "status",
+      "terminalCode",
+      "workerAuthorizationOutcome",
+      "workerStartOutcome",
+      "signatureOutcome",
+      "submissionOutcome",
+      "submissionJournalState",
+      "legacyClaimRawSha256",
+      "noEffectProofDigest",
+      "noEffectEnvelopeHash",
+      "noEffectObservedAt",
+      "fenceRecordedAt",
+      "predecessorFenceSha256"
+    ];
+    for (const field of changedFenceFields) {
+      const changed = Object.freeze({ ...fence, [field]: "changed" });
+      expect(
+        matchesBscTestnetPtaWbnbPoolExactPreCustodyRecoveryForInternalUse(
+          legacyState,
+          "absent",
+          "absent",
+          Object.freeze({
+            recovery: Object.freeze({
+              generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
+              predecessorFence: changed
+            })
+          }) as Parameters<
+            typeof matchesBscTestnetPtaWbnbPoolExactPreCustodyRecoveryForInternalUse
+          >[3]
+        )
+      ).toBe(false);
+    }
+    expect(
+      matchesBscTestnetPtaWbnbPoolExactPreCustodyRecoveryForInternalUse(
+        legacyState,
+        "opened",
+        "absent",
+        instantiation
+      )
+    ).toBe(false);
+    expect(
+      matchesBscTestnetPtaWbnbPoolExactPreCustodyRecoveryForInternalUse(
+        legacyState,
+        "absent",
+        "opened",
+        instantiation
+      )
     ).toBe(false);
   });
 
@@ -564,9 +684,9 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
   it("binds broadcast owner time separately from the later fresh signing timestamp", () => {
     const request = reviewedWorkerRequest();
     const intent = Object.freeze({
-      schemaVersion: 1 as const,
+      schemaVersion: 2 as const,
       scope:
-        "owner_designated_internal_release_policy_and_exact_owner_pool_initialization" as const,
+        "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_2" as const,
       operationKey: request.operationKey,
       envelopeHash: request.transaction.sourceEnvelopeHash,
       reviewerApprovalDigest: request.reviewerApprovalDigest,
@@ -575,11 +695,12 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
       runtimeManifestSha256: request.runtimeManifestSha256,
       authenticatedAt: "2026-08-13T04:59:45.000Z",
       expiresAt: request.expiresAt,
+      recovery: request.recovery,
       transaction: request.transaction
     }) satisfies BscTestnetPtaWbnbPoolAuthorizedSigningIntent;
     const response = syntheticAttestedResponse(request);
     const broadcast = Object.freeze({
-      schemaVersion: 1,
+      schemaVersion: 2,
       operation:
         "consume_exact_bsc_testnet_pta_wbnb_pool_broadcast_authorization_after_durable_start",
       operationKey: request.operationKey,
@@ -589,6 +710,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
       runtimeManifestSha256: request.runtimeManifestSha256,
       reviewerApprovalDigest: request.reviewerApprovalDigest,
       ownerAuthorizationDigest: request.ownerAuthorizationDigest,
+      recovery: request.recovery,
       signingHash: request.transaction.signingHash,
       transactionHash: response.transactionHash,
       signedTransactionKeccak256: response.transactionHash,
@@ -608,6 +730,16 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
         requestHash: deriveBscTestnetPtaWbnbPoolSigningWorkerRequestHash(timedBody)
       });
     };
+    const withRecovery = (attemptId: Hex) => {
+      const { requestHash: _requestHash, ...body } = request;
+      void _requestHash;
+      const recovery = Object.freeze({ ...request.recovery, attemptId });
+      const recoveryBody = { ...body, recovery };
+      return Object.freeze({
+        ...recoveryBody,
+        requestHash: deriveBscTestnetPtaWbnbPoolSigningWorkerRequestHash(recoveryBody)
+      });
+    };
 
     expect(
       matchesBscTestnetPtaWbnbPoolExactBroadcastToSuccessfulSigningForInternalUse(
@@ -624,8 +756,19 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
         request
       },
       {
+        broadcast: Object.freeze({
+          ...broadcast,
+          recovery: Object.freeze({ ...broadcast.recovery, attemptId: `0x${"25".repeat(32)}` })
+        }),
+        request
+      },
+      {
         broadcast,
         request: withTimes("2026-08-13T04:59:44.999Z", request.expiresAt)
+      },
+      {
+        broadcast,
+        request: withRecovery(`0x${"26".repeat(32)}` as Hex)
       },
       {
         broadcast,
@@ -971,8 +1114,14 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     const mutations: Array<Readonly<{ label: string; value: unknown }>> = [];
     for (const key of Object.keys(request)) {
       const mutated = JSON.parse(JSON.stringify(request)) as Record<string, unknown>;
-      mutated[key] = key === "schemaVersion" ? 2 : key === "transaction" ? null : "__mutated__";
+      mutated[key] = key === "schemaVersion" ? 1 : key === "transaction" ? null : "__mutated__";
       mutations.push({ label: key, value: mutated });
+    }
+    for (const key of Object.keys(request.recovery)) {
+      const mutated = JSON.parse(JSON.stringify(request)) as Record<string, unknown>;
+      const recovery = mutated.recovery as Record<string, unknown>;
+      recovery[key] = key === "generation" ? 1 : "__mutated__";
+      mutations.push({ label: `recovery.${key}`, value: mutated });
     }
     for (const key of Object.keys(request.transaction)) {
       const mutated = JSON.parse(JSON.stringify(request)) as Record<string, unknown>;
@@ -981,7 +1130,9 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
       mutations.push({ label: `transaction.${key}`, value: mutated });
     }
     expect(mutations).toHaveLength(
-      Object.keys(request).length + Object.keys(request.transaction).length
+      Object.keys(request).length +
+        Object.keys(request.transaction).length +
+        Object.keys(request.recovery).length
     );
     for (const mutation of mutations) {
       const consume = vi.fn();
@@ -1007,7 +1158,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
         ...Object.entries(request).filter(([key]) => key !== "requestHash")
       ])
     );
-    const duplicate = valid.replace('"schemaVersion":1,', '"schemaVersion":1,"schemaVersion":1,');
+    const duplicate = valid.replace('"schemaVersion":2,', '"schemaVersion":2,"schemaVersion":2,');
     const extra = JSON.stringify({ ...request, extra: true });
     const malformedInputs: Uint8Array[] = [
       Buffer.alloc(0),

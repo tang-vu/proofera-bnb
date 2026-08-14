@@ -78,10 +78,10 @@ export const BSC_TESTNET_PTA_WBNB_POOL_CODE_IDENTITIES = Object.freeze({
 });
 
 export const BSC_TESTNET_PTA_WBNB_POOL_ENVELOPE_HASH_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-initialization-envelope:v1" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-initialization-envelope:v2" as const;
 
 export interface BscTestnetPtaWbnbPoolInitializationEnvelopeBody {
-  readonly schemaVersion: 1;
+  readonly schemaVersion: 2;
   readonly operation: "create_and_initialize_exact_pta_wbnb_pancake_v3_pool_once";
   readonly chainId: "97";
   readonly transaction: Readonly<{
@@ -112,6 +112,8 @@ export interface BscTestnetPtaWbnbPoolInitializationEnvelopeBody {
     latestNonce: "1";
     pendingNonce: "1";
     pendingPool: "0x0000000000000000000000000000000000000000";
+    candidateCode: "0x";
+    candidateNonce: "0";
     providerAgreementVerified: true;
     allRuntimeIdentitiesVerified: true;
     allEip1967SlotsZero: true;

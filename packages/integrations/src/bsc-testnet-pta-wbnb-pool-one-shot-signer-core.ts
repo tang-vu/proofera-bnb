@@ -11,10 +11,11 @@ import {
   validateBscTestnetPtaWbnbPoolFreshRecheckCapability,
   validateBscTestnetPtaWbnbPoolSigningWorkerResponse,
   type BscTestnetPtaWbnbPoolProtocolIssue,
+  type BscTestnetPtaWbnbPoolRecoveryAttemptBinding,
   type BscTestnetPtaWbnbPoolSigningWorkerRequest
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 
-export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_CLAIM_SCHEMA_VERSION = 1 as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_CLAIM_SCHEMA_VERSION = 2 as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_CLAIM_OPERATION =
   "claim_exact_bsc_testnet_pta_wbnb_pool_initialization_once" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_SIGNED_READBACK_OPERATION =
@@ -54,6 +55,7 @@ export interface BscTestnetPtaWbnbPoolDurableClaimRequest {
   readonly runtimeManifestSha256: Hex;
   readonly reviewerApprovalDigest: Hex;
   readonly ownerAuthorizationDigest: Hex;
+  readonly recovery: BscTestnetPtaWbnbPoolRecoveryAttemptBinding;
   readonly serializedUnsignedTransaction: Hex;
   readonly signingHash: Hex;
   readonly gasLimit: string;
@@ -83,6 +85,7 @@ export interface BscTestnetPtaWbnbPoolPostClaimRecheckRequest {
   readonly runtimeManifestSha256: Hex;
   readonly reviewerApprovalDigest: Hex;
   readonly ownerAuthorizationDigest: Hex;
+  readonly recovery: BscTestnetPtaWbnbPoolRecoveryAttemptBinding;
   readonly signingHash: Hex;
 }
 
@@ -97,6 +100,7 @@ export interface BscTestnetPtaWbnbPoolDurableSignedReadbackRequest {
   readonly runtimeManifestSha256: Hex;
   readonly reviewerApprovalDigest: Hex;
   readonly ownerAuthorizationDigest: Hex;
+  readonly recovery: BscTestnetPtaWbnbPoolRecoveryAttemptBinding;
   readonly requestHash: Hex;
   readonly signingHash: Hex;
   readonly serializedUnsignedTransaction: Hex;
@@ -185,7 +189,10 @@ export interface BscTestnetPtaWbnbPoolOneShotSignerCore {
   readonly signOnce: () => Promise<BscTestnetPtaWbnbPoolOneShotSignerResult>;
 }
 
-/** Test-only DI seam. Production construction below is permanently blocked in this release. */
+/**
+ * Exact internal dependency shape shared by fixed production composition and tests. Plain
+ * dependency objects cannot mint the closure-private production authority.
+ */
 export interface BscTestnetPtaWbnbPoolOneShotSignerTestDependencies {
   readonly asOf: () => Date;
   readonly acquireAuthorizedIntent: () => Promise<unknown>;
@@ -397,19 +404,21 @@ function invalidCore(
 }
 
 /**
- * Production constructor is intentionally non-authorizing until a reviewed, non-injectable receipt
- * issuer is installed. It accepts no dependencies and can never reach a claim, secret, or worker.
+ * Generic no-dependency production constructor is intentionally fail-only. The fixed private
+ * production composition uses a separate branded internal seam; this export can never reach a claim,
+ * secret, or worker.
  */
 export function createBscTestnetPtaWbnbPoolProductionOneShotSignerCore(): BscTestnetPtaWbnbPoolOneShotSignerCore {
   return invalidCore(
     "PRODUCTION_AUTHORIZATION_UNAVAILABLE",
-    "This release has no production reviewer/owner receipt issuer; signing remains unavailable."
+    "The generic constructor carries no private branded authority; signing remains unavailable."
   );
 }
 
 /**
- * Dependency-injected protocol harness for deterministic tests and independent review only. signOnce
- * has no transaction arguments. Every ambiguous outcome after claim is terminal and non-retryable.
+ * Dependency-inspected protocol core used by fixed private production composition and deterministic
+ * tests. signOnce has no transaction arguments. Every ambiguous outcome after claim is terminal and
+ * non-retryable.
  */
 function createBscTestnetPtaWbnbPoolOneShotSignerCore(
   untrustedDependencies: unknown
@@ -418,7 +427,7 @@ function createBscTestnetPtaWbnbPoolOneShotSignerCore(
   if (dependencies === null) {
     return invalidCore(
       "CONFIGURATION_INVALID",
-      "Test signer core requires exact own-data non-proxy protocol ports."
+      "Signer core requires exact own-data non-proxy protocol ports."
     );
   }
 
@@ -513,6 +522,7 @@ function createBscTestnetPtaWbnbPoolOneShotSignerCore(
       runtimeManifestSha256: intent.runtimeManifestSha256,
       reviewerApprovalDigest: intent.reviewerApprovalDigest,
       ownerAuthorizationDigest: intent.ownerAuthorizationDigest,
+      recovery: intent.recovery,
       serializedUnsignedTransaction: intent.transaction.serializedUnsignedTransaction,
       signingHash: intent.transaction.signingHash,
       gasLimit: intent.transaction.gasLimit,
@@ -578,6 +588,7 @@ function createBscTestnetPtaWbnbPoolOneShotSignerCore(
       runtimeManifestSha256: intent.runtimeManifestSha256,
       reviewerApprovalDigest: intent.reviewerApprovalDigest,
       ownerAuthorizationDigest: intent.ownerAuthorizationDigest,
+      recovery: intent.recovery,
       signingHash: intent.transaction.signingHash
     });
     state = "acquiring_post_claim_recheck";
@@ -742,6 +753,7 @@ function createBscTestnetPtaWbnbPoolOneShotSignerCore(
       runtimeManifestSha256: intent.runtimeManifestSha256,
       reviewerApprovalDigest: intent.reviewerApprovalDigest,
       ownerAuthorizationDigest: intent.ownerAuthorizationDigest,
+      recovery: intent.recovery,
       requestHash: workerRequest.requestHash,
       signingHash: intent.transaction.signingHash,
       serializedUnsignedTransaction: intent.transaction.serializedUnsignedTransaction,
@@ -840,7 +852,10 @@ function createBscTestnetPtaWbnbPoolOneShotSignerCore(
   return Object.freeze({ boundary: CORE_BOUNDARY, getState: () => state, signOnce });
 }
 
-/** Internal deterministic composition seam; the production runner remains hard-blocked. */
+/**
+ * Internal deterministic composition seam. Production reaches it only through the fixed branded
+ * bridge; the public/generic production factory remains blocked.
+ */
 export function createBscTestnetPtaWbnbPoolOneShotSignerCoreForInternalUse(
   untrustedDependencies: unknown
 ): BscTestnetPtaWbnbPoolOneShotSignerCore {

@@ -116,6 +116,14 @@ function replaced(values, index, value) {
   return result;
 }
 
+function exactPowerShellFunction(source, name) {
+  const start = source.indexOf(`function ${name} {`);
+  assert.ok(start >= 0, `missing PowerShell function ${name}`);
+  const end = source.indexOf("\n}\n\ntry {", start);
+  assert.ok(end > start, `unterminated PowerShell function ${name}`);
+  return source.slice(start, end + 2);
+}
+
 function literalReleasePaths(source, endMarker, additions) {
   const start = source.indexOf("const RELEASE_SOURCE_PATHS");
   const end = source.indexOf(endMarker, start);
@@ -456,6 +464,20 @@ test("phase minus one is a minimal fixed pre-Node environment scrubber", () => {
     source,
     /Invoke-Expression|Import-Module|Add-Type|Start-Process|New-Object|\.\s+\$|PROOFERA_PHASE_ZERO_TEST/iu
   );
+  assert.equal((source.match(/Disable-ConsoleQuickEdit\s*$/gmu) ?? []).length, 1);
+  assert.match(source, /Microsoft\.Win32\.Win32Native/u);
+  assert.match(source, /'GetStdHandle'/u);
+  assert.match(source, /'GetConsoleMode'/u);
+  assert.match(source, /'SetConsoleMode'/u);
+  assert.match(source, /\$enableQuickEditMode = \[Int32\]0x0040/u);
+  assert.match(source, /\$enableExtendedFlags = \[Int32\]0x0080/u);
+  assert.doesNotMatch(
+    source,
+    /WriteConsoleInput|ReadConsoleInput|PeekConsoleInput|FlushConsoleInputBuffer|OpenStandardInput|Console\]::In/u
+  );
+  const hardening = source.indexOf("Disable-ConsoleQuickEdit", source.indexOf("$fixedEnvironment"));
+  const node = source.indexOf("& 'D:\\Node\\node.exe'");
+  assert.ok(hardening >= 0 && node > hardening);
   assert.match(source, /\[Environment\]::GetEnvironmentVariables\('Process'\)\.Keys/u);
   assert.match(source, /SetEnvironmentVariable\(\[string\]\$name, \$null, 'Process'\)/u);
   assert.match(source, /& 'D:\\Node\\node\.exe' @childArguments/u);
@@ -477,7 +499,137 @@ test("phase minus one is a minimal fixed pre-Node environment scrubber", () => {
 });
 
 test(
-  "phase minus one removes a harmless Node preload before starting phase zero",
+  "the exact QuickEdit hardener fails closed when its native console type is unavailable",
+  {
+    skip: process.platform !== "win32"
+  },
+  () => {
+    const directory = temporaryDirectory();
+    const probe = resolve(directory, "quick-edit-missing-native.ps1");
+    const hardener = exactPowerShellFunction(
+      readFileSync(PHASE_MINUS_ONE_SOURCE, "utf8"),
+      "Disable-ConsoleQuickEdit"
+    ).replace("Microsoft.Win32.Win32Native", "ProofEra.Missing.ConsoleNative");
+    writeFileSync(
+      probe,
+      `${hardener}\ntry { Disable-ConsoleQuickEdit; exit 90 } catch { exit 47 }\n`,
+      "utf8"
+    );
+    const result = spawnSync(
+      "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      ["-NoLogo", "-NoProfile", "-NonInteractive", "-File", probe],
+      {
+        cwd: ROOT,
+        encoding: "utf8",
+        env: EXACT_PHASE_ONE_ENVIRONMENT,
+        maxBuffer: 4 * 1024,
+        shell: false,
+        timeout: 10_000,
+        windowsHide: true
+      }
+    );
+    assert.equal(result.status, 47, result.stderr);
+    assert.equal(result.signal, null);
+    assert.equal(result.stdout, "");
+    assert.equal(result.stderr, "");
+  }
+);
+
+test(
+  "the exact hardener clears QuickEdit in a new classic console without mutating queued input",
+  {
+    skip: process.platform !== "win32"
+  },
+  () => {
+    const directory = temporaryDirectory();
+    const probe = resolve(directory, "quick-edit-classic-console.ps1");
+    const resultPath = resolve(directory, "quick-edit-result.json");
+    const hardener = exactPowerShellFunction(
+      readFileSync(PHASE_MINUS_ONE_SOURCE, "utf8"),
+      "Disable-ConsoleQuickEdit"
+    );
+    writeFileSync(
+      probe,
+      `${hardener}
+$ErrorActionPreference = 'Stop'
+try {
+  $flags = [Reflection.BindingFlags]::NonPublic -bor [Reflection.BindingFlags]::Static
+  $native = [Console].Assembly.GetType('Microsoft.Win32.Win32Native', $true, $false)
+  $getHandle = $native.GetMethod('GetStdHandle', $flags, $null, [Type[]]@([Int32]), $null)
+  $getMode = $native.GetMethod('GetConsoleMode', $flags, $null, [Type[]]@([IntPtr], [Int32].MakeByRefType()), $null)
+  $setMode = $native.GetMethod('SetConsoleMode', $flags, $null, [Type[]]@([IntPtr], [Int32]), $null)
+  $peek = $native.GetMethods($flags) | Where-Object Name -ceq 'PeekConsoleInput' | Select-Object -First 1
+  if ($null -eq $peek) { throw 'peek-unavailable' }
+  $handle = [IntPtr]$getHandle.Invoke($null, [object[]]@([Int32]-10))
+  $originalArguments = [object[]]@($handle, [Int32]0)
+  if (-not [bool]$getMode.Invoke($null, $originalArguments)) { throw 'original-mode' }
+  $originalMode = [Int32]$originalArguments[1]
+  $testMode = [Int32](($originalMode -band (-bnot ([Int32]0x0018))) -bor ([Int32]0x00c0))
+  if (-not [bool]$setMode.Invoke($null, [object[]]@($handle, $testMode))) { throw 'test-mode' }
+  $beforeRecordType = $peek.GetParameters()[1].ParameterType.GetElementType()
+  $beforeArguments = [object[]]@($handle, [Activator]::CreateInstance($beforeRecordType), [Int32]1, [Int32]0)
+  if (-not [bool]$peek.Invoke($null, $beforeArguments)) { throw 'peek-before' }
+  Disable-ConsoleQuickEdit
+  $afterArguments = [object[]]@($handle, [Activator]::CreateInstance($beforeRecordType), [Int32]1, [Int32]0)
+  if (-not [bool]$peek.Invoke($null, $afterArguments)) { throw 'peek-after' }
+  $verifiedArguments = [object[]]@($handle, [Int32]0)
+  if (-not [bool]$getMode.Invoke($null, $verifiedArguments)) { throw 'verified-mode' }
+  $payload = @{
+    initialMode = $testMode
+    verifiedMode = [Int32]$verifiedArguments[1]
+    queuedBefore = [Int32]$beforeArguments[3]
+    queuedAfter = [Int32]$afterArguments[3]
+  }
+  [IO.File]::WriteAllText($args[0], ($payload | ConvertTo-Json -Compress), [Text.Encoding]::UTF8)
+} catch {
+  [IO.File]::WriteAllText(
+    $args[0],
+    ((@{ error = $_.Exception.Message }) | ConvertTo-Json -Compress),
+    [Text.Encoding]::UTF8
+  )
+  exit 48
+} finally {
+  if ($null -ne $setMode -and $null -ne $handle -and $null -ne $originalMode) {
+    [void]$setMode.Invoke($null, [object[]]@($handle, $originalMode))
+  }
+}
+`,
+      "utf8"
+    );
+    const escapePowerShellLiteral = (value) => value.replaceAll("'", "''");
+    const executable = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
+    const launch =
+      `$child = Start-Process -FilePath '${escapePowerShellLiteral(executable)}' ` +
+      `-ArgumentList @('-NoLogo','-NoProfile','-NonInteractive','-File','${escapePowerShellLiteral(probe)}','${escapePowerShellLiteral(resultPath)}') ` +
+      "-WindowStyle Normal -PassThru -Wait; exit $child.ExitCode";
+    const result = spawnSync(
+      "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      ["-NoLogo", "-NoProfile", "-NonInteractive", "-Command", launch],
+      {
+        cwd: ROOT,
+        encoding: "utf8",
+        env: EXACT_PHASE_ONE_ENVIRONMENT,
+        maxBuffer: 4 * 1024,
+        shell: false,
+        timeout: 10_000,
+        windowsHide: true
+      }
+    );
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.signal, null);
+    assert.equal(existsSync(resultPath), true);
+    const observation = JSON.parse(readFileSync(resultPath, "utf8").replace(/^\uFEFF/u, ""));
+    assert.equal(observation.error, undefined, observation.error);
+    assert.equal(observation.initialMode & 0x40, 0x40);
+    assert.equal(observation.verifiedMode & 0x40, 0);
+    assert.equal(observation.verifiedMode & 0x80, 0x80);
+    assert.equal(observation.verifiedMode & ~0xc0, observation.initialMode & ~0xc0);
+    assert.equal(observation.queuedAfter, observation.queuedBefore);
+  }
+);
+
+test(
+  "phase minus one rejects redirected input before starting phase zero or a harmless preload",
   {
     skip: process.platform !== "win32"
   },
@@ -522,8 +674,8 @@ test(
     assert.equal(existsSync(sentinel), false);
     assert.deepEqual(JSON.parse(result.stdout), {
       status: "blocked",
-      code: "PHASE_ZERO_BOOTSTRAP_FAILED",
-      message: "The trusted local release bootstrap failed closed before phase one."
+      code: "PHASE_MINUS_ONE_BOOTSTRAP_FAILED",
+      message: "The trusted Windows bootstrap failed closed before Node startup."
     });
   }
 );

@@ -39,12 +39,16 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
-  BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY
+  BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS,
+  BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
+  BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
+  BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
+  type BscTestnetPtaWbnbPoolRecoveryAttemptBinding
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 
-export const BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCHEMA_VERSION = 1 as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCHEMA_VERSION = 2 as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCOPE =
-  "authenticated_exact_pool_submission_after_durable_signed_commit" as const;
+  "authenticated_exact_pool_recovery_generation_2_submission_after_durable_signed_commit" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_OPERATION =
   "submit_exact_bsc_testnet_pta_wbnb_pool_initialization_once" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RECONCILIATION_OPERATION =
@@ -61,12 +65,13 @@ export const BSC_TESTNET_PTA_WBNB_POOL_INITIALIZE_TOPIC =
   "0x98636036cb66a9c19a37435efc1e90142190214e8abeb821bdba3f2990dd4c95" as const satisfies Hex;
 
 const SUBMISSION_STARTED_DIGEST_DOMAIN =
-  "proofera.bsc-testnet.pta-wbnb-pool.submission-started.v1" as const;
+  "proofera.bsc-testnet.pta-wbnb-pool.submission-started.v2" as const;
 const RECONCILIATION_DIGEST_DOMAIN =
-  "proofera.bsc-testnet.pta-wbnb-pool.reconciliation.v1" as const;
+  "proofera.bsc-testnet.pta-wbnb-pool.reconciliation.v2" as const;
 const MAXIMUM_CAPABILITY_LIFETIME_MILLISECONDS =
   BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS * 1_000;
-const MAXIMUM_PRE_SUBMISSION_OBSERVATION_AGE_MILLISECONDS = 30_000;
+const MAXIMUM_PRE_SUBMISSION_OBSERVATION_AGE_MILLISECONDS =
+  BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS * 1_000;
 const MAXIMUM_SIGNED_TRANSACTION_BYTES = 2_048;
 const MAXIMUM_BLOCK_TRANSACTION_HASHES = 100_000;
 export const BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_FINALITY_ANCESTRY_BLOCKS = 128 as const;
@@ -148,6 +153,7 @@ export interface BscTestnetPtaWbnbPoolSubmissionCapability {
   readonly ownerAuthorizationDigest: Hex;
   readonly releaseCommit: string;
   readonly runtimeManifestSha256: Hex;
+  readonly recovery: BscTestnetPtaWbnbPoolRecoveryAttemptBinding;
   readonly authenticatedAt: string;
   readonly expiresAt: string;
   readonly signedCommitDurablyVerified: true;
@@ -204,6 +210,7 @@ export interface BscTestnetPtaWbnbPoolSubmissionJournalState {
   readonly runtimeManifestSha256: Hex;
   readonly reviewerApprovalDigest: Hex;
   readonly ownerAuthorizationDigest: Hex;
+  readonly recovery: BscTestnetPtaWbnbPoolRecoveryAttemptBinding;
   readonly signingHash: Hex;
   readonly transactionHash: Hex;
   readonly signedTransactionKeccak256: Hex;
@@ -222,6 +229,7 @@ export interface BscTestnetPtaWbnbPoolSubmissionStartedRequest {
   readonly runtimeManifestSha256: Hex;
   readonly reviewerApprovalDigest: Hex;
   readonly ownerAuthorizationDigest: Hex;
+  readonly recovery: BscTestnetPtaWbnbPoolRecoveryAttemptBinding;
   readonly signingHash: Hex;
   readonly transactionHash: Hex;
   readonly signedTransactionKeccak256: Hex;
@@ -238,6 +246,7 @@ export interface BscTestnetPtaWbnbPoolTerminalReconciliationRequest {
   readonly runtimeManifestSha256: Hex;
   readonly reviewerApprovalDigest: Hex;
   readonly ownerAuthorizationDigest: Hex;
+  readonly recovery: BscTestnetPtaWbnbPoolRecoveryAttemptBinding;
   readonly signingHash: Hex;
   readonly transactionHash: Hex;
   readonly signedTransactionKeccak256: Hex;
@@ -251,6 +260,18 @@ export interface BscTestnetPtaWbnbPoolSubmissionJournal {
   readonly commitSubmissionStarted: (
     request: BscTestnetPtaWbnbPoolSubmissionStartedRequest
   ) => Promise<unknown>;
+  readonly commitTerminalReconciliation: (
+    request: BscTestnetPtaWbnbPoolTerminalReconciliationRequest
+  ) => Promise<unknown>;
+}
+
+/**
+ * Restart-only durable evidence handle. Its runtime surface cannot initialize a signed commit or
+ * append submission_started, so reconciliation can only read the retained binding and append the
+ * terminal observation derived from fixed RPC evidence.
+ */
+export interface BscTestnetPtaWbnbPoolTerminalReconciliationJournal {
+  readonly readState: () => Promise<unknown>;
   readonly commitTerminalReconciliation: (
     request: BscTestnetPtaWbnbPoolTerminalReconciliationRequest
   ) => Promise<unknown>;
@@ -490,11 +511,11 @@ export interface BscTestnetPtaWbnbPoolSubmissionTestDependencies {
   readonly observeExactTransaction: (transactionHash: Hex) => Promise<unknown>;
 }
 
-/** Read-only restart seam: deliberately has no authenticator, signer, or broadcaster dependency. */
+/** Restart seam: only a terminal-evidence append handle exists; signing/submission cannot start. */
 export interface BscTestnetPtaWbnbPoolReconciliationRecoveryDependencies {
   readonly now: () => Date;
   readonly acquireRecoveryCapability: () => Promise<unknown>;
-  readonly journal: BscTestnetPtaWbnbPoolSubmissionJournal;
+  readonly journal: BscTestnetPtaWbnbPoolTerminalReconciliationJournal;
   readonly observeExactTransaction: (transactionHash: Hex) => Promise<unknown>;
 }
 
@@ -602,6 +623,36 @@ function exactBytes32(value: unknown): value is Hex {
   return typeof value === "string" && BYTES32.test(value);
 }
 
+function snapshotRecoveryAttempt(
+  input: unknown
+): BscTestnetPtaWbnbPoolRecoveryAttemptBinding | null {
+  const recovery = inspectRecord(input, RECOVERY_KEYS);
+  if (
+    recovery === null ||
+    recovery.generation !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION ||
+    recovery.predecessorState !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE ||
+    !exactBytes32(recovery.predecessorFenceSha256) ||
+    recovery.predecessorFenceSha256 === ZERO_WORD ||
+    !exactBytes32(recovery.attemptId) ||
+    recovery.attemptId === ZERO_WORD
+  ) {
+    return null;
+  }
+  return Object.freeze({
+    generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
+    predecessorState: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
+    predecessorFenceSha256: recovery.predecessorFenceSha256,
+    attemptId: recovery.attemptId
+  });
+}
+
+function sameRecoveryAttempt(
+  left: BscTestnetPtaWbnbPoolRecoveryAttemptBinding,
+  right: BscTestnetPtaWbnbPoolRecoveryAttemptBinding
+): boolean {
+  return RECOVERY_KEYS.every((key) => left[key] === right[key]);
+}
+
 function exactBytes(value: unknown, maximumBytes: number): value is Hex {
   return (
     typeof value === "string" &&
@@ -670,6 +721,7 @@ const CAPABILITY_KEYS = [
   "operationKey",
   "ownerAuthorizationDigest",
   "preSubmission",
+  "recovery",
   "releaseCommit",
   "reviewerApprovalDigest",
   "runtimeManifestSha256",
@@ -677,6 +729,12 @@ const CAPABILITY_KEYS = [
   "scope",
   "signedCommitDurablyVerified",
   "transaction"
+] as const;
+const RECOVERY_KEYS = [
+  "attemptId",
+  "generation",
+  "predecessorFenceSha256",
+  "predecessorState"
 ] as const;
 const PRE_SUBMISSION_KEYS = [
   "candidateCode",
@@ -735,6 +793,7 @@ async function validateSubmissionCapability(
       issue: issue("CAPABILITY_INVALID", "capability", "Capability shape is not exact plain data.")
     };
   }
+  const recovery = snapshotRecoveryAttempt(capability.recovery);
   if (
     capability.schemaVersion !== BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCHEMA_VERSION ||
     capability.scope !== BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCOPE ||
@@ -756,7 +815,8 @@ async function validateSubmissionCapability(
     !RELEASE_COMMIT.test(capability.releaseCommit) ||
     capability.releaseCommit === ZERO_RELEASE_COMMIT ||
     !exactBytes32(capability.runtimeManifestSha256) ||
-    capability.runtimeManifestSha256 === ZERO_WORD
+    capability.runtimeManifestSha256 === ZERO_WORD ||
+    recovery === null
   ) {
     return {
       status: "invalid",
@@ -1022,6 +1082,7 @@ async function validateSubmissionCapability(
       ownerAuthorizationDigest: capability.ownerAuthorizationDigest,
       releaseCommit: capability.releaseCommit,
       runtimeManifestSha256: capability.runtimeManifestSha256,
+      recovery,
       authenticatedAt: capability.authenticatedAt as string,
       expiresAt: capability.expiresAt as string,
       signedCommitDurablyVerified: true,
@@ -1080,6 +1141,7 @@ function parseJournalState(
     "envelopeHash",
     "operationKey",
     "ownerAuthorizationDigest",
+    "recovery",
     "releaseCommit",
     "reviewerApprovalDigest",
     "runtimeManifestSha256",
@@ -1091,8 +1153,10 @@ function parseJournalState(
     "transactionHash"
   ]);
   const expectedStart = submissionStartedRequest(capability);
+  const recovery = state === null ? null : snapshotRecoveryAttempt(state.recovery);
   if (
     state === null ||
+    recovery === null ||
     state.schemaVersion !== BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCHEMA_VERSION ||
     state.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
     state.claimId !== capability.claimId ||
@@ -1101,6 +1165,7 @@ function parseJournalState(
     state.runtimeManifestSha256 !== capability.runtimeManifestSha256 ||
     state.reviewerApprovalDigest !== capability.reviewerApprovalDigest ||
     state.ownerAuthorizationDigest !== capability.ownerAuthorizationDigest ||
+    !sameRecoveryAttempt(recovery, capability.recovery) ||
     state.signingHash !== capability.transaction.signingHash ||
     state.transactionHash !== capability.transaction.transactionHash ||
     state.signedTransactionKeccak256 !== expectedStart.signedTransactionKeccak256 ||
@@ -1122,6 +1187,7 @@ function parseJournalState(
     runtimeManifestSha256: capability.runtimeManifestSha256,
     reviewerApprovalDigest: capability.reviewerApprovalDigest,
     ownerAuthorizationDigest: capability.ownerAuthorizationDigest,
+    recovery: capability.recovery,
     signingHash: capability.transaction.signingHash,
     transactionHash: capability.transaction.transactionHash,
     signedTransactionKeccak256: expectedStart.signedTransactionKeccak256,
@@ -1143,6 +1209,7 @@ function submissionStartedRequest(
     runtimeManifestSha256: capability.runtimeManifestSha256,
     reviewerApprovalDigest: capability.reviewerApprovalDigest,
     ownerAuthorizationDigest: capability.ownerAuthorizationDigest,
+    recovery: capability.recovery,
     signingHash: capability.transaction.signingHash,
     transactionHash: capability.transaction.transactionHash,
     signedTransactionKeccak256: keccak256(capability.transaction.signedTransaction)
@@ -1175,6 +1242,7 @@ export async function deriveBscTestnetPtaWbnbPoolSubmissionJournalStateForIntern
     runtimeManifestSha256: capability.runtimeManifestSha256,
     reviewerApprovalDigest: capability.reviewerApprovalDigest,
     ownerAuthorizationDigest: capability.ownerAuthorizationDigest,
+    recovery: capability.recovery,
     signingHash: capability.transaction.signingHash,
     transactionHash: capability.transaction.transactionHash,
     signedTransactionKeccak256: keccak256(capability.transaction.signedTransaction),
@@ -2237,6 +2305,7 @@ function reconcileEvidence(
     schemaVersion: BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCHEMA_VERSION,
     operation: BSC_TESTNET_PTA_WBNB_POOL_RECONCILIATION_OPERATION,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
+    recovery: capability.recovery,
     transactionHash: capability.transaction.transactionHash,
     observedAt: evidence.observedAt as string,
     primary,
@@ -2254,8 +2323,8 @@ function reconcileEvidence(
 }
 
 /**
- * Content-only validator for the future fixed RPC adapter. It does not authenticate a submission
- * capability and cannot submit a transaction. Production composition remains blocked below.
+ * Content-only validator used by the fixed private RPC observation path. It does not authenticate a
+ * submission capability and cannot submit a transaction.
  */
 export async function reconcileBscTestnetPtaWbnbPoolEvidenceForInternalUse(
   untrustedCapability: unknown,
@@ -2379,7 +2448,6 @@ function inspectRecoveryDependencies(
   ]);
   if (dependencies === null) return null;
   const journal = inspectRecord(dependencies.journal, [
-    "commitSubmissionStarted",
     "commitTerminalReconciliation",
     "readState"
   ]);
@@ -2387,7 +2455,6 @@ function inspectRecoveryDependencies(
     dependencies.acquireRecoveryCapability,
     dependencies.now,
     dependencies.observeExactTransaction,
-    journal?.commitSubmissionStarted,
     journal?.commitTerminalReconciliation,
     journal?.readState
   ];
@@ -2402,9 +2469,6 @@ function inspectRecoveryDependencies(
     acquireRecoveryCapability: dependencies.acquireRecoveryCapability as () => Promise<unknown>,
     journal: Object.freeze({
       readState: journal.readState as () => Promise<unknown>,
-      commitSubmissionStarted: journal.commitSubmissionStarted as (
-        request: BscTestnetPtaWbnbPoolSubmissionStartedRequest
-      ) => Promise<unknown>,
       commitTerminalReconciliation: journal.commitTerminalReconciliation as (
         request: BscTestnetPtaWbnbPoolTerminalReconciliationRequest
       ) => Promise<unknown>
@@ -2435,8 +2499,9 @@ function terminalAckValid(
 }
 
 /**
- * Test-only one-shot composition seam. The caller cannot provide transaction bytes to the returned
- * method. A future durable journal must fsync/O_EXCL `submission_started` before acknowledging it.
+ * Internal one-shot composition core. The caller cannot provide transaction bytes to the returned
+ * method. Production supplies the append-only fsync/O_EXCL v3 journal through the fixed private
+ * bridge; tests inject deterministic non-network ports.
  */
 function createBscTestnetPtaWbnbPoolSubmissionCore(
   dependenciesInput: BscTestnetPtaWbnbPoolSubmissionTestDependencies
@@ -2768,6 +2833,7 @@ async function reconcileFromDurableStartedState(
     runtimeManifestSha256: capability.runtimeManifestSha256,
     reviewerApprovalDigest: capability.reviewerApprovalDigest,
     ownerAuthorizationDigest: capability.ownerAuthorizationDigest,
+    recovery: capability.recovery,
     signingHash: capability.transaction.signingHash,
     transactionHash,
     signedTransactionKeccak256: keccak256(capability.transaction.signedTransaction),

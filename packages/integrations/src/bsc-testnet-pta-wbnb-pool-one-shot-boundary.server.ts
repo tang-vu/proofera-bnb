@@ -49,8 +49,9 @@ export interface BscTestnetPtaWbnbPoolOneShotExactBinding {
 }
 
 /**
- * A future executor must obtain this authorization receipt outside this module. Its digest must bind
- * the exact envelope and user-facing risk disclosure; this preparation turn creates no receipt.
+ * Legacy preparation-only receipt shape. It is non-authorizing: the executable generation-2 path
+ * obtains a separately branded owner-v5 intent outside this module, and copied JSON/digests here
+ * cannot substitute for that authority.
  */
 export interface BscTestnetPtaWbnbPoolExternalAuthorizationReceipt {
   readonly kind: "exact_pta_wbnb_pool_initialization_user_authorization_v1";
@@ -138,6 +139,7 @@ export interface BscTestnetPtaWbnbPoolOneShotPreparedDescriptor {
   readonly status: "prepared_non_authorizing";
   readonly operationKey: Hex;
   readonly envelopeHash: Hex;
+  readonly envelopeObservedAt: string;
   readonly exactBinding: BscTestnetPtaWbnbPoolOneShotExactBinding;
   readonly envelopeExpiresAt: string;
   readonly signingReady: false;
@@ -277,6 +279,8 @@ function inspectedEnvelope(value: unknown): BscTestnetPtaWbnbPoolInitializationE
       "allRuntimeIdentitiesVerified",
       "allEip1967SlotsZero",
       "allProtocolBindingsVerified",
+      "candidateCode",
+      "candidateNonce",
       "feeTierVerified",
       "simulationReturnPool",
       "gasEstimate"
@@ -332,7 +336,7 @@ function inspectedEnvelope(value: unknown): BscTestnetPtaWbnbPoolInitializationE
   const expiresMilliseconds = Date.parse(envelope.expiresAt);
   const observedMilliseconds = Date.parse(envelope.observation.observedAt);
   if (
-    envelope.schemaVersion !== 1 ||
+    envelope.schemaVersion !== 2 ||
     envelope.operation !== "create_and_initialize_exact_pta_wbnb_pancake_v3_pool_once" ||
     envelope.chainId !== "97" ||
     envelope.transaction.from !== BSC_TESTNET_PTA_WBNB_POOL_SENDER ||
@@ -364,6 +368,8 @@ function inspectedEnvelope(value: unknown): BscTestnetPtaWbnbPoolInitializationE
     envelope.observation.latestNonce !== "1" ||
     envelope.observation.pendingNonce !== "1" ||
     envelope.observation.pendingPool !== "0x0000000000000000000000000000000000000000" ||
+    envelope.observation.candidateCode !== "0x" ||
+    envelope.observation.candidateNonce !== "0" ||
     envelope.observation.providerAgreementVerified !== true ||
     envelope.observation.allRuntimeIdentitiesVerified !== true ||
     envelope.observation.allEip1967SlotsZero !== true ||
@@ -514,6 +520,7 @@ export function describeBscTestnetPtaWbnbPoolOneShotBoundary(
     status: "prepared_non_authorizing" as const,
     operationKey,
     envelopeHash: envelope.envelopeHash,
+    envelopeObservedAt: envelope.observation.observedAt,
     exactBinding,
     envelopeExpiresAt: envelope.expiresAt,
     signingReady: false as const,

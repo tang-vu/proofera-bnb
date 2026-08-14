@@ -1144,6 +1144,7 @@ function createBscTestnetPtaWbnbPoolPostClaimRechecker(
         runtimeManifestSha256: input.authorizedIntent.runtimeManifestSha256,
         authenticatedAt: issuedAt.iso,
         expiresAt: input.authorizedIntent.expiresAt,
+        recovery: input.authorizedIntent.recovery,
         freshPostClaimDualRpcRecheckPerformed: true,
         rpc: Object.freeze({
           primaryOrigin: BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN,

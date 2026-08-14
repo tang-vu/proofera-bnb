@@ -15,7 +15,10 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_SENDER,
   BSC_TESTNET_WBNB_ADDRESS
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
-import { BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
+import {
+  BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY
+} from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_RUNTIME_MANIFEST_DOMAIN,
   BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_POLICY_DIGEST_DOMAIN,
@@ -39,6 +42,12 @@ const REVIEWED_AT = "2026-08-13T07:59:00.000Z";
 const POLICY_EXPIRES_AT = "2026-08-13T09:00:00.000Z";
 const ENVELOPE_EXPIRES_AT = "2026-08-13T08:00:30.000Z";
 const ENVELOPE_HASH = `0x${"44".repeat(32)}` as Hex;
+const NO_EFFECT_ENVELOPE_HASH = `0x${"45".repeat(32)}` as Hex;
+const NO_EFFECT_PROOF_DIGEST = `0x${"46".repeat(32)}` as Hex;
+const PREDECESSOR_FENCE_SHA256 = `0x${"47".repeat(32)}` as Hex;
+const NO_EFFECT_OBSERVED_AT = "2026-08-13T07:59:57.000Z";
+const FENCE_RECORDED_AT = "2026-08-13T07:59:58.000Z";
+const EXECUTION_ENVELOPE_OBSERVED_AT = "2026-08-13T07:59:59.000Z";
 const TTY_NONCE = `0x${"ab".repeat(32)}` as Hex;
 const TTY_STARTED_AT = 1_000;
 const TTY_NOT_AFTER = 301_000;
@@ -82,14 +91,44 @@ function releaseIdentity(): BscTestnetPtaWbnbPoolExactReleaseIdentity {
 
 type PolicyBody = Omit<BscTestnetPtaWbnbPoolReleaseReviewPolicy, "policyDigest">;
 
+function predecessorFence() {
+  return Object.freeze({
+    status: "superseded_before_worker" as const,
+    terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" as const,
+    workerAuthorizationOutcome: "not_attempted" as const,
+    workerStartOutcome: "not_attempted" as const,
+    signatureOutcome: "not_attempted" as const,
+    submissionOutcome: "not_attempted" as const,
+    submissionJournalState: "exact_empty" as const,
+    fenceRecordedAt: FENCE_RECORDED_AT,
+    legacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+    noEffectProofDigest: NO_EFFECT_PROOF_DIGEST,
+    noEffectEnvelopeHash: NO_EFFECT_ENVELOPE_HASH,
+    noEffectObservedAt: NO_EFFECT_OBSERVED_AT,
+    predecessorFenceSha256: PREDECESSOR_FENCE_SHA256
+  });
+}
+
+function instantiationInput(
+  envelopeHash: Hex = ENVELOPE_HASH,
+  expiresAt: string = ENVELOPE_EXPIRES_AT
+) {
+  return Object.freeze({
+    envelopeHash,
+    executionEnvelopeObservedAt: EXECUTION_ENVELOPE_OBSERVED_AT,
+    expiresAt,
+    predecessorFence: predecessorFence()
+  });
+}
+
 function policyBody(release = releaseIdentity()): PolicyBody {
   const reviewedSubjectSha256 =
     deriveBscTestnetPtaWbnbPoolReleaseReviewSubjectSha256ForInternalUse(release);
   if (reviewedSubjectSha256 === null) throw new Error("synthetic release must be valid");
   return Object.freeze({
-    schemaVersion: 1 as const,
-    kind: "owner_designated_internal_multi_agent_release_review_policy_v1" as const,
-    decision: "GO_EXACT_CHAIN_97_ONE_SHOT_POLICY" as const,
+    schemaVersion: 2 as const,
+    kind: "owner_designated_internal_multi_agent_release_review_policy_generation_2_v2" as const,
+    decision: "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_2_POLICY" as const,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     release,
     transaction: Object.freeze({
@@ -118,7 +157,9 @@ function policyBody(release = releaseIdentity()): PolicyBody {
       maximumEnvelopeLifetimeSeconds: "300" as const,
       maximumOwnerConfirmationWindowSeconds: "240" as const,
       maximumExecutionAuthorityLifetimeSeconds: "45" as const,
-      maximumPostClaimRecheckAgeSeconds: "30" as const
+      maximumPostClaimRecheckAgeSeconds: "30" as const,
+      recoveryGeneration: "2" as const,
+      predecessorLegacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256
     }),
     scope: Object.freeze({
       exactFreshEnvelopeRequired: true as const,
@@ -132,7 +173,18 @@ function policyBody(release = releaseIdentity()): PolicyBody {
       mainnetWriteAuthorized: false as const,
       initializerHasNoDeadline: true as const,
       publicMempoolCanRace: true as const,
-      priceIsMarketPriceOraclePegOrValuation: false as const
+      priceIsMarketPriceOraclePegOrValuation: false as const,
+      predecessorAppendOnlyFenceRequired: true as const,
+      predecessorNoEffectProofRequired: true as const,
+      predecessorStateRequired: "superseded_before_worker" as const,
+      predecessorTerminalCodeRequired: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" as const,
+      predecessorWorkerAuthorizationOutcomeRequired: "not_attempted" as const,
+      predecessorWorkerStartOutcomeRequired: "not_attempted" as const,
+      predecessorSignatureOutcomeRequired: "not_attempted" as const,
+      predecessorSubmissionJournalStateRequired: "exact_empty" as const,
+      predecessorSubmissionOutcomeRequired: "not_attempted" as const,
+      fenceObservationMayBeReusedAsExecutionEnvelope: false as const,
+      freshEnvelopeAfterFenceRequired: true as const
     }),
     reviewedSubjectSha256,
     implementationAgentIdentity: "root-implementation-agent",
@@ -228,7 +280,9 @@ function expectedBinding(
     runtimeManifestSha256: instantiation.runtimeManifestSha256,
     policyDigest: instantiation.policyDigest,
     reviewedSubjectSha256: instantiation.reviewedSubjectSha256,
+    recovery: instantiation.recovery,
     envelopeHash: instantiation.envelopeHash,
+    executionEnvelopeObservedAt: instantiation.executionEnvelopeObservedAt,
     expiresAt: instantiation.expiresAt,
     instantiationDigest: instantiation.instantiationDigest
   });
@@ -294,8 +348,8 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
     if (admission === null) throw new Error("expected realm");
 
     expect(admission.policy).toMatchObject({
-      schemaVersion: 1,
-      decision: "GO_EXACT_CHAIN_97_ONE_SHOT_POLICY",
+      schemaVersion: 2,
+      decision: "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_2_POLICY",
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       release: expectedRelease,
       transaction: {
@@ -317,7 +371,9 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
         maximumEnvelopeLifetimeSeconds: "300",
         maximumOwnerConfirmationWindowSeconds: "240",
         maximumExecutionAuthorityLifetimeSeconds: "45",
-        maximumPostClaimRecheckAgeSeconds: "30"
+        maximumPostClaimRecheckAgeSeconds: "30",
+        recoveryGeneration: "2",
+        predecessorLegacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256
       },
       scope: {
         maximumSignatureCount: "1",
@@ -327,7 +383,16 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
         tokenApprovalAuthorized: false,
         tokenTransferAuthorized: false,
         mainnetWriteAuthorized: false,
-        priceIsMarketPriceOraclePegOrValuation: false
+        priceIsMarketPriceOraclePegOrValuation: false,
+        predecessorStateRequired: "superseded_before_worker",
+        predecessorTerminalCodeRequired: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
+        predecessorWorkerAuthorizationOutcomeRequired: "not_attempted",
+        predecessorWorkerStartOutcomeRequired: "not_attempted",
+        predecessorSignatureOutcomeRequired: "not_attempted",
+        predecessorSubmissionJournalStateRequired: "exact_empty",
+        predecessorSubmissionOutcomeRequired: "not_attempted",
+        fenceObservationMayBeReusedAsExecutionEnvelope: false,
+        freshEnvelopeAfterFenceRequired: true
       },
       limitations: {
         ownerDesignatedInternalReview: true,
@@ -347,13 +412,16 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
       "audit-agent-b"
     ]);
 
-    const instantiation = admission.instantiate(
-      Object.freeze({ envelopeHash: ENVELOPE_HASH, expiresAt: ENVELOPE_EXPIRES_AT })
-    );
+    const instantiation = admission.instantiate(instantiationInput());
     expect(instantiation).toMatchObject({
       policyDigest: admission.policyDigest,
       envelopeHash: ENVELOPE_HASH,
+      executionEnvelopeObservedAt: EXECUTION_ENVELOPE_OBSERVED_AT,
       expiresAt: ENVELOPE_EXPIRES_AT,
+      recovery: {
+        generation: 2,
+        predecessorFence: predecessorFence()
+      },
       automatedPolicyApplication: true,
       reviewerInspectedExactEnvelope: false,
       reviewIsNotTransactionAuthorization: true
@@ -373,11 +441,7 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
     expect(admission.consumeForTestsOnly(instantiation, binding)).toBe(true);
     expect(admission.authenticateForTestsOnly(instantiation, binding)).toBe(false);
     expect(admission.consumeForTestsOnly(instantiation, binding)).toBe(false);
-    expect(
-      admission.instantiate(
-        Object.freeze({ envelopeHash: ENVELOPE_HASH, expiresAt: ENVELOPE_EXPIRES_AT })
-      )
-    ).toBeNull();
+    expect(admission.instantiate(instantiationInput())).toBeNull();
   });
 
   it("requires exact canonical UTF-8 bytes and a digest in the policy domain", () => {
@@ -430,7 +494,22 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
         (record.caps as Record<string, unknown>).maximumPostClaimRecheckAgeSeconds = "31";
       },
       (record) => {
+        (record.caps as Record<string, unknown>).recoveryGeneration = "1";
+      },
+      (record) => {
+        (record.caps as Record<string, unknown>).predecessorLegacyClaimRawSha256 =
+          `0x${"01".repeat(32)}`;
+      },
+      (record) => {
         (record.scope as Record<string, unknown>).lpPositionMintAuthorized = true;
+      },
+      (record) => {
+        (record.scope as Record<string, unknown>).predecessorWorkerStartOutcomeRequired =
+          "attempted";
+      },
+      (record) => {
+        (record.scope as Record<string, unknown>).predecessorSubmissionJournalStateRequired =
+          "not_empty";
       },
       (record) => {
         (record.limitations as Record<string, unknown>).externalIndependentReviewAvailable = true;
@@ -451,15 +530,85 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
     }
   });
 
-  it("rejects the incompatible v1 exact-key caps revision that omits the three new bounds", () => {
+  it("rejects v1 policy replay and legacy exact-key caps that omit generation-2 bounds", () => {
+    const v1 = decodedPolicy(serialize());
+    v1.schemaVersion = 1;
+    v1.kind = "owner_designated_internal_multi_agent_release_review_policy_v1";
+    v1.decision = "GO_EXACT_CHAIN_97_ONE_SHOT_POLICY";
+    expect(
+      realm(resealPolicy(v1, BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_POLICY_DIGEST_DOMAIN))
+    ).toBeNull();
+
     const legacy = decodedPolicy(serialize());
     const caps = legacy.caps as Record<string, unknown>;
     delete caps.maximumOwnerConfirmationWindowSeconds;
     delete caps.maximumExecutionAuthorityLifetimeSeconds;
     delete caps.maximumPostClaimRecheckAgeSeconds;
+    delete caps.recoveryGeneration;
+    delete caps.predecessorLegacyClaimRawSha256;
     expect(
       realm(resealPolicy(legacy, BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_POLICY_DIGEST_DOMAIN))
     ).toBeNull();
+  });
+
+  it("requires append-only fence ordering and a distinct later execution envelope B", () => {
+    const {
+      submissionJournalState: _omittedSubmissionJournalState,
+      ...fenceWithoutSubmissionJournalState
+    } = predecessorFence();
+    void _omittedSubmissionJournalState;
+    const cases = [
+      instantiationInput(NO_EFFECT_ENVELOPE_HASH),
+      Object.freeze({
+        ...instantiationInput(),
+        executionEnvelopeObservedAt: FENCE_RECORDED_AT
+      }),
+      Object.freeze({
+        ...instantiationInput(),
+        predecessorFence: Object.freeze({
+          ...predecessorFence(),
+          fenceRecordedAt: NO_EFFECT_OBSERVED_AT
+        })
+      }),
+      Object.freeze({
+        ...instantiationInput(),
+        predecessorFence: Object.freeze({
+          ...predecessorFence(),
+          legacyClaimRawSha256: `0x${"01".repeat(32)}`
+        })
+      }),
+      Object.freeze({
+        ...instantiationInput(),
+        predecessorFence: Object.freeze({
+          ...predecessorFence(),
+          workerAuthorizationOutcome: "attempted"
+        })
+      }),
+      Object.freeze({
+        ...instantiationInput(),
+        predecessorFence: Object.freeze({
+          ...predecessorFence(),
+          submissionJournalState: "not_empty"
+        })
+      }),
+      Object.freeze({
+        ...instantiationInput(),
+        predecessorFence: Object.freeze(fenceWithoutSubmissionJournalState)
+      }),
+      Object.freeze({
+        ...instantiationInput(),
+        predecessorFence: Object.freeze({
+          ...predecessorFence(),
+          predecessorFenceSha256: `0x${"02".repeat(32)}`,
+          unexpected: true
+        })
+      })
+    ];
+    for (const input of cases) {
+      const admission = realm();
+      if (admission === null) throw new Error("expected realm");
+      expect(admission.instantiate(input)).toBeNull();
+    }
   });
 
   it("requires a deeply frozen, exact and ordered schema-v2 expected manifest", () => {
@@ -577,10 +726,7 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
     expect(admission).not.toBeNull();
     if (admission === null) throw new Error("expected realm");
 
-    const exactInput = Object.freeze({
-      envelopeHash: ENVELOPE_HASH,
-      expiresAt: ENVELOPE_EXPIRES_AT
-    });
+    const exactInput = instantiationInput();
     expect(admission.instantiate({ ...exactInput })).toBeNull();
     expect(admission.instantiate(new Proxy(exactInput, {}))).toBeNull();
     const accessorInput = Object.freeze(
@@ -597,7 +743,9 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
       admission.instantiate(
         Object.freeze({
           envelopeHash: ENVELOPE_HASH,
-          expiresAt: "2026-08-13T08:05:00.001Z"
+          executionEnvelopeObservedAt: EXECUTION_ENVELOPE_OBSERVED_AT,
+          expiresAt: "2026-08-13T08:05:00.001Z",
+          predecessorFence: predecessorFence()
         })
       )
     ).toBeNull();
@@ -609,7 +757,9 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
       maximumAdmission.instantiate(
         Object.freeze({
           envelopeHash: ENVELOPE_HASH,
-          expiresAt: "2026-08-13T08:05:00.000Z"
+          executionEnvelopeObservedAt: EXECUTION_ENVELOPE_OBSERVED_AT,
+          expiresAt: "2026-08-13T08:05:00.000Z",
+          predecessorFence: predecessorFence()
         })
       )
     ).not.toBeNull();
@@ -652,7 +802,9 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
       preReviewAdmission.instantiate(
         Object.freeze({
           envelopeHash: ENVELOPE_HASH,
-          expiresAt: "2026-08-13T07:59:29.999Z"
+          executionEnvelopeObservedAt: EXECUTION_ENVELOPE_OBSERVED_AT,
+          expiresAt: "2026-08-13T07:59:29.999Z",
+          predecessorFence: predecessorFence()
         })
       )
     ).toBeNull();
@@ -678,7 +830,19 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
         binding.reviewedSubjectSha256 = `0x${"77".repeat(32)}`;
       },
       (binding) => {
+        binding.recovery = Object.freeze({
+          generation: 2,
+          predecessorFence: Object.freeze({
+            ...predecessorFence(),
+            predecessorFenceSha256: `0x${"78".repeat(32)}`
+          })
+        });
+      },
+      (binding) => {
         binding.envelopeHash = `0x${"88".repeat(32)}`;
+      },
+      (binding) => {
+        binding.executionEnvelopeObservedAt = "2026-08-13T07:59:58.000Z";
       },
       (binding) => {
         binding.expiresAt = "2026-08-13T08:00:29.999Z";
@@ -690,9 +854,7 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
     for (const mutate of mutations) {
       const admission = realm();
       if (admission === null) throw new Error("expected realm");
-      const instantiation = admission.instantiate(
-        Object.freeze({ envelopeHash: ENVELOPE_HASH, expiresAt: ENVELOPE_EXPIRES_AT })
-      );
+      const instantiation = admission.instantiate(instantiationInput());
       if (instantiation === null) throw new Error("expected instantiation");
       const binding = { ...expectedBinding(instantiation) };
       mutate(binding);

@@ -27,7 +27,11 @@ const ENVELOPE_HASH = `0x${"11".repeat(32)}` as Hex;
 const MANIFEST = `0x${"22".repeat(32)}` as Hex;
 const TEXT_DIGEST = `0x${"33".repeat(32)}` as Hex;
 const RELEASE = "a".repeat(40);
+const RELEASE_TREE = "b".repeat(40);
+const PREDECESSOR_FENCE_SHA256 = `0x${"55".repeat(32)}` as Hex;
+const ATTEMPT_ID = `0x${"66".repeat(32)}` as Hex;
 const REVIEWED_AT = "2026-08-13T04:29:50.000Z";
+const ENVELOPE_OBSERVED_AT = "2026-08-13T04:29:45.000Z";
 const AUTHORIZED_AT = "2026-08-13T04:29:55.000Z";
 const EXECUTION_EXPIRES_AT = "2026-08-13T04:30:40.000Z";
 const ENVELOPE_EXPIRES_AT = "2026-08-13T04:34:55.000Z";
@@ -51,6 +55,7 @@ function descriptor() {
     status: "prepared_non_authorizing",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
+    envelopeObservedAt: ENVELOPE_OBSERVED_AT,
     exactBinding: {
       chainId: 97,
       from: BSC_TESTNET_PTA_WBNB_POOL_SENDER,
@@ -108,7 +113,11 @@ function reviewerApproval() {
   });
 }
 
-function ownerAuthorization(reviewerDigest: Hex, expiresAt = EXECUTION_EXPIRES_AT) {
+function ownerAuthorization(
+  reviewerDigest: Hex,
+  expiresAt = EXECUTION_EXPIRES_AT,
+  ceremonyNonce = `0x${"44".repeat(32)}` as Hex
+) {
   const exact = buildBscTestnetPtaWbnbPoolExactSigningTransaction({
     gasLimit: "5983857",
     gasPriceWei: "100000000",
@@ -116,54 +125,32 @@ function ownerAuthorization(reviewerDigest: Hex, expiresAt = EXECUTION_EXPIRES_A
   });
   if (exact === null) throw new Error("Transaction fixture failed.");
   const body = {
-    schemaVersion: 1,
-    kind: "exact_owner_envelope_authorization_v1",
-    decision: "authorize_one_chain_97_pool_initialization_signature",
+    schemaVersion: 3,
+    kind: "exact_owner_recovery_generation_2_signature_and_single_broadcast_authorization_v3",
+    decision: "authorize_fresh_chain_97_pool_recovery_generation_2_signature_and_single_broadcast",
+    broadcastPolicy: "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity",
+    liquidityActionAuthorized: false,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
     releaseCommit: RELEASE,
+    releaseTree: RELEASE_TREE,
     runtimeManifestSha256: MANIFEST,
     reviewerApprovalDigest: reviewerDigest,
     ownerIdentity: "ProofEra Repository Owner",
     authorizationTextSha256: TEXT_DIGEST,
+    ceremonyNonce,
+    recovery: deeplyFreeze({
+      generation: 2,
+      predecessorState: "superseded_before_worker",
+      predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
+      attemptId: ATTEMPT_ID
+    }),
     signingHash: exact.signingHash,
     gasLimit: exact.gasLimit,
     gasPriceWei: exact.gasPriceWei,
     maximumCostWei: exact.maximumCostWei,
     authorizedAt: AUTHORIZED_AT,
     expiresAt
-  } as const;
-  return deeplyFreeze({
-    ...body,
-    authorizationDigest: canonicalDigest(
-      BSC_TESTNET_PTA_WBNB_POOL_OWNER_AUTHORIZATION_DIGEST_DOMAIN,
-      body
-    )
-  });
-}
-
-function ownerV2Authorization(reviewerDigest: Hex, ceremonyNonce = `0x${"44".repeat(32)}` as Hex) {
-  const legacy = ownerAuthorization(reviewerDigest);
-  const body = {
-    schemaVersion: 2,
-    kind: "exact_owner_signature_and_single_broadcast_authorization_v2",
-    decision: "authorize_one_chain_97_pool_initialization_signature_and_single_broadcast",
-    broadcastPolicy: "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity",
-    liquidityActionAuthorized: false,
-    operationKey: legacy.operationKey,
-    envelopeHash: legacy.envelopeHash,
-    releaseCommit: legacy.releaseCommit,
-    runtimeManifestSha256: legacy.runtimeManifestSha256,
-    reviewerApprovalDigest: legacy.reviewerApprovalDigest,
-    ownerIdentity: legacy.ownerIdentity,
-    authorizationTextSha256: legacy.authorizationTextSha256,
-    ceremonyNonce,
-    signingHash: legacy.signingHash,
-    gasLimit: legacy.gasLimit,
-    gasPriceWei: legacy.gasPriceWei,
-    maximumCostWei: legacy.maximumCostWei,
-    authorizedAt: legacy.authorizedAt,
-    expiresAt: legacy.expiresAt
   } as const;
   return deeplyFreeze({
     ...body,
@@ -261,9 +248,9 @@ describe("PTA/WBNB pool exact authorization composition", () => {
     }
   });
 
-  it("binds the CSPRNG ceremony nonce into exact owner v2 receipt bytes", () => {
+  it("binds the CSPRNG ceremony nonce and recovery attempt into exact owner v3 receipt bytes", () => {
     const reviewer = reviewerApproval();
-    const owner = ownerV2Authorization(reviewer.approvalDigest);
+    const owner = ownerAuthorization(reviewer.approvalDigest);
     const ownerBrands = new WeakSet<object>([owner]);
     const gate = createBscTestnetPtaWbnbPoolAuthorizationGateForTests({
       asOf: () => new Date("2026-08-13T04:30:00.000Z"),
@@ -275,6 +262,10 @@ describe("PTA/WBNB pool exact authorization composition", () => {
     for (const mutation of [
       { ...owner, ceremonyNonce: `0x${"55".repeat(32)}` },
       { ...owner, ceremonyNonce: `0x${"00".repeat(32)}` },
+      {
+        ...owner,
+        recovery: deeplyFreeze({ ...owner.recovery, attemptId: `0x${"77".repeat(32)}` })
+      },
       Object.fromEntries(Object.entries(owner).filter(([key]) => key !== "ceremonyNonce"))
     ]) {
       expect(gate.authorize(descriptor(), reviewer, deeplyFreeze(mutation))).toMatchObject({

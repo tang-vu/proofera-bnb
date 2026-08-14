@@ -40,6 +40,7 @@ describe("BSC testnet PTA/WBNB pool preparation package boundary", () => {
       "openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse",
       "createWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUse",
       "openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse",
+      "openExistingWindowsBscTestnetPtaWbnbPoolSubmissionJournalForTerminalReconciliationForInternalUse",
       "acquireBscTestnetPtaWbnbPoolProductionPreSubmissionForInternalUse",
       "sendExactBscTestnetPtaWbnbPoolRawTransactionOnceForInternalUse",
       "runBscTestnetPtaWbnbPoolProductionOnceFromStdin",

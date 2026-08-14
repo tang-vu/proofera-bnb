@@ -182,6 +182,7 @@ describe("PTA/WBNB durable one-shot boundary specification", () => {
     expect(prepared).toMatchObject({
       status: "prepared_non_authorizing",
       operationKey: expect.stringMatching(/^0x[0-9a-f]{64}$/u),
+      envelopeObservedAt: NOW,
       exactBinding: {
         chainId: 97,
         from: ADDRESSES.sender,
@@ -300,6 +301,21 @@ describe("PTA/WBNB durable one-shot boundary specification", () => {
     expect(
       describeBscTestnetPtaWbnbPoolOneShotBoundary(extraEnvelope, () => new Date(NOW))
     ).toMatchObject({ status: "blocked", reason: "invalid_envelope" });
+
+    for (const observation of [
+      Object.freeze({ ...original.observation, candidateCode: "0x01" as "0x" }),
+      Object.freeze({ ...original.observation, candidateNonce: "1" as "0" })
+    ]) {
+      const candidateForgery = rehash(
+        Object.freeze({
+          ...original,
+          observation
+        }) as BscTestnetPtaWbnbPoolInitializationEnvelope
+      );
+      expect(
+        describeBscTestnetPtaWbnbPoolOneShotBoundary(candidateForgery, () => new Date(NOW))
+      ).toMatchObject({ status: "blocked", reason: "invalid_envelope" });
+    }
   });
 
   it("rejects expired envelopes and proxy/accessor clocks trap-zero", async () => {

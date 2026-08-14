@@ -10,7 +10,12 @@ import { isProxy } from "node:util/types";
 import type { Hex } from "viem";
 
 import { runPinnedPowerShellForInternalUse } from "./bsc-testnet-deployer-custody-windows.server";
-import { BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
+import {
+  BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
+  BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
+  BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
+  type BscTestnetPtaWbnbPoolRecoveryAttemptBinding
+} from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_RECONCILIATION_OPERATION,
   BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_OPERATION,
@@ -20,15 +25,16 @@ import {
   type BscTestnetPtaWbnbPoolSubmissionJournal,
   type BscTestnetPtaWbnbPoolSubmissionJournalState,
   type BscTestnetPtaWbnbPoolSubmissionStartedRequest,
+  type BscTestnetPtaWbnbPoolTerminalReconciliationJournal,
   type BscTestnetPtaWbnbPoolTerminalReconciliationRequest
 } from "./bsc-testnet-pta-wbnb-pool-submission-reconciler.server";
 
 const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const SUBDIRECTORY = ["ProofEra", "operations", "bsc-testnet-pta-wbnb-pool-submission-v2"] as const;
-const SCHEMA = "bsc_testnet_pta_wbnb_pool_submission_journal_v2" as const;
-const SIGNED_COMMIT_FILE = "01-signed-commit.v2.json" as const;
-const SUBMISSION_STARTED_FILE = "02-submission-started.v2.json" as const;
-const TERMINAL_RECONCILIATION_FILE = "03-terminal-reconciliation.v2.json" as const;
+const SCHEMA = "bsc_testnet_pta_wbnb_pool_submission_journal_v3" as const;
+const SIGNED_COMMIT_FILE = "01-signed-commit.v3.json" as const;
+const SUBMISSION_STARTED_FILE = "02-submission-started.v3.json" as const;
+const TERMINAL_RECONCILIATION_FILE = "03-terminal-reconciliation.v3.json" as const;
 const FILES = Object.freeze([
   SIGNED_COMMIT_FILE,
   SUBMISSION_STARTED_FILE,
@@ -43,9 +49,10 @@ const BYTES32 = /^0x[0-9a-f]{64}$/u;
 const RELEASE_COMMIT = /^[0-9a-f]{40}$/u;
 const UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u;
 
-export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V2_POLICY = Object.freeze({
-  kind: "exact_owner_signature_and_single_broadcast_authorization_v2" as const,
-  decision: "authorize_one_chain_97_pool_initialization_signature_and_single_broadcast" as const,
+export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V3_POLICY = Object.freeze({
+  kind: "exact_owner_recovery_generation_2_signature_and_single_broadcast_authorization_v3" as const,
+  decision:
+    "authorize_one_chain_97_pool_recovery_generation_2_signature_and_single_broadcast" as const,
   broadcastPolicy: "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity" as const,
   liquidityActionAuthorized: false as const,
   oneSignatureMaximum: true as const,
@@ -57,13 +64,13 @@ export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V2_POLICY = Object.freeze({
   journalAuthenticatesAuthority: false as const
 });
 
-export type BscTestnetPtaWbnbPoolDurableOwnerV2Policy =
-  typeof BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V2_POLICY;
+export type BscTestnetPtaWbnbPoolDurableOwnerV3Policy =
+  typeof BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V3_POLICY;
 
 export interface BscTestnetPtaWbnbPoolDurableSignedCommitRequest {
-  readonly schemaVersion: 1;
-  readonly kind: "authenticated_owner_v2_signed_submission_commit_v1";
-  readonly ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV2Policy;
+  readonly schemaVersion: 2;
+  readonly kind: "authenticated_owner_recovery_generation_2_signed_submission_commit_v2";
+  readonly ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV3Policy;
   /**
    * The caller has already authenticated this capability. The journal validates and retains its
    * exact bytes as recovery evidence; persisted bytes never recreate that object capability.
@@ -76,7 +83,7 @@ export type BscTestnetPtaWbnbPoolSubmissionRecoveryState =
   | Readonly<{
       state: "unknown_outcome";
       capability: BscTestnetPtaWbnbPoolSubmissionCapability | null;
-      ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV2Policy | null;
+      ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV3Policy | null;
       signedCommitSha256: Hex | null;
       submissionStartedRecordSha256: Hex | null;
       journalEvidenceOnly: true;
@@ -84,10 +91,10 @@ export type BscTestnetPtaWbnbPoolSubmissionRecoveryState =
       sendingAuthorizedByJournal: false;
     }>
   | Readonly<{
-      schemaVersion: 1;
+      schemaVersion: 2;
       journalSchema: typeof SCHEMA;
       state: "signed_committed" | "submission_started" | "confirmed" | "reverted";
-      ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV2Policy;
+      ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV3Policy;
       capability: BscTestnetPtaWbnbPoolSubmissionCapability;
       signedCommitSha256: Hex;
       submissionStartedRecordSha256: Hex | null;
@@ -97,11 +104,17 @@ export type BscTestnetPtaWbnbPoolSubmissionRecoveryState =
       sendingAuthorizedByJournal: false;
     }>;
 
+export type BscTestnetPtaWbnbPoolSubmissionTerminalRecoveryState =
+  | Extract<BscTestnetPtaWbnbPoolSubmissionRecoveryState, Readonly<{ state: "unknown_outcome" }>>
+  | (Extract<BscTestnetPtaWbnbPoolSubmissionRecoveryState, Readonly<{ schemaVersion: 2 }>> &
+      Readonly<{ state: "submission_started" }>);
+
 const BINDING_KEYS = [
   "claimId",
   "envelopeHash",
   "operationKey",
   "ownerAuthorizationDigest",
+  "recovery",
   "releaseCommit",
   "reviewerApprovalDigest",
   "runtimeManifestSha256",
@@ -150,6 +163,7 @@ const CAPABILITY_KEYS = [
   "operationKey",
   "ownerAuthorizationDigest",
   "preSubmission",
+  "recovery",
   "releaseCommit",
   "reviewerApprovalDigest",
   "runtimeManifestSha256",
@@ -157,6 +171,12 @@ const CAPABILITY_KEYS = [
   "scope",
   "signedCommitDurablyVerified",
   "transaction"
+] as const;
+const RECOVERY_KEYS = [
+  "attemptId",
+  "generation",
+  "predecessorFenceSha256",
+  "predecessorState"
 ] as const;
 const PRE_SUBMISSION_KEYS = [
   "candidateCode",
@@ -210,6 +230,7 @@ type Binding = Pick<
   | "runtimeManifestSha256"
   | "reviewerApprovalDigest"
   | "ownerAuthorizationDigest"
+  | "recovery"
   | "signingHash"
   | "transactionHash"
   | "signedTransactionKeccak256"
@@ -220,7 +241,7 @@ type SignedCommitRecord = Readonly<{
   schema: typeof SCHEMA;
   kind: "signed_commit";
   recordedAt: string;
-  ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV2Policy;
+  ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV3Policy;
   capability: BscTestnetPtaWbnbPoolSubmissionCapability;
   journalEvidenceOnly: true;
 }>;
@@ -260,10 +281,19 @@ export interface BscTestnetPtaWbnbPoolDurableSubmissionJournal extends BscTestne
   readonly readRecoveryState: () => Promise<BscTestnetPtaWbnbPoolSubmissionRecoveryState>;
 }
 
-export interface BscTestnetPtaWbnbPoolSubmissionJournalRecoveryReader extends BscTestnetPtaWbnbPoolDurableSubmissionJournal {
+export interface BscTestnetPtaWbnbPoolSubmissionJournalRecoveryReader {
+  readonly readRecoveryState: () => Promise<BscTestnetPtaWbnbPoolSubmissionRecoveryState>;
   /** Null means the retained on-disk sequence is not a complete, strictly valid recovery state. */
   readonly readStrictRecoveryState: () => Promise<BscTestnetPtaWbnbPoolSubmissionRecoveryState | null>;
 }
+
+export type BscTestnetPtaWbnbPoolSubmissionTerminalRecoveryJournal =
+  BscTestnetPtaWbnbPoolTerminalReconciliationJournal;
+
+interface BscTestnetPtaWbnbPoolInternalSubmissionJournal
+  extends
+    BscTestnetPtaWbnbPoolDurableSubmissionJournal,
+    BscTestnetPtaWbnbPoolSubmissionJournalRecoveryReader {}
 
 export type BscTestnetPtaWbnbPoolSubmissionJournalRecoveryProbeResult =
   | Readonly<{
@@ -297,6 +327,20 @@ export type BscTestnetPtaWbnbPoolExistingSubmissionJournalResult =
       journal: null;
       state: null;
       issue: Readonly<{ code: "RECOVERY_JOURNAL_INVALID"; message: string }>;
+    }>;
+
+export type BscTestnetPtaWbnbPoolExistingSubmissionTerminalRecoveryResult =
+  | Readonly<{
+      status: "opened";
+      journal: BscTestnetPtaWbnbPoolSubmissionTerminalRecoveryJournal;
+      state: BscTestnetPtaWbnbPoolSubmissionTerminalRecoveryState;
+      issue: null;
+    }>
+  | Readonly<{
+      status: "blocked";
+      journal: null;
+      state: null;
+      issue: Readonly<{ code: "TERMINAL_RECOVERY_JOURNAL_INVALID"; message: string }>;
     }>;
 
 function inspectRecord(input: unknown, expectedKeys?: readonly string[]): DataRecord | null {
@@ -379,6 +423,34 @@ function exactHex32(input: unknown): input is Hex {
   return typeof input === "string" && BYTES32.test(input) && input !== `0x${"00".repeat(32)}`;
 }
 
+function snapshotRecoveryAttempt(
+  input: unknown
+): BscTestnetPtaWbnbPoolRecoveryAttemptBinding | null {
+  const recovery = inspectRecord(input, RECOVERY_KEYS);
+  if (
+    recovery === null ||
+    recovery.generation !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION ||
+    recovery.predecessorState !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE ||
+    !exactHex32(recovery.predecessorFenceSha256) ||
+    !exactHex32(recovery.attemptId)
+  ) {
+    return null;
+  }
+  return Object.freeze({
+    generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
+    predecessorState: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
+    predecessorFenceSha256: recovery.predecessorFenceSha256,
+    attemptId: recovery.attemptId
+  });
+}
+
+function sameRecoveryAttempt(
+  left: BscTestnetPtaWbnbPoolRecoveryAttemptBinding,
+  right: BscTestnetPtaWbnbPoolRecoveryAttemptBinding
+): boolean {
+  return RECOVERY_KEYS.every((key) => left[key] === right[key]);
+}
+
 function exactClaimId(input: unknown): input is string {
   return (
     typeof input === "string" &&
@@ -421,13 +493,13 @@ function sha256Text(input: string): Hex {
   return `0x${createHash("sha256").update(input, "utf8").digest("hex")}`;
 }
 
-function exactOwnerV2Policy(input: unknown): BscTestnetPtaWbnbPoolDurableOwnerV2Policy | null {
+function exactOwnerV3Policy(input: unknown): BscTestnetPtaWbnbPoolDurableOwnerV3Policy | null {
   const record = inspectRecord(input, POLICY_KEYS);
   return record !== null &&
     POLICY_KEYS.every(
-      (key) => record[key] === BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V2_POLICY[key]
+      (key) => record[key] === BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V3_POLICY[key]
     )
-    ? BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V2_POLICY
+    ? BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V3_POLICY
     : null;
 }
 
@@ -446,15 +518,20 @@ function snapshotCapability(input: unknown): BscTestnetPtaWbnbPoolSubmissionCapa
     root === null ? null : inspectRecord(root.preSubmission, PRE_SUBMISSION_KEYS);
   const transaction =
     root === null ? null : inspectRecord(root.transaction, CAPABILITY_TRANSACTION_KEYS);
-  if (root === null || preSubmission === null || transaction === null) return null;
+  const recovery = root === null ? null : snapshotRecoveryAttempt(root.recovery);
+  if (root === null || preSubmission === null || transaction === null || recovery === null) {
+    return null;
+  }
   const snapshot: Record<string, unknown> = {};
   for (const key of CAPABILITY_KEYS) {
     snapshot[key] =
       key === "preSubmission"
         ? orderedFrozenRecord(preSubmission, PRE_SUBMISSION_KEYS)
-        : key === "transaction"
-          ? orderedFrozenRecord(transaction, CAPABILITY_TRANSACTION_KEYS)
-          : root[key];
+        : key === "recovery"
+          ? recovery
+          : key === "transaction"
+            ? orderedFrozenRecord(transaction, CAPABILITY_TRANSACTION_KEYS)
+            : root[key];
   }
   return Object.freeze(snapshot) as unknown as BscTestnetPtaWbnbPoolSubmissionCapability;
 }
@@ -462,7 +539,7 @@ function snapshotCapability(input: unknown): BscTestnetPtaWbnbPoolSubmissionCapa
 type ParsedSignedCommitRequest = Readonly<{
   capability: BscTestnetPtaWbnbPoolSubmissionCapability;
   binding: Binding;
-  ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV2Policy;
+  ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV3Policy;
 }>;
 
 async function parseSignedCommitRequest(
@@ -470,14 +547,14 @@ async function parseSignedCommitRequest(
   asOf: Date
 ): Promise<ParsedSignedCommitRequest | null> {
   const record = inspectRecord(input, SIGNED_COMMIT_REQUEST_KEYS);
-  const policy = record === null ? null : exactOwnerV2Policy(record.ownerAuthorizationPolicy);
+  const policy = record === null ? null : exactOwnerV3Policy(record.ownerAuthorizationPolicy);
   const capability = record === null ? null : snapshotCapability(record.capability);
   if (
     record === null ||
     policy === null ||
     capability === null ||
-    record.schemaVersion !== 1 ||
-    record.kind !== "authenticated_owner_v2_signed_submission_commit_v1"
+    record.schemaVersion !== 2 ||
+    record.kind !== "authenticated_owner_recovery_generation_2_signed_submission_commit_v2"
   ) {
     return null;
   }
@@ -496,6 +573,7 @@ async function parseSignedCommitRequest(
 }
 
 function parseBinding(input: DataRecord): Binding | null {
+  const recovery = snapshotRecoveryAttempt(input.recovery);
   if (
     input.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
     !exactClaimId(input.claimId) ||
@@ -512,7 +590,8 @@ function parseBinding(input: DataRecord): Binding | null {
     !exactHex32(input.transactionHash) ||
     !exactHex32(input.signedTransactionKeccak256) ||
     input.transactionHash !== input.signedTransactionKeccak256 ||
-    !exactHex32(input.submissionStartedDigest)
+    !exactHex32(input.submissionStartedDigest) ||
+    recovery === null
   ) {
     return null;
   }
@@ -524,6 +603,7 @@ function parseBinding(input: DataRecord): Binding | null {
     runtimeManifestSha256: input.runtimeManifestSha256,
     reviewerApprovalDigest: input.reviewerApprovalDigest,
     ownerAuthorizationDigest: input.ownerAuthorizationDigest,
+    recovery,
     signingHash: input.signingHash,
     transactionHash: input.transactionHash,
     signedTransactionKeccak256: input.signedTransactionKeccak256,
@@ -532,7 +612,11 @@ function parseBinding(input: DataRecord): Binding | null {
 }
 
 function sameBinding(left: Binding, right: Binding): boolean {
-  return BINDING_KEYS.every((key) => left[key] === right[key]);
+  return BINDING_KEYS.every((key) =>
+    key === "recovery"
+      ? sameRecoveryAttempt(left.recovery, right.recovery)
+      : left[key] === right[key]
+  );
 }
 
 function parseInitial(input: unknown): Binding | null {
@@ -614,7 +698,7 @@ async function parseStoredSignedCommit(input: string | null): Promise<ParsedSign
     "schema"
   ]);
   const recordedAt = exact?.recordedAt;
-  const policy = exact === null ? null : exactOwnerV2Policy(exact.ownerAuthorizationPolicy);
+  const policy = exact === null ? null : exactOwnerV3Policy(exact.ownerAuthorizationPolicy);
   const capability = exact === null ? null : snapshotCapability(exact.capability);
   if (
     input === null ||
@@ -772,7 +856,7 @@ function unknownSnapshot(
 /** Append-only protocol core; production supplies only the fixed Windows adapter below. */
 export function createBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUse(
   untrustedPorts: unknown
-): BscTestnetPtaWbnbPoolSubmissionJournalRecoveryReader {
+): BscTestnetPtaWbnbPoolInternalSubmissionJournal {
   const ports = inspectPorts(untrustedPorts);
   if (ports === null) throw new Error("PTA_WBNB_POOL_SUBMISSION_JOURNAL_CONFIGURATION_INVALID");
   let terminalUnknownSnapshot: Snapshot | null = null;
@@ -942,7 +1026,7 @@ export function createBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUs
       });
     }
     return Object.freeze({
-      schemaVersion: 1 as const,
+      schemaVersion: 2 as const,
       journalSchema: SCHEMA,
       state: snapshot.state,
       ownerAuthorizationPolicy: snapshot.signedCommit.record.ownerAuthorizationPolicy,
@@ -1139,7 +1223,7 @@ try {
     if (-not $item.PSIsContainer -or (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)) { throw 'path' }
     $cursor = $item.FullName
   }
-  $allowed = @('01-signed-commit.v2.json','02-submission-started.v2.json','03-terminal-reconciliation.v2.json')
+  $allowed = @('01-signed-commit.v3.json','02-submission-started.v3.json','03-terminal-reconciliation.v3.json')
   foreach ($child in @(Get-ChildItem -LiteralPath $cursor -Force)) {
     if ($child.PSIsContainer -or ($allowed -notcontains $child.Name) -or (($child.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) -or $child.LinkType) { throw 'child' }
   }
@@ -1390,6 +1474,83 @@ async function readOnlyFixedDirectory(): Promise<string | null> {
   return expected;
 }
 
+const terminalRecoveryObservationBrands = new WeakMap<
+  object,
+  Readonly<{ directory: string; fingerprint: string }>
+>();
+
+function recoveryStateFingerprint(value: BscTestnetPtaWbnbPoolSubmissionRecoveryState): string {
+  return createHash("sha256")
+    .update("proofera.bsc-testnet.pta-wbnb-pool.submission-recovery-observation.v1\u0000", "utf8")
+    .update(JSON.stringify(value), "utf8")
+    .digest("hex");
+}
+
+function terminalRecoveryState(
+  value: BscTestnetPtaWbnbPoolSubmissionRecoveryState
+): value is BscTestnetPtaWbnbPoolSubmissionTerminalRecoveryState {
+  if (value.state === "submission_started") {
+    return (
+      BYTES32.test(value.signedCommitSha256) &&
+      typeof value.submissionStartedRecordSha256 === "string" &&
+      BYTES32.test(value.submissionStartedRecordSha256) &&
+      value.reconciliationDigest === null
+    );
+  }
+  return (
+    value.state === "unknown_outcome" &&
+    value.capability !== null &&
+    value.ownerAuthorizationPolicy !== null &&
+    typeof value.signedCommitSha256 === "string" &&
+    BYTES32.test(value.signedCommitSha256) &&
+    typeof value.submissionStartedRecordSha256 === "string" &&
+    BYTES32.test(value.submissionStartedRecordSha256)
+  );
+}
+
+function recoveryReaderFacade(
+  journal: BscTestnetPtaWbnbPoolInternalSubmissionJournal
+): BscTestnetPtaWbnbPoolSubmissionJournalRecoveryReader {
+  return Object.freeze({
+    readRecoveryState: journal.readRecoveryState,
+    readStrictRecoveryState: journal.readStrictRecoveryState
+  });
+}
+
+function durableJournalFacade(
+  journal: BscTestnetPtaWbnbPoolInternalSubmissionJournal
+): BscTestnetPtaWbnbPoolDurableSubmissionJournal {
+  return Object.freeze({
+    initializeSignedCommit: journal.initializeSignedCommit,
+    readState: journal.readState,
+    readRecoveryState: journal.readRecoveryState,
+    commitSubmissionStarted: journal.commitSubmissionStarted,
+    commitTerminalReconciliation: journal.commitTerminalReconciliation
+  });
+}
+
+function terminalRecoveryJournalFacade(
+  journal: BscTestnetPtaWbnbPoolInternalSubmissionJournal
+): BscTestnetPtaWbnbPoolSubmissionTerminalRecoveryJournal {
+  return Object.freeze({
+    readState: journal.readState,
+    commitTerminalReconciliation: journal.commitTerminalReconciliation
+  });
+}
+
+function terminalRecoveryBlocked(): BscTestnetPtaWbnbPoolExistingSubmissionTerminalRecoveryResult {
+  return Object.freeze({
+    status: "blocked" as const,
+    journal: null,
+    state: null,
+    issue: Object.freeze({
+      code: "TERMINAL_RECOVERY_JOURNAL_INVALID" as const,
+      message:
+        "The fixed submission journal no longer matches the authenticated terminal-recovery observation."
+    })
+  });
+}
+
 function recoveryBlocked(): BscTestnetPtaWbnbPoolExistingSubmissionJournalResult {
   return Object.freeze({
     status: "blocked" as const,
@@ -1402,9 +1563,7 @@ function recoveryBlocked(): BscTestnetPtaWbnbPoolExistingSubmissionJournalResult
   });
 }
 
-function createWindowsAdapter(
-  directory: string
-): BscTestnetPtaWbnbPoolSubmissionJournalRecoveryReader {
+function createWindowsAdapter(directory: string): BscTestnetPtaWbnbPoolInternalSubmissionJournal {
   return createBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUse(
     Object.freeze({
       now: () => new Date(),
@@ -1501,12 +1660,82 @@ async function openExistingAtDirectory(
       });
     }
     const journal = createWindowsAdapter(directory);
-    const state = await journal.readStrictRecoveryState();
-    return state === null
-      ? recoveryBlocked()
-      : Object.freeze({ status: "opened" as const, journal, state, issue: null });
+    const first = await journal.readRecoveryState();
+    const strict = await journal.readStrictRecoveryState();
+    const second = await journal.readRecoveryState();
+    const firstFingerprint = recoveryStateFingerprint(first);
+    if (
+      firstFingerprint !== recoveryStateFingerprint(second) ||
+      (strict === null
+        ? !terminalRecoveryState(first) || first.state !== "unknown_outcome"
+        : firstFingerprint !== recoveryStateFingerprint(strict))
+    ) {
+      return recoveryBlocked();
+    }
+    const state = strict ?? first;
+    terminalRecoveryObservationBrands.set(
+      state,
+      Object.freeze({ directory: win32.normalize(directory), fingerprint: firstFingerprint })
+    );
+    return Object.freeze({
+      status: "opened" as const,
+      journal: recoveryReaderFacade(journal),
+      state,
+      issue: null
+    });
   } catch {
     return recoveryBlocked();
+  }
+}
+
+async function openTerminalRecoveryAtDirectory(
+  directory: string,
+  expectedState: unknown
+): Promise<BscTestnetPtaWbnbPoolExistingSubmissionTerminalRecoveryResult> {
+  try {
+    if (typeof expectedState !== "object" || expectedState === null || isProxy(expectedState)) {
+      return terminalRecoveryBlocked();
+    }
+    const observation = terminalRecoveryObservationBrands.get(expectedState);
+    if (
+      observation === undefined ||
+      observation.directory.toLowerCase() !== win32.normalize(directory).toLowerCase()
+    ) {
+      return terminalRecoveryBlocked();
+    }
+    const entries = await readdir(directory, { withFileTypes: true });
+    const names: string[] = [];
+    for (const entry of entries) {
+      if (!entry.isFile() || !isJournalFileName(entry.name)) {
+        return terminalRecoveryBlocked();
+      }
+      names.push(entry.name);
+    }
+    names.sort();
+    if (!(await verifyPaths(directory, names))) return terminalRecoveryBlocked();
+
+    const journal = createWindowsAdapter(directory);
+    const first = await journal.readRecoveryState();
+    const strict = await journal.readStrictRecoveryState();
+    const second = await journal.readRecoveryState();
+    if (
+      !terminalRecoveryState(first) ||
+      recoveryStateFingerprint(first) !== observation.fingerprint ||
+      recoveryStateFingerprint(second) !== observation.fingerprint ||
+      (first.state === "submission_started"
+        ? strict === null || recoveryStateFingerprint(strict) !== observation.fingerprint
+        : strict !== null)
+    ) {
+      return terminalRecoveryBlocked();
+    }
+    return Object.freeze({
+      status: "opened" as const,
+      journal: terminalRecoveryJournalFacade(journal),
+      state: first,
+      issue: null
+    });
+  } catch {
+    return terminalRecoveryBlocked();
   }
 }
 
@@ -1528,6 +1757,24 @@ export async function openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJ
       : openExistingAtDirectory(directory);
   } catch {
     return recoveryBlocked();
+  }
+}
+
+/**
+ * Reopens the fixed journal only for a previously branded startup observation and returns a
+ * terminal-evidence-only facade. Any path/state/capability/recovery drift blocks the handoff.
+ */
+export async function openExistingWindowsBscTestnetPtaWbnbPoolSubmissionJournalForTerminalReconciliationForInternalUse(
+  expectedState: unknown
+): Promise<BscTestnetPtaWbnbPoolExistingSubmissionTerminalRecoveryResult> {
+  if (process.platform !== "win32") return terminalRecoveryBlocked();
+  try {
+    const directory = await readOnlyFixedDirectory();
+    return directory === null
+      ? terminalRecoveryBlocked()
+      : openTerminalRecoveryAtDirectory(directory, expectedState);
+  } catch {
+    return terminalRecoveryBlocked();
   }
 }
 
@@ -1558,7 +1805,7 @@ export async function createWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournal
   if (directory === null || !(await verifyPaths(directory, []))) {
     throw new Error("PTA_WBNB_POOL_SUBMISSION_JOURNAL_CONFIGURATION_INVALID");
   }
-  return createWindowsAdapter(directory);
+  return durableJournalFacade(createWindowsAdapter(directory));
 }
 
 /**
@@ -1589,7 +1836,7 @@ export async function createWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournal
   ) {
     throw new Error("PTA_WBNB_POOL_SUBMISSION_JOURNAL_TEST_DIRECTORY_INVALID");
   }
-  return createWindowsAdapter(directory);
+  return durableJournalFacade(createWindowsAdapter(directory));
 }
 
 /** Test-only no-write recovery seam over a caller-created synthetic directory. */
@@ -1612,4 +1859,27 @@ export async function openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJ
     return recoveryBlocked();
   }
   return openExistingAtDirectory(directory);
+}
+
+/** Test-only terminal-evidence facade over a previously branded synthetic startup observation. */
+export async function openExistingWindowsBscTestnetPtaWbnbPoolSubmissionJournalForTerminalReconciliationAtSyntheticDirectoryForTests(
+  untrustedDirectory: unknown,
+  expectedState: unknown
+): Promise<BscTestnetPtaWbnbPoolExistingSubmissionTerminalRecoveryResult> {
+  if (process.platform !== "win32") return terminalRecoveryBlocked();
+  if (
+    typeof untrustedDirectory !== "string" ||
+    untrustedDirectory.length > 500 ||
+    !/^[A-Za-z]:\\[^\0\r\n]*$/u.test(untrustedDirectory) ||
+    untrustedDirectory.includes("/") ||
+    win32.normalize(untrustedDirectory) !== untrustedDirectory
+  ) {
+    return terminalRecoveryBlocked();
+  }
+  const directory = resolve(untrustedDirectory);
+  const relation = relative(REPOSITORY_ROOT, directory);
+  if (relation === "" || (!relation.startsWith(`..${sep}`) && relation !== "..")) {
+    return terminalRecoveryBlocked();
+  }
+  return openTerminalRecoveryAtDirectory(directory, expectedState);
 }

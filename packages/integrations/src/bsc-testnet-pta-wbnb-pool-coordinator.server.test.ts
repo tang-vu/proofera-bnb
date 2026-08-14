@@ -292,6 +292,8 @@ describe("BSC testnet PTA/WBNB pool coordinator", () => {
           latestNonce: "1",
           pendingNonce: "1",
           pendingPool: ADDRESSES.zero,
+          candidateCode: "0x",
+          candidateNonce: "0",
           providerAgreementVerified: true,
           allRuntimeIdentitiesVerified: true,
           allEip1967SlotsZero: true,

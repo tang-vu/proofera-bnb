@@ -19,14 +19,17 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
+  BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
+  BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
   buildBscTestnetPtaWbnbPoolExactSigningTransaction,
-  type BscTestnetPtaWbnbPoolAuthorizedSigningIntent
+  type BscTestnetPtaWbnbPoolAuthorizedSigningIntent,
+  type BscTestnetPtaWbnbPoolRecoveryAttemptBinding
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 
 export const BSC_TESTNET_PTA_WBNB_POOL_REVIEWER_APPROVAL_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.external-reviewer-approval.v1" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_OWNER_AUTHORIZATION_DIGEST_DOMAIN =
-  "proofera.bsc-testnet.pta-wbnb-pool.owner-envelope-authorization.v1" as const;
+  "proofera.bsc-testnet.pta-wbnb-pool.owner-envelope-authorization.v2" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_OWNER_DESIGNATED_REVIEW_APPROVAL_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.owner-designated-internal-multi-agent-review.v1" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_REVIEW_ARTIFACT_SHA256 =
@@ -118,12 +121,14 @@ export interface BscTestnetPtaWbnbPoolOwnerSignatureAndBroadcastAuthorizationBod
   BscTestnetPtaWbnbPoolOwnerEnvelopeAuthorizationBody,
   "schemaVersion" | "kind" | "decision"
 > {
-  readonly schemaVersion: 2;
-  readonly kind: "exact_owner_signature_and_single_broadcast_authorization_v2";
-  readonly decision: "authorize_one_chain_97_pool_initialization_signature_and_single_broadcast";
+  readonly schemaVersion: 3;
+  readonly kind: "exact_owner_recovery_generation_2_signature_and_single_broadcast_authorization_v3";
+  readonly decision: "authorize_fresh_chain_97_pool_recovery_generation_2_signature_and_single_broadcast";
   readonly broadcastPolicy: "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity";
   readonly liquidityActionAuthorized: false;
   readonly ceremonyNonce: Hex;
+  readonly releaseTree: string;
+  readonly recovery: BscTestnetPtaWbnbPoolRecoveryAttemptBinding;
 }
 
 export interface BscTestnetPtaWbnbPoolOwnerSignatureAndBroadcastAuthorization extends BscTestnetPtaWbnbPoolOwnerSignatureAndBroadcastAuthorizationBody {
@@ -188,6 +193,7 @@ const DESCRIPTOR_KEYS = [
   "authorizationReceiptCreated",
   "envelopeExpiresAt",
   "envelopeHash",
+  "envelopeObservedAt",
   "executionAuthorized",
   "exactBinding",
   "journalClaimCreated",
@@ -265,14 +271,21 @@ const OWNER_BODY_KEYS = [
   "schemaVersion",
   "signingHash"
 ] as const;
-const OWNER_KEYS = [...OWNER_BODY_KEYS, "authorizationDigest"] as const;
-const OWNER_V2_BODY_KEYS = [
+const OWNER_V3_BODY_KEYS = [
   ...OWNER_BODY_KEYS,
   "broadcastPolicy",
   "ceremonyNonce",
-  "liquidityActionAuthorized"
+  "liquidityActionAuthorized",
+  "recovery",
+  "releaseTree"
 ] as const;
-const OWNER_V2_KEYS = [...OWNER_V2_BODY_KEYS, "authorizationDigest"] as const;
+const OWNER_V3_KEYS = [...OWNER_V3_BODY_KEYS, "authorizationDigest"] as const;
+const RECOVERY_KEYS = [
+  "attemptId",
+  "generation",
+  "predecessorFenceSha256",
+  "predecessorState"
+] as const;
 
 function inspectRecord(
   value: unknown,
@@ -331,6 +344,29 @@ function releaseCommit(value: unknown): string | null {
   return typeof value === "string" && /^[0-9a-f]{40}$/u.test(value) && !/^0{40}$/u.test(value)
     ? value
     : null;
+}
+
+function recoveryAttempt(value: unknown): BscTestnetPtaWbnbPoolRecoveryAttemptBinding | null {
+  const recovery = inspectRecord(value, RECOVERY_KEYS);
+  const predecessorFenceSha256 =
+    recovery === null ? null : exactHex32(recovery.predecessorFenceSha256);
+  const attemptId = recovery === null ? null : exactHex32(recovery.attemptId);
+  if (
+    recovery === null ||
+    !Object.isFrozen(value) ||
+    recovery.generation !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION ||
+    recovery.predecessorState !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE ||
+    predecessorFenceSha256 === null ||
+    attemptId === null
+  ) {
+    return null;
+  }
+  return Object.freeze({
+    generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
+    predecessorState: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
+    predecessorFenceSha256,
+    attemptId
+  });
 }
 
 function identity(value: unknown): string | null {
@@ -452,6 +488,7 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
     }
     const envelopeHash = exactHex32(descriptor.envelopeHash);
     const descriptorExpiry = canonicalUtc(descriptor.envelopeExpiresAt);
+    const descriptorObservedAt = canonicalUtc(descriptor.envelopeObservedAt);
     const gasLimit =
       typeof exactBinding.gasLimit === "bigint" && exactBinding.gasLimit > 0n
         ? exactBinding.gasLimit
@@ -465,6 +502,8 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
       descriptor.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
       envelopeHash === null ||
       descriptorExpiry === null ||
+      descriptorObservedAt === null ||
+      descriptorObservedAt.milliseconds >= descriptorExpiry.milliseconds ||
       descriptorExpiry.milliseconds <= now ||
       descriptor.signingReady !== false ||
       descriptor.signingAuthorized !== false ||
@@ -592,9 +631,11 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
       ownerValue !== null && typeof ownerValue === "object" && !isProxy(ownerValue)
         ? Object.getOwnPropertyDescriptor(ownerValue, "kind")?.value
         : null;
-    const ownerV2 = ownerKind === "exact_owner_signature_and_single_broadcast_authorization_v2";
-    const ownerBodyKeys = ownerV2 ? OWNER_V2_BODY_KEYS : OWNER_BODY_KEYS;
-    const owner = inspectRecord(ownerValue, ownerV2 ? OWNER_V2_KEYS : OWNER_KEYS);
+    const ownerV3 =
+      ownerKind ===
+      "exact_owner_recovery_generation_2_signature_and_single_broadcast_authorization_v3";
+    const ownerBodyKeys = OWNER_V3_BODY_KEYS;
+    const owner = ownerV3 ? inspectRecord(ownerValue, OWNER_V3_KEYS) : null;
     if (owner === null) {
       return blocked(
         "OWNER_AUTHORIZATION_INVALID",
@@ -608,7 +649,9 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
     );
     const ownerDigest = exactHex32(owner.authorizationDigest);
     const ownerTextDigest = exactHex32(owner.authorizationTextSha256);
-    const ceremonyNonce = ownerV2 ? exactHex32(owner.ceremonyNonce) : null;
+    const ceremonyNonce = exactHex32(owner.ceremonyNonce);
+    const recovery = recoveryAttempt(owner.recovery);
+    const ownerReleaseTree = releaseCommit(owner.releaseTree);
     const ownerRuntimeManifest = exactHex32(owner.runtimeManifestSha256);
     const ownerCommit = releaseCommit(owner.releaseCommit);
     const ownerIdentity = identity(owner.ownerIdentity);
@@ -618,23 +661,21 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
       ownerDigest === null ||
       ownerBody === null ||
       ownerTextDigest === null ||
+      recovery === null ||
+      ownerReleaseTree === null ||
       ownerRuntimeManifest === null ||
       ownerCommit === null ||
       ownerIdentity === null ||
       authorizedAt === null ||
       ownerExpiry === null ||
-      (!ownerV2 && owner.schemaVersion !== 1) ||
-      (ownerV2 && owner.schemaVersion !== 2) ||
-      (!ownerV2 && owner.kind !== "exact_owner_envelope_authorization_v1") ||
-      (!ownerV2 && owner.decision !== "authorize_one_chain_97_pool_initialization_signature") ||
-      (ownerV2 &&
-        (owner.kind !== "exact_owner_signature_and_single_broadcast_authorization_v2" ||
-          owner.decision !==
-            "authorize_one_chain_97_pool_initialization_signature_and_single_broadcast" ||
-          owner.broadcastPolicy !==
-            "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity" ||
-          ceremonyNonce === null ||
-          owner.liquidityActionAuthorized !== false)) ||
+      owner.schemaVersion !== 3 ||
+      owner.kind !==
+        "exact_owner_recovery_generation_2_signature_and_single_broadcast_authorization_v3" ||
+      owner.decision !==
+        "authorize_fresh_chain_97_pool_recovery_generation_2_signature_and_single_broadcast" ||
+      owner.broadcastPolicy !== "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity" ||
+      ceremonyNonce === null ||
+      owner.liquidityActionAuthorized !== false ||
       owner.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
       owner.envelopeHash !== envelopeHash ||
       owner.reviewerApprovalDigest !== reviewerApprovalDigest ||
@@ -688,9 +729,9 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
       return blocked("AUTHORIZATION_EXPIRED", "expiresAt", "Authorization envelope expired.");
     }
     const intent = Object.freeze({
-      schemaVersion: 1 as const,
+      schemaVersion: 2 as const,
       scope:
-        "owner_designated_internal_release_policy_and_exact_owner_pool_initialization" as const,
+        "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_2" as const,
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       envelopeHash,
       reviewerApprovalDigest,
@@ -699,6 +740,7 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
       runtimeManifestSha256: reviewerRuntimeManifest,
       authenticatedAt: authorizedAt.iso,
       expiresAt: ownerExpiry.iso,
+      recovery,
       transaction
     });
     brandedIntents.add(intent);
@@ -722,9 +764,9 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
 }
 
 /**
- * Internal validation seam for deterministic compositions. A future executable runner must retain
- * both authenticators as private object-capability checks; public JSON and matching digests are
- * never sufficient. This file is intentionally absent from the package export map.
+ * Internal validation seam used by fixed production composition and deterministic tests. Production
+ * retains both authenticators as private object-capability checks; public JSON and matching digests
+ * are never sufficient. This file is intentionally absent from the package export map.
  */
 export function createBscTestnetPtaWbnbPoolAuthorizationGateForInternalUse(
   untrustedDependencies: unknown

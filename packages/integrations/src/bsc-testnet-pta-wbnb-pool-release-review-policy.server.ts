@@ -30,26 +30,30 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS,
-  BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY
+  BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
+  BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
+  BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 
 export const BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_RUNTIME_MANIFEST_DOMAIN =
   "ProofEra:bsc-testnet-pta-wbnb-pool-production-runtime-manifest:v2" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_SUBJECT_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-subject:v1" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-subject:v2" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_POLICY_DIGEST_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-policy:v1" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-policy:v2" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RUNTIME_REVIEW_INSTANTIATION_DIGEST_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-runtime-review-instantiation:v1" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-runtime-review-instantiation:v2" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_CHALLENGE_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-challenge:v2" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-challenge:v3" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_FRAME_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-frame:v2" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-frame:v3" as const;
 
-const POLICY_KIND = "owner_designated_internal_multi_agent_release_review_policy_v1" as const;
-const POLICY_DECISION = "GO_EXACT_CHAIN_97_ONE_SHOT_POLICY" as const;
+const POLICY_KIND =
+  "owner_designated_internal_multi_agent_release_review_policy_generation_2_v2" as const;
+const POLICY_DECISION = "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_2_POLICY" as const;
 const REVIEWER_DECISION = "GO_WITH_ZERO_P0_AND_ZERO_P1" as const;
-const INSTANTIATION_KIND = "automated_release_policy_envelope_instantiation_v1" as const;
+const INSTANTIATION_KIND = "automated_release_policy_recovery_envelope_instantiation_v2" as const;
 const BYTES32 = /^0x[0-9a-f]{64}$/u;
 const GIT_OBJECT = /^[0-9a-f]{40}$/u;
 const UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u;
@@ -101,7 +105,9 @@ const CAPS_KEYS = [
   "maximumEnvelopeLifetimeSeconds",
   "maximumOwnerConfirmationWindowSeconds",
   "maximumExecutionAuthorityLifetimeSeconds",
-  "maximumPostClaimRecheckAgeSeconds"
+  "maximumPostClaimRecheckAgeSeconds",
+  "predecessorLegacyClaimRawSha256",
+  "recoveryGeneration"
 ] as const;
 const SCOPE_KEYS = [
   "exactFreshEnvelopeRequired",
@@ -115,7 +121,18 @@ const SCOPE_KEYS = [
   "mainnetWriteAuthorized",
   "initializerHasNoDeadline",
   "publicMempoolCanRace",
-  "priceIsMarketPriceOraclePegOrValuation"
+  "priceIsMarketPriceOraclePegOrValuation",
+  "predecessorAppendOnlyFenceRequired",
+  "predecessorNoEffectProofRequired",
+  "predecessorSignatureOutcomeRequired",
+  "predecessorStateRequired",
+  "predecessorSubmissionJournalStateRequired",
+  "predecessorSubmissionOutcomeRequired",
+  "predecessorTerminalCodeRequired",
+  "predecessorWorkerAuthorizationOutcomeRequired",
+  "predecessorWorkerStartOutcomeRequired",
+  "fenceObservationMayBeReusedAsExecutionEnvelope",
+  "freshEnvelopeAfterFenceRequired"
 ] as const;
 const REVIEWER_KEYS = [
   "taskLabel",
@@ -152,14 +169,37 @@ const POLICY_BODY_KEYS = [
   "limitations"
 ] as const;
 const POLICY_KEYS = [...POLICY_BODY_KEYS, "policyDigest"] as const;
-const INSTANTIATION_INPUT_KEYS = ["envelopeHash", "expiresAt"] as const;
+const INSTANTIATION_INPUT_KEYS = [
+  "envelopeHash",
+  "executionEnvelopeObservedAt",
+  "expiresAt",
+  "predecessorFence"
+] as const;
+const PREDECESSOR_FENCE_KEYS = [
+  "fenceRecordedAt",
+  "legacyClaimRawSha256",
+  "noEffectEnvelopeHash",
+  "noEffectObservedAt",
+  "noEffectProofDigest",
+  "predecessorFenceSha256",
+  "signatureOutcome",
+  "status",
+  "submissionJournalState",
+  "submissionOutcome",
+  "terminalCode",
+  "workerAuthorizationOutcome",
+  "workerStartOutcome"
+] as const;
+const RUNTIME_RECOVERY_KEYS = ["generation", "predecessorFence"] as const;
 const INSTANTIATION_EXPECTED_BINDING_KEYS = [
   "releaseCommit",
   "releaseTree",
   "runtimeManifestSha256",
   "policyDigest",
   "reviewedSubjectSha256",
+  "recovery",
   "envelopeHash",
+  "executionEnvelopeObservedAt",
   "expiresAt",
   "instantiationDigest"
 ] as const;
@@ -186,7 +226,7 @@ export interface BscTestnetPtaWbnbPoolExactReleaseIdentity {
 }
 
 export interface BscTestnetPtaWbnbPoolReleaseReviewPolicy {
-  readonly schemaVersion: 1;
+  readonly schemaVersion: 2;
   readonly kind: typeof POLICY_KIND;
   readonly decision: typeof POLICY_DECISION;
   readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
@@ -218,6 +258,8 @@ export interface BscTestnetPtaWbnbPoolReleaseReviewPolicy {
     maximumOwnerConfirmationWindowSeconds: "240";
     maximumExecutionAuthorityLifetimeSeconds: "45";
     maximumPostClaimRecheckAgeSeconds: "30";
+    recoveryGeneration: "2";
+    predecessorLegacyClaimRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256;
   }>;
   readonly scope: Readonly<{
     exactFreshEnvelopeRequired: true;
@@ -232,6 +274,17 @@ export interface BscTestnetPtaWbnbPoolReleaseReviewPolicy {
     initializerHasNoDeadline: true;
     publicMempoolCanRace: true;
     priceIsMarketPriceOraclePegOrValuation: false;
+    predecessorAppendOnlyFenceRequired: true;
+    predecessorNoEffectProofRequired: true;
+    predecessorStateRequired: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE;
+    predecessorTerminalCodeRequired: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN";
+    predecessorWorkerAuthorizationOutcomeRequired: "not_attempted";
+    predecessorWorkerStartOutcomeRequired: "not_attempted";
+    predecessorSignatureOutcomeRequired: "not_attempted";
+    predecessorSubmissionJournalStateRequired: "exact_empty";
+    predecessorSubmissionOutcomeRequired: "not_attempted";
+    fenceObservationMayBeReusedAsExecutionEnvelope: false;
+    freshEnvelopeAfterFenceRequired: true;
   }>;
   readonly reviewedSubjectSha256: Hex;
   readonly implementationAgentIdentity: string;
@@ -258,8 +311,29 @@ export interface BscTestnetPtaWbnbPoolReleaseReviewPolicy {
   readonly policyDigest: Hex;
 }
 
+export interface BscTestnetPtaWbnbPoolPredecessorFenceBinding {
+  readonly status: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE;
+  readonly terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN";
+  readonly workerAuthorizationOutcome: "not_attempted";
+  readonly workerStartOutcome: "not_attempted";
+  readonly signatureOutcome: "not_attempted";
+  readonly submissionOutcome: "not_attempted";
+  readonly submissionJournalState: "exact_empty";
+  readonly fenceRecordedAt: string;
+  readonly legacyClaimRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256;
+  readonly noEffectProofDigest: Hex;
+  readonly noEffectEnvelopeHash: Hex;
+  readonly noEffectObservedAt: string;
+  readonly predecessorFenceSha256: Hex;
+}
+
+export interface BscTestnetPtaWbnbPoolRuntimeReviewRecoveryBinding {
+  readonly generation: typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
+  readonly predecessorFence: BscTestnetPtaWbnbPoolPredecessorFenceBinding;
+}
+
 export interface BscTestnetPtaWbnbPoolRuntimeReviewInstantiation {
-  readonly schemaVersion: 1;
+  readonly schemaVersion: 2;
   readonly kind: typeof INSTANTIATION_KIND;
   readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
   readonly policyDigest: Hex;
@@ -267,10 +341,12 @@ export interface BscTestnetPtaWbnbPoolRuntimeReviewInstantiation {
   readonly releaseTree: string;
   readonly runtimeManifestSha256: Hex;
   readonly reviewedSubjectSha256: Hex;
+  readonly recovery: BscTestnetPtaWbnbPoolRuntimeReviewRecoveryBinding;
   readonly reviewerTaskLabels: readonly string[];
   readonly policyReviewedAt: string;
   readonly policyExpiresAt: string;
   readonly envelopeHash: Hex;
+  readonly executionEnvelopeObservedAt: string;
   readonly instantiatedAt: string;
   readonly expiresAt: string;
   readonly automatedPolicyApplication: true;
@@ -285,7 +361,9 @@ export interface BscTestnetPtaWbnbPoolRuntimeReviewExpectedBinding {
   readonly runtimeManifestSha256: Hex;
   readonly policyDigest: Hex;
   readonly reviewedSubjectSha256: Hex;
+  readonly recovery: BscTestnetPtaWbnbPoolRuntimeReviewRecoveryBinding;
   readonly envelopeHash: Hex;
+  readonly executionEnvelopeObservedAt: string;
   readonly expiresAt: string;
   readonly instantiationDigest: Hex;
 }
@@ -409,6 +487,71 @@ function exactUtc(value: unknown): Readonly<{ iso: string; milliseconds: number 
   return Number.isSafeInteger(milliseconds) && new Date(milliseconds).toISOString() === value
     ? Object.freeze({ iso: value, milliseconds })
     : null;
+}
+
+function parsePredecessorFence(
+  value: unknown,
+  requireFrozen = true
+): BscTestnetPtaWbnbPoolPredecessorFenceBinding | null {
+  const fence = inspectExactRecord(value, PREDECESSOR_FENCE_KEYS);
+  const noEffectObservedAt = fence === null ? null : exactUtc(fence.noEffectObservedAt);
+  const fenceRecordedAt = fence === null ? null : exactUtc(fence.fenceRecordedAt);
+  if (
+    fence === null ||
+    (requireFrozen && !Object.isFrozen(value)) ||
+    fence.status !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE ||
+    fence.terminalCode !== "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" ||
+    fence.workerAuthorizationOutcome !== "not_attempted" ||
+    fence.workerStartOutcome !== "not_attempted" ||
+    fence.signatureOutcome !== "not_attempted" ||
+    fence.submissionOutcome !== "not_attempted" ||
+    fence.submissionJournalState !== "exact_empty" ||
+    fenceRecordedAt === null ||
+    fence.legacyClaimRawSha256 !== BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256 ||
+    !exactBytes32(fence.noEffectProofDigest) ||
+    !exactBytes32(fence.noEffectEnvelopeHash) ||
+    noEffectObservedAt === null ||
+    fenceRecordedAt.milliseconds <= noEffectObservedAt.milliseconds ||
+    !exactBytes32(fence.predecessorFenceSha256)
+  ) {
+    return null;
+  }
+  return Object.freeze({
+    status: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
+    terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
+    workerAuthorizationOutcome: "not_attempted",
+    workerStartOutcome: "not_attempted",
+    signatureOutcome: "not_attempted",
+    submissionOutcome: "not_attempted",
+    submissionJournalState: "exact_empty",
+    fenceRecordedAt: fenceRecordedAt.iso,
+    legacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+    noEffectProofDigest: fence.noEffectProofDigest,
+    noEffectEnvelopeHash: fence.noEffectEnvelopeHash,
+    noEffectObservedAt: noEffectObservedAt.iso,
+    predecessorFenceSha256: fence.predecessorFenceSha256
+  });
+}
+
+function parseRuntimeRecovery(
+  value: unknown,
+  requireFrozen = true
+): BscTestnetPtaWbnbPoolRuntimeReviewRecoveryBinding | null {
+  const recovery = inspectExactRecord(value, RUNTIME_RECOVERY_KEYS);
+  const predecessorFence =
+    recovery === null ? null : parsePredecessorFence(recovery.predecessorFence, requireFrozen);
+  if (
+    recovery === null ||
+    predecessorFence === null ||
+    (requireFrozen && !Object.isFrozen(value)) ||
+    recovery.generation !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+  ) {
+    return null;
+  }
+  return Object.freeze({
+    generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
+    predecessorFence
+  });
 }
 
 function captureNow(clock: () => Date): number | null {
@@ -676,7 +819,9 @@ function exactCaps(): BscTestnetPtaWbnbPoolReleaseReviewPolicy["caps"] {
     maximumExecutionAuthorityLifetimeSeconds:
       BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS.toString() as "45",
     maximumPostClaimRecheckAgeSeconds:
-      BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS.toString() as "30"
+      BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS.toString() as "30",
+    recoveryGeneration: "2",
+    predecessorLegacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256
   });
 }
 
@@ -693,7 +838,18 @@ function exactScope(): BscTestnetPtaWbnbPoolReleaseReviewPolicy["scope"] {
     mainnetWriteAuthorized: false,
     initializerHasNoDeadline: true,
     publicMempoolCanRace: true,
-    priceIsMarketPriceOraclePegOrValuation: false
+    priceIsMarketPriceOraclePegOrValuation: false,
+    predecessorAppendOnlyFenceRequired: true,
+    predecessorNoEffectProofRequired: true,
+    predecessorStateRequired: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
+    predecessorTerminalCodeRequired: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
+    predecessorWorkerAuthorizationOutcomeRequired: "not_attempted",
+    predecessorWorkerStartOutcomeRequired: "not_attempted",
+    predecessorSignatureOutcomeRequired: "not_attempted",
+    predecessorSubmissionJournalStateRequired: "exact_empty",
+    predecessorSubmissionOutcomeRequired: "not_attempted",
+    fenceObservationMayBeReusedAsExecutionEnvelope: false,
+    freshEnvelopeAfterFenceRequired: true
   });
 }
 
@@ -780,7 +936,7 @@ function parsePolicyBody(
     reviewedAt === null ||
     expiresAt === null ||
     expectedSubjectDigest === null ||
-    policy.schemaVersion !== 1 ||
+    policy.schemaVersion !== 2 ||
     policy.kind !== POLICY_KIND ||
     policy.decision !== POLICY_DECISION ||
     policy.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
@@ -840,7 +996,7 @@ function parsePolicyBody(
     }
   }
   return Object.freeze({
-    schemaVersion: 1,
+    schemaVersion: 2,
     kind: POLICY_KIND,
     decision: POLICY_DECISION,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -913,16 +1069,32 @@ function buildInstantiation(
   now: number
 ): BscTestnetPtaWbnbPoolRuntimeReviewInstantiation | null {
   const record = inspectExactRecord(input, INSTANTIATION_INPUT_KEYS);
+  const predecessorFence =
+    record === null ? null : parsePredecessorFence(record.predecessorFence, true);
+  const noEffectObservedAt =
+    predecessorFence === null ? null : exactUtc(predecessorFence.noEffectObservedAt);
+  const fenceRecordedAt =
+    predecessorFence === null ? null : exactUtc(predecessorFence.fenceRecordedAt);
+  const executionEnvelopeObservedAt =
+    record === null ? null : exactUtc(record.executionEnvelopeObservedAt);
   const envelopeExpiry = record === null ? null : exactUtc(record.expiresAt);
   const policyReviewedAt = exactUtc(policy.reviewedAt);
   const policyExpiry = exactUtc(policy.expiresAt);
   if (
     record === null ||
+    predecessorFence === null ||
+    noEffectObservedAt === null ||
+    fenceRecordedAt === null ||
+    executionEnvelopeObservedAt === null ||
     !Object.isFrozen(input) ||
     envelopeExpiry === null ||
     policyReviewedAt === null ||
     policyExpiry === null ||
     !exactBytes32(record.envelopeHash) ||
+    record.envelopeHash === predecessorFence.noEffectEnvelopeHash ||
+    noEffectObservedAt.milliseconds >= fenceRecordedAt.milliseconds ||
+    fenceRecordedAt.milliseconds >= executionEnvelopeObservedAt.milliseconds ||
+    executionEnvelopeObservedAt.milliseconds > now ||
     now < policyReviewedAt.milliseconds ||
     now >= policyExpiry.milliseconds ||
     envelopeExpiry.milliseconds <= now ||
@@ -933,7 +1105,7 @@ function buildInstantiation(
     return null;
   }
   const body = Object.freeze({
-    schemaVersion: 1 as const,
+    schemaVersion: 2 as const,
     kind: INSTANTIATION_KIND,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     policyDigest: policy.policyDigest,
@@ -941,10 +1113,15 @@ function buildInstantiation(
     releaseTree: policy.release.releaseTree,
     runtimeManifestSha256: policy.release.runtimeManifest.runtimeManifestSha256,
     reviewedSubjectSha256: policy.reviewedSubjectSha256,
+    recovery: Object.freeze({
+      generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
+      predecessorFence
+    }),
     reviewerTaskLabels: Object.freeze(policy.reviewers.map((reviewer) => reviewer.taskLabel)),
     policyReviewedAt: policy.reviewedAt,
     policyExpiresAt: policy.expiresAt,
     envelopeHash: record.envelopeHash,
+    executionEnvelopeObservedAt: executionEnvelopeObservedAt.iso,
     instantiatedAt: new Date(now).toISOString(),
     expiresAt: envelopeExpiry.iso,
     automatedPolicyApplication: true as const,
@@ -993,7 +1170,9 @@ function buildRealm(
         runtimeManifestSha256: instantiation.runtimeManifestSha256,
         policyDigest: instantiation.policyDigest,
         reviewedSubjectSha256: instantiation.reviewedSubjectSha256,
+        recovery: instantiation.recovery,
         envelopeHash: instantiation.envelopeHash,
+        executionEnvelopeObservedAt: instantiation.executionEnvelopeObservedAt,
         expiresAt: instantiation.expiresAt,
         instantiationDigest: instantiation.instantiationDigest
       })
@@ -1064,6 +1243,11 @@ function parseExpectedInstantiationBinding(
 ): BscTestnetPtaWbnbPoolRuntimeReviewExpectedBinding | null {
   const binding = inspectExactRecord(value, INSTANTIATION_EXPECTED_BINDING_KEYS);
   const expiresAt = binding === null ? null : exactUtc(binding.expiresAt);
+  const recovery = binding === null ? null : parseRuntimeRecovery(binding.recovery, true);
+  const executionEnvelopeObservedAt =
+    binding === null ? null : exactUtc(binding.executionEnvelopeObservedAt);
+  const fenceRecordedAt =
+    recovery === null ? null : exactUtc(recovery.predecessorFence.fenceRecordedAt);
   if (
     binding === null ||
     !Object.isFrozen(value) ||
@@ -1074,6 +1258,10 @@ function parseExpectedInstantiationBinding(
     !exactBytes32(binding.runtimeManifestSha256) ||
     !exactBytes32(binding.policyDigest) ||
     !exactBytes32(binding.reviewedSubjectSha256) ||
+    recovery === null ||
+    executionEnvelopeObservedAt === null ||
+    fenceRecordedAt === null ||
+    executionEnvelopeObservedAt.milliseconds <= fenceRecordedAt.milliseconds ||
     !exactBytes32(binding.envelopeHash) ||
     expiresAt === null ||
     !exactBytes32(binding.instantiationDigest)
@@ -1086,7 +1274,9 @@ function parseExpectedInstantiationBinding(
     runtimeManifestSha256: binding.runtimeManifestSha256,
     policyDigest: binding.policyDigest,
     reviewedSubjectSha256: binding.reviewedSubjectSha256,
+    recovery,
     envelopeHash: binding.envelopeHash,
+    executionEnvelopeObservedAt: executionEnvelopeObservedAt.iso,
     expiresAt: expiresAt.iso,
     instantiationDigest: binding.instantiationDigest
   });
@@ -1096,7 +1286,14 @@ function sameExpectedInstantiationBinding(
   left: BscTestnetPtaWbnbPoolRuntimeReviewExpectedBinding,
   right: BscTestnetPtaWbnbPoolRuntimeReviewExpectedBinding
 ): boolean {
-  return INSTANTIATION_EXPECTED_BINDING_KEYS.every((key) => left[key] === right[key]);
+  const scalarKeys = INSTANTIATION_EXPECTED_BINDING_KEYS.filter((key) => key !== "recovery");
+  return (
+    scalarKeys.every((key) => left[key] === right[key]) &&
+    left.recovery.generation === right.recovery.generation &&
+    PREDECESSOR_FENCE_KEYS.every(
+      (key) => left.recovery.predecessorFence[key] === right.recovery.predecessorFence[key]
+    )
+  );
 }
 
 function consumes(
@@ -1635,8 +1832,9 @@ export async function readBscTestnetPtaWbnbPoolReleaseReviewPolicyFromControllin
 }
 
 /**
- * Exercises only the untrusted v2 transport decoder in adversarial tests. It cannot parse or admit
- * a policy, access the production WeakMap, or create an authority-bearing realm.
+ * Exercises only the untrusted bounded transport decoder (introduced in v2, current domain v3) in
+ * adversarial tests. It cannot parse or admit a policy, access the production WeakMap, or create an
+ * authority-bearing realm.
  */
 export function decodeBscTestnetPtaWbnbPoolReleaseReviewTtyTransportForTestsOnly(
   untrustedEvents: unknown,

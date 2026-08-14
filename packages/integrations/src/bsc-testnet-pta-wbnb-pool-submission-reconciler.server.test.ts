@@ -52,6 +52,7 @@ import {
   reconcileBscTestnetPtaWbnbPoolEvidenceForInternalUse,
   type BscTestnetPtaWbnbPoolPostState,
   type BscTestnetPtaWbnbPoolProviderReconciliationEvidence,
+  type BscTestnetPtaWbnbPoolReconciliationRecoveryDependencies,
   type BscTestnetPtaWbnbPoolReconciliationEvidence,
   type BscTestnetPtaWbnbPoolSubmissionCapability,
   type BscTestnetPtaWbnbPoolSubmissionTestDependencies
@@ -64,6 +65,8 @@ const ENVELOPE_HASH = `0x${"11".repeat(32)}` as Hex;
 const REVIEWER_DIGEST = `0x${"22".repeat(32)}` as Hex;
 const OWNER_DIGEST = `0x${"33".repeat(32)}` as Hex;
 const MANIFEST_DIGEST = `0x${"44".repeat(32)}` as Hex;
+const PREDECESSOR_FENCE_SHA256 = `0x${"45".repeat(32)}` as Hex;
+const ATTEMPT_ID = `0x${"46".repeat(32)}` as Hex;
 const RECEIPT_BLOCK_HASH = `0x${"aa".repeat(32)}` as Hex;
 const RECEIPT_PARENT_HASH = `0x${"bb".repeat(32)}` as Hex;
 const RECEIPT_BLOCK_NUMBER = 100n;
@@ -183,7 +186,7 @@ async function submissionCapability(
     value: 0n
   });
   return Object.freeze({
-    schemaVersion: 1,
+    schemaVersion: 2,
     scope: BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCOPE,
     operation: BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_OPERATION,
     oneShotIntentId: BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
@@ -194,6 +197,12 @@ async function submissionCapability(
     ownerAuthorizationDigest: OWNER_DIGEST,
     releaseCommit: RELEASE_COMMIT,
     runtimeManifestSha256: MANIFEST_DIGEST,
+    recovery: Object.freeze({
+      generation: 2,
+      predecessorState: "superseded_before_worker",
+      predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
+      attemptId: ATTEMPT_ID
+    }),
     authenticatedAt: times.authenticatedAt,
     expiresAt: times.expiresAt,
     signedCommitDurablyVerified: true,
@@ -397,7 +406,7 @@ function evidence(
   capability: BscTestnetPtaWbnbPoolSubmissionCapability
 ): BscTestnetPtaWbnbPoolReconciliationEvidence {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     operation: BSC_TESTNET_PTA_WBNB_POOL_RECONCILIATION_OPERATION,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     transactionHash: capability.transaction.transactionHash,
@@ -412,7 +421,7 @@ function journalState(
   state: "signed_committed" | "submission_started" = "signed_committed"
 ) {
   const body = Object.freeze({
-    schemaVersion: 1,
+    schemaVersion: 2,
     operation: BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_OPERATION,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     claimId: capability.claimId,
@@ -421,12 +430,13 @@ function journalState(
     runtimeManifestSha256: capability.runtimeManifestSha256,
     reviewerApprovalDigest: capability.reviewerApprovalDigest,
     ownerAuthorizationDigest: capability.ownerAuthorizationDigest,
+    recovery: capability.recovery,
     signingHash: capability.transaction.signingHash,
     transactionHash: capability.transaction.transactionHash,
     signedTransactionKeccak256: keccak256(capability.transaction.signedTransaction)
   });
   return Object.freeze({
-    schemaVersion: 1,
+    schemaVersion: 2,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     claimId: capability.claimId,
     envelopeHash: capability.envelopeHash,
@@ -434,12 +444,13 @@ function journalState(
     runtimeManifestSha256: capability.runtimeManifestSha256,
     reviewerApprovalDigest: capability.reviewerApprovalDigest,
     ownerAuthorizationDigest: capability.ownerAuthorizationDigest,
+    recovery: capability.recovery,
     signingHash: capability.transaction.signingHash,
     transactionHash: capability.transaction.transactionHash,
     signedTransactionKeccak256: body.signedTransactionKeccak256,
     submissionStartedDigest: keccak256(
       stringToHex(
-        `proofera.bsc-testnet.pta-wbnb-pool.submission-started.v1\u0000${JSON.stringify(body)}`
+        `proofera.bsc-testnet.pta-wbnb-pool.submission-started.v2\u0000${JSON.stringify(body)}`
       )
     ),
     state
@@ -650,7 +661,6 @@ describe("BSC testnet exact PTA/WBNB submission reconciler", () => {
       expiresAt: "2026-08-13T07:59:30.000Z"
     });
     const exactEvidence = evidence(capability);
-    const start = vi.fn();
     const observe = vi.fn(async () => exactEvidence);
     const commitTerminal = vi.fn(async (request) => ({
       status: request.outcome,
@@ -658,14 +668,14 @@ describe("BSC testnet exact PTA/WBNB submission reconciler", () => {
       submissionStartedDigest: request.submissionStartedDigest,
       transactionHash: request.transactionHash
     }));
+    const terminalJournal = Object.freeze({
+      readState: async () => journalState(capability, "submission_started"),
+      commitTerminalReconciliation: commitTerminal
+    });
     const recovery = createBscTestnetPtaWbnbPoolReconciliationRecoveryCoreForInternalUse({
       now: () => new Date(NOW),
       acquireRecoveryCapability: async () => capability,
-      journal: {
-        readState: async () => journalState(capability, "submission_started"),
-        commitSubmissionStarted: start,
-        commitTerminalReconciliation: commitTerminal
-      },
+      journal: terminalJournal,
       observeExactTransaction: observe
     });
 
@@ -674,7 +684,10 @@ describe("BSC testnet exact PTA/WBNB submission reconciler", () => {
       retryBroadcastAllowed: false,
       reconciliationRetryAllowed: false
     });
-    expect(start).not.toHaveBeenCalled();
+    expect(Object.keys(terminalJournal).sort()).toEqual([
+      "commitTerminalReconciliation",
+      "readState"
+    ]);
     expect(observe).toHaveBeenCalledTimes(1);
     expect(commitTerminal).toHaveBeenCalledTimes(1);
   });
@@ -682,13 +695,11 @@ describe("BSC testnet exact PTA/WBNB submission reconciler", () => {
   it("restart-only core refuses a signed_committed state instead of signing or starting it", async () => {
     const capability = await submissionCapability();
     const observe = vi.fn();
-    const start = vi.fn();
     const recovery = createBscTestnetPtaWbnbPoolReconciliationRecoveryCoreForInternalUse({
       now: () => new Date(NOW),
       acquireRecoveryCapability: async () => capability,
       journal: {
         readState: async () => journalState(capability, "signed_committed"),
-        commitSubmissionStarted: start,
         commitTerminalReconciliation: vi.fn()
       },
       observeExactTransaction: observe
@@ -698,7 +709,27 @@ describe("BSC testnet exact PTA/WBNB submission reconciler", () => {
       status: "do_not_retry",
       issue: { code: "RECOVERY_REQUIRES_DURABLE_SUBMISSION_START" }
     });
-    expect(start).not.toHaveBeenCalled();
+    expect(observe).not.toHaveBeenCalled();
+  });
+
+  it("rejects a restart journal that exposes any submission-start mutator", async () => {
+    const capability = await submissionCapability();
+    const observe = vi.fn();
+    const recovery = createBscTestnetPtaWbnbPoolReconciliationRecoveryCoreForInternalUse({
+      now: () => new Date(NOW),
+      acquireRecoveryCapability: async () => capability,
+      journal: {
+        readState: async () => journalState(capability, "submission_started"),
+        commitTerminalReconciliation: vi.fn(),
+        commitSubmissionStarted: vi.fn()
+      } as unknown as BscTestnetPtaWbnbPoolReconciliationRecoveryDependencies["journal"],
+      observeExactTransaction: observe
+    });
+
+    expect(await recovery.submitAndReconcileOnce()).toMatchObject({
+      status: "do_not_retry",
+      issue: { code: "CONFIGURATION_INVALID" }
+    });
     expect(observe).not.toHaveBeenCalled();
   });
 
@@ -1536,10 +1567,13 @@ describe("BSC testnet exact PTA/WBNB submission reconciler", () => {
 
     const zeroBytes32 = `0x${"00".repeat(32)}`;
     const bindingMutations: unknown[] = [
+      { ...capability, schemaVersion: 1 },
       { ...capability, envelopeHash: zeroBytes32 },
       { ...capability, reviewerApprovalDigest: capability.ownerAuthorizationDigest },
       { ...capability, runtimeManifestSha256: zeroBytes32 },
       { ...capability, releaseCommit: "0".repeat(40) },
+      { ...capability, recovery: { ...capability.recovery, generation: 1 } },
+      { ...capability, recovery: { ...capability.recovery, attemptId: zeroBytes32 } },
       {
         ...capability,
         transaction: { ...capability.transaction, signingHash: zeroBytes32 }

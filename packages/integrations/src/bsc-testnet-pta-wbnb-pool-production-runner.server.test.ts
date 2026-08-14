@@ -4,8 +4,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const harness = vi.hoisted(() => ({
   order: [] as string[],
+  openLegacy: vi.fn(),
   openLocal: vi.fn(),
   openSubmission: vi.fn(),
+  openTerminalSubmission: vi.fn(),
   createBridge: vi.fn(),
   readPolicy: vi.fn(),
   prepare: vi.fn(),
@@ -21,11 +23,15 @@ const harness = vi.hoisted(() => ({
 
 vi.mock("server-only", () => ({}));
 vi.mock("./bsc-testnet-pta-wbnb-pool-local-journal.server", () => ({
+  openExistingWindowsBscTestnetPtaWbnbPoolLegacyLocalJournalForRecoveryForInternalUse:
+    harness.openLegacy,
   openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse: harness.openLocal
 }));
 vi.mock("./bsc-testnet-pta-wbnb-pool-submission-journal.server", () => ({
   openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse:
-    harness.openSubmission
+    harness.openSubmission,
+  openExistingWindowsBscTestnetPtaWbnbPoolSubmissionJournalForTerminalReconciliationForInternalUse:
+    harness.openTerminalSubmission
 }));
 vi.mock("./bsc-testnet-pta-wbnb-pool-signing-worker", () => ({
   createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeForInternalUse: harness.createBridge
@@ -75,12 +81,65 @@ const EMPTY_SUBMISSION = Object.freeze({
   state: Object.freeze({ state: "empty" as const }),
   issue: null
 });
+const LEGACY_CLAIM_RAW_SHA256 =
+  "0xf10e90eb836a94446ace100bbc9a6fc5de6cc35b1d82e4d10fb4736ef8559e32" as const;
+const FENCE = Object.freeze({
+  status: "superseded_before_worker" as const,
+  terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" as const,
+  workerAuthorizationOutcome: "not_attempted" as const,
+  workerStartOutcome: "not_attempted" as const,
+  signatureOutcome: "not_attempted" as const,
+  submissionOutcome: "not_attempted" as const,
+  submissionJournalState: "exact_empty" as const,
+  legacyClaimRawSha256: LEGACY_CLAIM_RAW_SHA256,
+  noEffectProofDigest: `0x${"10".repeat(32)}` as const,
+  noEffectEnvelopeHash: `0x${"11".repeat(32)}` as const,
+  noEffectObservedAt: "2026-08-14T10:00:00.000Z",
+  fenceRecordedAt: "2026-08-14T10:00:01.000Z",
+  predecessorFenceSha256: `0x${"12".repeat(32)}` as const
+});
+const LEGACY_JOURNAL = Object.freeze({
+  readClaimOnlyRecoveryCandidate: vi.fn(async () => null),
+  fenceClaimBeforeWorker: vi.fn(),
+  readState: vi.fn(),
+  readStrictRecoveryState: vi.fn(async () =>
+    Object.freeze({ status: "superseded_before_worker", supersessionFence: FENCE })
+  )
+});
+const LEGACY_FENCED = Object.freeze({
+  status: "opened" as const,
+  journal: LEGACY_JOURNAL,
+  state: Object.freeze({ status: "superseded_before_worker" as const, supersessionFence: FENCE }),
+  issue: null
+});
 const RELEASE = Object.freeze({
   releaseCommit: "1".repeat(40),
   releaseTree: "2".repeat(40),
   runtimeManifest: Object.freeze({ runtimeManifestSha256: `0x${"11".repeat(32)}` })
 });
-const ENVELOPE = Object.freeze({ envelopeHash: `0x${"22".repeat(32)}` });
+function envelope(hashByte: string, observedAt: string) {
+  return Object.freeze({
+    envelopeHash: `0x${hashByte.repeat(32)}`,
+    observation: Object.freeze({
+      observedAt,
+      finalizedBlockNumber: "1",
+      finalizedBlockHash: `0x${"23".repeat(32)}`,
+      finalizedBlockTimestamp: "1",
+      latestNonce: "1" as const,
+      pendingNonce: "1" as const,
+      pendingPool: "0x0000000000000000000000000000000000000000" as const,
+      candidateCode: "0x" as const,
+      candidateNonce: "0" as const,
+      providerAgreementVerified: true as const,
+      allRuntimeIdentitiesVerified: true as const,
+      allEip1967SlotsZero: true as const,
+      allProtocolBindingsVerified: true as const,
+      feeTierVerified: true as const,
+      simulationReturnPool: "0x30b07e82d7181a53Ae2EA98Cd08b6733Ffd831aE" as const
+    })
+  });
+}
+const ENVELOPE = envelope("22", "2026-08-14T10:00:02.000Z");
 const DESCRIPTOR = Object.freeze({
   status: "prepared_non_authorizing" as const,
   envelopeHash: `0x${"22".repeat(32)}`,
@@ -124,6 +183,10 @@ function deferred<Value>(): Readonly<{
 }
 
 function readyFreshPath(): void {
+  harness.openLegacy.mockImplementation(async () => {
+    harness.order.push("legacy-open");
+    return LEGACY_FENCED;
+  });
   harness.openLocal.mockImplementation(async () => {
     harness.order.push("local-open");
     return EMPTY_LOCAL;
@@ -191,10 +254,14 @@ beforeEach(() => {
 });
 
 describe("PTA/WBNB recovery-first production runner", () => {
-  it("completes both read-only opens before release, TTY, RPC, custody, or activation", async () => {
+  it("rereads all three durable namespaces across fence, TTY, activation, and claim boundaries", async () => {
     await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toEqual(FRESH_RESULT);
 
     expect(harness.order).toEqual([
+      "legacy-open",
+      "local-open",
+      "submission-open",
+      "legacy-open",
       "local-open",
       "submission-open",
       "release",
@@ -203,8 +270,17 @@ describe("PTA/WBNB recovery-first production runner", () => {
       "describe-envelope",
       "instantiate-policy",
       "owner-tty",
+      "legacy-open",
+      "local-open",
+      "submission-open",
       "activate-custody-journal",
+      "legacy-open",
+      "local-open",
+      "submission-open",
       "provision-submission-broadcaster",
+      "legacy-open",
+      "local-open",
+      "submission-open",
       "composition-create",
       "composition-run"
     ]);
@@ -212,7 +288,13 @@ describe("PTA/WBNB recovery-first production runner", () => {
     expect(harness.instantiate).toHaveBeenCalledWith(
       Object.freeze({
         envelopeHash: DESCRIPTOR.envelopeHash,
-        expiresAt: DESCRIPTOR.envelopeExpiresAt
+        executionEnvelopeObservedAt: ENVELOPE.observation.observedAt,
+        expiresAt: DESCRIPTOR.envelopeExpiresAt,
+        predecessorFence: expect.objectContaining({
+          predecessorFenceSha256: FENCE.predecessorFenceSha256,
+          fenceRecordedAt: FENCE.fenceRecordedAt,
+          noEffectEnvelopeHash: FENCE.noEffectEnvelopeHash
+        })
       })
     );
     expect(harness.ceremony).toHaveBeenCalledWith(DESCRIPTOR, RUNTIME_INSTANTIATION);
@@ -222,6 +304,7 @@ describe("PTA/WBNB recovery-first production runner", () => {
       expect.objectContaining({
         intent: INTENT,
         executionCapability: EXECUTION_CAPABILITY,
+        legacySigningJournal: LEGACY_JOURNAL,
         signingJournal: SIGNING_JOURNAL,
         submissionJournal: SUBMISSION_JOURNAL,
         broadcaster: BROADCASTER
@@ -229,13 +312,18 @@ describe("PTA/WBNB recovery-first production runner", () => {
     );
   });
 
-  it("waits for both open probes and does not preload policy while either is pending", async () => {
+  it("waits for all three startup probes and does not preload policy while any is pending", async () => {
+    const legacy = deferred<typeof LEGACY_FENCED>();
     const local = deferred<typeof EMPTY_LOCAL>();
     const submission = deferred<typeof EMPTY_SUBMISSION>();
+    harness.openLegacy.mockImplementation(() => legacy.promise);
     harness.openLocal.mockImplementation(() => local.promise);
     harness.openSubmission.mockImplementation(() => submission.promise);
 
     const running = runBscTestnetPtaWbnbPoolProductionOnceFromStdin();
+    await Promise.resolve();
+    expect(harness.readPolicy).not.toHaveBeenCalled();
+    legacy.resolve(LEGACY_FENCED);
     await Promise.resolve();
     expect(harness.readPolicy).not.toHaveBeenCalled();
     local.resolve(EMPTY_LOCAL);
@@ -267,6 +355,156 @@ describe("PTA/WBNB recovery-first production runner", () => {
     expect(harness.createBroadcaster).not.toHaveBeenCalled();
   });
 
+  it("rejects a predecessor fence whose exact-empty submission binding changed", async () => {
+    const invalidFence = Object.freeze({
+      ...FENCE,
+      submissionJournalState: "not_exact_empty"
+    });
+    harness.openLegacy.mockResolvedValue(
+      Object.freeze({
+        status: "opened",
+        journal: LEGACY_JOURNAL,
+        state: Object.freeze({
+          status: "superseded_before_worker",
+          supersessionFence: invalidFence
+        }),
+        issue: null
+      })
+    );
+
+    await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toMatchObject({
+      status: "blocked",
+      code: "PREDECESSOR_NOT_EXACT_CLAIM_ONLY"
+    });
+    expect(harness.createBridge).not.toHaveBeenCalled();
+    expect(harness.readPolicy).not.toHaveBeenCalled();
+    expect(harness.prepare).not.toHaveBeenCalled();
+    expect(harness.activate).not.toHaveBeenCalled();
+    expect(harness.createBroadcaster).not.toHaveBeenCalled();
+  });
+
+  it("returns after snapshot A fencing and permits snapshot B only in the next invocation", async () => {
+    const snapshotA = envelope("31", "2026-08-14T10:00:00.500Z");
+    const fenceA = Object.freeze({ ...FENCE, noEffectEnvelopeHash: snapshotA.envelopeHash });
+    const fencedJournalA = Object.freeze({
+      ...LEGACY_JOURNAL,
+      readStrictRecoveryState: vi.fn(async () =>
+        Object.freeze({ status: "superseded_before_worker", supersessionFence: fenceA })
+      )
+    });
+    const fencedA = Object.freeze({
+      status: "opened" as const,
+      journal: fencedJournalA,
+      state: Object.freeze({
+        status: "superseded_before_worker" as const,
+        supersessionFence: fenceA
+      }),
+      issue: null
+    });
+    const candidate = Object.freeze({
+      status: "claimed" as const,
+      legacyClaimRawSha256: LEGACY_CLAIM_RAW_SHA256,
+      legacyClaimRecordedAt: "2026-08-14T09:59:00.000Z",
+      legacyAuthorizationExpiresAt: "2026-08-14T10:00:00.250Z"
+    });
+    const claimJournal = Object.freeze({
+      readClaimOnlyRecoveryCandidate: vi.fn(async () => candidate),
+      fenceClaimBeforeWorker: vi.fn(async () => fenceA),
+      readState: vi.fn(),
+      readStrictRecoveryState: vi.fn()
+    });
+    const claimOnly = Object.freeze({
+      status: "opened" as const,
+      journal: claimJournal,
+      state: Object.freeze({ status: "claimed" as const, supersessionFence: null }),
+      issue: null
+    });
+    harness.openLegacy
+      .mockResolvedValueOnce(claimOnly)
+      .mockResolvedValueOnce(claimOnly)
+      .mockResolvedValue(fencedA);
+    harness.prepare
+      .mockResolvedValueOnce(Object.freeze({ status: "observed" as const, envelope: snapshotA }))
+      .mockResolvedValueOnce(Object.freeze({ status: "observed" as const, envelope: ENVELOPE }));
+
+    await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toMatchObject({
+      status: "blocked",
+      code: "PREDECESSOR_FENCE_RECORDED_RESTART_REQUIRED"
+    });
+    expect(harness.prepare).toHaveBeenCalledTimes(1);
+    expect(harness.createBridge).not.toHaveBeenCalled();
+    expect(harness.readPolicy).not.toHaveBeenCalled();
+    expect(harness.instantiate).not.toHaveBeenCalled();
+    expect(harness.ceremony).not.toHaveBeenCalled();
+    expect(harness.activate).not.toHaveBeenCalled();
+    expect(harness.createBroadcaster).not.toHaveBeenCalled();
+    expect(harness.createComposition).not.toHaveBeenCalled();
+    expect(harness.runComposition).not.toHaveBeenCalled();
+    expect(claimJournal.fenceClaimBeforeWorker).toHaveBeenCalledWith(
+      expect.objectContaining({
+        expectedLegacyClaimRawSha256: LEGACY_CLAIM_RAW_SHA256,
+        proof: expect.objectContaining({
+          envelopeHash: snapshotA.envelopeHash,
+          observedAt: snapshotA.observation.observedAt,
+          submissionJournalPresence: "absent"
+        })
+      })
+    );
+
+    harness.order.splice(0);
+    await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toEqual(FRESH_RESULT);
+    expect(harness.prepare).toHaveBeenCalledTimes(2);
+    expect(harness.instantiate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        envelopeHash: ENVELOPE.envelopeHash,
+        executionEnvelopeObservedAt: ENVELOPE.observation.observedAt,
+        predecessorFence: expect.objectContaining({
+          noEffectEnvelopeHash: snapshotA.envelopeHash,
+          fenceRecordedAt: fenceA.fenceRecordedAt
+        })
+      })
+    );
+    expect(harness.createBridge.mock.invocationCallOrder[0]).toBeLessThan(
+      harness.prepare.mock.invocationCallOrder[1] ?? Number.NaN
+    );
+  });
+
+  it("blocks when execution snapshot B is not strictly after the retained fence", async () => {
+    harness.prepare.mockResolvedValueOnce(
+      Object.freeze({
+        status: "observed" as const,
+        envelope: envelope("22", FENCE.fenceRecordedAt)
+      })
+    );
+    await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toMatchObject({
+      status: "blocked",
+      code: "EXECUTION_ENVELOPE_NOT_AFTER_FENCE"
+    });
+    expect(harness.instantiate).not.toHaveBeenCalled();
+    expect(harness.ceremony).not.toHaveBeenCalled();
+    expect(harness.activate).not.toHaveBeenCalled();
+  });
+
+  it("rejects active-journal drift after owner TTY before custody activation", async () => {
+    const changedActive = Object.freeze({
+      status: "opened" as const,
+      journal: Object.freeze({ readState: vi.fn(), readStrictRecoveryState: vi.fn() }),
+      state: Object.freeze({ status: "claimed" as const }),
+      issue: null
+    });
+    harness.openLocal
+      .mockResolvedValueOnce(EMPTY_LOCAL)
+      .mockResolvedValueOnce(EMPTY_LOCAL)
+      .mockResolvedValueOnce(changedActive);
+    await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toMatchObject({
+      status: "blocked",
+      code: "POST_OWNER_DURABLE_STATE_CHANGED"
+    });
+    expect(harness.ceremony).toHaveBeenCalledTimes(1);
+    expect(harness.activate).not.toHaveBeenCalled();
+    expect(harness.createBroadcaster).not.toHaveBeenCalled();
+  });
+
   it("uses an opened matching pair only for reconciliation and never enters fresh authority", async () => {
     const localJournal = Object.freeze({});
     const submissionJournal = Object.freeze({});
@@ -281,11 +519,87 @@ describe("PTA/WBNB recovery-first production runner", () => {
     );
 
     await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toEqual(FRESH_RESULT);
-    expect(harness.reconcile).toHaveBeenCalledWith(localJournal, submissionJournal);
+    expect(harness.reconcile).toHaveBeenCalledWith(localJournal, submissionJournal, null);
     expect(harness.createBridge).not.toHaveBeenCalled();
     expect(harness.readPolicy).not.toHaveBeenCalled();
     expect(harness.activate).not.toHaveBeenCalled();
     expect(harness.createBroadcaster).not.toHaveBeenCalled();
+  });
+
+  it("reopens a started submission through only the terminal-reconciliation facade", async () => {
+    const localJournal = Object.freeze({});
+    const submissionReader = Object.freeze({
+      readRecoveryState: vi.fn(),
+      readStrictRecoveryState: vi.fn()
+    });
+    const submissionState = Object.freeze({ state: "submission_started" as const });
+    const terminalJournal = Object.freeze({
+      readState: vi.fn(),
+      commitTerminalReconciliation: vi.fn()
+    });
+    harness.openLocal.mockResolvedValueOnce(
+      Object.freeze({ status: "opened", journal: localJournal, state: {}, issue: null })
+    );
+    harness.openSubmission.mockResolvedValueOnce(
+      Object.freeze({
+        status: "opened",
+        journal: submissionReader,
+        state: submissionState,
+        issue: null
+      })
+    );
+    harness.openTerminalSubmission.mockResolvedValueOnce(
+      Object.freeze({
+        status: "opened",
+        journal: terminalJournal,
+        state: submissionState,
+        issue: null
+      })
+    );
+    harness.reconcile.mockResolvedValueOnce(
+      Object.freeze({ status: "handled", result: FRESH_RESULT })
+    );
+
+    await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toEqual(FRESH_RESULT);
+    expect(harness.openTerminalSubmission).toHaveBeenCalledWith(submissionState);
+    expect(Object.keys(submissionReader).sort()).toEqual([
+      "readRecoveryState",
+      "readStrictRecoveryState"
+    ]);
+    expect(Object.keys(terminalJournal).sort()).toEqual([
+      "commitTerminalReconciliation",
+      "readState"
+    ]);
+    expect(harness.reconcile).toHaveBeenCalledWith(localJournal, submissionReader, terminalJournal);
+    expect(harness.createBridge).not.toHaveBeenCalled();
+  });
+
+  it("blocks when the started state changes before the terminal-only reopen", async () => {
+    const submissionState = Object.freeze({ state: "unknown_outcome" as const });
+    harness.openLocal.mockResolvedValueOnce(
+      Object.freeze({ status: "opened", journal: Object.freeze({}), state: {}, issue: null })
+    );
+    harness.openSubmission.mockResolvedValueOnce(
+      Object.freeze({
+        status: "opened",
+        journal: Object.freeze({
+          readRecoveryState: vi.fn(),
+          readStrictRecoveryState: vi.fn()
+        }),
+        state: submissionState,
+        issue: null
+      })
+    );
+    harness.openTerminalSubmission.mockResolvedValueOnce(
+      Object.freeze({ status: "blocked", journal: null, state: null, issue: {} })
+    );
+
+    await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toMatchObject({
+      status: "blocked",
+      code: "TERMINAL_RECOVERY_JOURNAL_INVALID"
+    });
+    expect(harness.reconcile).not.toHaveBeenCalled();
+    expect(harness.createBridge).not.toHaveBeenCalled();
   });
 
   it.each(["confirmed", "reverted"] as const)(
@@ -315,7 +629,7 @@ describe("PTA/WBNB recovery-first production runner", () => {
       await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toEqual(
         terminalResult
       );
-      expect(harness.reconcile).toHaveBeenCalledWith(localJournal, submissionJournal);
+      expect(harness.reconcile).toHaveBeenCalledWith(localJournal, submissionJournal, null);
       expect(harness.createBridge).not.toHaveBeenCalled();
       expect(harness.readPolicy).not.toHaveBeenCalled();
       expect(harness.prepare).not.toHaveBeenCalled();
