@@ -115,7 +115,10 @@ function policyBody(release = releaseIdentity()): PolicyBody {
       maximumGasLimit: "6000000" as const,
       maximumGasPriceWei: "3000000000" as const,
       maximumTotalCostWei: "18000000000000000" as const,
-      maximumEnvelopeLifetimeSeconds: "45" as const
+      maximumEnvelopeLifetimeSeconds: "300" as const,
+      maximumOwnerConfirmationWindowSeconds: "240" as const,
+      maximumExecutionAuthorityLifetimeSeconds: "45" as const,
+      maximumPostClaimRecheckAgeSeconds: "30" as const
     }),
     scope: Object.freeze({
       exactFreshEnvelopeRequired: true as const,
@@ -311,7 +314,10 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
         maximumGasLimit: "6000000",
         maximumGasPriceWei: "3000000000",
         maximumTotalCostWei: "18000000000000000",
-        maximumEnvelopeLifetimeSeconds: "45"
+        maximumEnvelopeLifetimeSeconds: "300",
+        maximumOwnerConfirmationWindowSeconds: "240",
+        maximumExecutionAuthorityLifetimeSeconds: "45",
+        maximumPostClaimRecheckAgeSeconds: "30"
       },
       scope: {
         maximumSignatureCount: "1",
@@ -412,6 +418,18 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
         (record.caps as Record<string, unknown>).maximumGasLimit = "6000001";
       },
       (record) => {
+        (record.caps as Record<string, unknown>).maximumEnvelopeLifetimeSeconds = "45";
+      },
+      (record) => {
+        (record.caps as Record<string, unknown>).maximumOwnerConfirmationWindowSeconds = "241";
+      },
+      (record) => {
+        (record.caps as Record<string, unknown>).maximumExecutionAuthorityLifetimeSeconds = "46";
+      },
+      (record) => {
+        (record.caps as Record<string, unknown>).maximumPostClaimRecheckAgeSeconds = "31";
+      },
+      (record) => {
         (record.scope as Record<string, unknown>).lpPositionMintAuthorized = true;
       },
       (record) => {
@@ -431,6 +449,17 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
         realm(resealPolicy(record, BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_POLICY_DIGEST_DOMAIN))
       ).toBeNull();
     }
+  });
+
+  it("rejects the incompatible v1 exact-key caps revision that omits the three new bounds", () => {
+    const legacy = decodedPolicy(serialize());
+    const caps = legacy.caps as Record<string, unknown>;
+    delete caps.maximumOwnerConfirmationWindowSeconds;
+    delete caps.maximumExecutionAuthorityLifetimeSeconds;
+    delete caps.maximumPostClaimRecheckAgeSeconds;
+    expect(
+      realm(resealPolicy(legacy, BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_POLICY_DIGEST_DOMAIN))
+    ).toBeNull();
   });
 
   it("requires a deeply frozen, exact and ordered schema-v2 expected manifest", () => {
@@ -568,10 +597,22 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
       admission.instantiate(
         Object.freeze({
           envelopeHash: ENVELOPE_HASH,
-          expiresAt: "2026-08-13T08:00:45.001Z"
+          expiresAt: "2026-08-13T08:05:00.001Z"
         })
       )
     ).toBeNull();
+
+    const maximumAdmission = realm(serialize(), releaseIdentity(), clock);
+    expect(maximumAdmission).not.toBeNull();
+    if (maximumAdmission === null) throw new Error("expected realm");
+    expect(
+      maximumAdmission.instantiate(
+        Object.freeze({
+          envelopeHash: ENVELOPE_HASH,
+          expiresAt: "2026-08-13T08:05:00.000Z"
+        })
+      )
+    ).not.toBeNull();
 
     const secondAdmission = realm(serialize(), releaseIdentity(), clock);
     expect(secondAdmission).not.toBeNull();

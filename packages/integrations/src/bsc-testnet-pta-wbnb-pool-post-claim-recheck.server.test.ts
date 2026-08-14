@@ -67,7 +67,7 @@ function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
     ownerAuthorizationDigest: OWNER_DIGEST,
     releaseCommit: RELEASE,
     runtimeManifestSha256: MANIFEST,
-    authenticatedAt: "2026-08-13T04:29:50.000Z",
+    authenticatedAt: "2026-08-13T04:29:45.000Z",
     expiresAt: "2026-08-13T04:30:30.000Z",
     transaction: transaction()
   });

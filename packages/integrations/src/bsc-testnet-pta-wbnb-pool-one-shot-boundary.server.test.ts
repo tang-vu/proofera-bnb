@@ -227,7 +227,7 @@ describe("PTA/WBNB durable one-shot boundary specification", () => {
         observedAt: "2026-08-13T10:00:31.000Z"
       }),
       caps: refreshed.caps,
-      expiresAt: "2026-08-13T10:01:16.000Z",
+      expiresAt: "2026-08-13T10:05:31.000Z",
       raceBoundary: refreshed.raceBoundary,
       authorization: refreshed.authorization
     };
@@ -253,6 +253,26 @@ describe("PTA/WBNB durable one-shot boundary specification", () => {
     }
     expect(secondDescriptor.envelopeHash).not.toBe(firstDescriptor.envelopeHash);
     expect(secondDescriptor.operationKey).toBe(firstDescriptor.operationKey);
+  });
+
+  it("requires the exact 300-second envelope lifetime", async () => {
+    const exact = await envelope();
+    expect(
+      describeBscTestnetPtaWbnbPoolOneShotBoundary(
+        exact,
+        () => new Date("2026-08-13T10:00:40.000Z")
+      )
+    ).toMatchObject({ status: "prepared_non_authorizing" });
+
+    const extended = rehash(
+      Object.freeze({ ...deepFrozenClone(exact), expiresAt: "2026-08-13T10:05:30.001Z" })
+    );
+    expect(
+      describeBscTestnetPtaWbnbPoolOneShotBoundary(
+        extended,
+        () => new Date("2026-08-13T10:00:40.000Z")
+      )
+    ).toMatchObject({ status: "blocked", reason: "invalid_envelope" });
   });
 
   it("rejects a recomputed-hash forgery in every nested exact boundary", async () => {
@@ -287,7 +307,7 @@ describe("PTA/WBNB durable one-shot boundary specification", () => {
     expect(
       describeBscTestnetPtaWbnbPoolOneShotBoundary(
         original,
-        () => new Date("2026-08-13T10:01:15.000Z")
+        () => new Date("2026-08-13T10:05:30.000Z")
       )
     ).toMatchObject({ status: "blocked", reason: "expired_envelope" });
 

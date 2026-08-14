@@ -331,7 +331,7 @@ describe("BSC testnet PTA/WBNB pool coordinator", () => {
         blockchainWritePerformed: false
       }
     });
-    expect(result.envelope.expiresAt).toBe("2026-08-13T10:01:15.000Z");
+    expect(result.envelope.expiresAt).toBe("2026-08-13T10:05:30.000Z");
     expect(execution.primary.calls.slice(1, 3)).toEqual([
       { method: "eth_getBlockByNumber", params: ["finalized", false] },
       {

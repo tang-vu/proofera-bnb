@@ -1,9 +1,11 @@
 # PancakeSwap V3 BSC testnet PTA/WBNB pool readiness
 
-Updated: 2026-08-13. Decision: **exact offline provenance, a non-authorizing read-only
+Updated: 2026-08-14. Decision: **exact offline provenance, a non-authorizing read-only
 preflight, an old-scope unsent request, an owner-designated internal multi-agent technical decision
-for `bc7000e`, and a recovery-first exact-policy/owner-gated production path are recorded; no final
-policy for the current release, owner transaction approval, pool, or write exists**.
+for `bc7000e`, and a recovery-first exact-policy/owner-gated production path are recorded. An exact
+`36f6e5e7` policy was admitted through TTY v2 but received no exact owner confirmation and became
+historical after the timing source changed; this preparation record supplies no matching policy and
+records no owner transaction approval, pool, or write**.
 
 Machine record:
 [`evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json`](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json)
@@ -182,7 +184,9 @@ hashes prove local integrity only. They do not authenticate a reviewer.
 The request predates and excludes the post-claim recheck and submission/reconciliation files. It has
 not been sent, accepted, or approved and is not used to claim an external, Sigstore-authenticated, or
 third-party review. It cannot review the later subject, substitute for exact owner authorization, or
-authorize custody access, signing, broadcast, or an onchain write.
+authorize custody access, signing, broadcast, or an onchain write. Its generator, test, and retained
+artifact pin the historical 45-second envelope cap and are not a producer or evidence source for the
+revised runtime timing contract.
 
 ## Owner-designated internal multi-agent technical review
 
@@ -214,7 +218,7 @@ requires matching latest/pending nonce and empty-pool state, candidate code/nonc
 zero-value initializer simulation returning the conditional address, two-provider agreement, sender
 balance, and fixed estimate/gas-price/total-cost caps.
 
-On success it can create only a 45-second, digest-bound unsigned observation envelope whose
+On success it can create only an exact 300-second, digest-bound unsigned observation envelope whose
 `signingReady`, `signingAuthorized`, and `executionAuthorized` flags are always false. The one-shot
 boundary validates that envelope and still accepts no custody, journal, signer, transport, or
 broadcast dependency.
@@ -272,6 +276,17 @@ operating-system CSPRNG, and accepts only the exact digest-bound confirmation by
 window closes. The ceremony does not use argv, environment, temporary files, shell, logger, custody,
 RPC writes, signer, or broadcaster. Challenge generation alone mints no authority.
 
+The current timing contract separates four clocks: an exact `300`-second envelope, at most `240`
+seconds for owner entry, an exact `45`-second execution-authority lifetime, and a `30`-second post-claim
+recheck freshness bound. The owner deadline is
+`min(challengeIssuedAt + 240 seconds, envelopeExpiresAt - 45 seconds)`, which preserves the complete
+execution reserve. The owner transaction-authorization and exact-byte-confirmation domains are v4.
+The bytes bind `challengeIssuedAt`, `confirmationNotAfter`, the 45-second lifetime, and its
+deterministic derivation rule; they do not claim future clock values. Only after an exact byte match
+does the internal clock capture actual `confirmedAt`, and the `WeakMap`-branded
+`execute_exact_bsc_testnet_pta_wbnb_pool_once_v4` command binds that timestamp and
+`executionExpiresAt = confirmedAt + 45 seconds`.
+
 The native bridge holds a current-user fixed-custody-path/ACL capability, ceremony-command brand, and
 execution-capability state inside one closure. Before durable `worker_started`, its custody probe checks
 only fixed paths, `lstat`/file kind, `realpath`, and current-user ACL. It does not open the custody
@@ -315,10 +330,28 @@ missing/duplicate/reordered chunks, malformed terminators, and buffered trailing
 admission, fresh RPC, custody access, or owner authority. This invariant does not
 prove that the OS queue had no earlier input and does not protect against malicious same-user preload.
 
+A later exact v2 exercise used audited release commit
+`36f6e5e7fa8b4b5ccf255a6210afa2d25c25afa5`, tree
+`54ed5c2a8f754e79080528a2ce25669a6532a66b`, runtime-manifest SHA-256
+`0x25e5aedb6d73e6fff416803ce9d42737d9124e525e0b81bf906321f4d06258d4`, and canonical policy digest
+`0xd1a33479a607d744a51ff8d6d3df8772f41ec2f1363911d2655f926c754c3b38`. The strict TTY-v2 reader
+admitted the policy. Recovery probes found both signing and submission journals absent; fresh read-only
+preflight against the two fixed official RPCs succeeded and the exact owner challenge was displayed.
+No exact owner confirmation was accepted. Subsequent attempts stopped fail-closed with
+`POLICY_FRAME_INVALID`, `CEREMONY_IO_FAILED`, and `OWNER_CONFIRMATION_INVALID`. Across those exercises
+there was no custody-artifact access, DPAPI operation, custody unlock, signature, new transaction hash,
+send or broadcast, receipt, pool, or liquidity. The timing source then changed, making this exact
+triplet and policy historical and non-authorizing for the current source. This was a one-off local
+terminal observation. Its raw output and harness were not retained, so it is not reproducible
+repository evidence or a gate. The negative custody/sign/send statements reflect the observed
+fail-closed result plus code ordering, not a retained artifact.
+
 A separate local post-claim recheck core requires the authorization gate's authenticated private
 intent before making any read. It compares only the two fixed official RPC origins, finds a common
 finalized block, uses EIP-1898 `requireCanonical`, and repeats chain, nonce, empty-pool, empty-candidate,
-sender-code, simulation, balance, gas, cost, authorization-expiry and 30-second completion bounds. Its
+sender-code, simulation, balance, gas, cost, exact execution expiry, and 30-second refreshed-observation
+freshness bounds. Its refreshed observation/authentication timestamp must be at or after actual
+`confirmedAt` while preserving the same `executionExpiresAt`. Its
 opaque in-memory capability is bound to the exact claim and intent; cloned or proxy values are not
 accepted. Seventeen focused tests exercise that behavior and its failure boundaries.
 
@@ -372,9 +405,10 @@ independence, or protection from two colluding/identically faulty Byzantine prov
 child wires these controls to a closure-private sender; the public worker and generic raw sender remain
 unavailable. Every release containing this path must have a committed and pushed identity, then its exact
 commit/tree/full runtime manifest must receive new owner-designated audits and a matching policy before
-the owner enters the separate exact TTY confirmation. This document supplies no such policy/confirmation,
-signature, send, transaction receipt, pool or LP position exists. These changed files are not covered
-by the old external-review request or retained `bc7000e` decision.
+the owner enters the separate exact TTY confirmation. This document records the historical admitted
+`36f6e5e7` policy but supplies no matching policy or confirmation for the current timing-changed source;
+no signature, send, transaction receipt, pool, or LP position exists. These changed files are not covered
+by the old external-review request, retained `bc7000e` decision, or now-stale `36f6e5e7` policy.
 
 ## Separate proposed liquidity envelope
 
@@ -390,8 +424,8 @@ The two write decisions stay separate:
    broadcast window, durable one-shot claim/submission journal, a new exact owner-designated
    distinct-agent technical decision and canonical policy for the exact final release, exact owner
    authorization through the bounded TTY ceremony, receipt, exact logs, and post-state
-   reconciliation. This preparation record supplies none of those release, authority, or transaction
-   outputs.
+   reconciliation. The historical `36f6e5e7` release/policy no longer matches the timing source; this
+   preparation record supplies none of those current authority or transaction outputs.
 2. Only after the pool is independently re-reviewed may an LP mint be prepared. It requires separate
    bounded token approvals, explicit ticks/amounts/minima/deadline/slippage, owner/revoke authority,
    simulation, user confirmation, and receipt evidence.
@@ -405,12 +439,15 @@ The two write decisions stay separate:
   journal/recovery/ancestry delta. Local implementation review does not replace that release-bound
   decision. Do not describe this lane as external, Sigstore-authenticated or third-party review. The
   old eight-file unsent request, public Gist and byte-exact re-fetch provide no review for later code.
+  Its generator, test, and artifact remain pinned to the historical 45-second envelope and are not
+  timing evidence for the revised `300`/`240`/`45`/`30` contract.
 - Obtain a distinct exact owner authorization. Neither the request nor a future reviewer decision can
   substitute for it.
 - Generate the canonical v2 runtime policy only after the final commit is pushed and two designated
   read-only agents approve its exact commit/tree/full manifest. Use that exact triplet only with the
   absolute PowerShell phase-minus-one command; never substitute direct Node, the blocked pnpm wrapper,
-  placeholder values, or the historical v1 triplet/policy.
+  placeholder values, the historical v1 triplet/policy, or the admitted but now-stale `36f6e5e7`
+  triplet/policy.
   Admit the matching policy through the strict nonce-bound v2 `BEGIN`/ordered `CHUNK`/`END` TTY phase.
   Then require the owner's exact second-phase confirmation; neither gate may be inferred from repository
   contents, chat, digests, or journal state. The
@@ -428,9 +465,10 @@ and a read-only non-authorizing preflight plus a phase-minus-one/phase-zero, exa
 recovery/signing/submission/reconciliation path are implemented. The owner-designated internal technical-review
 gate is complete only for the exact `bc7000e` nonexecuting subject, not this changed release until its
 final commit is pushed and receives new exact audits. **No authenticated external/third-party review is
-claimed. This preparation record contains no audited v2 release triplet, matching runtime policy, exact
-owner transaction approval, signature, send, receipt, PTA/WBNB pool, liquidity, oracle, position,
-Pancake write, or autonomous-execution evidence**.
+claimed. The exact `36f6e5e7` v2 triplet and policy admission are historical, non-authorizing records;
+this preparation record contains no matching policy for the current timing-changed source, exact owner
+transaction approval, signature, send, receipt, PTA/WBNB pool, liquidity, oracle, position, Pancake
+write, or autonomous-execution evidence**.
 
 The machine record is linked to the retained
 [bounded public-result RPC transcript](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json)

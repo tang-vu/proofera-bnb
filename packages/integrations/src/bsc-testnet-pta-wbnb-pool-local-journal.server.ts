@@ -11,6 +11,7 @@ import { keccak256, type Address, type Hex } from "viem";
 
 import { runPinnedPowerShellForInternalUse } from "./bsc-testnet-deployer-custody-windows.server";
 import {
+  BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_LIMIT,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_PRICE_WEI,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_TOTAL_COST_WEI,
@@ -30,7 +31,8 @@ const JOURNAL_SUBDIRECTORY = ["ProofEra", "operations", "bsc-testnet-pta-wbnb-po
 const SCHEMA_VERSION = "bsc_testnet_pta_wbnb_pool_local_journal_v1" as const;
 const AUTHORIZATION_KIND = "exact_pta_wbnb_pool_initialization_user_authorization_v1" as const;
 const MAXIMUM_RECORD_BYTES = 32_768;
-const MAXIMUM_AUTHORIZATION_LIFETIME_MILLISECONDS = 5 * 60 * 1_000;
+const MAXIMUM_AUTHORIZATION_LIFETIME_MILLISECONDS =
+  BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS * 1_000;
 const BYTES32 = /^0x[0-9a-f]{64}$/u;
 const RAW_TRANSACTION = /^0x[0-9a-f]+$/u;
 const CANONICAL_UINT = /^(?:0|[1-9][0-9]*)$/u;
@@ -419,6 +421,7 @@ function inspectClaimRequest(
     expiresAt === null ||
     (nowMilliseconds !== null && authorizedMilliseconds > nowMilliseconds) ||
     (nowMilliseconds !== null && expiresMilliseconds <= nowMilliseconds) ||
+    expiresMilliseconds <= authorizedMilliseconds ||
     expiresMilliseconds - authorizedMilliseconds > MAXIMUM_AUTHORIZATION_LIFETIME_MILLISECONDS
   ) {
     return null;

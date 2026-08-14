@@ -18,11 +18,11 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE,
   BSC_TESTNET_PTA_WBNB_POOL_CHAIN_ID,
   BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN,
+  BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_KECCAK256,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_SELECTOR,
-  BSC_TESTNET_PTA_WBNB_POOL_ENVELOPE_LIFETIME_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_ESTIMATE,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_LIMIT,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_PRICE_WEI,
@@ -679,9 +679,8 @@ export function parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse(
     root.scope !== "owner_designated_internal_release_policy_and_exact_owner_pool_initialization" ||
     root.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
     transaction.sourceEnvelopeHash !== envelopeHash ||
-    authenticatedAt.milliseconds >= expiresAt.milliseconds ||
-    expiresAt.milliseconds - authenticatedAt.milliseconds >
-      BSC_TESTNET_PTA_WBNB_POOL_ENVELOPE_LIFETIME_SECONDS * 1_000
+    expiresAt.milliseconds - authenticatedAt.milliseconds !==
+      BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS * 1_000
   ) {
     return null;
   }
@@ -902,20 +901,28 @@ export function validateBscTestnetPtaWbnbPoolFreshRecheckCapability(
         issue: issue("CAPABILITY_EXPIRED", "capability.expiresAt", "Capability has expired.")
       });
     }
-    const authorizedExpiry = canonicalUtc(expected.authorizedIntent.expiresAt);
+    const authorizedIntent = parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse(
+      expected.authorizedIntent
+    );
+    const authorizedAt =
+      authorizedIntent === null ? null : canonicalUtc(authorizedIntent.authenticatedAt);
+    const authorizedExpiry =
+      authorizedIntent === null ? null : canonicalUtc(authorizedIntent.expiresAt);
     if (
+      authorizedIntent === null ||
+      authorizedAt === null ||
       authorizedExpiry === null ||
-      capability.operationKey !== expected.authorizedIntent.operationKey ||
-      capability.envelopeHash !== expected.authorizedIntent.envelopeHash ||
-      capability.releaseCommit !== expected.authorizedIntent.releaseCommit ||
-      capability.runtimeManifestSha256 !== expected.authorizedIntent.runtimeManifestSha256 ||
-      capability.reviewerApprovalDigest !== expected.authorizedIntent.reviewerApprovalDigest ||
-      capability.ownerAuthorizationDigest !== expected.authorizedIntent.ownerAuthorizationDigest ||
+      capability.operationKey !== authorizedIntent.operationKey ||
+      capability.envelopeHash !== authorizedIntent.envelopeHash ||
+      capability.releaseCommit !== authorizedIntent.releaseCommit ||
+      capability.runtimeManifestSha256 !== authorizedIntent.runtimeManifestSha256 ||
+      capability.reviewerApprovalDigest !== authorizedIntent.reviewerApprovalDigest ||
+      capability.ownerAuthorizationDigest !== authorizedIntent.ownerAuthorizationDigest ||
       capability.claimId !== expectedClaimId ||
-      capability.transaction.sourceEnvelopeHash !== expected.authorizedIntent.envelopeHash ||
-      JSON.stringify(capability.transaction) !==
-        JSON.stringify(expected.authorizedIntent.transaction) ||
-      expiresAt.milliseconds > authorizedExpiry.milliseconds
+      capability.transaction.sourceEnvelopeHash !== authorizedIntent.envelopeHash ||
+      JSON.stringify(capability.transaction) !== JSON.stringify(authorizedIntent.transaction) ||
+      authenticatedAt.milliseconds < authorizedAt.milliseconds ||
+      expiresAt.milliseconds !== authorizedExpiry.milliseconds
     ) {
       return Object.freeze({
         status: "invalid" as const,
@@ -1016,6 +1023,8 @@ function inspectWorkerRequest(input: unknown): BscTestnetPtaWbnbPoolSigningWorke
     root.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
     root.requestHashDomain !== BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_REQUEST_HASH_DOMAIN ||
     authenticatedAt.milliseconds >= expiresAt.milliseconds ||
+    expiresAt.milliseconds - authenticatedAt.milliseconds >
+      BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS * 1_000 ||
     transaction.sourceEnvelopeHash === `0x${"00".repeat(32)}`
   ) {
     return null;

@@ -80,7 +80,7 @@ const POLICY_REVIEWED_AT = "2026-08-13T04:20:00.000Z";
 const INSTANTIATED_AT = "2026-08-13T04:29:50.000Z";
 const AUTHORIZED_AT = "2026-08-13T04:29:55.000Z";
 const NOW = "2026-08-13T04:30:00.000Z";
-const EXPIRES_AT = "2026-08-13T04:30:30.000Z";
+const EXPIRES_AT = "2026-08-13T04:35:00.000Z";
 const POLICY_EXPIRES_AT = "2026-08-13T05:00:00.000Z";
 
 function deeplyFreeze<Value>(value: Value): Readonly<Value> {
@@ -91,7 +91,9 @@ function deeplyFreeze<Value>(value: Value): Readonly<Value> {
   return value;
 }
 
-function descriptor(): BscTestnetPtaWbnbPoolOneShotPreparedDescriptor {
+function descriptor(
+  envelopeExpiresAt = EXPIRES_AT
+): BscTestnetPtaWbnbPoolOneShotPreparedDescriptor {
   return deeplyFreeze({
     status: "prepared_non_authorizing",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -108,7 +110,7 @@ function descriptor(): BscTestnetPtaWbnbPoolOneShotPreparedDescriptor {
       gasLimit: 5_983_857n,
       gasPriceWei: 100_000_000n
     },
-    envelopeExpiresAt: EXPIRES_AT,
+    envelopeExpiresAt,
     signingReady: false,
     signingAuthorized: false,
     executionAuthorized: false,
@@ -208,12 +210,16 @@ function commandFor(
     AUTHORIZED_AT
   );
   if (challenge === null) throw new Error("Challenge fixture failed.");
+  const confirmedAt = NOW;
+  const executionExpiresAt = new Date(Date.parse(confirmedAt) + 45_000).toISOString();
   return deeplyFreeze({
-    schemaVersion: 1,
-    kind: "execute_exact_bsc_testnet_pta_wbnb_pool_once_v1",
+    schemaVersion: 4,
+    kind: "execute_exact_bsc_testnet_pta_wbnb_pool_once_v4",
     executionFlag: BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_EXECUTION_FLAG,
     runtimeReviewInstantiation: instantiation,
-    authorizedAt: AUTHORIZED_AT,
+    challengeIssuedAt: AUTHORIZED_AT,
+    confirmedAt,
+    executionExpiresAt,
     ceremonyNonce: CEREMONY_NONCE,
     ownerAuthorizationText: challenge.ownerAuthorizationText,
     ownerAuthorizationTextSha256: challenge.ownerAuthorizationTextSha256
@@ -222,12 +228,13 @@ function commandFor(
 
 async function confirmedCommand(
   instantiation: BscTestnetPtaWbnbPoolRuntimeReviewInstantiation,
-  releaseTrust: BscTestnetPtaWbnbPoolSigningWorkerReleaseTrust
+  releaseTrust: BscTestnetPtaWbnbPoolSigningWorkerReleaseTrust,
+  exactDescriptor = descriptor()
 ) {
   let displayed = "";
   let clock = Date.parse(AUTHORIZED_AT);
   const result = await conductBscTestnetPtaWbnbPoolOwnerCeremonyForInternalUse(
-    descriptor(),
+    exactDescriptor,
     instantiation,
     releaseTrust,
     RELEASE_TREE,
@@ -252,16 +259,18 @@ async function confirmedCommand(
 
 async function authorizedHarness(now: () => Date = () => new Date(NOW)) {
   const setup = harness(now);
+  const exactDescriptor = descriptor();
   const instantiation = runtimeReview();
-  const command = await confirmedCommand(instantiation, setup.releaseTrust);
-  const authorization = setup.authority.authorize(descriptor(), command, setup.localCapability);
+  const command = await confirmedCommand(instantiation, setup.releaseTrust, exactDescriptor);
+  const authorization = setup.authority.authorize(exactDescriptor, command, setup.localCapability);
   if (authorization.status !== "authorized") throw new Error(authorization.issue.message);
   return { ...setup, authorization };
 }
 
 function signingRequest(
   authorization: Extract<BscTestnetPtaWbnbPoolProductionAuthorityResult, { status: "authorized" }>,
-  claimId = "claim-authority-capability-1"
+  claimId = "claim-authority-capability-1",
+  authenticatedAt = authorization.intent.authenticatedAt
 ) {
   return buildBscTestnetPtaWbnbPoolSigningWorkerRequest({
     operationKey: authorization.intent.operationKey,
@@ -272,7 +281,7 @@ function signingRequest(
     journalClaimToken: `0x${"99".repeat(32)}`,
     releaseCommit: authorization.intent.releaseCommit,
     runtimeManifestSha256: authorization.intent.runtimeManifestSha256,
-    authenticatedAt: authorization.intent.authenticatedAt,
+    authenticatedAt,
     expiresAt: authorization.intent.expiresAt,
     transaction: authorization.intent.transaction
   });
@@ -343,6 +352,14 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
     expect(challenge.ownerAuthorizationText).toContain(`reviewedSubjectSha256=${REVIEWED_SUBJECT}`);
     expect(challenge.ownerAuthorizationText).toContain("automatedPolicyApplication=true");
     expect(challenge.ownerAuthorizationText).toContain("reviewerInspectedExactEnvelope=false");
+    expect(challenge.ownerAuthorizationText).toContain(`challengeIssuedAt=${AUTHORIZED_AT}`);
+    expect(challenge.ownerAuthorizationText).toContain(
+      "confirmationNotAfter=2026-08-13T04:33:55.000Z"
+    );
+    expect(challenge.ownerAuthorizationText).toContain("executionAuthorizationLifetimeSeconds=45");
+    expect(challenge.ownerAuthorizationText).toContain(
+      "executionAuthorizationRule=confirmedAt_is_captured_after_exact_match_and_executionExpiresAt_equals_confirmedAt_plus_lifetime"
+    );
     expect(challenge.ownerAuthorizationText).toContain("liquidityActionAuthorized=false");
     expect(challenge.ownerAuthorizationText).toContain(
       "ack.custodyUnlockVerifiedBeforeDurableClaim=false"
@@ -359,11 +376,13 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
     expect(
       authority.authorize(exactDescriptor, commandFor(instantiation, releaseTrust), localCapability)
     ).toMatchObject({ status: "blocked", issue: { code: "OWNER_CEREMONY_REQUIRED" } });
-    const command = await confirmedCommand(instantiation, releaseTrust);
+    const command = await confirmedCommand(instantiation, releaseTrust, exactDescriptor);
     const result = authority.authorize(exactDescriptor, command, localCapability);
     if (result.status !== "authorized") throw new Error(result.issue.message);
     expect(result.reviewDecisionDigest).toBe(INSTANTIATION_DIGEST);
     expect(result.intent.reviewerApprovalDigest).toBe(INSTANTIATION_DIGEST);
+    expect(result.intent.authenticatedAt).toBe(command.confirmedAt);
+    expect(result.intent.expiresAt).toBe(command.executionExpiresAt);
     expect(result.boundary).toMatchObject({
       authorityModel: "windows_current_user_fixed_custody_path_acl_object_capability",
       custodyKeyAddressVerifiedBeforeDurableClaim: false,
@@ -500,6 +519,83 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
     ).toBe(false);
   });
 
+  it("accepts only canonical fresh post-claim authentication at or after owner confirmation", async () => {
+    const refreshed = await authorizedHarness();
+    const refreshedCapability = refreshed.authorization.executionCapability;
+    expect(refreshed.authority.reserveExecutionCapabilityForWorker(refreshedCapability)).toBe(true);
+    expect(
+      refreshed.authority.consumeExecutionCapabilityAfterDurableStart(
+        refreshedCapability,
+        signingRequest(refreshed.authorization, "claim-refreshed-authentication", NOW)
+      )
+    ).toBe(true);
+
+    const beforeConfirmation = await authorizedHarness();
+    const beforeCapability = beforeConfirmation.authorization.executionCapability;
+    const preConfirmationTimestamp = new Date(
+      Date.parse(beforeConfirmation.authorization.intent.authenticatedAt) - 1
+    ).toISOString();
+    expect(beforeConfirmation.authority.reserveExecutionCapabilityForWorker(beforeCapability)).toBe(
+      true
+    );
+    expect(
+      beforeConfirmation.authority.consumeExecutionCapabilityAfterDurableStart(
+        beforeCapability,
+        signingRequest(
+          beforeConfirmation.authorization,
+          "claim-pre-confirmation-authentication",
+          preConfirmationTimestamp
+        )
+      )
+    ).toBe(false);
+
+    const malformed = await authorizedHarness();
+    const malformedCapability = malformed.authorization.executionCapability;
+    expect(malformed.authority.reserveExecutionCapabilityForWorker(malformedCapability)).toBe(true);
+    expect(
+      malformed.authority.consumeExecutionCapabilityAfterDurableStart(
+        malformedCapability,
+        signingRequest(
+          malformed.authorization,
+          "claim-malformed-authentication",
+          "not-a-utc-timestamp"
+        )
+      )
+    ).toBe(false);
+  });
+
+  it("rejects a structurally exact copied command while preserving the original private brand", async () => {
+    const exactDescriptor = descriptor();
+    const setup = harness();
+    const instantiation = runtimeReview();
+    const command = await confirmedCommand(instantiation, setup.releaseTrust, exactDescriptor);
+    const copiedCommand = deeplyFreeze({ ...command });
+    expect(
+      setup.authority.authorize(exactDescriptor, copiedCommand, setup.localCapability)
+    ).toMatchObject({ status: "blocked", issue: { code: "OWNER_CEREMONY_REQUIRED" } });
+    expect(
+      setup.authority.authorize(exactDescriptor, command, setup.localCapability)
+    ).toMatchObject({ status: "authorized" });
+  });
+
+  it("accepts the execution authority immediately before expiry and rejects its exact boundary", async () => {
+    const authorizeAtExecutionOffset = async (offsetMilliseconds: number) => {
+      let authorityClock = Date.parse(NOW);
+      const setup = harness(() => new Date(authorityClock));
+      const exactDescriptor = descriptor();
+      const instantiation = runtimeReview();
+      const command = await confirmedCommand(instantiation, setup.releaseTrust, exactDescriptor);
+      authorityClock = Date.parse(command.executionExpiresAt) + offsetMilliseconds;
+      return setup.authority.authorize(exactDescriptor, command, setup.localCapability);
+    };
+
+    await expect(authorizeAtExecutionOffset(-1)).resolves.toMatchObject({ status: "authorized" });
+    await expect(authorizeAtExecutionOffset(0)).resolves.toMatchObject({
+      status: "blocked",
+      issue: { code: "AUTHORIZATION_REQUIRED" }
+    });
+  });
+
   it("performs one same-process exact challenge/confirmation round with a fresh nonce", async () => {
     const { releaseTrust } = harness();
     const instantiation = runtimeReview();
@@ -528,11 +624,71 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
     expect(result.command.ceremonyNonce).toMatch(/^0x[0-9a-f]{64}$/u);
     expect(result.command.ceremonyNonce).not.toBe(`0x${"00".repeat(32)}`);
     expect(result.command.runtimeReviewInstantiation).toBe(instantiation);
+    expect(result.command.schemaVersion).toBe(4);
+    expect(result.command.kind).toBe("execute_exact_bsc_testnet_pta_wbnb_pool_once_v4");
+    expect(result.command.challengeIssuedAt).toBe(AUTHORIZED_AT);
+    expect(
+      Date.parse(result.command.executionExpiresAt) - Date.parse(result.command.confirmedAt)
+    ).toBe(45_000);
     expect(result.command.ownerAuthorizationText).toContain(
       `ceremonyNonce=${result.command.ceremonyNonce}`
     );
     expect(displayed).toHaveLength(1);
     displayed[0]?.fill(0);
+  });
+
+  it("reserves the exact execution lifetime, enforces both confirmation deadlines, and rejects clock rollback", async () => {
+    const issueAt = Date.parse(AUTHORIZED_AT);
+    const exactConfirmation = (display: string): Buffer => {
+      const marker =
+        "Paste exactly the following UTF-8 confirmation bytes, with no leading/trailing whitespace:\n";
+      return Buffer.from(display.slice(display.indexOf(marker) + marker.length).trimEnd(), "utf8");
+    };
+    const run = async (envelopeExpiresAt: string, timestamps: number[]) => {
+      const exactDescriptor = descriptor(envelopeExpiresAt);
+      const setup = harness();
+      const instantiation = runtimeReview({ expiresAt: envelopeExpiresAt });
+      let displayed = "";
+      let observedNotAfter: number | null = null;
+      const result = await conductBscTestnetPtaWbnbPoolOwnerCeremonyForInternalUse(
+        exactDescriptor,
+        instantiation,
+        setup.releaseTrust,
+        RELEASE_TREE,
+        Object.freeze({
+          now: () => new Date(timestamps.shift() ?? Date.parse(envelopeExpiresAt)),
+          writeChallenge: async (bytes: Uint8Array) => {
+            displayed = Buffer.from(bytes).toString("utf8");
+          },
+          readExactConfirmation: async (limits: Readonly<{ notAfterMilliseconds: number }>) => {
+            observedNotAfter = limits.notAfterMilliseconds;
+            return exactConfirmation(displayed);
+          }
+        })
+      );
+      return { result, observedNotAfter };
+    };
+
+    const ownerWindow = await run(EXPIRES_AT, [issueAt, issueAt + 1, issueAt + 240_000 - 1]);
+    expect(ownerWindow.observedNotAfter).toBe(issueAt + 240_000);
+    expect(ownerWindow.result).toMatchObject({ status: "confirmed" });
+
+    const exactOwnerBoundary = await run(EXPIRES_AT, [issueAt, issueAt + 1, issueAt + 240_000]);
+    expect(exactOwnerBoundary.result).toMatchObject({
+      status: "blocked",
+      issue: { code: "CEREMONY_EXPIRED" }
+    });
+
+    const reserveExpiry = new Date(issueAt + 180_000).toISOString();
+    const envelopeReserve = await run(reserveExpiry, [issueAt, issueAt + 1, issueAt + 135_000 - 1]);
+    expect(envelopeReserve.observedNotAfter).toBe(issueAt + 135_000);
+    expect(envelopeReserve.result).toMatchObject({ status: "confirmed" });
+
+    const rollback = await run(EXPIRES_AT, [issueAt, issueAt + 2, issueAt + 1]);
+    expect(rollback.result).toMatchObject({
+      status: "blocked",
+      issue: { code: "CEREMONY_CLOCK_INVALID" }
+    });
   });
 
   it("rejects confirmation mutation, replay nonce drift, and expiry", async () => {

@@ -166,7 +166,7 @@ function claim(overrides: Partial<BscTestnetPtaWbnbPoolClaimRequest> = {}) {
     releaseCommit: "6".repeat(40),
     runtimeManifestSha256: hex32("7"),
     authorizedAt: "2026-08-13T10:00:00.000Z",
-    expiresAt: "2026-08-13T10:01:00.000Z",
+    expiresAt: "2026-08-13T10:00:45.000Z",
     ...overrides
   };
   return Object.freeze({
@@ -185,7 +185,7 @@ function workerExchange(request: BscTestnetPtaWbnbPoolClaimRequest, token: Hex) 
     journalClaimToken: token,
     releaseCommit: request.releaseCommit,
     runtimeManifestSha256: request.runtimeManifestSha256,
-    authenticatedAt: request.authorizedAt,
+    authenticatedAt: NOW,
     expiresAt: request.expiresAt,
     transaction: exactTransaction()
   }) satisfies BscTestnetPtaWbnbPoolValidatedSigningIntent;
@@ -605,6 +605,9 @@ describe("PTA/WBNB pool local append-only journal", () => {
     const selfDigest = hex32("4");
     for (const request of [
       claim({ expiresAt: NOW }),
+      claim({ expiresAt: "2026-08-13T10:00:45.001Z" }),
+      claim({ expiresAt: "2026-08-13T10:05:00.000Z" }),
+      claim({ authorizedAt: "2026-08-13T10:00:40.000Z", expiresAt: "2026-08-13T10:00:35.000Z" }),
       claim({ reviewerApprovalDigest: selfDigest, ownerAuthorizationDigest: selfDigest }),
       claim({ maxCostWei: "999" }),
       claim({ gasLimit: "6000001" })

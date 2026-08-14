@@ -8,6 +8,7 @@ import {
   BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
   BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE,
   BSC_TESTNET_PTA_WBNB_POOL_CHAIN_ID,
+  BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_KECCAK256,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_SELECTOR,
@@ -643,7 +644,9 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
       owner.maximumCostWei !== transaction.maximumCostWei ||
       authorizedAt.milliseconds < reviewedAt.milliseconds ||
       authorizedAt.milliseconds > now ||
-      ownerExpiry.milliseconds !== descriptorExpiry.milliseconds ||
+      ownerExpiry.milliseconds - authorizedAt.milliseconds !==
+        BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS * 1_000 ||
+      ownerExpiry.milliseconds > descriptorExpiry.milliseconds ||
       ownerDigest !==
         canonicalBodyDigest(
           BSC_TESTNET_PTA_WBNB_POOL_OWNER_AUTHORIZATION_DIGEST_DOMAIN,
@@ -681,7 +684,7 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
         "Self-sealed owner bytes are not an authenticated owner capability."
       );
     }
-    if (descriptorExpiry.milliseconds <= now) {
+    if (ownerExpiry.milliseconds <= now || descriptorExpiry.milliseconds <= now) {
       return blocked("AUTHORIZATION_EXPIRED", "expiresAt", "Authorization envelope expired.");
     }
     const intent = Object.freeze({
@@ -695,7 +698,7 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
       releaseCommit: reviewerCommit,
       runtimeManifestSha256: reviewerRuntimeManifest,
       authenticatedAt: authorizedAt.iso,
-      expiresAt: descriptorExpiry.iso,
+      expiresAt: ownerExpiry.iso,
       transaction
     });
     brandedIntents.add(intent);

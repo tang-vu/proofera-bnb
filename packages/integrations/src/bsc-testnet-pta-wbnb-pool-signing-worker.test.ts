@@ -24,6 +24,8 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   buildBscTestnetPtaWbnbPoolExactSigningTransaction,
   buildBscTestnetPtaWbnbPoolSigningWorkerRequest,
+  deriveBscTestnetPtaWbnbPoolSigningWorkerRequestHash,
+  type BscTestnetPtaWbnbPoolAuthorizedSigningIntent,
   type BscTestnetPtaWbnbPoolSigningWorkerRequest,
   type BscTestnetPtaWbnbPoolSigningWorkerResponse,
   type BscTestnetPtaWbnbPoolValidatedSigningIntent
@@ -34,6 +36,7 @@ import {
   createBscTestnetPtaWbnbPoolSigningWorkerForInternalUse,
   createWindowsBscTestnetPtaWbnbPoolSigningWorker,
   isBscTestnetPtaWbnbPoolSigningDeadlineCurrentForInternalUse,
+  matchesBscTestnetPtaWbnbPoolExactBroadcastToSuccessfulSigningForInternalUse,
   reconstructExactBscTestnetPtaWbnbPoolRfc6979TransactionForInternalUse,
   signExactBscTestnetPtaWbnbPoolEncryptedStoreForInternalUse,
   signExactBscTestnetPtaWbnbPoolEncryptedStoreWithExpectedSignerForInternalUse,
@@ -547,13 +550,117 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
       "let successfulSigningResponse: BscTestnetPtaWbnbPoolSigningWorkerResponse | null = null"
     );
     expect(nativeSource).toContain("successfulSigningResponse = durablyCommittedResponse");
-    const localMatchIndex = nativeSource.indexOf("exactBroadcastMatchesSuccessfulSigning(");
+    const localMatchIndex = nativeSource.indexOf(
+      "matchesBscTestnetPtaWbnbPoolExactBroadcastToSuccessfulSigningForInternalUse("
+    );
     const delegatedIndex = nativeSource.indexOf(
       "issuer.consumeExactBroadcastAuthorizationAfterDurableStart("
     );
     expect(localMatchIndex).toBeGreaterThan(0);
     expect(delegatedIndex).toBeGreaterThan(localMatchIndex);
     expect(nativeSource).toContain("nativeActivatedProductionBridges.add(bridge)");
+  });
+
+  it("binds broadcast owner time separately from the later fresh signing timestamp", () => {
+    const request = reviewedWorkerRequest();
+    const intent = Object.freeze({
+      schemaVersion: 1 as const,
+      scope:
+        "owner_designated_internal_release_policy_and_exact_owner_pool_initialization" as const,
+      operationKey: request.operationKey,
+      envelopeHash: request.transaction.sourceEnvelopeHash,
+      reviewerApprovalDigest: request.reviewerApprovalDigest,
+      ownerAuthorizationDigest: request.ownerAuthorizationDigest,
+      releaseCommit: request.releaseCommit,
+      runtimeManifestSha256: request.runtimeManifestSha256,
+      authenticatedAt: "2026-08-13T04:59:45.000Z",
+      expiresAt: request.expiresAt,
+      transaction: request.transaction
+    }) satisfies BscTestnetPtaWbnbPoolAuthorizedSigningIntent;
+    const response = syntheticAttestedResponse(request);
+    const broadcast = Object.freeze({
+      schemaVersion: 1,
+      operation:
+        "consume_exact_bsc_testnet_pta_wbnb_pool_broadcast_authorization_after_durable_start",
+      operationKey: request.operationKey,
+      claimId: request.claimId,
+      envelopeHash: request.transaction.sourceEnvelopeHash,
+      releaseCommit: request.releaseCommit,
+      runtimeManifestSha256: request.runtimeManifestSha256,
+      reviewerApprovalDigest: request.reviewerApprovalDigest,
+      ownerAuthorizationDigest: request.ownerAuthorizationDigest,
+      signingHash: request.transaction.signingHash,
+      transactionHash: response.transactionHash,
+      signedTransactionKeccak256: response.transactionHash,
+      submissionStartedDigest: `0x${"77".repeat(32)}`,
+      authenticatedAt: intent.authenticatedAt,
+      expiresAt: intent.expiresAt,
+      signedTransaction: response.signedTransaction,
+      terminalPreSubmissionObservedAt: NOW,
+      terminalPreSubmissionDigest: `0x${"88".repeat(32)}`
+    });
+    const withTimes = (authenticatedAt: string, expiresAt: string) => {
+      const { requestHash: _requestHash, ...body } = request;
+      void _requestHash;
+      const timedBody = { ...body, authenticatedAt, expiresAt };
+      return Object.freeze({
+        ...timedBody,
+        requestHash: deriveBscTestnetPtaWbnbPoolSigningWorkerRequestHash(timedBody)
+      });
+    };
+
+    expect(
+      matchesBscTestnetPtaWbnbPoolExactBroadcastToSuccessfulSigningForInternalUse(
+        broadcast,
+        intent,
+        request,
+        response
+      )
+    ).toBe(true);
+
+    const cases = [
+      {
+        broadcast: Object.freeze({ ...broadcast, authenticatedAt: request.authenticatedAt }),
+        request
+      },
+      {
+        broadcast,
+        request: withTimes("2026-08-13T04:59:44.999Z", request.expiresAt)
+      },
+      {
+        broadcast,
+        request: withTimes("2026-08-13T05:00:20.000Z", request.expiresAt)
+      },
+      {
+        broadcast,
+        request: withTimes(request.expiresAt, request.expiresAt)
+      },
+      {
+        broadcast,
+        request: withTimes(request.authenticatedAt, "2026-08-13T05:00:29.999Z")
+      },
+      {
+        broadcast: Object.freeze({
+          ...broadcast,
+          expiresAt: "2026-08-13T05:00:29.999Z"
+        }),
+        request
+      },
+      {
+        broadcast,
+        request: { ...request, authenticatedAt: "not-a-time" }
+      }
+    ];
+    for (const candidate of cases) {
+      expect(
+        matchesBscTestnetPtaWbnbPoolExactBroadcastToSuccessfulSigningForInternalUse(
+          candidate.broadcast,
+          intent,
+          candidate.request,
+          syntheticAttestedResponse(candidate.request)
+        )
+      ).toBe(false);
+    }
   });
 
   it("durably starts before custody unlock/sign and refuses a canonical transaction from any other signer", async () => {
@@ -650,6 +757,31 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     expect(consumeWorkerAuthorization).not.toHaveBeenCalled();
     expect(signExactTransaction).not.toHaveBeenCalled();
     reordered.fill(0);
+  });
+
+  it("rejects a correctly hashed five-minute request before durable or secret action", async () => {
+    const request = reviewedWorkerRequest();
+    const { requestHash: _requestHash, ...body } = request;
+    void _requestHash;
+    const fiveMinuteBody = {
+      ...body,
+      expiresAt: "2026-08-13T05:05:00.000Z"
+    };
+    const fiveMinuteRequest = Object.freeze({
+      ...fiveMinuteBody,
+      requestHash: deriveBscTestnetPtaWbnbPoolSigningWorkerRequestHash(fiveMinuteBody)
+    });
+    const consume = vi.fn();
+    const sign = vi.fn();
+    const worker = createBscTestnetPtaWbnbPoolSigningWorkerForInternalUse(
+      workerPorts({ consumeWorkerAuthorization: consume, signExactTransaction: sign })
+    );
+
+    await expect(worker.invokeExactSigningWorker(fiveMinuteRequest)).rejects.toThrow(
+      "failed closed"
+    );
+    expect(consume).not.toHaveBeenCalled();
+    expect(sign).not.toHaveBeenCalled();
   });
 
   it("commits the attested bytes durably before returning them", async () => {

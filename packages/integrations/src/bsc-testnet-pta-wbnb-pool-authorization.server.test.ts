@@ -29,7 +29,8 @@ const TEXT_DIGEST = `0x${"33".repeat(32)}` as Hex;
 const RELEASE = "a".repeat(40);
 const REVIEWED_AT = "2026-08-13T04:29:50.000Z";
 const AUTHORIZED_AT = "2026-08-13T04:29:55.000Z";
-const EXPIRES_AT = "2026-08-13T04:30:30.000Z";
+const EXECUTION_EXPIRES_AT = "2026-08-13T04:30:40.000Z";
+const ENVELOPE_EXPIRES_AT = "2026-08-13T04:34:55.000Z";
 
 function deeplyFreeze<Value>(value: Value): Readonly<Value> {
   if (value !== null && typeof value === "object") {
@@ -62,7 +63,7 @@ function descriptor() {
       gasLimit: 5_983_857n,
       gasPriceWei: 100_000_000n
     },
-    envelopeExpiresAt: EXPIRES_AT,
+    envelopeExpiresAt: ENVELOPE_EXPIRES_AT,
     signingReady: false,
     signingAuthorized: false,
     executionAuthorized: false,
@@ -99,7 +100,7 @@ function reviewerApproval() {
     dataKeccak256: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_KECCAK256,
     expectedPool: BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE,
     reviewedAt: REVIEWED_AT,
-    expiresAt: EXPIRES_AT
+    expiresAt: ENVELOPE_EXPIRES_AT
   } as const;
   return deeplyFreeze({
     ...body,
@@ -107,7 +108,7 @@ function reviewerApproval() {
   });
 }
 
-function ownerAuthorization(reviewerDigest: Hex) {
+function ownerAuthorization(reviewerDigest: Hex, expiresAt = EXECUTION_EXPIRES_AT) {
   const exact = buildBscTestnetPtaWbnbPoolExactSigningTransaction({
     gasLimit: "5983857",
     gasPriceWei: "100000000",
@@ -130,7 +131,7 @@ function ownerAuthorization(reviewerDigest: Hex) {
     gasPriceWei: exact.gasPriceWei,
     maximumCostWei: exact.maximumCostWei,
     authorizedAt: AUTHORIZED_AT,
-    expiresAt: EXPIRES_AT
+    expiresAt
   } as const;
   return deeplyFreeze({
     ...body,
@@ -215,12 +216,34 @@ describe("PTA/WBNB pool exact authorization composition", () => {
         reviewerApprovalDigest: reviewer.approvalDigest,
         ownerAuthorizationDigest: owner.authorizationDigest,
         releaseCommit: RELEASE,
-        runtimeManifestSha256: MANIFEST
+        runtimeManifestSha256: MANIFEST,
+        authenticatedAt: AUTHORIZED_AT,
+        expiresAt: EXECUTION_EXPIRES_AT
       }
     });
     if (result.status !== "authorized") throw new Error(result.issue.message);
     expect(gate.authenticateAuthorizedIntent(result.intent)).toBe(true);
     expect(gate.authenticateAuthorizedIntent(structuredClone(result.intent))).toBe(false);
+  });
+
+  it("rejects owner authority shorter, longer, or expanded to the five-minute envelope", () => {
+    const reviewer = reviewerApproval();
+    for (const expiresAt of [
+      "2026-08-13T04:30:39.999Z",
+      "2026-08-13T04:30:40.001Z",
+      ENVELOPE_EXPIRES_AT
+    ]) {
+      const owner = ownerAuthorization(reviewer.approvalDigest, expiresAt);
+      const gate = createBscTestnetPtaWbnbPoolAuthorizationGateForTests({
+        asOf: () => new Date("2026-08-13T04:30:00.000Z"),
+        authenticateExternalReviewerApproval: (candidate: unknown) => candidate === reviewer,
+        authenticateOwnerEnvelopeAuthorization: (candidate: unknown) => candidate === owner
+      });
+      expect(gate.authorize(descriptor(), reviewer, owner)).toMatchObject({
+        status: "blocked",
+        issue: { code: "OWNER_AUTHORIZATION_INVALID" }
+      });
+    }
   });
 
   it("does not mistake correctly self-sealed receipt bytes for authentication", () => {

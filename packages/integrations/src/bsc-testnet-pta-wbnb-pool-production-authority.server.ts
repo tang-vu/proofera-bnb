@@ -10,12 +10,14 @@ import {
   BSC_TESTNET_PTA_ADDRESS,
   BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE,
   BSC_TESTNET_PTA_WBNB_POOL_CHAIN_ID,
+  BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_KECCAK256,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_SELECTOR,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_LIMIT,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_PRICE_WEI,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_TOTAL_COST_WEI,
+  BSC_TESTNET_PTA_WBNB_POOL_OWNER_CONFIRMATION_WINDOW_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_SENDER,
   BSC_TESTNET_PTA_WBNB_POOL_SQRT_PRICE_X96,
   BSC_TESTNET_WBNB_ADDRESS
@@ -46,9 +48,9 @@ import type { BscTestnetPtaWbnbPoolSigningWorkerReleaseTrust } from "./bsc-testn
 export const BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_EXECUTION_FLAG =
   "I_EXPLICITLY_AUTHORIZE_ONE_EXACT_PTA_WBNB_POOL_INITIALIZATION_ON_BSC_TESTNET_CHAIN_97" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_OWNER_AUTHORIZATION_TEXT_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-owner-transaction-authorization:v3" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-owner-transaction-authorization:v4" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_OWNER_CONFIRMATION_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-owner-exact-byte-confirmation:v3" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-owner-exact-byte-confirmation:v4" as const;
 
 const BROADCAST_OPERATION =
   "consume_exact_bsc_testnet_pta_wbnb_pool_broadcast_authorization_after_durable_start" as const;
@@ -61,7 +63,10 @@ const SIGNED_TRANSACTION = /^0x(?:[0-9a-f]{2})+$/u;
 const MAXIMUM_OWNER_TEXT_BYTES = 6_144;
 const MAXIMUM_OWNER_CONFIRMATION_BYTES = 768;
 const MAXIMUM_SIGNED_TRANSACTION_BYTES = 2_048;
-const OWNER_CONFIRMATION_WINDOW_MILLISECONDS = 30_000;
+const OWNER_CONFIRMATION_WINDOW_MILLISECONDS =
+  BSC_TESTNET_PTA_WBNB_POOL_OWNER_CONFIRMATION_WINDOW_SECONDS * 1_000;
+const EXECUTION_AUTHORITY_LIFETIME_MILLISECONDS =
+  BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS * 1_000;
 const ZERO_32 = `0x${"00".repeat(32)}`;
 
 const DESCRIPTOR_KEYS = [
@@ -121,9 +126,11 @@ const INSTANTIATION_KEYS = [
   "schemaVersion"
 ] as const;
 const COMMAND_KEYS = [
-  "authorizedAt",
   "ceremonyNonce",
+  "challengeIssuedAt",
+  "confirmedAt",
   "executionFlag",
+  "executionExpiresAt",
   "kind",
   "ownerAuthorizationText",
   "ownerAuthorizationTextSha256",
@@ -207,14 +214,21 @@ const BROADCAST_REQUEST_KEYS = [
 ] as const;
 
 type DataRecord = Readonly<Record<string, unknown>>;
-const confirmedOwnerCeremonyCommands = new WeakSet<object>();
+type ConfirmedOwnerCeremonyCommandRecord = Readonly<{
+  descriptor: BscTestnetPtaWbnbPoolOneShotPreparedDescriptor;
+  confirmedAt: string;
+  executionExpiresAt: string;
+}>;
+const confirmedOwnerCeremonyCommands = new WeakMap<object, ConfirmedOwnerCeremonyCommandRecord>();
 
 export interface BscTestnetPtaWbnbPoolProductionExecutionCommand {
-  readonly schemaVersion: 1;
-  readonly kind: "execute_exact_bsc_testnet_pta_wbnb_pool_once_v1";
+  readonly schemaVersion: 4;
+  readonly kind: "execute_exact_bsc_testnet_pta_wbnb_pool_once_v4";
   readonly executionFlag: typeof BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_EXECUTION_FLAG;
   readonly runtimeReviewInstantiation: BscTestnetPtaWbnbPoolRuntimeReviewInstantiation;
-  readonly authorizedAt: string;
+  readonly challengeIssuedAt: string;
+  readonly confirmedAt: string;
+  readonly executionExpiresAt: string;
   readonly ceremonyNonce: Hex;
   readonly ownerAuthorizationText: string;
   readonly ownerAuthorizationTextSha256: Hex;
@@ -564,6 +578,16 @@ function workerRequestMatchesIntent(
   const transaction =
     request === null ? null : inspectRecord(request.transaction, WORKER_TRANSACTION_KEYS);
   if (request === null || transaction === null) return false;
+  const requestAuthenticatedAt = exactUtc(request.authenticatedAt);
+  const intentAuthenticatedAt = exactUtc(intent.authenticatedAt);
+  const intentExpiresAt = exactUtc(intent.expiresAt);
+  if (
+    requestAuthenticatedAt === null ||
+    intentAuthenticatedAt === null ||
+    intentExpiresAt === null
+  ) {
+    return false;
+  }
   const expectedTransaction = intent.transaction;
   return (
     request.schemaVersion === 1 &&
@@ -580,7 +604,8 @@ function workerRequestMatchesIntent(
     request.runtimeManifestSha256 === intent.runtimeManifestSha256 &&
     request.reviewerApprovalDigest === intent.reviewerApprovalDigest &&
     request.ownerAuthorizationDigest === intent.ownerAuthorizationDigest &&
-    request.authenticatedAt === intent.authenticatedAt &&
+    requestAuthenticatedAt.milliseconds >= intentAuthenticatedAt.milliseconds &&
+    requestAuthenticatedAt.milliseconds < intentExpiresAt.milliseconds &&
     request.expiresAt === intent.expiresAt &&
     request.requestHashDomain === BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_REQUEST_HASH_DOMAIN &&
     exactHex32(request.requestHash) &&
@@ -660,20 +685,47 @@ function blocked(
   });
 }
 
+function ownerConfirmationNotAfterMilliseconds(
+  descriptorExpiryMilliseconds: number,
+  challengeIssuedAtMilliseconds: number
+): number | null {
+  const ownerWindowNotAfter =
+    challengeIssuedAtMilliseconds + OWNER_CONFIRMATION_WINDOW_MILLISECONDS;
+  const executionReserveNotAfter =
+    descriptorExpiryMilliseconds - EXECUTION_AUTHORITY_LIFETIME_MILLISECONDS;
+  const notAfterMilliseconds = Math.min(ownerWindowNotAfter, executionReserveNotAfter);
+  return Number.isSafeInteger(ownerWindowNotAfter) &&
+    Number.isSafeInteger(executionReserveNotAfter) &&
+    Number.isSafeInteger(notAfterMilliseconds) &&
+    notAfterMilliseconds > challengeIssuedAtMilliseconds
+    ? notAfterMilliseconds
+    : null;
+}
+
 function ownerAuthorizationText(
   descriptor: BscTestnetPtaWbnbPoolOneShotPreparedDescriptor,
   instantiation: BscTestnetPtaWbnbPoolRuntimeReviewInstantiation,
   release: BscTestnetPtaWbnbPoolSigningWorkerReleaseTrust,
   releaseTree: string,
   ceremonyNonce: Hex,
-  authorizedAt: string
+  challengeIssuedAt: string
 ): string | null {
+  const parsedChallengeIssuedAt = exactUtc(challengeIssuedAt);
+  const descriptorExpiry = exactUtc(descriptor.envelopeExpiresAt);
+  const confirmationNotAfterMilliseconds =
+    parsedChallengeIssuedAt === null || descriptorExpiry === null
+      ? null
+      : ownerConfirmationNotAfterMilliseconds(
+          descriptorExpiry.milliseconds,
+          parsedChallengeIssuedAt.milliseconds
+        );
   const transaction = buildBscTestnetPtaWbnbPoolExactSigningTransaction({
     gasLimit: descriptor.exactBinding.gasLimit.toString(),
     gasPriceWei: descriptor.exactBinding.gasPriceWei.toString(),
     sourceEnvelopeHash: descriptor.envelopeHash
   });
-  if (transaction === null) return null;
+  if (transaction === null || confirmationNotAfterMilliseconds === null) return null;
+  const confirmationNotAfter = new Date(confirmationNotAfterMilliseconds).toISOString();
   return [
     BSC_TESTNET_PTA_WBNB_POOL_OWNER_AUTHORIZATION_TEXT_DOMAIN,
     "decision=AUTHORIZE_ONE_EXACT_POOL_INITIALIZATION_SIGNATURE_AND_SUBMISSION",
@@ -716,8 +768,11 @@ function ownerAuthorizationText(
     "reviewerInspectedExactEnvelope=false",
     "reviewIsNotTransactionAuthorization=true",
     `ceremonyNonce=${ceremonyNonce}`,
-    `authorizedAt=${authorizedAt}`,
-    `expiresAt=${descriptor.envelopeExpiresAt}`,
+    `challengeIssuedAt=${challengeIssuedAt}`,
+    `confirmationNotAfter=${confirmationNotAfter}`,
+    `reviewEnvelopeExpiresAt=${descriptor.envelopeExpiresAt}`,
+    `executionAuthorizationLifetimeSeconds=${BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS}`,
+    "executionAuthorizationRule=confirmedAt_is_captured_after_exact_match_and_executionExpiresAt_equals_confirmedAt_plus_lifetime",
     "risk.initializerHasNoDeadline=true",
     "risk.publicMempoolCanRace=true",
     "risk.noReplacementOrRebroadcastAfterSubmissionStarted=true",
@@ -738,20 +793,20 @@ export function buildBscTestnetPtaWbnbPoolOwnerAuthorizationChallengeForInternal
   release: BscTestnetPtaWbnbPoolSigningWorkerReleaseTrust,
   releaseTree: string,
   ceremonyNonce: Hex,
-  authorizedAt: string
+  challengeIssuedAt: string
 ): Readonly<{
   ownerAuthorizationText: string;
   ownerAuthorizationTextSha256: Hex;
   ownerConfirmationText: string;
 }> | null {
   const descriptor = parseDescriptor(descriptorValue);
-  const parsedAuthorizedAt = exactUtc(authorizedAt);
+  const parsedChallengeIssuedAt = exactUtc(challengeIssuedAt);
   if (
     descriptor === null ||
     !validReleaseTrust(release) ||
     !TREE.test(releaseTree) ||
     !exactHex32(ceremonyNonce) ||
-    parsedAuthorizedAt === null
+    parsedChallengeIssuedAt === null
   ) {
     return null;
   }
@@ -760,7 +815,7 @@ export function buildBscTestnetPtaWbnbPoolOwnerAuthorizationChallengeForInternal
     descriptor,
     release,
     releaseTree,
-    parsedAuthorizedAt.milliseconds
+    parsedChallengeIssuedAt.milliseconds
   );
   if (instantiation === null) return null;
   const text = ownerAuthorizationText(
@@ -769,7 +824,7 @@ export function buildBscTestnetPtaWbnbPoolOwnerAuthorizationChallengeForInternal
     release,
     releaseTree,
     ceremonyNonce,
-    authorizedAt
+    challengeIssuedAt
   );
   if (text === null || Buffer.byteLength(text, "utf8") > MAXIMUM_OWNER_TEXT_BYTES) return null;
   const ownerAuthorizationTextSha256 = sha256Text(text);
@@ -868,13 +923,20 @@ export async function conductBscTestnetPtaWbnbPoolOwnerCeremonyForInternalUse(
   }
   const descriptor = parseDescriptor(descriptorValue);
   const now = ports.now as () => Date;
-  const authorizedAtMilliseconds = captureNow(now);
+  const challengeIssuedAtMilliseconds = captureNow(now);
   const descriptorExpiry = descriptor === null ? null : exactUtc(descriptor.envelopeExpiresAt);
+  const notAfterMilliseconds =
+    challengeIssuedAtMilliseconds === null || descriptorExpiry === null
+      ? null
+      : ownerConfirmationNotAfterMilliseconds(
+          descriptorExpiry.milliseconds,
+          challengeIssuedAtMilliseconds
+        );
   if (
     descriptor === null ||
-    authorizedAtMilliseconds === null ||
+    challengeIssuedAtMilliseconds === null ||
     descriptorExpiry === null ||
-    descriptorExpiry.milliseconds <= authorizedAtMilliseconds ||
+    notAfterMilliseconds === null ||
     !validReleaseTrust(release) ||
     !TREE.test(releaseTree)
   ) {
@@ -885,7 +947,7 @@ export async function conductBscTestnetPtaWbnbPoolOwnerCeremonyForInternalUse(
     descriptor,
     release,
     releaseTree,
-    authorizedAtMilliseconds
+    challengeIssuedAtMilliseconds
   );
   if (instantiation === null || !authenticateInstantiation(instantiationValue, instantiation)) {
     return ceremonyBlocked(
@@ -894,7 +956,7 @@ export async function conductBscTestnetPtaWbnbPoolOwnerCeremonyForInternalUse(
       "The private one-use runtime review instantiation is invalid or unauthenticated."
     );
   }
-  const authorizedAt = new Date(authorizedAtMilliseconds).toISOString();
+  const challengeIssuedAt = new Date(challengeIssuedAtMilliseconds).toISOString();
   const ceremonyNonceBytes = randomBytes(32);
   let ceremonyNonce: Hex;
   try {
@@ -908,7 +970,7 @@ export async function conductBscTestnetPtaWbnbPoolOwnerCeremonyForInternalUse(
     release,
     releaseTree,
     ceremonyNonce,
-    authorizedAt
+    challengeIssuedAt
   );
   if (challenge === null) {
     return ceremonyBlocked(
@@ -917,10 +979,6 @@ export async function conductBscTestnetPtaWbnbPoolOwnerCeremonyForInternalUse(
       "The exact release/policy/envelope challenge could not be built."
     );
   }
-  const notAfterMilliseconds = Math.min(
-    descriptorExpiry.milliseconds,
-    authorizedAtMilliseconds + OWNER_CONFIRMATION_WINDOW_MILLISECONDS
-  );
   const display = ownerChallengeDisplay(challenge);
   const expected = Buffer.from(challenge.ownerConfirmationText, "utf8");
   let received: Buffer | null = null;
@@ -929,7 +987,18 @@ export async function conductBscTestnetPtaWbnbPoolOwnerCeremonyForInternalUse(
     await Reflect.apply(ports.writeChallenge as (bytes: Uint8Array) => Promise<void>, undefined, [
       display
     ]);
-    const remaining = notAfterMilliseconds - (captureNow(now) ?? notAfterMilliseconds);
+    const readStartedAtMilliseconds = captureNow(now);
+    if (
+      readStartedAtMilliseconds === null ||
+      readStartedAtMilliseconds < challengeIssuedAtMilliseconds
+    ) {
+      return ceremonyBlocked(
+        "CEREMONY_CLOCK_INVALID",
+        "confirmation",
+        "The owner-ceremony clock moved backwards before confirmation input."
+      );
+    }
+    const remaining = notAfterMilliseconds - readStartedAtMilliseconds;
     if (remaining <= 0) {
       return ceremonyBlocked("CEREMONY_EXPIRED", "confirmation", "Confirmation window expired.");
     }
@@ -960,32 +1029,58 @@ export async function conductBscTestnetPtaWbnbPoolOwnerCeremonyForInternalUse(
     received = Buffer.from(supplied);
     const confirmed =
       received.byteLength === expected.byteLength && timingSafeEqual(received, expected);
-    const confirmedAt = captureNow(now);
-    if (
-      !confirmed ||
-      confirmedAt === null ||
-      confirmedAt >= notAfterMilliseconds ||
-      confirmedAt >= descriptorExpiry.milliseconds
-    ) {
+    if (!confirmed) {
       return ceremonyBlocked(
-        confirmed ? "CEREMONY_EXPIRED" : "OWNER_CONFIRMATION_MISMATCH",
+        "OWNER_CONFIRMATION_MISMATCH",
         "confirmation",
-        confirmed
-          ? "The exact confirmation arrived after its bounded window."
-          : "Owner confirmation bytes did not exactly match the displayed challenge digest."
+        "Owner confirmation bytes did not exactly match the displayed challenge digest."
       );
     }
+    const confirmedAtMilliseconds = captureNow(now);
+    if (confirmedAtMilliseconds === null || confirmedAtMilliseconds < readStartedAtMilliseconds) {
+      return ceremonyBlocked(
+        "CEREMONY_CLOCK_INVALID",
+        "confirmation",
+        "The owner-ceremony clock moved backwards after exact confirmation."
+      );
+    }
+    if (confirmedAtMilliseconds >= notAfterMilliseconds) {
+      return ceremonyBlocked(
+        "CEREMONY_EXPIRED",
+        "confirmation",
+        "The exact confirmation arrived after its bounded window."
+      );
+    }
+    const executionExpiresAtMilliseconds =
+      confirmedAtMilliseconds + EXECUTION_AUTHORITY_LIFETIME_MILLISECONDS;
+    if (
+      !Number.isSafeInteger(executionExpiresAtMilliseconds) ||
+      executionExpiresAtMilliseconds >= descriptorExpiry.milliseconds
+    ) {
+      return ceremonyBlocked(
+        "CEREMONY_EXPIRED",
+        "confirmation",
+        "The exact confirmation did not leave the complete bounded execution window."
+      );
+    }
+    const confirmedAt = new Date(confirmedAtMilliseconds).toISOString();
+    const executionExpiresAt = new Date(executionExpiresAtMilliseconds).toISOString();
     const command = Object.freeze({
-      schemaVersion: 1 as const,
-      kind: "execute_exact_bsc_testnet_pta_wbnb_pool_once_v1" as const,
+      schemaVersion: 4 as const,
+      kind: "execute_exact_bsc_testnet_pta_wbnb_pool_once_v4" as const,
       executionFlag: BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_EXECUTION_FLAG,
       runtimeReviewInstantiation: instantiation,
-      authorizedAt,
+      challengeIssuedAt,
+      confirmedAt,
+      executionExpiresAt,
       ceremonyNonce,
       ownerAuthorizationText: challenge.ownerAuthorizationText,
       ownerAuthorizationTextSha256: challenge.ownerAuthorizationTextSha256
     });
-    confirmedOwnerCeremonyCommands.add(command);
+    confirmedOwnerCeremonyCommands.set(
+      command,
+      Object.freeze({ descriptor, confirmedAt, executionExpiresAt })
+    );
     return Object.freeze({
       status: "confirmed" as const,
       command,
@@ -1087,13 +1182,17 @@ function createBscTestnetPtaWbnbPoolAuthorityIssuer(
         "This authority realm already issued its only execution capability."
       );
     }
+    let confirmedCommandRecord: ConfirmedOwnerCeremonyCommandRecord | null = null;
     try {
-      if (
-        typeof commandValue !== "object" ||
-        commandValue === null ||
-        isProxy(commandValue) ||
-        !confirmedOwnerCeremonyCommands.has(commandValue)
-      ) {
+      if (typeof commandValue !== "object" || commandValue === null || isProxy(commandValue)) {
+        return blocked(
+          "OWNER_CEREMONY_REQUIRED",
+          "command",
+          "Only a command privately branded by this process's exact owner ceremony is accepted."
+        );
+      }
+      confirmedCommandRecord = confirmedOwnerCeremonyCommands.get(commandValue) ?? null;
+      if (confirmedCommandRecord === null) {
         return blocked(
           "OWNER_CEREMONY_REQUIRED",
           "command",
@@ -1111,20 +1210,44 @@ function createBscTestnetPtaWbnbPoolAuthorityIssuer(
     }
     const descriptor = parseDescriptor(descriptorValue);
     const command = inspectRecord(commandValue, COMMAND_KEYS);
-    const authorizedAt = command === null ? null : exactUtc(command.authorizedAt);
+    const challengeIssuedAt = command === null ? null : exactUtc(command.challengeIssuedAt);
+    const confirmedAt = command === null ? null : exactUtc(command.confirmedAt);
+    const executionExpiresAt = command === null ? null : exactUtc(command.executionExpiresAt);
+    const descriptorExpiry = descriptor === null ? null : exactUtc(descriptor.envelopeExpiresAt);
+    const confirmationNotAfterMilliseconds =
+      challengeIssuedAt === null || descriptorExpiry === null
+        ? null
+        : ownerConfirmationNotAfterMilliseconds(
+            descriptorExpiry.milliseconds,
+            challengeIssuedAt.milliseconds
+          );
     if (
+      confirmedCommandRecord === null ||
       descriptor === null ||
       command === null ||
-      authorizedAt === null ||
-      command.schemaVersion !== 1 ||
-      command.kind !== "execute_exact_bsc_testnet_pta_wbnb_pool_once_v1" ||
+      challengeIssuedAt === null ||
+      confirmedAt === null ||
+      executionExpiresAt === null ||
+      descriptorExpiry === null ||
+      confirmationNotAfterMilliseconds === null ||
+      confirmedCommandRecord.descriptor !== descriptor ||
+      confirmedCommandRecord.confirmedAt !== confirmedAt.iso ||
+      confirmedCommandRecord.executionExpiresAt !== executionExpiresAt.iso ||
+      command.schemaVersion !== 4 ||
+      command.kind !== "execute_exact_bsc_testnet_pta_wbnb_pool_once_v4" ||
       command.executionFlag !== BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_EXECUTION_FLAG ||
       typeof command.ownerAuthorizationText !== "string" ||
       Buffer.byteLength(command.ownerAuthorizationText, "utf8") > MAXIMUM_OWNER_TEXT_BYTES ||
       !exactHex32(command.ownerAuthorizationTextSha256) ||
       !exactHex32(command.ceremonyNonce) ||
       sha256Text(command.ownerAuthorizationText) !== command.ownerAuthorizationTextSha256 ||
-      authorizedAt.milliseconds > current
+      confirmedAt.milliseconds < challengeIssuedAt.milliseconds ||
+      confirmedAt.milliseconds >= confirmationNotAfterMilliseconds ||
+      executionExpiresAt.milliseconds !==
+        confirmedAt.milliseconds + EXECUTION_AUTHORITY_LIFETIME_MILLISECONDS ||
+      executionExpiresAt.milliseconds >= descriptorExpiry.milliseconds ||
+      confirmedAt.milliseconds > current ||
+      current >= executionExpiresAt.milliseconds
     ) {
       return blocked(
         "AUTHORIZATION_REQUIRED",
@@ -1155,7 +1278,7 @@ function createBscTestnetPtaWbnbPoolAuthorityIssuer(
       release,
       releaseTree,
       command.ceremonyNonce as Hex,
-      authorizedAt.iso
+      challengeIssuedAt.iso
     );
     if (expectedText === null || command.ownerAuthorizationText !== expectedText) {
       return blocked(
@@ -1194,8 +1317,8 @@ function createBscTestnetPtaWbnbPoolAuthorityIssuer(
       gasLimit: transaction.gasLimit,
       gasPriceWei: transaction.gasPriceWei,
       maximumCostWei: transaction.maximumCostWei,
-      authorizedAt: authorizedAt.iso,
-      expiresAt: descriptor.envelopeExpiresAt
+      authorizedAt: confirmedAt.iso,
+      expiresAt: executionExpiresAt.iso
     });
     const ownerAuthorization = Object.freeze({
       ...ownerBody,
@@ -1215,8 +1338,8 @@ function createBscTestnetPtaWbnbPoolAuthorityIssuer(
       ownerAuthorizationDigest: ownerAuthorization.authorizationDigest,
       releaseCommit: release.releaseCommit,
       runtimeManifestSha256: release.runtimeManifestSha256,
-      authenticatedAt: authorizedAt.iso,
-      expiresAt: descriptor.envelopeExpiresAt,
+      authenticatedAt: confirmedAt.iso,
+      expiresAt: executionExpiresAt.iso,
       transaction
     }) satisfies BscTestnetPtaWbnbPoolAuthorizedSigningIntent;
     let instantiationConsumed = false;

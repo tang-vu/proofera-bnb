@@ -1475,6 +1475,17 @@ describe("BSC testnet exact PTA/WBNB submission reconciler", () => {
   it("strictly validates untrusted capability content before reading reconciliation evidence", async () => {
     const capability = await submissionCapability();
     const exactEvidence = evidence(capability);
+    const fiveMinuteCapability = await submissionCapability({
+      authenticatedAt: "2026-08-13T08:00:10.000Z",
+      expiresAt: "2026-08-13T08:05:10.000Z"
+    });
+    expect(
+      await reconcileBscTestnetPtaWbnbPoolEvidenceForInternalUse(
+        fiveMinuteCapability,
+        evidence(fiveMinuteCapability),
+        new Date(NOW)
+      )
+    ).toMatchObject({ status: "invalid", issue: { code: "CAPABILITY_INVALID" } });
     const get = vi.fn();
     const getPrototypeOf = vi.fn();
     const ownKeys = vi.fn();

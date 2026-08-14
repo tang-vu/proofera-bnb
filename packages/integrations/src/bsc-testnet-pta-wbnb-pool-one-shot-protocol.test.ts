@@ -25,6 +25,7 @@ import {
   buildBscTestnetPtaWbnbPoolExactSigningTransaction,
   buildBscTestnetPtaWbnbPoolSigningWorkerRequest,
   deriveBscTestnetPtaWbnbPoolSigningWorkerRequestHash,
+  parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse,
   validateBscTestnetPtaWbnbPoolFreshRecheckCapability,
   validateBscTestnetPtaWbnbPoolSigningWorkerRequest,
   validateBscTestnetPtaWbnbPoolSigningWorkerResponse,
@@ -41,6 +42,7 @@ const MANIFEST = `0x${"55".repeat(32)}` as Hex;
 const RELEASE = "a".repeat(40);
 const AUTHENTICATED_AT = "2026-08-13T04:30:00.000Z";
 const EXPIRES_AT = "2026-08-13T04:30:30.000Z";
+const OWNER_AUTHENTICATED_AT = "2026-08-13T04:29:45.000Z";
 
 function transaction() {
   const result = buildBscTestnetPtaWbnbPoolExactSigningTransaction({
@@ -62,7 +64,7 @@ function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
     ownerAuthorizationDigest: OWNER_DIGEST,
     releaseCommit: RELEASE,
     runtimeManifestSha256: MANIFEST,
-    authenticatedAt: "2026-08-13T04:29:50.000Z",
+    authenticatedAt: OWNER_AUTHENTICATED_AT,
     expiresAt: EXPIRES_AT,
     transaction: transaction()
   });
@@ -215,6 +217,52 @@ describe("PTA/WBNB pool exact one-shot protocol", () => {
     }
   });
 
+  it("accepts only an exact forty-five-second owner execution authority", () => {
+    const exact = authorizedIntent();
+    expect(parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse(exact)).not.toBeNull();
+
+    for (const expiresAt of [
+      "2026-08-13T04:30:29.999Z",
+      "2026-08-13T04:30:30.001Z",
+      "2026-08-13T04:34:45.000Z"
+    ]) {
+      expect(
+        parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse(
+          Object.freeze({ ...exact, expiresAt })
+        )
+      ).toBeNull();
+    }
+  });
+
+  it("binds a refreshed post-claim timestamp after owner confirmation to the exact owner expiry", () => {
+    const intent = authorizedIntent();
+    const valid = freshCapability();
+    expect(
+      validateBscTestnetPtaWbnbPoolFreshRecheckCapability(
+        valid,
+        { authorizedIntent: intent, claimId: valid.claimId },
+        new Date("2026-08-13T04:30:01.000Z")
+      )
+    ).toMatchObject({ status: "valid", intent: { authenticatedAt: AUTHENTICATED_AT } });
+
+    for (const altered of [
+      {
+        ...valid,
+        authenticatedAt: "2026-08-13T04:29:44.999Z",
+        rpc: { ...valid.rpc, observedAt: "2026-08-13T04:29:44.999Z" }
+      },
+      { ...valid, expiresAt: "2026-08-13T04:30:29.999Z" }
+    ]) {
+      expect(
+        validateBscTestnetPtaWbnbPoolFreshRecheckCapability(
+          altered,
+          { authorizedIntent: intent, claimId: valid.claimId },
+          new Date("2026-08-13T04:30:01.000Z")
+        ).status
+      ).toBe("invalid");
+    }
+  });
+
   it("binds release, manifest, both authorization digests, claim token and exact transaction", () => {
     const request = validatedRequest();
     expect(
@@ -241,6 +289,26 @@ describe("PTA/WBNB pool exact one-shot protocol", () => {
         ).status
       ).toBe("invalid");
     }
+  });
+
+  it("rejects a correctly hashed worker request carrying a five-minute capability", () => {
+    const request = validatedRequest();
+    const { requestHash: _requestHash, ...body } = request;
+    void _requestHash;
+    const longBody = {
+      ...body,
+      expiresAt: "2026-08-13T04:35:00.000Z"
+    };
+    const longRequest = Object.freeze({
+      ...longBody,
+      requestHash: deriveBscTestnetPtaWbnbPoolSigningWorkerRequestHash(longBody)
+    });
+    expect(
+      validateBscTestnetPtaWbnbPoolSigningWorkerRequest(
+        longRequest,
+        new Date("2026-08-13T04:30:02.000Z")
+      ).status
+    ).toBe("invalid");
   });
 
   it("round-trips canonical signed RLP with short scalars and normalizes the parsed manager", async () => {

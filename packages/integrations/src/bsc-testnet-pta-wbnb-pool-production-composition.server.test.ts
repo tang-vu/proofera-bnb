@@ -36,13 +36,11 @@ vi.mock("./bsc-testnet-pta-wbnb-pool-submission-reconciler.server", async (impor
   };
 });
 
-import { BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
-import type { BscTestnetPtaWbnbPoolAuthorizedSigningIntent } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 import {
-  BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
-  BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
-  BSC_TESTNET_PTA_WBNB_POOL_SENDER
-} from "./bsc-testnet-pta-wbnb-pool-initialization";
+  BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
+  buildBscTestnetPtaWbnbPoolExactSigningTransaction
+} from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
+import type { BscTestnetPtaWbnbPoolAuthorizedSigningIntent } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 import {
   createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse,
   reconcileExistingBscTestnetPtaWbnbPoolRecoveryForInternalUse,
@@ -239,6 +237,12 @@ describe("PTA/WBNB fresh production composition", () => {
     const envelopeHash = `0x${"61".repeat(32)}` as const;
     const transactionHash = `0x${"62".repeat(32)}` as const;
     const expiresAt = "2026-08-13T08:00:40.000Z";
+    const transaction = buildBscTestnetPtaWbnbPoolExactSigningTransaction({
+      gasLimit: "6000000",
+      gasPriceWei: "100000000",
+      sourceEnvelopeHash: envelopeHash
+    });
+    if (transaction === null) throw new Error("Exact transaction fixture failed.");
     const intent: BscTestnetPtaWbnbPoolAuthorizedSigningIntent = Object.freeze({
       schemaVersion: 1,
       scope: "owner_designated_internal_release_policy_and_exact_owner_pool_initialization",
@@ -248,23 +252,9 @@ describe("PTA/WBNB fresh production composition", () => {
       ownerAuthorizationDigest: `0x${"64".repeat(32)}`,
       releaseCommit: "1".repeat(40),
       runtimeManifestSha256: `0x${"65".repeat(32)}`,
-      authenticatedAt: "2026-08-13T08:00:10.000Z",
+      authenticatedAt: "2026-08-13T07:59:55.000Z",
       expiresAt,
-      transaction: Object.freeze({
-        type: "legacy",
-        eip155ReplayProtection: true,
-        from: BSC_TESTNET_PTA_WBNB_POOL_SENDER,
-        to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
-        nonce: "1",
-        valueWei: "0",
-        gasLimit: "6000000",
-        gasPriceWei: "100000000",
-        maximumCostWei: "600000000000000",
-        data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
-        serializedUnsignedTransaction: "0x01",
-        signingHash: `0x${"66".repeat(32)}`,
-        sourceEnvelopeHash: envelopeHash
-      })
+      transaction
     });
     doubles.describe.mockReturnValueOnce(
       Object.freeze({
@@ -272,7 +262,7 @@ describe("PTA/WBNB fresh production composition", () => {
         operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
         envelopeHash,
         exactBinding: Object.freeze({ gasLimit: 6_000_000n, gasPriceWei: 100_000_000n }),
-        envelopeExpiresAt: expiresAt
+        envelopeExpiresAt: "2026-08-13T08:04:55.000Z"
       })
     );
     doubles.signOnce.mockResolvedValueOnce(
@@ -322,6 +312,73 @@ describe("PTA/WBNB fresh production composition", () => {
       transactionHash
     });
     expect(ports.broadcaster.sendExactRawTransactionOnce).not.toHaveBeenCalled();
+  });
+
+  it("rejects a five-minute activated intent before issuing a worker", async () => {
+    const envelopeHash = `0x${"67".repeat(32)}` as const;
+    const transaction = buildBscTestnetPtaWbnbPoolExactSigningTransaction({
+      gasLimit: "6000000",
+      gasPriceWei: "100000000",
+      sourceEnvelopeHash: envelopeHash
+    });
+    if (transaction === null) throw new Error("Exact transaction fixture failed.");
+    const intent = Object.freeze({
+      schemaVersion: 1 as const,
+      scope:
+        "owner_designated_internal_release_policy_and_exact_owner_pool_initialization" as const,
+      operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
+      envelopeHash,
+      reviewerApprovalDigest: `0x${"68".repeat(32)}` as const,
+      ownerAuthorizationDigest: `0x${"69".repeat(32)}` as const,
+      releaseCommit: "2".repeat(40),
+      runtimeManifestSha256: `0x${"6a".repeat(32)}` as const,
+      authenticatedAt: "2026-08-13T07:59:55.000Z",
+      expiresAt: "2026-08-13T08:04:55.000Z",
+      transaction
+    }) satisfies BscTestnetPtaWbnbPoolAuthorizedSigningIntent;
+    doubles.describe.mockReturnValueOnce(
+      Object.freeze({
+        status: "prepared_non_authorizing",
+        operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
+        envelopeHash,
+        exactBinding: Object.freeze({ gasLimit: 6_000_000n, gasPriceWei: 100_000_000n }),
+        envelopeExpiresAt: intent.expiresAt
+      })
+    );
+    const issueWorker = vi.fn();
+    const ports: BscTestnetPtaWbnbPoolFixedProductionPorts = {
+      now: () => new Date("2026-08-13T08:00:20.000Z"),
+      intent,
+      executionCapability: Object.freeze({}),
+      authenticateAuthorizedIntent: (candidate: unknown) => candidate === intent,
+      signingJournal: {
+        claimExactInitialization: vi.fn(),
+        authorizeWorker: vi.fn(),
+        startWorker: vi.fn(),
+        consumeWorkerAuthorization: vi.fn(),
+        commitWorkerSignedTransaction: vi.fn(),
+        failBeforeSubmission: vi.fn(),
+        recordUnknownOutcome: vi.fn(),
+        readState: vi.fn(async () => EMPTY_SIGNING_STATE)
+      },
+      submissionJournal: {
+        initializeSignedCommit: vi.fn(),
+        readRecoveryState: vi.fn(async () => ({ state: "empty" as const })),
+        readState: vi.fn(),
+        commitSubmissionStarted: vi.fn(),
+        commitTerminalReconciliation: vi.fn()
+      },
+      issueWorker,
+      broadcaster: {
+        acquireTerminalPreSendRecheck: vi.fn(),
+        sendExactRawTransactionOnce: vi.fn()
+      }
+    };
+
+    await expect(
+      createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(ports).runOnce({})
+    ).resolves.toMatchObject({ status: "blocked", code: "ACTIVATED_INTENT_INVALID" });
+    expect(issueWorker).not.toHaveBeenCalled();
   });
 });
 

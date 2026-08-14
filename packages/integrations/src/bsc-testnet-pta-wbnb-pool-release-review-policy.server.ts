@@ -12,6 +12,7 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE,
   BSC_TESTNET_PTA_WBNB_POOL_CHAIN_ID,
   BSC_TESTNET_PTA_WBNB_POOL_ENVELOPE_LIFETIME_SECONDS,
+  BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE,
   BSC_TESTNET_PTA_WBNB_POOL_FEE,
   BSC_TESTNET_PTA_WBNB_POOL_GAS_MARGIN_BPS,
@@ -22,11 +23,15 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_LIMIT,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_PRICE_WEI,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_TOTAL_COST_WEI,
+  BSC_TESTNET_PTA_WBNB_POOL_OWNER_CONFIRMATION_WINDOW_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_SENDER,
   BSC_TESTNET_PTA_WBNB_POOL_SQRT_PRICE_X96,
   BSC_TESTNET_WBNB_ADDRESS
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
-import { BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
+import {
+  BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS,
+  BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY
+} from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 
 export const BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_RUNTIME_MANIFEST_DOMAIN =
   "ProofEra:bsc-testnet-pta-wbnb-pool-production-runtime-manifest:v2" as const;
@@ -93,7 +98,10 @@ const CAPS_KEYS = [
   "maximumGasLimit",
   "maximumGasPriceWei",
   "maximumTotalCostWei",
-  "maximumEnvelopeLifetimeSeconds"
+  "maximumEnvelopeLifetimeSeconds",
+  "maximumOwnerConfirmationWindowSeconds",
+  "maximumExecutionAuthorityLifetimeSeconds",
+  "maximumPostClaimRecheckAgeSeconds"
 ] as const;
 const SCOPE_KEYS = [
   "exactFreshEnvelopeRequired",
@@ -206,7 +214,10 @@ export interface BscTestnetPtaWbnbPoolReleaseReviewPolicy {
     maximumGasLimit: "6000000";
     maximumGasPriceWei: "3000000000";
     maximumTotalCostWei: "18000000000000000";
-    maximumEnvelopeLifetimeSeconds: "45";
+    maximumEnvelopeLifetimeSeconds: "300";
+    maximumOwnerConfirmationWindowSeconds: "240";
+    maximumExecutionAuthorityLifetimeSeconds: "45";
+    maximumPostClaimRecheckAgeSeconds: "30";
   }>;
   readonly scope: Readonly<{
     exactFreshEnvelopeRequired: true;
@@ -659,7 +670,13 @@ function exactCaps(): BscTestnetPtaWbnbPoolReleaseReviewPolicy["caps"] {
     maximumTotalCostWei:
       BSC_TESTNET_PTA_WBNB_POOL_MAX_TOTAL_COST_WEI.toString() as "18000000000000000",
     maximumEnvelopeLifetimeSeconds:
-      BSC_TESTNET_PTA_WBNB_POOL_ENVELOPE_LIFETIME_SECONDS.toString() as "45"
+      BSC_TESTNET_PTA_WBNB_POOL_ENVELOPE_LIFETIME_SECONDS.toString() as "300",
+    maximumOwnerConfirmationWindowSeconds:
+      BSC_TESTNET_PTA_WBNB_POOL_OWNER_CONFIRMATION_WINDOW_SECONDS.toString() as "240",
+    maximumExecutionAuthorityLifetimeSeconds:
+      BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS.toString() as "45",
+    maximumPostClaimRecheckAgeSeconds:
+      BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS.toString() as "30"
   });
 }
 

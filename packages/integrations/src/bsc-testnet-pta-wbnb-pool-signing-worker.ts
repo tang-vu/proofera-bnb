@@ -58,11 +58,13 @@ import {
   type BscTestnetPtaWbnbPoolLocalJournal
 } from "./bsc-testnet-pta-wbnb-pool-local-journal.server";
 import {
+  BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_OPERATION,
   BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_PROTOCOL_VERSION,
   BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_REQUEST_HASH_DOMAIN,
+  parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse,
   validateBscTestnetPtaWbnbPoolSigningWorkerRequest,
   validateBscTestnetPtaWbnbPoolSigningWorkerResponse,
   type BscTestnetPtaWbnbPoolAuthorizedSigningIntent,
@@ -1475,7 +1477,7 @@ function parseWorkerInput(
     nonce: BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE,
     signingNotAfterMilliseconds: Math.min(
       expiresAtMilliseconds,
-      authenticatedAtMilliseconds + 30_000
+      authenticatedAtMilliseconds + BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS * 1_000
     )
   });
   if (!validateExactTransaction(transaction)) return null;
@@ -1988,14 +1990,38 @@ function sameWorkerResponse(
   );
 }
 
-function exactBroadcastMatchesSuccessfulSigning(
+/** Verification-only exact binding used in addition to the closure-private execution capability. */
+export function matchesBscTestnetPtaWbnbPoolExactBroadcastToSuccessfulSigningForInternalUse(
   value: unknown,
+  intent: BscTestnetPtaWbnbPoolAuthorizedSigningIntent,
   request: BscTestnetPtaWbnbPoolSigningWorkerRequest,
   response: BscTestnetPtaWbnbPoolSigningWorkerResponse
 ): boolean {
   const record = dataRecord(value);
+  const recordAuthenticatedAt =
+    record === null ? null : exactUtcMilliseconds(record.authenticatedAt);
+  const recordExpiresAt = record === null ? null : exactUtcMilliseconds(record.expiresAt);
+  const terminalObservedAt =
+    record === null ? null : exactUtcMilliseconds(record.terminalPreSubmissionObservedAt);
+  const intentAuthenticatedAt = exactUtcMilliseconds(intent.authenticatedAt);
+  const intentExpiresAt = exactUtcMilliseconds(intent.expiresAt);
+  const requestAuthenticatedAt = exactUtcMilliseconds(request.authenticatedAt);
+  const requestExpiresAt = exactUtcMilliseconds(request.expiresAt);
+  const parsedIntent = parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse(intent);
   if (
     record === null ||
+    recordAuthenticatedAt === null ||
+    recordExpiresAt === null ||
+    terminalObservedAt === null ||
+    intentAuthenticatedAt === null ||
+    intentExpiresAt === null ||
+    requestAuthenticatedAt === null ||
+    requestExpiresAt === null ||
+    parsedIntent === null ||
+    validateBscTestnetPtaWbnbPoolSigningWorkerRequest(
+      request,
+      new Date(requestAuthenticatedAt ?? Number.NaN)
+    ).status !== "valid" ||
     !Object.isFrozen(value) ||
     !hasExactKeys(record, EXACT_BROADCAST_REQUEST_KEYS) ||
     record.schemaVersion !== 1 ||
@@ -2010,12 +2036,16 @@ function exactBroadcastMatchesSuccessfulSigning(
     record.signingHash !== request.transaction.signingHash ||
     record.transactionHash !== response.transactionHash ||
     record.signedTransactionKeccak256 !== response.transactionHash ||
-    record.authenticatedAt !== request.authenticatedAt ||
-    record.expiresAt !== request.expiresAt ||
+    record.authenticatedAt !== intent.authenticatedAt ||
+    record.expiresAt !== intent.expiresAt ||
+    request.expiresAt !== intent.expiresAt ||
+    requestAuthenticatedAt < intentAuthenticatedAt ||
+    requestAuthenticatedAt >= intentExpiresAt ||
+    requestExpiresAt !== intentExpiresAt ||
+    terminalObservedAt < requestAuthenticatedAt ||
     record.signedTransaction !== response.signedTransaction ||
     exactLowerHex(record.submissionStartedDigest, 32) === null ||
-    exactLowerHex(record.terminalPreSubmissionDigest, 32) === null ||
-    exactUtcMilliseconds(record.terminalPreSubmissionObservedAt) === null
+    exactLowerHex(record.terminalPreSubmissionDigest, 32) === null
   ) {
     return false;
   }
@@ -2402,8 +2432,9 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
             candidateCapability === executionCapability &&
             successfulSigningRequest !== null &&
             successfulSigningResponse !== null &&
-            exactBroadcastMatchesSuccessfulSigning(
+            matchesBscTestnetPtaWbnbPoolExactBroadcastToSuccessfulSigningForInternalUse(
               request,
+              intent,
               successfulSigningRequest,
               successfulSigningResponse
             );

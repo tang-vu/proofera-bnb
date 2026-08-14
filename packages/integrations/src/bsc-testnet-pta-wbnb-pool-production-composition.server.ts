@@ -22,6 +22,7 @@ import {
 import {
   BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
+  parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse,
   type BscTestnetPtaWbnbPoolAuthorizedSigningIntent,
   type BscTestnetPtaWbnbPoolSigningWorkerRequest
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
@@ -445,6 +446,7 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
       return blocked("ENVELOPE_INVALID", "Fresh exact coordinator envelope is unavailable.");
     }
     const intent = ports.intent;
+    const parsedIntent = parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse(intent);
     let authenticatedIntent = false;
     try {
       authenticatedIntent = ports.authenticateAuthorizedIntent(intent) === true;
@@ -452,13 +454,16 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
       authenticatedIntent = false;
     }
     if (
+      parsedIntent === null ||
       !authenticatedIntent ||
-      intent.operationKey !== descriptor.operationKey ||
-      intent.envelopeHash !== descriptor.envelopeHash ||
-      intent.expiresAt !== descriptor.envelopeExpiresAt ||
-      intent.transaction.sourceEnvelopeHash !== descriptor.envelopeHash ||
-      intent.transaction.gasLimit !== descriptor.exactBinding.gasLimit.toString() ||
-      intent.transaction.gasPriceWei !== descriptor.exactBinding.gasPriceWei.toString()
+      parsedIntent.operationKey !== descriptor.operationKey ||
+      parsedIntent.envelopeHash !== descriptor.envelopeHash ||
+      Date.parse(parsedIntent.authenticatedAt) > now.getTime() ||
+      Date.parse(parsedIntent.expiresAt) <= now.getTime() ||
+      Date.parse(parsedIntent.expiresAt) > Date.parse(descriptor.envelopeExpiresAt) ||
+      parsedIntent.transaction.sourceEnvelopeHash !== descriptor.envelopeHash ||
+      parsedIntent.transaction.gasLimit !== descriptor.exactBinding.gasLimit.toString() ||
+      parsedIntent.transaction.gasPriceWei !== descriptor.exactBinding.gasPriceWei.toString()
     ) {
       return blocked(
         "ACTIVATED_INTENT_INVALID",
