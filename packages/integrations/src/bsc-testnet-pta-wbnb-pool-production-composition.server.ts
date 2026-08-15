@@ -22,7 +22,9 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-signer-core";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
-  BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION,
+  BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse,
   type BscTestnetPtaWbnbPoolAuthorizedSigningIntent,
@@ -38,7 +40,7 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-production-rpc.server";
 import {
   deriveBscTestnetPtaWbnbPoolAuthorizationReceiptSha256,
-  type BscTestnetPtaWbnbPoolGeneration2ClaimRequest,
+  type BscTestnetPtaWbnbPoolGeneration3ClaimRequest,
   type BscTestnetPtaWbnbPoolLegacyLocalJournalRecoveryReader,
   type BscTestnetPtaWbnbPoolLocalJournal,
   type BscTestnetPtaWbnbPoolLocalJournalRecoveryReader,
@@ -58,7 +60,7 @@ import {
   type BscTestnetPtaWbnbPoolTerminalReconciliationJournal
 } from "./bsc-testnet-pta-wbnb-pool-submission-reconciler.server";
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V3_POLICY,
+  BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V4_POLICY,
   type BscTestnetPtaWbnbPoolDurableSubmissionJournal,
   type BscTestnetPtaWbnbPoolSubmissionJournalRecoveryReader,
   type BscTestnetPtaWbnbPoolSubmissionRecoveryState
@@ -177,7 +179,7 @@ function stateBinding(state: BscTestnetPtaWbnbPoolLocalJournalState): Readonly<{
   reviewerApprovalDigest: Hex;
   ownerAuthorizationDigest: Hex;
   signingHash: Hex;
-  generation: 2;
+  generation: typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
   predecessorState: "superseded_before_worker";
   predecessorFenceSha256: Hex;
   attemptId: Hex;
@@ -189,7 +191,7 @@ function stateBinding(state: BscTestnetPtaWbnbPoolLocalJournalState): Readonly<{
     state.reviewerApprovalDigest !== null &&
     state.ownerAuthorizationDigest !== null &&
     state.signingHash !== null &&
-    state.generation === 2 &&
+    state.generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION &&
     state.predecessorState === "superseded_before_worker" &&
     state.predecessorFenceSha256 !== null &&
     state.attemptId !== null
@@ -201,7 +203,7 @@ function stateBinding(state: BscTestnetPtaWbnbPoolLocalJournalState): Readonly<{
         reviewerApprovalDigest: state.reviewerApprovalDigest,
         ownerAuthorizationDigest: state.ownerAuthorizationDigest,
         signingHash: state.signingHash,
-        generation: 2,
+        generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
         predecessorState: "superseded_before_worker",
         predecessorFenceSha256: state.predecessorFenceSha256,
         attemptId: state.attemptId
@@ -211,7 +213,7 @@ function stateBinding(state: BscTestnetPtaWbnbPoolLocalJournalState): Readonly<{
 
 function exactClaimRequestFromIntent(
   intent: BscTestnetPtaWbnbPoolAuthorizedSigningIntent
-): BscTestnetPtaWbnbPoolGeneration2ClaimRequest {
+): BscTestnetPtaWbnbPoolGeneration3ClaimRequest {
   const body = Object.freeze({
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: intent.envelopeHash,
@@ -237,16 +239,13 @@ function exactClaimRequestFromIntent(
   });
 }
 
-function exactLegacySupersessionFence(
+function exactPredecessorSupersessionFence(
   state: BscTestnetPtaWbnbPoolLocalJournalState | null
 ): NonNullable<BscTestnetPtaWbnbPoolLocalJournalState["supersessionFence"]> | null {
   if (
     state === null ||
     state.status !== "superseded_before_worker" ||
-    state.generation !== 1 ||
-    state.predecessorState !== null ||
-    state.predecessorFenceSha256 !== null ||
-    state.attemptId !== null ||
+    state.generation !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION ||
     state.supersessionFence === null
   ) {
     return null;
@@ -261,7 +260,7 @@ function exactLegacySupersessionFence(
     fence.signatureOutcome === "not_attempted" &&
     fence.submissionOutcome === "not_attempted" &&
     fence.submissionJournalState === "exact_empty" &&
-    fence.legacyClaimRawSha256 === BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256 &&
+    fence.predecessorClaimRawSha256 === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256 &&
     exactBytes32(fence.noEffectProofDigest) &&
     exactBytes32(fence.noEffectEnvelopeHash) &&
     exactBytes32(fence.predecessorFenceSha256) &&
@@ -278,12 +277,12 @@ function legacyFenceMatchesRecoveryAttempt(
   executionEnvelopeHash: Hex,
   executionEnvelopeObservedAt: string
 ): boolean {
-  const fence = exactLegacySupersessionFence(state);
+  const fence = exactPredecessorSupersessionFence(state);
   if (fence === null) return false;
   const fenceRecordedAt = Date.parse(fence.fenceRecordedAt);
   const executionObservedAt = Date.parse(executionEnvelopeObservedAt);
   return (
-    intent.recovery.generation === 2 &&
+    intent.recovery.generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION &&
     intent.recovery.predecessorState === "superseded_before_worker" &&
     intent.recovery.predecessorFenceSha256 === fence.predecessorFenceSha256 &&
     executionEnvelopeHash === intent.envelopeHash &&
@@ -297,7 +296,7 @@ function legacyFenceMatchesRecoveryAttempt(
 function claimedStateMatchesRequest(
   state: BscTestnetPtaWbnbPoolLocalJournalState,
   claimId: string,
-  request: BscTestnetPtaWbnbPoolGeneration2ClaimRequest
+  request: BscTestnetPtaWbnbPoolGeneration3ClaimRequest
 ): boolean {
   return (
     state.status === "claimed" &&
@@ -554,7 +553,7 @@ export async function reconcileExistingBscTestnetPtaWbnbPoolRecoveryForInternalU
 /**
  * Narrow fresh-only composition. It accepts only the already activated private native capabilities
  * minted after the release policy and exact owner ceremony. It re-reads the append-only legacy
- * fence and both active durable journals, and refuses any changed state before the generation-2
+ * fence and both active durable journals, and refuses any changed state before the generation-3
  * claim.
  */
 export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
@@ -590,10 +589,10 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
         "Durable state changed after the recovery probes or owner ceremony; signing and submission are forbidden."
       );
     }
-    if (exactLegacySupersessionFence(legacyState) === null) {
+    if (exactPredecessorSupersessionFence(legacyState) === null) {
       return blocked(
         "LEGACY_SUPERSESSION_FENCE_CHANGED_AFTER_OWNER_CONFIRMATION",
-        "The append-only predecessor fence is unavailable or changed after the owner ceremony; generation-2 authority cannot be used."
+        "The append-only predecessor fence is unavailable or changed after the owner ceremony; generation-3 authority cannot be used."
       );
     }
     const descriptor = describeBscTestnetPtaWbnbPoolOneShotBoundary(envelope, ports.now);
@@ -821,9 +820,9 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
     }
     await ports.submissionJournal.initializeSignedCommit(
       Object.freeze({
-        schemaVersion: 2 as const,
-        kind: "authenticated_owner_recovery_generation_2_signed_submission_commit_v2" as const,
-        ownerAuthorizationPolicy: BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V3_POLICY,
+        schemaVersion: 3 as const,
+        kind: "authenticated_owner_recovery_generation_3_signed_submission_commit_v3" as const,
+        ownerAuthorizationPolicy: BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V4_POLICY,
         capability
       })
     );

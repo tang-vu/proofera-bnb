@@ -186,7 +186,7 @@ async function submissionCapability(
     value: 0n
   });
   return Object.freeze({
-    schemaVersion: 2,
+    schemaVersion: 3,
     scope: BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCOPE,
     operation: BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_OPERATION,
     oneShotIntentId: BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
@@ -198,7 +198,7 @@ async function submissionCapability(
     releaseCommit: RELEASE_COMMIT,
     runtimeManifestSha256: MANIFEST_DIGEST,
     recovery: Object.freeze({
-      generation: 2,
+      generation: 3,
       predecessorState: "superseded_before_worker",
       predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
       attemptId: ATTEMPT_ID
@@ -406,7 +406,7 @@ function evidence(
   capability: BscTestnetPtaWbnbPoolSubmissionCapability
 ): BscTestnetPtaWbnbPoolReconciliationEvidence {
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     operation: BSC_TESTNET_PTA_WBNB_POOL_RECONCILIATION_OPERATION,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     transactionHash: capability.transaction.transactionHash,
@@ -421,7 +421,7 @@ function journalState(
   state: "signed_committed" | "submission_started" = "signed_committed"
 ) {
   const body = Object.freeze({
-    schemaVersion: 2,
+    schemaVersion: 3,
     operation: BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_OPERATION,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     claimId: capability.claimId,
@@ -436,7 +436,7 @@ function journalState(
     signedTransactionKeccak256: keccak256(capability.transaction.signedTransaction)
   });
   return Object.freeze({
-    schemaVersion: 2,
+    schemaVersion: 3,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     claimId: capability.claimId,
     envelopeHash: capability.envelopeHash,
@@ -450,7 +450,7 @@ function journalState(
     signedTransactionKeccak256: body.signedTransactionKeccak256,
     submissionStartedDigest: keccak256(
       stringToHex(
-        `proofera.bsc-testnet.pta-wbnb-pool.submission-started.v2\u0000${JSON.stringify(body)}`
+        `proofera.bsc-testnet.pta-wbnb-pool.submission-started.v3\u0000${JSON.stringify(body)}`
       )
     ),
     state

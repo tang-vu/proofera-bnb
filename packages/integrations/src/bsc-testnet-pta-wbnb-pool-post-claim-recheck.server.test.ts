@@ -61,8 +61,8 @@ function transaction() {
 
 function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
   return Object.freeze({
-    schemaVersion: 2,
-    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_2",
+    schemaVersion: 3,
+    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_3",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
     reviewerApprovalDigest: REVIEWER_DIGEST,
@@ -72,7 +72,7 @@ function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
     authenticatedAt: "2026-08-13T04:29:45.000Z",
     expiresAt: "2026-08-13T04:30:30.000Z",
     recovery: Object.freeze({
-      generation: 2,
+      generation: 3,
       predecessorState: "superseded_before_worker",
       predecessorFenceSha256: PREDECESSOR_FENCE,
       attemptId: ATTEMPT_ID
@@ -264,7 +264,7 @@ describe("PTA/WBNB post-claim dual-RPC recheck", () => {
       authenticatedAt: COMPLETE,
       expiresAt: "2026-08-13T04:30:30.000Z",
       recovery: {
-        generation: 2,
+        generation: 3,
         predecessorState: "superseded_before_worker",
         predecessorFenceSha256: PREDECESSOR_FENCE,
         attemptId: ATTEMPT_ID

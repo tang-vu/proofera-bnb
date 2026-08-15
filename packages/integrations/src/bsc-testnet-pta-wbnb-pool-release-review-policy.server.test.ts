@@ -16,7 +16,7 @@ import {
   BSC_TESTNET_WBNB_ADDRESS
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 import {
@@ -101,7 +101,7 @@ function predecessorFence() {
     submissionOutcome: "not_attempted" as const,
     submissionJournalState: "exact_empty" as const,
     fenceRecordedAt: FENCE_RECORDED_AT,
-    legacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+    predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
     noEffectProofDigest: NO_EFFECT_PROOF_DIGEST,
     noEffectEnvelopeHash: NO_EFFECT_ENVELOPE_HASH,
     noEffectObservedAt: NO_EFFECT_OBSERVED_AT,
@@ -126,9 +126,9 @@ function policyBody(release = releaseIdentity()): PolicyBody {
     deriveBscTestnetPtaWbnbPoolReleaseReviewSubjectSha256ForInternalUse(release);
   if (reviewedSubjectSha256 === null) throw new Error("synthetic release must be valid");
   return Object.freeze({
-    schemaVersion: 2 as const,
-    kind: "owner_designated_internal_multi_agent_release_review_policy_generation_2_v2" as const,
-    decision: "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_2_POLICY" as const,
+    schemaVersion: 3 as const,
+    kind: "owner_designated_internal_multi_agent_release_review_policy_generation_3_v3" as const,
+    decision: "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_3_POLICY" as const,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     release,
     transaction: Object.freeze({
@@ -158,8 +158,8 @@ function policyBody(release = releaseIdentity()): PolicyBody {
       maximumOwnerConfirmationWindowSeconds: "240" as const,
       maximumExecutionAuthorityLifetimeSeconds: "45" as const,
       maximumPostClaimRecheckAgeSeconds: "30" as const,
-      recoveryGeneration: "2" as const,
-      predecessorLegacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256
+      recoveryGeneration: "3" as const,
+      predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256
     }),
     scope: Object.freeze({
       exactFreshEnvelopeRequired: true as const,
@@ -348,8 +348,8 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
     if (admission === null) throw new Error("expected realm");
 
     expect(admission.policy).toMatchObject({
-      schemaVersion: 2,
-      decision: "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_2_POLICY",
+      schemaVersion: 3,
+      decision: "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_3_POLICY",
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       release: expectedRelease,
       transaction: {
@@ -372,8 +372,8 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
         maximumOwnerConfirmationWindowSeconds: "240",
         maximumExecutionAuthorityLifetimeSeconds: "45",
         maximumPostClaimRecheckAgeSeconds: "30",
-        recoveryGeneration: "2",
-        predecessorLegacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256
+        recoveryGeneration: "3",
+        predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256
       },
       scope: {
         maximumSignatureCount: "1",
@@ -419,7 +419,7 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
       executionEnvelopeObservedAt: EXECUTION_ENVELOPE_OBSERVED_AT,
       expiresAt: ENVELOPE_EXPIRES_AT,
       recovery: {
-        generation: 2,
+        generation: 3,
         predecessorFence: predecessorFence()
       },
       automatedPolicyApplication: true,
@@ -497,8 +497,7 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
         (record.caps as Record<string, unknown>).recoveryGeneration = "1";
       },
       (record) => {
-        (record.caps as Record<string, unknown>).predecessorLegacyClaimRawSha256 =
-          `0x${"01".repeat(32)}`;
+        (record.caps as Record<string, unknown>).predecessorClaimRawSha256 = `0x${"01".repeat(32)}`;
       },
       (record) => {
         (record.scope as Record<string, unknown>).lpPositionMintAuthorized = true;
@@ -545,7 +544,7 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
     delete caps.maximumExecutionAuthorityLifetimeSeconds;
     delete caps.maximumPostClaimRecheckAgeSeconds;
     delete caps.recoveryGeneration;
-    delete caps.predecessorLegacyClaimRawSha256;
+    delete caps.predecessorClaimRawSha256;
     expect(
       realm(resealPolicy(legacy, BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_POLICY_DIGEST_DOMAIN))
     ).toBeNull();
@@ -574,7 +573,7 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
         ...instantiationInput(),
         predecessorFence: Object.freeze({
           ...predecessorFence(),
-          legacyClaimRawSha256: `0x${"01".repeat(32)}`
+          predecessorClaimRawSha256: `0x${"01".repeat(32)}`
         })
       }),
       Object.freeze({
@@ -831,7 +830,7 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
       },
       (binding) => {
         binding.recovery = Object.freeze({
-          generation: 2,
+          generation: 3,
           predecessorFence: Object.freeze({
             ...predecessorFence(),
             predecessorFenceSha256: `0x${"78".repeat(32)}`

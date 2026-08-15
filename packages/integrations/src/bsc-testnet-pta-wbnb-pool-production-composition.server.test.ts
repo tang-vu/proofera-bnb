@@ -37,7 +37,7 @@ vi.mock("./bsc-testnet-pta-wbnb-pool-submission-reconciler.server", async (impor
 });
 
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   buildBscTestnetPtaWbnbPoolExactSigningTransaction
@@ -98,7 +98,7 @@ const EMPTY_SIGNING_STATE: BscTestnetPtaWbnbPoolLocalJournalState = Object.freez
 const LEGACY_FENCE_STATE: BscTestnetPtaWbnbPoolLocalJournalState = Object.freeze({
   ...EMPTY_SIGNING_STATE,
   status: "superseded_before_worker",
-  generation: 1,
+  generation: 2,
   supersessionFence: Object.freeze({
     status: "superseded_before_worker",
     terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
@@ -107,7 +107,7 @@ const LEGACY_FENCE_STATE: BscTestnetPtaWbnbPoolLocalJournalState = Object.freeze
     signatureOutcome: "not_attempted",
     submissionOutcome: "not_attempted",
     submissionJournalState: "exact_empty",
-    legacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+    predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
     noEffectProofDigest: NO_EFFECT_PROOF_DIGEST,
     noEffectEnvelopeHash: NO_EFFECT_ENVELOPE_HASH,
     noEffectObservedAt: "2026-08-13T07:59:40.000Z",
@@ -225,7 +225,7 @@ function retainedTerminalPair(
     reviewerApprovalDigest: `0x${"49".repeat(32)}` as const,
     ownerAuthorizationDigest: `0x${"4a".repeat(32)}` as const,
     recovery: Object.freeze({
-      generation: 2 as const,
+      generation: 3 as const,
       predecessorState: "superseded_before_worker" as const,
       predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
       attemptId: ATTEMPT_ID
@@ -264,7 +264,7 @@ function retainedTerminalPair(
       gasPriceWei: capability.transaction.gasPriceWei,
       maxCostWei: capability.transaction.maximumCostWei,
       signingHash: capability.transaction.signingHash,
-      generation: 2,
+      generation: 3,
       predecessorState: "superseded_before_worker",
       predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
       attemptId: ATTEMPT_ID
@@ -303,7 +303,7 @@ describe("PTA/WBNB fresh production composition", () => {
         ...LEGACY_FENCE_STATE,
         supersessionFence: Object.freeze({
           ...retainedFence,
-          legacyClaimRawSha256: `0x${"55".repeat(32)}`
+          predecessorClaimRawSha256: `0x${"55".repeat(32)}`
         })
       })
     );
@@ -354,8 +354,8 @@ describe("PTA/WBNB fresh production composition", () => {
     });
     if (transaction === null) throw new Error("Exact transaction fixture failed.");
     const intent: BscTestnetPtaWbnbPoolAuthorizedSigningIntent = Object.freeze({
-      schemaVersion: 2,
-      scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_2",
+      schemaVersion: 3,
+      scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_3",
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       envelopeHash,
       reviewerApprovalDigest: `0x${"63".repeat(32)}`,
@@ -365,7 +365,7 @@ describe("PTA/WBNB fresh production composition", () => {
       authenticatedAt: "2026-08-13T07:59:55.000Z",
       expiresAt,
       recovery: Object.freeze({
-        generation: 2,
+        generation: 3,
         predecessorState: "superseded_before_worker",
         predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
         attemptId: ATTEMPT_ID
@@ -432,9 +432,9 @@ describe("PTA/WBNB fresh production composition", () => {
     });
     if (transaction === null) throw new Error("Exact transaction fixture failed.");
     const intent = Object.freeze({
-      schemaVersion: 2 as const,
+      schemaVersion: 3 as const,
       scope:
-        "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_2" as const,
+        "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_3" as const,
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       envelopeHash,
       reviewerApprovalDigest: `0x${"68".repeat(32)}` as const,
@@ -444,7 +444,7 @@ describe("PTA/WBNB fresh production composition", () => {
       authenticatedAt: "2026-08-13T07:59:55.000Z",
       expiresAt: "2026-08-13T08:04:55.000Z",
       recovery: Object.freeze({
-        generation: 2 as const,
+        generation: 3 as const,
         predecessorState: "superseded_before_worker" as const,
         predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
         attemptId: ATTEMPT_ID
@@ -489,7 +489,7 @@ describe("PTA/WBNB fresh production composition", () => {
     expect(issueWorker).not.toHaveBeenCalled();
   });
 
-  it("rechecks all three durable states and verifies the exact generation-2 claim readback", async () => {
+  it("rechecks all durable states and verifies the exact generation-3 claim readback", async () => {
     const envelopeHash = `0x${"81".repeat(32)}` as const;
     const transaction = buildBscTestnetPtaWbnbPoolExactSigningTransaction({
       gasLimit: "6000000",
@@ -498,8 +498,8 @@ describe("PTA/WBNB fresh production composition", () => {
     });
     if (transaction === null) throw new Error("Exact transaction fixture failed.");
     const intent: BscTestnetPtaWbnbPoolAuthorizedSigningIntent = Object.freeze({
-      schemaVersion: 2,
-      scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_2",
+      schemaVersion: 3,
+      scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_3",
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       envelopeHash,
       reviewerApprovalDigest: `0x${"82".repeat(32)}`,
@@ -509,7 +509,7 @@ describe("PTA/WBNB fresh production composition", () => {
       authenticatedAt: "2026-08-13T08:00:10.000Z",
       expiresAt: "2026-08-13T08:00:55.000Z",
       recovery: Object.freeze({
-        generation: 2,
+        generation: 3,
         predecessorState: "superseded_before_worker",
         predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
         attemptId: ATTEMPT_ID
@@ -571,7 +571,7 @@ describe("PTA/WBNB fresh production composition", () => {
         dependencies: OneShotSignerModule.BscTestnetPtaWbnbPoolOneShotSignerTestDependencies
       ) => {
         const durableClaimRequest = Object.freeze({
-          schemaVersion: 2,
+          schemaVersion: 3,
           operation: "claim_exact_bsc_testnet_pta_wbnb_pool_initialization_once",
           oneShotIntentId: BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
           operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -634,7 +634,7 @@ describe("PTA/WBNB fresh production composition", () => {
         await expect(
           dependencies.readBackSignedCommit(
             Object.freeze({
-              schemaVersion: 2,
+              schemaVersion: 3,
               operation: "verify_exact_bsc_testnet_pta_wbnb_pool_signed_commit",
               oneShotIntentId: BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
               operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -687,7 +687,7 @@ describe("PTA/WBNB fresh production composition", () => {
     expect(submissionJournal.readRecoveryState).toHaveBeenCalledTimes(2);
     expect(claimExactInitialization).toHaveBeenCalledWith(
       expect.objectContaining({
-        generation: 2,
+        generation: 3,
         predecessorState: "superseded_before_worker",
         predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
         attemptId: ATTEMPT_ID,
@@ -696,7 +696,7 @@ describe("PTA/WBNB fresh production composition", () => {
     );
     expect(retainedClaimState).toMatchObject({
       status: "claimed",
-      generation: 2,
+      generation: 3,
       predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
       attemptId: ATTEMPT_ID
     });
@@ -869,7 +869,7 @@ describe("PTA/WBNB recovery-only composition", () => {
         reviewerApprovalDigest: `0x${"74".repeat(32)}` as const,
         ownerAuthorizationDigest: `0x${"75".repeat(32)}` as const,
         recovery: Object.freeze({
-          generation: 2 as const,
+          generation: 3 as const,
           predecessorState: "superseded_before_worker" as const,
           predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
           attemptId: ATTEMPT_ID
@@ -902,7 +902,7 @@ describe("PTA/WBNB recovery-only composition", () => {
         gasPriceWei: capability.transaction.gasPriceWei,
         maxCostWei: capability.transaction.maximumCostWei,
         signingHash: capability.transaction.signingHash,
-        generation: 2,
+        generation: 3,
         predecessorState: "superseded_before_worker",
         predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
         attemptId: ATTEMPT_ID

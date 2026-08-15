@@ -41,7 +41,7 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-submission-reconciler.server";
 import { runPinnedPowerShellForInternalUse } from "./bsc-testnet-deployer-custody-windows.server";
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V3_POLICY,
+  BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V4_POLICY,
   createBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUse,
   createWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalAtSyntheticDirectoryForTests,
   openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalAtSyntheticDirectoryForTests,
@@ -90,7 +90,7 @@ async function capability(reference = NOW): Promise<BscTestnetPtaWbnbPoolSubmiss
     releaseCommit: "1".repeat(40),
     runtimeManifestSha256: bytes32("4"),
     recovery: Object.freeze({
-      generation: 2,
+      generation: 3,
       predecessorState: "superseded_before_worker",
       predecessorFenceSha256: bytes32("6"),
       attemptId: bytes32("7")
@@ -147,9 +147,9 @@ function signedCommit(
   cap: BscTestnetPtaWbnbPoolSubmissionCapability
 ): BscTestnetPtaWbnbPoolDurableSignedCommitRequest {
   return Object.freeze({
-    schemaVersion: 2,
-    kind: "authenticated_owner_recovery_generation_2_signed_submission_commit_v2",
-    ownerAuthorizationPolicy: BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V3_POLICY,
+    schemaVersion: 3,
+    kind: "authenticated_owner_recovery_generation_3_signed_submission_commit_v3",
+    ownerAuthorizationPolicy: BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V4_POLICY,
     capability: cap
   });
 }
@@ -353,16 +353,16 @@ describe("durable PTA/WBNB submission journal v3", () => {
     await expect(journal.readRecoveryState()).resolves.toMatchObject({
       state: "signed_committed",
       capability: cap,
-      ownerAuthorizationPolicy: BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V3_POLICY,
+      ownerAuthorizationPolicy: BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V4_POLICY,
       journalEvidenceOnly: true,
       authorityReauthenticationRequired: true,
       sendingAuthorizedByJournal: false
     });
-    const retained = fixture.files.get("01-signed-commit.v3.json") ?? "";
+    const retained = fixture.files.get("01-signed-commit.v4.json") ?? "";
     expect(retained).toContain(cap.transaction.signedTransaction);
     expect(retained).toContain(cap.preSubmission.finalizedBlockHash);
     expect(retained).toContain("one_send_only_no_retry_no_replacement_reconcile_after_ambiguity");
-    expect(fixture.files.has("02-submission-started.v3.json")).toBe(false);
+    expect(fixture.files.has("02-submission-started.v4.json")).toBe(false);
   });
 
   it("elects exactly one submission winner and all restarts are reconciliation-only", async () => {
@@ -399,7 +399,7 @@ describe("durable PTA/WBNB submission journal v3", () => {
         createExclusive: async (name: string, content: string) => {
           if (fixture.files.has(name)) return "exists" as const;
           fixture.files.set(name, content);
-          if (name === "02-submission-started.v3.json") throw new Error("power lost");
+          if (name === "02-submission-started.v4.json") throw new Error("power lost");
           return "created" as const;
         }
       })
@@ -432,7 +432,7 @@ describe("durable PTA/WBNB submission journal v3", () => {
     const partial = memoryPorts();
     const first = createBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUse(partial.ports);
     await first.initializeSignedCommit(signedCommit(cap));
-    partial.files.set("02-submission-started.v3.json", '{"partial":true}');
+    partial.files.set("02-submission-started.v4.json", '{"partial":true}');
     await expect(first.readRecoveryState()).resolves.toMatchObject({
       state: "unknown_outcome",
       capability: cap
@@ -491,8 +491,8 @@ describe("durable PTA/WBNB submission journal v3", () => {
       state: "confirmed",
       reconciliationDigest: terminal.reconciliationDigest
     });
-    expect(fixture.files.get("03-terminal-reconciliation.v3.json")).toMatch(/signedCommitSha256/u);
-    expect(fixture.files.get("03-terminal-reconciliation.v3.json")).toMatch(
+    expect(fixture.files.get("03-terminal-reconciliation.v4.json")).toMatch(/signedCommitSha256/u);
+    expect(fixture.files.get("03-terminal-reconciliation.v4.json")).toMatch(
       /submissionStartedRecordSha256/u
     );
     await expect(
@@ -514,7 +514,7 @@ describe("durable PTA/WBNB submission journal v3", () => {
         Object.freeze({
           ...signedCommit(cap),
           ownerAuthorizationPolicy: Object.freeze({
-            ...BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V3_POLICY,
+            ...BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V4_POLICY,
             retryAllowed: true
           })
         }) as unknown as BscTestnetPtaWbnbPoolDurableSignedCommitRequest
@@ -580,7 +580,7 @@ describe("durable PTA/WBNB submission journal v3", () => {
     expect(SOURCE).toContain(
       'const SUBDIRECTORY = ["ProofEra", "operations", "bsc-testnet-pta-wbnb-pool-submission-v2"]'
     );
-    expect(SOURCE).toContain('const SIGNED_COMMIT_FILE = "01-signed-commit.v3.json"');
+    expect(SOURCE).toContain('const SIGNED_COMMIT_FILE = "01-signed-commit.v4.json"');
     const readOnlyStart = SOURCE.indexOf("const LOCAL_APPLICATION_DATA_READ_ONLY_PROBE_SCRIPT");
     const provisioningStart = SOURCE.indexOf("const PREPARE_SCRIPT");
     const readOnlyScript = SOURCE.slice(readOnlyStart, provisioningStart);
@@ -667,7 +667,7 @@ describe.runIf(process.platform === "win32")(
         ).resolves.toMatchObject({ status: "blocked", journal: null });
         expect(await snapshotSyntheticTree(directory)).toEqual(beforeOpen);
 
-        const partialTerminal = win32.join(directory, "03-terminal-reconciliation.v3.json");
+        const partialTerminal = win32.join(directory, "03-terminal-reconciliation.v4.json");
         await writeFile(partialTerminal, '{"partial":true}', { encoding: "utf8", flag: "wx" });
         await runSyntheticPowerShell(PROTECT_SYNTHETIC_PATH_SCRIPT, partialTerminal);
         const unknownStartup =
@@ -696,7 +696,7 @@ describe.runIf(process.platform === "win32")(
     }, 45_000);
 
     it("blocks partial/order-mismatched recovery files without changing them", async () => {
-      for (const name of ["01-signed-commit.v3.json", "02-submission-started.v3.json"] as const) {
+      for (const name of ["01-signed-commit.v4.json", "02-submission-started.v4.json"] as const) {
         const directory = await createSyntheticWindowsDirectory();
         try {
           const path = win32.join(directory, name);
@@ -734,7 +734,7 @@ describe.runIf(process.platform === "win32")(
           sendingAuthorizedByJournal: false
         });
 
-        const partialPath = win32.join(directory, "02-submission-started.v3.json");
+        const partialPath = win32.join(directory, "02-submission-started.v4.json");
         await writeFile(partialPath, '{"partial":true}', { encoding: "utf8", flag: "wx" });
         await runSyntheticPowerShell(PROTECT_SYNTHETIC_PATH_SCRIPT, partialPath);
         const afterPowerLoss =
@@ -762,7 +762,7 @@ describe.runIf(process.platform === "win32")(
         await journal.initializeSignedCommit(signedCommit(cap));
         await runSyntheticPowerShell(
           WEAKEN_SYNTHETIC_ACL_SCRIPT,
-          win32.join(aclDirectory, "01-signed-commit.v3.json")
+          win32.join(aclDirectory, "01-signed-commit.v4.json")
         );
         const before = await snapshotSyntheticTree(aclDirectory);
         await expect(
@@ -792,8 +792,8 @@ describe.runIf(process.platform === "win32")(
           );
         await journal.initializeSignedCommit(signedCommit(cap));
         await link(
-          win32.join(linkDirectory, "01-signed-commit.v3.json"),
-          win32.join(linkDirectory, "02-submission-started.v3.json")
+          win32.join(linkDirectory, "01-signed-commit.v4.json"),
+          win32.join(linkDirectory, "02-submission-started.v4.json")
         );
         const before = await snapshotSyntheticTree(linkDirectory);
         await expect(
@@ -819,7 +819,7 @@ describe.runIf(process.platform === "win32")(
       const directory = await createSyntheticWindowsDirectory();
       const target = await createSyntheticWindowsDirectory();
       try {
-        await symlink(target, win32.join(directory, "01-signed-commit.v3.json"), "junction");
+        await symlink(target, win32.join(directory, "01-signed-commit.v4.json"), "junction");
         const targetBefore = await snapshotSyntheticTree(target);
         await expect(
           openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalAtSyntheticDirectoryForTests(

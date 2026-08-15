@@ -16,10 +16,10 @@ import {
   type BscTestnetPtaWbnbPoolSubmissionJournalState
 } from "./bsc-testnet-pta-wbnb-pool-submission-reconciler.server";
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V3_POLICY,
+  BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V4_POLICY,
   createWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUse,
   type BscTestnetPtaWbnbPoolDurableSubmissionJournal,
-  type BscTestnetPtaWbnbPoolDurableOwnerV3Policy,
+  type BscTestnetPtaWbnbPoolDurableOwnerV4Policy,
   type BscTestnetPtaWbnbPoolSubmissionRecoveryState
 } from "./bsc-testnet-pta-wbnb-pool-submission-journal.server";
 import {
@@ -30,7 +30,7 @@ import {
 const BROADCAST_OPERATION =
   "consume_exact_bsc_testnet_pta_wbnb_pool_broadcast_authorization_after_durable_start" as const;
 const TERMINAL_PREFLIGHT_DIGEST_DOMAIN =
-  "proofera.bsc-testnet.pta-wbnb-pool.terminal-pre-send.v2" as const;
+  "proofera.bsc-testnet.pta-wbnb-pool.terminal-pre-send.v3" as const;
 const MAXIMUM_RPC_RESPONSE_BYTES = 32_768;
 const RPC_TIMEOUT_MILLISECONDS = 8_000;
 const MAXIMUM_TERMINAL_PRE_SUBMISSION_AGE_MILLISECONDS =
@@ -80,7 +80,7 @@ const JOURNAL_STATE_KEYS = [
 ] as const;
 
 export interface BscTestnetPtaWbnbPoolExactBroadcastAuthorizationRequest {
-  readonly schemaVersion: 2;
+  readonly schemaVersion: 3;
   readonly operation: typeof BROADCAST_OPERATION;
   readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
   readonly claimId: string;
@@ -283,8 +283,8 @@ function snapshotPreSubmission(
     BscTestnetPtaWbnbPoolSubmissionCapability["preSubmission"] | null;
 }
 
-function exactOwnerPolicy(value: unknown): value is BscTestnetPtaWbnbPoolDurableOwnerV3Policy {
-  return sameJson(value, BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V3_POLICY);
+function exactOwnerPolicy(value: unknown): value is BscTestnetPtaWbnbPoolDurableOwnerV4Policy {
+  return sameJson(value, BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V4_POLICY);
 }
 
 function startedState(
@@ -306,7 +306,7 @@ function authorizationRequest(
   terminalPreSubmission: BscTestnetPtaWbnbPoolSubmissionCapability["preSubmission"]
 ): BscTestnetPtaWbnbPoolExactBroadcastAuthorizationRequest {
   return Object.freeze({
-    schemaVersion: 2 as const,
+    schemaVersion: 3 as const,
     operation: BROADCAST_OPERATION,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     claimId: capability.claimId,

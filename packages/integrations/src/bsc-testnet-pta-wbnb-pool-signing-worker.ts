@@ -55,8 +55,8 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
   createWindowsBscTestnetPtaWbnbPoolLocalJournal,
-  openExistingWindowsBscTestnetPtaWbnbPoolLegacyLocalJournalForRecoveryForInternalUse,
   openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse,
+  openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse,
   type BscTestnetPtaWbnbPoolLocalJournal,
   type BscTestnetPtaWbnbPoolLocalJournalState
 } from "./bsc-testnet-pta-wbnb-pool-local-journal.server";
@@ -2064,7 +2064,7 @@ export function matchesBscTestnetPtaWbnbPoolExactBroadcastToSuccessfulSigningFor
     !Object.isFrozen(record.recovery) ||
     !hasExactKeys(record, EXACT_BROADCAST_REQUEST_KEYS) ||
     !hasExactKeys(recovery, EXACT_BROADCAST_RECOVERY_KEYS) ||
-    record.schemaVersion !== 2 ||
+    record.schemaVersion !== 3 ||
     record.operation !== EXACT_BROADCAST_OPERATION ||
     record.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
     record.claimId !== request.claimId ||
@@ -2142,7 +2142,7 @@ export function matchesBscTestnetPtaWbnbPoolExactPreCustodyRecoveryForInternalUs
       retained.submissionOutcome === expected.submissionOutcome &&
       retained.submissionJournalState === expected.submissionJournalState &&
       retained.fenceRecordedAt === expected.fenceRecordedAt &&
-      retained.legacyClaimRawSha256 === expected.legacyClaimRawSha256 &&
+      retained.predecessorClaimRawSha256 === expected.predecessorClaimRawSha256 &&
       retained.noEffectProofDigest === expected.noEffectProofDigest &&
       retained.noEffectEnvelopeHash === expected.noEffectEnvelopeHash &&
       retained.noEffectObservedAt === expected.noEffectObservedAt &&
@@ -2393,7 +2393,7 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
       }
 
       const [legacyRecovery, activeRecovery, submissionRecovery] = await Promise.all([
-        openExistingWindowsBscTestnetPtaWbnbPoolLegacyLocalJournalForRecoveryForInternalUse(),
+        openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse(),
         openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse(),
         openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse()
       ]);
@@ -2413,7 +2413,7 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
         return nativeActivationBlocked(
           "NATIVE_RECOVERY_STATE_INVALID",
           "recovery",
-          "The exact predecessor fence or empty generation-2 durable namespaces changed before custody metadata access."
+          "The exact predecessor fence or empty generation-3 durable namespaces changed before custody metadata access."
         );
       }
 

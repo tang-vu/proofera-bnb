@@ -6,14 +6,17 @@ import { prepareBscTestnetPtaWbnbPoolInitializationEnvelope } from "./bsc-testne
 import {
   openExistingWindowsBscTestnetPtaWbnbPoolLegacyLocalJournalForRecoveryForInternalUse,
   openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse,
+  openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse,
   type BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult,
-  type BscTestnetPtaWbnbPoolExistingLocalJournalResult
+  type BscTestnetPtaWbnbPoolExistingLocalJournalResult,
+  type BscTestnetPtaWbnbPoolExistingPredecessorLocalJournalResult
 } from "./bsc-testnet-pta-wbnb-pool-local-journal.server";
 import type { BscTestnetPtaWbnbPoolNoEffectProof } from "./bsc-testnet-pta-wbnb-pool-local-journal.server";
 import { describeBscTestnetPtaWbnbPoolOneShotBoundary } from "./bsc-testnet-pta-wbnb-pool-one-shot-boundary.server";
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
-  BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_1_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
+  BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 import { createBscTestnetPtaWbnbPoolPrivateBroadcasterForInternalUse } from "./bsc-testnet-pta-wbnb-pool-private-broadcaster.server";
 import {
@@ -81,7 +84,8 @@ function mixedRecoveryState(
 }
 
 type DurableRecoverySnapshot = Readonly<{
-  legacy: BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult;
+  ancestor: BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult;
+  predecessor: BscTestnetPtaWbnbPoolExistingPredecessorLocalJournalResult;
   active: BscTestnetPtaWbnbPoolExistingLocalJournalResult;
   submission: BscTestnetPtaWbnbPoolExistingSubmissionJournalResult;
 }>;
@@ -92,20 +96,23 @@ type ObservedPreparation = Extract<
 >;
 
 async function probeAllDurableRecoveryState(): Promise<DurableRecoverySnapshot> {
-  const [legacy, active, submission] = await Promise.all([
+  const [ancestor, predecessor, active, submission] = await Promise.all([
     openExistingWindowsBscTestnetPtaWbnbPoolLegacyLocalJournalForRecoveryForInternalUse(),
+    openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse(),
     openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse(),
     openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse()
   ]);
-  return Object.freeze({ legacy, active, submission });
+  return Object.freeze({ ancestor, predecessor, active, submission });
 }
 
-function exactPredecessorFence(
-  legacy: BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult
-): BscTestnetPtaWbnbPoolPredecessorFenceBinding | null {
-  const fence = legacy.status === "opened" ? legacy.state.supersessionFence : null;
-  return legacy.status === "opened" &&
-    legacy.state.status === "superseded_before_worker" &&
+function exactAncestorFence(
+  ancestor: BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult
+): boolean {
+  const fence = ancestor.status === "opened" ? ancestor.state.supersessionFence : null;
+  return (
+    ancestor.status === "opened" &&
+    ancestor.state.status === "superseded_before_worker" &&
+    ancestor.state.generation === 1 &&
     fence !== null &&
     fence.status === "superseded_before_worker" &&
     fence.terminalCode === "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" &&
@@ -114,7 +121,26 @@ function exactPredecessorFence(
     fence.signatureOutcome === "not_attempted" &&
     fence.submissionOutcome === "not_attempted" &&
     fence.submissionJournalState === "exact_empty" &&
-    fence.legacyClaimRawSha256 === BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256
+    fence.predecessorClaimRawSha256 === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_1_CLAIM_RAW_SHA256
+  );
+}
+
+function exactPredecessorFence(
+  predecessor: BscTestnetPtaWbnbPoolExistingPredecessorLocalJournalResult
+): BscTestnetPtaWbnbPoolPredecessorFenceBinding | null {
+  const fence = predecessor.status === "opened" ? predecessor.state.supersessionFence : null;
+  return predecessor.status === "opened" &&
+    predecessor.state.status === "superseded_before_worker" &&
+    predecessor.state.generation === 2 &&
+    fence !== null &&
+    fence.status === "superseded_before_worker" &&
+    fence.terminalCode === "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" &&
+    fence.workerAuthorizationOutcome === "not_attempted" &&
+    fence.workerStartOutcome === "not_attempted" &&
+    fence.signatureOutcome === "not_attempted" &&
+    fence.submissionOutcome === "not_attempted" &&
+    fence.submissionJournalState === "exact_empty" &&
+    fence.predecessorClaimRawSha256 === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256
     ? Object.freeze({
         status: fence.status,
         terminalCode: fence.terminalCode,
@@ -124,7 +150,7 @@ function exactPredecessorFence(
         submissionOutcome: fence.submissionOutcome,
         submissionJournalState: fence.submissionJournalState,
         fenceRecordedAt: fence.fenceRecordedAt,
-        legacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+        predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
         noEffectProofDigest: fence.noEffectProofDigest,
         noEffectEnvelopeHash: fence.noEffectEnvelopeHash,
         noEffectObservedAt: fence.noEffectObservedAt,
@@ -146,7 +172,7 @@ function samePredecessorFence(
     left.submissionOutcome === right.submissionOutcome &&
     left.submissionJournalState === right.submissionJournalState &&
     left.fenceRecordedAt === right.fenceRecordedAt &&
-    left.legacyClaimRawSha256 === right.legacyClaimRawSha256 &&
+    left.predecessorClaimRawSha256 === right.predecessorClaimRawSha256 &&
     left.noEffectProofDigest === right.noEffectProofDigest &&
     left.noEffectEnvelopeHash === right.noEffectEnvelopeHash &&
     left.noEffectObservedAt === right.noEffectObservedAt &&
@@ -184,7 +210,8 @@ function noEffectProofFromObservedPreparation(
 
 function durableSnapshotBlocked(snapshot: DurableRecoverySnapshot): boolean {
   return (
-    snapshot.legacy.status === "blocked" ||
+    snapshot.ancestor.status === "blocked" ||
+    snapshot.predecessor.status === "blocked" ||
     snapshot.active.status === "blocked" ||
     snapshot.submission.status === "blocked"
   );
@@ -199,20 +226,24 @@ function retainsExactFreshPrerequisites(
   expectedFence: BscTestnetPtaWbnbPoolPredecessorFenceBinding
 ): snapshot is DurableRecoverySnapshot &
   Readonly<{
-    legacy: Extract<BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult, { status: "opened" }>;
+    predecessor: Extract<
+      BscTestnetPtaWbnbPoolExistingPredecessorLocalJournalResult,
+      { status: "opened" }
+    >;
   }> {
-  const retained = exactPredecessorFence(snapshot.legacy);
+  const retained = exactPredecessorFence(snapshot.predecessor);
   return (
     !durableSnapshotBlocked(snapshot) &&
+    exactAncestorFence(snapshot.ancestor) &&
     exactEmptyActiveAndSubmission(snapshot) &&
-    snapshot.legacy.status === "opened" &&
+    snapshot.predecessor.status === "opened" &&
     retained !== null &&
     samePredecessorFence(retained, expectedFence)
   );
 }
 
 /**
- * Fixed production root. All three fixed LocalAppData namespaces are opened read-only before
+ * Fixed production root. All four fixed LocalAppData namespaces are opened read-only before
  * release review, TTY input, custody, signing, or broadcasting. A claim-only predecessor may use
  * one invocation solely to append and reread its fence; a later invocation must obtain snapshot B
  * before any new owner authority can exist.
@@ -234,10 +265,13 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
     );
   }
   if (startup.active.status === "opened" || startup.submission.status === "opened") {
-    if (exactPredecessorFence(startup.legacy) === null) {
+    if (
+      !exactAncestorFence(startup.ancestor) ||
+      exactPredecessorFence(startup.predecessor) === null
+    ) {
       return blocked(
         "PREDECESSOR_FENCE_INVALID",
-        "Generation-2 durable state exists without the exact immutable generation-1 supersession fence."
+        "Generation-3 durable state exists without the exact immutable generation-1 and generation-2 supersession chain."
       );
     }
   }
@@ -277,18 +311,18 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
     return mixedRecoveryState(startup.active, startup.submission);
   }
 
-  if (startup.legacy.status !== "opened") {
+  if (!exactAncestorFence(startup.ancestor) || startup.predecessor.status !== "opened") {
     return blocked(
       "PREDECESSOR_CLAIM_MISSING",
-      "The exact generation-1 incident claim is absent; recovery generation 2 cannot create fresh authority."
+      "The exact fenced generation-1 ancestor and generation-2 incident claim are required before recovery generation 3 can create fresh authority."
     );
   }
 
-  let predecessorFence = exactPredecessorFence(startup.legacy);
+  let predecessorFence = exactPredecessorFence(startup.predecessor);
   let noEffectEnvelopeHash: Hex | null = predecessorFence?.noEffectEnvelopeHash ?? null;
   let createdFenceThisInvocation = false;
   if (predecessorFence === null) {
-    const candidate = await startup.legacy.journal.readClaimOnlyRecoveryCandidate();
+    const candidate = await startup.predecessor.journal.readClaimOnlyRecoveryCandidate();
     if (candidate === null) {
       return blocked(
         "PREDECESSOR_NOT_EXACT_CLAIM_ONLY",
@@ -342,19 +376,21 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
         "Durable state could not be reread immediately before the append-only fence."
       );
     }
-    const preFenceLegacy = immediatelyBeforeFence.legacy;
+    const preFencePredecessor = immediatelyBeforeFence.predecessor;
     const rereadCandidate =
-      preFenceLegacy.status === "opened"
-        ? await preFenceLegacy.journal.readClaimOnlyRecoveryCandidate()
+      preFencePredecessor.status === "opened"
+        ? await preFencePredecessor.journal.readClaimOnlyRecoveryCandidate()
         : null;
     if (
       durableSnapshotBlocked(immediatelyBeforeFence) ||
+      !exactAncestorFence(immediatelyBeforeFence.ancestor) ||
       !exactEmptyActiveAndSubmission(immediatelyBeforeFence) ||
-      preFenceLegacy.status !== "opened" ||
+      preFencePredecessor.status !== "opened" ||
       rereadCandidate === null ||
-      rereadCandidate.legacyClaimRawSha256 !== candidate.legacyClaimRawSha256 ||
-      rereadCandidate.legacyClaimRecordedAt !== candidate.legacyClaimRecordedAt ||
-      rereadCandidate.legacyAuthorizationExpiresAt !== candidate.legacyAuthorizationExpiresAt
+      rereadCandidate.predecessorClaimRawSha256 !== candidate.predecessorClaimRawSha256 ||
+      rereadCandidate.predecessorClaimRecordedAt !== candidate.predecessorClaimRecordedAt ||
+      rereadCandidate.predecessorAuthorizationExpiresAt !==
+        candidate.predecessorAuthorizationExpiresAt
     ) {
       return blocked(
         "PRE_FENCE_STATE_CHANGED",
@@ -362,9 +398,9 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
       );
     }
     try {
-      await preFenceLegacy.journal.fenceClaimBeforeWorker(
+      await preFencePredecessor.journal.fenceClaimBeforeWorker(
         Object.freeze({
-          expectedLegacyClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_LEGACY_CLAIM_RAW_SHA256,
+          expectedPredecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
           proof
         })
       );
@@ -384,32 +420,33 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
   } catch {
     return blocked(
       "POST_FENCE_REREAD_FAILED",
-      "The three durable namespaces could not be reread after the predecessor fence."
+      "The four durable namespaces could not be reread after the predecessor fence."
     );
   }
-  const retainedFence = exactPredecessorFence(afterFence.legacy);
+  const retainedFence = exactPredecessorFence(afterFence.predecessor);
   if (
     durableSnapshotBlocked(afterFence) ||
+    !exactAncestorFence(afterFence.ancestor) ||
     !exactEmptyActiveAndSubmission(afterFence) ||
-    afterFence.legacy.status !== "opened" ||
+    afterFence.predecessor.status !== "opened" ||
     retainedFence === null ||
     (predecessorFence !== null && !samePredecessorFence(retainedFence, predecessorFence)) ||
     (noEffectEnvelopeHash !== null && retainedFence.noEffectEnvelopeHash !== noEffectEnvelopeHash)
   ) {
     return blocked(
       "POST_FENCE_STATE_INVALID",
-      "The exact immutable fence plus empty generation-2 and submission namespaces was not retained."
+      "The exact immutable generation-2 fence plus empty generation-3 and submission namespaces was not retained."
     );
   }
   predecessorFence = retainedFence;
   if (createdFenceThisInvocation) {
     return blocked(
       "PREDECESSOR_FENCE_RECORDED_RESTART_REQUIRED",
-      "The exact predecessor fence was durably recorded and reread. Start a new invocation before snapshot B, policy, owner authority, custody, or generation-2 claim."
+      "The exact predecessor fence was durably recorded and reread. Start a new invocation before snapshot B, policy, owner authority, custody, or generation-3 claim."
     );
   }
   const fixedPredecessorFence = predecessorFence;
-  const legacySigningJournal = afterFence.legacy.journal;
+  const legacySigningJournal = afterFence.predecessor.journal;
 
   let preAuthorizationBridge: Awaited<
     ReturnType<typeof createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeForInternalUse>
@@ -517,7 +554,7 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
   } catch {
     return blocked(
       "POST_OWNER_DURABLE_REREAD_FAILED",
-      "The three durable namespaces could not be reread after owner confirmation."
+      "The four durable namespaces could not be reread after owner confirmation."
     );
   }
   if (!retainsExactFreshPrerequisites(afterOwnerTty, fixedPredecessorFence)) {
@@ -554,7 +591,7 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
     if (!retainsExactFreshPrerequisites(beforeComposition, fixedPredecessorFence)) {
       return blocked(
         "PRE_COMPOSITION_DURABLE_STATE_CHANGED",
-        "The predecessor fence or empty active/submission state changed before the generation-2 claim."
+        "The predecessor fence or empty active/submission state changed before the generation-3 claim."
       );
     }
     return createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(

@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const harness = vi.hoisted(() => ({
   order: [] as string[],
+  openAncestor: vi.fn(),
   openLegacy: vi.fn(),
   openLocal: vi.fn(),
   openSubmission: vi.fn(),
@@ -24,6 +25,8 @@ const harness = vi.hoisted(() => ({
 vi.mock("server-only", () => ({}));
 vi.mock("./bsc-testnet-pta-wbnb-pool-local-journal.server", () => ({
   openExistingWindowsBscTestnetPtaWbnbPoolLegacyLocalJournalForRecoveryForInternalUse:
+    harness.openAncestor,
+  openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse:
     harness.openLegacy,
   openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse: harness.openLocal
 }));
@@ -83,6 +86,28 @@ const EMPTY_SUBMISSION = Object.freeze({
 });
 const LEGACY_CLAIM_RAW_SHA256 =
   "0xf10e90eb836a94446ace100bbc9a6fc5de6cc35b1d82e4d10fb4736ef8559e32" as const;
+const PREDECESSOR_CLAIM_RAW_SHA256 =
+  "0x613df995936c3ccfff56e5da5588906f1bd28340ae8297eb08524274b9b8e1c3" as const;
+const ANCESTOR_FENCE = Object.freeze({
+  status: "superseded_before_worker" as const,
+  terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" as const,
+  workerAuthorizationOutcome: "not_attempted" as const,
+  workerStartOutcome: "not_attempted" as const,
+  signatureOutcome: "not_attempted" as const,
+  submissionOutcome: "not_attempted" as const,
+  submissionJournalState: "exact_empty" as const,
+  predecessorClaimRawSha256: LEGACY_CLAIM_RAW_SHA256
+});
+const ANCESTOR_FENCED = Object.freeze({
+  status: "opened" as const,
+  journal: Object.freeze({}),
+  state: Object.freeze({
+    status: "superseded_before_worker" as const,
+    generation: 1 as const,
+    supersessionFence: ANCESTOR_FENCE
+  }),
+  issue: null
+});
 const FENCE = Object.freeze({
   status: "superseded_before_worker" as const,
   terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" as const,
@@ -91,7 +116,7 @@ const FENCE = Object.freeze({
   signatureOutcome: "not_attempted" as const,
   submissionOutcome: "not_attempted" as const,
   submissionJournalState: "exact_empty" as const,
-  legacyClaimRawSha256: LEGACY_CLAIM_RAW_SHA256,
+  predecessorClaimRawSha256: PREDECESSOR_CLAIM_RAW_SHA256,
   noEffectProofDigest: `0x${"10".repeat(32)}` as const,
   noEffectEnvelopeHash: `0x${"11".repeat(32)}` as const,
   noEffectObservedAt: "2026-08-14T10:00:00.000Z",
@@ -109,7 +134,11 @@ const LEGACY_JOURNAL = Object.freeze({
 const LEGACY_FENCED = Object.freeze({
   status: "opened" as const,
   journal: LEGACY_JOURNAL,
-  state: Object.freeze({ status: "superseded_before_worker" as const, supersessionFence: FENCE }),
+  state: Object.freeze({
+    status: "superseded_before_worker" as const,
+    generation: 2 as const,
+    supersessionFence: FENCE
+  }),
   issue: null
 });
 const RELEASE = Object.freeze({
@@ -183,6 +212,10 @@ function deferred<Value>(): Readonly<{
 }
 
 function readyFreshPath(): void {
+  harness.openAncestor.mockImplementation(async () => {
+    harness.order.push("ancestor-open");
+    return ANCESTOR_FENCED;
+  });
   harness.openLegacy.mockImplementation(async () => {
     harness.order.push("legacy-open");
     return LEGACY_FENCED;
@@ -249,18 +282,20 @@ function readyFreshPath(): void {
 
 beforeEach(() => {
   harness.order.splice(0);
-  vi.clearAllMocks();
+  vi.resetAllMocks();
   readyFreshPath();
 });
 
 describe("PTA/WBNB recovery-first production runner", () => {
-  it("rereads all three durable namespaces across fence, TTY, activation, and claim boundaries", async () => {
+  it("rereads all four durable namespaces across fence, TTY, activation, and claim boundaries", async () => {
     await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toEqual(FRESH_RESULT);
 
     expect(harness.order).toEqual([
+      "ancestor-open",
       "legacy-open",
       "local-open",
       "submission-open",
+      "ancestor-open",
       "legacy-open",
       "local-open",
       "submission-open",
@@ -270,14 +305,17 @@ describe("PTA/WBNB recovery-first production runner", () => {
       "describe-envelope",
       "instantiate-policy",
       "owner-tty",
+      "ancestor-open",
       "legacy-open",
       "local-open",
       "submission-open",
       "activate-custody-journal",
+      "ancestor-open",
       "legacy-open",
       "local-open",
       "submission-open",
       "provision-submission-broadcaster",
+      "ancestor-open",
       "legacy-open",
       "local-open",
       "submission-open",
@@ -312,7 +350,7 @@ describe("PTA/WBNB recovery-first production runner", () => {
     );
   });
 
-  it("waits for all three startup probes and does not preload policy while any is pending", async () => {
+  it("waits for all four startup probes and does not preload policy while any is pending", async () => {
     const legacy = deferred<typeof LEGACY_FENCED>();
     const local = deferred<typeof EMPTY_LOCAL>();
     const submission = deferred<typeof EMPTY_SUBMISSION>();
@@ -397,15 +435,16 @@ describe("PTA/WBNB recovery-first production runner", () => {
       journal: fencedJournalA,
       state: Object.freeze({
         status: "superseded_before_worker" as const,
+        generation: 2 as const,
         supersessionFence: fenceA
       }),
       issue: null
     });
     const candidate = Object.freeze({
       status: "claimed" as const,
-      legacyClaimRawSha256: LEGACY_CLAIM_RAW_SHA256,
-      legacyClaimRecordedAt: "2026-08-14T09:59:00.000Z",
-      legacyAuthorizationExpiresAt: "2026-08-14T10:00:00.250Z"
+      predecessorClaimRawSha256: PREDECESSOR_CLAIM_RAW_SHA256,
+      predecessorClaimRecordedAt: "2026-08-14T09:59:00.000Z",
+      predecessorAuthorizationExpiresAt: "2026-08-14T10:00:00.250Z"
     });
     const claimJournal = Object.freeze({
       readClaimOnlyRecoveryCandidate: vi.fn(async () => candidate),
@@ -416,7 +455,11 @@ describe("PTA/WBNB recovery-first production runner", () => {
     const claimOnly = Object.freeze({
       status: "opened" as const,
       journal: claimJournal,
-      state: Object.freeze({ status: "claimed" as const, supersessionFence: null }),
+      state: Object.freeze({
+        status: "claimed" as const,
+        generation: 2 as const,
+        supersessionFence: null
+      }),
       issue: null
     });
     harness.openLegacy
@@ -442,7 +485,7 @@ describe("PTA/WBNB recovery-first production runner", () => {
     expect(harness.runComposition).not.toHaveBeenCalled();
     expect(claimJournal.fenceClaimBeforeWorker).toHaveBeenCalledWith(
       expect.objectContaining({
-        expectedLegacyClaimRawSha256: LEGACY_CLAIM_RAW_SHA256,
+        expectedPredecessorClaimRawSha256: PREDECESSOR_CLAIM_RAW_SHA256,
         proof: expect.objectContaining({
           envelopeHash: snapshotA.envelopeHash,
           observedAt: snapshotA.observation.observedAt,

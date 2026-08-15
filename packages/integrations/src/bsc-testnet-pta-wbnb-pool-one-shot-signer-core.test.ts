@@ -78,8 +78,8 @@ function exactTransaction() {
 
 function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
   return Object.freeze({
-    schemaVersion: 2,
-    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_2",
+    schemaVersion: 3,
+    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_3",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
     reviewerApprovalDigest: REVIEWER_DIGEST,
@@ -95,7 +95,7 @@ function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
 
 function freshCapability(): BscTestnetPtaWbnbPoolFreshRecheckCapability {
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     scope: BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_SCOPE,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
@@ -290,7 +290,7 @@ describe("PTA/WBNB pool one-shot signer core", () => {
       "signed_commit_readback"
     ]);
     expect(calls.claim.mock.calls[0]?.[0]).toMatchObject({
-      schemaVersion: 2,
+      schemaVersion: 3,
       operation: BSC_TESTNET_PTA_WBNB_POOL_DURABLE_CLAIM_OPERATION,
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       envelopeHash: ENVELOPE_HASH,
@@ -308,7 +308,7 @@ describe("PTA/WBNB pool one-shot signer core", () => {
       recovery: RECOVERY
     });
     expect(calls.readback.mock.calls[0]?.[0]).toMatchObject({
-      schemaVersion: 2,
+      schemaVersion: 3,
       operation: BSC_TESTNET_PTA_WBNB_POOL_DURABLE_SIGNED_READBACK_OPERATION,
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       envelopeHash: ENVELOPE_HASH,
@@ -584,7 +584,7 @@ describe("PTA/WBNB pool one-shot signer core", () => {
     await expect(journal.readState()).resolves.toMatchObject({ status: "signed_committed" });
     expect(integratedResult.issue).toBeNull();
     expect(integratedResult).toMatchObject({ status: "signed_committed" });
-    expect(files.has("04-transition.v2.json")).toBe(true);
+    expect(files.has("04-transition.v3.json")).toBe(true);
     expect(files.size).toBe(4);
   });
 });

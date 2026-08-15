@@ -125,9 +125,9 @@ function ownerAuthorization(
   });
   if (exact === null) throw new Error("Transaction fixture failed.");
   const body = {
-    schemaVersion: 3,
-    kind: "exact_owner_recovery_generation_2_signature_and_single_broadcast_authorization_v3",
-    decision: "authorize_fresh_chain_97_pool_recovery_generation_2_signature_and_single_broadcast",
+    schemaVersion: 4,
+    kind: "exact_owner_recovery_generation_3_signature_and_single_broadcast_authorization_v4",
+    decision: "authorize_fresh_chain_97_pool_recovery_generation_3_signature_and_single_broadcast",
     broadcastPolicy: "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity",
     liquidityActionAuthorized: false,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -140,7 +140,7 @@ function ownerAuthorization(
     authorizationTextSha256: TEXT_DIGEST,
     ceremonyNonce,
     recovery: deeplyFreeze({
-      generation: 2,
+      generation: 3,
       predecessorState: "superseded_before_worker",
       predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
       attemptId: ATTEMPT_ID

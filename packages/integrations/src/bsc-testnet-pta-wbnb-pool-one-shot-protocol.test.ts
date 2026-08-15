@@ -81,8 +81,8 @@ function transaction() {
 
 function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
   return Object.freeze({
-    schemaVersion: 2,
-    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_2",
+    schemaVersion: 3,
+    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_3",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
     reviewerApprovalDigest: REVIEWER_DIGEST,
@@ -99,7 +99,7 @@ function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
 function freshCapability(): BscTestnetPtaWbnbPoolFreshRecheckCapability {
   const timestamp = Math.floor(Date.parse("2026-08-13T04:29:30.000Z") / 1_000).toString();
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     scope: BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_SCOPE,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
@@ -167,7 +167,7 @@ function responseWithScalars(request: BscTestnetPtaWbnbPoolSigningWorkerRequest,
     { r, s, v: 229n }
   );
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     operation: BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_OPERATION,
     status: "signed",
     oneShotIntentId: BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
@@ -201,7 +201,7 @@ describe("PTA/WBNB pool exact one-shot protocol", () => {
     expect(keccak256(exact.serializedUnsignedTransaction)).toBe(exact.signingHash);
   });
 
-  it("derives generation-2 attempt IDs from canonical full release identity and rejects drift", () => {
+  it("derives generation-3 attempt IDs from canonical full release identity and rejects drift", () => {
     const exact = recovery().attemptId;
     expect(exact).toMatch(/^0x[0-9a-f]{64}$/u);
     expect(
