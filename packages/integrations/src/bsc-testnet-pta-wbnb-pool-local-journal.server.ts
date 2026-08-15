@@ -21,6 +21,9 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_1_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION,
@@ -39,45 +42,65 @@ const LEGACY_JOURNAL_SUBDIRECTORY = [
   "operations",
   "bsc-testnet-pta-wbnb-pool-v1"
 ] as const;
-const PREDECESSOR_JOURNAL_SUBDIRECTORY = [
+const GENERATION_2_JOURNAL_SUBDIRECTORY = [
   "ProofEra",
   "operations",
   "bsc-testnet-pta-wbnb-pool-v2"
 ] as const;
-const ACTIVE_JOURNAL_SUBDIRECTORY = [
+const PREDECESSOR_JOURNAL_SUBDIRECTORY = [
   "ProofEra",
   "operations",
   "bsc-testnet-pta-wbnb-pool-v3"
 ] as const;
+const ACTIVE_JOURNAL_SUBDIRECTORY = [
+  "ProofEra",
+  "operations",
+  "bsc-testnet-pta-wbnb-pool-v4"
+] as const;
 const LEGACY_SCHEMA_VERSION = "bsc_testnet_pta_wbnb_pool_local_journal_v1" as const;
-const PREDECESSOR_SCHEMA_VERSION = "bsc_testnet_pta_wbnb_pool_local_journal_v2" as const;
-const ACTIVE_SCHEMA_VERSION = "bsc_testnet_pta_wbnb_pool_local_journal_v3" as const;
+const GENERATION_2_SCHEMA_VERSION = "bsc_testnet_pta_wbnb_pool_local_journal_v2" as const;
+const PREDECESSOR_SCHEMA_VERSION = "bsc_testnet_pta_wbnb_pool_local_journal_v3" as const;
+const ACTIVE_SCHEMA_VERSION = "bsc_testnet_pta_wbnb_pool_local_journal_v4" as const;
 const SUPERSESSION_FENCE_SCHEMA_VERSION =
+  "bsc_testnet_pta_wbnb_pool_pre_worker_supersession_fence_v3" as const;
+const GENERATION_2_SUPERSESSION_FENCE_SCHEMA_VERSION =
   "bsc_testnet_pta_wbnb_pool_pre_worker_supersession_fence_v2" as const;
 const LEGACY_SUPERSESSION_FENCE_SCHEMA_VERSION =
   "bsc_testnet_pta_wbnb_pool_pre_worker_supersession_fence_v1" as const;
 const LEGACY_AUTHORIZATION_KIND =
   "exact_pta_wbnb_pool_initialization_user_authorization_v1" as const;
 const ACTIVE_AUTHORIZATION_KIND =
-  "exact_pta_wbnb_pool_recovery_generation_3_user_authorization_v3" as const;
+  "exact_pta_wbnb_pool_recovery_generation_4_user_authorization_v4" as const;
 const PREDECESSOR_AUTHORIZATION_KIND =
+  "exact_pta_wbnb_pool_recovery_generation_3_user_authorization_v3" as const;
+const GENERATION_2_AUTHORIZATION_KIND =
   "exact_pta_wbnb_pool_recovery_generation_2_user_authorization_v2" as const;
-const PREDECESSOR_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN =
+const GENERATION_2_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.authorization-receipt.v2" as const;
-const PREDECESSOR_CLAIM_ID_DIGEST_DOMAIN =
+const GENERATION_2_CLAIM_ID_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.claim-id.v2" as const;
-export const BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN =
+const PREDECESSOR_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.authorization-receipt.v3" as const;
-export const BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_CLAIM_ID_DIGEST_DOMAIN =
+const PREDECESSOR_CLAIM_ID_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.claim-id.v3" as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN =
+  "proofera.bsc-testnet.pta-wbnb-pool.authorization-receipt.v4" as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_CLAIM_ID_DIGEST_DOMAIN =
+  "proofera.bsc-testnet.pta-wbnb-pool.claim-id.v4" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_SUPERSESSION_FENCE_DIGEST_DOMAIN =
+  "proofera.bsc-testnet.pta-wbnb-pool.pre-worker-supersession-fence.v3" as const;
+const GENERATION_2_SUPERSESSION_FENCE_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.pre-worker-supersession-fence.v2" as const;
 const LEGACY_SUPERSESSION_FENCE_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.pre-worker-supersession-fence.v1" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_NO_EFFECT_PROOF_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.pre-worker-no-effect-proof.v2" as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_FAILED_BEFORE_WORKER_DIGEST_DOMAIN =
+  "proofera.bsc-testnet.pta-wbnb-pool.failed-before-worker.v4" as const;
 export {
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_1_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256
 };
 const MAXIMUM_RECORD_BYTES = 32_768;
@@ -99,26 +122,64 @@ const LEGACY_SLOT_FILES = Object.freeze([
   "05-transition.v1.json"
 ]);
 const ACTIVE_SLOT_FILES = Object.freeze([
-  "01-claim.v3.json",
-  "02-transition.v3.json",
-  "03-transition.v3.json",
-  "04-transition.v3.json",
-  "05-transition.v3.json"
+  "01-claim.v4.json",
+  "02-transition.v4.json",
+  "03-transition.v4.json",
+  "04-transition.v4.json",
+  "05-transition.v4.json"
 ]);
-const PREDECESSOR_SLOT_FILES = Object.freeze([
+const GENERATION_2_SLOT_FILES = Object.freeze([
   "01-claim.v2.json",
   "02-transition.v2.json",
   "03-transition.v2.json",
   "04-transition.v2.json",
   "05-transition.v2.json"
 ]);
+const PREDECESSOR_SLOT_FILES = Object.freeze([
+  "01-claim.v3.json",
+  "02-transition.v3.json",
+  "03-transition.v3.json",
+  "04-transition.v3.json",
+  "05-transition.v3.json"
+]);
 
 export { BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY };
 
 type JournalGeneration =
   | 1
+  | typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2
   | typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
   | typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
+
+function isFenceableGeneration(
+  generation: JournalGeneration
+): generation is Exclude<JournalGeneration, typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION> {
+  return generation !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
+}
+
+function slotFilesFor(generation: JournalGeneration): readonly string[] {
+  switch (generation) {
+    case 1:
+      return LEGACY_SLOT_FILES;
+    case BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2:
+      return GENERATION_2_SLOT_FILES;
+    case BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION:
+      return PREDECESSOR_SLOT_FILES;
+    case BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION:
+      return ACTIVE_SLOT_FILES;
+  }
+}
+
+function expectedClaimRawSha256For(generation: Exclude<JournalGeneration, 4>): Hex {
+  switch (generation) {
+    case 1:
+      return BSC_TESTNET_PTA_WBNB_POOL_GENERATION_1_CLAIM_RAW_SHA256;
+    case BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2:
+      return BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2_CLAIM_RAW_SHA256;
+    case BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION:
+      return BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_CLAIM_RAW_SHA256;
+  }
+}
 
 export interface BscTestnetPtaWbnbPoolRecoveryJournalBinding {
   readonly generation: typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
@@ -148,6 +209,7 @@ export interface BscTestnetPtaWbnbPoolLegacyClaimRequestForTests {
 
 interface BscTestnetPtaWbnbPoolRecoveryClaimRequest extends BscTestnetPtaWbnbPoolLegacyClaimRequestForTests {
   readonly generation:
+    | typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2
     | typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
     | typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
   readonly predecessorState: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE;
@@ -155,9 +217,13 @@ interface BscTestnetPtaWbnbPoolRecoveryClaimRequest extends BscTestnetPtaWbnbPoo
   readonly attemptId: Hex;
 }
 
-export interface BscTestnetPtaWbnbPoolGeneration3ClaimRequest extends BscTestnetPtaWbnbPoolRecoveryClaimRequest {
+export interface BscTestnetPtaWbnbPoolGeneration4ClaimRequest extends BscTestnetPtaWbnbPoolRecoveryClaimRequest {
   readonly generation: typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
 }
+
+/** @deprecated Historical name retained only so the staged gen4 callers can migrate atomically. */
+export type BscTestnetPtaWbnbPoolGeneration3ClaimRequest =
+  BscTestnetPtaWbnbPoolGeneration4ClaimRequest;
 
 type AnyClaimRequest =
   BscTestnetPtaWbnbPoolLegacyClaimRequestForTests | BscTestnetPtaWbnbPoolRecoveryClaimRequest;
@@ -176,7 +242,8 @@ function isRecoveryClaim(
 ): request is BscTestnetPtaWbnbPoolRecoveryClaimRequest | RecoveryClaimBody {
   return (
     "generation" in request &&
-    (request.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION ||
+    (request.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2 ||
+      request.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION ||
       request.generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION)
   );
 }
@@ -193,6 +260,7 @@ interface JournalBinding {
   readonly releaseCommit: string;
   readonly runtimeManifestSha256: Hex;
   readonly generation?:
+    | typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2
     | typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
     | typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
   readonly predecessorState?: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE;
@@ -226,6 +294,17 @@ export interface BscTestnetPtaWbnbPoolTerminalRequest extends JournalBinding {
   readonly outcomeDigest: Hex;
   readonly serializedTransaction?: Hex;
   readonly transactionHash?: Hex;
+}
+
+export type BscTestnetPtaWbnbPoolFailedBeforeWorkerIssueCode =
+  | "POST_CLAIM_RECHECK_REJECTED"
+  | "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN"
+  | "EXECUTION_AUTHORITY_EXPIRED";
+
+export interface BscTestnetPtaWbnbPoolFailedBeforeWorkerRequest extends JournalBinding {
+  readonly phase: "post_claim_recheck";
+  readonly issueCode: BscTestnetPtaWbnbPoolFailedBeforeWorkerIssueCode;
+  readonly outcomeDigest: Hex;
 }
 
 export interface BscTestnetPtaWbnbPoolNoEffectProof {
@@ -286,6 +365,7 @@ export type BscTestnetPtaWbnbPoolLocalJournalStatus =
   | "worker_started"
   | "signed_committed"
   | "superseded_before_worker"
+  | "failed_before_worker"
   | "failed_before_submission"
   | "unknown_outcome";
 
@@ -317,7 +397,7 @@ export interface BscTestnetPtaWbnbPoolLocalJournalState {
 
 export interface BscTestnetPtaWbnbPoolLocalJournal {
   readonly claimExactInitialization: (
-    request: BscTestnetPtaWbnbPoolGeneration3ClaimRequest
+    request: BscTestnetPtaWbnbPoolGeneration4ClaimRequest
   ) => Promise<
     | Readonly<{ status: "claimed"; claimId: string }>
     | Readonly<{
@@ -329,6 +409,9 @@ export interface BscTestnetPtaWbnbPoolLocalJournal {
   readonly authorizeWorker: (
     request: BscTestnetPtaWbnbPoolWorkerAuthorizationRequest
   ) => Promise<Readonly<{ status: "worker_authorized" }>>;
+  readonly failBeforeWorker: (
+    request: BscTestnetPtaWbnbPoolFailedBeforeWorkerRequest
+  ) => Promise<Readonly<{ status: "failed_before_worker" }>>;
   readonly startWorker: (
     request: BscTestnetPtaWbnbPoolWorkerStartRequest
   ) => Promise<Readonly<{ status: "worker_started" }>>;
@@ -465,12 +548,16 @@ type RecordKind =
   | "worker_started"
   | "signed_committed"
   | "superseded_before_worker"
+  | "failed_before_worker"
   | "failed_before_submission"
   | "unknown_outcome";
 
 interface ParsedRecord extends JournalBinding {
   readonly schemaVersion:
-    typeof LEGACY_SCHEMA_VERSION | typeof PREDECESSOR_SCHEMA_VERSION | typeof ACTIVE_SCHEMA_VERSION;
+    | typeof LEGACY_SCHEMA_VERSION
+    | typeof GENERATION_2_SCHEMA_VERSION
+    | typeof PREDECESSOR_SCHEMA_VERSION
+    | typeof ACTIVE_SCHEMA_VERSION;
   readonly kind: RecordKind;
   readonly recordedAt: string;
   readonly claim?: AnyClaimRequest;
@@ -480,6 +567,8 @@ interface ParsedRecord extends JournalBinding {
   readonly transactionHash?: Hex;
   readonly recoveredSigner?: Address;
   readonly outcomeDigest?: Hex;
+  readonly phase?: "post_claim_recheck";
+  readonly issueCode?: BscTestnetPtaWbnbPoolFailedBeforeWorkerIssueCode;
   readonly supersessionFence?: BscTestnetPtaWbnbPoolSupersessionFenceState;
 }
 
@@ -660,6 +749,36 @@ export function deriveBscTestnetPtaWbnbPoolNoEffectProofDigest(input: unknown): 
       );
 }
 
+function inspectFailedBeforeWorkerIssueCode(
+  input: unknown
+): BscTestnetPtaWbnbPoolFailedBeforeWorkerIssueCode | null {
+  return input === "POST_CLAIM_RECHECK_REJECTED" ||
+    input === "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" ||
+    input === "EXECUTION_AUTHORITY_EXPIRED"
+    ? input
+    : null;
+}
+
+export function deriveBscTestnetPtaWbnbPoolFailedBeforeWorkerOutcomeDigest(
+  input: unknown
+): Hex | null {
+  const record = dataRecord(input);
+  const issueCode = record === null ? null : inspectFailedBeforeWorkerIssueCode(record.issueCode);
+  return record !== null &&
+    exactKeys(record, ["phase", "issueCode", "evidenceDigest"]) &&
+    record.phase === "post_claim_recheck" &&
+    issueCode !== null &&
+    exactBytes32(record.evidenceDigest)
+    ? sha256Hex(
+        `${BSC_TESTNET_PTA_WBNB_POOL_FAILED_BEFORE_WORKER_DIGEST_DOMAIN}\u0000${JSON.stringify({
+          phase: record.phase,
+          issueCode,
+          evidenceDigest: record.evidenceDigest
+        })}`
+      )
+    : null;
+}
+
 function supersessionFenceDigestBody(
   input: Readonly<{
     binding: JournalBinding;
@@ -683,7 +802,7 @@ function supersessionFenceDigestBody(
     runtimeManifestSha256: input.binding.runtimeManifestSha256
   };
   const fenceBinding =
-    input.binding.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
+    input.binding.generation !== undefined
       ? {
           ...commonBinding,
           generation: input.binding.generation,
@@ -693,14 +812,16 @@ function supersessionFenceDigestBody(
         }
       : commonBinding;
   const predecessorClaimBinding =
-    input.binding.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
+    input.binding.generation !== undefined
       ? { predecessorClaimRawSha256: input.predecessorClaimRawSha256 }
       : { legacyClaimRawSha256: input.predecessorClaimRawSha256 };
   return {
     schemaVersion:
-      input.binding.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
-        ? SUPERSESSION_FENCE_SCHEMA_VERSION
-        : LEGACY_SUPERSESSION_FENCE_SCHEMA_VERSION,
+      input.binding.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2
+        ? GENERATION_2_SUPERSESSION_FENCE_SCHEMA_VERSION
+        : input.binding.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
+          ? SUPERSESSION_FENCE_SCHEMA_VERSION
+          : LEGACY_SUPERSESSION_FENCE_SCHEMA_VERSION,
     kind: "superseded_before_worker",
     ...fenceBinding,
     terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
@@ -722,7 +843,9 @@ function deriveSupersessionFenceSha256(input: Parameters<typeof supersessionFenc
     `${
       input.binding.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
         ? BSC_TESTNET_PTA_WBNB_POOL_SUPERSESSION_FENCE_DIGEST_DOMAIN
-        : LEGACY_SUPERSESSION_FENCE_DIGEST_DOMAIN
+        : input.binding.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2
+          ? GENERATION_2_SUPERSESSION_FENCE_DIGEST_DOMAIN
+          : LEGACY_SUPERSESSION_FENCE_DIGEST_DOMAIN
     }\u0000${JSON.stringify(supersessionFenceDigestBody(input))}`
   );
 }
@@ -747,9 +870,11 @@ function receiptBody(request: AnyClaimBody) {
     ? {
         schemaVersion: request.generation,
         kind:
-          request.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
-            ? PREDECESSOR_AUTHORIZATION_KIND
-            : ACTIVE_AUTHORIZATION_KIND,
+          request.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2
+            ? GENERATION_2_AUTHORIZATION_KIND
+            : request.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
+              ? PREDECESSOR_AUTHORIZATION_KIND
+              : ACTIVE_AUTHORIZATION_KIND,
         ...common,
         generation: request.generation,
         predecessorState: request.predecessorState,
@@ -765,9 +890,11 @@ export function deriveBscTestnetPtaWbnbPoolAuthorizationReceiptSha256(request: A
   return isRecoveryClaim(request)
     ? sha256Hex(
         `${
-          request.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
-            ? PREDECESSOR_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN
-            : BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN
+          request.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2
+            ? GENERATION_2_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN
+            : request.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
+              ? PREDECESSOR_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN
+              : BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN
         }\u0000${JSON.stringify(body)}`
       )
     : sha256Hex(JSON.stringify(body));
@@ -881,7 +1008,9 @@ function claimIdFor(request: AnyClaimRequest, generation: JournalGeneration): st
     `${
       generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
         ? PREDECESSOR_CLAIM_ID_DIGEST_DOMAIN
-        : BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_CLAIM_ID_DIGEST_DOMAIN
+        : generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2
+          ? GENERATION_2_CLAIM_ID_DIGEST_DOMAIN
+          : BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_CLAIM_ID_DIGEST_DOMAIN
     }\u0000${JSON.stringify({
       operationKey: request.operationKey,
       generation,
@@ -1004,7 +1133,8 @@ function bindingOf(record: DataRecord | JournalBinding): JournalBinding {
     ownerAuthorizationDigest: record.ownerAuthorizationDigest as Hex,
     releaseCommit: record.releaseCommit as string,
     runtimeManifestSha256: record.runtimeManifestSha256 as Hex,
-    ...(record.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION ||
+    ...(record.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2 ||
+    record.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION ||
     record.generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
       ? {
           generation: record.generation,
@@ -1052,11 +1182,16 @@ function serialize(value: Readonly<Record<string, unknown>>): string {
 }
 
 function schemaVersionFor(generation: JournalGeneration) {
-  return generation === 1
-    ? LEGACY_SCHEMA_VERSION
-    : generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
-      ? PREDECESSOR_SCHEMA_VERSION
-      : ACTIVE_SCHEMA_VERSION;
+  switch (generation) {
+    case 1:
+      return LEGACY_SCHEMA_VERSION;
+    case BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2:
+      return GENERATION_2_SCHEMA_VERSION;
+    case BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION:
+      return PREDECESSOR_SCHEMA_VERSION;
+    case BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION:
+      return ACTIVE_SCHEMA_VERSION;
+  }
 }
 
 const BINDING_KEYS = [
@@ -1150,6 +1285,7 @@ function parseStored(
     2: [
       "worker_authorized",
       "superseded_before_worker",
+      "failed_before_worker",
       "failed_before_submission",
       "unknown_outcome"
     ],
@@ -1165,7 +1301,7 @@ function parseStored(
     const predecessorClaimRawSha256 =
       generation === 1 ? record.legacyClaimRawSha256 : record.predecessorClaimRawSha256;
     if (
-      (generation !== 1 && generation !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION) ||
+      !isFenceableGeneration(generation) ||
       !exactKeys(
         record,
         generation === 1 ? LEGACY_SUPERSESSION_FENCE_KEYS : SUPERSESSION_FENCE_KEYS
@@ -1173,17 +1309,16 @@ function parseStored(
       record.schemaVersion !==
         (generation === 1
           ? LEGACY_SUPERSESSION_FENCE_SCHEMA_VERSION
-          : SUPERSESSION_FENCE_SCHEMA_VERSION) ||
+          : generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2
+            ? GENERATION_2_SUPERSESSION_FENCE_SCHEMA_VERSION
+            : SUPERSESSION_FENCE_SCHEMA_VERSION) ||
       record.terminalCode !== "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" ||
       record.workerAuthorizationOutcome !== "not_attempted" ||
       record.workerStartOutcome !== "not_attempted" ||
       record.signatureOutcome !== "not_attempted" ||
       record.submissionOutcome !== "not_attempted" ||
       record.submissionJournalState !== "exact_empty" ||
-      predecessorClaimRawSha256 !==
-        (generation === 1
-          ? BSC_TESTNET_PTA_WBNB_POOL_GENERATION_1_CLAIM_RAW_SHA256
-          : BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256) ||
+      predecessorClaimRawSha256 !== expectedClaimRawSha256For(generation) ||
       !exactBytes32(record.noEffectProofDigest) ||
       !exactBytes32(record.noEffectEnvelopeHash) ||
       noEffectObservedAt === null ||
@@ -1230,7 +1365,7 @@ function parseStored(
       predecessorFenceSha256: record.predecessorFenceSha256
     });
     const parsed: ParsedRecord = Object.freeze({
-      schemaVersion: generation === 1 ? LEGACY_SCHEMA_VERSION : PREDECESSOR_SCHEMA_VERSION,
+      schemaVersion: schemaVersionFor(generation),
       kind,
       ...bindingOf(binding),
       recordedAt: fenceRecordedAt,
@@ -1348,6 +1483,42 @@ function parseStored(
       : null;
   }
 
+  if (kind === "failed_before_worker") {
+    const binding = inspectStoredCommon(
+      record,
+      ["phase", "issueCode", "outcomeDigest"],
+      generation
+    );
+    const issueCode = inspectFailedBeforeWorkerIssueCode(record.issueCode);
+    if (
+      generation !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION ||
+      binding === null ||
+      record.phase !== "post_claim_recheck" ||
+      issueCode === null ||
+      !exactBytes32(record.outcomeDigest)
+    ) {
+      return null;
+    }
+    const parsed: ParsedRecord = Object.freeze({
+      schemaVersion: schemaVersionFor(generation),
+      kind,
+      ...binding,
+      recordedAt: record.recordedAt as string,
+      phase: "post_claim_recheck" as const,
+      issueCode,
+      outcomeDigest: record.outcomeDigest
+    });
+    return content ===
+      serialize({
+        ...commonRecord(kind, binding, parsed.recordedAt),
+        phase: parsed.phase,
+        issueCode: parsed.issueCode,
+        outcomeDigest: parsed.outcomeDigest
+      })
+      ? parsed
+      : null;
+  }
+
   const binding = inspectStoredCommon(
     record,
     ["outcomeDigest", "serializedTransaction", "transactionHash"],
@@ -1419,11 +1590,13 @@ function stateFrom(
     generation:
       claim === null
         ? null
-        : claim.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
-          ? BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
-          : claim.generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
-            ? BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
-            : 1,
+        : claim.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2
+          ? BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2
+          : claim.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
+            ? BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
+            : claim.generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+              ? BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+              : 1,
     predecessorState: claim?.predecessorState ?? null,
     predecessorFenceSha256: claim?.predecessorFenceSha256 ?? null,
     attemptId: claim?.attemptId ?? null,
@@ -1535,18 +1708,14 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
   if (
     ports === null ||
     (untrustedGeneration !== 1 &&
+      untrustedGeneration !== BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2 &&
       untrustedGeneration !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION &&
       untrustedGeneration !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION)
   ) {
     throw new Error("PTA_WBNB_POOL_JOURNAL_CONFIGURATION_INVALID");
   }
   const generation: JournalGeneration = untrustedGeneration;
-  const slotFiles =
-    generation === 1
-      ? LEGACY_SLOT_FILES
-      : generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
-        ? PREDECESSOR_SLOT_FILES
-        : ACTIVE_SLOT_FILES;
+  const slotFiles = slotFilesFor(generation);
 
   const readSnapshot = async (): Promise<JournalSnapshot> => {
     const listed = inspectSecurityNames(await ports.listNames(), slotFiles);
@@ -1586,12 +1755,10 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
       fence !== undefined &&
       (records.length !== 2 ||
         records.at(-1) !== fence ||
-        (generation !== 1 && generation !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION) ||
+        !isFenceableGeneration(generation) ||
         fence.supersessionFence === undefined ||
         fence.supersessionFence.predecessorClaimRawSha256 !==
-          (generation === 1
-            ? BSC_TESTNET_PTA_WBNB_POOL_GENERATION_1_CLAIM_RAW_SHA256
-            : BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256) ||
+          expectedClaimRawSha256For(generation) ||
         sha256Hex(claimRecord(claim.claim, claim.recordedAt, generation)) !==
           fence.supersessionFence.predecessorClaimRawSha256 ||
         Date.parse(fence.supersessionFence.noEffectObservedAt) <
@@ -1637,6 +1804,7 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
       worker_started: ["claim", "worker_authorized", "worker_started"],
       signed_committed: ["claim", "worker_authorized", "worker_started", "signed_committed"],
       superseded_before_worker: ["claim", "superseded_before_worker"],
+      failed_before_worker: ["claim", "failed_before_worker"],
       failed_before_submission: kinds,
       unknown_outcome: kinds
     };
@@ -1760,7 +1928,7 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
       const snapshot = await readSnapshot();
       const claim = snapshot.records[0];
       if (
-        (generation !== 1 && generation !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION) ||
+        !isFenceableGeneration(generation) ||
         snapshot.state.status !== "claimed" ||
         snapshot.records.length !== 1 ||
         claim === undefined ||
@@ -1770,10 +1938,7 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
         return null;
       }
       const rawSha256 = sha256Hex(claimRecord(claim.claim, claim.recordedAt, generation));
-      const expectedRawSha256 =
-        generation === 1
-          ? BSC_TESTNET_PTA_WBNB_POOL_GENERATION_1_CLAIM_RAW_SHA256
-          : BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256;
+      const expectedRawSha256 = expectedClaimRawSha256For(generation);
       if (rawSha256 !== expectedRawSha256) return null;
       return Object.freeze({
         status: "claimed" as const,
@@ -1811,16 +1976,13 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
     ) {
       throw new Error("PTA_WBNB_POOL_JOURNAL_SUPERSESSION_PERMANENTLY_BLOCKED");
     }
-    if (generation !== 1 && generation !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION) {
+    if (!isFenceableGeneration(generation)) {
       throw new Error("PTA_WBNB_POOL_JOURNAL_SUPERSESSION_PERMANENTLY_BLOCKED");
     }
     const predecessorClaimRawSha256 = sha256Hex(
       claimRecord(claim.claim, claim.recordedAt, generation)
     );
-    const expectedRawSha256 =
-      generation === 1
-        ? BSC_TESTNET_PTA_WBNB_POOL_GENERATION_1_CLAIM_RAW_SHA256
-        : BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256;
+    const expectedRawSha256 = expectedClaimRawSha256For(generation);
     const predecessorExpiresAt = Date.parse(claim.claim.expiresAt);
     const noEffectObservedAt = Date.parse(proof.observedAt);
     if (
@@ -1938,6 +2100,42 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
       binding
     );
     return Object.freeze({ status: "worker_authorized" as const });
+  };
+
+  const failBeforeWorker = async (
+    untrustedRequest: BscTestnetPtaWbnbPoolFailedBeforeWorkerRequest
+  ): Promise<Readonly<{ status: "failed_before_worker" }>> => {
+    const recordedAt = captureNow(ports.now);
+    const record = inspectBinding(
+      untrustedRequest,
+      ["phase", "issueCode", "outcomeDigest"],
+      generation
+    );
+    const issueCode = record === null ? null : inspectFailedBeforeWorkerIssueCode(record.issueCode);
+    if (
+      generation !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION ||
+      recordedAt === null ||
+      record === null ||
+      record.phase !== "post_claim_recheck" ||
+      issueCode === null ||
+      !exactBytes32(record.outcomeDigest)
+    ) {
+      throw new Error("PTA_WBNB_POOL_JOURNAL_INPUT_INVALID");
+    }
+    const binding = bindingOf(record);
+    await append(
+      2,
+      serialize({
+        ...commonRecord("failed_before_worker", binding, recordedAt),
+        phase: "post_claim_recheck",
+        issueCode,
+        outcomeDigest: record.outcomeDigest
+      }),
+      "claimed",
+      "failed_before_worker",
+      binding
+    );
+    return Object.freeze({ status: "failed_before_worker" as const });
   };
 
   const startWorker = async (
@@ -2150,6 +2348,7 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
     if (
       expected === "empty" ||
       expected === "superseded_before_worker" ||
+      expected === "failed_before_worker" ||
       expected === "unknown_outcome" ||
       expected === "failed_before_submission" ||
       slot > slotFiles.length ||
@@ -2190,6 +2389,7 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
     readClaimOnlyRecoveryCandidate,
     fenceClaimBeforeWorker,
     authorizeWorker,
+    failBeforeWorker,
     startWorker,
     consumeWorkerAuthorization,
     commitWorkerSignedTransaction,
@@ -2259,7 +2459,7 @@ try {
   if ([IO.Path]::GetFullPath($baseItem.FullName) -ne [IO.Path]::GetFullPath($base)) { throw 'base-path' }
 
   $cursor = $baseItem.FullName
-  foreach ($segment in @('ProofEra', 'operations', 'bsc-testnet-pta-wbnb-pool-v3')) {
+  foreach ($segment in @('ProofEra', 'operations', 'bsc-testnet-pta-wbnb-pool-v4')) {
     $candidate = [IO.Path]::GetFullPath([IO.Path]::Combine($cursor, $segment))
     if ([IO.Path]::GetDirectoryName($candidate) -ne [IO.Path]::GetFullPath($cursor)) { throw 'escape' }
     if (Test-Path -LiteralPath $candidate) {
@@ -2277,8 +2477,8 @@ try {
 
   # All ancestors have been validated before the first ACL mutation.
   $allowed = @(
-     '01-claim.v3.json', '02-transition.v3.json', '03-transition.v3.json',
-     '04-transition.v3.json', '05-transition.v3.json'
+     '01-claim.v4.json', '02-transition.v4.json', '03-transition.v4.json',
+     '04-transition.v4.json', '05-transition.v4.json'
   )
   $retainedFiles = @()
   foreach ($child in @(Get-ChildItem -LiteralPath $cursor -Force)) {
@@ -2377,6 +2577,7 @@ function expectedJournalDirectoryFromLocalAppData(
   }
   if (
     subdirectory !== LEGACY_JOURNAL_SUBDIRECTORY &&
+    subdirectory !== GENERATION_2_JOURNAL_SUBDIRECTORY &&
     subdirectory !== PREDECESSOR_JOURNAL_SUBDIRECTORY &&
     subdirectory !== ACTIVE_JOURNAL_SUBDIRECTORY
   ) {
@@ -2633,12 +2834,7 @@ function createWindowsAdapter(
   directory: string,
   generation: JournalGeneration
 ): BscTestnetPtaWbnbPoolLocalJournalCore {
-  const slotFiles =
-    generation === 1
-      ? LEGACY_SLOT_FILES
-      : generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
-        ? PREDECESSOR_SLOT_FILES
-        : ACTIVE_SLOT_FILES;
+  const slotFiles = slotFilesFor(generation);
   const createExclusiveRecord = async (
     name: string,
     contentFactory: () => string
@@ -2690,10 +2886,7 @@ function createWindowsAdapter(
       createExclusive: (name: string, content: string) =>
         createExclusiveRecord(name, () => content),
       createExclusiveFenceFromFactory: (name: string, contentFactory: () => string) => {
-        if (
-          (generation !== 1 && generation !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION) ||
-          name !== slotFiles[1]
-        ) {
+        if (!isFenceableGeneration(generation) || name !== slotFiles[1]) {
           throw new Error("PTA_WBNB_POOL_JOURNAL_FILE_INVALID");
         }
         return createExclusiveRecord(name, contentFactory);
@@ -2711,6 +2904,7 @@ function activeJournalFacade(
   return Object.freeze({
     claimExactInitialization: core.claimExactInitialization,
     authorizeWorker: core.authorizeWorker,
+    failBeforeWorker: core.failBeforeWorker,
     startWorker: core.startWorker,
     consumeWorkerAuthorization: core.consumeWorkerAuthorization,
     commitWorkerSignedTransaction: core.commitWorkerSignedTransaction,
@@ -2765,12 +2959,7 @@ async function openExistingLocalAtDirectory(
   generation: JournalGeneration
 ): Promise<ExistingCoreJournalResult> {
   try {
-    const slotFiles =
-      generation === 1
-        ? LEGACY_SLOT_FILES
-        : generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
-          ? PREDECESSOR_SLOT_FILES
-          : ACTIVE_SLOT_FILES;
+    const slotFiles = slotFilesFor(generation);
     const names = (await readdir(directory, { withFileTypes: true })).map((entry) => {
       if (!entry.isFile() || !slotFiles.some((allowed) => allowed === entry.name)) {
         throw new Error("PTA_WBNB_POOL_JOURNAL_DIRECTORY_CONTAMINATED");
@@ -2889,8 +3078,36 @@ export async function openExistingWindowsBscTestnetPtaWbnbPoolLegacyLocalJournal
 }
 
 /**
- * Opens the immutable generation-2 predecessor for claim-only fencing. It never provisions the
- * namespace; stale generation-2 worker authorization competes for the same slot-2 O_EXCL record.
+ * Opens immutable generation 2 for historical chain verification/fencing. This named seam is kept
+ * separate from the current predecessor so advancing generations never changes the bytes parsed.
+ */
+export async function openExistingWindowsBscTestnetPtaWbnbPoolGeneration2LocalJournalForRecoveryForInternalUse(): Promise<BscTestnetPtaWbnbPoolExistingPredecessorLocalJournalResult> {
+  if (process.platform !== "win32") return recoveryBlocked();
+  try {
+    const directory = await readOnlyFixedJournalDirectory(GENERATION_2_JOURNAL_SUBDIRECTORY);
+    if (directory === null) {
+      return Object.freeze({
+        status: "absent" as const,
+        journal: null,
+        state: emptyLocalJournalState(),
+        issue: null
+      });
+    }
+    const opened = await openExistingLocalAtDirectory(
+      directory,
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2
+    );
+    return opened.status === "opened"
+      ? Object.freeze({ ...opened, journal: legacyRecoveryFacade(opened.journal) })
+      : opened;
+  } catch {
+    return recoveryBlocked();
+  }
+}
+
+/**
+ * Opens the immutable generation-3 predecessor for claim-only fencing. It never provisions the
+ * namespace; stale generation-3 worker authorization competes for the same slot-2 O_EXCL record.
  */
 export async function openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse(): Promise<BscTestnetPtaWbnbPoolExistingPredecessorLocalJournalResult> {
   if (process.platform !== "win32") return recoveryBlocked();

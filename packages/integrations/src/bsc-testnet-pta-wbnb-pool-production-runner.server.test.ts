@@ -5,8 +5,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const harness = vi.hoisted(() => ({
   order: [] as string[],
   openAncestor: vi.fn(),
+  openGeneration2: vi.fn(),
   openLegacy: vi.fn(),
   openLocal: vi.fn(),
+  probePredecessorSubmission: vi.fn(),
   openSubmission: vi.fn(),
   openTerminalSubmission: vi.fn(),
   createBridge: vi.fn(),
@@ -26,6 +28,8 @@ vi.mock("server-only", () => ({}));
 vi.mock("./bsc-testnet-pta-wbnb-pool-local-journal.server", () => ({
   openExistingWindowsBscTestnetPtaWbnbPoolLegacyLocalJournalForRecoveryForInternalUse:
     harness.openAncestor,
+  openExistingWindowsBscTestnetPtaWbnbPoolGeneration2LocalJournalForRecoveryForInternalUse:
+    harness.openGeneration2,
   openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse:
     harness.openLegacy,
   openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse: harness.openLocal
@@ -34,7 +38,9 @@ vi.mock("./bsc-testnet-pta-wbnb-pool-submission-journal.server", () => ({
   openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse:
     harness.openSubmission,
   openExistingWindowsBscTestnetPtaWbnbPoolSubmissionJournalForTerminalReconciliationForInternalUse:
-    harness.openTerminalSubmission
+    harness.openTerminalSubmission,
+  probeWindowsBscTestnetPtaWbnbPoolPredecessorSubmissionJournalForInternalUse:
+    harness.probePredecessorSubmission
 }));
 vi.mock("./bsc-testnet-pta-wbnb-pool-signing-worker", () => ({
   createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeForInternalUse: harness.createBridge
@@ -84,10 +90,19 @@ const EMPTY_SUBMISSION = Object.freeze({
   state: Object.freeze({ state: "empty" as const }),
   issue: null
 });
+const EMPTY_PREDECESSOR_SUBMISSION = Object.freeze({
+  status: "ready" as const,
+  presence: "empty" as const,
+  files: Object.freeze([]),
+  issue: null
+});
 const LEGACY_CLAIM_RAW_SHA256 =
   "0xf10e90eb836a94446ace100bbc9a6fc5de6cc35b1d82e4d10fb4736ef8559e32" as const;
 const PREDECESSOR_CLAIM_RAW_SHA256 =
   "0x613df995936c3ccfff56e5da5588906f1bd28340ae8297eb08524274b9b8e1c3" as const;
+const GENERATION_3_CLAIM_RAW_SHA256 =
+  "0x7ff780a8f0ac1a1f8ff7bced5d858259f918cdb1891c684aa208b6bca31c9585" as const;
+const ANCESTOR_FENCE_SHA256 = `0x${"09".repeat(32)}` as const;
 const ANCESTOR_FENCE = Object.freeze({
   status: "superseded_before_worker" as const,
   terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" as const,
@@ -96,7 +111,8 @@ const ANCESTOR_FENCE = Object.freeze({
   signatureOutcome: "not_attempted" as const,
   submissionOutcome: "not_attempted" as const,
   submissionJournalState: "exact_empty" as const,
-  predecessorClaimRawSha256: LEGACY_CLAIM_RAW_SHA256
+  predecessorClaimRawSha256: LEGACY_CLAIM_RAW_SHA256,
+  predecessorFenceSha256: ANCESTOR_FENCE_SHA256
 });
 const ANCESTOR_FENCED = Object.freeze({
   status: "opened" as const,
@@ -123,12 +139,21 @@ const FENCE = Object.freeze({
   fenceRecordedAt: "2026-08-14T10:00:01.000Z",
   predecessorFenceSha256: `0x${"12".repeat(32)}` as const
 });
+const PREDECESSOR_FENCE = Object.freeze({
+  ...FENCE,
+  predecessorClaimRawSha256: GENERATION_3_CLAIM_RAW_SHA256,
+  noEffectProofDigest: `0x${"13".repeat(32)}` as const,
+  noEffectEnvelopeHash: `0x${"14".repeat(32)}` as const,
+  noEffectObservedAt: "2026-08-14T10:00:01.500Z",
+  fenceRecordedAt: "2026-08-14T10:00:01.750Z",
+  predecessorFenceSha256: `0x${"15".repeat(32)}` as const
+});
 const LEGACY_JOURNAL = Object.freeze({
   readClaimOnlyRecoveryCandidate: vi.fn(async () => null),
   fenceClaimBeforeWorker: vi.fn(),
   readState: vi.fn(),
   readStrictRecoveryState: vi.fn(async () =>
-    Object.freeze({ status: "superseded_before_worker", supersessionFence: FENCE })
+    Object.freeze({ status: "superseded_before_worker", supersessionFence: PREDECESSOR_FENCE })
   )
 });
 const LEGACY_FENCED = Object.freeze({
@@ -136,7 +161,19 @@ const LEGACY_FENCED = Object.freeze({
   journal: LEGACY_JOURNAL,
   state: Object.freeze({
     status: "superseded_before_worker" as const,
+    generation: 3 as const,
+    predecessorFenceSha256: FENCE.predecessorFenceSha256,
+    supersessionFence: PREDECESSOR_FENCE
+  }),
+  issue: null
+});
+const GENERATION_2_FENCED = Object.freeze({
+  status: "opened" as const,
+  journal: Object.freeze({}),
+  state: Object.freeze({
+    status: "superseded_before_worker" as const,
     generation: 2 as const,
+    predecessorFenceSha256: ANCESTOR_FENCE_SHA256,
     supersessionFence: FENCE
   }),
   issue: null
@@ -220,6 +257,10 @@ function readyFreshPath(): void {
     harness.order.push("legacy-open");
     return LEGACY_FENCED;
   });
+  harness.openGeneration2.mockImplementation(async () => {
+    harness.order.push("generation2-open");
+    return GENERATION_2_FENCED;
+  });
   harness.openLocal.mockImplementation(async () => {
     harness.order.push("local-open");
     return EMPTY_LOCAL;
@@ -227,6 +268,10 @@ function readyFreshPath(): void {
   harness.openSubmission.mockImplementation(async () => {
     harness.order.push("submission-open");
     return EMPTY_SUBMISSION;
+  });
+  harness.probePredecessorSubmission.mockImplementation(async () => {
+    harness.order.push("predecessor-submission-probe");
+    return EMPTY_PREDECESSOR_SUBMISSION;
   });
   harness.createBridge.mockImplementation(async () => {
     harness.order.push("release");
@@ -287,17 +332,21 @@ beforeEach(() => {
 });
 
 describe("PTA/WBNB recovery-first production runner", () => {
-  it("rereads all four durable namespaces across fence, TTY, activation, and claim boundaries", async () => {
+  it("rereads all six durable namespaces across fence, TTY, activation, and claim boundaries", async () => {
     await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toEqual(FRESH_RESULT);
 
     expect(harness.order).toEqual([
       "ancestor-open",
+      "generation2-open",
       "legacy-open",
       "local-open",
+      "predecessor-submission-probe",
       "submission-open",
       "ancestor-open",
+      "generation2-open",
       "legacy-open",
       "local-open",
+      "predecessor-submission-probe",
       "submission-open",
       "release",
       "policy-tty",
@@ -306,18 +355,24 @@ describe("PTA/WBNB recovery-first production runner", () => {
       "instantiate-policy",
       "owner-tty",
       "ancestor-open",
+      "generation2-open",
       "legacy-open",
       "local-open",
+      "predecessor-submission-probe",
       "submission-open",
       "activate-custody-journal",
       "ancestor-open",
+      "generation2-open",
       "legacy-open",
       "local-open",
+      "predecessor-submission-probe",
       "submission-open",
       "provision-submission-broadcaster",
       "ancestor-open",
+      "generation2-open",
       "legacy-open",
       "local-open",
+      "predecessor-submission-probe",
       "submission-open",
       "composition-create",
       "composition-run"
@@ -329,9 +384,9 @@ describe("PTA/WBNB recovery-first production runner", () => {
         executionEnvelopeObservedAt: ENVELOPE.observation.observedAt,
         expiresAt: DESCRIPTOR.envelopeExpiresAt,
         predecessorFence: expect.objectContaining({
-          predecessorFenceSha256: FENCE.predecessorFenceSha256,
-          fenceRecordedAt: FENCE.fenceRecordedAt,
-          noEffectEnvelopeHash: FENCE.noEffectEnvelopeHash
+          predecessorFenceSha256: PREDECESSOR_FENCE.predecessorFenceSha256,
+          fenceRecordedAt: PREDECESSOR_FENCE.fenceRecordedAt,
+          noEffectEnvelopeHash: PREDECESSOR_FENCE.noEffectEnvelopeHash
         })
       })
     );
@@ -350,7 +405,7 @@ describe("PTA/WBNB recovery-first production runner", () => {
     );
   });
 
-  it("waits for all four startup probes and does not preload policy while any is pending", async () => {
+  it("waits for all six startup probes and does not preload policy while any is pending", async () => {
     const legacy = deferred<typeof LEGACY_FENCED>();
     const local = deferred<typeof EMPTY_LOCAL>();
     const submission = deferred<typeof EMPTY_SUBMISSION>();
@@ -423,7 +478,10 @@ describe("PTA/WBNB recovery-first production runner", () => {
 
   it("returns after snapshot A fencing and permits snapshot B only in the next invocation", async () => {
     const snapshotA = envelope("31", "2026-08-14T10:00:00.500Z");
-    const fenceA = Object.freeze({ ...FENCE, noEffectEnvelopeHash: snapshotA.envelopeHash });
+    const fenceA = Object.freeze({
+      ...PREDECESSOR_FENCE,
+      noEffectEnvelopeHash: snapshotA.envelopeHash
+    });
     const fencedJournalA = Object.freeze({
       ...LEGACY_JOURNAL,
       readStrictRecoveryState: vi.fn(async () =>
@@ -435,14 +493,15 @@ describe("PTA/WBNB recovery-first production runner", () => {
       journal: fencedJournalA,
       state: Object.freeze({
         status: "superseded_before_worker" as const,
-        generation: 2 as const,
+        generation: 3 as const,
+        predecessorFenceSha256: FENCE.predecessorFenceSha256,
         supersessionFence: fenceA
       }),
       issue: null
     });
     const candidate = Object.freeze({
       status: "claimed" as const,
-      predecessorClaimRawSha256: PREDECESSOR_CLAIM_RAW_SHA256,
+      predecessorClaimRawSha256: GENERATION_3_CLAIM_RAW_SHA256,
       predecessorClaimRecordedAt: "2026-08-14T09:59:00.000Z",
       predecessorAuthorizationExpiresAt: "2026-08-14T10:00:00.250Z"
     });
@@ -457,7 +516,8 @@ describe("PTA/WBNB recovery-first production runner", () => {
       journal: claimJournal,
       state: Object.freeze({
         status: "claimed" as const,
-        generation: 2 as const,
+        generation: 3 as const,
+        predecessorFenceSha256: FENCE.predecessorFenceSha256,
         supersessionFence: null
       }),
       issue: null
@@ -485,7 +545,7 @@ describe("PTA/WBNB recovery-first production runner", () => {
     expect(harness.runComposition).not.toHaveBeenCalled();
     expect(claimJournal.fenceClaimBeforeWorker).toHaveBeenCalledWith(
       expect.objectContaining({
-        expectedPredecessorClaimRawSha256: PREDECESSOR_CLAIM_RAW_SHA256,
+        expectedPredecessorClaimRawSha256: GENERATION_3_CLAIM_RAW_SHA256,
         proof: expect.objectContaining({
           envelopeHash: snapshotA.envelopeHash,
           observedAt: snapshotA.observation.observedAt,

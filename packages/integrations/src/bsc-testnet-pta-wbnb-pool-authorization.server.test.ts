@@ -33,7 +33,7 @@ const ATTEMPT_ID = `0x${"66".repeat(32)}` as Hex;
 const REVIEWED_AT = "2026-08-13T04:29:50.000Z";
 const ENVELOPE_OBSERVED_AT = "2026-08-13T04:29:45.000Z";
 const AUTHORIZED_AT = "2026-08-13T04:29:55.000Z";
-const EXECUTION_EXPIRES_AT = "2026-08-13T04:30:40.000Z";
+const EXECUTION_EXPIRES_AT = "2026-08-13T04:30:55.000Z";
 const ENVELOPE_EXPIRES_AT = "2026-08-13T04:34:55.000Z";
 
 function deeplyFreeze<Value>(value: Value): Readonly<Value> {
@@ -125,9 +125,9 @@ function ownerAuthorization(
   });
   if (exact === null) throw new Error("Transaction fixture failed.");
   const body = {
-    schemaVersion: 4,
-    kind: "exact_owner_recovery_generation_3_signature_and_single_broadcast_authorization_v4",
-    decision: "authorize_fresh_chain_97_pool_recovery_generation_3_signature_and_single_broadcast",
+    schemaVersion: 5,
+    kind: "exact_owner_recovery_generation_4_signature_and_single_broadcast_authorization_v5",
+    decision: "authorize_fresh_chain_97_pool_recovery_generation_4_signature_and_single_broadcast",
     broadcastPolicy: "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity",
     liquidityActionAuthorized: false,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -140,7 +140,7 @@ function ownerAuthorization(
     authorizationTextSha256: TEXT_DIGEST,
     ceremonyNonce,
     recovery: deeplyFreeze({
-      generation: 3,
+      generation: 4,
       predecessorState: "superseded_before_worker",
       predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
       attemptId: ATTEMPT_ID

@@ -18,6 +18,7 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_PRICE_WEI,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_OBSERVATION_AGE_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_TOTAL_COST_WEI,
+  BSC_TESTNET_PTA_WBNB_POOL_POST_RECHECK_EXECUTION_RESERVE_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN,
   BSC_TESTNET_PTA_WBNB_POOL_SENDER,
   BSC_TESTNET_WBNB_ADDRESS,
@@ -131,6 +132,7 @@ export type BscTestnetPtaWbnbPoolPostClaimRecheckIssueCode =
   | "AUTHORIZATION_AUTHENTICATION_FAILED"
   | "CLOCK_INVALID"
   | "AUTHORIZATION_EXPIRED"
+  | "AUTHORIZATION_RESERVE_INSUFFICIENT"
   | "RPC_REQUEST_FAILED"
   | "MALFORMED_RPC_RESPONSE"
   | "CHAIN_MISMATCH"
@@ -138,6 +140,7 @@ export type BscTestnetPtaWbnbPoolPostClaimRecheckIssueCode =
   | "FINALIZED_BLOCK_IN_FUTURE"
   | "FINALIZED_BLOCK_STALE"
   | "RECHECK_WINDOW_EXCEEDED"
+  | "RECHECK_EXECUTION_RESERVE_EXHAUSTED"
   | "NONCE_MISMATCH"
   | "POOL_ALREADY_EXISTS_OR_RACED"
   | "SENDER_NOT_EOA"
@@ -728,6 +731,18 @@ function createBscTestnetPtaWbnbPoolPostClaimRechecker(
           false
         );
       }
+      const recheckNotAfterMilliseconds = Math.min(
+        started.milliseconds + BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS * 1_000,
+        authorizedExpiry - BSC_TESTNET_PTA_WBNB_POOL_POST_RECHECK_EXECUTION_RESERVE_SECONDS * 1_000
+      );
+      if (recheckNotAfterMilliseconds <= started.milliseconds) {
+        return blocked(
+          "AUTHORIZATION_RESERVE_INSUFFICIENT",
+          "clock",
+          "The post-claim read cannot preserve the exact post-recheck execution reserve.",
+          false
+        );
+      }
 
       rpcReadPerformed = true;
       const chainRequest = freezeRequest({
@@ -1031,11 +1046,11 @@ function createBscTestnetPtaWbnbPoolPostClaimRechecker(
           true
         );
       }
-      if (completed.milliseconds >= authorizedExpiry) {
+      if (completed.milliseconds > recheckNotAfterMilliseconds) {
         return blocked(
-          "AUTHORIZATION_EXPIRED",
+          "RECHECK_EXECUTION_RESERVE_EXHAUSTED",
           "clock",
-          "The exact authorization expired during the post-claim read.",
+          "The dual-RPC read did not finish before the exact post-recheck execution reserve.",
           true
         );
       }
@@ -1092,11 +1107,11 @@ function createBscTestnetPtaWbnbPoolPostClaimRechecker(
       if (issuedAt === null || issuedAt.milliseconds < completed.milliseconds) {
         return blocked("CLOCK_INVALID", "clock", "The capability-issuance clock is invalid.", true);
       }
-      if (issuedAt.milliseconds >= authorizedExpiry) {
+      if (issuedAt.milliseconds > recheckNotAfterMilliseconds) {
         return blocked(
-          "AUTHORIZATION_EXPIRED",
+          "RECHECK_EXECUTION_RESERVE_EXHAUSTED",
           "clock",
-          "The exact authorization expired before capability issuance completed.",
+          "Capability issuance did not preserve the exact post-recheck execution reserve.",
           true
         );
       }

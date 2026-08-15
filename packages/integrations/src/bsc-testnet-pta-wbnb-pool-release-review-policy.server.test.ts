@@ -126,9 +126,9 @@ function policyBody(release = releaseIdentity()): PolicyBody {
     deriveBscTestnetPtaWbnbPoolReleaseReviewSubjectSha256ForInternalUse(release);
   if (reviewedSubjectSha256 === null) throw new Error("synthetic release must be valid");
   return Object.freeze({
-    schemaVersion: 3 as const,
-    kind: "owner_designated_internal_multi_agent_release_review_policy_generation_3_v3" as const,
-    decision: "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_3_POLICY" as const,
+    schemaVersion: 4 as const,
+    kind: "owner_designated_internal_multi_agent_release_review_policy_generation_4_v4" as const,
+    decision: "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_4_POLICY" as const,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     release,
     transaction: Object.freeze({
@@ -156,9 +156,12 @@ function policyBody(release = releaseIdentity()): PolicyBody {
       maximumTotalCostWei: "18000000000000000" as const,
       maximumEnvelopeLifetimeSeconds: "300" as const,
       maximumOwnerConfirmationWindowSeconds: "240" as const,
-      maximumExecutionAuthorityLifetimeSeconds: "45" as const,
+      maximumExecutionAuthorityLifetimeSeconds: "60" as const,
+      minimumRemainingBeforeClaimSeconds: "50" as const,
+      maximumPostConfirmationPreclaimSeconds: "10" as const,
+      postRecheckExecutionReserveSeconds: "20" as const,
       maximumPostClaimRecheckAgeSeconds: "30" as const,
-      recoveryGeneration: "3" as const,
+      recoveryGeneration: "4" as const,
       predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256
     }),
     scope: Object.freeze({
@@ -348,8 +351,8 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
     if (admission === null) throw new Error("expected realm");
 
     expect(admission.policy).toMatchObject({
-      schemaVersion: 3,
-      decision: "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_3_POLICY",
+      schemaVersion: 4,
+      decision: "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_4_POLICY",
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       release: expectedRelease,
       transaction: {
@@ -370,9 +373,12 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
         maximumTotalCostWei: "18000000000000000",
         maximumEnvelopeLifetimeSeconds: "300",
         maximumOwnerConfirmationWindowSeconds: "240",
-        maximumExecutionAuthorityLifetimeSeconds: "45",
+        maximumExecutionAuthorityLifetimeSeconds: "60",
+        minimumRemainingBeforeClaimSeconds: "50",
+        maximumPostConfirmationPreclaimSeconds: "10",
+        postRecheckExecutionReserveSeconds: "20",
         maximumPostClaimRecheckAgeSeconds: "30",
-        recoveryGeneration: "3",
+        recoveryGeneration: "4",
         predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256
       },
       scope: {
@@ -419,7 +425,7 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
       executionEnvelopeObservedAt: EXECUTION_ENVELOPE_OBSERVED_AT,
       expiresAt: ENVELOPE_EXPIRES_AT,
       recovery: {
-        generation: 3,
+        generation: 4,
         predecessorFence: predecessorFence()
       },
       automatedPolicyApplication: true,
@@ -830,7 +836,7 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
       },
       (binding) => {
         binding.recovery = Object.freeze({
-          generation: 3,
+          generation: 4,
           predecessorFence: Object.freeze({
             ...predecessorFence(),
             predecessorFenceSha256: `0x${"78".repeat(32)}`

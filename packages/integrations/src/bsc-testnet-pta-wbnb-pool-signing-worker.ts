@@ -48,9 +48,13 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_BYTES,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_KECCAK256,
+  BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS,
+  BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_POST_CONFIRMATION_PRECLAIM_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_LIMIT,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_PRICE_WEI,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_TOTAL_COST_WEI,
+  BSC_TESTNET_PTA_WBNB_POOL_MINIMUM_REMAINING_BEFORE_CLAIM_SECONDS,
+  BSC_TESTNET_PTA_WBNB_POOL_POST_RECHECK_EXECUTION_RESERVE_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_SENDER
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
@@ -284,6 +288,7 @@ export type BscTestnetPtaWbnbPoolSigningWorkerBlockedCode =
   | "CLOCK_INVALID"
   | "CUSTODY_UNAVAILABLE"
   | "INPUT_INVALID"
+  | "NATIVE_RECOVERY_STATE_INVALID"
   | "PAYLOAD_EXPIRED"
   | "PRODUCTION_AUTHORIZATION_UNAVAILABLE"
   | "RELEASE_TRUST_INVALID"
@@ -2064,7 +2069,7 @@ export function matchesBscTestnetPtaWbnbPoolExactBroadcastToSuccessfulSigningFor
     !Object.isFrozen(record.recovery) ||
     !hasExactKeys(record, EXACT_BROADCAST_REQUEST_KEYS) ||
     !hasExactKeys(recovery, EXACT_BROADCAST_RECOVERY_KEYS) ||
-    record.schemaVersion !== 3 ||
+    record.schemaVersion !== 4 ||
     record.operation !== EXACT_BROADCAST_OPERATION ||
     record.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
     record.claimId !== request.claimId ||
@@ -2179,6 +2184,7 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
     Readonly<{
       descriptor: BscTestnetPtaWbnbPoolOneShotPreparedDescriptor;
       instantiation: BscTestnetPtaWbnbPoolRuntimeReviewInstantiation;
+      signingJournal: BscTestnetPtaWbnbPoolLocalJournal;
     }>
   >();
   let ceremonyAttempted = false;
@@ -2316,17 +2322,107 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
       });
     }
     ceremonyAttempted = true;
+    let signingJournal: BscTestnetPtaWbnbPoolLocalJournal;
+    let preparationDigest: Hex;
+    try {
+      // Complete the expensive release, durable-state, and metadata-only custody preparation before
+      // owner confirmation. None of these steps mints signing/broadcast authority or opens custody.
+      const expectedProductionReleaseBeforeOwner =
+        await assertExactBscTestnetPtaWbnbPoolProductionInvocation();
+      const [actualIdentity, actualTrust] = await Promise.all([
+        inspectBscTestnetPtaWbnbPoolExactReleaseIdentityForInternalUse(),
+        inspectBscTestnetPtaWbnbPoolSigningWorkerReleaseTrustForInternalUse()
+      ]);
+      if (
+        expectedProductionReleaseBeforeOwner.releaseCommit !==
+          expectedProductionRelease.releaseCommit ||
+        expectedProductionReleaseBeforeOwner.releaseTree !==
+          expectedProductionRelease.releaseTree ||
+        expectedProductionReleaseBeforeOwner.runtimeManifestSha256 !==
+          expectedProductionRelease.runtimeManifestSha256 ||
+        !releaseIdentityMatchesExpectedProductionArguments(
+          actualIdentity,
+          expectedProductionReleaseBeforeOwner
+        ) ||
+        !sameReleaseIdentity(actualIdentity, releaseIdentity) ||
+        !sameReleaseTrust(actualTrust, releaseTrust) ||
+        !releaseTrustMatchesIdentity(actualTrust, actualIdentity)
+      ) {
+        throw new PoolSigningWorkerFailure("RELEASE_TRUST_INVALID");
+      }
+      const [legacyRecovery, activeRecovery, submissionRecovery] = await Promise.all([
+        openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse(),
+        openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse(),
+        openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse()
+      ]);
+      const legacyState =
+        legacyRecovery.status === "opened"
+          ? await legacyRecovery.journal.readStrictRecoveryState()
+          : null;
+      if (
+        legacyState === null ||
+        !matchesBscTestnetPtaWbnbPoolExactPreCustodyRecoveryForInternalUse(
+          legacyState,
+          activeRecovery.status,
+          submissionRecovery.status,
+          runtimeReviewInstantiation
+        )
+      ) {
+        throw new PoolSigningWorkerFailure("NATIVE_RECOVERY_STATE_INVALID");
+      }
+      await assertFixedWindowsBscTestnetPtaWbnbPoolCustodyMetadataForInternalUse();
+      signingJournal = await createWindowsBscTestnetPtaWbnbPoolLocalJournal();
+      const preparedState = await signingJournal.readState();
+      if (preparedState.status !== "empty") {
+        throw new PoolSigningWorkerFailure("NATIVE_RECOVERY_STATE_INVALID");
+      }
+      const preparationBody = JSON.stringify({
+        releaseCommit: releaseIdentity.releaseCommit,
+        releaseTree,
+        runtimeManifestSha256: releaseIdentity.runtimeManifest.runtimeManifestSha256,
+        runtimeReviewInstantiationDigest: runtimeReviewInstantiation.instantiationDigest,
+        predecessorFenceSha256:
+          runtimeReviewInstantiation.recovery.predecessorFence.predecessorFenceSha256,
+        activeJournalState: "exact_empty",
+        submissionJournalState: "exact_empty",
+        custodyMetadataVerified: true,
+        executionAuthorityLifetimeSeconds:
+          BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS,
+        minimumRemainingBeforeClaimSeconds:
+          BSC_TESTNET_PTA_WBNB_POOL_MINIMUM_REMAINING_BEFORE_CLAIM_SECONDS,
+        maximumPostConfirmationPreclaimSeconds:
+          BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_POST_CONFIRMATION_PRECLAIM_SECONDS,
+        postRecheckExecutionReserveSeconds:
+          BSC_TESTNET_PTA_WBNB_POOL_POST_RECHECK_EXECUTION_RESERVE_SECONDS
+      });
+      preparationDigest = `0x${createHash("sha256")
+        .update("proofera.bsc-testnet.pta-wbnb-pool.owner-preparation.v1\u0000", "utf8")
+        .update(preparationBody, "utf8")
+        .digest("hex")}` as Hex;
+    } catch {
+      return Object.freeze({
+        status: "blocked" as const,
+        command: null,
+        issue: Object.freeze({
+          code: "OWNER_PREPARATION_FAILED",
+          path: "preparation",
+          message:
+            "The exact release, durable-state, or metadata-only custody preparation failed before the owner challenge."
+        })
+      });
+    }
     const result = await conductBscTestnetPtaWbnbPoolOwnerCeremonyForInternalUse(
       descriptor,
       runtimeReviewInstantiation,
       releaseTrust,
       releaseTree,
+      preparationDigest,
       nativeTtyPorts
     );
     if (result.status === "confirmed") {
       ceremonyCommands.set(
         result.command,
-        Object.freeze({ descriptor, instantiation: runtimeReviewInstantiation })
+        Object.freeze({ descriptor, instantiation: runtimeReviewInstantiation, signingJournal })
       );
     }
     return result;
@@ -2365,60 +2461,17 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
       ceremonyCommands.delete(command);
       const runtimeReviewInstantiation = ceremonyBinding.instantiation;
 
-      // Release drift is rejected before the first custody or journal operation.
-      const expectedProductionReleaseAfter =
-        await assertExactBscTestnetPtaWbnbPoolProductionInvocation();
-      const [actualIdentity, actualTrust] = await Promise.all([
-        inspectBscTestnetPtaWbnbPoolExactReleaseIdentityForInternalUse(),
-        inspectBscTestnetPtaWbnbPoolSigningWorkerReleaseTrustForInternalUse()
-      ]);
-      if (
-        expectedProductionReleaseAfter.releaseCommit !== expectedProductionRelease.releaseCommit ||
-        expectedProductionReleaseAfter.releaseTree !== expectedProductionRelease.releaseTree ||
-        expectedProductionReleaseAfter.runtimeManifestSha256 !==
-          expectedProductionRelease.runtimeManifestSha256 ||
-        !releaseIdentityMatchesExpectedProductionArguments(
-          actualIdentity,
-          expectedProductionReleaseAfter
-        ) ||
-        !sameReleaseIdentity(actualIdentity, releaseIdentity) ||
-        !sameReleaseTrust(actualTrust, releaseTrust) ||
-        !releaseTrustMatchesIdentity(actualTrust, actualIdentity)
-      ) {
-        return nativeActivationBlocked(
-          "RELEASE_TRUST_INVALID",
-          "release",
-          "The exact clean published release changed before native activation."
-        );
-      }
-
-      const [legacyRecovery, activeRecovery, submissionRecovery] = await Promise.all([
-        openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse(),
-        openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse(),
-        openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse()
-      ]);
-      const legacyState =
-        legacyRecovery.status === "opened"
-          ? await legacyRecovery.journal.readStrictRecoveryState()
-          : null;
-      if (
-        legacyState === null ||
-        !matchesBscTestnetPtaWbnbPoolExactPreCustodyRecoveryForInternalUse(
-          legacyState,
-          activeRecovery.status,
-          submissionRecovery.status,
-          runtimeReviewInstantiation
-        )
-      ) {
+      // Heavy release/journal/ACL preparation completed before the owner challenge. After the exact
+      // confirmation only a lightweight in-realm empty-state reread is permitted before authority.
+      const signingJournal = ceremonyBinding.signingJournal;
+      const preparedState = await signingJournal.readState();
+      if (preparedState.status !== "empty") {
         return nativeActivationBlocked(
           "NATIVE_RECOVERY_STATE_INVALID",
           "recovery",
-          "The exact predecessor fence or empty generation-3 durable namespaces changed before custody metadata access."
+          "The prepared active journal changed after owner confirmation."
         );
       }
-
-      await assertFixedWindowsBscTestnetPtaWbnbPoolCustodyMetadataForInternalUse();
-      const signingJournal = await createWindowsBscTestnetPtaWbnbPoolLocalJournal();
       const authorization: BscTestnetPtaWbnbPoolProductionAuthorityResult = issuer.authorize(
         descriptor,
         command,
@@ -2433,38 +2486,20 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
       }
 
       const { intent, executionCapability } = authorization;
+      if (intent.reviewerApprovalDigest !== runtimeReviewInstantiation.instantiationDigest) {
+        return nativeActivationBlocked(
+          "NATIVE_REVIEW_INSTANTIATION_INVALID",
+          "intent.reviewerApprovalDigest",
+          "The authorized intent does not match the exact pre-owner runtime review instantiation."
+        );
+      }
       let successfulSigningRequest: BscTestnetPtaWbnbPoolSigningWorkerRequest | null = null;
       let successfulSigningResponse: BscTestnetPtaWbnbPoolSigningWorkerResponse | null = null;
       let workerIssued = false;
       let broadcastAttempted = false;
 
       const inspectExactReleaseAndTree =
-        async (): Promise<BscTestnetPtaWbnbPoolSigningWorkerReleaseTrust> => {
-          const expectedProductionReleaseForWorker =
-            await assertExactBscTestnetPtaWbnbPoolProductionInvocation();
-          const [actualIdentityAfter, actualTrustAfter] = await Promise.all([
-            inspectBscTestnetPtaWbnbPoolExactReleaseIdentityForInternalUse(),
-            inspectBscTestnetPtaWbnbPoolSigningWorkerReleaseTrustForInternalUse()
-          ]);
-          if (
-            expectedProductionReleaseForWorker.releaseCommit !==
-              expectedProductionRelease.releaseCommit ||
-            expectedProductionReleaseForWorker.releaseTree !==
-              expectedProductionRelease.releaseTree ||
-            expectedProductionReleaseForWorker.runtimeManifestSha256 !==
-              expectedProductionRelease.runtimeManifestSha256 ||
-            !releaseIdentityMatchesExpectedProductionArguments(
-              actualIdentityAfter,
-              expectedProductionReleaseForWorker
-            ) ||
-            !sameReleaseIdentity(actualIdentityAfter, releaseIdentity) ||
-            !sameReleaseTrust(actualTrustAfter, releaseTrust) ||
-            !releaseTrustMatchesIdentity(actualTrustAfter, actualIdentityAfter)
-          ) {
-            throw new PoolSigningWorkerFailure("RELEASE_TRUST_INVALID");
-          }
-          return actualTrustAfter;
-        };
+        async (): Promise<BscTestnetPtaWbnbPoolSigningWorkerReleaseTrust> => releaseTrust;
 
       const issueWorker = (candidateCapability: unknown): BscTestnetPtaWbnbPoolSigningWorker => {
         if (

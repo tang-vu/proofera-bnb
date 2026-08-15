@@ -61,18 +61,18 @@ function transaction() {
 
 function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
   return Object.freeze({
-    schemaVersion: 3,
-    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_3",
+    schemaVersion: 4,
+    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_4",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
     reviewerApprovalDigest: REVIEWER_DIGEST,
     ownerAuthorizationDigest: OWNER_DIGEST,
     releaseCommit: RELEASE,
     runtimeManifestSha256: MANIFEST,
-    authenticatedAt: "2026-08-13T04:29:45.000Z",
-    expiresAt: "2026-08-13T04:30:30.000Z",
+    authenticatedAt: "2026-08-13T04:29:55.000Z",
+    expiresAt: "2026-08-13T04:30:55.000Z",
     recovery: Object.freeze({
-      generation: 3,
+      generation: 4,
       predecessorState: "superseded_before_worker",
       predecessorFenceSha256: PREDECESSOR_FENCE,
       attemptId: ATTEMPT_ID
@@ -262,9 +262,9 @@ describe("PTA/WBNB post-claim dual-RPC recheck", () => {
       claimId: "claim-pool-001",
       journalClaimToken: CLAIM_TOKEN,
       authenticatedAt: COMPLETE,
-      expiresAt: "2026-08-13T04:30:30.000Z",
+      expiresAt: "2026-08-13T04:30:55.000Z",
       recovery: {
-        generation: 3,
+        generation: 4,
         predecessorState: "superseded_before_worker",
         predecessorFenceSha256: PREDECESSOR_FENCE,
         attemptId: ATTEMPT_ID
@@ -442,7 +442,7 @@ describe("PTA/WBNB post-claim dual-RPC recheck", () => {
   });
 
   it("rejects expired or overlong observations before issuing a journal token", async () => {
-    const expired = setup({}, {}, { clock: clocks(["2026-08-13T04:30:30.000Z"]) });
+    const expired = setup({}, {}, { clock: clocks(["2026-08-13T04:30:55.000Z"]) });
     await expect(expired.rechecker.recheck(input())).resolves.toMatchObject({
       status: "blocked",
       issue: { code: "AUTHORIZATION_EXPIRED" },
@@ -459,7 +459,7 @@ describe("PTA/WBNB post-claim dual-RPC recheck", () => {
     );
     await expect(overlong.rechecker.recheck(input())).resolves.toMatchObject({
       status: "blocked",
-      issue: { code: "RECHECK_WINDOW_EXCEEDED" }
+      issue: { code: "RECHECK_EXECUTION_RESERVE_EXHAUSTED" }
     });
     expect(overlong.tokenCalls()).toBe(0);
 
@@ -467,6 +467,35 @@ describe("PTA/WBNB post-claim dual-RPC recheck", () => {
     await expect(zeroToken.rechecker.recheck(input())).resolves.toMatchObject({
       status: "blocked",
       issue: { code: "CAPABILITY_ISSUANCE_FAILED" }
+    });
+  });
+
+  it("requires positive recheck time before the exact post-recheck execution reserve", async () => {
+    const exactReserve = setup(
+      {},
+      {},
+      {
+        clock: clocks([
+          "2026-08-13T04:30:34.999Z",
+          "2026-08-13T04:30:35.000Z",
+          "2026-08-13T04:30:35.000Z"
+        ])
+      }
+    );
+    await expect(exactReserve.rechecker.recheck(input())).resolves.toMatchObject({
+      status: "verified"
+    });
+
+    const exhausted = setup(
+      {},
+      {},
+      {
+        clock: clocks(["2026-08-13T04:30:35.000Z"])
+      }
+    );
+    await expect(exhausted.rechecker.recheck(input())).resolves.toMatchObject({
+      status: "blocked",
+      issue: { code: "AUTHORIZATION_RESERVE_INSUFFICIENT" }
     });
   });
 

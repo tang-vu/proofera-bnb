@@ -77,6 +77,7 @@ const INSTANTIATION_DIGEST = `0x${"66".repeat(32)}` as Hex;
 const NO_EFFECT_PROOF_DIGEST = `0x${"67".repeat(32)}` as Hex;
 const NO_EFFECT_ENVELOPE_HASH = `0x${"68".repeat(32)}` as Hex;
 const PREDECESSOR_FENCE_SHA256 = `0x${"69".repeat(32)}` as Hex;
+const PREPARATION_DIGEST = `0x${"6a".repeat(32)}` as Hex;
 const RELEASE = "a".repeat(40);
 const RELEASE_TREE = "b".repeat(40);
 const CEREMONY_NONCE = `0x${"88".repeat(32)}` as const;
@@ -85,7 +86,7 @@ const ENVELOPE_OBSERVED_AT = "2026-08-13T04:29:48.000Z";
 const INSTANTIATED_AT = "2026-08-13T04:29:50.000Z";
 const AUTHORIZED_AT = "2026-08-13T04:29:55.000Z";
 const CONFIRMED_AT = "2026-08-13T04:29:55.002Z";
-const EXECUTION_EXPIRES_AT = "2026-08-13T04:30:40.002Z";
+const EXECUTION_EXPIRES_AT = "2026-08-13T04:30:55.002Z";
 const NOW = "2026-08-13T04:30:00.000Z";
 const EXPIRES_AT = "2026-08-13T04:34:48.000Z";
 const POLICY_EXPIRES_AT = "2026-08-13T05:00:00.000Z";
@@ -161,7 +162,7 @@ function runtimeRecoveryForEnvelopeObservedAt(
 ): BscTestnetPtaWbnbPoolRuntimeReviewInstantiation["recovery"] {
   const observed = Date.parse(envelopeObservedAt);
   return deeplyFreeze({
-    generation: 3,
+    generation: 4,
     predecessorFence: {
       status: "superseded_before_worker",
       terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
@@ -185,8 +186,8 @@ function runtimeReview(
   branded = true
 ): BscTestnetPtaWbnbPoolRuntimeReviewInstantiation {
   const value = deeplyFreeze({
-    schemaVersion: 3,
-    kind: "automated_release_policy_recovery_envelope_instantiation_v3",
+    schemaVersion: 4,
+    kind: "automated_release_policy_recovery_envelope_instantiation_v4",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     policyDigest: POLICY_DIGEST,
     releaseCommit: RELEASE,
@@ -244,15 +245,17 @@ function commandFor(
     releaseTrust,
     RELEASE_TREE,
     CEREMONY_NONCE,
-    AUTHORIZED_AT
+    AUTHORIZED_AT,
+    PREPARATION_DIGEST
   );
   if (challenge === null) throw new Error("Challenge fixture failed.");
   return deeplyFreeze({
-    schemaVersion: 6,
-    kind: "execute_exact_bsc_testnet_pta_wbnb_pool_recovery_generation_3_once_v6",
+    schemaVersion: 7,
+    kind: "execute_exact_bsc_testnet_pta_wbnb_pool_recovery_generation_4_once_v7",
     executionFlag: BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_EXECUTION_FLAG,
     runtimeReviewInstantiation: instantiation,
     challengeIssuedAt: AUTHORIZED_AT,
+    preparationDigest: PREPARATION_DIGEST,
     recovery: challenge.recovery,
     ceremonyNonce: CEREMONY_NONCE,
     ownerAuthorizationText: challenge.ownerAuthorizationText,
@@ -272,6 +275,7 @@ async function confirmedCommand(
     instantiation,
     releaseTrust,
     RELEASE_TREE,
+    PREPARATION_DIGEST,
     Object.freeze({
       now: () => new Date(clock++),
       writeChallenge: async (bytes: Uint8Array) => {
@@ -329,7 +333,7 @@ function broadcastRequest(
   const signedTransaction = "0x01" as Hex;
   const transactionHash = keccak256(signedTransaction);
   return deeplyFreeze({
-    schemaVersion: 3,
+    schemaVersion: 4,
     operation:
       "consume_exact_bsc_testnet_pta_wbnb_pool_broadcast_authorization_after_durable_start",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -367,7 +371,8 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
       releaseTrust,
       RELEASE_TREE,
       CEREMONY_NONCE,
-      AUTHORIZED_AT
+      AUTHORIZED_AT,
+      PREPARATION_DIGEST
     );
     expect(challenge).not.toBeNull();
     if (challenge === null) throw new Error("Challenge fixture failed.");
@@ -403,9 +408,9 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
     expect(challenge.ownerAuthorizationText).toContain("reviewerInspectedExactEnvelope=false");
     expect(challenge.ownerAuthorizationText).toContain(`challengeIssuedAt=${AUTHORIZED_AT}`);
     expect(challenge.ownerAuthorizationText).toContain(
-      "confirmationNotAfter=2026-08-13T04:33:55.000Z"
+      "confirmationNotAfter=2026-08-13T04:33:48.000Z"
     );
-    expect(challenge.ownerAuthorizationText).toContain("executionAuthorizationLifetimeSeconds=45");
+    expect(challenge.ownerAuthorizationText).toContain("executionAuthorizationLifetimeSeconds=60");
     expect(challenge.ownerAuthorizationText).toContain(
       "executionAuthorizationRule=confirmedAt_is_captured_after_exact_match_and_executionExpiresAt_equals_confirmedAt_plus_lifetime"
     );
@@ -423,7 +428,7 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
       `0x${createHash("sha256").update(challenge.ownerAuthorizationText).digest("hex")}`
     );
     expect(challenge.ownerConfirmationText).toContain(
-      "decision=CONFIRM_FRESH_GENERATION_3_AUTHORIZATION_AFTER_APPEND_ONLY_PREDECESSOR_FENCE_ONE_SIGNATURE_AND_ONE_SUBMISSION_NO_RETRY_NO_REPLACEMENT"
+      "decision=CONFIRM_FRESH_GENERATION_4_AUTHORIZATION_AFTER_APPEND_ONLY_PREDECESSOR_FENCE_ONE_SIGNATURE_AND_ONE_SUBMISSION_NO_RETRY_NO_REPLACEMENT"
     );
     expect(challenge.ownerConfirmationText).not.toContain("GENERATION_2_AUTHORIZATION");
     expect(
@@ -457,6 +462,7 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
         unbranded,
         setup.releaseTrust,
         RELEASE_TREE,
+        PREPARATION_DIGEST,
         Object.freeze({
           now: () => new Date(AUTHORIZED_AT),
           writeChallenge: async () => undefined,
@@ -476,7 +482,8 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
         setup.releaseTrust,
         RELEASE_TREE,
         CEREMONY_NONCE,
-        AUTHORIZED_AT
+        AUTHORIZED_AT,
+        PREPARATION_DIGEST
       )
     ).toBeNull();
 
@@ -498,13 +505,14 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
         setup.releaseTrust,
         RELEASE_TREE,
         CEREMONY_NONCE,
-        AUTHORIZED_AT
+        AUTHORIZED_AT,
+        PREPARATION_DIGEST
       )
     ).toBeNull();
     expect(traps).toBe(0);
   });
 
-  it("rejects v4 owner replay and every fixed predecessor recovery mutation", async () => {
+  it("rejects pre-v7 owner replay and every fixed predecessor recovery mutation", async () => {
     const setup = harness();
     const exactDescriptor = descriptor();
     const branded = runtimeReview();
@@ -577,7 +585,8 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
           setup.releaseTrust,
           RELEASE_TREE,
           CEREMONY_NONCE,
-          AUTHORIZED_AT
+          AUTHORIZED_AT,
+          PREPARATION_DIGEST
         )
       ).toBeNull();
     }
@@ -875,6 +884,7 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
       instantiation,
       releaseTrust,
       RELEASE_TREE,
+      PREPARATION_DIGEST,
       Object.freeze({
         now: () => new Date(clock++),
         writeChallenge: async (bytes: Uint8Array) => {
@@ -893,15 +903,15 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
     expect(result.command.ceremonyNonce).toMatch(/^0x[0-9a-f]{64}$/u);
     expect(result.command.ceremonyNonce).not.toBe(`0x${"00".repeat(32)}`);
     expect(result.command.runtimeReviewInstantiation).toBe(instantiation);
-    expect(result.command.schemaVersion).toBe(6);
+    expect(result.command.schemaVersion).toBe(7);
     expect(result.command.kind).toBe(
-      "execute_exact_bsc_testnet_pta_wbnb_pool_recovery_generation_3_once_v6"
+      "execute_exact_bsc_testnet_pta_wbnb_pool_recovery_generation_4_once_v7"
     );
     expect(result.command.challengeIssuedAt).toBe(AUTHORIZED_AT);
     expect(result.command).not.toHaveProperty("confirmedAt");
     expect(result.command).not.toHaveProperty("executionExpiresAt");
     expect(result.command.recovery).toMatchObject({
-      generation: 3,
+      generation: 4,
       predecessorFenceSha256: PREDECESSOR_FENCE_SHA256
     });
     expect(result.command.ownerAuthorizationText).toContain(
@@ -934,6 +944,7 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
         instantiation,
         setup.releaseTrust,
         RELEASE_TREE,
+        PREPARATION_DIGEST,
         Object.freeze({
           now: () => new Date(timestamps.shift() ?? Date.parse(envelopeExpiresAt)),
           writeChallenge: async (bytes: Uint8Array) => {
@@ -948,19 +959,27 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
       return { result, observedNotAfter };
     };
 
-    const ownerWindow = await run(EXPIRES_AT, [issueAt, issueAt + 1, issueAt + 240_000 - 1]);
-    expect(ownerWindow.observedNotAfter).toBe(issueAt + 240_000);
+    const ownerWindow = await run(EXPIRES_AT, [
+      issueAt,
+      issueAt + 1,
+      Date.parse(EXPIRES_AT) - 60_000 - 1
+    ]);
+    expect(ownerWindow.observedNotAfter).toBe(Date.parse(EXPIRES_AT) - 60_000);
     expect(ownerWindow.result).toMatchObject({ status: "confirmed" });
 
-    const exactOwnerBoundary = await run(EXPIRES_AT, [issueAt, issueAt + 1, issueAt + 240_000]);
+    const exactOwnerBoundary = await run(EXPIRES_AT, [
+      issueAt,
+      issueAt + 1,
+      Date.parse(EXPIRES_AT) - 60_000
+    ]);
     expect(exactOwnerBoundary.result).toMatchObject({
       status: "blocked",
       issue: { code: "CEREMONY_EXPIRED" }
     });
 
     const reserveExpiry = new Date(issueAt + 180_000).toISOString();
-    const envelopeReserve = await run(reserveExpiry, [issueAt, issueAt + 1, issueAt + 135_000 - 1]);
-    expect(envelopeReserve.observedNotAfter).toBe(issueAt + 135_000);
+    const envelopeReserve = await run(reserveExpiry, [issueAt, issueAt + 1, issueAt + 120_000 - 1]);
+    expect(envelopeReserve.observedNotAfter).toBe(issueAt + 120_000);
     expect(envelopeReserve.result).toMatchObject({ status: "confirmed" });
 
     const rollback = await run(EXPIRES_AT, [issueAt, issueAt + 2, issueAt + 1]);
@@ -986,6 +1005,7 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
         runtimeReview(),
         releaseTrust,
         RELEASE_TREE,
+        PREPARATION_DIGEST,
         Object.freeze({
           now: () => new Date(timestamps.shift() ?? Date.parse(EXPIRES_AT)),
           writeChallenge: async (bytes: Uint8Array) => {

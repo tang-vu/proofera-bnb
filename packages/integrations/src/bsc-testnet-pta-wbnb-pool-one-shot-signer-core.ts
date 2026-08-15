@@ -2,7 +2,12 @@ import { isProxy } from "node:util/types";
 
 import type { Hex } from "viem";
 
-import type { BSC_TESTNET_PTA_WBNB_POOL_SENDER } from "./bsc-testnet-pta-wbnb-pool-initialization";
+import {
+  BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_POST_CONFIRMATION_PRECLAIM_SECONDS,
+  BSC_TESTNET_PTA_WBNB_POOL_MINIMUM_REMAINING_BEFORE_CLAIM_SECONDS,
+  BSC_TESTNET_PTA_WBNB_POOL_POST_RECHECK_EXECUTION_RESERVE_SECONDS,
+  type BSC_TESTNET_PTA_WBNB_POOL_SENDER
+} from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -15,7 +20,7 @@ import {
   type BscTestnetPtaWbnbPoolSigningWorkerRequest
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 
-export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_CLAIM_SCHEMA_VERSION = 3 as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_CLAIM_SCHEMA_VERSION = 4 as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_CLAIM_OPERATION =
   "claim_exact_bsc_testnet_pta_wbnb_pool_initialization_once" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_SIGNED_READBACK_OPERATION =
@@ -117,12 +122,14 @@ export type BscTestnetPtaWbnbPoolOneShotSignerIssueCode =
   | "AUTHORIZATION_CONTENT_INVALID"
   | "AUTHORIZATION_AUTHENTICATION_FAILED"
   | "AUTHORIZATION_EXPIRED"
+  | "AUTHORIZATION_RESERVE_INSUFFICIENT"
   | "CLAIM_OUTCOME_UNKNOWN"
   | "INTENT_ALREADY_CLAIMED"
   | "CLAIM_IDENTIFIER_INVALID"
   | "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN"
   | "POST_CLAIM_RECHECK_INVALID"
   | "POST_CLAIM_RECHECK_AUTHENTICATION_FAILED"
+  | "POST_CLAIM_RECHECK_RESERVE_EXHAUSTED"
   | "WORKER_AUTHORIZATION_OUTCOME_UNKNOWN"
   | "WORKER_OUTCOME_UNKNOWN"
   | "WORKER_OUTPUT_INVALID"
@@ -509,6 +516,27 @@ function createBscTestnetPtaWbnbPoolOneShotSignerCore(
         "terminal_do_not_retry"
       );
     }
+    const authenticatedAt = Date.parse(intent.authenticatedAt);
+    if (
+      !Number.isSafeInteger(authenticatedAt) ||
+      authenticatedAt > firstClock.getTime() ||
+      firstClock.getTime() - authenticatedAt >
+        BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_POST_CONFIRMATION_PRECLAIM_SECONDS * 1_000 ||
+      authorizationExpiry - firstClock.getTime() <
+        BSC_TESTNET_PTA_WBNB_POOL_MINIMUM_REMAINING_BEFORE_CLAIM_SECONDS * 1_000
+    ) {
+      return setTerminal(
+        blockedBeforeClaim(
+          signerIssue(
+            "AUTHORIZATION_RESERVE_INSUFFICIENT",
+            "authorization",
+            "The one-use owner command no longer retains the exact bounded post-claim execution reserve."
+          ),
+          false
+        ),
+        "terminal_do_not_retry"
+      );
+    }
 
     const claimRequest = Object.freeze({
       schemaVersion: BSC_TESTNET_PTA_WBNB_POOL_DURABLE_CLAIM_SCHEMA_VERSION,
@@ -660,6 +688,38 @@ function createBscTestnetPtaWbnbPoolOneShotSignerCore(
             "POST_CLAIM_RECHECK_AUTHENTICATION_FAILED",
             "recheck",
             "Fresh RPC JSON is not an authenticated capability from the fixed dual-provider reader."
+          ),
+          "claimed",
+          "not_attempted"
+        ),
+        "terminal_do_not_retry"
+      );
+    }
+    const reserveClock = captureClock(dependencies.asOf);
+    if (reserveClock === null || reserveClock.getTime() < secondClock.getTime()) {
+      return setTerminal(
+        doNotRetry(
+          signerIssue(
+            "POST_CLAIM_RECHECK_RESERVE_EXHAUSTED",
+            "recheck",
+            "The post-recheck reserve clock is invalid or moved backwards."
+          ),
+          "claimed",
+          "not_attempted"
+        ),
+        "terminal_do_not_retry"
+      );
+    }
+    if (
+      Date.parse(intent.expiresAt) - reserveClock.getTime() <
+      BSC_TESTNET_PTA_WBNB_POOL_POST_RECHECK_EXECUTION_RESERVE_SECONDS * 1_000
+    ) {
+      return setTerminal(
+        doNotRetry(
+          signerIssue(
+            "POST_CLAIM_RECHECK_RESERVE_EXHAUSTED",
+            "recheck",
+            "The authenticated post-claim capability no longer preserves the exact remaining execution reserve."
           ),
           "claimed",
           "not_attempted"

@@ -19,11 +19,14 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_KECCAK256,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_SELECTOR,
+  BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_POST_CONFIRMATION_PRECLAIM_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_ESTIMATE,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_LIMIT,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_PRICE_WEI,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_TOTAL_COST_WEI,
   BSC_TESTNET_PTA_WBNB_POOL_OWNER_CONFIRMATION_WINDOW_SECONDS,
+  BSC_TESTNET_PTA_WBNB_POOL_MINIMUM_REMAINING_BEFORE_CLAIM_SECONDS,
+  BSC_TESTNET_PTA_WBNB_POOL_POST_RECHECK_EXECUTION_RESERVE_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_SENDER,
   BSC_TESTNET_PTA_WBNB_POOL_SQRT_PRICE_X96,
   BSC_TESTNET_WBNB_ADDRESS
@@ -39,21 +42,21 @@ import {
 export const BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_RUNTIME_MANIFEST_DOMAIN =
   "ProofEra:bsc-testnet-pta-wbnb-pool-production-runtime-manifest:v2" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_SUBJECT_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-subject:v3" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-subject:v4" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_POLICY_DIGEST_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-policy:v3" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-policy:v4" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RUNTIME_REVIEW_INSTANTIATION_DIGEST_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-runtime-review-instantiation:v3" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-runtime-review-instantiation:v4" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_CHALLENGE_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-challenge:v4" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-challenge:v5" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_FRAME_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-frame:v4" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-frame:v5" as const;
 
 const POLICY_KIND =
-  "owner_designated_internal_multi_agent_release_review_policy_generation_3_v3" as const;
-const POLICY_DECISION = "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_3_POLICY" as const;
+  "owner_designated_internal_multi_agent_release_review_policy_generation_4_v4" as const;
+const POLICY_DECISION = "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_4_POLICY" as const;
 const REVIEWER_DECISION = "GO_WITH_ZERO_P0_AND_ZERO_P1" as const;
-const INSTANTIATION_KIND = "automated_release_policy_recovery_envelope_instantiation_v3" as const;
+const INSTANTIATION_KIND = "automated_release_policy_recovery_envelope_instantiation_v4" as const;
 const BYTES32 = /^0x[0-9a-f]{64}$/u;
 const GIT_OBJECT = /^[0-9a-f]{40}$/u;
 const UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u;
@@ -105,6 +108,9 @@ const CAPS_KEYS = [
   "maximumEnvelopeLifetimeSeconds",
   "maximumOwnerConfirmationWindowSeconds",
   "maximumExecutionAuthorityLifetimeSeconds",
+  "minimumRemainingBeforeClaimSeconds",
+  "maximumPostConfirmationPreclaimSeconds",
+  "postRecheckExecutionReserveSeconds",
   "maximumPostClaimRecheckAgeSeconds",
   "predecessorClaimRawSha256",
   "recoveryGeneration"
@@ -226,7 +232,7 @@ export interface BscTestnetPtaWbnbPoolExactReleaseIdentity {
 }
 
 export interface BscTestnetPtaWbnbPoolReleaseReviewPolicy {
-  readonly schemaVersion: 3;
+  readonly schemaVersion: 4;
   readonly kind: typeof POLICY_KIND;
   readonly decision: typeof POLICY_DECISION;
   readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
@@ -256,9 +262,12 @@ export interface BscTestnetPtaWbnbPoolReleaseReviewPolicy {
     maximumTotalCostWei: "18000000000000000";
     maximumEnvelopeLifetimeSeconds: "300";
     maximumOwnerConfirmationWindowSeconds: "240";
-    maximumExecutionAuthorityLifetimeSeconds: "45";
+    maximumExecutionAuthorityLifetimeSeconds: "60";
+    minimumRemainingBeforeClaimSeconds: "50";
+    maximumPostConfirmationPreclaimSeconds: "10";
+    postRecheckExecutionReserveSeconds: "20";
     maximumPostClaimRecheckAgeSeconds: "30";
-    recoveryGeneration: "3";
+    recoveryGeneration: "4";
     predecessorClaimRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256;
   }>;
   readonly scope: Readonly<{
@@ -333,7 +342,7 @@ export interface BscTestnetPtaWbnbPoolRuntimeReviewRecoveryBinding {
 }
 
 export interface BscTestnetPtaWbnbPoolRuntimeReviewInstantiation {
-  readonly schemaVersion: 3;
+  readonly schemaVersion: 4;
   readonly kind: typeof INSTANTIATION_KIND;
   readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
   readonly policyDigest: Hex;
@@ -817,10 +826,16 @@ function exactCaps(): BscTestnetPtaWbnbPoolReleaseReviewPolicy["caps"] {
     maximumOwnerConfirmationWindowSeconds:
       BSC_TESTNET_PTA_WBNB_POOL_OWNER_CONFIRMATION_WINDOW_SECONDS.toString() as "240",
     maximumExecutionAuthorityLifetimeSeconds:
-      BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS.toString() as "45",
+      BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS.toString() as "60",
+    minimumRemainingBeforeClaimSeconds:
+      BSC_TESTNET_PTA_WBNB_POOL_MINIMUM_REMAINING_BEFORE_CLAIM_SECONDS.toString() as "50",
+    maximumPostConfirmationPreclaimSeconds:
+      BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_POST_CONFIRMATION_PRECLAIM_SECONDS.toString() as "10",
+    postRecheckExecutionReserveSeconds:
+      BSC_TESTNET_PTA_WBNB_POOL_POST_RECHECK_EXECUTION_RESERVE_SECONDS.toString() as "20",
     maximumPostClaimRecheckAgeSeconds:
       BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS.toString() as "30",
-    recoveryGeneration: "3",
+    recoveryGeneration: "4",
     predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256
   });
 }
@@ -936,7 +951,7 @@ function parsePolicyBody(
     reviewedAt === null ||
     expiresAt === null ||
     expectedSubjectDigest === null ||
-    policy.schemaVersion !== 3 ||
+    policy.schemaVersion !== 4 ||
     policy.kind !== POLICY_KIND ||
     policy.decision !== POLICY_DECISION ||
     policy.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
@@ -996,7 +1011,7 @@ function parsePolicyBody(
     }
   }
   return Object.freeze({
-    schemaVersion: 3,
+    schemaVersion: 4,
     kind: POLICY_KIND,
     decision: POLICY_DECISION,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -1105,7 +1120,7 @@ function buildInstantiation(
     return null;
   }
   const body = Object.freeze({
-    schemaVersion: 3 as const,
+    schemaVersion: 4 as const,
     kind: INSTANTIATION_KIND,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     policyDigest: policy.policyDigest,
@@ -1832,7 +1847,7 @@ export async function readBscTestnetPtaWbnbPoolReleaseReviewPolicyFromControllin
 }
 
 /**
- * Exercises only the untrusted bounded transport decoder (introduced in v2, current domain v3) in
+ * Exercises only the untrusted bounded transport decoder (introduced in v2, current domain v5) in
  * adversarial tests. It cannot parse or admit a policy, access the production WeakMap, or create an
  * authority-bearing realm.
  */

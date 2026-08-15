@@ -159,7 +159,7 @@ function reviewedWorkerRequest() {
     releaseCommit: RELEASE_COMMIT,
     runtimeManifestSha256: RUNTIME_MANIFEST_SHA256,
     authenticatedAt: "2026-08-13T05:00:00.000Z",
-    expiresAt: "2026-08-13T05:00:30.000Z",
+    expiresAt: "2026-08-13T05:00:45.000Z",
     recovery: RECOVERY,
     transaction
   });
@@ -454,8 +454,9 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     expect(activationIndex).toBeGreaterThan(0);
     expect(invocationIndex).toBeGreaterThan(0);
     expect(releaseIndex).toBeGreaterThan(invocationIndex);
-    expect(custodyIndex).toBeGreaterThan(activationIndex);
+    expect(custodyIndex).toBeLessThan(activationIndex);
     expect(journalIndex).toBeGreaterThan(custodyIndex);
+    expect(journalIndex).toBeLessThan(activationIndex);
     const predecessorRecoveryIndex = nativeSource.indexOf(
       "openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse()"
     );
@@ -500,7 +501,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     ).toBe(false);
   });
 
-  it("requires the exact retained fence and two empty generation-3 namespaces before custody metadata", () => {
+  it("requires the exact retained fence and empty generation-4 signing/submission-v3 namespaces before custody metadata", () => {
     const fence = Object.freeze({
       status: "superseded_before_worker",
       terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
@@ -619,15 +620,15 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
       /probeWindowsBscTestnetDeployerCustody\s*\(|readAndVerifyPinnedCustody|readStableFile|\bopen\s*\(|\.readFile\s*\(|sha256Hex|createHash|createDecipheriv|scrypt\s*\(|DPAPI_UNPROTECT_SCRIPT|assertReadyCustody|secretScalar/u
     );
 
-    const activationMarker = "const activateAfterCeremony = async";
+    const preparationMarker = "const conductOwnerCeremony = async";
     const journalMarker = "await createWindowsBscTestnetPtaWbnbPoolLocalJournal()";
-    const activationIndex = SOURCE.indexOf(activationMarker);
-    const journalIndex = SOURCE.indexOf(journalMarker, activationIndex);
-    const preJournalActivationSource = SOURCE.slice(activationIndex, journalIndex);
-    expect(preJournalActivationSource).toContain(
+    const preparationIndex = SOURCE.indexOf(preparationMarker);
+    const journalIndex = SOURCE.indexOf(journalMarker, preparationIndex);
+    const preOwnerJournalSource = SOURCE.slice(preparationIndex, journalIndex);
+    expect(preOwnerJournalSource).toContain(
       "await assertFixedWindowsBscTestnetPtaWbnbPoolCustodyMetadataForInternalUse()"
     );
-    expect(preJournalActivationSource).not.toMatch(
+    expect(preOwnerJournalSource).not.toMatch(
       /probeWindowsBscTestnetDeployerCustody\s*\(|readAndVerifyPinnedArtifacts|readBoundedStableRegularFile|\bopen\s*\(|\.readFile\s*\(|DPAPI_UNPROTECT_SCRIPT|unprotectCurrentUser|unlockBscTestnetDeployerEncryptedStore|secretScalar/u
     );
 
@@ -684,9 +685,9 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
   it("binds broadcast owner time separately from the later fresh signing timestamp", () => {
     const request = reviewedWorkerRequest();
     const intent = Object.freeze({
-      schemaVersion: 3 as const,
+      schemaVersion: 4 as const,
       scope:
-        "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_3" as const,
+        "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_4" as const,
       operationKey: request.operationKey,
       envelopeHash: request.transaction.sourceEnvelopeHash,
       reviewerApprovalDigest: request.reviewerApprovalDigest,
@@ -700,7 +701,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     }) satisfies BscTestnetPtaWbnbPoolAuthorizedSigningIntent;
     const response = syntheticAttestedResponse(request);
     const broadcast = Object.freeze({
-      schemaVersion: 3,
+      schemaVersion: 4,
       operation:
         "consume_exact_bsc_testnet_pta_wbnb_pool_broadcast_authorization_after_durable_start",
       operationKey: request.operationKey,
@@ -1158,7 +1159,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
         ...Object.entries(request).filter(([key]) => key !== "requestHash")
       ])
     );
-    const duplicate = valid.replace('"schemaVersion":3,', '"schemaVersion":3,"schemaVersion":3,');
+    const duplicate = valid.replace('"schemaVersion":4,', '"schemaVersion":4,"schemaVersion":4,');
     const extra = JSON.stringify({ ...request, extra: true });
     const malformedInputs: Uint8Array[] = [
       Buffer.alloc(0),

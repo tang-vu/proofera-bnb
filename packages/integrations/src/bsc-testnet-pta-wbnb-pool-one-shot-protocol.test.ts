@@ -19,6 +19,8 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_SCOPE,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
@@ -48,7 +50,7 @@ const RELEASE = "a".repeat(40);
 const RELEASE_TREE = "b".repeat(40);
 const AUTHENTICATED_AT = "2026-08-13T04:30:00.000Z";
 const EXPIRES_AT = "2026-08-13T04:30:30.000Z";
-const OWNER_AUTHENTICATED_AT = "2026-08-13T04:29:45.000Z";
+const OWNER_AUTHENTICATED_AT = "2026-08-13T04:29:30.000Z";
 
 function recovery() {
   const attemptId = deriveBscTestnetPtaWbnbPoolRecoveryAttemptId({
@@ -81,8 +83,8 @@ function transaction() {
 
 function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
   return Object.freeze({
-    schemaVersion: 3,
-    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_3",
+    schemaVersion: 4,
+    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_4",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
     reviewerApprovalDigest: REVIEWER_DIGEST,
@@ -99,7 +101,7 @@ function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
 function freshCapability(): BscTestnetPtaWbnbPoolFreshRecheckCapability {
   const timestamp = Math.floor(Date.parse("2026-08-13T04:29:30.000Z") / 1_000).toString();
   return {
-    schemaVersion: 3,
+    schemaVersion: 4,
     scope: BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_SCOPE,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
@@ -167,7 +169,7 @@ function responseWithScalars(request: BscTestnetPtaWbnbPoolSigningWorkerRequest,
     { r, s, v: 229n }
   );
   return {
-    schemaVersion: 3,
+    schemaVersion: 4,
     operation: BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_OPERATION,
     status: "signed",
     oneShotIntentId: BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
@@ -184,6 +186,14 @@ function responseWithScalars(request: BscTestnetPtaWbnbPoolSigningWorkerRequest,
 }
 
 describe("PTA/WBNB pool exact one-shot protocol", () => {
+  it("pins the immutable generation-2 and exact generation-3 predecessor claim digests", () => {
+    expect(BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2_CLAIM_RAW_SHA256).toBe(
+      "0x613df995936c3ccfff56e5da5588906f1bd28340ae8297eb08524274b9b8e1c3"
+    );
+    expect(BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_CLAIM_RAW_SHA256).toBe(
+      "0x7ff780a8f0ac1a1f8ff7bced5d858259f918cdb1891c684aa208b6bca31c9585"
+    );
+  });
   it("pins the reviewed operation key and exact legacy EIP-155 unsigned transaction", () => {
     const exact = transaction();
     expect(BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY).toBe(
@@ -201,7 +211,7 @@ describe("PTA/WBNB pool exact one-shot protocol", () => {
     expect(keccak256(exact.serializedUnsignedTransaction)).toBe(exact.signingHash);
   });
 
-  it("derives generation-3 attempt IDs from canonical full release identity and rejects drift", () => {
+  it("derives generation-4 attempt IDs from canonical full release identity and rejects drift", () => {
     const exact = recovery().attemptId;
     expect(exact).toMatch(/^0x[0-9a-f]{64}$/u);
     expect(
@@ -281,14 +291,14 @@ describe("PTA/WBNB pool exact one-shot protocol", () => {
     }
   });
 
-  it("accepts only an exact forty-five-second owner execution authority", () => {
+  it("accepts only an exact sixty-second owner execution authority", () => {
     const exact = authorizedIntent();
     expect(parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse(exact)).not.toBeNull();
 
     for (const expiresAt of [
       "2026-08-13T04:30:29.999Z",
       "2026-08-13T04:30:30.001Z",
-      "2026-08-13T04:34:45.000Z"
+      "2026-08-13T04:34:30.000Z"
     ]) {
       expect(
         parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse(
@@ -348,8 +358,8 @@ describe("PTA/WBNB pool exact one-shot protocol", () => {
     for (const altered of [
       {
         ...valid,
-        authenticatedAt: "2026-08-13T04:29:44.999Z",
-        rpc: { ...valid.rpc, observedAt: "2026-08-13T04:29:44.999Z" }
+        authenticatedAt: "2026-08-13T04:29:29.999Z",
+        rpc: { ...valid.rpc, observedAt: "2026-08-13T04:29:29.999Z" }
       },
       { ...valid, expiresAt: "2026-08-13T04:30:29.999Z" }
     ]) {
