@@ -1036,7 +1036,7 @@ export function buildBscTestnetPtaWbnbPoolOwnerAuthorizationChallengeForInternal
     `predecessorFenceSha256=${recovery.predecessorFenceSha256}`,
     `attemptId=${recovery.attemptId}`,
     `ceremonyNonce=${ceremonyNonce}`,
-    "decision=CONFIRM_FRESH_GENERATION_2_AUTHORIZATION_AFTER_APPEND_ONLY_PREDECESSOR_FENCE_ONE_SIGNATURE_AND_ONE_SUBMISSION_NO_RETRY_NO_REPLACEMENT"
+    "decision=CONFIRM_FRESH_GENERATION_3_AUTHORIZATION_AFTER_APPEND_ONLY_PREDECESSOR_FENCE_ONE_SIGNATURE_AND_ONE_SUBMISSION_NO_RETRY_NO_REPLACEMENT"
   ].join("|");
   if (Buffer.byteLength(confirmation, "utf8") > MAXIMUM_OWNER_CONFIRMATION_BYTES) return null;
   return Object.freeze({

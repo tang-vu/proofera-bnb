@@ -700,7 +700,7 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
           }
           const retainedClaim = await ports.signingJournal.readState();
           if (!claimedStateMatchesRequest(retainedClaim, result.claimId, claimRequest)) {
-            throw new Error("GENERATION_2_CLAIM_READBACK_MISMATCH");
+            throw new Error("GENERATION_3_CLAIM_READBACK_MISMATCH");
           }
           return Object.freeze({ status: "claimed" as const, claimId: result.claimId });
         },

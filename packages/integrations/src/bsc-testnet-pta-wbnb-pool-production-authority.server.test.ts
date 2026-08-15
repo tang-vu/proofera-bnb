@@ -422,6 +422,10 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
     expect(challenge.ownerAuthorizationTextSha256).toBe(
       `0x${createHash("sha256").update(challenge.ownerAuthorizationText).digest("hex")}`
     );
+    expect(challenge.ownerConfirmationText).toContain(
+      "decision=CONFIRM_FRESH_GENERATION_3_AUTHORIZATION_AFTER_APPEND_ONLY_PREDECESSOR_FENCE_ONE_SIGNATURE_AND_ONE_SUBMISSION_NO_RETRY_NO_REPLACEMENT"
+    );
+    expect(challenge.ownerConfirmationText).not.toContain("GENERATION_2_AUTHORIZATION");
     expect(
       authority.authorize(exactDescriptor, commandFor(instantiation, releaseTrust), localCapability)
     ).toMatchObject({ status: "blocked", issue: { code: "OWNER_CEREMONY_REQUIRED" } });
