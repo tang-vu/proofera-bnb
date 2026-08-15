@@ -46,9 +46,9 @@ import {
   type BscTestnetPtaWbnbPoolRecoveryAttemptBinding
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 
-export const BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCHEMA_VERSION = 4 as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCHEMA_VERSION = 5 as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCOPE =
-  "authenticated_exact_pool_recovery_generation_4_submission_after_durable_signed_commit" as const;
+  "authenticated_exact_pool_recovery_generation_5_submission_after_durable_signed_commit" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_OPERATION =
   "submit_exact_bsc_testnet_pta_wbnb_pool_initialization_once" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RECONCILIATION_OPERATION =
@@ -65,9 +65,9 @@ export const BSC_TESTNET_PTA_WBNB_POOL_INITIALIZE_TOPIC =
   "0x98636036cb66a9c19a37435efc1e90142190214e8abeb821bdba3f2990dd4c95" as const satisfies Hex;
 
 const SUBMISSION_STARTED_DIGEST_DOMAIN =
-  "proofera.bsc-testnet.pta-wbnb-pool.submission-started.v4" as const;
+  "proofera.bsc-testnet.pta-wbnb-pool.submission-started.v5" as const;
 const RECONCILIATION_DIGEST_DOMAIN =
-  "proofera.bsc-testnet.pta-wbnb-pool.reconciliation.v4" as const;
+  "proofera.bsc-testnet.pta-wbnb-pool.reconciliation.v5" as const;
 const MAXIMUM_CAPABILITY_LIFETIME_MILLISECONDS =
   BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS * 1_000;
 const MAXIMUM_PRE_SUBMISSION_OBSERVATION_AGE_MILLISECONDS =
@@ -631,8 +631,8 @@ function snapshotRecoveryAttempt(
     recovery === null ||
     recovery.generation !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION ||
     recovery.predecessorState !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE ||
-    !exactBytes32(recovery.predecessorFenceSha256) ||
-    recovery.predecessorFenceSha256 === ZERO_WORD ||
+    !exactBytes32(recovery.predecessorTerminalRawSha256) ||
+    recovery.predecessorTerminalRawSha256 === ZERO_WORD ||
     !exactBytes32(recovery.attemptId) ||
     recovery.attemptId === ZERO_WORD
   ) {
@@ -641,7 +641,7 @@ function snapshotRecoveryAttempt(
   return Object.freeze({
     generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
     predecessorState: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
-    predecessorFenceSha256: recovery.predecessorFenceSha256,
+    predecessorTerminalRawSha256: recovery.predecessorTerminalRawSha256,
     attemptId: recovery.attemptId
   });
 }
@@ -733,7 +733,7 @@ const CAPABILITY_KEYS = [
 const RECOVERY_KEYS = [
   "attemptId",
   "generation",
-  "predecessorFenceSha256",
+  "predecessorTerminalRawSha256",
   "predecessorState"
 ] as const;
 const PRE_SUBMISSION_KEYS = [

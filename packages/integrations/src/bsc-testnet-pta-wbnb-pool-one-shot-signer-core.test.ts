@@ -31,6 +31,7 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-signer-core";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_SCOPE,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
@@ -54,7 +55,8 @@ const REVIEWER_DIGEST = `0x${"22".repeat(32)}` as Hex;
 const OWNER_DIGEST = `0x${"33".repeat(32)}` as Hex;
 const CLAIM_TOKEN = `0x${"44".repeat(32)}` as Hex;
 const MANIFEST = `0x${"55".repeat(32)}` as Hex;
-const PREDECESSOR_FENCE_SHA256 = `0x${"88".repeat(32)}` as Hex;
+const PREDECESSOR_TERMINAL_RAW_SHA256 =
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256;
 const ATTEMPT_ID = `0x${"99".repeat(32)}` as Hex;
 const RELEASE = "a".repeat(40);
 const NOW = "2026-08-13T04:30:01.000Z";
@@ -62,7 +64,7 @@ const NOW = "2026-08-13T04:30:01.000Z";
 const RECOVERY = Object.freeze({
   generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
   predecessorState: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
-  predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
+  predecessorTerminalRawSha256: PREDECESSOR_TERMINAL_RAW_SHA256,
   attemptId: ATTEMPT_ID
 });
 
@@ -78,8 +80,8 @@ function exactTransaction() {
 
 function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
   return Object.freeze({
-    schemaVersion: 4,
-    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_4",
+    schemaVersion: 5,
+    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_5",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
     reviewerApprovalDigest: REVIEWER_DIGEST,
@@ -87,7 +89,7 @@ function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
     releaseCommit: RELEASE,
     runtimeManifestSha256: MANIFEST,
     authenticatedAt: "2026-08-13T04:29:55.000Z",
-    expiresAt: "2026-08-13T04:30:55.000Z",
+    expiresAt: "2026-08-13T04:31:55.000Z",
     recovery: RECOVERY,
     transaction: exactTransaction()
   });
@@ -97,7 +99,7 @@ function freshCapability(
   authenticatedAt = "2026-08-13T04:30:00.000Z"
 ): BscTestnetPtaWbnbPoolFreshRecheckCapability {
   return {
-    schemaVersion: 4,
+    schemaVersion: 5,
     scope: BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_SCOPE,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
@@ -108,7 +110,7 @@ function freshCapability(
     releaseCommit: RELEASE,
     runtimeManifestSha256: MANIFEST,
     authenticatedAt,
-    expiresAt: "2026-08-13T04:30:55.000Z",
+    expiresAt: "2026-08-13T04:31:55.000Z",
     recovery: RECOVERY,
     freshPostClaimDualRpcRecheckPerformed: true,
     rpc: {
@@ -121,7 +123,7 @@ function freshCapability(
       finalizedBlockNumber: "124775556",
       finalizedBlockHash: `0x${"66".repeat(32)}`,
       finalizedBlockTimestamp: Math.floor(
-        Date.parse("2026-08-13T04:29:30.000Z") / 1_000
+        (Date.parse(authenticatedAt) - 30_000) / 1_000
       ).toString(),
       finalizedBlockGasLimit: "140000000",
       latestNonce: "1",
@@ -301,7 +303,7 @@ describe("PTA/WBNB pool one-shot signer core", () => {
       "signed_commit_readback"
     ]);
     expect(calls.claim.mock.calls[0]?.[0]).toMatchObject({
-      schemaVersion: 4,
+      schemaVersion: 5,
       operation: BSC_TESTNET_PTA_WBNB_POOL_DURABLE_CLAIM_OPERATION,
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       envelopeHash: ENVELOPE_HASH,
@@ -319,7 +321,7 @@ describe("PTA/WBNB pool one-shot signer core", () => {
       recovery: RECOVERY
     });
     expect(calls.readback.mock.calls[0]?.[0]).toMatchObject({
-      schemaVersion: 4,
+      schemaVersion: 5,
       operation: BSC_TESTNET_PTA_WBNB_POOL_DURABLE_SIGNED_READBACK_OPERATION,
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       envelopeHash: ENVELOPE_HASH,
@@ -330,11 +332,17 @@ describe("PTA/WBNB pool one-shot signer core", () => {
   });
 
   it("accepts the exact preclaim reserve boundary and rejects one millisecond beyond it", async () => {
-    const exact = harness({ asOf: "2026-08-13T04:30:05.000Z" });
+    const exact = harness({
+      asOf: "2026-08-13T04:30:55.000Z",
+      recheckAuthenticatedAt: "2026-08-13T04:30:55.000Z"
+    });
     await expect(exact.core.signOnce()).resolves.toMatchObject({ status: "signed_committed" });
     expect(exact.calls.claim).toHaveBeenCalledTimes(1);
 
-    const late = harness({ asOf: "2026-08-13T04:30:05.001Z" });
+    const late = harness({
+      asOf: "2026-08-13T04:30:55.001Z",
+      recheckAuthenticatedAt: "2026-08-13T04:30:55.001Z"
+    });
     await expect(late.core.signOnce()).resolves.toMatchObject({
       status: "blocked_before_claim",
       issue: { code: "AUTHORIZATION_RESERVE_INSUFFICIENT" }
@@ -384,15 +392,15 @@ describe("PTA/WBNB pool one-shot signer core", () => {
 
   it("rechecks the exact twenty-second reserve after the post-claim await", async () => {
     const exact = harness({
-      asOf: ["2026-08-13T04:30:01.000Z", "2026-08-13T04:30:34.000Z", "2026-08-13T04:30:35.000Z"],
-      recheckAuthenticatedAt: "2026-08-13T04:30:34.000Z"
+      asOf: ["2026-08-13T04:30:01.000Z", "2026-08-13T04:31:34.000Z", "2026-08-13T04:31:35.000Z"],
+      recheckAuthenticatedAt: "2026-08-13T04:31:34.000Z"
     });
     await expect(exact.core.signOnce()).resolves.toMatchObject({ status: "signed_committed" });
     expect(exact.calls.authorizeWorker).toHaveBeenCalledTimes(1);
 
     const late = harness({
-      asOf: ["2026-08-13T04:30:01.000Z", "2026-08-13T04:30:34.000Z", "2026-08-13T04:30:35.001Z"],
-      recheckAuthenticatedAt: "2026-08-13T04:30:34.000Z"
+      asOf: ["2026-08-13T04:30:01.000Z", "2026-08-13T04:31:34.000Z", "2026-08-13T04:31:35.001Z"],
+      recheckAuthenticatedAt: "2026-08-13T04:31:34.000Z"
     });
     await expect(late.core.signOnce()).resolves.toMatchObject({
       status: "do_not_retry",
@@ -403,8 +411,8 @@ describe("PTA/WBNB pool one-shot signer core", () => {
     expect(late.calls.worker).not.toHaveBeenCalled();
 
     const rollback = harness({
-      asOf: ["2026-08-13T04:30:01.000Z", "2026-08-13T04:30:34.000Z", "2026-08-13T04:30:33.999Z"],
-      recheckAuthenticatedAt: "2026-08-13T04:30:34.000Z"
+      asOf: ["2026-08-13T04:30:01.000Z", "2026-08-13T04:31:34.000Z", "2026-08-13T04:31:33.999Z"],
+      recheckAuthenticatedAt: "2026-08-13T04:31:34.000Z"
     });
     await expect(rollback.core.signOnce()).resolves.toMatchObject({
       status: "do_not_retry",
@@ -503,7 +511,7 @@ describe("PTA/WBNB pool one-shot signer core", () => {
         ownerAuthorizationDigest: request.ownerAuthorizationDigest,
         generation: request.recovery.generation,
         predecessorState: request.recovery.predecessorState,
-        predecessorFenceSha256: request.recovery.predecessorFenceSha256,
+        predecessorTerminalRawSha256: request.recovery.predecessorTerminalRawSha256,
         attemptId: request.recovery.attemptId,
         releaseCommit: request.releaseCommit,
         runtimeManifestSha256: request.runtimeManifestSha256,
@@ -545,7 +553,7 @@ describe("PTA/WBNB pool one-shot signer core", () => {
         state.runtimeManifestSha256 === null ||
         state.generation !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION ||
         state.predecessorState === null ||
-        state.predecessorFenceSha256 === null ||
+        state.predecessorTerminalRawSha256 === null ||
         state.attemptId === null
       ) {
         throw new Error("missing journal binding");
@@ -563,7 +571,7 @@ describe("PTA/WBNB pool one-shot signer core", () => {
         runtimeManifestSha256: state.runtimeManifestSha256,
         generation: state.generation,
         predecessorState: state.predecessorState,
-        predecessorFenceSha256: state.predecessorFenceSha256,
+        predecessorTerminalRawSha256: state.predecessorTerminalRawSha256,
         attemptId: state.attemptId,
         workerRequestHash: request.requestHash,
         authorizationTokenDigest: keccak256(request.journalClaimToken)
@@ -639,7 +647,7 @@ describe("PTA/WBNB pool one-shot signer core", () => {
     await expect(journal.readState()).resolves.toMatchObject({ status: "signed_committed" });
     expect(integratedResult.issue).toBeNull();
     expect(integratedResult).toMatchObject({ status: "signed_committed" });
-    expect(files.has("04-transition.v4.json")).toBe(true);
+    expect(files.has("04-transition.v5.json")).toBe(true);
     expect(files.size).toBe(4);
   });
 });

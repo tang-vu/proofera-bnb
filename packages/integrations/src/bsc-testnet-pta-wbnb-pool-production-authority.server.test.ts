@@ -53,6 +53,11 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import type { BscTestnetPtaWbnbPoolOneShotPreparedDescriptor } from "./bsc-testnet-pta-wbnb-pool-one-shot-boundary.server";
 import {
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ATTEMPT_ID,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ENVELOPE_HASH,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   buildBscTestnetPtaWbnbPoolSigningWorkerRequest
@@ -74,9 +79,6 @@ const WORKER_SOURCE = `0x${"33".repeat(32)}` as Hex;
 const POLICY_DIGEST = `0x${"44".repeat(32)}` as Hex;
 const REVIEWED_SUBJECT = `0x${"55".repeat(32)}` as Hex;
 const INSTANTIATION_DIGEST = `0x${"66".repeat(32)}` as Hex;
-const NO_EFFECT_PROOF_DIGEST = `0x${"67".repeat(32)}` as Hex;
-const NO_EFFECT_ENVELOPE_HASH = `0x${"68".repeat(32)}` as Hex;
-const PREDECESSOR_FENCE_SHA256 = `0x${"69".repeat(32)}` as Hex;
 const PREPARATION_DIGEST = `0x${"6a".repeat(32)}` as Hex;
 const RELEASE = "a".repeat(40);
 const RELEASE_TREE = "b".repeat(40);
@@ -86,7 +88,7 @@ const ENVELOPE_OBSERVED_AT = "2026-08-13T04:29:48.000Z";
 const INSTANTIATED_AT = "2026-08-13T04:29:50.000Z";
 const AUTHORIZED_AT = "2026-08-13T04:29:55.000Z";
 const CONFIRMED_AT = "2026-08-13T04:29:55.002Z";
-const EXECUTION_EXPIRES_AT = "2026-08-13T04:30:55.002Z";
+const EXECUTION_EXPIRES_AT = "2026-08-13T04:31:55.002Z";
 const NOW = "2026-08-13T04:30:00.000Z";
 const EXPIRES_AT = "2026-08-13T04:34:48.000Z";
 const POLICY_EXPIRES_AT = "2026-08-13T05:00:00.000Z";
@@ -162,21 +164,24 @@ function runtimeRecoveryForEnvelopeObservedAt(
 ): BscTestnetPtaWbnbPoolRuntimeReviewInstantiation["recovery"] {
   const observed = Date.parse(envelopeObservedAt);
   return deeplyFreeze({
-    generation: 4,
-    predecessorFence: {
-      status: "superseded_before_worker",
-      terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
+    generation: 5,
+    predecessorTerminal: {
+      status: "failed_before_worker",
+      generation: 4,
+      predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
+      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
+      predecessorEnvelopeHash: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ENVELOPE_HASH,
+      inheritedFenceSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256,
+      predecessorAttemptId: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ATTEMPT_ID,
+      phase: "post_claim_recheck",
+      issueCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
+      outcomeDigest: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
       workerAuthorizationOutcome: "not_attempted",
       workerStartOutcome: "not_attempted",
       signatureOutcome: "not_attempted",
       submissionOutcome: "not_attempted",
       submissionJournalState: "exact_empty",
-      fenceRecordedAt: new Date(observed - 1_000).toISOString(),
-      predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
-      noEffectProofDigest: NO_EFFECT_PROOF_DIGEST,
-      noEffectEnvelopeHash: NO_EFFECT_ENVELOPE_HASH,
-      noEffectObservedAt: new Date(observed - 2_000).toISOString(),
-      predecessorFenceSha256: PREDECESSOR_FENCE_SHA256
+      recordedAt: new Date(observed - 1_000).toISOString()
     }
   });
 }
@@ -186,8 +191,8 @@ function runtimeReview(
   branded = true
 ): BscTestnetPtaWbnbPoolRuntimeReviewInstantiation {
   const value = deeplyFreeze({
-    schemaVersion: 4,
-    kind: "automated_release_policy_recovery_envelope_instantiation_v4",
+    schemaVersion: 5,
+    kind: "automated_release_policy_recovery_envelope_instantiation_v5",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     policyDigest: POLICY_DIGEST,
     releaseCommit: RELEASE,
@@ -250,8 +255,8 @@ function commandFor(
   );
   if (challenge === null) throw new Error("Challenge fixture failed.");
   return deeplyFreeze({
-    schemaVersion: 7,
-    kind: "execute_exact_bsc_testnet_pta_wbnb_pool_recovery_generation_4_once_v7",
+    schemaVersion: 8,
+    kind: "execute_exact_bsc_testnet_pta_wbnb_pool_recovery_generation_5_once_v8",
     executionFlag: BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_EXECUTION_FLAG,
     runtimeReviewInstantiation: instantiation,
     challengeIssuedAt: AUTHORIZED_AT,
@@ -333,7 +338,7 @@ function broadcastRequest(
   const signedTransaction = "0x01" as Hex;
   const transactionHash = keccak256(signedTransaction);
   return deeplyFreeze({
-    schemaVersion: 4,
+    schemaVersion: 5,
     operation:
       "consume_exact_bsc_testnet_pta_wbnb_pool_broadcast_authorization_after_durable_start",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -391,7 +396,7 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
       `runtimeReviewInstantiationDigest=${INSTANTIATION_DIGEST}`
     );
     expect(challenge.ownerAuthorizationText).toContain(
-      `predecessorFenceSha256=${PREDECESSOR_FENCE_SHA256}`
+      `predecessorTerminalRawSha256=${BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256}`
     );
     expect(challenge.ownerAuthorizationText).toContain(
       `predecessorClaimRawSha256=${BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256}`
@@ -408,9 +413,9 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
     expect(challenge.ownerAuthorizationText).toContain("reviewerInspectedExactEnvelope=false");
     expect(challenge.ownerAuthorizationText).toContain(`challengeIssuedAt=${AUTHORIZED_AT}`);
     expect(challenge.ownerAuthorizationText).toContain(
-      "confirmationNotAfter=2026-08-13T04:33:48.000Z"
+      "confirmationNotAfter=2026-08-13T04:32:48.000Z"
     );
-    expect(challenge.ownerAuthorizationText).toContain("executionAuthorizationLifetimeSeconds=60");
+    expect(challenge.ownerAuthorizationText).toContain("executionAuthorizationLifetimeSeconds=120");
     expect(challenge.ownerAuthorizationText).toContain(
       "executionAuthorizationRule=confirmedAt_is_captured_after_exact_match_and_executionExpiresAt_equals_confirmedAt_plus_lifetime"
     );
@@ -428,7 +433,7 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
       `0x${createHash("sha256").update(challenge.ownerAuthorizationText).digest("hex")}`
     );
     expect(challenge.ownerConfirmationText).toContain(
-      "decision=CONFIRM_FRESH_GENERATION_4_AUTHORIZATION_AFTER_APPEND_ONLY_PREDECESSOR_FENCE_ONE_SIGNATURE_AND_ONE_SUBMISSION_NO_RETRY_NO_REPLACEMENT"
+      "decision=CONFIRM_FRESH_GENERATION_5_AUTHORIZATION_AFTER_APPEND_ONLY_PREDECESSOR_TERMINAL_ONE_SIGNATURE_AND_ONE_SUBMISSION_NO_RETRY_NO_REPLACEMENT"
     );
     expect(challenge.ownerConfirmationText).not.toContain("GENERATION_2_AUTHORIZATION");
     expect(
@@ -512,7 +517,7 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
     expect(traps).toBe(0);
   });
 
-  it("rejects pre-v7 owner replay and every fixed predecessor recovery mutation", async () => {
+  it("rejects pre-v8 owner replay and every fixed predecessor recovery mutation", async () => {
     const setup = harness();
     const exactDescriptor = descriptor();
     const branded = runtimeReview();
@@ -535,42 +540,42 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
     });
 
     const baseRecovery = runtimeRecoveryForEnvelopeObservedAt();
-    const fence = baseRecovery.predecessorFence;
+    const terminal = baseRecovery.predecessorTerminal;
     const {
       submissionJournalState: _omittedSubmissionJournalState,
       ...fenceWithoutSubmissionJournalState
-    } = fence;
+    } = terminal;
     void _omittedSubmissionJournalState;
     const mutations: unknown[] = [
       Object.freeze({ ...baseRecovery, generation: 1 }),
       Object.freeze({
         ...baseRecovery,
-        predecessorFence: deeplyFreeze({ ...fence, status: "claimed" })
+        predecessorTerminal: deeplyFreeze({ ...terminal, status: "claimed" })
       }),
       Object.freeze({
         ...baseRecovery,
-        predecessorFence: deeplyFreeze({ ...fence, workerStartOutcome: "attempted" })
+        predecessorTerminal: deeplyFreeze({ ...terminal, workerStartOutcome: "attempted" })
       }),
       Object.freeze({
         ...baseRecovery,
-        predecessorFence: deeplyFreeze({ ...fence, submissionJournalState: "not_empty" })
+        predecessorTerminal: deeplyFreeze({ ...terminal, submissionJournalState: "not_empty" })
       }),
       Object.freeze({
         ...baseRecovery,
-        predecessorFence: deeplyFreeze(fenceWithoutSubmissionJournalState)
+        predecessorTerminal: deeplyFreeze(fenceWithoutSubmissionJournalState)
       }),
       Object.freeze({
         ...baseRecovery,
-        predecessorFence: deeplyFreeze({
-          ...fence,
+        predecessorTerminal: deeplyFreeze({
+          ...terminal,
           predecessorClaimRawSha256: `0x${"01".repeat(32)}`
         })
       }),
       Object.freeze({
         ...baseRecovery,
-        predecessorFence: deeplyFreeze({
-          ...fence,
-          fenceRecordedAt: fence.noEffectObservedAt
+        predecessorTerminal: deeplyFreeze({
+          ...terminal,
+          recordedAt: ENVELOPE_OBSERVED_AT
         })
       })
     ];
@@ -903,16 +908,16 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
     expect(result.command.ceremonyNonce).toMatch(/^0x[0-9a-f]{64}$/u);
     expect(result.command.ceremonyNonce).not.toBe(`0x${"00".repeat(32)}`);
     expect(result.command.runtimeReviewInstantiation).toBe(instantiation);
-    expect(result.command.schemaVersion).toBe(7);
+    expect(result.command.schemaVersion).toBe(8);
     expect(result.command.kind).toBe(
-      "execute_exact_bsc_testnet_pta_wbnb_pool_recovery_generation_4_once_v7"
+      "execute_exact_bsc_testnet_pta_wbnb_pool_recovery_generation_5_once_v8"
     );
     expect(result.command.challengeIssuedAt).toBe(AUTHORIZED_AT);
     expect(result.command).not.toHaveProperty("confirmedAt");
     expect(result.command).not.toHaveProperty("executionExpiresAt");
     expect(result.command.recovery).toMatchObject({
-      generation: 4,
-      predecessorFenceSha256: PREDECESSOR_FENCE_SHA256
+      generation: 5,
+      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256
     });
     expect(result.command.ownerAuthorizationText).toContain(
       `ceremonyNonce=${result.command.ceremonyNonce}`
@@ -962,15 +967,15 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
     const ownerWindow = await run(EXPIRES_AT, [
       issueAt,
       issueAt + 1,
-      Date.parse(EXPIRES_AT) - 60_000 - 1
+      Date.parse(EXPIRES_AT) - 120_000 - 1
     ]);
-    expect(ownerWindow.observedNotAfter).toBe(Date.parse(EXPIRES_AT) - 60_000);
+    expect(ownerWindow.observedNotAfter).toBe(Date.parse(EXPIRES_AT) - 120_000);
     expect(ownerWindow.result).toMatchObject({ status: "confirmed" });
 
     const exactOwnerBoundary = await run(EXPIRES_AT, [
       issueAt,
       issueAt + 1,
-      Date.parse(EXPIRES_AT) - 60_000
+      Date.parse(EXPIRES_AT) - 120_000
     ]);
     expect(exactOwnerBoundary.result).toMatchObject({
       status: "blocked",
@@ -978,8 +983,8 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
     });
 
     const reserveExpiry = new Date(issueAt + 180_000).toISOString();
-    const envelopeReserve = await run(reserveExpiry, [issueAt, issueAt + 1, issueAt + 120_000 - 1]);
-    expect(envelopeReserve.observedNotAfter).toBe(issueAt + 120_000);
+    const envelopeReserve = await run(reserveExpiry, [issueAt, issueAt + 1, issueAt + 60_000 - 1]);
+    expect(envelopeReserve.observedNotAfter).toBe(issueAt + 60_000);
     expect(envelopeReserve.result).toMatchObject({ status: "confirmed" });
 
     const rollback = await run(EXPIRES_AT, [issueAt, issueAt + 2, issueAt + 1]);

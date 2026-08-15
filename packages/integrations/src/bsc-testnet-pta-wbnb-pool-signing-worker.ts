@@ -62,7 +62,7 @@ import {
   openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse,
   openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse,
   type BscTestnetPtaWbnbPoolLocalJournal,
-  type BscTestnetPtaWbnbPoolLocalJournalState
+  type BscTestnetPtaWbnbPoolPredecessorTerminalState
 } from "./bsc-testnet-pta-wbnb-pool-local-journal.server";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS,
@@ -96,7 +96,10 @@ import {
   type BscTestnetPtaWbnbPoolProductionRuntimeManifestEntry,
   type BscTestnetPtaWbnbPoolRuntimeReviewInstantiation
 } from "./bsc-testnet-pta-wbnb-pool-release-review-policy.server";
-import { openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse } from "./bsc-testnet-pta-wbnb-pool-submission-journal.server";
+import {
+  openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse,
+  probeWindowsBscTestnetPtaWbnbPoolGeneration3SubmissionJournalForInternalUse
+} from "./bsc-testnet-pta-wbnb-pool-submission-journal.server";
 
 const MAXIMUM_STDIN_BYTES = 32_768;
 const MAXIMUM_JSON_DEPTH = 12;
@@ -1376,7 +1379,7 @@ const WORKER_REQUEST_KEYS = [
 const WORKER_RECOVERY_KEYS = [
   "generation",
   "predecessorState",
-  "predecessorFenceSha256",
+  "predecessorTerminalRawSha256",
   "attemptId"
 ] as const;
 
@@ -1933,7 +1936,7 @@ const EXACT_BROADCAST_REQUEST_KEYS = [
 const EXACT_BROADCAST_RECOVERY_KEYS = [
   "generation",
   "predecessorState",
-  "predecessorFenceSha256",
+  "predecessorTerminalRawSha256",
   "attemptId"
 ] as const;
 
@@ -2069,7 +2072,7 @@ export function matchesBscTestnetPtaWbnbPoolExactBroadcastToSuccessfulSigningFor
     !Object.isFrozen(record.recovery) ||
     !hasExactKeys(record, EXACT_BROADCAST_REQUEST_KEYS) ||
     !hasExactKeys(recovery, EXACT_BROADCAST_RECOVERY_KEYS) ||
-    record.schemaVersion !== 4 ||
+    record.schemaVersion !== 5 ||
     record.operation !== EXACT_BROADCAST_OPERATION ||
     record.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
     record.claimId !== request.claimId ||
@@ -2125,33 +2128,35 @@ export function authenticateBscTestnetPtaWbnbPoolNativeProductionBridgeForIntern
  * create a journal, authority, worker, signer, or broadcaster.
  */
 export function matchesBscTestnetPtaWbnbPoolExactPreCustodyRecoveryForInternalUse(
-  legacyState: Pick<BscTestnetPtaWbnbPoolLocalJournalState, "status" | "supersessionFence">,
+  predecessorTerminal: BscTestnetPtaWbnbPoolPredecessorTerminalState,
+  predecessorSubmissionPresence: unknown,
   activeStatus: unknown,
   submissionStatus: unknown,
   instantiation: Pick<BscTestnetPtaWbnbPoolRuntimeReviewInstantiation, "recovery">
 ): boolean {
   try {
-    const retained = legacyState.supersessionFence;
-    const expected = instantiation.recovery.predecessorFence;
+    const expected = instantiation.recovery.predecessorTerminal;
     return (
-      legacyState.status === "superseded_before_worker" &&
-      retained !== null &&
+      predecessorSubmissionPresence === "empty" &&
       activeStatus === "absent" &&
       submissionStatus === "absent" &&
       instantiation.recovery.generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION &&
-      retained.status === expected.status &&
-      retained.terminalCode === expected.terminalCode &&
-      retained.workerAuthorizationOutcome === expected.workerAuthorizationOutcome &&
-      retained.workerStartOutcome === expected.workerStartOutcome &&
-      retained.signatureOutcome === expected.signatureOutcome &&
-      retained.submissionOutcome === expected.submissionOutcome &&
-      retained.submissionJournalState === expected.submissionJournalState &&
-      retained.fenceRecordedAt === expected.fenceRecordedAt &&
-      retained.predecessorClaimRawSha256 === expected.predecessorClaimRawSha256 &&
-      retained.noEffectProofDigest === expected.noEffectProofDigest &&
-      retained.noEffectEnvelopeHash === expected.noEffectEnvelopeHash &&
-      retained.noEffectObservedAt === expected.noEffectObservedAt &&
-      retained.predecessorFenceSha256 === expected.predecessorFenceSha256
+      predecessorTerminal.status === expected.status &&
+      predecessorTerminal.generation === expected.generation &&
+      predecessorTerminal.predecessorClaimRawSha256 === expected.predecessorClaimRawSha256 &&
+      predecessorTerminal.predecessorTerminalRawSha256 === expected.predecessorTerminalRawSha256 &&
+      predecessorTerminal.predecessorEnvelopeHash === expected.predecessorEnvelopeHash &&
+      predecessorTerminal.inheritedFenceSha256 === expected.inheritedFenceSha256 &&
+      predecessorTerminal.predecessorAttemptId === expected.predecessorAttemptId &&
+      predecessorTerminal.phase === expected.phase &&
+      predecessorTerminal.issueCode === expected.issueCode &&
+      predecessorTerminal.outcomeDigest === expected.outcomeDigest &&
+      predecessorTerminal.workerAuthorizationOutcome === expected.workerAuthorizationOutcome &&
+      predecessorTerminal.workerStartOutcome === expected.workerStartOutcome &&
+      predecessorTerminal.signatureOutcome === expected.signatureOutcome &&
+      expected.submissionOutcome === "not_attempted" &&
+      expected.submissionJournalState === "exact_empty" &&
+      predecessorTerminal.recordedAt === expected.recordedAt
     );
   } catch {
     return false;
@@ -2201,6 +2206,33 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
         value === localCustodyPathAclCapability
     })
   );
+
+  const retainsExactPreCustodyRecovery = async (
+    runtimeReviewInstantiation: BscTestnetPtaWbnbPoolRuntimeReviewInstantiation
+  ): Promise<boolean> => {
+    const [predecessorRecovery, predecessorSubmission, activeRecovery, submissionRecovery] =
+      await Promise.all([
+        openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse(),
+        probeWindowsBscTestnetPtaWbnbPoolGeneration3SubmissionJournalForInternalUse(),
+        openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse(),
+        openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse()
+      ]);
+    const predecessorTerminal =
+      predecessorRecovery.status === "opened"
+        ? await predecessorRecovery.journal.readExactTerminalRecoveryBinding()
+        : null;
+    return (
+      predecessorTerminal !== null &&
+      predecessorSubmission.status === "ready" &&
+      matchesBscTestnetPtaWbnbPoolExactPreCustodyRecoveryForInternalUse(
+        predecessorTerminal,
+        predecessorSubmission.presence,
+        activeRecovery.status,
+        submissionRecovery.status,
+        runtimeReviewInstantiation
+      )
+    );
+  };
 
   const nativeTtyPorts: BscTestnetPtaWbnbPoolOwnerCeremonyPorts = Object.freeze({
     now,
@@ -2350,24 +2382,7 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
       ) {
         throw new PoolSigningWorkerFailure("RELEASE_TRUST_INVALID");
       }
-      const [legacyRecovery, activeRecovery, submissionRecovery] = await Promise.all([
-        openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse(),
-        openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse(),
-        openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse()
-      ]);
-      const legacyState =
-        legacyRecovery.status === "opened"
-          ? await legacyRecovery.journal.readStrictRecoveryState()
-          : null;
-      if (
-        legacyState === null ||
-        !matchesBscTestnetPtaWbnbPoolExactPreCustodyRecoveryForInternalUse(
-          legacyState,
-          activeRecovery.status,
-          submissionRecovery.status,
-          runtimeReviewInstantiation
-        )
-      ) {
+      if (!(await retainsExactPreCustodyRecovery(runtimeReviewInstantiation))) {
         throw new PoolSigningWorkerFailure("NATIVE_RECOVERY_STATE_INVALID");
       }
       await assertFixedWindowsBscTestnetPtaWbnbPoolCustodyMetadataForInternalUse();
@@ -2381,8 +2396,8 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
         releaseTree,
         runtimeManifestSha256: releaseIdentity.runtimeManifest.runtimeManifestSha256,
         runtimeReviewInstantiationDigest: runtimeReviewInstantiation.instantiationDigest,
-        predecessorFenceSha256:
-          runtimeReviewInstantiation.recovery.predecessorFence.predecessorFenceSha256,
+        predecessorTerminalRawSha256:
+          runtimeReviewInstantiation.recovery.predecessorTerminal.predecessorTerminalRawSha256,
         activeJournalState: "exact_empty",
         submissionJournalState: "exact_empty",
         custodyMetadataVerified: true,
@@ -2396,7 +2411,7 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
           BSC_TESTNET_PTA_WBNB_POOL_POST_RECHECK_EXECUTION_RESERVE_SECONDS
       });
       preparationDigest = `0x${createHash("sha256")
-        .update("proofera.bsc-testnet.pta-wbnb-pool.owner-preparation.v1\u0000", "utf8")
+        .update("proofera.bsc-testnet.pta-wbnb-pool.owner-preparation.v2\u0000", "utf8")
         .update(preparationBody, "utf8")
         .digest("hex")}` as Hex;
     } catch {
@@ -2461,9 +2476,16 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
       ceremonyCommands.delete(command);
       const runtimeReviewInstantiation = ceremonyBinding.instantiation;
 
-      // Heavy release/journal/ACL preparation completed before the owner challenge. After the exact
-      // confirmation only a lightweight in-realm empty-state reread is permitted before authority.
+      // Release and custody preparation completed before the owner challenge. After confirmation,
+      // re-open every durable recovery prerequisite read-only before minting execution authority.
       const signingJournal = ceremonyBinding.signingJournal;
+      if (!(await retainsExactPreCustodyRecovery(runtimeReviewInstantiation))) {
+        return nativeActivationBlocked(
+          "NATIVE_RECOVERY_STATE_INVALID",
+          "recovery",
+          "The exact generation-4 terminal or empty generation-5 signing/submission prerequisites changed after owner confirmation."
+        );
+      }
       const preparedState = await signingJournal.readState();
       if (preparedState.status !== "empty") {
         return nativeActivationBlocked(

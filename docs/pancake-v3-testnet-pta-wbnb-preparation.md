@@ -2,11 +2,11 @@
 
 Updated: 2026-08-15. Decision: **exact offline provenance, a non-authorizing read-only
 preflight, an old-scope unsent request, an owner-designated internal multi-agent technical decision
-for `bc7000e`, and an incident-only generation-4 production recovery path are recorded. Historical one-off
-non-retained operational observation, exact release `336af296` received owner-v4 confirmation but
-stopped at the durable legacy claim-only QuickEdit incident after that authority expired. It created no
-worker start, signature, send, receipt, pool, or liquidity and cannot authorize recovery. This
-preparation record supplies no matching generation-4 policy or owner-v7 approval and records no pool or
+for `bc7000e`, and the historical generation-4 operational outcome are recorded. A one-off local
+generation-4 run accepted owner-v7 confirmation and durably ended `failed_before_worker`; its console
+output and harness were not retained. It created no worker start, custody-secret access, signature,
+send, receipt, pool, or liquidity and cannot authorize recovery. Current generation 5 requires a new
+release policy, fresh envelope, and owner-v8 approval. This record supplies none and records no pool or
 Pancake write**.
 
 Machine record:
@@ -269,11 +269,11 @@ preload/parent-provenance, or comprehensive concurrent-tamper defense exists.
 
 The server-only signing scaffold now implements the exact fixed transaction
 protocol, authorization-receipt validation, signer core, Windows signing worker, and append-only
-operation journals. The immutable incident predecessor remains rooted at
-`%LOCALAPPDATA%\ProofEra\operations\bsc-testnet-pta-wbnb-pool-v1`; generations 2 and 3 are immutable
-predecessors and recovery generation 4 uses `bsc-testnet-pta-wbnb-pool-v4`. Journal creation is restricted to the
-current Windows user with protected ACL checks, and every state transition is append-only and
-exact-operation-bound. The journal receipt self-hash detects local mutation only; it
+operation journals. Signing generations 1 through 4 are immutable predecessors and recovery generation
+5 uses `bsc-testnet-pta-wbnb-pool-v5`. Submission-v2/v3 are read-only predecessors and active writes use
+submission-v4 with v6 schema/files, for eight isolated namespaces in total. Journal creation is
+restricted to the current Windows user with protected ACL checks, and every state transition is
+append-only and exact-operation-bound. The journal receipt self-hash detects local mutation only; it
 is **integrity evidence, not reviewer identity, owner authorization, signing authority, or permission
 to submit**.
 
@@ -283,18 +283,17 @@ operating-system CSPRNG, and accepts only the exact digest-bound confirmation by
 window closes. The ceremony does not use argv, environment, temporary files, shell, logger, custody,
 RPC writes, signer, or broadcaster. Challenge generation alone mints no authority.
 
-The current recovery timing contract separates four clocks: an exact `300`-second envelope, at most `240`
-seconds for owner entry, an exact `60`-second execution-authority lifetime, and a `30`-second post-claim
-recheck freshness bound. The owner deadline was
-`min(challengeIssuedAt + 240 seconds, envelopeExpiresAt - 60 seconds)`, which preserves the complete
-execution reserve. Before slot-1 claim at least 50 seconds must remain and no more than 10 seconds may
-have elapsed since confirmation; a successful post-claim recheck must leave 20 seconds. The owner
-transaction-authorization and exact-byte-confirmation domains are v7.
-The bytes bind `challengeIssuedAt`, `confirmationNotAfter`, the 60-second lifetime, and their
+The current generation-5 recovery timing contract uses exact caps `300/240/120/60/60/20/30` seconds for
+the envelope, owner-entry cap, execution authority, minimum remaining before claim, maximum elapsed before
+claim, post-recheck reserve, and freshness. The owner deadline is
+`min(challengeIssuedAt + 240 seconds, envelopeExpiresAt - 120 seconds)`, so the 240-second cap is further
+bounded by preserving the complete 120-second authority reserve.
+The owner transaction-authorization and exact-byte-confirmation domains are v8.
+The bytes bind `challengeIssuedAt`, `confirmationNotAfter`, the 120-second lifetime, and their
 deterministic derivation rule; they did not claim future clock values. Only after an exact byte match
 did the internal clock capture actual `confirmedAt`, and the `WeakMap`-branded
-generation-4 command binds that timestamp and `executionExpiresAt = confirmedAt + 60 seconds`.
-Generation 4 binds the exact generation-3 fence and attempt identity through owner-v7 domains.
+generation-5 command binds that timestamp and `executionExpiresAt = confirmedAt + 120 seconds`.
+Generation 5 binds the exact generation-4 terminal and attempt identity through owner-v8 domains.
 
 The native bridge holds a current-user fixed-custody-path/ACL capability, ceremony-command brand, and
 execution-capability state inside one closure. Before durable `worker_started`, its custody probe checks
@@ -322,7 +321,7 @@ there was no fresh RPC, custody-artifact access, DPAPI operation, custody unlock
 transaction hash, send, receipt, pool, or liquidity. The source then changed, so this exact triplet and
 policy are historical v1 evidence only and cannot authorize v2.
 
-The current v5 challenge/frame domains retain the strict nonce-bound ASCII `BEGIN`/`CHUNK`/`END` state
+The current v6 challenge/frame domains retain the strict nonce-bound ASCII `BEGIN`/`CHUNK`/`END` state
 machine introduced in v2 under one absolute five-minute deadline. Every line binds its exact line index, chunk count, policy byte
 length, and lowercase raw policy-byte SHA-256; each `CHUNK` also binds its exact zero-based chunk
 index. Lines must be exact-order LF or CRLF with no blank/control/trailing data. The hard content-line
@@ -334,7 +333,7 @@ chunks/eight total bounded lines without becoming authority. A one-off local Win
 motivated these conservative constants, but its harness and result are not retained and it is not
 reproducible repository evidence. Repository unit tests establish only the transport arithmetic and
 parser behavior. The reader reconstructs the policy once, verifies exact
-count/order, declared length/hash, and canonical base64url, and rejects retired v1/v2/v3/v4 domains, truncation,
+count/order, declared length/hash, and canonical base64url, and rejects retired v1/v2/v3/v4/v5 domains, truncation,
 missing/duplicate/reordered chunks, malformed terminators, and buffered trailing input before policy
 admission, fresh RPC, custody access, or owner authority. This invariant does not
 prove that the OS queue had no earlier input and does not protect against malicious same-user preload.
@@ -385,18 +384,23 @@ exactly `1,362` bytes with raw SHA-256 `0x7ff780a8f0ac1a1f8ff7bced5d858259f918cd
 There is no slot 2, worker authorization/start, custody access, signature, submission, transaction hash,
 receipt, pool, or liquidity. The exact proximate error was not retained, so expiry is not asserted as fact.
 
-Recovery generation 4 is fixed to that exact incident. Invocation A requires the immutable generation-1/2
-fences plus the expired exact generation-3 claim and exact-empty generation-4 plus old/new submission state,
-obtains snapshot A, rereads all six durable namespaces, appends/rereads the generation-3 slot-2 fence, and exits
-`PREDECESSOR_FENCE_RECORDED_RESTART_REQUIRED`. Invocation B must be a later process, admit a new policy
-through TTY v5, obtain snapshot B strictly after the fence, and only then request owner-v7 confirmation.
-Any later durable evidence, partial state, unexpected file, ACL/path ambiguity, race, or unknown append blocks.
+Generation 4 is now historical. A one-off local run accepted owner-v7 and durably retained claim raw
+SHA-256 `0xd5fc6da9f853c621f4f407c9d8a729f898c0297720bc50817e633fa538967f36` plus `failed_before_worker`
+transition raw SHA-256 `0x2e0570423b1217f1dab6fa8cdb91a0a75b2d78023bacc611a6c81017d0033bab`, with
+`POST_CLAIM_RECHECK_OUTCOME_UNKNOWN`. Exact two-slot local-journal ordering proves no worker
+authorization/start/signature. Separate exact-empty submission-v3 plus code ordering proves no
+submission/send and supports no custody-secret access or DPAPI/unlock. Raw console output and the harness were not retained, so this is not
+reproducible repository or chain evidence and supplies no receipt.
 
-The active signing journal uses `bsc-testnet-pta-wbnb-pool-v4` and carries
-`{ generation, predecessorState, predecessorFenceSha256, attemptId }` through claim, worker, signed
-readback, submission, and reconciliation. The v1/v2/v3 predecessors remain immutable. Submission-v2
-is a strict read-only predecessor probe; active submission uses `bsc-testnet-pta-wbnb-pool-submission-v3`
-with v5 durable records. Persisted bytes never recreate owner authority.
+Recovery generation 5 directly binds that exact terminal and separately requires exact-empty
+submission-v3. It uses no Invocation A, new no-effect proof, or reusable fence snapshot. A fresh,
+distinct envelope observed after the terminal is required. Policy/runtime-instantiation is v5, TTY is
+v6, owner command/text/confirmation is v8, and signing/intent/broadcast are v5.
+The active signing journal uses `bsc-testnet-pta-wbnb-pool-v5` and carries
+`{ generation, predecessorState, predecessorTerminalRawSha256, attemptId }` through claim, worker,
+signed readback, submission, and reconciliation. Signing v1-v4 and submission-v2/v3 remain immutable;
+active submission uses `bsc-testnet-pta-wbnb-pool-submission-v4` with v6 durable records. Persisted
+bytes never recreate owner authority.
 
 A separate local post-claim recheck core requires the authorization gate's authenticated private
 intent before making any read. It compares only the two fixed official RPC origins, finds a common
@@ -433,10 +437,11 @@ liquidity and initialized observation state. A reverted receipt is kept distinct
 success logs or pool post-state.
 
 The repository now locally implements those formerly pending controls. Its append-only submission
-journal schema v5 persists the exact generation-4 owner-authorization, recovery quartet,
-one-signature/one-broadcast policy, and transaction binding. Submission-v2 is probed read-only while
-new writes use submission-v3, so predecessor state is not hidden by a directory rename. Composition reads
-generation-1/2/3, active generation-4, predecessor submission-v2, and active submission-v3 before any authorization or signing: terminal state stops; durable
+journal schema v6 persists the exact generation-5 owner authorization, recovery quartet,
+one-signature/one-broadcast policy, and transaction binding. Submission-v2/v3 are probed read-only while
+new writes use submission-v4, so predecessor state is not hidden by a directory rename. The production root reads
+signing generations 1 through 5 and submission v2 through v4 before any authorization or signing; composition
+then rereads the generation-4 terminal, exact-empty submission-v3, active signing-v5, and active submission-v4: terminal state stops; durable
 `submission_started`/`unknown_outcome` enters recovery-only reconciliation; a signed commit without a
 durable start cannot recreate owner authority; and mismatched restart state fails closed. A fresh
 attempt must win durable `submission_started`, after which a second fixed dual-RPC state snapshot is
@@ -459,10 +464,11 @@ independence, or protection from two colluding/identically faulty Byzantine prov
 child wires these controls to a closure-private sender; the public worker and generic raw sender remain
 unavailable. Every release containing this path must have a committed and pushed identity, then its exact
 commit/tree/full runtime manifest must receive new owner-designated audits and a matching policy before
-the owner enters the separate exact generation-4 owner-v7 TTY confirmation on invocation B. This document
+the owner enters the separate exact generation-5 owner-v8 TTY confirmation. This document
 records the historical admitted `36f6e5e7` policy and the later expired owner-v4 incident at
-`336af296` and `655187f2`, but supplies no matching policy or owner-v7 confirmation for generation 4; no
-generation-4 signature, send, transaction receipt, pool, or LP position exists. These changed files are
+`336af296` and `655187f2`, plus the non-retained generation-4 terminal observation, but supplies no
+matching policy or owner-v8 confirmation for generation 5; no generation-5 signature, send, transaction
+receipt, pool, or LP position exists. These changed files are
 not covered by the old external-review request, retained `bc7000e` decision, or any historical policy.
 
 ## Separate proposed liquidity envelope
@@ -476,23 +482,21 @@ position authority is approved by this document.
 The two write decisions stay separate:
 
 1. Pool initialization requires its own fresh simulation, exact sender/nonce/gas/cost envelope, short
-   broadcast window, durable one-shot claim/submission journal, the exact predecessor fence, a new
-   owner-designated distinct-agent technical decision and canonical policy for the exact generation-4
-   release, exact owner-v7 authorization through the bounded invocation-B TTY ceremony, receipt, exact
-   logs, and post-state reconciliation. The expired owner-v4 confirmation for historical `336af296`
-   cannot cross the predecessor fence; this preparation record supplies none of those generation-4
-   authority or transaction outputs.
+   broadcast window, durable one-shot claim/submission journal, the exact generation-4 terminal, a new
+   owner-designated distinct-agent technical decision and canonical policy for the exact generation-5
+   release, exact owner-v8 authorization through the bounded TTY ceremony, receipt, exact logs, and
+   post-state reconciliation. Historical confirmations cannot cross the terminal binding; this
+   preparation record supplies none of those generation-5 authority or transaction outputs.
 2. Only after the pool is independently re-reviewed may an LP mint be prepared. It requires separate
    bounded token approvals, explicit ticks/amounts/minima/deadline/slippage, owner/revoke authority,
    simulation, user confirmation, and receipt evidence.
 
 ## Remaining blockers
 
-- Invocation A must freshly establish exact no-effect snapshot A only for the frozen predecessor, then
-  append/reread the immutable fence and require restart. Invocation B must independently refresh all
-  five runtime identities, manager/factory/deployer relationships, fee configuration, factory owner,
-  LM controls, pair lookup, nonce, fee, gas, and balance in a distinct snapshot B strictly after that
-  fence.
+- Generation 5 must reread all eight namespaces, bind the exact generation-4 terminal and exact-empty
+  submission-v3, then independently refresh all five runtime identities, manager/factory/deployer
+  relationships, fee configuration, factory owner, LM controls, pair lookup, nonce, fee, gas, and
+  balance in a fresh distinct envelope after that terminal. No Invocation A or no-effect fence applies.
 - Preserve the owner-designated internal decision only for exact commit `bc7000e`. Obtain a final
   distinct-agent technical decision bound to the exact changed release, including the ceremony/bridge/
   journal/recovery/ancestry delta. Local implementation review does not replace that release-bound
@@ -500,19 +504,19 @@ The two write decisions stay separate:
   old eight-file unsent request, public Gist and byte-exact re-fetch provide no review for later code.
   Its generator, test, and artifact remain pinned to the historical 45-second envelope and are not
   timing evidence for the revised `300`/`240`/`60`/`30` contract.
-- Obtain a fresh exact generation-4 owner-v7 authorization on invocation B. Expired owner-v4/v5/v6
-  confirmations, requests, fences, or reviewer decisions cannot substitute for it.
-- Generate the canonical generation-4 runtime policy only after the final commit is pushed and two
+- Obtain a fresh exact generation-5 owner-v8 authorization. Expired owner-v4/v5/v6/v7 confirmations,
+  requests, terminal records, or reviewer decisions cannot substitute for it.
+- Generate the canonical generation-5 runtime policy only after the final commit is pushed and two
   designated read-only agents approve its exact commit/tree/full manifest. Use that exact triplet only with the
   absolute PowerShell phase-minus-one command; never substitute direct Node, the blocked pnpm wrapper,
   placeholder values, the historical v1 triplet/policy, the stale `36f6e5e7` triplet/policy, or the
   incident `336af296` triplet/policy/owner-v4 bytes.
-  Admit the matching policy through the strict nonce-bound v5 `BEGIN`/ordered `CHUNK`/`END` TTY phase,
-  run the fixed coordinator for snapshot B, and instantiate the admitted policy on B. Then require the
-  owner's exact v7 second-phase confirmation; neither gate may be inferred from
+  Admit the matching policy through the strict nonce-bound v6 `BEGIN`/ordered `CHUNK`/`END` TTY phase,
+  run the fixed coordinator for the fresh envelope, and instantiate the admitted policy on it. Then
+  require the owner's exact v8 second-phase confirmation; neither gate may be inferred from
   repository contents, chat, digests, or journal state. The public worker and generic raw sender stay
   hard-blocked even when the closure-private path is used.
-- Re-run the fixed two-provider coordinator for snapshot B immediately before any generation-4 claim,
+- Re-run the fixed two-provider coordinator immediately before any generation-5 claim,
   then repeat the pending nonce, pool, candidate-code and simulation checks after the durable claim and
   abort on any drift.
 - Establish post-initialization observation cardinality and elapsed oracle history before using the
@@ -523,12 +527,12 @@ The two write decisions stay separate:
 Until those gates close and explorer-verifiable receipts exist, the truthful state remains: PTA and
 WBNB identities are evidenced, the retained pool construction path is reproduced exactly offline,
 and a read-only non-authorizing preflight plus a phase-minus-one/phase-zero, exact-policy/owner-gated
-incident-only generation-4 recovery/signing/submission/reconciliation path is implemented. The
+incident-only generation-5 recovery/signing/submission/reconciliation path is implemented. The
 owner-designated internal technical-review gate is complete only for the exact `bc7000e` nonexecuting
 subject, not this changed release until its final commit is pushed and receives new exact audits. **No
 authenticated external/third-party review is claimed. The `36f6e5e7` policy and the `336af296`
 policy/expired owner-v4 incident are historical, non-authorizing operational observations; this preparation
-record contains no matching generation-4 policy, owner-v7 transaction approval, signature, send,
+record contains no matching generation-5 policy, owner-v8 transaction approval, signature, send,
 receipt, PTA/WBNB pool, liquidity, oracle, position, Pancake write, or autonomous-execution evidence**.
 
 The machine record is linked to the retained

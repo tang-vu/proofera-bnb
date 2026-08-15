@@ -7,18 +7,18 @@ import {
   openExistingWindowsBscTestnetPtaWbnbPoolLegacyLocalJournalForRecoveryForInternalUse,
   openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse,
   openExistingWindowsBscTestnetPtaWbnbPoolGeneration2LocalJournalForRecoveryForInternalUse,
+  openExistingWindowsBscTestnetPtaWbnbPoolGeneration3LocalJournalForRecoveryForInternalUse,
   openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse,
   type BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult,
   type BscTestnetPtaWbnbPoolExistingLocalJournalResult,
   type BscTestnetPtaWbnbPoolExistingPredecessorLocalJournalResult
 } from "./bsc-testnet-pta-wbnb-pool-local-journal.server";
-import type { BscTestnetPtaWbnbPoolNoEffectProof } from "./bsc-testnet-pta-wbnb-pool-local-journal.server";
 import { describeBscTestnetPtaWbnbPoolOneShotBoundary } from "./bsc-testnet-pta-wbnb-pool-one-shot-boundary.server";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_1_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_CLAIM_RAW_SHA256,
-  BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 import { createBscTestnetPtaWbnbPoolPrivateBroadcasterForInternalUse } from "./bsc-testnet-pta-wbnb-pool-private-broadcaster.server";
 import {
@@ -29,13 +29,15 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-production-composition.server";
 import {
   readBscTestnetPtaWbnbPoolReleaseReviewPolicyFromControllingTtyForInternalUse,
-  type BscTestnetPtaWbnbPoolPredecessorFenceBinding
+  type BscTestnetPtaWbnbPoolPredecessorTerminalBinding
 } from "./bsc-testnet-pta-wbnb-pool-release-review-policy.server";
 import { createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeForInternalUse } from "./bsc-testnet-pta-wbnb-pool-signing-worker";
 import {
   openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse,
   openExistingWindowsBscTestnetPtaWbnbPoolSubmissionJournalForTerminalReconciliationForInternalUse,
+  probeWindowsBscTestnetPtaWbnbPoolGeneration3SubmissionJournalForInternalUse,
   probeWindowsBscTestnetPtaWbnbPoolPredecessorSubmissionJournalForInternalUse,
+  type BscTestnetPtaWbnbPoolGeneration3SubmissionJournalProbeResult,
   type BscTestnetPtaWbnbPoolPredecessorSubmissionJournalProbeResult,
   type BscTestnetPtaWbnbPoolExistingSubmissionJournalResult
 } from "./bsc-testnet-pta-wbnb-pool-submission-journal.server";
@@ -89,33 +91,42 @@ function mixedRecoveryState(
 
 type DurableRecoverySnapshot = Readonly<{
   ancestor: BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult;
-  generation2: BscTestnetPtaWbnbPoolExistingPredecessorLocalJournalResult;
+  generation2: BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult;
+  generation3: BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult;
   predecessor: BscTestnetPtaWbnbPoolExistingPredecessorLocalJournalResult;
   active: BscTestnetPtaWbnbPoolExistingLocalJournalResult;
-  predecessorSubmission: BscTestnetPtaWbnbPoolPredecessorSubmissionJournalProbeResult;
+  generation2Submission: BscTestnetPtaWbnbPoolPredecessorSubmissionJournalProbeResult;
+  predecessorSubmission: BscTestnetPtaWbnbPoolGeneration3SubmissionJournalProbeResult;
   submission: BscTestnetPtaWbnbPoolExistingSubmissionJournalResult;
 }>;
 
-type ObservedPreparation = Extract<
-  Awaited<ReturnType<typeof prepareBscTestnetPtaWbnbPoolInitializationEnvelope>>,
-  Readonly<{ status: "observed" }>
->;
-
 async function probeAllDurableRecoveryState(): Promise<DurableRecoverySnapshot> {
-  const [ancestor, generation2, predecessor, active, predecessorSubmission, submission] =
-    await Promise.all([
-      openExistingWindowsBscTestnetPtaWbnbPoolLegacyLocalJournalForRecoveryForInternalUse(),
-      openExistingWindowsBscTestnetPtaWbnbPoolGeneration2LocalJournalForRecoveryForInternalUse(),
-      openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse(),
-      openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse(),
-      probeWindowsBscTestnetPtaWbnbPoolPredecessorSubmissionJournalForInternalUse(),
-      openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse()
-    ]);
+  const [
+    ancestor,
+    generation2,
+    generation3,
+    predecessor,
+    active,
+    generation2Submission,
+    predecessorSubmission,
+    submission
+  ] = await Promise.all([
+    openExistingWindowsBscTestnetPtaWbnbPoolLegacyLocalJournalForRecoveryForInternalUse(),
+    openExistingWindowsBscTestnetPtaWbnbPoolGeneration2LocalJournalForRecoveryForInternalUse(),
+    openExistingWindowsBscTestnetPtaWbnbPoolGeneration3LocalJournalForRecoveryForInternalUse(),
+    openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse(),
+    openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse(),
+    probeWindowsBscTestnetPtaWbnbPoolPredecessorSubmissionJournalForInternalUse(),
+    probeWindowsBscTestnetPtaWbnbPoolGeneration3SubmissionJournalForInternalUse(),
+    openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse()
+  ]);
   return Object.freeze({
     ancestor,
     generation2,
+    generation3,
     predecessor,
     active,
+    generation2Submission,
     predecessorSubmission,
     submission
   });
@@ -141,16 +152,10 @@ function exactAncestorFenceSha256(
     : null;
 }
 
-function exactAncestorFence(
-  ancestor: BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult
-): boolean {
-  return exactAncestorFenceSha256(ancestor) !== null;
-}
-
-function exactPredecessorFence(
-  predecessor: BscTestnetPtaWbnbPoolExistingPredecessorLocalJournalResult,
+function exactGeneration3Fence(
+  predecessor: BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult,
   expectedAncestorFenceSha256: Hex
-): BscTestnetPtaWbnbPoolPredecessorFenceBinding | null {
+): Hex | null {
   const fence = predecessor.status === "opened" ? predecessor.state.supersessionFence : null;
   return predecessor.status === "opened" &&
     predecessor.state.status === "superseded_before_worker" &&
@@ -165,79 +170,18 @@ function exactPredecessorFence(
     fence.submissionOutcome === "not_attempted" &&
     fence.submissionJournalState === "exact_empty" &&
     fence.predecessorClaimRawSha256 === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_CLAIM_RAW_SHA256
-    ? Object.freeze({
-        status: fence.status,
-        terminalCode: fence.terminalCode,
-        workerAuthorizationOutcome: fence.workerAuthorizationOutcome,
-        workerStartOutcome: fence.workerStartOutcome,
-        signatureOutcome: fence.signatureOutcome,
-        submissionOutcome: fence.submissionOutcome,
-        submissionJournalState: fence.submissionJournalState,
-        fenceRecordedAt: fence.fenceRecordedAt,
-        predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_CLAIM_RAW_SHA256,
-        noEffectProofDigest: fence.noEffectProofDigest,
-        noEffectEnvelopeHash: fence.noEffectEnvelopeHash,
-        noEffectObservedAt: fence.noEffectObservedAt,
-        predecessorFenceSha256: fence.predecessorFenceSha256
-      })
+    ? fence.predecessorFenceSha256
     : null;
-}
-
-function samePredecessorFence(
-  left: BscTestnetPtaWbnbPoolPredecessorFenceBinding,
-  right: BscTestnetPtaWbnbPoolPredecessorFenceBinding
-): boolean {
-  return (
-    left.status === right.status &&
-    left.terminalCode === right.terminalCode &&
-    left.workerAuthorizationOutcome === right.workerAuthorizationOutcome &&
-    left.workerStartOutcome === right.workerStartOutcome &&
-    left.signatureOutcome === right.signatureOutcome &&
-    left.submissionOutcome === right.submissionOutcome &&
-    left.submissionJournalState === right.submissionJournalState &&
-    left.fenceRecordedAt === right.fenceRecordedAt &&
-    left.predecessorClaimRawSha256 === right.predecessorClaimRawSha256 &&
-    left.noEffectProofDigest === right.noEffectProofDigest &&
-    left.noEffectEnvelopeHash === right.noEffectEnvelopeHash &&
-    left.noEffectObservedAt === right.noEffectObservedAt &&
-    left.predecessorFenceSha256 === right.predecessorFenceSha256
-  );
-}
-
-function noEffectProofFromObservedPreparation(
-  prepared: ObservedPreparation
-): BscTestnetPtaWbnbPoolNoEffectProof {
-  const observation = prepared.envelope.observation;
-  return Object.freeze({
-    schemaVersion: 1 as const,
-    kind: "exact_fixed_dual_rpc_no_onchain_effect_after_claim_v1" as const,
-    operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
-    envelopeHash: prepared.envelope.envelopeHash,
-    observedAt: observation.observedAt,
-    finalizedBlockNumber: observation.finalizedBlockNumber,
-    finalizedBlockHash: observation.finalizedBlockHash,
-    finalizedBlockTimestamp: observation.finalizedBlockTimestamp,
-    latestNonce: observation.latestNonce,
-    pendingNonce: observation.pendingNonce,
-    pendingPool: observation.pendingPool,
-    candidateCode: observation.candidateCode,
-    candidateNonce: observation.candidateNonce,
-    providerAgreementVerified: observation.providerAgreementVerified,
-    allRuntimeIdentitiesVerified: observation.allRuntimeIdentitiesVerified,
-    allEip1967SlotsZero: observation.allEip1967SlotsZero,
-    allProtocolBindingsVerified: observation.allProtocolBindingsVerified,
-    feeTierVerified: observation.feeTierVerified,
-    simulationReturnPool: observation.simulationReturnPool,
-    submissionJournalPresence: "absent" as const
-  });
 }
 
 function durableSnapshotBlocked(snapshot: DurableRecoverySnapshot): boolean {
   return (
     snapshot.ancestor.status === "blocked" ||
     snapshot.generation2.status === "blocked" ||
+    snapshot.generation3.status === "blocked" ||
     snapshot.predecessor.status === "blocked" ||
     snapshot.active.status === "blocked" ||
+    snapshot.generation2Submission.status === "blocked" ||
     snapshot.predecessorSubmission.status === "blocked" ||
     snapshot.submission.status === "blocked"
   );
@@ -246,15 +190,18 @@ function durableSnapshotBlocked(snapshot: DurableRecoverySnapshot): boolean {
 function exactEmptyActiveAndSubmission(snapshot: DurableRecoverySnapshot): boolean {
   return (
     snapshot.active.status === "absent" &&
+    snapshot.generation2Submission.status === "ready" &&
+    snapshot.generation2Submission.presence !== "present" &&
+    snapshot.generation2Submission.files.length === 0 &&
     snapshot.predecessorSubmission.status === "ready" &&
-    snapshot.predecessorSubmission.presence !== "present" &&
+    snapshot.predecessorSubmission.presence === "empty" &&
     snapshot.predecessorSubmission.files.length === 0 &&
     snapshot.submission.status === "absent"
   );
 }
 
 function exactGeneration2Fence(
-  generation2: BscTestnetPtaWbnbPoolExistingPredecessorLocalJournalResult,
+  generation2: BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult,
   expectedAncestorFenceSha256: Hex
 ): Hex | null {
   const fence = generation2.status === "opened" ? generation2.state.supersessionFence : null;
@@ -275,9 +222,7 @@ function exactGeneration2Fence(
     : null;
 }
 
-function exactChainPredecessorFence(
-  snapshot: DurableRecoverySnapshot
-): BscTestnetPtaWbnbPoolPredecessorFenceBinding | null {
+function exactChainGeneration3Fence(snapshot: DurableRecoverySnapshot): Hex | null {
   const ancestorFenceSha256 = exactAncestorFenceSha256(snapshot.ancestor);
   const generation2FenceSha256 =
     ancestorFenceSha256 === null
@@ -285,49 +230,70 @@ function exactChainPredecessorFence(
       : exactGeneration2Fence(snapshot.generation2, ancestorFenceSha256);
   return generation2FenceSha256 === null
     ? null
-    : exactPredecessorFence(snapshot.predecessor, generation2FenceSha256);
+    : exactGeneration3Fence(snapshot.generation3, generation2FenceSha256);
 }
 
-function exactGeneration2Chain(snapshot: DurableRecoverySnapshot): boolean {
-  const ancestorFenceSha256 = exactAncestorFenceSha256(snapshot.ancestor);
-  return (
-    ancestorFenceSha256 !== null &&
-    exactGeneration2Fence(snapshot.generation2, ancestorFenceSha256) !== null
-  );
-}
-
-function retainsExactFreshPrerequisites(
+async function exactCombinedPredecessorTerminal(
   snapshot: DurableRecoverySnapshot,
-  expectedFence: BscTestnetPtaWbnbPoolPredecessorFenceBinding
-): snapshot is DurableRecoverySnapshot &
-  Readonly<{
-    predecessor: Extract<
-      BscTestnetPtaWbnbPoolExistingPredecessorLocalJournalResult,
-      { status: "opened" }
-    >;
-  }> {
-  const ancestorFenceSha256 = exactAncestorFenceSha256(snapshot.ancestor);
-  const generation2FenceSha256 =
-    ancestorFenceSha256 === null
-      ? null
-      : exactGeneration2Fence(snapshot.generation2, ancestorFenceSha256);
-  const retained = exactChainPredecessorFence(snapshot);
+  requireFreshActiveState = true
+): Promise<BscTestnetPtaWbnbPoolPredecessorTerminalBinding | null> {
+  if (
+    durableSnapshotBlocked(snapshot) ||
+    (requireFreshActiveState && !exactEmptyActiveAndSubmission(snapshot)) ||
+    snapshot.generation2Submission.status !== "ready" ||
+    snapshot.generation2Submission.presence === "present" ||
+    snapshot.generation2Submission.files.length !== 0 ||
+    snapshot.predecessor.status !== "opened" ||
+    snapshot.predecessorSubmission.status !== "ready" ||
+    snapshot.predecessorSubmission.presence !== "empty" ||
+    snapshot.predecessorSubmission.files.length !== 0
+  ) {
+    return null;
+  }
+  const generation3Fence = exactChainGeneration3Fence(snapshot);
+  if (generation3Fence === null) return null;
+  const terminal = await snapshot.predecessor.journal.readExactTerminalRecoveryBinding();
+  return terminal !== null &&
+    terminal.inheritedFenceSha256 === generation3Fence &&
+    terminal.predecessorTerminalRawSha256 ===
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256
+    ? Object.freeze({
+        ...terminal,
+        submissionOutcome: "not_attempted" as const,
+        submissionJournalState: "exact_empty" as const
+      })
+    : null;
+}
+
+function samePredecessorTerminal(
+  left: BscTestnetPtaWbnbPoolPredecessorTerminalBinding,
+  right: BscTestnetPtaWbnbPoolPredecessorTerminalBinding
+): boolean {
   return (
-    !durableSnapshotBlocked(snapshot) &&
-    exactAncestorFence(snapshot.ancestor) &&
-    generation2FenceSha256 !== null &&
-    exactEmptyActiveAndSubmission(snapshot) &&
-    snapshot.predecessor.status === "opened" &&
-    retained !== null &&
-    samePredecessorFence(retained, expectedFence)
+    left.status === right.status &&
+    left.generation === right.generation &&
+    left.predecessorClaimRawSha256 === right.predecessorClaimRawSha256 &&
+    left.predecessorTerminalRawSha256 === right.predecessorTerminalRawSha256 &&
+    left.predecessorEnvelopeHash === right.predecessorEnvelopeHash &&
+    left.inheritedFenceSha256 === right.inheritedFenceSha256 &&
+    left.predecessorAttemptId === right.predecessorAttemptId &&
+    left.phase === right.phase &&
+    left.issueCode === right.issueCode &&
+    left.outcomeDigest === right.outcomeDigest &&
+    left.workerAuthorizationOutcome === right.workerAuthorizationOutcome &&
+    left.workerStartOutcome === right.workerStartOutcome &&
+    left.signatureOutcome === right.signatureOutcome &&
+    left.submissionOutcome === right.submissionOutcome &&
+    left.submissionJournalState === right.submissionJournalState &&
+    left.recordedAt === right.recordedAt
   );
 }
 
 /**
- * Fixed production root. All six fixed LocalAppData namespaces are opened read-only before
- * release review, TTY input, custody, signing, or broadcasting. A claim-only predecessor may use
- * one invocation solely to append and reread its fence; a later invocation must obtain snapshot B
- * before any new owner authority can exist.
+ * Fixed production root. All eight fixed LocalAppData namespaces are opened read-only before
+ * release review, TTY input, custody, signing, or broadcasting. The exact immutable generation-4
+ * failed-before-worker terminal and exact-empty predecessor submission namespace are required
+ * before any fresh generation-5 owner authority can exist.
  */
 export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise<BscTestnetPtaWbnbPoolProductionRunResult> {
   let startup: DurableRecoverySnapshot;
@@ -345,15 +311,14 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
       "A fixed durable journal path, ACL, file identity, or retained sequence failed strict read-only recovery validation."
     );
   }
-  if (startup.active.status === "opened" || startup.submission.status === "opened") {
-    if (!exactAncestorFence(startup.ancestor) || exactChainPredecessorFence(startup) === null) {
+  const startupPredecessor = await exactCombinedPredecessorTerminal(startup, false);
+  if (startup.active.status === "opened" && startup.submission.status === "opened") {
+    if (startupPredecessor === null) {
       return blocked(
-        "PREDECESSOR_FENCE_INVALID",
-        "Generation-4 durable state exists without the exact immutable generation-1, generation-2, and generation-3 supersession chain."
+        "PREDECESSOR_TERMINAL_INVALID",
+        "Generation-5 durable state exists without the exact immutable generation-1 through generation-4 terminal lineage."
       );
     }
-  }
-  if (startup.active.status === "opened" && startup.submission.status === "opened") {
     try {
       const terminalRecovery =
         startup.submission.state.state === "submission_started" ||
@@ -388,144 +353,14 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
   if (!exactEmptyActiveAndSubmission(startup)) {
     return mixedRecoveryState(startup.active, startup.submission);
   }
-
-  if (!exactGeneration2Chain(startup) || startup.predecessor.status !== "opened") {
+  if (startupPredecessor === null || startup.predecessor.status !== "opened") {
     return blocked(
-      "PREDECESSOR_CLAIM_MISSING",
-      "The exact fenced generation-1 and generation-2 ancestors plus the generation-3 incident claim are required before recovery generation 4 can create fresh authority."
+      "PREDECESSOR_TERMINAL_MISSING",
+      "The exact generation-1 through generation-3 fence chain, generation-4 failed-before-worker terminal, and exact-empty predecessor submission namespaces are required before recovery generation 5 can create fresh authority."
     );
   }
-
-  let predecessorFence = exactChainPredecessorFence(startup);
-  let noEffectEnvelopeHash: Hex | null = predecessorFence?.noEffectEnvelopeHash ?? null;
-  let createdFenceThisInvocation = false;
-  if (predecessorFence === null) {
-    const candidate = await startup.predecessor.journal.readClaimOnlyRecoveryCandidate();
-    if (candidate === null) {
-      return blocked(
-        "PREDECESSOR_NOT_EXACT_CLAIM_ONLY",
-        "The predecessor journal is not the exact fixed claim-only incident state; supersession is permanently forbidden."
-      );
-    }
-
-    let noEffectPreparation: Awaited<
-      ReturnType<typeof prepareBscTestnetPtaWbnbPoolInitializationEnvelope>
-    >;
-    try {
-      noEffectPreparation = await prepareBscTestnetPtaWbnbPoolInitializationEnvelope();
-    } catch {
-      return blocked(
-        "NO_EFFECT_PROOF_RPC_FAILED",
-        "The fixed dual-RPC no-effect snapshot A could not be established; no fence or authority was created."
-      );
-    }
-    if (noEffectPreparation.status !== "observed") {
-      return blocked(
-        `NO_EFFECT_PROOF_${noEffectPreparation.reason.toUpperCase()}`,
-        noEffectPreparation.message
-      );
-    }
-    let noEffectDescriptor: ReturnType<typeof describeBscTestnetPtaWbnbPoolOneShotBoundary>;
-    try {
-      noEffectDescriptor = describeBscTestnetPtaWbnbPoolOneShotBoundary(
-        noEffectPreparation.envelope,
-        () => new Date()
-      );
-    } catch {
-      return blocked(
-        "NO_EFFECT_PROOF_ENVELOPE_INVALID",
-        "Snapshot A failed exact envelope validation; no predecessor fence was attempted."
-      );
-    }
-    if (noEffectDescriptor.status !== "prepared_non_authorizing") {
-      return blocked(
-        "NO_EFFECT_PROOF_ENVELOPE_INVALID",
-        "Snapshot A failed exact envelope validation; no predecessor fence was attempted."
-      );
-    }
-    const proof = noEffectProofFromObservedPreparation(noEffectPreparation);
-
-    let immediatelyBeforeFence: DurableRecoverySnapshot;
-    try {
-      immediatelyBeforeFence = await probeAllDurableRecoveryState();
-    } catch {
-      return blocked(
-        "PRE_FENCE_REREAD_FAILED",
-        "Durable state could not be reread immediately before the append-only fence."
-      );
-    }
-    const preFencePredecessor = immediatelyBeforeFence.predecessor;
-    const rereadCandidate =
-      preFencePredecessor.status === "opened"
-        ? await preFencePredecessor.journal.readClaimOnlyRecoveryCandidate()
-        : null;
-    if (
-      durableSnapshotBlocked(immediatelyBeforeFence) ||
-      !exactGeneration2Chain(immediatelyBeforeFence) ||
-      !exactEmptyActiveAndSubmission(immediatelyBeforeFence) ||
-      preFencePredecessor.status !== "opened" ||
-      rereadCandidate === null ||
-      rereadCandidate.predecessorClaimRawSha256 !== candidate.predecessorClaimRawSha256 ||
-      rereadCandidate.predecessorClaimRecordedAt !== candidate.predecessorClaimRecordedAt ||
-      rereadCandidate.predecessorAuthorizationExpiresAt !==
-        candidate.predecessorAuthorizationExpiresAt
-    ) {
-      return blocked(
-        "PRE_FENCE_STATE_CHANGED",
-        "The exact claim-only predecessor or exact-empty active/submission state changed before slot-2 O_EXCL."
-      );
-    }
-    try {
-      await preFencePredecessor.journal.fenceClaimBeforeWorker(
-        Object.freeze({
-          expectedPredecessorClaimRawSha256:
-            BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_CLAIM_RAW_SHA256,
-          proof
-        })
-      );
-      createdFenceThisInvocation = true;
-    } catch {
-      return blocked(
-        "PREDECESSOR_FENCE_RACE_OR_UNKNOWN",
-        "The append-only predecessor fence did not win slot 2 with a known created outcome; recovery authority remains forbidden."
-      );
-    }
-    noEffectEnvelopeHash = proof.envelopeHash;
-  }
-
-  let afterFence: DurableRecoverySnapshot;
-  try {
-    afterFence = await probeAllDurableRecoveryState();
-  } catch {
-    return blocked(
-      "POST_FENCE_REREAD_FAILED",
-      "The six durable namespaces could not be reread after the predecessor fence."
-    );
-  }
-  const retainedFence = exactChainPredecessorFence(afterFence);
-  if (
-    durableSnapshotBlocked(afterFence) ||
-    !exactAncestorFence(afterFence.ancestor) ||
-    !exactEmptyActiveAndSubmission(afterFence) ||
-    afterFence.predecessor.status !== "opened" ||
-    retainedFence === null ||
-    (predecessorFence !== null && !samePredecessorFence(retainedFence, predecessorFence)) ||
-    (noEffectEnvelopeHash !== null && retainedFence.noEffectEnvelopeHash !== noEffectEnvelopeHash)
-  ) {
-    return blocked(
-      "POST_FENCE_STATE_INVALID",
-      "The exact immutable generation-3 fence plus empty generation-4 and old/new submission namespaces was not retained."
-    );
-  }
-  predecessorFence = retainedFence;
-  if (createdFenceThisInvocation) {
-    return blocked(
-      "PREDECESSOR_FENCE_RECORDED_RESTART_REQUIRED",
-      "The exact predecessor fence was durably recorded and reread. Start a new invocation before snapshot B, policy, owner authority, custody, or generation-4 claim."
-    );
-  }
-  const fixedPredecessorFence = predecessorFence;
-  const legacySigningJournal = afterFence.predecessor.journal;
+  const fixedPredecessorTerminal = startupPredecessor;
+  const predecessorSigningJournal = startup.predecessor.journal;
 
   let preAuthorizationBridge: Awaited<
     ReturnType<typeof createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeForInternalUse>
@@ -571,13 +406,13 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
     return blocked(`COORDINATOR_${prepared.reason.toUpperCase()}`, prepared.message);
   }
   if (
-    prepared.envelope.envelopeHash === fixedPredecessorFence.noEffectEnvelopeHash ||
+    prepared.envelope.envelopeHash === fixedPredecessorTerminal.predecessorEnvelopeHash ||
     Date.parse(prepared.envelope.observation.observedAt) <=
-      Date.parse(fixedPredecessorFence.fenceRecordedAt)
+      Date.parse(fixedPredecessorTerminal.recordedAt)
   ) {
     return blocked(
-      "EXECUTION_ENVELOPE_NOT_AFTER_FENCE",
-      "Execution snapshot B is not distinct from and strictly later than the retained no-effect fence snapshot A."
+      "EXECUTION_ENVELOPE_NOT_AFTER_TERMINAL",
+      "The fresh execution snapshot is not distinct from and strictly later than the retained generation-4 terminal."
     );
   }
   let descriptor: ReturnType<typeof describeBscTestnetPtaWbnbPoolOneShotBoundary>;
@@ -602,7 +437,7 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
         envelopeHash: descriptor.envelopeHash,
         executionEnvelopeObservedAt: prepared.envelope.observation.observedAt,
         expiresAt: descriptor.envelopeExpiresAt,
-        predecessorFence: fixedPredecessorFence
+        predecessorTerminal: fixedPredecessorTerminal
       })
     );
   } catch {
@@ -633,13 +468,17 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
   } catch {
     return blocked(
       "POST_OWNER_DURABLE_REREAD_FAILED",
-      "The six durable namespaces could not be reread after owner confirmation."
+      "The eight durable namespaces could not be reread after owner confirmation."
     );
   }
-  if (!retainsExactFreshPrerequisites(afterOwnerTty, fixedPredecessorFence)) {
+  const afterOwnerTerminal = await exactCombinedPredecessorTerminal(afterOwnerTty);
+  if (
+    afterOwnerTerminal === null ||
+    !samePredecessorTerminal(afterOwnerTerminal, fixedPredecessorTerminal)
+  ) {
     return blocked(
       "POST_OWNER_DURABLE_STATE_CHANGED",
-      "The predecessor fence or active/submission emptiness changed after owner confirmation; activation is forbidden."
+      "The predecessor terminal or active/submission emptiness changed after owner confirmation; activation is forbidden."
     );
   }
   let activation: Awaited<ReturnType<typeof preAuthorizationBridge.activateAfterCeremony>>;
@@ -657,20 +496,28 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
 
   try {
     const afterActivation = await probeAllDurableRecoveryState();
-    if (!retainsExactFreshPrerequisites(afterActivation, fixedPredecessorFence)) {
+    const afterActivationTerminal = await exactCombinedPredecessorTerminal(afterActivation);
+    if (
+      afterActivationTerminal === null ||
+      !samePredecessorTerminal(afterActivationTerminal, fixedPredecessorTerminal)
+    ) {
       return blocked(
         "POST_ACTIVATION_DURABLE_STATE_CHANGED",
-        "The predecessor fence or empty active/submission state changed during native activation."
+        "The predecessor terminal or empty active/submission state changed during native activation."
       );
     }
     const broadcastBundle = await createBscTestnetPtaWbnbPoolPrivateBroadcasterForInternalUse(
       activation.bridge
     );
     const beforeComposition = await probeAllDurableRecoveryState();
-    if (!retainsExactFreshPrerequisites(beforeComposition, fixedPredecessorFence)) {
+    const beforeCompositionTerminal = await exactCombinedPredecessorTerminal(beforeComposition);
+    if (
+      beforeCompositionTerminal === null ||
+      !samePredecessorTerminal(beforeCompositionTerminal, fixedPredecessorTerminal)
+    ) {
       return blocked(
         "PRE_COMPOSITION_DURABLE_STATE_CHANGED",
-        "The predecessor fence or empty active/submission state changed before the generation-4 claim."
+        "The predecessor terminal or empty active/submission state changed before the generation-5 claim."
       );
     }
     return createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
@@ -679,7 +526,10 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
         intent: activation.bridge.intent,
         executionCapability: activation.bridge.executionCapability,
         authenticateAuthorizedIntent: activation.bridge.authenticateAuthorizedIntent,
-        legacySigningJournal,
+        predecessorSigningJournal,
+        predecessorTerminal: fixedPredecessorTerminal,
+        probePredecessorSubmission:
+          probeWindowsBscTestnetPtaWbnbPoolGeneration3SubmissionJournalForInternalUse,
         signingJournal: activation.bridge.signingJournal,
         submissionJournal: broadcastBundle.submissionJournal,
         issueWorker: activation.bridge.issueWorker,

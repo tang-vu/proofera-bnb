@@ -33,7 +33,11 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
   BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
@@ -42,21 +46,21 @@ import {
 export const BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_RUNTIME_MANIFEST_DOMAIN =
   "ProofEra:bsc-testnet-pta-wbnb-pool-production-runtime-manifest:v2" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_SUBJECT_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-subject:v4" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-subject:v5" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_POLICY_DIGEST_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-policy:v4" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-policy:v5" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RUNTIME_REVIEW_INSTANTIATION_DIGEST_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-runtime-review-instantiation:v4" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-runtime-review-instantiation:v5" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_CHALLENGE_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-challenge:v5" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-challenge:v6" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_FRAME_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-frame:v5" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-frame:v6" as const;
 
 const POLICY_KIND =
-  "owner_designated_internal_multi_agent_release_review_policy_generation_4_v4" as const;
-const POLICY_DECISION = "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_4_POLICY" as const;
+  "owner_designated_internal_multi_agent_release_review_policy_generation_5_v5" as const;
+const POLICY_DECISION = "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_5_POLICY" as const;
 const REVIEWER_DECISION = "GO_WITH_ZERO_P0_AND_ZERO_P1" as const;
-const INSTANTIATION_KIND = "automated_release_policy_recovery_envelope_instantiation_v4" as const;
+const INSTANTIATION_KIND = "automated_release_policy_recovery_envelope_instantiation_v5" as const;
 const BYTES32 = /^0x[0-9a-f]{64}$/u;
 const GIT_OBJECT = /^[0-9a-f]{40}$/u;
 const UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u;
@@ -113,6 +117,9 @@ const CAPS_KEYS = [
   "postRecheckExecutionReserveSeconds",
   "maximumPostClaimRecheckAgeSeconds",
   "predecessorClaimRawSha256",
+  "predecessorTerminalRawSha256",
+  "predecessorFailedBeforeWorkerOutcomeDigest",
+  "inheritedPredecessorFenceSha256",
   "recoveryGeneration"
 ] as const;
 const SCOPE_KEYS = [
@@ -128,17 +135,17 @@ const SCOPE_KEYS = [
   "initializerHasNoDeadline",
   "publicMempoolCanRace",
   "priceIsMarketPriceOraclePegOrValuation",
-  "predecessorAppendOnlyFenceRequired",
-  "predecessorNoEffectProofRequired",
+  "predecessorTerminalRecordRequired",
+  "predecessorFailedBeforeWorkerEvidenceRequired",
   "predecessorSignatureOutcomeRequired",
   "predecessorStateRequired",
-  "predecessorSubmissionJournalStateRequired",
+  "predecessorSubmissionV3JournalStateRequired",
   "predecessorSubmissionOutcomeRequired",
-  "predecessorTerminalCodeRequired",
+  "predecessorIssueCodeRequired",
+  "predecessorPhaseRequired",
   "predecessorWorkerAuthorizationOutcomeRequired",
   "predecessorWorkerStartOutcomeRequired",
-  "fenceObservationMayBeReusedAsExecutionEnvelope",
-  "freshEnvelopeAfterFenceRequired"
+  "freshEnvelopeAfterTerminalRequired"
 ] as const;
 const REVIEWER_KEYS = [
   "taskLabel",
@@ -179,24 +186,27 @@ const INSTANTIATION_INPUT_KEYS = [
   "envelopeHash",
   "executionEnvelopeObservedAt",
   "expiresAt",
-  "predecessorFence"
+  "predecessorTerminal"
 ] as const;
-const PREDECESSOR_FENCE_KEYS = [
-  "fenceRecordedAt",
+const PREDECESSOR_TERMINAL_KEYS = [
+  "generation",
+  "inheritedFenceSha256",
+  "issueCode",
+  "outcomeDigest",
+  "phase",
+  "predecessorAttemptId",
   "predecessorClaimRawSha256",
-  "noEffectEnvelopeHash",
-  "noEffectObservedAt",
-  "noEffectProofDigest",
-  "predecessorFenceSha256",
+  "predecessorEnvelopeHash",
+  "predecessorTerminalRawSha256",
+  "recordedAt",
   "signatureOutcome",
   "status",
   "submissionJournalState",
   "submissionOutcome",
-  "terminalCode",
   "workerAuthorizationOutcome",
   "workerStartOutcome"
 ] as const;
-const RUNTIME_RECOVERY_KEYS = ["generation", "predecessorFence"] as const;
+const RUNTIME_RECOVERY_KEYS = ["generation", "predecessorTerminal"] as const;
 const INSTANTIATION_EXPECTED_BINDING_KEYS = [
   "releaseCommit",
   "releaseTree",
@@ -232,7 +242,7 @@ export interface BscTestnetPtaWbnbPoolExactReleaseIdentity {
 }
 
 export interface BscTestnetPtaWbnbPoolReleaseReviewPolicy {
-  readonly schemaVersion: 4;
+  readonly schemaVersion: 5;
   readonly kind: typeof POLICY_KIND;
   readonly decision: typeof POLICY_DECISION;
   readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
@@ -262,13 +272,16 @@ export interface BscTestnetPtaWbnbPoolReleaseReviewPolicy {
     maximumTotalCostWei: "18000000000000000";
     maximumEnvelopeLifetimeSeconds: "300";
     maximumOwnerConfirmationWindowSeconds: "240";
-    maximumExecutionAuthorityLifetimeSeconds: "60";
-    minimumRemainingBeforeClaimSeconds: "50";
-    maximumPostConfirmationPreclaimSeconds: "10";
+    maximumExecutionAuthorityLifetimeSeconds: "120";
+    minimumRemainingBeforeClaimSeconds: "60";
+    maximumPostConfirmationPreclaimSeconds: "60";
     postRecheckExecutionReserveSeconds: "20";
     maximumPostClaimRecheckAgeSeconds: "30";
-    recoveryGeneration: "4";
+    recoveryGeneration: "5";
     predecessorClaimRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256;
+    predecessorTerminalRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256;
+    predecessorFailedBeforeWorkerOutcomeDigest: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST;
+    inheritedPredecessorFenceSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256;
   }>;
   readonly scope: Readonly<{
     exactFreshEnvelopeRequired: true;
@@ -283,17 +296,17 @@ export interface BscTestnetPtaWbnbPoolReleaseReviewPolicy {
     initializerHasNoDeadline: true;
     publicMempoolCanRace: true;
     priceIsMarketPriceOraclePegOrValuation: false;
-    predecessorAppendOnlyFenceRequired: true;
-    predecessorNoEffectProofRequired: true;
+    predecessorTerminalRecordRequired: true;
+    predecessorFailedBeforeWorkerEvidenceRequired: true;
     predecessorStateRequired: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE;
-    predecessorTerminalCodeRequired: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN";
+    predecessorIssueCodeRequired: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN";
+    predecessorPhaseRequired: "post_claim_recheck";
     predecessorWorkerAuthorizationOutcomeRequired: "not_attempted";
     predecessorWorkerStartOutcomeRequired: "not_attempted";
     predecessorSignatureOutcomeRequired: "not_attempted";
-    predecessorSubmissionJournalStateRequired: "exact_empty";
+    predecessorSubmissionV3JournalStateRequired: "exact_empty";
     predecessorSubmissionOutcomeRequired: "not_attempted";
-    fenceObservationMayBeReusedAsExecutionEnvelope: false;
-    freshEnvelopeAfterFenceRequired: true;
+    freshEnvelopeAfterTerminalRequired: true;
   }>;
   readonly reviewedSubjectSha256: Hex;
   readonly implementationAgentIdentity: string;
@@ -320,29 +333,32 @@ export interface BscTestnetPtaWbnbPoolReleaseReviewPolicy {
   readonly policyDigest: Hex;
 }
 
-export interface BscTestnetPtaWbnbPoolPredecessorFenceBinding {
+export interface BscTestnetPtaWbnbPoolPredecessorTerminalBinding {
   readonly status: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE;
-  readonly terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN";
+  readonly generation: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION;
+  readonly predecessorClaimRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256;
+  readonly predecessorTerminalRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256;
+  readonly predecessorEnvelopeHash: Hex;
+  readonly inheritedFenceSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256;
+  readonly predecessorAttemptId: Hex;
+  readonly phase: "post_claim_recheck";
+  readonly issueCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN";
+  readonly outcomeDigest: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST;
   readonly workerAuthorizationOutcome: "not_attempted";
   readonly workerStartOutcome: "not_attempted";
   readonly signatureOutcome: "not_attempted";
   readonly submissionOutcome: "not_attempted";
   readonly submissionJournalState: "exact_empty";
-  readonly fenceRecordedAt: string;
-  readonly predecessorClaimRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256;
-  readonly noEffectProofDigest: Hex;
-  readonly noEffectEnvelopeHash: Hex;
-  readonly noEffectObservedAt: string;
-  readonly predecessorFenceSha256: Hex;
+  readonly recordedAt: string;
 }
 
 export interface BscTestnetPtaWbnbPoolRuntimeReviewRecoveryBinding {
   readonly generation: typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
-  readonly predecessorFence: BscTestnetPtaWbnbPoolPredecessorFenceBinding;
+  readonly predecessorTerminal: BscTestnetPtaWbnbPoolPredecessorTerminalBinding;
 }
 
 export interface BscTestnetPtaWbnbPoolRuntimeReviewInstantiation {
-  readonly schemaVersion: 4;
+  readonly schemaVersion: 5;
   readonly kind: typeof INSTANTIATION_KIND;
   readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
   readonly policyDigest: Hex;
@@ -498,47 +514,53 @@ function exactUtc(value: unknown): Readonly<{ iso: string; milliseconds: number 
     : null;
 }
 
-function parsePredecessorFence(
+function parsePredecessorTerminal(
   value: unknown,
   requireFrozen = true
-): BscTestnetPtaWbnbPoolPredecessorFenceBinding | null {
-  const fence = inspectExactRecord(value, PREDECESSOR_FENCE_KEYS);
-  const noEffectObservedAt = fence === null ? null : exactUtc(fence.noEffectObservedAt);
-  const fenceRecordedAt = fence === null ? null : exactUtc(fence.fenceRecordedAt);
+): BscTestnetPtaWbnbPoolPredecessorTerminalBinding | null {
+  const terminal = inspectExactRecord(value, PREDECESSOR_TERMINAL_KEYS);
+  const recordedAt = terminal === null ? null : exactUtc(terminal.recordedAt);
   if (
-    fence === null ||
+    terminal === null ||
     (requireFrozen && !Object.isFrozen(value)) ||
-    fence.status !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE ||
-    fence.terminalCode !== "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" ||
-    fence.workerAuthorizationOutcome !== "not_attempted" ||
-    fence.workerStartOutcome !== "not_attempted" ||
-    fence.signatureOutcome !== "not_attempted" ||
-    fence.submissionOutcome !== "not_attempted" ||
-    fence.submissionJournalState !== "exact_empty" ||
-    fenceRecordedAt === null ||
-    fence.predecessorClaimRawSha256 !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256 ||
-    !exactBytes32(fence.noEffectProofDigest) ||
-    !exactBytes32(fence.noEffectEnvelopeHash) ||
-    noEffectObservedAt === null ||
-    fenceRecordedAt.milliseconds <= noEffectObservedAt.milliseconds ||
-    !exactBytes32(fence.predecessorFenceSha256)
+    terminal.status !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE ||
+    terminal.generation !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION ||
+    terminal.predecessorClaimRawSha256 !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256 ||
+    terminal.predecessorTerminalRawSha256 !==
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256 ||
+    !exactBytes32(terminal.predecessorEnvelopeHash) ||
+    terminal.inheritedFenceSha256 !== BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256 ||
+    !exactBytes32(terminal.predecessorAttemptId) ||
+    terminal.phase !== "post_claim_recheck" ||
+    terminal.issueCode !== "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" ||
+    terminal.outcomeDigest !==
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST ||
+    terminal.workerAuthorizationOutcome !== "not_attempted" ||
+    terminal.workerStartOutcome !== "not_attempted" ||
+    terminal.signatureOutcome !== "not_attempted" ||
+    terminal.submissionOutcome !== "not_attempted" ||
+    terminal.submissionJournalState !== "exact_empty" ||
+    recordedAt === null
   ) {
     return null;
   }
   return Object.freeze({
     status: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
-    terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
+    generation: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION,
+    predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
+    predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
+    predecessorEnvelopeHash: terminal.predecessorEnvelopeHash,
+    inheritedFenceSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256,
+    predecessorAttemptId: terminal.predecessorAttemptId,
+    phase: "post_claim_recheck",
+    issueCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
+    outcomeDigest: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
     workerAuthorizationOutcome: "not_attempted",
     workerStartOutcome: "not_attempted",
     signatureOutcome: "not_attempted",
     submissionOutcome: "not_attempted",
     submissionJournalState: "exact_empty",
-    fenceRecordedAt: fenceRecordedAt.iso,
-    predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
-    noEffectProofDigest: fence.noEffectProofDigest,
-    noEffectEnvelopeHash: fence.noEffectEnvelopeHash,
-    noEffectObservedAt: noEffectObservedAt.iso,
-    predecessorFenceSha256: fence.predecessorFenceSha256
+    recordedAt: recordedAt.iso
   });
 }
 
@@ -547,11 +569,13 @@ function parseRuntimeRecovery(
   requireFrozen = true
 ): BscTestnetPtaWbnbPoolRuntimeReviewRecoveryBinding | null {
   const recovery = inspectExactRecord(value, RUNTIME_RECOVERY_KEYS);
-  const predecessorFence =
-    recovery === null ? null : parsePredecessorFence(recovery.predecessorFence, requireFrozen);
+  const predecessorTerminal =
+    recovery === null
+      ? null
+      : parsePredecessorTerminal(recovery.predecessorTerminal, requireFrozen);
   if (
     recovery === null ||
-    predecessorFence === null ||
+    predecessorTerminal === null ||
     (requireFrozen && !Object.isFrozen(value)) ||
     recovery.generation !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
   ) {
@@ -559,7 +583,7 @@ function parseRuntimeRecovery(
   }
   return Object.freeze({
     generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
-    predecessorFence
+    predecessorTerminal
   });
 }
 
@@ -826,17 +850,21 @@ function exactCaps(): BscTestnetPtaWbnbPoolReleaseReviewPolicy["caps"] {
     maximumOwnerConfirmationWindowSeconds:
       BSC_TESTNET_PTA_WBNB_POOL_OWNER_CONFIRMATION_WINDOW_SECONDS.toString() as "240",
     maximumExecutionAuthorityLifetimeSeconds:
-      BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS.toString() as "60",
+      BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS.toString() as "120",
     minimumRemainingBeforeClaimSeconds:
-      BSC_TESTNET_PTA_WBNB_POOL_MINIMUM_REMAINING_BEFORE_CLAIM_SECONDS.toString() as "50",
+      BSC_TESTNET_PTA_WBNB_POOL_MINIMUM_REMAINING_BEFORE_CLAIM_SECONDS.toString() as "60",
     maximumPostConfirmationPreclaimSeconds:
-      BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_POST_CONFIRMATION_PRECLAIM_SECONDS.toString() as "10",
+      BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_POST_CONFIRMATION_PRECLAIM_SECONDS.toString() as "60",
     postRecheckExecutionReserveSeconds:
       BSC_TESTNET_PTA_WBNB_POOL_POST_RECHECK_EXECUTION_RESERVE_SECONDS.toString() as "20",
     maximumPostClaimRecheckAgeSeconds:
       BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS.toString() as "30",
-    recoveryGeneration: "4",
-    predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256
+    recoveryGeneration: "5",
+    predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
+    predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
+    predecessorFailedBeforeWorkerOutcomeDigest:
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+    inheritedPredecessorFenceSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256
   });
 }
 
@@ -854,17 +882,17 @@ function exactScope(): BscTestnetPtaWbnbPoolReleaseReviewPolicy["scope"] {
     initializerHasNoDeadline: true,
     publicMempoolCanRace: true,
     priceIsMarketPriceOraclePegOrValuation: false,
-    predecessorAppendOnlyFenceRequired: true,
-    predecessorNoEffectProofRequired: true,
+    predecessorTerminalRecordRequired: true,
+    predecessorFailedBeforeWorkerEvidenceRequired: true,
     predecessorStateRequired: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
-    predecessorTerminalCodeRequired: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
+    predecessorIssueCodeRequired: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
+    predecessorPhaseRequired: "post_claim_recheck",
     predecessorWorkerAuthorizationOutcomeRequired: "not_attempted",
     predecessorWorkerStartOutcomeRequired: "not_attempted",
     predecessorSignatureOutcomeRequired: "not_attempted",
-    predecessorSubmissionJournalStateRequired: "exact_empty",
+    predecessorSubmissionV3JournalStateRequired: "exact_empty",
     predecessorSubmissionOutcomeRequired: "not_attempted",
-    fenceObservationMayBeReusedAsExecutionEnvelope: false,
-    freshEnvelopeAfterFenceRequired: true
+    freshEnvelopeAfterTerminalRequired: true
   });
 }
 
@@ -951,7 +979,7 @@ function parsePolicyBody(
     reviewedAt === null ||
     expiresAt === null ||
     expectedSubjectDigest === null ||
-    policy.schemaVersion !== 4 ||
+    policy.schemaVersion !== 5 ||
     policy.kind !== POLICY_KIND ||
     policy.decision !== POLICY_DECISION ||
     policy.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
@@ -1011,7 +1039,7 @@ function parsePolicyBody(
     }
   }
   return Object.freeze({
-    schemaVersion: 4,
+    schemaVersion: 5,
     kind: POLICY_KIND,
     decision: POLICY_DECISION,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -1084,12 +1112,10 @@ function buildInstantiation(
   now: number
 ): BscTestnetPtaWbnbPoolRuntimeReviewInstantiation | null {
   const record = inspectExactRecord(input, INSTANTIATION_INPUT_KEYS);
-  const predecessorFence =
-    record === null ? null : parsePredecessorFence(record.predecessorFence, true);
-  const noEffectObservedAt =
-    predecessorFence === null ? null : exactUtc(predecessorFence.noEffectObservedAt);
-  const fenceRecordedAt =
-    predecessorFence === null ? null : exactUtc(predecessorFence.fenceRecordedAt);
+  const predecessorTerminal =
+    record === null ? null : parsePredecessorTerminal(record.predecessorTerminal, true);
+  const predecessorRecordedAt =
+    predecessorTerminal === null ? null : exactUtc(predecessorTerminal.recordedAt);
   const executionEnvelopeObservedAt =
     record === null ? null : exactUtc(record.executionEnvelopeObservedAt);
   const envelopeExpiry = record === null ? null : exactUtc(record.expiresAt);
@@ -1097,18 +1123,16 @@ function buildInstantiation(
   const policyExpiry = exactUtc(policy.expiresAt);
   if (
     record === null ||
-    predecessorFence === null ||
-    noEffectObservedAt === null ||
-    fenceRecordedAt === null ||
+    predecessorTerminal === null ||
+    predecessorRecordedAt === null ||
     executionEnvelopeObservedAt === null ||
     !Object.isFrozen(input) ||
     envelopeExpiry === null ||
     policyReviewedAt === null ||
     policyExpiry === null ||
     !exactBytes32(record.envelopeHash) ||
-    record.envelopeHash === predecessorFence.noEffectEnvelopeHash ||
-    noEffectObservedAt.milliseconds >= fenceRecordedAt.milliseconds ||
-    fenceRecordedAt.milliseconds >= executionEnvelopeObservedAt.milliseconds ||
+    record.envelopeHash === predecessorTerminal.predecessorEnvelopeHash ||
+    predecessorRecordedAt.milliseconds >= executionEnvelopeObservedAt.milliseconds ||
     executionEnvelopeObservedAt.milliseconds > now ||
     now < policyReviewedAt.milliseconds ||
     now >= policyExpiry.milliseconds ||
@@ -1120,7 +1144,7 @@ function buildInstantiation(
     return null;
   }
   const body = Object.freeze({
-    schemaVersion: 4 as const,
+    schemaVersion: 5 as const,
     kind: INSTANTIATION_KIND,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     policyDigest: policy.policyDigest,
@@ -1130,7 +1154,7 @@ function buildInstantiation(
     reviewedSubjectSha256: policy.reviewedSubjectSha256,
     recovery: Object.freeze({
       generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
-      predecessorFence
+      predecessorTerminal
     }),
     reviewerTaskLabels: Object.freeze(policy.reviewers.map((reviewer) => reviewer.taskLabel)),
     policyReviewedAt: policy.reviewedAt,
@@ -1261,8 +1285,8 @@ function parseExpectedInstantiationBinding(
   const recovery = binding === null ? null : parseRuntimeRecovery(binding.recovery, true);
   const executionEnvelopeObservedAt =
     binding === null ? null : exactUtc(binding.executionEnvelopeObservedAt);
-  const fenceRecordedAt =
-    recovery === null ? null : exactUtc(recovery.predecessorFence.fenceRecordedAt);
+  const predecessorRecordedAt =
+    recovery === null ? null : exactUtc(recovery.predecessorTerminal.recordedAt);
   if (
     binding === null ||
     !Object.isFrozen(value) ||
@@ -1275,8 +1299,8 @@ function parseExpectedInstantiationBinding(
     !exactBytes32(binding.reviewedSubjectSha256) ||
     recovery === null ||
     executionEnvelopeObservedAt === null ||
-    fenceRecordedAt === null ||
-    executionEnvelopeObservedAt.milliseconds <= fenceRecordedAt.milliseconds ||
+    predecessorRecordedAt === null ||
+    executionEnvelopeObservedAt.milliseconds <= predecessorRecordedAt.milliseconds ||
     !exactBytes32(binding.envelopeHash) ||
     expiresAt === null ||
     !exactBytes32(binding.instantiationDigest)
@@ -1305,8 +1329,8 @@ function sameExpectedInstantiationBinding(
   return (
     scalarKeys.every((key) => left[key] === right[key]) &&
     left.recovery.generation === right.recovery.generation &&
-    PREDECESSOR_FENCE_KEYS.every(
-      (key) => left.recovery.predecessorFence[key] === right.recovery.predecessorFence[key]
+    PREDECESSOR_TERMINAL_KEYS.every(
+      (key) => left.recovery.predecessorTerminal[key] === right.recovery.predecessorTerminal[key]
     )
   );
 }
@@ -1847,7 +1871,7 @@ export async function readBscTestnetPtaWbnbPoolReleaseReviewPolicyFromControllin
 }
 
 /**
- * Exercises only the untrusted bounded transport decoder (introduced in v2, current domain v5) in
+ * Exercises only the untrusted bounded transport decoder (introduced in v2, current domain v6) in
  * adversarial tests. It cannot parse or admit a policy, access the production WeakMap, or create an
  * authority-bearing realm.
  */

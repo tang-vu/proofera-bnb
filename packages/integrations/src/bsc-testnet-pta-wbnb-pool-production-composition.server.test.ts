@@ -37,7 +37,12 @@ vi.mock("./bsc-testnet-pta-wbnb-pool-submission-reconciler.server", async (impor
 });
 
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ATTEMPT_ID,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ENVELOPE_HASH,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   buildBscTestnetPtaWbnbPoolExactSigningTransaction
@@ -52,7 +57,8 @@ import {
 import type {
   BscTestnetPtaWbnbPoolLocalJournal,
   BscTestnetPtaWbnbPoolLocalJournalRecoveryReader,
-  BscTestnetPtaWbnbPoolLegacyLocalJournalRecoveryReader,
+  BscTestnetPtaWbnbPoolPredecessorLocalJournalRecoveryReader,
+  BscTestnetPtaWbnbPoolPredecessorTerminalState,
   BscTestnetPtaWbnbPoolLocalJournalState
 } from "./bsc-testnet-pta-wbnb-pool-local-journal.server";
 import type { BscTestnetPtaWbnbPoolPrivateBroadcaster } from "./bsc-testnet-pta-wbnb-pool-private-broadcaster.server";
@@ -64,9 +70,8 @@ const COMPOSITION_SOURCE = readFileSync(
   "utf8"
 );
 
-const PREDECESSOR_FENCE_SHA256 = `0x${"51".repeat(32)}` as const;
-const NO_EFFECT_PROOF_DIGEST = `0x${"52".repeat(32)}` as const;
-const NO_EFFECT_ENVELOPE_HASH = `0x${"53".repeat(32)}` as const;
+const PREDECESSOR_TERMINAL_RAW_SHA256 =
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256;
 const ATTEMPT_ID = `0x${"54".repeat(32)}` as const;
 
 const EMPTY_SIGNING_STATE: BscTestnetPtaWbnbPoolLocalJournalState = Object.freeze({
@@ -84,6 +89,7 @@ const EMPTY_SIGNING_STATE: BscTestnetPtaWbnbPoolLocalJournalState = Object.freez
   generation: null,
   predecessorState: null,
   predecessorFenceSha256: null,
+  predecessorTerminalRawSha256: null,
   attemptId: null,
   gasLimit: null,
   gasPriceWei: null,
@@ -95,25 +101,27 @@ const EMPTY_SIGNING_STATE: BscTestnetPtaWbnbPoolLocalJournalState = Object.freez
   supersessionFence: null
 });
 
-const LEGACY_FENCE_STATE: BscTestnetPtaWbnbPoolLocalJournalState = Object.freeze({
-  ...EMPTY_SIGNING_STATE,
-  status: "superseded_before_worker",
-  generation: 3,
-  supersessionFence: Object.freeze({
-    status: "superseded_before_worker",
-    terminalCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
-    workerAuthorizationOutcome: "not_attempted",
-    workerStartOutcome: "not_attempted",
-    signatureOutcome: "not_attempted",
-    submissionOutcome: "not_attempted",
-    submissionJournalState: "exact_empty",
-    predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
-    noEffectProofDigest: NO_EFFECT_PROOF_DIGEST,
-    noEffectEnvelopeHash: NO_EFFECT_ENVELOPE_HASH,
-    noEffectObservedAt: "2026-08-13T07:59:40.000Z",
-    fenceRecordedAt: "2026-08-13T07:59:45.000Z",
-    predecessorFenceSha256: PREDECESSOR_FENCE_SHA256
-  })
+const PREDECESSOR_TERMINAL_LOCAL: BscTestnetPtaWbnbPoolPredecessorTerminalState = Object.freeze({
+  status: "failed_before_worker",
+  generation: 4,
+  predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_CLAIM_RAW_SHA256,
+  predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
+  predecessorEnvelopeHash: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ENVELOPE_HASH,
+  inheritedFenceSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256,
+  predecessorAttemptId: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ATTEMPT_ID,
+  phase: "post_claim_recheck",
+  issueCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
+  outcomeDigest: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+  workerAuthorizationOutcome: "not_attempted",
+  workerStartOutcome: "not_attempted",
+  signatureOutcome: "not_attempted",
+  recordedAt: "2026-08-13T07:59:45.000Z"
+});
+
+const PREDECESSOR_TERMINAL = Object.freeze({
+  ...PREDECESSOR_TERMINAL_LOCAL,
+  submissionOutcome: "not_attempted" as const,
+  submissionJournalState: "exact_empty" as const
 });
 
 function localJournalStub(
@@ -132,16 +140,15 @@ function localJournalStub(
   };
 }
 
-function legacyJournalStub(
-  readStrictRecoveryState: () => Promise<BscTestnetPtaWbnbPoolLocalJournalState | null> = vi.fn(
-    async () => LEGACY_FENCE_STATE
+function predecessorJournalStub(
+  readExactTerminalRecoveryBinding: () => Promise<BscTestnetPtaWbnbPoolPredecessorTerminalState | null> = vi.fn(
+    async () => PREDECESSOR_TERMINAL_LOCAL
   )
-): BscTestnetPtaWbnbPoolLegacyLocalJournalRecoveryReader {
+): BscTestnetPtaWbnbPoolPredecessorLocalJournalRecoveryReader {
   return {
-    readClaimOnlyRecoveryCandidate: vi.fn(async () => null),
-    fenceClaimBeforeWorker: vi.fn(),
-    readState: vi.fn(async () => LEGACY_FENCE_STATE),
-    readStrictRecoveryState
+    readState: vi.fn(async () => EMPTY_SIGNING_STATE),
+    readStrictRecoveryState: vi.fn(async () => EMPTY_SIGNING_STATE),
+    readExactTerminalRecoveryBinding
   };
 }
 
@@ -167,7 +174,14 @@ function inertPorts(
       throw new Error("execution capability must remain unreachable");
     },
     authenticateAuthorizedIntent: vi.fn(() => false),
-    legacySigningJournal: legacyJournalStub(),
+    predecessorSigningJournal: predecessorJournalStub(),
+    predecessorTerminal: PREDECESSOR_TERMINAL,
+    probePredecessorSubmission: vi.fn(async () => ({
+      status: "ready" as const,
+      presence: "empty" as const,
+      files: Object.freeze([]),
+      issue: null
+    })),
     signingJournal: localJournalStub(vi.fn(async () => signingState)),
     submissionJournal: {
       initializeSignedCommit: vi.fn(),
@@ -226,13 +240,13 @@ function retainedTerminalPair(
     reviewerApprovalDigest: `0x${"49".repeat(32)}` as const,
     ownerAuthorizationDigest: `0x${"4a".repeat(32)}` as const,
     recovery: Object.freeze({
-      generation: 4 as const,
-      predecessorState: "superseded_before_worker" as const,
-      predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
+      generation: 5 as const,
+      predecessorState: "failed_before_worker" as const,
+      predecessorTerminalRawSha256: PREDECESSOR_TERMINAL_RAW_SHA256,
       attemptId: ATTEMPT_ID
     }),
     authenticatedAt: "2026-08-13T08:00:10.000Z",
-    expiresAt: "2026-08-13T08:00:40.000Z",
+    expiresAt: "2026-08-13T08:02:10.000Z",
     transaction: Object.freeze({
       signedTransaction: "0x01" as const,
       transactionHash,
@@ -265,9 +279,9 @@ function retainedTerminalPair(
       gasPriceWei: capability.transaction.gasPriceWei,
       maxCostWei: capability.transaction.maximumCostWei,
       signingHash: capability.transaction.signingHash,
-      generation: 4,
-      predecessorState: "superseded_before_worker",
-      predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
+      generation: 5,
+      predecessorState: "failed_before_worker",
+      predecessorTerminalRawSha256: PREDECESSOR_TERMINAL_RAW_SHA256,
       attemptId: ATTEMPT_ID
     })
   });
@@ -295,25 +309,17 @@ describe("PTA/WBNB fresh production composition", () => {
     expect(harness.issueWorker).not.toHaveBeenCalled();
   });
 
-  it("rejects a mutated predecessor fence before reading activated owner authority", async () => {
+  it("rejects a mutated predecessor terminal before reading activated owner authority", async () => {
     const harness = inertPorts({ state: "empty" });
-    const retainedFence = LEGACY_FENCE_STATE.supersessionFence;
-    if (retainedFence === null) throw new Error("Legacy fence fixture is unavailable.");
-    vi.mocked(harness.ports.legacySigningJournal.readStrictRecoveryState).mockResolvedValueOnce(
-      Object.freeze({
-        ...LEGACY_FENCE_STATE,
-        supersessionFence: Object.freeze({
-          ...retainedFence,
-          predecessorClaimRawSha256: `0x${"55".repeat(32)}`
-        })
-      })
-    );
+    vi.mocked(
+      harness.ports.predecessorSigningJournal.readExactTerminalRecoveryBinding
+    ).mockResolvedValueOnce(null);
 
     await expect(
       createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(harness.ports).runOnce({})
     ).resolves.toMatchObject({
       status: "blocked",
-      code: "LEGACY_SUPERSESSION_FENCE_CHANGED_AFTER_OWNER_CONFIRMATION"
+      code: "PREDECESSOR_TERMINAL_CHANGED_AFTER_OWNER_CONFIRMATION"
     });
     expect(harness.intentReads()).toBe(0);
     expect(harness.issueWorker).not.toHaveBeenCalled();
@@ -347,7 +353,7 @@ describe("PTA/WBNB fresh production composition", () => {
   it("retains the durable transaction hash and forbids retries after a post-signing failure", async () => {
     const envelopeHash = `0x${"61".repeat(32)}` as const;
     const transactionHash = `0x${"62".repeat(32)}` as const;
-    const expiresAt = "2026-08-13T08:00:55.000Z";
+    const expiresAt = "2026-08-13T08:01:55.000Z";
     const transaction = buildBscTestnetPtaWbnbPoolExactSigningTransaction({
       gasLimit: "6000000",
       gasPriceWei: "100000000",
@@ -355,8 +361,8 @@ describe("PTA/WBNB fresh production composition", () => {
     });
     if (transaction === null) throw new Error("Exact transaction fixture failed.");
     const intent: BscTestnetPtaWbnbPoolAuthorizedSigningIntent = Object.freeze({
-      schemaVersion: 4,
-      scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_4",
+      schemaVersion: 5,
+      scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_5",
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       envelopeHash,
       reviewerApprovalDigest: `0x${"63".repeat(32)}`,
@@ -366,9 +372,9 @@ describe("PTA/WBNB fresh production composition", () => {
       authenticatedAt: "2026-08-13T07:59:55.000Z",
       expiresAt,
       recovery: Object.freeze({
-        generation: 4,
-        predecessorState: "superseded_before_worker",
-        predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
+        generation: 5,
+        predecessorState: "failed_before_worker",
+        predecessorTerminalRawSha256: PREDECESSOR_TERMINAL_RAW_SHA256,
         attemptId: ATTEMPT_ID
       }),
       transaction
@@ -395,7 +401,14 @@ describe("PTA/WBNB fresh production composition", () => {
       intent,
       executionCapability: Object.freeze({}),
       authenticateAuthorizedIntent: (candidate) => candidate === intent,
-      legacySigningJournal: legacyJournalStub(),
+      predecessorSigningJournal: predecessorJournalStub(),
+      predecessorTerminal: PREDECESSOR_TERMINAL,
+      probePredecessorSubmission: vi.fn(async () => ({
+        status: "ready" as const,
+        presence: "empty" as const,
+        files: Object.freeze([]),
+        issue: null
+      })),
       signingJournal: localJournalStub(signingRead),
       submissionJournal: {
         initializeSignedCommit: vi.fn(),
@@ -433,9 +446,9 @@ describe("PTA/WBNB fresh production composition", () => {
     });
     if (transaction === null) throw new Error("Exact transaction fixture failed.");
     const intent = Object.freeze({
-      schemaVersion: 4 as const,
+      schemaVersion: 5 as const,
       scope:
-        "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_4" as const,
+        "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_5" as const,
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       envelopeHash,
       reviewerApprovalDigest: `0x${"68".repeat(32)}` as const,
@@ -445,9 +458,9 @@ describe("PTA/WBNB fresh production composition", () => {
       authenticatedAt: "2026-08-13T07:59:55.000Z",
       expiresAt: "2026-08-13T08:04:55.000Z",
       recovery: Object.freeze({
-        generation: 4 as const,
-        predecessorState: "superseded_before_worker" as const,
-        predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
+        generation: 5 as const,
+        predecessorState: "failed_before_worker" as const,
+        predecessorTerminalRawSha256: PREDECESSOR_TERMINAL_RAW_SHA256,
         attemptId: ATTEMPT_ID
       }),
       transaction
@@ -468,7 +481,14 @@ describe("PTA/WBNB fresh production composition", () => {
       intent,
       executionCapability: Object.freeze({}),
       authenticateAuthorizedIntent: (candidate: unknown) => candidate === intent,
-      legacySigningJournal: legacyJournalStub(),
+      predecessorSigningJournal: predecessorJournalStub(),
+      predecessorTerminal: PREDECESSOR_TERMINAL,
+      probePredecessorSubmission: vi.fn(async () => ({
+        status: "ready" as const,
+        presence: "empty" as const,
+        files: Object.freeze([]),
+        issue: null
+      })),
       signingJournal: localJournalStub(vi.fn(async () => EMPTY_SIGNING_STATE)),
       submissionJournal: {
         initializeSignedCommit: vi.fn(),
@@ -499,8 +519,8 @@ describe("PTA/WBNB fresh production composition", () => {
     });
     if (transaction === null) throw new Error("Exact transaction fixture failed.");
     const intent: BscTestnetPtaWbnbPoolAuthorizedSigningIntent = Object.freeze({
-      schemaVersion: 4,
-      scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_4",
+      schemaVersion: 5,
+      scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_5",
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       envelopeHash,
       reviewerApprovalDigest: `0x${"71".repeat(32)}`,
@@ -508,11 +528,11 @@ describe("PTA/WBNB fresh production composition", () => {
       releaseCommit: "7".repeat(40),
       runtimeManifestSha256: `0x${"73".repeat(32)}`,
       authenticatedAt: "2026-08-13T08:00:10.000Z",
-      expiresAt: "2026-08-13T08:01:10.000Z",
+      expiresAt: "2026-08-13T08:02:10.000Z",
       recovery: Object.freeze({
-        generation: 4,
-        predecessorState: "superseded_before_worker",
-        predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
+        generation: 5,
+        predecessorState: "failed_before_worker",
+        predecessorTerminalRawSha256: PREDECESSOR_TERMINAL_RAW_SHA256,
         attemptId: ATTEMPT_ID
       }),
       transaction
@@ -552,9 +572,9 @@ describe("PTA/WBNB fresh production composition", () => {
       ownerAuthorizationDigest: intent.ownerAuthorizationDigest,
       releaseCommit: intent.releaseCommit,
       runtimeManifestSha256: intent.runtimeManifestSha256,
-      generation: 4 as const,
-      predecessorState: "superseded_before_worker" as const,
-      predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
+      generation: 5 as const,
+      predecessorState: "failed_before_worker" as const,
+      predecessorTerminalRawSha256: PREDECESSOR_TERMINAL_RAW_SHA256,
       attemptId: ATTEMPT_ID,
       gasLimit: transaction.gasLimit,
       gasPriceWei: transaction.gasPriceWei,
@@ -570,7 +590,14 @@ describe("PTA/WBNB fresh production composition", () => {
       intent,
       executionCapability: Object.freeze({}),
       authenticateAuthorizedIntent: (candidate) => candidate === intent,
-      legacySigningJournal: legacyJournalStub(),
+      predecessorSigningJournal: predecessorJournalStub(),
+      predecessorTerminal: PREDECESSOR_TERMINAL,
+      probePredecessorSubmission: vi.fn(async () => ({
+        status: "ready" as const,
+        presence: "empty" as const,
+        files: Object.freeze([]),
+        issue: null
+      })),
       signingJournal,
       submissionJournal: {
         initializeSignedCommit: vi.fn(),
@@ -607,7 +634,7 @@ describe("PTA/WBNB fresh production composition", () => {
     expect(invokeExactSigningWorker).not.toHaveBeenCalled();
   });
 
-  it("rechecks all durable states and verifies the exact generation-4 claim readback", async () => {
+  it("rechecks all durable states and verifies the exact generation-5 claim readback", async () => {
     const envelopeHash = `0x${"81".repeat(32)}` as const;
     const transaction = buildBscTestnetPtaWbnbPoolExactSigningTransaction({
       gasLimit: "6000000",
@@ -616,8 +643,8 @@ describe("PTA/WBNB fresh production composition", () => {
     });
     if (transaction === null) throw new Error("Exact transaction fixture failed.");
     const intent: BscTestnetPtaWbnbPoolAuthorizedSigningIntent = Object.freeze({
-      schemaVersion: 4,
-      scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_4",
+      schemaVersion: 5,
+      scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_5",
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       envelopeHash,
       reviewerApprovalDigest: `0x${"82".repeat(32)}`,
@@ -625,11 +652,11 @@ describe("PTA/WBNB fresh production composition", () => {
       releaseCommit: "4".repeat(40),
       runtimeManifestSha256: `0x${"84".repeat(32)}`,
       authenticatedAt: "2026-08-13T08:00:10.000Z",
-      expiresAt: "2026-08-13T08:01:10.000Z",
+      expiresAt: "2026-08-13T08:02:10.000Z",
       recovery: Object.freeze({
-        generation: 4,
-        predecessorState: "superseded_before_worker",
-        predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
+        generation: 5,
+        predecessorState: "failed_before_worker",
+        predecessorTerminalRawSha256: PREDECESSOR_TERMINAL_RAW_SHA256,
         attemptId: ATTEMPT_ID
       }),
       transaction
@@ -663,7 +690,7 @@ describe("PTA/WBNB fresh production composition", () => {
           runtimeManifestSha256: request.runtimeManifestSha256,
           generation: request.generation ?? null,
           predecessorState: request.predecessorState ?? null,
-          predecessorFenceSha256: request.predecessorFenceSha256 ?? null,
+          predecessorTerminalRawSha256: request.predecessorTerminalRawSha256 ?? null,
           attemptId: request.attemptId ?? null,
           gasLimit: request.gasLimit,
           gasPriceWei: request.gasPriceWei,
@@ -689,7 +716,7 @@ describe("PTA/WBNB fresh production composition", () => {
         dependencies: OneShotSignerModule.BscTestnetPtaWbnbPoolOneShotSignerTestDependencies
       ) => {
         const durableClaimRequest = Object.freeze({
-          schemaVersion: 4,
+          schemaVersion: 5,
           operation: "claim_exact_bsc_testnet_pta_wbnb_pool_initialization_once",
           oneShotIntentId: BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
           operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -752,7 +779,7 @@ describe("PTA/WBNB fresh production composition", () => {
         await expect(
           dependencies.readBackSignedCommit(
             Object.freeze({
-              schemaVersion: 4,
+              schemaVersion: 5,
               operation: "verify_exact_bsc_testnet_pta_wbnb_pool_signed_commit",
               oneShotIntentId: BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
               operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -779,13 +806,20 @@ describe("PTA/WBNB fresh production composition", () => {
         });
       }
     );
-    const legacySigningJournal = legacyJournalStub();
+    const predecessorSigningJournal = predecessorJournalStub();
     const ports: BscTestnetPtaWbnbPoolFixedProductionPorts = {
       now: () => new Date("2026-08-13T08:00:20.000Z"),
       intent,
       executionCapability: Object.freeze({}),
       authenticateAuthorizedIntent: (candidate) => candidate === intent,
-      legacySigningJournal,
+      predecessorSigningJournal,
+      predecessorTerminal: PREDECESSOR_TERMINAL,
+      probePredecessorSubmission: vi.fn(async () => ({
+        status: "ready" as const,
+        presence: "empty" as const,
+        files: Object.freeze([]),
+        issue: null
+      })),
       signingJournal,
       submissionJournal,
       issueWorker: vi.fn(() => ({
@@ -801,21 +835,21 @@ describe("PTA/WBNB fresh production composition", () => {
     await expect(
       createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(ports).runOnce({})
     ).resolves.toMatchObject({ status: "blocked", code: "TEST_STOP_AFTER_CLAIM" });
-    expect(legacySigningJournal.readStrictRecoveryState).toHaveBeenCalledTimes(2);
+    expect(predecessorSigningJournal.readExactTerminalRecoveryBinding).toHaveBeenCalledTimes(2);
     expect(submissionJournal.readRecoveryState).toHaveBeenCalledTimes(2);
     expect(claimExactInitialization).toHaveBeenCalledWith(
       expect.objectContaining({
-        generation: 4,
-        predecessorState: "superseded_before_worker",
-        predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
+        generation: 5,
+        predecessorState: "failed_before_worker",
+        predecessorTerminalRawSha256: PREDECESSOR_TERMINAL_RAW_SHA256,
         attemptId: ATTEMPT_ID,
         ownerAuthorizationDigest: intent.ownerAuthorizationDigest
       })
     );
     expect(retainedClaimState).toMatchObject({
       status: "claimed",
-      generation: 4,
-      predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
+      generation: 5,
+      predecessorTerminalRawSha256: PREDECESSOR_TERMINAL_RAW_SHA256,
       attemptId: ATTEMPT_ID
     });
   });
@@ -987,13 +1021,13 @@ describe("PTA/WBNB recovery-only composition", () => {
         reviewerApprovalDigest: `0x${"74".repeat(32)}` as const,
         ownerAuthorizationDigest: `0x${"75".repeat(32)}` as const,
         recovery: Object.freeze({
-          generation: 4 as const,
-          predecessorState: "superseded_before_worker" as const,
-          predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
+          generation: 5 as const,
+          predecessorState: "failed_before_worker" as const,
+          predecessorTerminalRawSha256: PREDECESSOR_TERMINAL_RAW_SHA256,
           attemptId: ATTEMPT_ID
         }),
         authenticatedAt: "2026-08-13T08:00:10.000Z",
-        expiresAt: "2026-08-13T08:00:40.000Z",
+        expiresAt: "2026-08-13T08:02:10.000Z",
         transaction: Object.freeze({
           signedTransaction: "0x01" as const,
           transactionHash,
@@ -1020,9 +1054,9 @@ describe("PTA/WBNB recovery-only composition", () => {
         gasPriceWei: capability.transaction.gasPriceWei,
         maxCostWei: capability.transaction.maximumCostWei,
         signingHash: capability.transaction.signingHash,
-        generation: 4,
-        predecessorState: "superseded_before_worker",
-        predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
+        generation: 5,
+        predecessorState: "failed_before_worker",
+        predecessorTerminalRawSha256: PREDECESSOR_TERMINAL_RAW_SHA256,
         attemptId: ATTEMPT_ID
       });
       const recoveryState = Object.freeze({

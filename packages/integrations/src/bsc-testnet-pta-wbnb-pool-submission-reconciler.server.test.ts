@@ -34,6 +34,7 @@ import {
   BSC_TESTNET_WBNB_ADDRESS
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
@@ -65,7 +66,6 @@ const ENVELOPE_HASH = `0x${"11".repeat(32)}` as Hex;
 const REVIEWER_DIGEST = `0x${"22".repeat(32)}` as Hex;
 const OWNER_DIGEST = `0x${"33".repeat(32)}` as Hex;
 const MANIFEST_DIGEST = `0x${"44".repeat(32)}` as Hex;
-const PREDECESSOR_FENCE_SHA256 = `0x${"45".repeat(32)}` as Hex;
 const ATTEMPT_ID = `0x${"46".repeat(32)}` as Hex;
 const RECEIPT_BLOCK_HASH = `0x${"aa".repeat(32)}` as Hex;
 const RECEIPT_PARENT_HASH = `0x${"bb".repeat(32)}` as Hex;
@@ -186,7 +186,7 @@ async function submissionCapability(
     value: 0n
   });
   return Object.freeze({
-    schemaVersion: 4,
+    schemaVersion: 5,
     scope: BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCOPE,
     operation: BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_OPERATION,
     oneShotIntentId: BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
@@ -198,9 +198,9 @@ async function submissionCapability(
     releaseCommit: RELEASE_COMMIT,
     runtimeManifestSha256: MANIFEST_DIGEST,
     recovery: Object.freeze({
-      generation: 4,
-      predecessorState: "superseded_before_worker",
-      predecessorFenceSha256: PREDECESSOR_FENCE_SHA256,
+      generation: 5,
+      predecessorState: "failed_before_worker",
+      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
       attemptId: ATTEMPT_ID
     }),
     authenticatedAt: times.authenticatedAt,
@@ -406,7 +406,7 @@ function evidence(
   capability: BscTestnetPtaWbnbPoolSubmissionCapability
 ): BscTestnetPtaWbnbPoolReconciliationEvidence {
   return {
-    schemaVersion: 4,
+    schemaVersion: 5,
     operation: BSC_TESTNET_PTA_WBNB_POOL_RECONCILIATION_OPERATION,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     transactionHash: capability.transaction.transactionHash,
@@ -421,7 +421,7 @@ function journalState(
   state: "signed_committed" | "submission_started" = "signed_committed"
 ) {
   const body = Object.freeze({
-    schemaVersion: 4,
+    schemaVersion: 5,
     operation: BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_OPERATION,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     claimId: capability.claimId,
@@ -436,7 +436,7 @@ function journalState(
     signedTransactionKeccak256: keccak256(capability.transaction.signedTransaction)
   });
   return Object.freeze({
-    schemaVersion: 4,
+    schemaVersion: 5,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     claimId: capability.claimId,
     envelopeHash: capability.envelopeHash,
@@ -450,7 +450,7 @@ function journalState(
     signedTransactionKeccak256: body.signedTransactionKeccak256,
     submissionStartedDigest: keccak256(
       stringToHex(
-        `proofera.bsc-testnet.pta-wbnb-pool.submission-started.v4\u0000${JSON.stringify(body)}`
+        `proofera.bsc-testnet.pta-wbnb-pool.submission-started.v5\u0000${JSON.stringify(body)}`
       )
     ),
     state

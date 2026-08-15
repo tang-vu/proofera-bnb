@@ -6,8 +6,10 @@ const harness = vi.hoisted(() => ({
   order: [] as string[],
   openAncestor: vi.fn(),
   openGeneration2: vi.fn(),
-  openLegacy: vi.fn(),
+  openGeneration3: vi.fn(),
+  openPredecessor: vi.fn(),
   openLocal: vi.fn(),
+  probeGeneration2Submission: vi.fn(),
   probePredecessorSubmission: vi.fn(),
   openSubmission: vi.fn(),
   openTerminalSubmission: vi.fn(),
@@ -30,8 +32,10 @@ vi.mock("./bsc-testnet-pta-wbnb-pool-local-journal.server", () => ({
     harness.openAncestor,
   openExistingWindowsBscTestnetPtaWbnbPoolGeneration2LocalJournalForRecoveryForInternalUse:
     harness.openGeneration2,
+  openExistingWindowsBscTestnetPtaWbnbPoolGeneration3LocalJournalForRecoveryForInternalUse:
+    harness.openGeneration3,
   openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse:
-    harness.openLegacy,
+    harness.openPredecessor,
   openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse: harness.openLocal
 }));
 vi.mock("./bsc-testnet-pta-wbnb-pool-submission-journal.server", () => ({
@@ -40,6 +44,8 @@ vi.mock("./bsc-testnet-pta-wbnb-pool-submission-journal.server", () => ({
   openExistingWindowsBscTestnetPtaWbnbPoolSubmissionJournalForTerminalReconciliationForInternalUse:
     harness.openTerminalSubmission,
   probeWindowsBscTestnetPtaWbnbPoolPredecessorSubmissionJournalForInternalUse:
+    harness.probeGeneration2Submission,
+  probeWindowsBscTestnetPtaWbnbPoolGeneration3SubmissionJournalForInternalUse:
     harness.probePredecessorSubmission
 }));
 vi.mock("./bsc-testnet-pta-wbnb-pool-signing-worker", () => ({
@@ -68,6 +74,19 @@ vi.mock("./bsc-testnet-pta-wbnb-pool-production-composition.server", () => ({
 
 import { runBscTestnetPtaWbnbPoolProductionOnceFromStdin } from "./bsc-testnet-pta-wbnb-pool-production-runner.server";
 import { sendExactBscTestnetPtaWbnbPoolRawTransactionOnceForInternalUse } from "./bsc-testnet-pta-wbnb-pool-production-rpc.server";
+import type { BscTestnetPtaWbnbPoolPredecessorTerminalState } from "./bsc-testnet-pta-wbnb-pool-local-journal.server";
+import {
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_1_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ATTEMPT_ID,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ENVELOPE_HASH,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
+} from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 
 const RUNNER_SOURCE = readFileSync(
   new URL("./bsc-testnet-pta-wbnb-pool-production-runner.server.ts", import.meta.url),
@@ -96,12 +115,12 @@ const EMPTY_PREDECESSOR_SUBMISSION = Object.freeze({
   files: Object.freeze([]),
   issue: null
 });
-const LEGACY_CLAIM_RAW_SHA256 =
-  "0xf10e90eb836a94446ace100bbc9a6fc5de6cc35b1d82e4d10fb4736ef8559e32" as const;
-const PREDECESSOR_CLAIM_RAW_SHA256 =
-  "0x613df995936c3ccfff56e5da5588906f1bd28340ae8297eb08524274b9b8e1c3" as const;
-const GENERATION_3_CLAIM_RAW_SHA256 =
-  "0x7ff780a8f0ac1a1f8ff7bced5d858259f918cdb1891c684aa208b6bca31c9585" as const;
+const EMPTY_GENERATION_2_SUBMISSION = Object.freeze({
+  status: "ready" as const,
+  presence: "absent" as const,
+  files: Object.freeze([]),
+  issue: null
+});
 const ANCESTOR_FENCE_SHA256 = `0x${"09".repeat(32)}` as const;
 const ANCESTOR_FENCE = Object.freeze({
   status: "superseded_before_worker" as const,
@@ -111,7 +130,7 @@ const ANCESTOR_FENCE = Object.freeze({
   signatureOutcome: "not_attempted" as const,
   submissionOutcome: "not_attempted" as const,
   submissionJournalState: "exact_empty" as const,
-  predecessorClaimRawSha256: LEGACY_CLAIM_RAW_SHA256,
+  predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_1_CLAIM_RAW_SHA256,
   predecessorFenceSha256: ANCESTOR_FENCE_SHA256
 });
 const ANCESTOR_FENCED = Object.freeze({
@@ -132,7 +151,7 @@ const FENCE = Object.freeze({
   signatureOutcome: "not_attempted" as const,
   submissionOutcome: "not_attempted" as const,
   submissionJournalState: "exact_empty" as const,
-  predecessorClaimRawSha256: PREDECESSOR_CLAIM_RAW_SHA256,
+  predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2_CLAIM_RAW_SHA256,
   noEffectProofDigest: `0x${"10".repeat(32)}` as const,
   noEffectEnvelopeHash: `0x${"11".repeat(32)}` as const,
   noEffectObservedAt: "2026-08-14T10:00:00.000Z",
@@ -141,14 +160,14 @@ const FENCE = Object.freeze({
 });
 const PREDECESSOR_FENCE = Object.freeze({
   ...FENCE,
-  predecessorClaimRawSha256: GENERATION_3_CLAIM_RAW_SHA256,
+  predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_CLAIM_RAW_SHA256,
   noEffectProofDigest: `0x${"13".repeat(32)}` as const,
   noEffectEnvelopeHash: `0x${"14".repeat(32)}` as const,
   noEffectObservedAt: "2026-08-14T10:00:01.500Z",
   fenceRecordedAt: "2026-08-14T10:00:01.750Z",
-  predecessorFenceSha256: `0x${"15".repeat(32)}` as const
+  predecessorFenceSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256
 });
-const LEGACY_JOURNAL = Object.freeze({
+const GENERATION_3_JOURNAL = Object.freeze({
   readClaimOnlyRecoveryCandidate: vi.fn(async () => null),
   fenceClaimBeforeWorker: vi.fn(),
   readState: vi.fn(),
@@ -156,9 +175,9 @@ const LEGACY_JOURNAL = Object.freeze({
     Object.freeze({ status: "superseded_before_worker", supersessionFence: PREDECESSOR_FENCE })
   )
 });
-const LEGACY_FENCED = Object.freeze({
+const GENERATION_3_FENCED = Object.freeze({
   status: "opened" as const,
-  journal: LEGACY_JOURNAL,
+  journal: GENERATION_3_JOURNAL,
   state: Object.freeze({
     status: "superseded_before_worker" as const,
     generation: 3 as const,
@@ -175,6 +194,43 @@ const GENERATION_2_FENCED = Object.freeze({
     generation: 2 as const,
     predecessorFenceSha256: ANCESTOR_FENCE_SHA256,
     supersessionFence: FENCE
+  }),
+  issue: null
+});
+const PREDECESSOR_TERMINAL = Object.freeze({
+  status: "failed_before_worker" as const,
+  generation: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION,
+  predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_CLAIM_RAW_SHA256,
+  predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
+  predecessorEnvelopeHash: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ENVELOPE_HASH,
+  inheritedFenceSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256,
+  predecessorAttemptId: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ATTEMPT_ID,
+  phase: "post_claim_recheck" as const,
+  issueCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" as const,
+  outcomeDigest: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+  workerAuthorizationOutcome: "not_attempted" as const,
+  workerStartOutcome: "not_attempted" as const,
+  signatureOutcome: "not_attempted" as const,
+  recordedAt: "2026-08-14T10:00:01.900Z"
+}) satisfies BscTestnetPtaWbnbPoolPredecessorTerminalState;
+const PREDECESSOR_TERMINAL_BINDING = Object.freeze({
+  ...PREDECESSOR_TERMINAL,
+  submissionOutcome: "not_attempted" as const,
+  submissionJournalState: "exact_empty" as const
+});
+const PREDECESSOR_JOURNAL = Object.freeze({
+  readState: vi.fn(),
+  readStrictRecoveryState: vi.fn(),
+  readExactTerminalRecoveryBinding: vi.fn<
+    () => Promise<BscTestnetPtaWbnbPoolPredecessorTerminalState | null>
+  >(async () => PREDECESSOR_TERMINAL)
+});
+const PREDECESSOR_OPENED = Object.freeze({
+  status: "opened" as const,
+  journal: PREDECESSOR_JOURNAL,
+  state: Object.freeze({
+    status: "failed_before_worker" as const,
+    generation: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
   }),
   issue: null
 });
@@ -236,6 +292,16 @@ const FRESH_RESULT = Object.freeze({
   transactionHash: null,
   boundary: Object.freeze({ environment: "bsc-testnet", chainId: "97" })
 });
+const DURABLE_PROBE_ORDER = Object.freeze([
+  "ancestor-open",
+  "generation2-open",
+  "generation3-open",
+  "predecessor-open",
+  "local-open",
+  "generation2-submission-probe",
+  "predecessor-submission-probe",
+  "submission-open"
+]);
 
 function deferred<Value>(): Readonly<{
   promise: Promise<Value>;
@@ -253,13 +319,20 @@ function readyFreshPath(): void {
     harness.order.push("ancestor-open");
     return ANCESTOR_FENCED;
   });
-  harness.openLegacy.mockImplementation(async () => {
-    harness.order.push("legacy-open");
-    return LEGACY_FENCED;
-  });
   harness.openGeneration2.mockImplementation(async () => {
     harness.order.push("generation2-open");
     return GENERATION_2_FENCED;
+  });
+  harness.openGeneration3.mockImplementation(async () => {
+    harness.order.push("generation3-open");
+    return GENERATION_3_FENCED;
+  });
+  PREDECESSOR_JOURNAL.readExactTerminalRecoveryBinding.mockImplementation(
+    async () => PREDECESSOR_TERMINAL
+  );
+  harness.openPredecessor.mockImplementation(async () => {
+    harness.order.push("predecessor-open");
+    return PREDECESSOR_OPENED;
   });
   harness.openLocal.mockImplementation(async () => {
     harness.order.push("local-open");
@@ -268,6 +341,10 @@ function readyFreshPath(): void {
   harness.openSubmission.mockImplementation(async () => {
     harness.order.push("submission-open");
     return EMPTY_SUBMISSION;
+  });
+  harness.probeGeneration2Submission.mockImplementation(async () => {
+    harness.order.push("generation2-submission-probe");
+    return EMPTY_GENERATION_2_SUBMISSION;
   });
   harness.probePredecessorSubmission.mockImplementation(async () => {
     harness.order.push("predecessor-submission-probe");
@@ -332,48 +409,22 @@ beforeEach(() => {
 });
 
 describe("PTA/WBNB recovery-first production runner", () => {
-  it("rereads all six durable namespaces across fence, TTY, activation, and claim boundaries", async () => {
+  it("rereads all eight durable namespaces across startup, owner, activation, and claim boundaries", async () => {
     await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toEqual(FRESH_RESULT);
 
     expect(harness.order).toEqual([
-      "ancestor-open",
-      "generation2-open",
-      "legacy-open",
-      "local-open",
-      "predecessor-submission-probe",
-      "submission-open",
-      "ancestor-open",
-      "generation2-open",
-      "legacy-open",
-      "local-open",
-      "predecessor-submission-probe",
-      "submission-open",
+      ...DURABLE_PROBE_ORDER,
       "release",
       "policy-tty",
       "coordinator-rpc",
       "describe-envelope",
       "instantiate-policy",
       "owner-tty",
-      "ancestor-open",
-      "generation2-open",
-      "legacy-open",
-      "local-open",
-      "predecessor-submission-probe",
-      "submission-open",
+      ...DURABLE_PROBE_ORDER,
       "activate-custody-journal",
-      "ancestor-open",
-      "generation2-open",
-      "legacy-open",
-      "local-open",
-      "predecessor-submission-probe",
-      "submission-open",
+      ...DURABLE_PROBE_ORDER,
       "provision-submission-broadcaster",
-      "ancestor-open",
-      "generation2-open",
-      "legacy-open",
-      "local-open",
-      "predecessor-submission-probe",
-      "submission-open",
+      ...DURABLE_PROBE_ORDER,
       "composition-create",
       "composition-run"
     ]);
@@ -383,11 +434,7 @@ describe("PTA/WBNB recovery-first production runner", () => {
         envelopeHash: DESCRIPTOR.envelopeHash,
         executionEnvelopeObservedAt: ENVELOPE.observation.observedAt,
         expiresAt: DESCRIPTOR.envelopeExpiresAt,
-        predecessorFence: expect.objectContaining({
-          predecessorFenceSha256: PREDECESSOR_FENCE.predecessorFenceSha256,
-          fenceRecordedAt: PREDECESSOR_FENCE.fenceRecordedAt,
-          noEffectEnvelopeHash: PREDECESSOR_FENCE.noEffectEnvelopeHash
-        })
+        predecessorTerminal: PREDECESSOR_TERMINAL_BINDING
       })
     );
     expect(harness.ceremony).toHaveBeenCalledWith(DESCRIPTOR, RUNTIME_INSTANTIATION);
@@ -397,29 +444,65 @@ describe("PTA/WBNB recovery-first production runner", () => {
       expect.objectContaining({
         intent: INTENT,
         executionCapability: EXECUTION_CAPABILITY,
-        legacySigningJournal: LEGACY_JOURNAL,
+        predecessorSigningJournal: PREDECESSOR_JOURNAL,
+        predecessorTerminal: PREDECESSOR_TERMINAL_BINDING,
+        probePredecessorSubmission: harness.probePredecessorSubmission,
         signingJournal: SIGNING_JOURNAL,
         submissionJournal: SUBMISSION_JOURNAL,
         broadcaster: BROADCASTER
       })
     );
+    expect(PREDECESSOR_JOURNAL.readExactTerminalRecoveryBinding).toHaveBeenCalledTimes(4);
   });
 
-  it("waits for all six startup probes and does not preload policy while any is pending", async () => {
-    const legacy = deferred<typeof LEGACY_FENCED>();
+  it("waits for all eight startup probes and does not preload policy while any is pending", async () => {
+    const ancestor = deferred<typeof ANCESTOR_FENCED>();
+    const generation2 = deferred<typeof GENERATION_2_FENCED>();
+    const generation3 = deferred<typeof GENERATION_3_FENCED>();
+    const predecessor = deferred<typeof PREDECESSOR_OPENED>();
     const local = deferred<typeof EMPTY_LOCAL>();
+    const generation2Submission = deferred<typeof EMPTY_GENERATION_2_SUBMISSION>();
+    const predecessorSubmission = deferred<typeof EMPTY_PREDECESSOR_SUBMISSION>();
     const submission = deferred<typeof EMPTY_SUBMISSION>();
-    harness.openLegacy.mockImplementation(() => legacy.promise);
+    harness.openAncestor.mockImplementation(() => ancestor.promise);
+    harness.openGeneration2.mockImplementation(() => generation2.promise);
+    harness.openGeneration3.mockImplementation(() => generation3.promise);
+    harness.openPredecessor.mockImplementation(() => predecessor.promise);
     harness.openLocal.mockImplementation(() => local.promise);
+    harness.probeGeneration2Submission.mockImplementation(() => generation2Submission.promise);
+    harness.probePredecessorSubmission.mockImplementation(() => predecessorSubmission.promise);
     harness.openSubmission.mockImplementation(() => submission.promise);
 
     const running = runBscTestnetPtaWbnbPoolProductionOnceFromStdin();
     await Promise.resolve();
+    expect(harness.openAncestor).toHaveBeenCalledTimes(1);
+    expect(harness.openGeneration2).toHaveBeenCalledTimes(1);
+    expect(harness.openGeneration3).toHaveBeenCalledTimes(1);
+    expect(harness.openPredecessor).toHaveBeenCalledTimes(1);
+    expect(harness.openLocal).toHaveBeenCalledTimes(1);
+    expect(harness.probeGeneration2Submission).toHaveBeenCalledTimes(1);
+    expect(harness.probePredecessorSubmission).toHaveBeenCalledTimes(1);
+    expect(harness.openSubmission).toHaveBeenCalledTimes(1);
     expect(harness.readPolicy).not.toHaveBeenCalled();
-    legacy.resolve(LEGACY_FENCED);
+    ancestor.resolve(ANCESTOR_FENCED);
+    await Promise.resolve();
+    expect(harness.readPolicy).not.toHaveBeenCalled();
+    generation2.resolve(GENERATION_2_FENCED);
+    await Promise.resolve();
+    expect(harness.readPolicy).not.toHaveBeenCalled();
+    generation3.resolve(GENERATION_3_FENCED);
+    await Promise.resolve();
+    expect(harness.readPolicy).not.toHaveBeenCalled();
+    predecessor.resolve(PREDECESSOR_OPENED);
     await Promise.resolve();
     expect(harness.readPolicy).not.toHaveBeenCalled();
     local.resolve(EMPTY_LOCAL);
+    await Promise.resolve();
+    expect(harness.readPolicy).not.toHaveBeenCalled();
+    generation2Submission.resolve(EMPTY_GENERATION_2_SUBMISSION);
+    await Promise.resolve();
+    expect(harness.readPolicy).not.toHaveBeenCalled();
+    predecessorSubmission.resolve(EMPTY_PREDECESSOR_SUBMISSION);
     await Promise.resolve();
     expect(harness.readPolicy).not.toHaveBeenCalled();
     submission.resolve(EMPTY_SUBMISSION);
@@ -427,15 +510,17 @@ describe("PTA/WBNB recovery-first production runner", () => {
     expect(harness.readPolicy).toHaveBeenCalledTimes(1);
   });
 
-  it("fails closed on either invalid recovery journal before all later phases", async () => {
-    harness.openLocal.mockResolvedValueOnce(
-      Object.freeze({
-        status: "blocked",
-        journal: null,
-        state: null,
-        issue: Object.freeze({ code: "RECOVERY_JOURNAL_INVALID", message: "invalid" })
-      })
-    );
+  it.each([
+    ["generation-1 signing", harness.openAncestor],
+    ["generation-2 signing", harness.openGeneration2],
+    ["generation-3 signing", harness.openGeneration3],
+    ["generation-4 signing", harness.openPredecessor],
+    ["generation-5 signing", harness.openLocal],
+    ["submission-v2", harness.probeGeneration2Submission],
+    ["submission-v3", harness.probePredecessorSubmission],
+    ["submission-v4", harness.openSubmission]
+  ])("fails closed when the %s startup probe is blocked", async (_label, probe) => {
+    probe.mockResolvedValueOnce(Object.freeze({ status: "blocked" }));
 
     await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toMatchObject({
       status: "blocked",
@@ -448,157 +533,162 @@ describe("PTA/WBNB recovery-first production runner", () => {
     expect(harness.createBroadcaster).not.toHaveBeenCalled();
   });
 
-  it("rejects a predecessor fence whose exact-empty submission binding changed", async () => {
-    const invalidFence = Object.freeze({
-      ...FENCE,
-      submissionJournalState: "not_exact_empty"
-    });
-    harness.openLegacy.mockResolvedValue(
+  it.each([
+    [
+      "generation-4 raw terminal hash",
       Object.freeze({
-        status: "opened",
-        journal: LEGACY_JOURNAL,
-        state: Object.freeze({
-          status: "superseded_before_worker",
-          supersessionFence: invalidFence
-        }),
-        issue: null
+        ...PREDECESSOR_TERMINAL,
+        predecessorTerminalRawSha256: `0x${"81".repeat(32)}`
       })
-    );
+    ],
+    [
+      "generation-3 inherited fence",
+      Object.freeze({
+        ...PREDECESSOR_TERMINAL,
+        inheritedFenceSha256: `0x${"82".repeat(32)}`
+      })
+    ]
+  ])("rejects a generation-4 terminal with a mismatched %s", async (_label, terminal) => {
+    PREDECESSOR_JOURNAL.readExactTerminalRecoveryBinding.mockResolvedValueOnce(terminal as never);
 
     await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toMatchObject({
       status: "blocked",
-      code: "PREDECESSOR_NOT_EXACT_CLAIM_ONLY"
+      code: "PREDECESSOR_TERMINAL_MISSING"
     });
     expect(harness.createBridge).not.toHaveBeenCalled();
     expect(harness.readPolicy).not.toHaveBeenCalled();
     expect(harness.prepare).not.toHaveBeenCalled();
-    expect(harness.activate).not.toHaveBeenCalled();
-    expect(harness.createBroadcaster).not.toHaveBeenCalled();
   });
 
-  it("returns after snapshot A fencing and permits snapshot B only in the next invocation", async () => {
-    const snapshotA = envelope("31", "2026-08-14T10:00:00.500Z");
-    const fenceA = Object.freeze({
-      ...PREDECESSOR_FENCE,
-      noEffectEnvelopeHash: snapshotA.envelopeHash
-    });
-    const fencedJournalA = Object.freeze({
-      ...LEGACY_JOURNAL,
-      readStrictRecoveryState: vi.fn(async () =>
-        Object.freeze({ status: "superseded_before_worker", supersessionFence: fenceA })
-      )
-    });
-    const fencedA = Object.freeze({
-      status: "opened" as const,
-      journal: fencedJournalA,
-      state: Object.freeze({
-        status: "superseded_before_worker" as const,
-        generation: 3 as const,
-        predecessorFenceSha256: FENCE.predecessorFenceSha256,
-        supersessionFence: fenceA
-      }),
-      issue: null
-    });
-    const candidate = Object.freeze({
-      status: "claimed" as const,
-      predecessorClaimRawSha256: GENERATION_3_CLAIM_RAW_SHA256,
-      predecessorClaimRecordedAt: "2026-08-14T09:59:00.000Z",
-      predecessorAuthorizationExpiresAt: "2026-08-14T10:00:00.250Z"
-    });
-    const claimJournal = Object.freeze({
-      readClaimOnlyRecoveryCandidate: vi.fn(async () => candidate),
-      fenceClaimBeforeWorker: vi.fn(async () => fenceA),
-      readState: vi.fn(),
-      readStrictRecoveryState: vi.fn()
-    });
-    const claimOnly = Object.freeze({
-      status: "opened" as const,
-      journal: claimJournal,
-      state: Object.freeze({
-        status: "claimed" as const,
-        generation: 3 as const,
-        predecessorFenceSha256: FENCE.predecessorFenceSha256,
-        supersessionFence: null
-      }),
-      issue: null
-    });
-    harness.openLegacy
-      .mockResolvedValueOnce(claimOnly)
-      .mockResolvedValueOnce(claimOnly)
-      .mockResolvedValue(fencedA);
-    harness.prepare
-      .mockResolvedValueOnce(Object.freeze({ status: "observed" as const, envelope: snapshotA }))
-      .mockResolvedValueOnce(Object.freeze({ status: "observed" as const, envelope: ENVELOPE }));
-
-    await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toMatchObject({
-      status: "blocked",
-      code: "PREDECESSOR_FENCE_RECORDED_RESTART_REQUIRED"
-    });
-    expect(harness.prepare).toHaveBeenCalledTimes(1);
-    expect(harness.createBridge).not.toHaveBeenCalled();
-    expect(harness.readPolicy).not.toHaveBeenCalled();
-    expect(harness.instantiate).not.toHaveBeenCalled();
-    expect(harness.ceremony).not.toHaveBeenCalled();
-    expect(harness.activate).not.toHaveBeenCalled();
-    expect(harness.createBroadcaster).not.toHaveBeenCalled();
-    expect(harness.createComposition).not.toHaveBeenCalled();
-    expect(harness.runComposition).not.toHaveBeenCalled();
-    expect(claimJournal.fenceClaimBeforeWorker).toHaveBeenCalledWith(
-      expect.objectContaining({
-        expectedPredecessorClaimRawSha256: GENERATION_3_CLAIM_RAW_SHA256,
-        proof: expect.objectContaining({
-          envelopeHash: snapshotA.envelopeHash,
-          observedAt: snapshotA.observation.observedAt,
-          submissionJournalPresence: "absent"
+  it.each(["absent", "present"] as const)(
+    "requires submission-v3 to be an existing exact-empty namespace, not %s",
+    async (presence) => {
+      harness.probePredecessorSubmission.mockResolvedValueOnce(
+        Object.freeze({
+          status: "ready",
+          presence,
+          files: Object.freeze([]),
+          issue: null
         })
-      })
-    );
+      );
 
-    harness.order.splice(0);
-    await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toEqual(FRESH_RESULT);
-    expect(harness.prepare).toHaveBeenCalledTimes(2);
-    expect(harness.instantiate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        envelopeHash: ENVELOPE.envelopeHash,
-        executionEnvelopeObservedAt: ENVELOPE.observation.observedAt,
-        predecessorFence: expect.objectContaining({
-          noEffectEnvelopeHash: snapshotA.envelopeHash,
-          fenceRecordedAt: fenceA.fenceRecordedAt
-        })
-      })
-    );
-    expect(harness.createBridge.mock.invocationCallOrder[0]).toBeLessThan(
-      harness.prepare.mock.invocationCallOrder[1] ?? Number.NaN
-    );
-  });
+      await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toMatchObject({
+        status: "blocked",
+        code: "RESTART_BINDING_UNKNOWN"
+      });
+      expect(PREDECESSOR_JOURNAL.readExactTerminalRecoveryBinding).not.toHaveBeenCalled();
+      expect(harness.createBridge).not.toHaveBeenCalled();
+      expect(harness.readPolicy).not.toHaveBeenCalled();
+    }
+  );
 
-  it("blocks when execution snapshot B is not strictly after the retained fence", async () => {
-    harness.prepare.mockResolvedValueOnce(
+  it.each([
+    [
+      "reuses the generation-4 envelope hash",
       Object.freeze({
-        status: "observed" as const,
-        envelope: envelope("22", FENCE.fenceRecordedAt)
+        ...ENVELOPE,
+        envelopeHash: PREDECESSOR_TERMINAL.predecessorEnvelopeHash
       })
+    ],
+    ["is not later than the generation-4 terminal", envelope("22", PREDECESSOR_TERMINAL.recordedAt)]
+  ])("blocks a fresh envelope that %s", async (_label, candidate) => {
+    harness.prepare.mockResolvedValueOnce(
+      Object.freeze({ status: "observed" as const, envelope: candidate })
     );
     await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toMatchObject({
       status: "blocked",
-      code: "EXECUTION_ENVELOPE_NOT_AFTER_FENCE"
+      code: "EXECUTION_ENVELOPE_NOT_AFTER_TERMINAL"
     });
+    expect(PREDECESSOR_JOURNAL.readExactTerminalRecoveryBinding).toHaveBeenCalledTimes(1);
+    expect(harness.prepare).toHaveBeenCalledTimes(1);
     expect(harness.instantiate).not.toHaveBeenCalled();
     expect(harness.ceremony).not.toHaveBeenCalled();
     expect(harness.activate).not.toHaveBeenCalled();
   });
 
-  it("rejects active-journal drift after owner TTY before custody activation", async () => {
-    const changedActive = Object.freeze({
-      status: "opened" as const,
-      journal: Object.freeze({ readState: vi.fn(), readStrictRecoveryState: vi.fn() }),
-      state: Object.freeze({ status: "claimed" as const }),
-      issue: null
-    });
-    harness.openLocal
-      .mockResolvedValueOnce(EMPTY_LOCAL)
-      .mockResolvedValueOnce(EMPTY_LOCAL)
-      .mockResolvedValueOnce(changedActive);
+  it.each([
+    [
+      "generation-1 signing",
+      () =>
+        harness.openAncestor
+          .mockResolvedValueOnce(ANCESTOR_FENCED)
+          .mockResolvedValueOnce(EMPTY_LOCAL)
+    ],
+    [
+      "generation-2 signing",
+      () =>
+        harness.openGeneration2
+          .mockResolvedValueOnce(GENERATION_2_FENCED)
+          .mockResolvedValueOnce(EMPTY_LOCAL)
+    ],
+    [
+      "generation-3 signing",
+      () =>
+        harness.openGeneration3
+          .mockResolvedValueOnce(GENERATION_3_FENCED)
+          .mockResolvedValueOnce(EMPTY_LOCAL)
+    ],
+    [
+      "generation-4 signing",
+      () =>
+        harness.openPredecessor
+          .mockResolvedValueOnce(PREDECESSOR_OPENED)
+          .mockResolvedValueOnce(EMPTY_LOCAL)
+    ],
+    [
+      "generation-5 signing",
+      () =>
+        harness.openLocal.mockResolvedValueOnce(EMPTY_LOCAL).mockResolvedValueOnce(
+          Object.freeze({
+            status: "opened",
+            journal: Object.freeze({}),
+            state: Object.freeze({ status: "claimed" }),
+            issue: null
+          })
+        )
+    ],
+    [
+      "submission-v2",
+      () =>
+        harness.probeGeneration2Submission
+          .mockResolvedValueOnce(EMPTY_GENERATION_2_SUBMISSION)
+          .mockResolvedValueOnce(
+            Object.freeze({
+              status: "ready",
+              presence: "present",
+              files: Object.freeze(["01-claim.v4.json"]),
+              issue: null
+            })
+          )
+    ],
+    [
+      "submission-v3",
+      () =>
+        harness.probePredecessorSubmission
+          .mockResolvedValueOnce(EMPTY_PREDECESSOR_SUBMISSION)
+          .mockResolvedValueOnce(
+            Object.freeze({
+              status: "ready",
+              presence: "absent",
+              files: Object.freeze([]),
+              issue: null
+            })
+          )
+    ],
+    [
+      "submission-v4",
+      () =>
+        harness.openSubmission.mockResolvedValueOnce(EMPTY_SUBMISSION).mockResolvedValueOnce(
+          Object.freeze({
+            status: "opened",
+            journal: Object.freeze({}),
+            state: Object.freeze({ state: "signed_committed" }),
+            issue: null
+          })
+        )
+    ]
+  ])("rejects %s drift after owner TTY before custody activation", async (_label, arrange) => {
+    arrange();
     await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toMatchObject({
       status: "blocked",
       code: "POST_OWNER_DURABLE_STATE_CHANGED"
@@ -606,6 +696,66 @@ describe("PTA/WBNB recovery-first production runner", () => {
     expect(harness.ceremony).toHaveBeenCalledTimes(1);
     expect(harness.activate).not.toHaveBeenCalled();
     expect(harness.createBroadcaster).not.toHaveBeenCalled();
+  });
+
+  it("rejects active signing drift after activation before broadcaster provisioning", async () => {
+    harness.openLocal
+      .mockResolvedValueOnce(EMPTY_LOCAL)
+      .mockResolvedValueOnce(EMPTY_LOCAL)
+      .mockResolvedValueOnce(
+        Object.freeze({
+          status: "opened",
+          journal: Object.freeze({}),
+          state: Object.freeze({ status: "claimed" }),
+          issue: null
+        })
+      );
+
+    await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toMatchObject({
+      status: "blocked",
+      code: "POST_ACTIVATION_DURABLE_STATE_CHANGED"
+    });
+    expect(harness.activate).toHaveBeenCalledTimes(1);
+    expect(harness.createBroadcaster).not.toHaveBeenCalled();
+    expect(harness.createComposition).not.toHaveBeenCalled();
+  });
+
+  it("rejects submission-v4 drift immediately before composition", async () => {
+    harness.openSubmission
+      .mockResolvedValueOnce(EMPTY_SUBMISSION)
+      .mockResolvedValueOnce(EMPTY_SUBMISSION)
+      .mockResolvedValueOnce(EMPTY_SUBMISSION)
+      .mockResolvedValueOnce(
+        Object.freeze({
+          status: "opened",
+          journal: Object.freeze({}),
+          state: Object.freeze({ state: "signed_committed" }),
+          issue: null
+        })
+      );
+
+    await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toMatchObject({
+      status: "blocked",
+      code: "PRE_COMPOSITION_DURABLE_STATE_CHANGED"
+    });
+    expect(harness.activate).toHaveBeenCalledTimes(1);
+    expect(harness.createBroadcaster).toHaveBeenCalledTimes(1);
+    expect(harness.createComposition).not.toHaveBeenCalled();
+  });
+
+  it("rejects generation-4 terminal drift between startup and the post-owner reread", async () => {
+    PREDECESSOR_JOURNAL.readExactTerminalRecoveryBinding
+      .mockResolvedValueOnce(PREDECESSOR_TERMINAL)
+      .mockResolvedValueOnce(
+        Object.freeze({ ...PREDECESSOR_TERMINAL, recordedAt: "2026-08-14T10:00:01.901Z" })
+      );
+
+    await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toMatchObject({
+      status: "blocked",
+      code: "POST_OWNER_DURABLE_STATE_CHANGED"
+    });
+    expect(harness.ceremony).toHaveBeenCalledTimes(1);
+    expect(harness.activate).not.toHaveBeenCalled();
   });
 
   it("uses an opened matching pair only for reconciliation and never enters fresh authority", async () => {
@@ -627,6 +777,66 @@ describe("PTA/WBNB recovery-first production runner", () => {
     expect(harness.readPolicy).not.toHaveBeenCalled();
     expect(harness.activate).not.toHaveBeenCalled();
     expect(harness.createBroadcaster).not.toHaveBeenCalled();
+  });
+
+  it("rejects an opened recovery pair without the exact generation-4 terminal lineage", async () => {
+    PREDECESSOR_JOURNAL.readExactTerminalRecoveryBinding.mockResolvedValueOnce(null);
+    harness.openLocal.mockResolvedValueOnce(
+      Object.freeze({ status: "opened", journal: Object.freeze({}), state: {}, issue: null })
+    );
+    harness.openSubmission.mockResolvedValueOnce(
+      Object.freeze({ status: "opened", journal: Object.freeze({}), state: {}, issue: null })
+    );
+
+    await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toMatchObject({
+      status: "blocked",
+      code: "PREDECESSOR_TERMINAL_INVALID"
+    });
+    expect(harness.reconcile).not.toHaveBeenCalled();
+    expect(harness.createBridge).not.toHaveBeenCalled();
+  });
+
+  it("blocks when an opened recovery pair disappears during reconciliation", async () => {
+    harness.openLocal.mockResolvedValueOnce(
+      Object.freeze({ status: "opened", journal: Object.freeze({}), state: {}, issue: null })
+    );
+    harness.openSubmission.mockResolvedValueOnce(
+      Object.freeze({ status: "opened", journal: Object.freeze({}), state: {}, issue: null })
+    );
+    harness.reconcile.mockResolvedValueOnce(Object.freeze({ status: "fresh" }));
+
+    await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toMatchObject({
+      status: "blocked",
+      code: "RECOVERY_STATE_CHANGED"
+    });
+    expect(harness.reconcile).toHaveBeenCalledTimes(1);
+    expect(harness.createBridge).not.toHaveBeenCalled();
+  });
+
+  it("rejects a lone submission-v4 signed commit instead of treating it as a recovery pair", async () => {
+    const transactionHash = `0x${"65".repeat(32)}` as const;
+    harness.openSubmission.mockResolvedValueOnce(
+      Object.freeze({
+        status: "opened",
+        journal: Object.freeze({}),
+        state: Object.freeze({
+          state: "signed_committed",
+          capability: Object.freeze({
+            transaction: Object.freeze({ transactionHash })
+          })
+        }),
+        issue: null
+      })
+    );
+
+    await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toMatchObject({
+      status: "blocked",
+      code: "RESTART_SIGNED_COMMIT_REQUIRES_NEW_AUTHORITY",
+      transactionHash
+    });
+    expect(harness.reconcile).not.toHaveBeenCalled();
+    expect(harness.createBridge).not.toHaveBeenCalled();
+    expect(harness.readPolicy).not.toHaveBeenCalled();
   });
 
   it("reopens a started submission through only the terminal-reconciliation facade", async () => {

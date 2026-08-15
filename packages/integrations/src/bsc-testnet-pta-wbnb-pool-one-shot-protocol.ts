@@ -36,30 +36,47 @@ import {
 export const BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY =
   "0xe6c943aa33e600bfc1770ee654ee6b00bf6dbcc7cc1702c58bd1caa64dadb9cc" as const satisfies Hex;
 export const BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID =
-  "proofera:bsc-testnet:97:pta-wbnb:pancake-v3-fee-500:sender-nonce-1:v4" as const;
+  "proofera:bsc-testnet:97:pta-wbnb:pancake-v3-fee-500:sender-nonce-1:v5" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2 = 2 as const;
-export const BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION = 3 as const;
-export const BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION = 4 as const;
-export const BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE = "superseded_before_worker" as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3 = 3 as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION = 4 as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION = 5 as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE = "failed_before_worker" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_ATTEMPT_ID_DOMAIN =
-  "proofera.bsc-testnet.pta-wbnb-pool.recovery-attempt.v4" as const;
+  "proofera.bsc-testnet.pta-wbnb-pool.recovery-attempt.v5" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_GENERATION_1_CLAIM_RAW_SHA256 =
   "0xf10e90eb836a94446ace100bbc9a6fc5de6cc35b1d82e4d10fb4736ef8559e32" as const satisfies Hex;
 export const BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2_CLAIM_RAW_SHA256 =
   "0x613df995936c3ccfff56e5da5588906f1bd28340ae8297eb08524274b9b8e1c3" as const satisfies Hex;
 export const BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_CLAIM_RAW_SHA256 =
   "0x7ff780a8f0ac1a1f8ff7bced5d858259f918cdb1891c684aa208b6bca31c9585" as const satisfies Hex;
+export const BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256 =
+  "0x9fa84a9cf79373dd1ccfd5217bb0159cb6e97f6821489d9a1afbc0c5df258f2e" as const satisfies Hex;
+export const BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_CLAIM_RAW_SHA256 =
+  "0xd5fc6da9f853c621f4f407c9d8a729f898c0297720bc50817e633fa538967f36" as const satisfies Hex;
+export const BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256 =
+  "0x2e0570423b1217f1dab6fa8cdb91a0a75b2d78023bacc611a6c81017d0033bab" as const satisfies Hex;
+export const BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST =
+  "0x23468d2bf83c3b855334c077890c866c59955a44c42c83f2e32af4a5ef73ad06" as const satisfies Hex;
+export const BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ENVELOPE_HASH =
+  "0xbed286a4d6fe682aeb089870307b816937d330fd9cbd19d51228b488d64be6b1" as const satisfies Hex;
+export const BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ATTEMPT_ID =
+  "0xc55caf41d8822860e080a208644e0d21f63b823bb2ee3dee64c31d0484c13819" as const satisfies Hex;
+export const BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_RELEASE_COMMIT =
+  "d160530e3d5b18f1a82665a604a3fd25a19338de" as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_RUNTIME_MANIFEST_SHA256 =
+  "0x5b61083d27e794e00f24f708ba7f1ad029a4a8fe509adc8c2394d8bde23a9fbc" as const satisfies Hex;
 export const BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256 =
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_CLAIM_RAW_SHA256;
-export const BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_SCHEMA_VERSION = 4 as const;
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_CLAIM_RAW_SHA256;
+export const BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_SCHEMA_VERSION = 5 as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_SCOPE =
-  "exact_pta_wbnb_pool_recovery_generation_4_after_atomic_claim_and_dual_rpc_recheck" as const;
+  "exact_pta_wbnb_pool_recovery_generation_5_after_atomic_claim_and_dual_rpc_recheck" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS = 30 as const;
-export const BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_PROTOCOL_VERSION = 4 as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_PROTOCOL_VERSION = 5 as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_OPERATION =
   "sign_exact_bsc_testnet_pta_wbnb_pool_initialization" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_REQUEST_HASH_DOMAIN =
-  "proofera.bsc-testnet.pta-wbnb-pool-signing-worker-request.v4" as const;
+  "proofera.bsc-testnet.pta-wbnb-pool-signing-worker-request.v5" as const;
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as const;
 const UINT256_MAX = (1n << 256n) - 1n;
@@ -101,14 +118,14 @@ export interface BscTestnetPtaWbnbPoolExactSigningTransaction {
 export interface BscTestnetPtaWbnbPoolRecoveryAttemptBinding {
   readonly generation: typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
   readonly predecessorState: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE;
-  readonly predecessorFenceSha256: Hex;
+  readonly predecessorTerminalRawSha256: Hex;
   readonly attemptId: Hex;
 }
 
 export function deriveBscTestnetPtaWbnbPoolRecoveryAttemptId(
   input: Readonly<{
     generation: typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
-    predecessorFenceSha256: Hex;
+    predecessorTerminalRawSha256: Hex;
     envelopeHash: Hex;
     runtimeReviewInstantiationDigest: Hex;
     releaseCommit: string;
@@ -118,7 +135,7 @@ export function deriveBscTestnetPtaWbnbPoolRecoveryAttemptId(
 ): Hex | null {
   if (
     input.generation !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION ||
-    nonzeroHex32(input.predecessorFenceSha256) === null ||
+    nonzeroHex32(input.predecessorTerminalRawSha256) === null ||
     nonzeroHex32(input.envelopeHash) === null ||
     nonzeroHex32(input.runtimeReviewInstantiationDigest) === null ||
     exactReleaseCommit(input.releaseCommit) === null ||
@@ -129,7 +146,7 @@ export function deriveBscTestnetPtaWbnbPoolRecoveryAttemptId(
   }
   const canonical = {
     generation: input.generation,
-    predecessorFenceSha256: input.predecessorFenceSha256,
+    predecessorTerminalRawSha256: input.predecessorTerminalRawSha256,
     envelopeHash: input.envelopeHash,
     runtimeReviewInstantiationDigest: input.runtimeReviewInstantiationDigest,
     releaseCommit: input.releaseCommit,
@@ -145,8 +162,8 @@ export function deriveBscTestnetPtaWbnbPoolRecoveryAttemptId(
 
 /** Content validated by the authorization server; authenticity is a separate object capability. */
 export interface BscTestnetPtaWbnbPoolAuthorizedSigningIntent extends BscTestnetPtaWbnbPoolReleaseBinding {
-  readonly schemaVersion: 4;
-  readonly scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_4";
+  readonly schemaVersion: 5;
+  readonly scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_5";
   readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
   readonly envelopeHash: Hex;
   /** Legacy wire name: this is a private runtime-policy instantiation digest, not a reviewer signature. */
@@ -403,7 +420,7 @@ const AUTHORIZED_INTENT_KEYS = [
 const RECOVERY_KEYS = [
   "attemptId",
   "generation",
-  "predecessorFenceSha256",
+  "predecessorTerminalRawSha256",
   "predecessorState"
 ] as const;
 
@@ -526,23 +543,25 @@ function inspectRecoveryAttemptBinding(
   input: unknown
 ): BscTestnetPtaWbnbPoolRecoveryAttemptBinding | null {
   const recovery = inspectDataRecord(input, RECOVERY_KEYS);
-  const predecessorFenceSha256 =
-    recovery === null ? null : nonzeroHex32(recovery.predecessorFenceSha256);
+  const predecessorTerminalRawSha256 =
+    recovery === null ? null : nonzeroHex32(recovery.predecessorTerminalRawSha256);
   const attemptId = recovery === null ? null : nonzeroHex32(recovery.attemptId);
   if (
     recovery === null ||
     !Object.isFrozen(input) ||
     recovery.generation !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION ||
     recovery.predecessorState !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE ||
-    predecessorFenceSha256 === null ||
-    attemptId === null
+    predecessorTerminalRawSha256 === null ||
+    predecessorTerminalRawSha256 !== BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256 ||
+    attemptId === null ||
+    attemptId === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ATTEMPT_ID
   ) {
     return null;
   }
   return Object.freeze({
     generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
     predecessorState: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
-    predecessorFenceSha256,
+    predecessorTerminalRawSha256,
     attemptId
   });
 }
@@ -785,9 +804,9 @@ export function parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse(
     releaseCommit === null ||
     authenticatedAt === null ||
     expiresAt === null ||
-    root.schemaVersion !== 4 ||
+    root.schemaVersion !== 5 ||
     root.scope !==
-      "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_4" ||
+      "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_5" ||
     root.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
     transaction.sourceEnvelopeHash !== envelopeHash ||
     expiresAt.milliseconds - authenticatedAt.milliseconds !==
@@ -796,8 +815,8 @@ export function parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse(
     return null;
   }
   return Object.freeze({
-    schemaVersion: 4,
-    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_4",
+    schemaVersion: 5,
+    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_5",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash,
     reviewerApprovalDigest,

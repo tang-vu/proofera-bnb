@@ -24,6 +24,7 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_SENDER
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
@@ -39,7 +40,7 @@ import {
   type BscTestnetPtaWbnbPoolSubmissionCapability
 } from "./bsc-testnet-pta-wbnb-pool-submission-reconciler.server";
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V5_POLICY,
+  BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V6_POLICY,
   type BscTestnetPtaWbnbPoolSubmissionRecoveryState
 } from "./bsc-testnet-pta-wbnb-pool-submission-journal.server";
 
@@ -65,7 +66,7 @@ async function capability(): Promise<BscTestnetPtaWbnbPoolSubmissionCapability> 
   const unsigned = serializeTransaction(transaction);
   const signedTransaction = await privateKeyToAccount(PRIVATE_KEY).signTransaction(transaction);
   return Object.freeze({
-    schemaVersion: 4,
+    schemaVersion: 5,
     scope: BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_SCOPE,
     operation: BSC_TESTNET_PTA_WBNB_POOL_SUBMISSION_OPERATION,
     oneShotIntentId: BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
@@ -77,9 +78,9 @@ async function capability(): Promise<BscTestnetPtaWbnbPoolSubmissionCapability> 
     releaseCommit: "1".repeat(40),
     runtimeManifestSha256: `0x${"44".repeat(32)}`,
     recovery: Object.freeze({
-      generation: 4,
-      predecessorState: "superseded_before_worker",
-      predecessorFenceSha256: `0x${"45".repeat(32)}`,
+      generation: 5,
+      predecessorState: "failed_before_worker",
+      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
       attemptId: `0x${"46".repeat(32)}`
     }),
     authenticatedAt,
@@ -140,10 +141,10 @@ async function scenario(
   );
   if (derived === null) throw new Error("Synthetic capability invalid.");
   const recovery: BscTestnetPtaWbnbPoolSubmissionRecoveryState = Object.freeze({
-    schemaVersion: 4,
-    journalSchema: "bsc_testnet_pta_wbnb_pool_submission_journal_v5",
+    schemaVersion: 5,
+    journalSchema: "bsc_testnet_pta_wbnb_pool_submission_journal_v6",
     state: "submission_started",
-    ownerAuthorizationPolicy: BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V5_POLICY,
+    ownerAuthorizationPolicy: BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V6_POLICY,
     capability: cap,
     signedCommitSha256: `0x${"66".repeat(32)}`,
     submissionStartedRecordSha256: `0x${"77".repeat(32)}`,
