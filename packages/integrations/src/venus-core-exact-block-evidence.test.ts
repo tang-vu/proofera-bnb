@@ -27,7 +27,6 @@ function provider(providerId: string, publicSourceUrl: string) {
     markets: [
       {
         vTokenAddress: VTOKEN,
-        vTokenRuntimeCode: "0x6002",
         vTokenSymbol: "vUSDT",
         vTokenDecimals: 8,
         underlyingAddress: "0x7ef95a0Fe8B8dC0F1701bE7eA72d5A098C3aB1a1",

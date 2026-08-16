@@ -37,7 +37,6 @@ const utcSchema = z.string().datetime({ offset: false });
 
 const marketSchema = z.strictObject({
   vTokenAddress: nonZeroAddressSchema,
-  vTokenRuntimeCode: runtimeCodeSchema,
   vTokenSymbol: z.string().trim().min(1).max(64),
   vTokenDecimals: z.number().int().min(0).max(36),
   underlyingAddress: nonZeroAddressSchema.nullable(),

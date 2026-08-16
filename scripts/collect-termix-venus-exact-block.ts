@@ -204,7 +204,7 @@ async function collectProvider(
         blockNumber
       })
     ]);
-  const [oracleRuntimeCode, vaiRepayAmountRaw, vTokenRuntimeCodes] = await Promise.all([
+  const [oracleRuntimeCode, vaiRepayAmountRaw] = await Promise.all([
     client.getCode({ address: oracleAddress, blockNumber }),
     client.readContract({
       address: vaiControllerAddress,
@@ -212,8 +212,7 @@ async function collectProvider(
       functionName: "getVAIRepayAmount",
       args: [account],
       blockNumber
-    }),
-    Promise.all(markets.map((address) => client.getCode({ address, blockNumber })))
+    })
   ]);
 
   const [snapshots, symbols, vTokenDecimals, underlyingResults, marketConfigs, thresholds, prices] =
@@ -310,7 +309,6 @@ async function collectProvider(
     const price = required(prices, index, "PRICE");
     return {
       vTokenAddress,
-      vTokenRuntimeCode: requireCode(required(vTokenRuntimeCodes, index, "VTOKEN_CODE"), "VTOKEN"),
       vTokenSymbol: required(symbols, index, "VTOKEN_SYMBOL"),
       vTokenDecimals: required(vTokenDecimals, index, "VTOKEN_DECIMALS"),
       underlyingAddress: underlying.address,
