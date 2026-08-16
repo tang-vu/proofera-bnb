@@ -92,7 +92,7 @@ const unparsedReferenceAgentCoverage = [
     category: "health-factor-monitoring",
     name: "Health-Factor Guardian Analyzer",
     skill: "analyze_venus_health_factor",
-    methodologyVersion: "proofera-venus-core-health-factor-v1.2.0",
+    methodologyVersion: "proofera-venus-core-health-factor-v1.3.0",
     evidenceFocus: [
       "current and minimum health factor",
       "collateral, debt, and thresholds",

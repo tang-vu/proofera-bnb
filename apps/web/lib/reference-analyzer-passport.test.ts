@@ -174,7 +174,7 @@ describe("reference analyzer passports", () => {
       "health-factor-monitoring": {
         skill: /export const HEALTH_FACTOR_SKILL\s*=\s*"analyze_venus_health_factor"\s+as const;/,
         method:
-          /export const HEALTH_FACTOR_METHODOLOGY_VERSION\s*=\s*"proofera-venus-core-health-factor-v1\.2\.0"\s+as const;/
+          /export const HEALTH_FACTOR_METHODOLOGY_VERSION\s*=\s*"proofera-venus-core-health-factor-v1\.3\.0"\s+as const;/
       }
     } as const;
 

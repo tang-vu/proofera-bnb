@@ -196,6 +196,109 @@ function adjustedValueRaw(healthFactorRaw: bigint, debt = DEBT): string {
   return ((healthFactorRaw * debt) / E18).toString();
 }
 
+function observationPositions(
+  chainId: 56 | 97,
+  blockNumber: string,
+  hash: string,
+  observedAtUtc: string,
+  healthFactorRaw: bigint,
+  debt = DEBT
+) {
+  const collateralValue = (healthFactorRaw * debt) / THRESHOLD;
+  return {
+    collateralComplete: true,
+    debtComplete: true,
+    collateralPositions: [
+      {
+        market: "Venus BNB Core",
+        underlyingAsset: "BNB",
+        vTokenAddress: V_BNB,
+        ...collateralValues(collateralValue),
+        quoteValueUnit: QUOTE_VALUE_UNIT,
+        quoteValueScaleDecimals: QUOTE_VALUE_SCALE_DECIMALS,
+        effectiveLiquidationThresholdRaw: THRESHOLD.toString(),
+        liquidationThresholdScaleDecimals: 18,
+        chainId,
+        account: ACCOUNT,
+        blockNumber,
+        blockHash: hash,
+        observedAtUtc,
+        source: collateralSource(chainId, blockNumber, hash, observedAtUtc)
+      }
+    ],
+    debtPositions: [
+      {
+        market: "Venus USDC Core",
+        underlyingAsset: "USDC",
+        vTokenAddress: V_USDC,
+        ...debtValues(debt),
+        quoteValueUnit: QUOTE_VALUE_UNIT,
+        quoteValueScaleDecimals: QUOTE_VALUE_SCALE_DECIMALS,
+        chainId,
+        account: ACCOUNT,
+        blockNumber,
+        blockHash: hash,
+        observedAtUtc,
+        source: debtSource(chainId, blockNumber, hash, observedAtUtc)
+      }
+    ]
+  };
+}
+
+function observationWithHealthFactor(
+  observation: NonNullable<HealthFactorAnalysisInput["observationSeries"]>["observations"][number],
+  healthFactorRaw: bigint
+) {
+  return {
+    ...observation,
+    adjustedCollateralValueRaw: adjustedValueRaw(healthFactorRaw),
+    ...observationPositions(
+      observation.chainId,
+      observation.blockNumber,
+      observation.blockHash,
+      observation.observedAtUtc,
+      healthFactorRaw
+    )
+  };
+}
+
+function syncCurrentObservation(input: HealthFactorAnalysisInput): void {
+  const snapshot = input.currentSnapshot;
+  const series = input.observationSeries;
+  assert.ok(snapshot);
+  assert.ok(series);
+  const currentIndex = series.observations.findIndex(
+    ({ blockNumber, blockHash: hash }) =>
+      blockNumber === snapshot.blockNumber &&
+      hash.toLowerCase() === snapshot.blockHash.toLowerCase()
+  );
+  assert.notEqual(currentIndex, -1);
+  const current = series.observations[currentIndex];
+  assert.ok(current);
+  const adjusted = snapshot.collateralPositions.reduce(
+    (sum, position) => sum + BigInt(position.adjustedCollateralValueRaw),
+    0n
+  );
+  const debt = snapshot.debtPositions.reduce(
+    (sum, position) => sum + BigInt(position.debtValueRaw),
+    0n
+  );
+  series.observations[currentIndex] = {
+    ...current,
+    adjustedCollateralValueRaw: adjusted.toString(),
+    debtValueRaw: debt.toString(),
+    collateralComplete: snapshot.collateralComplete,
+    debtComplete: snapshot.debtComplete,
+    collateralPositions: snapshot.collateralPositions,
+    debtPositions: snapshot.debtPositions,
+    source: {
+      ...current.source,
+      collateralVTokenAddresses: snapshot.source.collateralVTokenAddresses,
+      debtVTokenAddresses: snapshot.source.debtVTokenAddresses
+    }
+  };
+}
+
 function fixture(chainId: 56 | 97 = 97): HealthFactorAnalysisInput {
   const currentBlock = "500";
   const currentHash = blockHash("c");
@@ -280,6 +383,13 @@ function fixture(chainId: 56 | 97 = 97): HealthFactorAnalysisInput {
           quoteValueUnit: QUOTE_VALUE_UNIT,
           quoteValueScaleDecimals: QUOTE_VALUE_SCALE_DECIMALS,
           liquidationThresholdScaleDecimals: 18,
+          ...observationPositions(
+            chainId,
+            "498",
+            blockHash("a"),
+            "2026-08-11T09:57:00Z",
+            1400000000000000000n
+          ),
           source: observationSource(chainId, "498", blockHash("a"), "2026-08-11T09:57:00Z")
         },
         {
@@ -293,6 +403,13 @@ function fixture(chainId: 56 | 97 = 97): HealthFactorAnalysisInput {
           quoteValueUnit: QUOTE_VALUE_UNIT,
           quoteValueScaleDecimals: QUOTE_VALUE_SCALE_DECIMALS,
           liquidationThresholdScaleDecimals: 18,
+          ...observationPositions(
+            chainId,
+            "499",
+            blockHash("b"),
+            "2026-08-11T09:58:00Z",
+            1550000000000000000n
+          ),
           source: observationSource(chainId, "499", blockHash("b"), "2026-08-11T09:58:00Z")
         },
         {
@@ -306,6 +423,13 @@ function fixture(chainId: 56 | 97 = 97): HealthFactorAnalysisInput {
           quoteValueUnit: QUOTE_VALUE_UNIT,
           quoteValueScaleDecimals: QUOTE_VALUE_SCALE_DECIMALS,
           liquidationThresholdScaleDecimals: 18,
+          ...observationPositions(
+            chainId,
+            currentBlock,
+            currentHash,
+            currentObservedAt,
+            currentHealthRaw
+          ),
           source: observationSource(chainId, currentBlock, currentHash, currentObservedAt)
         }
       ]
@@ -437,6 +561,7 @@ test("matches Venus per-market truncation before summing adjusted collateral", (
     minimumAlertReceipts: 0
   };
   input.alertReceipts = null;
+  syncCurrentObservation(input);
 
   const result = analyzeHealthFactor(input);
   assert.equal(result.monitoredPositions.totalCollateralValueRaw, "2");
@@ -484,6 +609,7 @@ test("uses ComptrollerLens operand order instead of reweighting an already-trunc
     minimumAlertReceipts: 0
   };
   input.alertReceipts = null;
+  syncCurrentObservation(input);
 
   const result = analyzeHealthFactor(input);
   assert.equal(result.currentHealthFactor.numerator, "1");
@@ -508,14 +634,8 @@ test("returns hold for a healthy sufficient window when alert receipts are not r
   const secondObservation = series.observations[1];
   assert.ok(firstObservation);
   assert.ok(secondObservation);
-  series.observations[0] = {
-    ...firstObservation,
-    adjustedCollateralValueRaw: adjustedValueRaw(1700000000000000000n)
-  };
-  series.observations[1] = {
-    ...secondObservation,
-    adjustedCollateralValueRaw: adjustedValueRaw(1650000000000000000n)
-  };
+  series.observations[0] = observationWithHealthFactor(firstObservation, 1700000000000000000n);
+  series.observations[1] = observationWithHealthFactor(secondObservation, 1650000000000000000n);
   input.policy = { ...policy, minimumAlertReceipts: 0 };
   input.alertReceipts = null;
 
@@ -669,10 +789,7 @@ test("models zero debt as not applicable without infinity", () => {
   snapshot.debtPositions[0] = { ...debt, ...debtValues(0n) };
   const currentObservation = series.observations.at(-1);
   assert.ok(currentObservation);
-  series.observations[series.observations.length - 1] = {
-    ...currentObservation,
-    debtValueRaw: "0"
-  };
+  syncCurrentObservation(input);
   input.policy = { ...policy, minimumAlertReceipts: 0 };
   input.alertReceipts = null;
 
@@ -782,10 +899,7 @@ test("alert latency requires complete coverage of every threshold-crossing obser
   assert.ok(series);
   const second = series.observations[1];
   assert.ok(second);
-  series.observations[1] = {
-    ...second,
-    adjustedCollateralValueRaw: adjustedValueRaw(1450000000000000000n)
-  };
+  series.observations[1] = observationWithHealthFactor(second, 1450000000000000000n);
 
   const result = analyzeHealthFactor(input);
   assert.equal(result.alertLatency.triggerObservationCount, 2);
@@ -968,6 +1082,26 @@ test("history cannot claim a current window when its current-block aggregate dif
   );
 });
 
+test("historical aggregates cannot hide mismatched raw Venus operands", () => {
+  const input = fixture();
+  const series = input.observationSeries;
+  assert.ok(series);
+  const first = series.observations[0];
+  assert.ok(first);
+  const collateral = first.collateralPositions[0];
+  assert.ok(collateral);
+  first.collateralPositions[0] = {
+    ...collateral,
+    vTokenBalanceRaw: (BigInt(collateral.vTokenBalanceRaw) + 1n).toString()
+  };
+
+  const result = analyzeHealthFactor(input);
+  assert.equal(result.observationWindow.observations[0]?.state, "invalid");
+  assert.equal(result.observationWindow.status, "insufficient");
+  assert.equal(result.observationWindow.minimumHealthFactor.state, "unavailable");
+  assert.ok(result.constraintViolations.some(({ code }) => code === "HISTORY_OBSERVATION_INVALID"));
+});
+
 test("preserves huge overflow-safe values and exact rational arithmetic", () => {
   const input = fixture();
   const snapshot = input.currentSnapshot;
@@ -990,13 +1124,7 @@ test("preserves huge overflow-safe values and exact rational arithmetic", () => 
     effectiveLiquidationThresholdRaw: E18.toString()
   };
   snapshot.debtPositions[0] = { ...debt, ...debtValues(1n) };
-  series.observations = [
-    {
-      ...currentObservation,
-      adjustedCollateralValueRaw: maximumSafeValue.toString(),
-      debtValueRaw: "1"
-    }
-  ];
+  series.observations = [{ ...currentObservation }];
   input.policy = {
     ...policy,
     minimumHistoryObservations: 1,
@@ -1004,6 +1132,7 @@ test("preserves huge overflow-safe values and exact rational arithmetic", () => 
     minimumAlertReceipts: 0
   };
   input.alertReceipts = null;
+  syncCurrentObservation(input);
 
   const result = analyzeHealthFactor(input);
   assert.equal(result.monitoredPositions.totalCollateralValueRaw, maximumSafeValue.toString());
@@ -1280,7 +1409,8 @@ function setCurrentHealthFactor(input: HealthFactorAnalysisInput, healthFactorRa
   };
   series.observations[series.observations.length - 1] = {
     ...currentObservation,
-    adjustedCollateralValueRaw: collateralValues(collateralValue).adjustedCollateralValueRaw
+    adjustedCollateralValueRaw: collateralValues(collateralValue).adjustedCollateralValueRaw,
+    collateralPositions: snapshot.collateralPositions
   };
 }
 

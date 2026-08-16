@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const HEALTH_FACTOR_SKILL = "analyze_venus_health_factor" as const;
 export const HEALTH_FACTOR_METHODOLOGY_VERSION =
-  "proofera-venus-core-health-factor-v1.2.0" as const;
+  "proofera-venus-core-health-factor-v1.3.0" as const;
 
 export const VENUS_CORE_COMPTROLLER_BY_CHAIN = {
   56: "0xfD36E2c2a6789Db23113685031d7F16329158384",
@@ -294,6 +294,10 @@ const observationSchema = z
     quoteValueUnit: quoteValueUnitSchema,
     quoteValueScaleDecimals: z.literal(OFFICIAL_QUOTE_VALUE_SCALE),
     liquidationThresholdScaleDecimals: z.number().int().min(0).max(36),
+    collateralComplete: z.boolean(),
+    debtComplete: z.boolean(),
+    collateralPositions: z.array(collateralPositionSchema).max(MAX_POSITIONS),
+    debtPositions: z.array(debtPositionSchema).max(MAX_POSITIONS),
     source: observationOnchainSourceSchema
   })
   .strict();
@@ -752,7 +756,7 @@ export function analyzeHealthFactor(rawInput: unknown): HealthFactorAnalysisResu
       zeroDebtRule:
         "Complete evidence with total debt equal to zero is reported as not_applicable_zero_debt. The analyzer never emits infinity or a fabricated numeric health factor.",
       historyRule:
-        "Minimum health factor uses only identity-, scale-, age-, and source-compatible observations at or before the current block. It remains unavailable unless the series is complete, meets count/duration requirements, and contains an exact current-block aggregate.",
+        "Every historical observation must carry complete raw collateral/debt positions whose operands, derived values, source relationships, and aggregates are recomputed. Minimum health factor remains unavailable unless the series meets count/duration requirements and contains an exact current-block snapshot.",
       officialSources: [
         "https://docs-v4.venus.io/guides/liquidation",
         "https://docs-v4.venus.io/whats-new/e-mode",
@@ -764,7 +768,7 @@ export function analyzeHealthFactor(rawInput: unknown): HealthFactorAnalysisResu
       "A computed ratio is not marketplace- or activation-eligible: sourceContentsVerified and freshnessAttestedByAgent remain false.",
       "A health factor above one does not prove that a Venus account cannot be liquidated: forced-liquidation settings and other protocol conditions must be checked separately.",
       "Oracle validity, E-Mode membership and fallback, market listing, pauses, liquidation incentive, close factor, interest accrued after the observed block, and transaction feasibility are not inferred.",
-      "Historical observations are aggregates supplied by the caller; minimum health factor is unknown when the configured window is incomplete or invalid.",
+      "Historical raw positions and source locators remain caller-supplied and unverified even though their context, integer arithmetic, derived values, and aggregates are recomputed; minimum health factor is unknown when the configured window is incomplete or invalid.",
       "Alert receipts are only structurally and contextually validated. Execution receipt fields remain unverified caller claims because this offline analyzer cannot authenticate the transaction hash or status.",
       "The result is read-only decision support; it cannot hold a wallet, sign, repay, add collateral, liquidate, or submit a transaction.",
       "No APY, PnL, success rate, avoided liquidation, or other performance claim is calculated or inferred."
@@ -1274,15 +1278,22 @@ function reviewPolicyTime(
 }
 
 function calculateCurrent(snapshot: z.infer<typeof currentSnapshotSchema>): CurrentCalculation {
+  return calculatePositionValues(snapshot.collateralPositions, snapshot.debtPositions);
+}
+
+function calculatePositionValues(
+  collateralPositions: readonly z.infer<typeof collateralPositionSchema>[],
+  debtPositions: readonly z.infer<typeof debtPositionSchema>[]
+): CurrentCalculation {
   let totalCollateralValueRaw = 0n;
   let adjustedCollateralValueRaw = 0n;
-  for (const position of snapshot.collateralPositions) {
+  for (const position of collateralPositions) {
     const value = BigInt(position.collateralValueRaw);
     totalCollateralValueRaw += value;
     adjustedCollateralValueRaw += BigInt(position.adjustedCollateralValueRaw);
   }
   let totalDebtValueRaw = 0n;
-  for (const position of snapshot.debtPositions) {
+  for (const position of debtPositions) {
     totalDebtValueRaw += BigInt(position.debtValueRaw);
   }
   return {
@@ -1337,6 +1348,117 @@ function deriveVenusDebtValue(position: {
 
 function isVenusArithmeticOverflow(error: unknown): boolean {
   return error instanceof Error && error.message === "VENUS_UINT256_OVERFLOW";
+}
+
+function historicalPositionContextMatches(
+  position: z.infer<typeof collateralPositionSchema> | z.infer<typeof debtPositionSchema>,
+  observation: z.infer<typeof observationSchema>
+): boolean {
+  return (
+    position.chainId === observation.chainId &&
+    sameAddress(position.account, observation.account) &&
+    position.blockNumber === observation.blockNumber &&
+    sameHex(position.blockHash, observation.blockHash) &&
+    sameInstant(position.observedAtUtc, observation.observedAtUtc) &&
+    position.source.chainId === position.chainId &&
+    sameAddress(position.source.account, position.account) &&
+    position.source.blockNumber === position.blockNumber &&
+    sameHex(position.source.blockHash, position.blockHash) &&
+    sameInstant(position.source.blockTimestampUtc, position.observedAtUtc) &&
+    sameAddress(position.source.comptrollerAddress, officialComptroller(position.chainId)) &&
+    sameAddress(position.source.vTokenAddress, position.vTokenAddress) &&
+    position.source.market === position.market &&
+    position.source.underlyingAsset === position.underlyingAsset
+  );
+}
+
+function reviewHistoricalPositions(
+  observation: z.infer<typeof observationSchema>,
+  methodology: z.infer<typeof methodologyEvidenceSchema>
+): { issues: string[]; calculation: CurrentCalculation | null } {
+  const issues: string[] = [];
+  if (!observation.collateralComplete || !observation.debtComplete) {
+    issues.push("Historical collateral or debt enumeration is not declared complete.");
+  }
+  if (
+    !sameAddressSet(
+      observation.source.collateralVTokenAddresses,
+      observation.collateralPositions.map(({ vTokenAddress }) => vTokenAddress)
+    ) ||
+    !sameAddressSet(
+      observation.source.debtVTokenAddresses,
+      observation.debtPositions.map(({ vTokenAddress }) => vTokenAddress)
+    )
+  ) {
+    issues.push("Historical source does not bind the exact collateral and debt position sets.");
+  }
+  if (
+    hasDuplicateAddress(
+      observation.collateralPositions.map(({ vTokenAddress }) => vTokenAddress)
+    ) ||
+    hasDuplicateAddress(observation.debtPositions.map(({ vTokenAddress }) => vTokenAddress))
+  ) {
+    issues.push("Historical position evidence contains a duplicate vToken.");
+  }
+
+  for (const position of observation.collateralPositions) {
+    if (
+      !historicalPositionContextMatches(position, observation) ||
+      position.liquidationThresholdScaleDecimals !== methodology.liquidationThresholdScaleDecimals
+    ) {
+      issues.push("Historical collateral position context or scale is incompatible.");
+      break;
+    }
+    try {
+      const derived = deriveVenusCollateralValues(position);
+      if (
+        position.collateralValueRaw !== derived.collateralValueRaw.toString() ||
+        position.adjustedCollateralValueRaw !== derived.adjustedCollateralValueRaw.toString()
+      ) {
+        issues.push("Historical collateral derived values do not match the raw Venus operands.");
+        break;
+      }
+    } catch (error) {
+      if (!isVenusArithmeticOverflow(error)) throw error;
+      issues.push("Historical collateral raw operands overflow uint256.");
+      break;
+    }
+  }
+
+  for (const position of observation.debtPositions) {
+    if (!historicalPositionContextMatches(position, observation)) {
+      issues.push("Historical debt position context is incompatible.");
+      break;
+    }
+    try {
+      if (position.debtValueRaw !== deriveVenusDebtValue(position).toString()) {
+        issues.push("Historical debt derived value does not match the raw Venus operands.");
+        break;
+      }
+    } catch (error) {
+      if (!isVenusArithmeticOverflow(error)) throw error;
+      issues.push("Historical debt raw operands overflow uint256.");
+      break;
+    }
+  }
+
+  const calculation = calculatePositionValues(
+    observation.collateralPositions,
+    observation.debtPositions
+  );
+  if (
+    calculation.adjustedCollateralValueRaw > MAX_UINT256 ||
+    calculation.totalDebtValueRaw > MAX_UINT256
+  ) {
+    issues.push("Historical adjusted collateral or debt aggregate exceeds uint256.");
+  }
+  if (
+    observation.adjustedCollateralValueRaw !== calculation.adjustedCollateralValueRaw.toString() ||
+    observation.debtValueRaw !== calculation.totalDebtValueRaw.toString()
+  ) {
+    issues.push("Historical aggregate does not match its exact raw position evidence.");
+  }
+  return { issues, calculation: issues.length === 0 ? calculation : null };
 }
 
 function currentMeasure(
@@ -1434,6 +1556,8 @@ function reviewHistory(
     ) {
       issues.push("Observation source contains duplicate vToken relationships.");
     }
+    const historicalPositions = reviewHistoricalPositions(observation, methodology);
+    issues.push(...historicalPositions.issues);
     const timing = timingState(
       observation.observedAtUtc,
       input.analysisAtUtc,
@@ -1461,12 +1585,12 @@ function reviewHistory(
     }
     seenBlocks.add(blockKey);
 
-    const debt = BigInt(observation.debtValueRaw);
+    const debt = historicalPositions.calculation?.totalDebtValueRaw ?? 0n;
     const ratio =
-      debt === 0n
+      historicalPositions.calculation === null || debt === 0n
         ? null
         : {
-            numerator: BigInt(observation.adjustedCollateralValueRaw),
+            numerator: historicalPositions.calculation.adjustedCollateralValueRaw,
             denominator: debt
           };
     const measure =
@@ -1503,17 +1627,30 @@ function reviewHistory(
         sameHex(evidence.blockHash, snapshot.blockHash)
     );
     if (currentObservation === undefined) {
+      const suppliedCurrentObservation = results.find(
+        ({ evidence }) =>
+          evidence.blockNumber === snapshot.blockNumber &&
+          sameHex(evidence.blockHash, snapshot.blockHash)
+      );
       addViolation(
         violations,
         "history",
-        "HISTORY_CURRENT_OBSERVATION_MISSING",
+        suppliedCurrentObservation === undefined
+          ? "HISTORY_CURRENT_OBSERVATION_MISSING"
+          : "HISTORY_CURRENT_OBSERVATION_MISMATCH",
         "observationSeries",
-        "Observation series does not contain the current snapshot block."
+        suppliedCurrentObservation === undefined
+          ? "Observation series does not contain the current snapshot block."
+          : "The supplied current-block observation is invalid or does not match the exact current snapshot."
       );
     } else if (
       currentObservation.evidence.adjustedCollateralValueRaw !==
         current.adjustedCollateralValueRaw.toString() ||
       currentObservation.evidence.debtValueRaw !== current.totalDebtValueRaw.toString() ||
+      JSON.stringify(currentObservation.evidence.collateralPositions) !==
+        JSON.stringify(snapshot.collateralPositions) ||
+      JSON.stringify(currentObservation.evidence.debtPositions) !==
+        JSON.stringify(snapshot.debtPositions) ||
       !sameAddressSet(
         currentObservation.evidence.source.collateralVTokenAddresses,
         snapshot.source.collateralVTokenAddresses

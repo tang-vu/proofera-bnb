@@ -44,12 +44,15 @@ truncated collateral value is not accepted. Thresholds must use Venus Core
 Pool's effective user-specific `USE_LIQUIDATION_THRESHOLD` result. A zero-debt
 account is reported as not applicable, not infinity.
 
-Historical minimum health factor is withheld unless the caller declares a
-complete series that ends at the exact current block and meets the configured
-count and duration. Alert-latency status requires a complete, one-to-one set of
-receipts for every threshold-crossing observation; duplicate receipts cannot
-increase evidence count. Any evidenced latency breach remains a breach even if
-other receipt coverage is missing.
+Every historical observation repeats complete raw collateral and debt
+positions. The analyzer recomputes every position and aggregate, binds each
+nested source to that observation's exact block, and requires the current
+observation to equal the complete current snapshot. Historical minimum health
+factor is withheld unless the series meets the configured count and duration.
+Alert-latency status requires a complete, one-to-one set of receipts for every
+threshold-crossing observation; duplicate receipts cannot increase evidence
+count. Any evidenced latency breach remains a breach even if other receipt
+coverage is missing.
 
 Official methodology references checked 2026-08-11:
 
