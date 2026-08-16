@@ -1,5 +1,6 @@
 export * from "./canonical.js";
 export * from "./pair.js";
+export * from "./permissionAudit.js";
 export * from "./pancakeLpAgentLane.js";
 export * from "./pancakeLpManualLane.js";
 export * from "./preregistration.js";

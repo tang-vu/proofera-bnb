@@ -138,8 +138,12 @@ canonical input, preserve raw API/A2A responses and cannot reach network access
 without a registered ERC-8004 identity and independently verified hire
 receipt. LP v2 also separates its mainnet source-data chain from testnet
 identity/hire receipts and preserves the never-run v1 definition. No final
-invocation or paired run exists; permission-audit lanes, manual session
-CLI/transcript, sourced cost and second-review artifacts remain required.
+invocation or paired run exists. Task 02 now has a strict deterministic,
+read-only permission-audit engine that rejects unbound evidence, reports each
+seeded authority defect independently, emits all three required enforcement
+layers, and explicitly records that it performed no execution. Its public
+agent/manual lanes and CLIs, final frozen bundle, manual transcript, sourced
+cost and second-review artifacts remain required.
 
 ## Milestone 5 — submission-grade product (`PLANNED`)
 

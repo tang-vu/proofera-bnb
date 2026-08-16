@@ -90,6 +90,8 @@ Exact task: audit one immutable, secret-free BSC testnet activation bundle conta
 
 Inputs still to bind: final activation proposal; exact block/code/authority evidence; deployed grant-claim database receipt; real grant/probe/revoke receipts; blind corpus and reviewer-held answer-key digest; pinned SDK/documentation artifacts; registered/hireable audit agent; manual procedure; release commit; and timed runner. No secret or signer material may enter the bundle.
 
+Available implementation boundary: `@proofera/benchmarks` now includes a strict deterministic audit engine for the canonical secret-free bundle. It validates evidence joins, rejects duplicate/unbound cases, compares direct targets/selectors/code/recipient/token, chain, expiry, quote age, spend bounds, retry, revoke and signer-exposure markers, and emits a corrected three-layer enforcement table. Its output is explicitly non-executing. These synthetic engine tests are not a TermiX run, agent lane, manual lane, receipt, finding against the final bundle or performance evidence.
+
 Rubric (100): true-positive coverage 35; false-positive discipline 15; impact/reproduction 15; least-authority correction 20; evidence/reproducibility 15. Missing a seeded generic dispatcher, session-signer leak, wrong target/recipient/token/chain, unbounded spend, unsafe unknown-outcome retry or revoke failure is a hard fail. A secret exposure or timed write is also a hard fail.
 
 Required evidence: identical frozen proposal/corpus/source bundle; raw and normalized findings; timing/cost/tool log; post-run answer-key adjudication; the exact authority transaction and API receipt re-observed in each run; and real ProofEra hire evidence for the agent method. None exists yet.
