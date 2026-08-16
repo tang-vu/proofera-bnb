@@ -92,6 +92,17 @@ Production configuration requires an explicit host, port, database, application-
 
 The canonical migration artifact SHA-256 is `fced0c471135a969a726eb1e2233c9b18976c0a2d66377fa40a9d52a552d17cb`; the independent semantic-contract SHA-256 is `fc81399172bf962fe4d0b017d58846a3651ca5ccd850004e20d280ebdad9639a`. Sixty-eight focused tests and 18 real PostgreSQL 17 cases pass, including exact replay/concurrency, catalog/ACL/namespace/role-setting mutation rejection, restricted initial ACL restoration, deployment mismatch, verifier timeout destruction, no-commit, commit/rollback disconnect, and no SQL continuation after timeout. CI reruns that live suite after the LP reservation suite. The implementation readiness object still sets `deploymentConfigured: false` and `releaseReady: false`; do not change those values until a deployed database, authenticated worker endpoint, log-redaction proof, backup/restore drill, and final-origin ceremony are verified.
 
+### Host-local staging observation — 2026-08-17
+
+The 24/7 Windows host now runs two isolated Docker volumes and containers from the exact pinned PostgreSQL image digest `sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641`:
+
+- `proofera-postgres-lp` / `proofera-postgres-lp-v1`, loopback only at `127.0.0.1:55431`, database `proofera_altana_lp`.
+- `proofera-postgres-grant` / `proofera-postgres-grant-v1`, loopback only at `127.0.0.1:55432`, database `proofera_altana_grant_claim`.
+
+Both use `restart=unless-stopped`; a `ProofEra WSL Keepalive` logon task keeps the Ubuntu WSL service boundary alive. Bootstrap and application passwords are independently random, stored only as current-user DPAPI ciphertext outside the repository, and are absent from container configuration after initialization. The unmodified migrations were applied once. `altana-production-postgres.readiness.test.ts` then passed both the LP administrator catalog plus direct-login application binding and the grant server's same-pool direct-login verifier.
+
+This is a real host-local staging deployment, not production activation evidence. Connections currently use loopback without TLS, no worker endpoint consumes either capability, and log-redaction, retention, backup/restore, reboot recovery, final-origin/passkey, and signer/KMS ceremonies are still open. Therefore `deploymentConfigured` and `releaseReady` remain false and public `/api/readiness` must remain `503 not_ready`.
+
 ## Public marketplace checklist
 
 1. Reserve the durable domain before creating passkeys/evidence wallets.
@@ -192,7 +203,7 @@ After local policy/worker/browser readiness:
 1. Create/recover an Altana passkey wallet on the final testnet evidence hostname.
 2. Fund only with faucet/minimal test assets.
 3. Commit and push generation 5, obtain new exact audits and commit/tree/runtime-manifest triplet, and invoke only the absolute PowerShell phase-minus-one command. Bind the exact generation-4 terminal, admit the matching policy through TTY v6 on a fresh later envelope, and require fresh owner-v8 authorization. Reconcile any initializer receipt before preparing a separately approved LP mint.
-4. Provision two dedicated PostgreSQL 17 databases with their respective isolated migration/application roles: one for LP context/quote reservations and one for grant-submission claims. Apply each reviewed versioned migration as its database owner. Require the LP administrator verifier plus direct-login application probe before binding `consumeOrRead`; separately require the grant server's same-pool `verifyReadiness` before accepting a grant claim. The local 10-case LP and 18-case grant suites and CI job are implementation evidence, not proof that either deployed database is ready.
+4. Promote the two host-local PostgreSQL 17 staging databases only after backup/restore and reboot drills. Preserve their isolated migration/application roles. Require the LP administrator verifier plus direct-login application probe before binding `consumeOrRead`; separately require the grant server's same-pool `verifyReadiness` before accepting a grant claim. The staging verifier and local 10-case LP/18-case grant suites prove schema/application boundaries, not worker or release readiness.
 5. Worker creates the scoped key; browser grants exact reviewed policy with Keystore registration.
 6. Probe exact authority, then simulate and execute one bounded direct operation.
 7. Capture Altana account/key links, `callsId` where exposed, BscScan transaction, decoded calldata and evidence manifest.
