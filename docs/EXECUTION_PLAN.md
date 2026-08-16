@@ -141,7 +141,9 @@ identity/hire receipts and preserves the never-run v1 definition. No final
 invocation or paired run exists. Task 02 now has a strict deterministic,
 read-only permission-audit engine that rejects unbound evidence, reports each
 seeded authority defect independently, emits all three required enforcement
-layers, and explicitly records that it performed no execution. Its public
+layers, requires distinct role-bound proposal/corpus/lifecycle/code/SDK and
+database-deployment evidence, exact code-policy parity, ordered distinct
+grant/revoke receipts, and explicitly records that it performed no execution. Its public
 agent/manual lanes and CLIs, final frozen bundle, manual transcript, sourced
 cost and second-review artifacts remain required.
 

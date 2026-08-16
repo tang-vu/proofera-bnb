@@ -9,6 +9,8 @@ export const PERMISSION_AUDIT_ENGINE_VERSION =
 const AddressSchema = z.string().regex(/^0x[0-9a-fA-F]{40}$/u);
 const SelectorSchema = z.string().regex(/^0x[0-9a-fA-F]{8}$/u);
 const DecimalIntegerSchema = z.string().regex(/^(0|[1-9][0-9]*)$/u);
+const TransactionHashSchema = z.string().regex(/^0x[0-9a-fA-F]{64}$/u);
+const BlockHashSchema = z.string().regex(/^0x[0-9a-fA-F]{64}$/u);
 
 const EvidenceReferenceSchema = z.strictObject({
   artifactId: BenchmarkIdSchema,
@@ -59,14 +61,44 @@ const AuditCaseSchema = z.strictObject({
 export const PermissionAuditBundleSchema = z.strictObject({
   activationProposal: AuditCaseSchema,
   adversarialCorpus: z.array(AuditCaseSchema).min(1).max(100),
+  authorityLifecycle: z.strictObject({
+    chainId: z.literal(97),
+    finalAuthorityState: z.literal("revoked"),
+    grantBlockHash: BlockHashSchema,
+    grantObservedAtUtc: UtcDateTimeSchema,
+    grantTransactionHash: TransactionHashSchema,
+    revokeBlockHash: BlockHashSchema,
+    revokeObservedAtUtc: UtcDateTimeSchema,
+    revokeTransactionHash: TransactionHashSchema
+  }),
+  codeAuthorityAttestation: z.strictObject({
+    attestedCalls: z.array(DirectCallSchema).min(1).max(20),
+    blockHash: BlockHashSchema,
+    blockNumber: DecimalIntegerSchema,
+    chainId: z.literal(97)
+  }),
+  durableClaimState: z.strictObject({
+    claimState: z.literal("claimed"),
+    databaseDeploymentReceiptArtifactId: BenchmarkIdSchema,
+    reservationId: BenchmarkIdSchema,
+    unknownOutcomeRetryAllowed: z.literal(false)
+  }),
   evidence: z.array(EvidenceReferenceSchema).min(1).max(200),
   expectedPolicy: ExpectedPolicySchema,
   frozenAtUtc: UtcDateTimeSchema,
   schemaVersion: z.literal("proofera-termix-permission-audit-bundle-v1.0.0"),
   sdkBehavior: z.strictObject({
     callsIdRetainedAfterGrantException: z.enum(["yes", "no", "unknown"]),
+    evidenceArtifactId: BenchmarkIdSchema,
     packageBytesSha256: Sha256Schema,
     version: z.literal("0.7.0")
+  }),
+  sourceBindings: z.strictObject({
+    activationProposalArtifactId: BenchmarkIdSchema,
+    adversarialCorpusArtifactId: BenchmarkIdSchema,
+    authorityLifecycleReceiptsArtifactId: BenchmarkIdSchema,
+    codeAuthorityAttestationArtifactId: BenchmarkIdSchema,
+    sdkBehaviorEvidenceArtifactId: BenchmarkIdSchema
   })
 });
 
@@ -170,6 +202,41 @@ function validateBundleEvidence(bundle: PermissionAuditBundle): void {
   }
   if (new Date(bundle.expectedPolicy.expiresAtUtc) <= new Date(bundle.frozenAtUtc)) {
     throw new Error("TERMIX_PERMISSION_AUDIT_EXPECTED_POLICY_EXPIRED");
+  }
+  const requiredSourceIds = [
+    ...Object.values(bundle.sourceBindings),
+    bundle.durableClaimState.databaseDeploymentReceiptArtifactId
+  ];
+  if (new Set(requiredSourceIds).size !== requiredSourceIds.length) {
+    throw new Error("TERMIX_PERMISSION_AUDIT_SOURCE_BINDING_DUPLICATE");
+  }
+  for (const artifactId of requiredSourceIds) {
+    if (!evidenceIds.has(artifactId)) {
+      throw new Error("TERMIX_PERMISSION_AUDIT_SOURCE_BINDING_UNBOUND");
+    }
+  }
+  if (
+    bundle.sdkBehavior.evidenceArtifactId !== bundle.sourceBindings.sdkBehaviorEvidenceArtifactId
+  ) {
+    throw new Error("TERMIX_PERMISSION_AUDIT_SDK_EVIDENCE_MISMATCH");
+  }
+  if (
+    sha256Canonical(bundle.codeAuthorityAttestation.attestedCalls) !==
+    sha256Canonical(bundle.expectedPolicy.allowedCalls)
+  ) {
+    throw new Error("TERMIX_PERMISSION_AUDIT_CODE_AUTHORITY_MISMATCH");
+  }
+  if (
+    bundle.authorityLifecycle.grantTransactionHash.toLowerCase() ===
+    bundle.authorityLifecycle.revokeTransactionHash.toLowerCase()
+  ) {
+    throw new Error("TERMIX_PERMISSION_AUDIT_LIFECYCLE_TRANSACTION_DUPLICATE");
+  }
+  if (
+    new Date(bundle.authorityLifecycle.revokeObservedAtUtc) <=
+    new Date(bundle.authorityLifecycle.grantObservedAtUtc)
+  ) {
+    throw new Error("TERMIX_PERMISSION_AUDIT_LIFECYCLE_ORDER_INVALID");
   }
 }
 
