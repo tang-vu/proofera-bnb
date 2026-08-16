@@ -143,9 +143,12 @@ read-only permission-audit engine that rejects unbound evidence, reports each
 seeded authority defect independently, emits all three required enforcement
 layers, requires distinct role-bound proposal/corpus/lifecycle/code/SDK and
 database-deployment evidence, exact code-policy parity, ordered distinct
-grant/revoke receipts, and explicitly records that it performed no execution. Its public
-agent/manual lanes and CLIs, final frozen bundle, manual transcript, sourced
-cost and second-review artifacts remain required.
+grant/revoke receipts, and explicitly records that it performed no execution.
+A fixed read-only RPC plan additionally binds chain ID 97, both successful
+lifecycle receipt joins, and every attested target's runtime bytes at the exact
+block hash; it exposes no arbitrary RPC method. Its public agent/manual lanes
+and CLIs, final frozen bundle, manual transcript, sourced cost and second-review
+artifacts remain required.
 
 ## Milestone 5 — submission-grade product (`PLANNED`)
 
