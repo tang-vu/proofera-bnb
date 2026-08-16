@@ -36,6 +36,15 @@ canonical Health request already committed under
 `evidence/termix/runs/venus-health/`. The exact final invocation remains
 unbound until the real declaration, ERC-8004 identity and hire receipt exist.
 
+`runVenusHealthManualTermixMethod` is the matching non-agent session state
+machine. It consumes operator events without calling an agent or network:
+positive monotonic active segments, exact read-only exchanges from either of
+the two fixed BSC-testnet RPC origins, and one canonical output bound to the
+same request digest and frozen manual procedure. Write RPCs, agent endpoints,
+API events outside active work, nested/mismatched segments, post-output events
+and identity drift fail closed. Its `agentInvoked: false` field remains an
+unauthenticated method declaration requiring independent tool-log review.
+
 ```bash
 pnpm --filter @proofera/benchmarks typecheck
 pnpm --filter @proofera/benchmarks test

@@ -125,15 +125,18 @@ From the repository root:
 pnpm --filter @proofera/benchmarks test
 ```
 
-The fixed `runVenusHealthAgentTermixMethod` lane and its root create-only CLI
-are implemented and tested. They digest-bind the canonical Health request,
-public endpoint and lane configuration; preserve the raw A2A response; verify
-a clean published source commit and committed input; and reject redirects,
-malformed envelopes, mismatched IDs, ambiguous parts, oversized responses or
-widened trust/execution flags. The outer timed runner rejects an unregistered
-agent or missing independently verified hire receipt before the lane can make
-an HTTP request. This is runner capability only: the exact final invocation
-remains unbound, and the CLI has not been invoked as a TermiX run.
+The fixed agent/manual Venus lanes and root create-only agent CLI are
+implemented and tested. The agent path digest-binds the canonical request,
+public endpoint and configuration; preserves the raw A2A response; verifies a
+clean published source commit and committed input; and rejects malformed or
+widened responses. The outer runner rejects an unregistered agent or missing
+verified hire receipt before HTTP. The manual path calls neither agent nor
+network: it timestamps positive operator-active segments, accepts only exact
+read-only exchanges from two fixed BSC-testnet RPC origins inside active work,
+and binds canonical output to the same request digest and procedure. Its
+no-agent declaration is not self-authenticating and remains a second-review
+gate. These are runner capabilities only: the exact final invocations remain
+unbound, and neither lane has been invoked as a TermiX run.
 
 Timed reproduction command: **UNBOUND**. Agent result: **NOT RUN**. Manual result: **NOT RUN**.
 

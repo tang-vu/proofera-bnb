@@ -136,8 +136,8 @@ lane and create-only CLI are implemented. The CLI accepts no shell command or
 secret, requires a clean published commit plus byte-exact committed canonical
 request, preserves the raw A2A response and cannot pass the outer gate without
 a registered ERC-8004 identity and independently verified hire receipt. No
-final Venus invocation or paired run exists; LP, permission-audit, manual-lane,
-cost and second-review artifacts remain required.
+final Venus invocation or paired run exists; LP, permission-audit, manual
+session CLI/transcript, cost and second-review artifacts remain required.
 
 ## Milestone 5 — submission-grade product (`PLANNED`)
 
