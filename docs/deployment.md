@@ -1,6 +1,6 @@
 # ProofEra deployment runbook
 
-Updated: 2026-08-15. The PTA fixture is finalized on BSC Testnet; no pool or mainnet action exists. Historical releases through generation 3 stopped at claim-only states. A later one-off local generation-4 run accepted owner-v7 confirmation and durably recorded `failed_before_worker`, still without worker start, custody-secret access, signature, submission, receipt, pool, or liquidity. Current recovery generation 5 requires its own committed/pushed identity, new exact audits and policy, a fresh envelope after the exact generation-4 terminal, and separate owner-v8 TTY confirmation.
+Updated: 2026-08-16. The PTA fixture is finalized on BSC Testnet; no pool or mainnet action exists. Historical releases through generation 3 stopped at claim-only states. A later one-off local generation-4 run accepted owner-v7 confirmation and durably recorded `failed_before_worker`, still without worker start, custody-secret access, signature, submission, receipt, pool, or liquidity. Current recovery generation 5 requires its own committed/pushed identity, new exact audits and policy, a fresh envelope after the exact generation-4 terminal, and separate owner-v8 TTY confirmation.
 
 ## Deployment topology
 
@@ -21,6 +21,18 @@ pnpm audit --prod --audit-level moderate
 ```
 
 Expected gates are formatting, zero-warning lint, strict typecheck, unit/integration tests, Next production build and isolated-port desktop/mobile Playwright. Routine commands never create wallets or send transactions.
+
+### Durable Windows host
+
+The owner's always-on Windows host serves the production build through a named Cloudflare Tunnel. PM2 supervises the loopback-only marketplace and four analyzers defined in `deploy/windows/ecosystem.config.cjs`; the tunnel credential and ingress configuration remain outside the repository. Public endpoints are:
+
+- marketplace: `https://proofera.tangvu.dev`;
+- LP Range: `https://proofera-lp.tangvu.dev`;
+- Grid Trading: `https://proofera-grid.tangvu.dev`;
+- Yield Optimisation: `https://proofera-yield.tangvu.dev`;
+- Health-Factor Guardian: `https://proofera-health.tangvu.dev`.
+
+Run `node scripts/check-local-production.mjs` for loopback liveness and `node scripts/check-local-production.mjs --public` for HTTPS liveness plus Agent Card identity. Public health is only an availability observation. The analyzers intentionally report `executionEnabled: false`; public endpoints do not prove BSC/ERC-8004 registration, marketplace eligibility, live data provenance, transaction authority, or execution receipts. Rebuild and restart from a clean published revision before treating a later smoke result as release evidence.
 
 ## Required environment
 

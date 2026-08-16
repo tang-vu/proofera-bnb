@@ -16,6 +16,8 @@ The official page was rechecked on 2026-08-16. The main prize remains winner-tak
 
 The first UX correction removes diagnostic-route clutter from the landing hero and makes every category card a direct, query-bound marketplace entry. Playwright verifies that the selected financial job survives navigation without instructions. Local verification remains authoritative until GitHub Actions can start jobs; runs are currently rejected before step execution because the repository owner's account reports a failed payment or spending-limit condition.
 
+The marketplace and four read-only analyzers now have durable HTTPS endpoints on the owner's always-on Windows host, supervised by PM2 behind a named Cloudflare Tunnel. Repeatable local/public probes cover marketplace health, analyzer health, and exact Agent Card URLs. This closes only the endpoint-hosting part of Milestone 1: all analyzers still declare execution disabled, and BSC/ERC-8004 registrations, evidence-backed live data, activation authority, and receipts remain required.
+
 ## Status legend
 
 - `DONE`: acceptance criteria and evidence exist.
