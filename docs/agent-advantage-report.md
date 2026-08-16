@@ -103,7 +103,7 @@ pnpm --filter @proofera/integrations exec vitest run src/altana-lp-activation-co
 pnpm --filter @proofera/benchmarks test
 ```
 
-The create-only agent entrypoint is `pnpm run:termix:permission-audit-agent -- --execute-exact-permission-audit-agent-run --input-bundle <tracked-canonical-bundle>`. It requires the byte-exact invocation on standard input, a clean published release, registered identity and verified hire before its fixed RPC/A2A lane can start; the final command remains **UNBOUND** until those values and the bundle are frozen. The manual CLI does not yet exist. Agent result: **NOT RUN**. Manual result: **NOT RUN**; neither lane has been invoked with benchmark evidence.
+The create-only agent entrypoint is `pnpm run:termix:permission-audit-agent -- --execute-exact-permission-audit-agent-run --input-bundle <tracked-canonical-bundle>`. It requires the byte-exact invocation on standard input, a clean published release, registered identity and verified hire before its fixed RPC/A2A lane can start. The create-only manual entrypoint is `pnpm run:termix:permission-audit-manual -- --execute-exact-permission-audit-manual-run --input-bundle <same-tracked-canonical-bundle>`; its first bounded NDJSON line binds the request and subsequent lines are timestamped operator events consumed by the no-agent/no-network lane. Both final invocations remain **UNBOUND** until the real declaration, identity, hire, bundle and run order are frozen. Agent result: **NOT RUN**. Manual result: **NOT RUN**; neither lane has been invoked with benchmark evidence.
 
 ## Task 03 — Venus health-factor replay and intervention decision
 

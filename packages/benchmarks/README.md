@@ -58,6 +58,13 @@ lane cannot reach its fixed RPC/A2A calls until the request proves chain-97
 registration and a verified hire receipt. This entrypoint does not create a
 final bundle or benchmark result by itself.
 
+The matching `pnpm run:termix:permission-audit-manual` CLI consumes bounded,
+LF-only UTF-8 NDJSON. Its first line binds the request and bundle; later lines
+are timestamped operator events passed directly to the manual lane. It has no
+agent or network call and writes only a new capture under
+`evidence/termix/runs/permission-audit/manual/`. Independent tool-log review
+is still required for the no-agent declaration.
+
 `runVenusHealthManualTermixMethod` is the matching non-agent session state
 machine. It consumes operator events without calling an agent or network:
 positive monotonic active segments, exact read-only exchanges from either of

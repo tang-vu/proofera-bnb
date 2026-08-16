@@ -20,7 +20,7 @@ The digest covers the exact task, required input-binding rules, fixed constraint
 
 Exact final declarations, registered agent identities, hire receipts, release commit, run-order seeds and timed invocation commands remain deliberately `UNBOUND`. A compact LP input candidate and both LP lanes now exist, and the Venus endpoint is code-fixed, but neither fact creates a run. Treating candidate values as final run evidence would create false evidence. A protocol stays non-publishable until all bindings are frozen once into one `BenchmarkDeclaration` and that byte-equivalent declaration is used by both runs.
 
-Task 02's deterministic `audit_altana_permission_bundle` skill is live on the public LP A2A endpoint and its Agent Card advertises that exact ID. A valid synthetic local/public smoke on 2026-08-17 returned matching bundle digests and `executionPerformed: false`. This is capability availability/parity only: it is not a frozen Task 02 input, registered identity, verified hire, timed run, raw benchmark transcript, receipt, scored finding or advantage claim. The create-only agent CLI exists; the manual CLI and all final bindings remain absent.
+Task 02's deterministic `audit_altana_permission_bundle` skill is live on the public LP A2A endpoint and its Agent Card advertises that exact ID. A valid synthetic local/public smoke on 2026-08-17 returned matching bundle digests and `executionPerformed: false`. This is capability availability/parity only: it is not a frozen Task 02 input, registered identity, verified hire, timed run, raw benchmark transcript, receipt, scored finding or advantage claim. Both create-only Task 02 CLIs exist; all final bindings remain absent.
 
 Validate the preregistrations and paired-run harness:
 
@@ -29,7 +29,7 @@ pnpm --filter @proofera/benchmarks typecheck
 pnpm --filter @proofera/benchmarks test
 ```
 
-The tests perform no network request, wallet operation, transaction, real timing measurement or result generation. Subprocess tests prove both production agent CLIs fail before network access when exact invocation material is absent. Task-specific prerequisite commands are recorded inside each JSON file. Their final timed invocations remain `null` until the release, identity, hire and run-order bindings exist.
+The tests perform no network request, wallet operation, transaction, real timing measurement or result generation. Subprocess tests prove the production CLIs fail before network/output access when exact invocation material is absent. Task-specific prerequisite commands are recorded inside each JSON file. Their final timed invocations remain `null` until the release, identity, hire and run-order bindings exist.
 
 Future raw run material belongs in a new run-ID directory, never inside `preregistrations/`. It must include the frozen declaration, raw inputs and outputs, UTC and monotonic timing, active-time segments, sourced integer costs, API/transaction receipts when required, rubric-complete second review, hashes, reproduction logs and limitations. Secrets and signer material are forbidden.
 
@@ -62,6 +62,14 @@ pnpm run:termix:permission-audit-agent -- --execute-exact-permission-audit-agent
 ```
 
 It accepts only a tracked, byte-exact canonical bundle and a bounded standard-input invocation. It requires a clean published commit, chain-97 registration and verified hire receipt before the fixed read-only RPC plan or public A2A request can occur. It writes one new immutable capture beneath `runs/permission-audit/agent/`. No final bundle, invocation or Task 02 run exists.
+
+The matching create-only manual runner is available as:
+
+```text
+pnpm run:termix:permission-audit-manual -- --execute-exact-permission-audit-manual-run --input-bundle evidence/termix/frozen/permission-audit/<bound-bundle>.canonical-json
+```
+
+Its standard input is bounded, LF-only UTF-8 NDJSON: the first line binds the timed request and bundle digest; subsequent lines are the operator's active-segment, exact artifact-read, fixed RPC-exchange and canonical-output events. The lane timestamps events as they are consumed and makes no agent or network request. It writes only a new capture beneath `runs/permission-audit/manual/`. This interface does not prove operator identity or absence of unreported tools; independent log review remains required.
 
 The read-only Venus preparation collector can be run against two fixed public BSC-testnet RPC origins without changing a preregistration:
 

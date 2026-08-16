@@ -3,5 +3,9 @@
   "compilerOptions": {
     "types": ["node"]
   },
-  "include": ["run-termix-permission-audit-agent.ts", "../packages/benchmarks/src/**/*.ts"]
+  "include": [
+    "run-termix-permission-audit-agent.ts",
+    "run-termix-permission-audit-manual.ts",
+    "../packages/benchmarks/src/**/*.ts"
+  ]
 }

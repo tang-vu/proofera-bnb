@@ -9,7 +9,8 @@ const REPOSITORY_ROOT = resolvePath(dirname(LOADER_PATH), "..");
 const EXACT_ENTRYPOINTS = new Set([
   resolvePath(REPOSITORY_ROOT, "scripts/run-termix-venus-health-agent.ts"),
   resolvePath(REPOSITORY_ROOT, "scripts/run-termix-pancake-lp-agent.ts"),
-  resolvePath(REPOSITORY_ROOT, "scripts/run-termix-permission-audit-agent.ts")
+  resolvePath(REPOSITORY_ROOT, "scripts/run-termix-permission-audit-agent.ts"),
+  resolvePath(REPOSITORY_ROOT, "scripts/run-termix-permission-audit-manual.ts")
 ]);
 const BENCHMARK_SOURCE_DIRECTORY = resolvePath(REPOSITORY_ROOT, "packages/benchmarks/src");
 const RELATIVE_WITHOUT_EXTENSION = /^(?:\.\.?\/).+[^./]$/u;
