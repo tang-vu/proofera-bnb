@@ -1,6 +1,6 @@
 # ProofEra submission draft
 
-Updated: 2026-08-13. Status: copy in progress; the PTA fixture receipt is public, while marketplace/agent/Altana/Pancake/TermiX evidence remains incomplete.
+Updated: 2026-08-17. Status: copy in progress; the marketplace and four read-only analyzer endpoints are public, while BSC registration, Altana/Pancake/TermiX evidence, activation, and final release evidence remain incomplete.
 
 ## Core copy
 
@@ -14,7 +14,7 @@ Users begin with a financial job—protect a Venus loan, manage Pancake concentr
 
 - Ingests third-party ERC-8004 identities without mistaking self-description for proof.
 - Locally renders one explicitly non-live Reference Analyzer dossier for each required category, with per-metric implemented/not-run versus absent-calculator truth. LP has a separate bounded configuration surface; Grid, Yield, and Health have strict configuration-only mandate routes. Equal live Passports, permission controls, activation, and receipts are still implementation/deployment work.
-- Includes four exact-pinned, hardened, non-executing local Studio-shaped reference-agent runtimes: LP Range (17 tests), Grid Trading (24), Yield Optimisation (33), and Health-Factor Guardian (37). The CI definition gives each a fail-independent matrix entry, but none is publicly hosted or ERC-8004-registered; the final claim depends on four independently verified, deployed, healthy endpoints.
+- Includes four exact-pinned, hardened, non-executing Studio-shaped reference-agent runtimes: LP Range (17 tests), Grid Trading (24), Yield Optimisation (33), and Health-Factor Guardian (37). All four expose public HTTPS health and Agent Card endpoints, but none is ERC-8004-registered, execution-enabled, or eligible for a live marketplace claim.
 - Uses typed adapter boundaries, exact versions and evidence manifests that can survive undisclosed Phase 2 requirements.
 - Treats permission inspection, status reconciliation and revoke as core marketplace features.
 
@@ -28,20 +28,20 @@ Users begin with a financial job—protect a Venus loan, manage Pancake concentr
 
 ## Submission evidence — incomplete
 
-| Item                          | Value                                    |
-| ----------------------------- | ---------------------------------------- |
-| Public marketplace URL        | NOT DEPLOYED                             |
-| Source commit                 | NOT FROZEN                               |
-| Four public agent endpoints   | NOT DEPLOYED                             |
-| ERC-8004 agent IDs/addresses  | NOT REGISTERED                           |
-| Altana account/key links      | NOT CREATED                              |
-| Grant/execute/revoke receipts | NOT EXECUTED                             |
-| Pancake benefit run           | NOT RUN                                  |
-| TermiX three-task report      | NOT RUN                                  |
-| Demo video                    | NOT RECORDED                             |
-| CI/public smoke evidence      | LOCAL GATES IN PROGRESS                  |
-| PTA fixture deployment        | FINALIZED CHAIN 97; NOT POOL/LP EVIDENCE |
-| PTA/WBNB pool readiness       | READ-ONLY SNAPSHOT; NO POOL OR WRITE     |
+| Item                          | Value                                                        |
+| ----------------------------- | ------------------------------------------------------------ |
+| Public marketplace URL        | `https://proofera.tangvu.dev`; activation not ready          |
+| Source commit                 | NOT FROZEN                                                   |
+| Four public agent endpoints   | DEPLOYED READ-ONLY; NOT BSC-REGISTERED                       |
+| ERC-8004 agent IDs/addresses  | NOT REGISTERED                                               |
+| Altana account/key links      | NOT CREATED                                                  |
+| Grant/execute/revoke receipts | NOT EXECUTED                                                 |
+| Pancake benefit run           | NOT RUN                                                      |
+| TermiX three-task report      | NOT RUN                                                      |
+| Demo video                    | NOT RECORDED                                                 |
+| CI/public smoke evidence      | LOCAL GATES AND PUBLIC SMOKE PASS; HOSTED CI BILLING-BLOCKED |
+| PTA fixture deployment        | FINALIZED CHAIN 97; NOT POOL/LP EVIDENCE                     |
+| PTA/WBNB pool readiness       | READ-ONLY SNAPSHOT; NO POOL OR WRITE                         |
 
 ## Required final validation
 

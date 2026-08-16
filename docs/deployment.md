@@ -32,7 +32,21 @@ The owner's always-on Windows host serves the production build through a named C
 - Yield Optimisation: `https://proofera-yield.tangvu.dev`;
 - Health-Factor Guardian: `https://proofera-health.tangvu.dev`.
 
-Run `node scripts/check-local-production.mjs` for loopback liveness and `node scripts/check-local-production.mjs --public` for HTTPS liveness plus Agent Card identity. Public health is only an availability observation. The analyzers intentionally report `executionEnabled: false`; public endpoints do not prove BSC/ERC-8004 registration, marketplace eligibility, live data provenance, transaction authority, or execution receipts. Rebuild and restart from a clean published revision before treating a later smoke result as release evidence.
+Run `node scripts/check-local-production.mjs` for loopback liveness and `node scripts/check-local-production.mjs --public` for HTTPS liveness plus Agent Card identity. A release probe additionally requires the exact published commit and rejects both a mismatched health build and a `misconfigured` readiness response:
+
+```powershell
+$releaseCommit = (git rev-parse HEAD).Trim()
+if ((git rev-parse origin/main).Trim() -ne $releaseCommit) { throw "Release is not published" }
+if ((git status --porcelain).Length -ne 0) { throw "Release worktree is not clean" }
+$env:PROOFERA_BUILD_VERSION = $releaseCommit
+pm2 start deploy/windows/ecosystem.config.cjs --update-env
+node scripts/check-local-production.mjs --public "--expected-build=$releaseCommit"
+if ($LASTEXITCODE -ne 0) { throw "Public release probe failed" }
+pm2 save
+Remove-Item Env:PROOFERA_BUILD_VERSION
+```
+
+`proofera-monitor` repeats that exact release probe every five minutes and records state changes in its bounded PM2 logs. This is host-local detection, not an independent uptime service or external paging channel. Public health is only an availability observation. Readiness remains `not_ready` until the real activation gates close. The analyzers intentionally report `executionEnabled: false`; public endpoints do not prove BSC/ERC-8004 registration, marketplace eligibility, live data provenance, transaction authority, or execution receipts.
 
 ## Required environment
 

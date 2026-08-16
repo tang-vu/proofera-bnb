@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
@@ -9,11 +10,16 @@ const directory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(directory, "..");
 const configPath = path.join(repositoryRoot, "deploy", "windows", "ecosystem.config.cjs");
 const require = createRequire(import.meta.url);
+const testBuild = "test-release-0123456789";
+const previousBuild = process.env.PROOFERA_BUILD_VERSION;
+process.env.PROOFERA_BUILD_VERSION = testBuild;
+const config = require(configPath);
+if (previousBuild === undefined) delete process.env.PROOFERA_BUILD_VERSION;
+else process.env.PROOFERA_BUILD_VERSION = previousBuild;
 
-test("local production topology is loopback-only and exposes five distinct processes", () => {
-  const config = require(configPath);
-  assert.equal(config.apps.length, 5);
-  assert.equal(new Set(config.apps.map(({ name }) => name)).size, 5);
+test("local production topology is loopback-only and exposes six distinct processes", () => {
+  assert.equal(config.apps.length, 6);
+  assert.equal(new Set(config.apps.map(({ name }) => name)).size, 6);
 
   const ports = [];
   for (const application of config.apps) {
@@ -26,7 +32,16 @@ test("local production topology is loopback-only and exposes five distinct proce
       assert.match(application.args, /--hostname 127\.0\.0\.1 --port 3030$/);
       assert.equal(application.env.NEXT_PUBLIC_APP_ORIGIN, "https://proofera.tangvu.dev");
       assert.equal(application.env.NEXT_PUBLIC_ALTANA_RP_ID, "proofera.tangvu.dev");
+      assert.equal(application.env.PROOFERA_BUILD_VERSION, testBuild);
+      assert.equal(application.env.PROOFERA_DATA_MODE, "strict");
       ports.push(3_030);
+      continue;
+    }
+
+    if (application.name === "proofera-monitor") {
+      assert.equal(application.script, "scripts/monitor-public-production.mjs");
+      assert.equal(application.env.PROOFERA_BUILD_VERSION, testBuild);
+      assert.equal(application.env.PROOFERA_MONITOR_INTERVAL_MS, "300000");
       continue;
     }
 
@@ -42,10 +57,26 @@ test("local production topology is loopback-only and exposes five distinct proce
   assert.equal(new Set(ports).size, ports.length);
 });
 
+test("PM2 topology refuses a missing or malformed immutable build identifier", () => {
+  for (const value of [undefined, "", "branch/name", "a".repeat(129)]) {
+    const environment = { ...process.env };
+    if (value === undefined) delete environment.PROOFERA_BUILD_VERSION;
+    else environment.PROOFERA_BUILD_VERSION = value;
+    const result = spawnSync(process.execPath, ["-e", `require(${JSON.stringify(configPath)})`], {
+      encoding: "utf8",
+      env: environment,
+      windowsHide: true
+    });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /PROOFERA_BUILD_VERSION must be an immutable release identifier/);
+  }
+});
+
 test("tracked production files contain no credential fields or tunnel tokens", async () => {
   const sources = await Promise.all([
     readFile(configPath, "utf8"),
-    readFile(path.join(directory, "check-local-production.mjs"), "utf8")
+    readFile(path.join(directory, "check-local-production.mjs"), "utf8"),
+    readFile(path.join(directory, "monitor-public-production.mjs"), "utf8")
   ]);
   const combined = sources.join("\n");
 
@@ -67,4 +98,6 @@ test("public smoke probe covers the marketplace, every agent, and every Agent Ca
   }
   assert.match(source, /\.well-known\/agent-card\.json/);
   assert.match(source, /executionEnabled === false/);
+  assert.match(source, /marketplace-readiness/);
+  assert.match(source, /body\?\.build === expectedBuild/);
 });

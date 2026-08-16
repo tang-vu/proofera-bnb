@@ -1,4 +1,14 @@
 const publicMode = process.argv.includes("--public");
+const expectedBuildArgument = process.argv.find((argument) =>
+  argument.startsWith("--expected-build=")
+);
+const expectedBuild = expectedBuildArgument?.slice("--expected-build=".length);
+
+if (expectedBuild !== undefined && !/^[A-Za-z0-9._-]{1,128}$/.test(expectedBuild)) {
+  process.stderr.write("expected build identifier is invalid\n");
+  process.exit(2);
+}
+
 const marketplaceOrigin = publicMode ? "https://proofera.tangvu.dev" : "http://127.0.0.1:3030";
 const agentOrigins = publicMode
   ? [
@@ -18,7 +28,10 @@ const probes = [
   {
     name: "marketplace",
     url: `${marketplaceOrigin}/api/health`,
-    validate: (body) => body?.service === "proofera-marketplace" && body?.status === "ok"
+    validate: (body) =>
+      body?.service === "proofera-marketplace" &&
+      body?.status === "ok" &&
+      (expectedBuild === undefined || body?.build === expectedBuild)
   },
   ...agentOrigins.map(([name, origin]) => ({
     name,
@@ -34,6 +47,21 @@ const probes = [
           body?.protocolVersion === "0.3.0" &&
           body?.skills?.length > 0
       }))
+    : []),
+  ...(publicMode && expectedBuild !== undefined
+    ? [
+        {
+          name: "marketplace-readiness",
+          url: `${marketplaceOrigin}/api/readiness`,
+          expectedStatus: 503,
+          validate: (body) =>
+            body?.build === expectedBuild &&
+            body?.status === "not_ready" &&
+            body?.readyForActivation === false &&
+            body?.readyForJudging === false &&
+            body?.capabilities?.activation === "unavailable"
+        }
+      ]
     : [])
 ];
 
@@ -49,7 +77,9 @@ for (const probe of probes) {
     const body = contentType.toLowerCase().includes("application/json")
       ? await response.json()
       : null;
-    if (!response.ok || !probe.validate(body)) {
+    const statusAccepted =
+      probe.expectedStatus === undefined ? response.ok : response.status === probe.expectedStatus;
+    if (!statusAccepted || !probe.validate(body)) {
       failures.push(`${probe.name}: unexpected HTTP response`);
       continue;
     }

@@ -2,6 +2,11 @@
 const path = require("node:path");
 
 const repositoryRoot = path.resolve(__dirname, "..", "..");
+const buildVersion = process.env.PROOFERA_BUILD_VERSION?.trim();
+
+if (buildVersion === undefined || !/^[A-Za-z0-9._-]{1,128}$/.test(buildVersion)) {
+  throw new Error("PROOFERA_BUILD_VERSION must be an immutable release identifier");
+}
 
 function agent(name, relativeRoot, port, publicUrl) {
   return {
@@ -47,7 +52,9 @@ module.exports = {
       env: {
         NODE_ENV: "production",
         NEXT_PUBLIC_APP_ORIGIN: "https://proofera.tangvu.dev",
-        NEXT_PUBLIC_ALTANA_RP_ID: "proofera.tangvu.dev"
+        NEXT_PUBLIC_ALTANA_RP_ID: "proofera.tangvu.dev",
+        PROOFERA_BUILD_VERSION: buildVersion,
+        PROOFERA_DATA_MODE: "strict"
       }
     },
     agent("proofera-agent-lp", "agents/lpRangeAgent", 9_101, "https://proofera-lp.tangvu.dev/"),
@@ -68,6 +75,25 @@ module.exports = {
       "agents/healthFactorGuardianAgent",
       9_104,
       "https://proofera-health.tangvu.dev/"
-    )
+    ),
+    {
+      name: "proofera-monitor",
+      cwd: repositoryRoot,
+      script: "scripts/monitor-public-production.mjs",
+      interpreter: process.execPath,
+      instances: 1,
+      exec_mode: "fork",
+      autorestart: true,
+      restart_delay: 5_000,
+      exp_backoff_restart_delay: 100,
+      max_memory_restart: "128M",
+      kill_timeout: 10_000,
+      time: true,
+      env: {
+        NODE_ENV: "production",
+        PROOFERA_BUILD_VERSION: buildVersion,
+        PROOFERA_MONITOR_INTERVAL_MS: "300000"
+      }
+    }
   ]
 };
