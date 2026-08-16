@@ -19,7 +19,9 @@ Do not claim that these analyzers were deployed by AgentCore. Their public A2A e
 
 Each encrypted Web3 Secret Storage file is under its agent workspace's ignored `.studio/wallets` directory, outside `app/agent`. Its independent random password is stored only as a current-user DPAPI blob outside the repository. Neither location is a KMS, portable backup, mainnet wallet, user-capital wallet, Altana signer, or browser passkey.
 
-A read-only PublicNode observation on 2026-08-17 found all four balances at exactly zero. Studio 0.0.5's self-paid registration path blocks below `0.002 tBNB` because registration can require two transactions. Use the official faucet or a separately approved bounded testnet funding transaction, then re-observe balance and current registration state before signing. The residual balance of ProofEra's older PTA deployment wallet is not authority to fund these accounts.
+A retained read-only preparation at finalized block `125490457` made 42 calls across the BNB Chain seed RPC and PublicNode. Both providers agreed on the block hash, registry runtime, `0.1 gwei` gas price, zero balance, zero nonce, zero registry `balanceOf`, and the initial registration gas estimate for every wallet. The artifact includes each exact first-step calldata and public Agent Card response. It does **not** prove funding, signing, registration, or a receipt.
+
+Studio 0.0.5's self-paid registration path blocks below `0.002 tBNB` because SDK `0.4.2` performs `register(string,(string,bytes)[])` and then `setAgentURI(uint256,string)`. The second calldata and estimate cannot be known exactly until the first confirmed receipt supplies `agentId`; the preparation keeps them null instead of inventing them. The bounded proposal is `0.003 tBNB` per wallet (`0.012 tBNB` total), with at most two registration transactions per wallet, `1,000,000` gas per transaction, and `0.2 gwei` gas-price cap. This is a review boundary, not approval. Use the official faucet or a separately approved bounded testnet funding transaction, then re-observe balance and current registration state before signing. The residual balance of ProofEra's older PTA deployment wallet is not authority to fund these accounts.
 
 ## Registration gate
 
@@ -33,3 +35,11 @@ For each agent, in order:
 6. Retain transaction hashes, agent IDs, final on-chain metadata, explorer links, observed blocks, and exact source commit in `evidence/`. Only then may the marketplace mark the corresponding identity registered.
 
 Mainnet registration remains separately approval-gated.
+
+Reproduce the create-only preflight from a reviewed clean base commit:
+
+```powershell
+node scripts/prepare-agent-registration-manifest.mjs --prepare-exact-registration-manifest --source-base-commit <40-hex-commit>
+```
+
+The retained preparation is `evidence/erc8004/preparations/125490457-four-agent-registration-preparation.json`.
