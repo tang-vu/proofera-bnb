@@ -67,6 +67,17 @@ Caller-supplied execution receipt fields remain explicitly unverified: this
 offline analyzer can check their internal context but cannot authenticate a
 transaction hash, chain inclusion, or outcome.
 
+`buildHealthFactorInputFromExactWindow` is the offline TermiX preparation
+adapter. It accepts an explicitly authorized chain-97 account plus an ordered
+window of two-provider-matched `proofera-venus-core-exact-block-evidence-v1.0.0`
+artifacts. It independently rechecks every raw integer derivation, provider
+identity/origin, observation time and window relationship, produces the strict
+v1.3 input, and rejects any input that is not decision-ready under the frozen
+policy. The returned manifest hashes every parsed evidence item. It never reads
+the network or filesystem and does not turn its authorization reference into
+an authenticated human identity, API receipt, hire receipt, alert receipt, or
+TermiX run.
+
 ## BNB Agent Studio runtime
 
 `app/agent/studio.toml` declares one AgentCore runtime with A2A and MCP faces.

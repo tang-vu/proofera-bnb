@@ -25,3 +25,9 @@ export {
   type RuntimeConfig,
   type RuntimeEnvironment
 } from "./runtimeConfig.js";
+export {
+  buildHealthFactorInputFromExactWindow,
+  venusCoreExactBlockEvidenceForWindowSchema,
+  type BuildHealthFactorExactWindowOptions,
+  type HealthFactorExactWindowBuild
+} from "./venusExactWindow.js";
