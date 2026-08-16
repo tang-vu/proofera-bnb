@@ -101,3 +101,10 @@ test("public smoke probe covers the marketplace, every agent, and every Agent Ca
   assert.match(source, /marketplace-readiness/);
   assert.match(source, /body\?\.build === expectedBuild/);
 });
+
+test("production monitor keeps one long-lived interval without an unsettled await", async () => {
+  const source = await readFile(path.join(directory, "monitor-public-production.mjs"), "utf8");
+  assert.match(source, /setInterval\(\(\) => void monitor\(\), intervalCandidate\);/);
+  assert.doesNotMatch(source, /\.unref\(\)/);
+  assert.doesNotMatch(source, /new Promise\(\(\) => \{\}\)/);
+});

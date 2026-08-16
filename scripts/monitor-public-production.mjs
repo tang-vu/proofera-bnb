@@ -62,5 +62,4 @@ async function monitor() {
 }
 
 await monitor();
-setInterval(() => void monitor(), intervalCandidate).unref();
-await new Promise(() => {});
+setInterval(() => void monitor(), intervalCandidate);
