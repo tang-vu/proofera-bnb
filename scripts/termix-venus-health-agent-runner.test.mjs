@@ -40,6 +40,7 @@ test("Venus timed CLI rejects missing exact invocation before network or output"
 
 test("Venus timed CLI rejects empty stdin before Git, network, or output", async () => {
   const result = await runCli([
+    "--",
     "--execute-exact-venus-health-agent-run",
     "--request-input",
     "evidence/termix/frozen/venus-health/final.canonical-json"

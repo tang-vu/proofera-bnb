@@ -25,15 +25,16 @@ interface Invocation {
 }
 
 function parseArguments(args: readonly string[]): string {
+  const normalized = args[0] === "--" ? args.slice(1) : args;
   if (
-    args.length !== 3 ||
-    args[0] !== "--execute-exact-venus-health-agent-run" ||
-    args[1] !== "--request-input" ||
-    args[2] === undefined
+    normalized.length !== 3 ||
+    normalized[0] !== "--execute-exact-venus-health-agent-run" ||
+    normalized[1] !== "--request-input" ||
+    normalized[2] === undefined
   ) {
     throw new Error("TERMIX_VENUS_CLI_ARGUMENTS_INVALID");
   }
-  return validateRepositoryPath(args[2]);
+  return validateRepositoryPath(normalized[2]);
 }
 
 function validateRepositoryPath(value: string): string {
