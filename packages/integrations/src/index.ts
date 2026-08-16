@@ -11,3 +11,4 @@ export * from "./pancake-v3-authority";
 export * from "./pancake-v3-latest";
 export * from "./pancake-v3-static-context";
 export * from "./venus-health";
+export * from "./venus-core-exact-block-evidence";
