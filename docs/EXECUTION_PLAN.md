@@ -147,8 +147,12 @@ grant/revoke receipts, and explicitly records that it performed no execution.
 A fixed read-only RPC plan additionally binds chain ID 97, both successful
 lifecycle receipt joins, and every attested target's runtime bytes at the exact
 block hash; it exposes no arbitrary RPC method. Its public agent/manual lanes
-and CLIs, final frozen bundle, manual transcript, sourced cost and second-review
-artifacts remain required.
+are now partially closed: the manual lane requires positive timed work, every
+digest-bound artifact exactly once, the complete fixed RPC plan, the five
+preregistered declaration input joins, no hire receipt and a canonical
+`agentInvoked: false` output. The public agent lane and both CLIs, final frozen
+bundle, real manual transcript, sourced cost and second-review artifacts remain
+required.
 
 ## Milestone 5 — submission-grade product (`PLANNED`)
 
