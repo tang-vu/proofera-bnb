@@ -12,7 +12,7 @@ Status: **NOT RUN**. Nothing in this directory is a benchmark result or a publis
 
 The digest covers the exact task, required input-binding rules, fixed constraints, environment-binding rules, rubric, hard-fail rules, parity controls, measurements, artifacts, receipts and reproduction plan. It is local tamper evidence, not an external timestamp or proof that a run occurred. Changing a definition requires a new version and digest; it must not overwrite the protocol used by a started run.
 
-Exact account, position, blocks, policies, endpoints, registered agent identities, configurations, release commit and timed runner commands are deliberately `UNBOUND`. Treating placeholder values as exact benchmark inputs would create false evidence. A protocol stays non-publishable until those fields are frozen once into one `BenchmarkDeclaration` and that byte-equivalent declaration is used by both runs.
+Exact account, position, blocks, policies, registered agent identities, final configurations, release commit and timed invocation commands are deliberately `UNBOUND`. The Venus agent lane endpoint is code-fixed, but that does not bind the final task declaration or create a run. Treating placeholder values as exact benchmark inputs would create false evidence. A protocol stays non-publishable until those fields are frozen once into one `BenchmarkDeclaration` and that byte-equivalent declaration is used by both runs.
 
 Validate the preregistrations and paired-run harness:
 
@@ -21,9 +21,21 @@ pnpm --filter @proofera/benchmarks typecheck
 pnpm --filter @proofera/benchmarks test
 ```
 
-The tests perform no network request, agent invocation, wallet operation, transaction, timing measurement or result generation. Task-specific prerequisite commands are recorded inside each JSON file. Their timed runner commands remain `null` until a real reproducible runner and exact inputs exist.
+The tests perform no network request, wallet operation, transaction, real timing measurement or result generation. Subprocess tests prove the Venus CLI fails before network access when its exact invocation is absent. Task-specific prerequisite commands are recorded inside each JSON file. Their final timed invocations remain `null` until exact inputs, identity and hire evidence exist.
 
 Future raw run material belongs in a new run-ID directory, never inside `preregistrations/`. It must include the frozen declaration, raw inputs and outputs, UTC and monotonic timing, active-time segments, sourced integer costs, API/transaction receipts when required, rubric-complete second review, hashes, reproduction logs and limitations. Secrets and signer material are forbidden.
+
+The create-only Venus agent runner is available as:
+
+```text
+pnpm run:termix:venus-agent -- --execute-exact-venus-health-agent-run --request-input evidence/termix/frozen/venus-health/<bound-request>.canonical-json
+```
+
+It reads the public timed invocation from standard input. It requires a clean,
+published source commit and byte-exact committed request, then writes one new
+capture beneath `runs/venus-health/`. The command is not currently runnable as
+a benchmark because no final request, registered agent identity or verified
+hire receipt exists.
 
 The read-only Venus preparation collector can be run against two fixed public BSC-testnet RPC origins without changing a preregistration:
 

@@ -74,15 +74,6 @@ From the repository root:
 pnpm --filter @proofera/benchmarks test
 ```
 
-The fixed `runVenusHealthAgentTermixMethod` lane is now implemented and tested.
-It digest-binds the canonical Health request, public endpoint and lane
-configuration; preserves the raw A2A response; and rejects redirects,
-malformed envelopes, mismatched IDs, agent errors, oversized responses or
-widened trust/execution flags. The outer timed runner rejects an unregistered
-agent or missing independently verified hire receipt before the lane can make
-an HTTP request. This is runner capability only: the final declaration and
-command remain unbound, and the lane has not been invoked as a TermiX run.
-
 Timed reproduction command: **UNBOUND**. Agent result: **NOT RUN**. Manual result: **NOT RUN**.
 
 ## Task 02 — Altana/Pancake autonomous-session permission audit
@@ -133,6 +124,16 @@ From the repository root:
 ```bash
 pnpm --filter @proofera/benchmarks test
 ```
+
+The fixed `runVenusHealthAgentTermixMethod` lane and its root create-only CLI
+are implemented and tested. They digest-bind the canonical Health request,
+public endpoint and lane configuration; preserve the raw A2A response; verify
+a clean published source commit and committed input; and reject redirects,
+malformed envelopes, mismatched IDs, ambiguous parts, oversized responses or
+widened trust/execution flags. The outer timed runner rejects an unregistered
+agent or missing independently verified hire receipt before the lane can make
+an HTTP request. This is runner capability only: the exact final invocation
+remains unbound, and the CLI has not been invoked as a TermiX run.
 
 Timed reproduction command: **UNBOUND**. Agent result: **NOT RUN**. Manual result: **NOT RUN**.
 

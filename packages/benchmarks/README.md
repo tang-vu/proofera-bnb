@@ -1,6 +1,10 @@
 # ProofEra paired benchmark harness
 
-This package validates and summarizes paired TermiX experiments. It does not run agents, execute reproduction commands, contact APIs, read chains, generate receipts, or fill missing values.
+This package validates and summarizes paired TermiX experiments. Its generic
+schemas and timing core do not execute shell commands, read chains, generate
+receipts, or fill missing values. The separately exported Venus agent lane can
+make one fixed public A2A request only after the caller supplies all outer
+eligibility evidence.
 
 Each agent and manual run carries its own immutable declaration. A pair is rejected unless the exact task, inputs, constraints, environment, receipt expectations, and pre-declared quality rubric match after canonical normalization. Costs stay in integer minor units and are grouped by denomination; the harness never performs exchange-rate conversion.
 
@@ -23,6 +27,14 @@ oversized responses or any output that widens the analyzer's five false trust
 and execution flags. The outer runner still rejects missing ERC-8004 identity
 or verified hire receipt before this lane can make its HTTP request. The A2A
 receipt does not independently authenticate the frozen Venus RPC evidence.
+
+The root `pnpm run:termix:venus-agent` CLI is the create-only production entry
+for that lane. It accepts the public invocation on standard input, requires a
+canonical Health request already committed under
+`evidence/termix/frozen/venus-health/`, verifies a clean `HEAD` equal to
+`origin/main`, and writes only a new capture under
+`evidence/termix/runs/venus-health/`. The exact final invocation remains
+unbound until the real declaration, ERC-8004 identity and hire receipt exist.
 
 ```bash
 pnpm --filter @proofera/benchmarks typecheck
