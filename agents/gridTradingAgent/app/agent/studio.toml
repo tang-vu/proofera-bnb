@@ -3,7 +3,17 @@ name = "gridTradingAgent-agent"
 
 [stack]
 runtime = "agentcore"
+protocol = "A2A"
 protocols = ["A2A", "MCP"]
 
 [network]
 default = "bsc-testnet"
+
+[identity]
+endpoint = "https://proofera-grid.tangvu.dev/"
+
+[wallet]
+kind = "evm-local"
+signer = "local"
+keystore_dir = "../../.studio/wallets"
+address = "0xFBfFa9BA36d578AFF2d05EDe840Fc7088e70ADB8"

@@ -3,7 +3,17 @@ name = "lpRangeAgent-agent"
 
 [stack]
 runtime = "agentcore"
+protocol = "A2A"
 protocols = ["A2A", "MCP"]
 
 [network]
 default = "bsc-testnet"
+
+[identity]
+endpoint = "https://proofera-lp.tangvu.dev/"
+
+[wallet]
+kind = "evm-local"
+signer = "local"
+keystore_dir = "../../.studio/wallets"
+address = "0xAd03eF7e21c35FD1446c153f6eE5e6165F696990"

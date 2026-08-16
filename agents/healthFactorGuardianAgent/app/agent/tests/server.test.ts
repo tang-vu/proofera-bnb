@@ -19,12 +19,19 @@ import {
 } from "../src/dualMain.js";
 import { resolveRuntimeConfig } from "../src/runtimeConfig.js";
 
-test("Studio manifest declares only dual read-only protocol faces", () => {
+test("Studio manifest binds dual read-only faces and public registration metadata", () => {
   const manifest = loadStudioToml(fileURLToPath(new URL("../studio.toml", import.meta.url)));
   assert.equal(table(manifest.project).name, "healthFactorGuardianAgent-agent");
   assert.equal(table(manifest.stack).runtime, "agentcore");
+  assert.equal(table(manifest.stack).protocol, "A2A");
   assert.deepEqual(table(manifest.stack).protocols, ["A2A", "MCP"]);
-  assert.equal(manifest.wallet, undefined);
+  assert.equal(table(manifest.identity).endpoint, "https://proofera-health.tangvu.dev/");
+  assert.deepEqual(table(manifest.wallet), {
+    address: "0x708cb7F2b974d94005E762A140c469F1125e0cB4",
+    keystore_dir: "../../.studio/wallets",
+    kind: "evm-local",
+    signer: "local"
+  });
   assert.equal(manifest.payments, undefined);
   assert.equal(manifest.llm, undefined);
 });

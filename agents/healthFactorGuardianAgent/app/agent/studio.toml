@@ -3,7 +3,17 @@ name = "healthFactorGuardianAgent-agent"
 
 [stack]
 runtime = "agentcore"
+protocol = "A2A"
 protocols = ["A2A", "MCP"]
 
 [network]
 default = "bsc-testnet"
+
+[identity]
+endpoint = "https://proofera-health.tangvu.dev/"
+
+[wallet]
+kind = "evm-local"
+signer = "local"
+keystore_dir = "../../.studio/wallets"
+address = "0x708cb7F2b974d94005E762A140c469F1125e0cB4"

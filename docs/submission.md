@@ -14,7 +14,7 @@ Users begin with a financial job—protect a Venus loan, manage Pancake concentr
 
 - Ingests third-party ERC-8004 identities without mistaking self-description for proof.
 - Locally renders one explicitly non-live Reference Analyzer dossier for each required category, with per-metric implemented/not-run versus absent-calculator truth. LP has a separate bounded configuration surface; Grid, Yield, and Health have strict configuration-only mandate routes. Equal live Passports, permission controls, activation, and receipts are still implementation/deployment work.
-- Includes four exact-pinned, hardened, non-executing Studio-shaped reference-agent runtimes: LP Range (17 tests), Grid Trading (24), Yield Optimisation (33), and Health-Factor Guardian (37). All four expose public HTTPS health and Agent Card endpoints, but none is ERC-8004-registered, execution-enabled, or eligible for a live marketplace claim.
+- Includes four exact-pinned, hardened, non-executing self-hosted A2A/MCP reference analyzers: LP Range (17 tests), Grid Trading (24), Yield Optimisation (33), and Health-Factor Guardian (37). All four expose public HTTPS health and Agent Card endpoints, but none is ERC-8004-registered, execution-enabled, or eligible for a live marketplace claim. Studio 0.0.5 does not classify the TypeScript runtimes as AgentCore-deployable, and ProofEra does not claim otherwise.
 - Uses typed adapter boundaries, exact versions and evidence manifests that can survive undisclosed Phase 2 requirements.
 - Treats permission inspection, status reconciliation and revoke as core marketplace features.
 

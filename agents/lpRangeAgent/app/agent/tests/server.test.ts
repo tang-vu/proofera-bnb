@@ -23,7 +23,7 @@ const RUNTIME_CONFIG = {
   publicUrl: "https://lp-range.example/a2a/"
 } as const;
 
-test("Studio manifest declares only read-only A2A and MCP runtime facts", () => {
+test("Studio manifest binds read-only protocols and public registration metadata", () => {
   const manifest = readFileSync(fileURLToPath(new URL("../studio.toml", import.meta.url)), "utf8")
     .replaceAll("\r\n", "\n")
     .trim();
@@ -35,10 +35,20 @@ test("Studio manifest declares only read-only A2A and MCP runtime facts", () => 
       "",
       "[stack]",
       'runtime = "agentcore"',
+      'protocol = "A2A"',
       'protocols = ["A2A", "MCP"]',
       "",
       "[network]",
-      'default = "bsc-testnet"'
+      'default = "bsc-testnet"',
+      "",
+      "[identity]",
+      'endpoint = "https://proofera-lp.tangvu.dev/"',
+      "",
+      "[wallet]",
+      'kind = "evm-local"',
+      'signer = "local"',
+      'keystore_dir = "../../.studio/wallets"',
+      'address = "0xAd03eF7e21c35FD1446c153f6eE5e6165F696990"'
     ].join("\n")
   );
 
