@@ -1,5 +1,14 @@
-import { sha256Bytes, sha256Canonical } from "./canonical.js";
-import { type PermissionAuditBundle } from "./permissionAudit.js";
+import { canonicalJson, sha256Bytes, sha256Canonical } from "./canonical.js";
+import {
+  expectedPermissionAuditDeclarationInputs,
+  type PermissionAuditBundle
+} from "./permissionAudit.js";
+import { TERMIX_TIMED_RUNNER_PROTOCOL_VERSION, type TermixTimedRunRequest } from "./runner.js";
+import {
+  BenchmarkDeclarationSchema,
+  normalizeBenchmarkDeclaration,
+  type BenchmarkDeclaration
+} from "./schemas.js";
 
 export const PERMISSION_AUDIT_FIXTURE = Object.freeze({
   code: "0x60006000",
@@ -11,6 +20,9 @@ export const PERMISSION_AUDIT_FIXTURE = Object.freeze({
   target: `0x${"1".repeat(40)}`,
   token: `0x${"3".repeat(40)}`
 });
+
+export const PERMISSION_AUDIT_FIXTURE_COMMIT = "a".repeat(40);
+export const PERMISSION_AUDIT_FIXTURE_RUN_ID = "permission-agent-001";
 
 export function permissionAuditFixtureBundle(): PermissionAuditBundle {
   const fixture = PERMISSION_AUDIT_FIXTURE;
@@ -116,4 +128,133 @@ export function permissionAuditFixtureRpcResponses(
     }),
     JSON.stringify({ id: exchangeIds[3], jsonrpc: "2.0", result: fixture.code })
   ];
+}
+
+export function permissionAuditFixtureDeclaration(
+  configurationSha256: string,
+  agentEndpoint: string,
+  rpcEndpoint: string
+): BenchmarkDeclaration {
+  const bundle = permissionAuditFixtureBundle();
+  return BenchmarkDeclarationSchema.parse({
+    benchmarkId: "permission-audit-live-v1",
+    constraints: [
+      {
+        constraintId: "read-only",
+        description: "No timed write, signature or broadcast.",
+        enforcement: "hard",
+        expected: { encoding: "canonical_json", value: "true" }
+      }
+    ],
+    environment: {
+      chainId: 97,
+      components: [
+        { configurationSha256: null, name: "node", version: "24.14.1" },
+        {
+          configurationSha256,
+          name: "proofera-security-auditor",
+          version: "1.0.0"
+        }
+      ],
+      kind: "testnet",
+      networkName: "BNB Smart Chain Testnet",
+      parameters: [
+        {
+          key: "authority-source-block",
+          value: {
+            encoding: "decimal_integer",
+            value: bundle.codeAuthorityAttestation.blockNumber
+          }
+        },
+        {
+          key: "permission-audit-agent-endpoint",
+          value: { encoding: "string", value: agentEndpoint }
+        },
+        {
+          key: "permission-audit-rpc-endpoint",
+          value: { encoding: "string", value: rpcEndpoint }
+        }
+      ],
+      softwareCommitSha: PERMISSION_AUDIT_FIXTURE_COMMIT
+    },
+    inputs: [...expectedPermissionAuditDeclarationInputs(bundle)].map(([inputId, value]) => ({
+      description: `Frozen ${inputId}`,
+      inputId,
+      unit: null,
+      value: { encoding: "canonical_json", value }
+    })),
+    qualityRubric: {
+      criteria: [
+        {
+          criterionId: "correctness",
+          description: "Evidence-linked true positives and corrected policy.",
+          evidenceRequired: "Canonical output and answer-key adjudication.",
+          maximumPoints: 100,
+          measurement: "Compare with the frozen reviewer-held answer key."
+        }
+      ],
+      declaredAtUtc: "2026-08-17T00:00:00.000Z",
+      rubricId: "permission-audit-rubric",
+      totalMaximumPoints: 100,
+      version: "1.0.0"
+    },
+    requiredReceiptKinds: ["api", "transaction"],
+    task: {
+      domain: "security",
+      exactDefinition: "Audit one frozen secret-free Altana permission bundle read-only.",
+      successCondition: "Return evidence-linked findings and a corrected enforcement table.",
+      taskId: "autonomous-session-permission-audit",
+      title: "Altana permission audit"
+    }
+  });
+}
+
+export function permissionAuditFixtureAgentRequest(
+  configurationSha256: string,
+  agentEndpoint: string,
+  rpcEndpoint: string
+): TermixTimedRunRequest {
+  const declaration = permissionAuditFixtureDeclaration(
+    configurationSha256,
+    agentEndpoint,
+    rpcEndpoint
+  );
+  const hireTransactionHash = `0x${"9".repeat(64)}`;
+  const rawReceipt = '{"status":"0x1"}';
+  return {
+    declaration,
+    declarationSha256: sha256Bytes(canonicalJson(normalizeBenchmarkDeclaration(declaration))),
+    hireReceipt: {
+      chainId: 97,
+      explorerUrl: `https://testnet.bscscan.com/tx/${hireTransactionHash}`,
+      observedAtUtc: "2026-08-17T00:01:00.000Z",
+      rawReceipt,
+      rawReceiptSha256: sha256Bytes(rawReceipt),
+      state: "verified",
+      transactionHash: hireTransactionHash,
+      verificationMethod: "Fixture receipt comparison",
+      verifiedAtUtc: "2026-08-17T00:02:00.000Z",
+      verifier: "Fixture verifier"
+    },
+    method: {
+      agentReference: {
+        agentId: "42",
+        chainId: 97,
+        registryAddress: `0x${"a".repeat(40)}`,
+        registrySourceUrl: `https://testnet.bscscan.com/address/0x${"a".repeat(40)}`,
+        standard: "ERC-8004",
+        state: "registered"
+      },
+      configurationSha256,
+      kind: "agent",
+      label: "Registered ProofEra permission auditor",
+      marketplace: "ProofEra",
+      runtime: "ProofEra deterministic A2A"
+    },
+    protocolVersion: TERMIX_TIMED_RUNNER_PROTOCOL_VERSION,
+    repositoryClean: true,
+    runId: PERMISSION_AUDIT_FIXTURE_RUN_ID,
+    runnerId: "permission-audit-agent-v1",
+    sourceCommitSha: PERMISSION_AUDIT_FIXTURE_COMMIT
+  };
 }

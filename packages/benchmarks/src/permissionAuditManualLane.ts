@@ -4,12 +4,14 @@ import { canonicalJson, isCanonicalJsonText, sha256Bytes } from "./canonical.js"
 import {
   PermissionAuditBundleSchema,
   PermissionAuditOutputSchema,
+  expectedPermissionAuditDeclarationInputs,
   type PermissionAuditBundle
 } from "./permissionAudit.js";
 import {
   PERMISSION_AUDIT_RPC_ENDPOINT,
   PERMISSION_AUDIT_RPC_PROVIDER,
   buildPermissionAuditRpcPlan,
+  permissionAuditRpcIdPrefix,
   validatePermissionAuditRpcResponse
 } from "./permissionAuditRpc.js";
 import {
@@ -26,13 +28,6 @@ export const PERMISSION_AUDIT_MANUAL_PROCEDURE_VERSION =
 
 const MAXIMUM_EVENTS = 250;
 const MAXIMUM_BODY_BYTES = 2_000_000;
-const INPUT_BINDINGS = Object.freeze({
-  "activation-proposal": "activationProposalArtifactId",
-  "adversarial-corpus": "adversarialCorpusArtifactId",
-  "authority-lifecycle-receipts": "authorityLifecycleReceiptsArtifactId",
-  "code-authority-attestation": "codeAuthorityAttestationArtifactId",
-  "sdk-behavior-evidence": "sdkBehaviorEvidenceArtifactId"
-} as const);
 
 const eventSchema = z.discriminatedUnion("event", [
   z.strictObject({
@@ -222,15 +217,9 @@ function validateManualBindings(
   ) {
     throw new Error("TERMIX_PERMISSION_AUDIT_MANUAL_TOOLS_MISMATCH");
   }
-  for (const [inputId, bindingKey] of Object.entries(INPUT_BINDINGS)) {
-    const artifactId = bundle.sourceBindings[bindingKey as keyof typeof bundle.sourceBindings];
-    const artifact = bundle.evidence.find((candidate) => candidate.artifactId === artifactId);
+  for (const [inputId, expectedValue] of expectedPermissionAuditDeclarationInputs(bundle)) {
     const declared = context.declaration.inputs.find((input) => input.inputId === inputId);
-    if (
-      artifact === undefined ||
-      declared?.value.encoding !== "canonical_json" ||
-      declared.value.value !== canonicalJson(artifact)
-    ) {
+    if (declared?.value.encoding !== "canonical_json" || declared.value.value !== expectedValue) {
       throw new Error("TERMIX_PERMISSION_AUDIT_MANUAL_DECLARATION_INPUT_MISMATCH");
     }
   }
@@ -260,10 +249,6 @@ function validateManualOutput(
   ) {
     throw new Error("TERMIX_PERMISSION_AUDIT_MANUAL_OUTPUT_BINDING_MISMATCH");
   }
-}
-
-export function permissionAuditRpcIdPrefix(runId: string): string {
-  return `audit-${sha256Bytes(runId).slice(0, 16)}`;
 }
 
 function validMonotonic(clock: TermixRunnerClock): bigint {

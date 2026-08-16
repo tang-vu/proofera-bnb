@@ -7,6 +7,10 @@ import { BenchmarkIdSchema } from "./schemas.js";
 export const PERMISSION_AUDIT_RPC_ENDPOINT = "https://bsc-testnet-rpc.publicnode.com" as const;
 export const PERMISSION_AUDIT_RPC_PROVIDER = "PublicNode BSC Testnet JSON-RPC" as const;
 
+export function permissionAuditRpcIdPrefix(runId: string): string {
+  return `audit-${sha256Bytes(runId).slice(0, 16)}`;
+}
+
 const jsonRpcResponseSchema = z.strictObject({
   id: z.string().min(1).max(100),
   jsonrpc: z.literal("2.0"),

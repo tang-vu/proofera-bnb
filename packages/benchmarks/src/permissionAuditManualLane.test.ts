@@ -4,11 +4,10 @@ import { canonicalJson, sha256Bytes } from "./canonical.js";
 import { auditPermissionBundle, type PermissionAuditBundle } from "./permissionAudit.js";
 import {
   PERMISSION_AUDIT_MANUAL_PROCEDURE_VERSION,
-  permissionAuditRpcIdPrefix,
   runPermissionAuditManualTermixMethod,
   type PermissionAuditManualEvent
 } from "./permissionAuditManualLane.js";
-import { buildPermissionAuditRpcPlan } from "./permissionAuditRpc.js";
+import { buildPermissionAuditRpcPlan, permissionAuditRpcIdPrefix } from "./permissionAuditRpc.js";
 import {
   PERMISSION_AUDIT_FIXTURE,
   permissionAuditFixtureBundle,

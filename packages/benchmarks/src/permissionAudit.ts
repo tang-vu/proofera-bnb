@@ -104,6 +104,27 @@ export const PermissionAuditBundleSchema = z.strictObject({
 
 export type PermissionAuditBundle = z.output<typeof PermissionAuditBundleSchema>;
 
+export const PERMISSION_AUDIT_DECLARATION_INPUT_BINDINGS = Object.freeze({
+  "activation-proposal": "activationProposalArtifactId",
+  "adversarial-corpus": "adversarialCorpusArtifactId",
+  "authority-lifecycle-receipts": "authorityLifecycleReceiptsArtifactId",
+  "code-authority-attestation": "codeAuthorityAttestationArtifactId",
+  "sdk-behavior-evidence": "sdkBehaviorEvidenceArtifactId"
+} as const);
+
+export function expectedPermissionAuditDeclarationInputs(
+  bundle: PermissionAuditBundle
+): ReadonlyMap<string, string> {
+  const values = new Map<string, string>();
+  for (const [inputId, bindingKey] of Object.entries(PERMISSION_AUDIT_DECLARATION_INPUT_BINDINGS)) {
+    const artifactId = bundle.sourceBindings[bindingKey as keyof typeof bundle.sourceBindings];
+    const artifact = bundle.evidence.find((candidate) => candidate.artifactId === artifactId);
+    if (artifact === undefined) throw new Error("TERMIX_PERMISSION_AUDIT_SOURCE_BINDING_UNBOUND");
+    values.set(inputId, canonicalJson(artifact));
+  }
+  return values;
+}
+
 const severityByFindingId = {
   "code-substitution": "critical",
   "generic-dispatcher": "critical",

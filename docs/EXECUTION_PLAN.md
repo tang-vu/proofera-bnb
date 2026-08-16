@@ -150,9 +150,13 @@ block hash; it exposes no arbitrary RPC method. Its public agent/manual lanes
 are now partially closed: the manual lane requires positive timed work, every
 digest-bound artifact exactly once, the complete fixed RPC plan, the five
 preregistered declaration input joins, no hire receipt and a canonical
-`agentInvoked: false` output. The public agent lane and both CLIs, final frozen
-bundle, real manual transcript, sourced cost and second-review artifacts remain
-required.
+`agentInvoked: false` output. The fixed agent lane is now implemented but not live: registration
+and verified hire are outer pre-network gates, the complete RPC plan runs before
+the one fixed A2A skill, declaration endpoint/component/input drift fails
+closed, and the response must bind the exact bundle with no execution. The
+deployed LP endpoint does not advertise or serve that audit skill yet. That
+public skill, both CLIs, the final frozen bundle, real manual transcript,
+sourced cost and second-review artifacts remain required.
 
 ## Milestone 5 — submission-grade product (`PLANNED`)
 
