@@ -25,7 +25,6 @@ const ACCOUNT = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const V_BNB = "0x3333333333333333333333333333333333333333";
 const V_USDC = "0x4444444444444444444444444444444444444444";
 const V_BTCB = "0x5555555555555555555555555555555555555555";
-const V_ETH = "0x6666666666666666666666666666666666666666";
 const TX = `0x${"9".repeat(64)}`;
 const TX_2 = `0x${"8".repeat(64)}`;
 const ZERO_ADDRESS = `0x${"0".repeat(40)}`;
@@ -34,7 +33,39 @@ const E18 = 10n ** 18n;
 const THRESHOLD = 800000000000000000n;
 const DEBT = 1000000000n;
 const QUOTE_VALUE_UNIT = "usd" as const;
-const QUOTE_VALUE_SCALE_DECIMALS = 6;
+const QUOTE_VALUE_SCALE_DECIMALS = 18 as const;
+
+function mulE18(left: bigint, right: bigint): bigint {
+  return (left * right) / E18;
+}
+
+function collateralValues(
+  vTokenBalance: bigint,
+  threshold = THRESHOLD,
+  exchangeRate = E18,
+  oraclePrice = E18
+) {
+  return {
+    vTokenBalanceRaw: vTokenBalance.toString(),
+    exchangeRateMantissaRaw: exchangeRate.toString(),
+    oraclePriceMantissaRaw: oraclePrice.toString(),
+    fixedPointScaleDecimals: 18 as const,
+    collateralValueRaw: mulE18(mulE18(exchangeRate, oraclePrice), vTokenBalance).toString(),
+    adjustedCollateralValueRaw: mulE18(
+      mulE18(mulE18(threshold, exchangeRate), oraclePrice),
+      vTokenBalance
+    ).toString()
+  };
+}
+
+function debtValues(borrowBalance: bigint, oraclePrice = E18) {
+  return {
+    borrowBalanceRaw: borrowBalance.toString(),
+    oraclePriceMantissaRaw: oraclePrice.toString(),
+    fixedPointScaleDecimals: 18 as const,
+    debtValueRaw: mulE18(oraclePrice, borrowBalance).toString()
+  };
+}
 
 function blockHash(character: string): string {
   return `0x${character.repeat(64)}`;
@@ -100,7 +131,7 @@ function collateralSource(
 ) {
   return {
     ...sourceCommon(chainId, blockNumber, hash, blockTimestampUtc),
-    readMethod: "venus_core_pool_collateral_value_and_threshold_v1" as const,
+    readMethod: "venus_core_pool_collateral_operands_and_values_v2" as const,
     market,
     underlyingAsset,
     vTokenAddress
@@ -118,7 +149,7 @@ function debtSource(
 ) {
   return {
     ...sourceCommon(chainId, blockNumber, hash, blockTimestampUtc),
-    readMethod: "venus_core_pool_debt_value_v1" as const,
+    readMethod: "venus_core_pool_debt_operands_and_value_v2" as const,
     market,
     underlyingAsset,
     vTokenAddress
@@ -204,7 +235,7 @@ function fixture(chainId: 56 | 97 = 97): HealthFactorAnalysisInput {
           market: "Venus BNB Core",
           underlyingAsset: "BNB",
           vTokenAddress: V_BNB,
-          collateralValueRaw: "2000000000",
+          ...collateralValues(2000000000n),
           quoteValueUnit: QUOTE_VALUE_UNIT,
           quoteValueScaleDecimals: QUOTE_VALUE_SCALE_DECIMALS,
           effectiveLiquidationThresholdRaw: THRESHOLD.toString(),
@@ -222,7 +253,7 @@ function fixture(chainId: 56 | 97 = 97): HealthFactorAnalysisInput {
           market: "Venus USDC Core",
           underlyingAsset: "USDC",
           vTokenAddress: V_USDC,
-          debtValueRaw: DEBT.toString(),
+          ...debtValues(DEBT),
           quoteValueUnit: QUOTE_VALUE_UNIT,
           quoteValueScaleDecimals: QUOTE_VALUE_SCALE_DECIMALS,
           chainId,
@@ -324,7 +355,7 @@ test("computes exact current and minimum health factors with explicit provenance
   assert.equal(testnet.currentHealthFactor.numerator, adjustedValueRaw(1600000000000000000n));
   assert.equal(testnet.currentHealthFactor.denominator, DEBT.toString());
   assert.equal(testnet.monitoredPositions.quoteValueUnit, "usd");
-  assert.equal(testnet.monitoredPositions.quoteValueScaleDecimals, 6);
+  assert.equal(testnet.monitoredPositions.quoteValueScaleDecimals, 18);
   assert.equal(testnet.observationWindow.status, "sufficient");
   assert.equal(testnet.observationWindow.windowSeconds, 170);
   assert.equal(testnet.observationWindow.minimumHealthFactor.state, "computed");
@@ -364,7 +395,7 @@ test("matches Venus per-market truncation before summing adjusted collateral", (
   snapshot.collateralPositions = [
     {
       ...collateral,
-      collateralValueRaw: "1",
+      ...collateralValues(1n, E18 / 2n),
       effectiveLiquidationThresholdRaw: halfThreshold
     },
     {
@@ -372,7 +403,7 @@ test("matches Venus per-market truncation before summing adjusted collateral", (
       market: "Venus BTCB Core",
       underlyingAsset: "BTCB",
       vTokenAddress: V_BTCB,
-      collateralValueRaw: "1",
+      ...collateralValues(1n, E18 / 2n),
       effectiveLiquidationThresholdRaw: halfThreshold,
       source: {
         ...collateral.source,
@@ -384,7 +415,7 @@ test("matches Venus per-market truncation before summing adjusted collateral", (
   ];
   methodology.source.collateralVTokenAddresses = [V_BNB, V_BTCB];
   snapshot.source.collateralVTokenAddresses = [V_BNB, V_BTCB];
-  snapshot.debtPositions[0] = { ...debt, debtValueRaw: "1" };
+  snapshot.debtPositions[0] = { ...debt, ...debtValues(1n) };
   input.observationSeries = {
     complete: true,
     observations: [
@@ -415,6 +446,56 @@ test("matches Venus per-market truncation before summing adjusted collateral", (
   assert.equal(result.currentHealthFactor.denominator, "1");
   assert.equal(result.currentHealthFactor.decimalValueFloor, "0");
   assert.equal(result.decision, "review_intervention");
+});
+
+test("uses ComptrollerLens operand order instead of reweighting an already-truncated value", () => {
+  const input = fixture();
+  const snapshot = input.currentSnapshot;
+  const series = input.observationSeries;
+  const policy = input.policy;
+  assert.ok(snapshot);
+  assert.ok(series);
+  assert.ok(policy);
+  const collateral = snapshot.collateralPositions[0];
+  const debt = snapshot.debtPositions[0];
+  const currentObservation = series.observations.at(-1);
+  assert.ok(collateral);
+  assert.ok(debt);
+  assert.ok(currentObservation);
+
+  const threshold = E18 / 3n;
+  const exact = collateralValues(3n, threshold, E18 + 1n, E18 + 4n);
+  assert.equal(exact.collateralValueRaw, "3");
+  assert.equal(exact.adjustedCollateralValueRaw, "1");
+  assert.equal(mulE18(BigInt(exact.collateralValueRaw), threshold), 0n);
+  snapshot.collateralPositions[0] = {
+    ...collateral,
+    ...exact,
+    effectiveLiquidationThresholdRaw: threshold.toString()
+  };
+  snapshot.debtPositions[0] = { ...debt, ...debtValues(1n) };
+  series.observations = [
+    { ...currentObservation, adjustedCollateralValueRaw: "1", debtValueRaw: "1" }
+  ];
+  input.policy = {
+    ...policy,
+    minimumHistoryObservations: 1,
+    minimumObservationWindowSeconds: 0,
+    minimumAlertReceipts: 0
+  };
+  input.alertReceipts = null;
+
+  const result = analyzeHealthFactor(input);
+  assert.equal(result.currentHealthFactor.numerator, "1");
+  assert.equal(result.currentHealthFactor.denominator, "1");
+
+  snapshot.collateralPositions[0] = {
+    ...snapshot.collateralPositions[0],
+    adjustedCollateralValueRaw: "0"
+  };
+  const mismatch = analyzeHealthFactor(input);
+  assert.equal(mismatch.currentHealthFactor.state, "unavailable");
+  assert.ok(mismatch.constraintViolations.some(({ code }) => code === "DERIVED_VALUE_MISMATCH"));
 });
 
 test("returns hold for a healthy sufficient window when alert receipts are not required", () => {
@@ -488,9 +569,12 @@ test("cross-block and fixed-point scale mismatches fail closed", () => {
   const wrongScale = fixture();
   const wrongSnapshot = wrongScale.currentSnapshot;
   assert.ok(wrongSnapshot);
-  const wrongDebt = wrongSnapshot.debtPositions[0];
-  assert.ok(wrongDebt);
-  wrongSnapshot.debtPositions[0] = { ...wrongDebt, quoteValueScaleDecimals: 18 };
+  const wrongCollateral = wrongSnapshot.collateralPositions[0];
+  assert.ok(wrongCollateral);
+  wrongSnapshot.collateralPositions[0] = {
+    ...wrongCollateral,
+    liquidationThresholdScaleDecimals: 17
+  };
   const wrongScaleResult = analyzeHealthFactor(wrongScale);
   assert.equal(wrongScaleResult.decision, "insufficient_evidence");
   assert.ok(wrongScaleResult.constraintViolations.some(({ code }) => code === "SCALE_MISMATCH"));
@@ -582,7 +666,7 @@ test("models zero debt as not applicable without infinity", () => {
   assert.ok(policy);
   const debt = snapshot.debtPositions[0];
   assert.ok(debt);
-  snapshot.debtPositions[0] = { ...debt, debtValueRaw: "0" };
+  snapshot.debtPositions[0] = { ...debt, ...debtValues(0n) };
   const currentObservation = series.observations.at(-1);
   assert.ok(currentObservation);
   series.observations[series.observations.length - 1] = {
@@ -884,7 +968,7 @@ test("history cannot claim a current window when its current-block aggregate dif
   );
 });
 
-test("preserves huge uint256 values and exact rational arithmetic", () => {
+test("preserves huge overflow-safe values and exact rational arithmetic", () => {
   const input = fixture();
   const snapshot = input.currentSnapshot;
   const series = input.observationSeries;
@@ -898,17 +982,18 @@ test("preserves huge uint256 values and exact rational arithmetic", () => {
   assert.ok(collateral);
   assert.ok(debt);
   assert.ok(currentObservation);
-  const maximum = ((1n << 256n) - 1n).toString();
+  const maximum = (1n << 256n) - 1n;
+  const maximumSafeValue = maximum / E18;
   snapshot.collateralPositions[0] = {
     ...collateral,
-    collateralValueRaw: maximum,
+    ...collateralValues(maximumSafeValue, E18),
     effectiveLiquidationThresholdRaw: E18.toString()
   };
-  snapshot.debtPositions[0] = { ...debt, debtValueRaw: "1" };
+  snapshot.debtPositions[0] = { ...debt, ...debtValues(1n) };
   series.observations = [
     {
       ...currentObservation,
-      adjustedCollateralValueRaw: maximum,
+      adjustedCollateralValueRaw: maximumSafeValue.toString(),
       debtValueRaw: "1"
     }
   ];
@@ -921,13 +1006,13 @@ test("preserves huge uint256 values and exact rational arithmetic", () => {
   input.alertReceipts = null;
 
   const result = analyzeHealthFactor(input);
-  assert.equal(result.monitoredPositions.totalCollateralValueRaw, maximum);
-  assert.equal(result.currentHealthFactor.numerator, maximum);
+  assert.equal(result.monitoredPositions.totalCollateralValueRaw, maximumSafeValue.toString());
+  assert.equal(result.currentHealthFactor.numerator, maximumSafeValue.toString());
   assert.equal(result.currentHealthFactor.denominator, "1");
   assert.equal(result.executionEnabled, false);
 });
 
-test("fails closed when summed adjusted collateral or debt exceeds uint256", () => {
+test("fails closed when a Venus intermediate multiplication exceeds uint256", () => {
   const input = fixture();
   const snapshot = input.currentSnapshot;
   assert.ok(snapshot);
@@ -939,25 +1024,19 @@ test("fails closed when summed adjusted collateral or debt exceeds uint256", () 
   snapshot.collateralPositions = [
     {
       ...collateral,
+      vTokenBalanceRaw: maximum,
+      exchangeRateMantissaRaw: E18.toString(),
+      oraclePriceMantissaRaw: E18.toString(),
+      effectiveLiquidationThresholdRaw: E18.toString(),
       collateralValueRaw: maximum,
-      effectiveLiquidationThresholdRaw: E18.toString()
-    },
-    {
-      ...collateral,
-      market: "Venus BTCB Core",
-      underlyingAsset: "BTCB",
-      vTokenAddress: V_BTCB,
-      collateralValueRaw: maximum,
-      effectiveLiquidationThresholdRaw: E18.toString()
+      adjustedCollateralValueRaw: maximum
     }
   ];
   snapshot.debtPositions = [
-    { ...debt, debtValueRaw: maximum },
     {
       ...debt,
-      market: "Venus ETH Core",
-      underlyingAsset: "ETH",
-      vTokenAddress: V_ETH,
+      borrowBalanceRaw: maximum,
+      oraclePriceMantissaRaw: E18.toString(),
       debtValueRaw: maximum
     }
   ];
@@ -966,12 +1045,8 @@ test("fails closed when summed adjusted collateral or debt exceeds uint256", () 
   assert.equal(result.currentHealthFactor.state, "unavailable");
   assert.equal(result.decision, "insufficient_evidence");
   assert.ok(
-    result.constraintViolations.some(
-      ({ code }) => code === "ADJUSTED_COLLATERAL_AGGREGATE_EXCEEDS_UINT256"
-    )
-  );
-  assert.ok(
-    result.constraintViolations.some(({ code }) => code === "DEBT_AGGREGATE_EXCEEDS_UINT256")
+    result.constraintViolations.filter(({ code }) => code === "VENUS_ARITHMETIC_OVERFLOW")
+      .length === 2
   );
 });
 
@@ -1201,11 +1276,11 @@ function setCurrentHealthFactor(input: HealthFactorAnalysisInput, healthFactorRa
   const collateralValue = (healthFactorRaw * DEBT) / THRESHOLD;
   snapshot.collateralPositions[0] = {
     ...collateral,
-    collateralValueRaw: collateralValue.toString()
+    ...collateralValues(collateralValue)
   };
   series.observations[series.observations.length - 1] = {
     ...currentObservation,
-    adjustedCollateralValueRaw: adjustedValueRaw(healthFactorRaw)
+    adjustedCollateralValueRaw: collateralValues(collateralValue).adjustedCollateralValueRaw
   };
 }
 

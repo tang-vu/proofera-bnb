@@ -206,15 +206,14 @@ export interface VenusCoreExactBlockEvidence {
 }
 
 function multiplyExp(left: bigint, right: bigint): bigint {
-  const result = (left * right) / EXP_SCALE;
-  if (result > UINT256_MAX) throw new Error("VENUS_UINT256_OVERFLOW");
-  return result;
+  if (left !== 0n && right > UINT256_MAX / left) {
+    throw new Error("VENUS_UINT256_OVERFLOW");
+  }
+  return (left * right) / EXP_SCALE;
 }
 
 function multiplyExpByScalar(value: bigint, scalar: bigint): bigint {
-  const product = value * scalar;
-  if (product > UINT256_MAX) throw new Error("VENUS_UINT256_OVERFLOW");
-  return product / EXP_SCALE;
+  return multiplyExp(value, scalar);
 }
 
 function comparableObservation(observation: VenusCoreExactBlockProviderObservation): string {

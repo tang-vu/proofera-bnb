@@ -4,12 +4,14 @@ This package is a deterministic, read-only health-factor analyzer for the
 Venus Core Pool on BSC 56 and 97. It does not fetch data, hold a wallet, sign,
 submit transactions, or write runtime state.
 
-The caller supplies a complete same-block collateral/debt snapshot, effective
-user liquidation thresholds, explicit fixed-point scales, observation history,
-alert-delivery receipts, optional execution receipts, timestamps, and
-provenance. Every current source must bind the requested account and exact
-block number/hash/timestamp to the chain-specific official Venus Core Pool
-Comptroller, a closed typed read method, and the relevant market/vToken set.
+The caller supplies a complete same-block collateral/debt snapshot, raw vToken
+balances, borrow balances, exchange-rate and oracle-price mantissas, effective
+user liquidation thresholds, explicit fixed-point scales, the derived values,
+observation history, alert-delivery receipts, optional execution receipts,
+timestamps, and provenance. Every current source must bind the requested
+account and exact block number/hash/timestamp to the chain-specific official
+Venus Core Pool Comptroller, a closed typed read method, and the relevant
+market/vToken set.
 Collateral and debt must use one documented `usd` quote unit and one scale. An
 unrelated contract or free-text read cannot produce a health factor.
 
@@ -25,17 +27,20 @@ receipt was independently verified. Evidence URLs must use non-loopback HTTPS,
 and zero addresses, block/transaction hashes, and digests are rejected.
 
 Health factor is represented as an exact rational after matching Venus's
-per-market integer truncation:
+per-market integer truncation and operand order. With `mulExp(a, b) =
+floor(a * b / 10^18)`, each multiplication first rejects a uint256 overflow:
 
 ```text
-sum(floor(collateralValueRaw * effectiveLiquidationThresholdRaw / 10^18))
-----------------------------------------------------------------------------
-sum(debtValueRaw)
+sum(mulExp(mulExp(mulExp(effectiveThreshold, exchangeRate), oraclePrice), vTokenBalance))
+-----------------------------------------------------------------------------------------
+sum(mulExp(oraclePrice, borrowBalance))
 ```
 
-Each collateral market is truncated before the adjusted values are summed,
-matching `ComptrollerLens`. Adjusted collateral and debt share the documented
-quote-value scale, which cancels in the ratio. Thresholds must use Venus Core
+The analyzer independently derives both supplied and adjusted USD-E18 values
+from the raw operands and rejects either supplied derived value when it differs.
+Each collateral market is truncated after every multiplication before the
+adjusted values are summed, matching `ComptrollerLens`; reweighting an already
+truncated collateral value is not accepted. Thresholds must use Venus Core
 Pool's effective user-specific `USE_LIQUIDATION_THRESHOLD` result. A zero-debt
 account is reported as not applicable, not infinity.
 

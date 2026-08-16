@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const HEALTH_FACTOR_SKILL = "analyze_venus_health_factor" as const;
 export const HEALTH_FACTOR_METHODOLOGY_VERSION =
-  "proofera-venus-core-health-factor-v1.1.0" as const;
+  "proofera-venus-core-health-factor-v1.2.0" as const;
 
 export const VENUS_CORE_COMPTROLLER_BY_CHAIN = {
   56: "0xfD36E2c2a6789Db23113685031d7F16329158384",
@@ -10,6 +10,7 @@ export const VENUS_CORE_COMPTROLLER_BY_CHAIN = {
 } as const;
 
 const MAX_UINT256 = (1n << 256n) - 1n;
+const OFFICIAL_QUOTE_VALUE_SCALE = 18;
 const OFFICIAL_THRESHOLD_SCALE = 18;
 const OFFICIAL_THRESHOLD_DENOMINATOR = 10n ** 18n;
 const MAX_POSITIONS = 64;
@@ -115,7 +116,7 @@ const venusOnchainSourceCommon = {
   blockHash: hash32Schema,
   blockTimestampUtc: utcTimestampSchema,
   quoteValueUnit: quoteValueUnitSchema,
-  quoteValueScaleDecimals: z.number().int().min(0).max(36)
+  quoteValueScaleDecimals: z.literal(OFFICIAL_QUOTE_VALUE_SCALE)
 } as const;
 
 const methodologyOnchainSourceSchema = z
@@ -138,7 +139,7 @@ const currentSnapshotOnchainSourceSchema = z
 const collateralOnchainSourceSchema = z
   .object({
     ...venusOnchainSourceCommon,
-    readMethod: z.literal("venus_core_pool_collateral_value_and_threshold_v1"),
+    readMethod: z.literal("venus_core_pool_collateral_operands_and_values_v2"),
     market: marketSchema,
     underlyingAsset: assetSchema,
     vTokenAddress: addressSchema
@@ -148,7 +149,7 @@ const collateralOnchainSourceSchema = z
 const debtOnchainSourceSchema = z
   .object({
     ...venusOnchainSourceCommon,
-    readMethod: z.literal("venus_core_pool_debt_value_v1"),
+    readMethod: z.literal("venus_core_pool_debt_operands_and_value_v2"),
     market: marketSchema,
     underlyingAsset: assetSchema,
     vTokenAddress: addressSchema
@@ -206,7 +207,7 @@ const methodologyEvidenceSchema = z
     weightingStrategy: z.literal("USE_LIQUIDATION_THRESHOLD"),
     thresholdRead: z.literal("getEffectiveLtvFactor"),
     quoteValueUnit: quoteValueUnitSchema,
-    quoteValueScaleDecimals: z.number().int().min(0).max(36),
+    quoteValueScaleDecimals: z.literal(OFFICIAL_QUOTE_VALUE_SCALE),
     liquidationThresholdScaleDecimals: z.literal(OFFICIAL_THRESHOLD_SCALE),
     chainId: chainIdSchema,
     account: addressSchema,
@@ -222,9 +223,14 @@ const collateralPositionSchema = z
     market: marketSchema,
     underlyingAsset: assetSchema,
     vTokenAddress: addressSchema,
+    vTokenBalanceRaw: uint256StringSchema,
+    exchangeRateMantissaRaw: uint256StringSchema,
+    oraclePriceMantissaRaw: uint256StringSchema,
+    fixedPointScaleDecimals: z.literal(OFFICIAL_THRESHOLD_SCALE),
     collateralValueRaw: uint256StringSchema,
+    adjustedCollateralValueRaw: uint256StringSchema,
     quoteValueUnit: quoteValueUnitSchema,
-    quoteValueScaleDecimals: z.number().int().min(0).max(36),
+    quoteValueScaleDecimals: z.literal(OFFICIAL_QUOTE_VALUE_SCALE),
     effectiveLiquidationThresholdRaw: uint256StringSchema.refine(
       (value) => BigInt(value) <= OFFICIAL_THRESHOLD_DENOMINATOR,
       "effective liquidation threshold must not exceed 1e18"
@@ -244,9 +250,12 @@ const debtPositionSchema = z
     market: marketSchema,
     underlyingAsset: assetSchema,
     vTokenAddress: addressSchema,
+    borrowBalanceRaw: uint256StringSchema,
+    oraclePriceMantissaRaw: uint256StringSchema,
+    fixedPointScaleDecimals: z.literal(OFFICIAL_THRESHOLD_SCALE),
     debtValueRaw: uint256StringSchema,
     quoteValueUnit: quoteValueUnitSchema,
-    quoteValueScaleDecimals: z.number().int().min(0).max(36),
+    quoteValueScaleDecimals: z.literal(OFFICIAL_QUOTE_VALUE_SCALE),
     chainId: chainIdSchema,
     account: addressSchema,
     blockNumber: uint256StringSchema,
@@ -264,7 +273,7 @@ const currentSnapshotSchema = z
     blockHash: hash32Schema,
     observedAtUtc: utcTimestampSchema,
     quoteValueUnit: quoteValueUnitSchema,
-    quoteValueScaleDecimals: z.number().int().min(0).max(36),
+    quoteValueScaleDecimals: z.literal(OFFICIAL_QUOTE_VALUE_SCALE),
     collateralComplete: z.boolean(),
     debtComplete: z.boolean(),
     collateralPositions: z.array(collateralPositionSchema).max(MAX_POSITIONS),
@@ -283,7 +292,7 @@ const observationSchema = z
     adjustedCollateralValueRaw: uint256StringSchema,
     debtValueRaw: uint256StringSchema,
     quoteValueUnit: quoteValueUnitSchema,
-    quoteValueScaleDecimals: z.number().int().min(0).max(36),
+    quoteValueScaleDecimals: z.literal(OFFICIAL_QUOTE_VALUE_SCALE),
     liquidationThresholdScaleDecimals: z.number().int().min(0).max(36),
     source: observationOnchainSourceSchema
   })
@@ -388,6 +397,8 @@ const violationCodeSchema = z.enum([
   "SOURCE_STALE",
   "SOURCE_IN_FUTURE",
   "DUPLICATE_POSITION",
+  "DERIVED_VALUE_MISMATCH",
+  "VENUS_ARITHMETIC_OVERFLOW",
   "ADJUSTED_COLLATERAL_AGGREGATE_EXCEEDS_UINT256",
   "DEBT_AGGREGATE_EXCEEDS_UINT256",
   "HISTORY_MISSING",
@@ -731,13 +742,13 @@ export function analyzeHealthFactor(rawInput: unknown): HealthFactorAnalysisResu
     rationale,
     methodology: {
       formula:
-        "healthFactor = sum(floor(collateralValueRaw * effectiveLiquidationThresholdRaw / 10^18)) / sum(debtValueRaw). Venus truncates each market contribution before summing; the common quote-value scale cancels.",
+        "healthFactor = sum(mulExp(mulExp(mulExp(effectiveLiquidationThresholdRaw, exchangeRateMantissaRaw), oraclePriceMantissaRaw), vTokenBalanceRaw)) / sum(mulExp(oraclePriceMantissaRaw, borrowBalanceRaw)), where every mulExp(a,b) = floor(a*b/10^18) and rejects uint256 multiplication overflow.",
       sameBlockRule:
         "Methodology, enumeration snapshot, every collateral value and effective threshold, and every debt value must identify the same BSC block number and hash before current health factor is computed.",
       sourceRule:
         "Every current value source must bind the official chain-specific Venus Core Pool Comptroller, requested account, exact block number/hash/timestamp, closed read method, related market/vToken, and the common USD quote unit/scale. Source contents remain caller-supplied and unverified.",
       thresholdRule:
-        "Each collateral term must use the account-specific Venus Core Pool getEffectiveLtvFactor result with USE_LIQUIDATION_THRESHOLD, scaled by 1e18; collateral factor is never substituted.",
+        "Each collateral term must use the account-specific Venus Core Pool getEffectiveLtvFactor result with USE_LIQUIDATION_THRESHOLD, scaled by 1e18. Threshold, exchange rate, oracle price, and vToken balance are multiplied in ComptrollerLens order with truncation after every step; collateral factor is never substituted.",
       zeroDebtRule:
         "Complete evidence with total debt equal to zero is reported as not_applicable_zero_debt. The analyzer never emits infinity or a fabricated numeric health factor.",
       historyRule:
@@ -931,10 +942,7 @@ function reviewCurrentEvidence(
   snapshot.collateralPositions.forEach((position, index) => {
     const path = `currentSnapshot.collateralPositions.${String(index)}`;
     const positionProvenance = reviewTimedBlockEvidence(path, position, reference, violations);
-    if (
-      position.quoteValueScaleDecimals !== reference.quoteScale ||
-      position.liquidationThresholdScaleDecimals !== reference.thresholdScale
-    ) {
+    if (position.liquidationThresholdScaleDecimals !== reference.thresholdScale) {
       positionProvenance.state = "scale_mismatch";
       addViolation(
         violations,
@@ -958,6 +966,32 @@ function reviewCurrentEvidence(
         "Collateral source market, asset, or vToken does not match the position."
       );
     }
+    try {
+      const derived = deriveVenusCollateralValues(position);
+      if (
+        position.collateralValueRaw !== derived.collateralValueRaw.toString() ||
+        position.adjustedCollateralValueRaw !== derived.adjustedCollateralValueRaw.toString()
+      ) {
+        positionProvenance.state = "identity_mismatch";
+        addViolation(
+          violations,
+          "current_evidence",
+          "DERIVED_VALUE_MISMATCH",
+          path,
+          "Collateral values do not match the raw Venus operands and exact ComptrollerLens truncation order."
+        );
+      }
+    } catch (error) {
+      if (!isVenusArithmeticOverflow(error)) throw error;
+      positionProvenance.state = "identity_mismatch";
+      addViolation(
+        violations,
+        "current_evidence",
+        "VENUS_ARITHMETIC_OVERFLOW",
+        path,
+        "Collateral raw operands overflow uint256 in the Venus multiplication sequence."
+      );
+    }
     provenance.push(positionProvenance);
     const key = position.vTokenAddress.toLowerCase();
     if (seenCollateral.has(key)) {
@@ -976,16 +1010,6 @@ function reviewCurrentEvidence(
   snapshot.debtPositions.forEach((position, index) => {
     const path = `currentSnapshot.debtPositions.${String(index)}`;
     const positionProvenance = reviewTimedBlockEvidence(path, position, reference, violations);
-    if (position.quoteValueScaleDecimals !== reference.quoteScale) {
-      positionProvenance.state = "scale_mismatch";
-      addViolation(
-        violations,
-        "current_evidence",
-        "SCALE_MISMATCH",
-        path,
-        "Debt quote-value scale does not match methodology."
-      );
-    }
     if (
       !sameAddress(position.source.vTokenAddress, position.vTokenAddress) ||
       position.source.market !== position.market ||
@@ -998,6 +1022,29 @@ function reviewCurrentEvidence(
         "SOURCE_RELATION_MISMATCH",
         `${path}.source`,
         "Debt source market, asset, or vToken does not match the position."
+      );
+    }
+    try {
+      const derivedDebtValueRaw = deriveVenusDebtValue(position);
+      if (position.debtValueRaw !== derivedDebtValueRaw.toString()) {
+        positionProvenance.state = "identity_mismatch";
+        addViolation(
+          violations,
+          "current_evidence",
+          "DERIVED_VALUE_MISMATCH",
+          path,
+          "Debt value does not match the raw Venus borrow balance, oracle price, and exact truncation order."
+        );
+      }
+    } catch (error) {
+      if (!isVenusArithmeticOverflow(error)) throw error;
+      positionProvenance.state = "identity_mismatch";
+      addViolation(
+        violations,
+        "current_evidence",
+        "VENUS_ARITHMETIC_OVERFLOW",
+        path,
+        "Debt raw operands overflow uint256 in the Venus multiplication sequence."
       );
     }
     provenance.push(positionProvenance);
@@ -1232,10 +1279,7 @@ function calculateCurrent(snapshot: z.infer<typeof currentSnapshotSchema>): Curr
   for (const position of snapshot.collateralPositions) {
     const value = BigInt(position.collateralValueRaw);
     totalCollateralValueRaw += value;
-    // Match Venus ComptrollerLens: truncate every market contribution before
-    // adding it to the account's adjusted collateral value.
-    adjustedCollateralValueRaw +=
-      (value * BigInt(position.effectiveLiquidationThresholdRaw)) / OFFICIAL_THRESHOLD_DENOMINATOR;
+    adjustedCollateralValueRaw += BigInt(position.adjustedCollateralValueRaw);
   }
   let totalDebtValueRaw = 0n;
   for (const position of snapshot.debtPositions) {
@@ -1253,6 +1297,46 @@ function calculateCurrent(snapshot: z.infer<typeof currentSnapshotSchema>): Curr
             denominator: totalDebtValueRaw
           }
   };
+}
+
+function checkedVenusMulExp(left: bigint, right: bigint): bigint {
+  if (left !== 0n && right > MAX_UINT256 / left) {
+    throw new Error("VENUS_UINT256_OVERFLOW");
+  }
+  return (left * right) / OFFICIAL_THRESHOLD_DENOMINATOR;
+}
+
+function deriveVenusCollateralValues(position: {
+  vTokenBalanceRaw: string;
+  exchangeRateMantissaRaw: string;
+  oraclePriceMantissaRaw: string;
+  effectiveLiquidationThresholdRaw: string;
+}): { collateralValueRaw: bigint; adjustedCollateralValueRaw: bigint } {
+  const balance = BigInt(position.vTokenBalanceRaw);
+  const exchangeRate = BigInt(position.exchangeRateMantissaRaw);
+  const price = BigInt(position.oraclePriceMantissaRaw);
+  const threshold = BigInt(position.effectiveLiquidationThresholdRaw);
+  return {
+    collateralValueRaw: checkedVenusMulExp(checkedVenusMulExp(exchangeRate, price), balance),
+    adjustedCollateralValueRaw: checkedVenusMulExp(
+      checkedVenusMulExp(checkedVenusMulExp(threshold, exchangeRate), price),
+      balance
+    )
+  };
+}
+
+function deriveVenusDebtValue(position: {
+  borrowBalanceRaw: string;
+  oraclePriceMantissaRaw: string;
+}): bigint {
+  return checkedVenusMulExp(
+    BigInt(position.oraclePriceMantissaRaw),
+    BigInt(position.borrowBalanceRaw)
+  );
+}
+
+function isVenusArithmeticOverflow(error: unknown): boolean {
+  return error instanceof Error && error.message === "VENUS_UINT256_OVERFLOW";
 }
 
 function currentMeasure(
@@ -1325,9 +1409,8 @@ function reviewHistory(
       issues.push("Observation chain or account does not match the request.");
     }
     if (
-      observation.quoteValueScaleDecimals !== methodology.quoteValueScaleDecimals ||
       observation.liquidationThresholdScaleDecimals !==
-        methodology.liquidationThresholdScaleDecimals
+      methodology.liquidationThresholdScaleDecimals
     ) {
       issues.push("Observation fixed-point scales do not match methodology.");
     }
@@ -1339,9 +1422,6 @@ function reviewHistory(
       !sameInstant(observation.source.blockTimestampUtc, observation.observedAtUtc)
     ) {
       issues.push("Observation onchain source does not match its block, account, or timestamp.");
-    }
-    if (observation.source.quoteValueScaleDecimals !== observation.quoteValueScaleDecimals) {
-      issues.push("Observation source scale does not match its aggregate values.");
     }
     if (
       !sameAddress(observation.source.comptrollerAddress, officialComptroller(observation.chainId))
