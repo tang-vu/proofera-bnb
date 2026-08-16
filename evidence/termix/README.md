@@ -20,7 +20,7 @@ The digest covers the exact task, required input-binding rules, fixed constraint
 
 Exact final declarations, registered agent identities, hire receipts, release commit, run-order seeds and timed invocation commands remain deliberately `UNBOUND`. A compact LP input candidate and both LP lanes now exist, and the Venus endpoint is code-fixed, but neither fact creates a run. Treating candidate values as final run evidence would create false evidence. A protocol stays non-publishable until all bindings are frozen once into one `BenchmarkDeclaration` and that byte-equivalent declaration is used by both runs.
 
-Task 02's deterministic `audit_altana_permission_bundle` skill is live on the public LP A2A endpoint and its Agent Card advertises that exact ID. A valid synthetic local/public smoke on 2026-08-17 returned matching bundle digests and `executionPerformed: false`. This is capability availability/parity only: it is not a frozen Task 02 input, registered identity, verified hire, timed run, raw benchmark transcript, receipt, scored finding or advantage claim. Both Task 02 create-only CLIs and all final bindings remain absent.
+Task 02's deterministic `audit_altana_permission_bundle` skill is live on the public LP A2A endpoint and its Agent Card advertises that exact ID. A valid synthetic local/public smoke on 2026-08-17 returned matching bundle digests and `executionPerformed: false`. This is capability availability/parity only: it is not a frozen Task 02 input, registered identity, verified hire, timed run, raw benchmark transcript, receipt, scored finding or advantage claim. The create-only agent CLI exists; the manual CLI and all final bindings remain absent.
 
 Validate the preregistrations and paired-run harness:
 
@@ -54,6 +54,14 @@ pnpm run:termix:pancake-lp-agent -- --execute-exact-pancake-lp-agent-run --input
 It requires a clean published commit, the tracked byte-exact bundle, chain-97
 registration and verified hire receipt before its exact-hash mainnet RPC read
 or public A2A request can occur. No final invocation or LP benchmark run exists.
+
+The create-only Task 02 agent runner is available as:
+
+```text
+pnpm run:termix:permission-audit-agent -- --execute-exact-permission-audit-agent-run --input-bundle evidence/termix/frozen/permission-audit/<bound-bundle>.canonical-json
+```
+
+It accepts only a tracked, byte-exact canonical bundle and a bounded standard-input invocation. It requires a clean published commit, chain-97 registration and verified hire receipt before the fixed read-only RPC plan or public A2A request can occur. It writes one new immutable capture beneath `runs/permission-audit/agent/`. No final bundle, invocation or Task 02 run exists.
 
 The read-only Venus preparation collector can be run against two fixed public BSC-testnet RPC origins without changing a preregistration:
 

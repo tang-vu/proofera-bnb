@@ -51,6 +51,13 @@ canonical Health request already committed under
 `evidence/termix/runs/venus-health/`. The exact final invocation remains
 unbound until the real declaration, ERC-8004 identity and hire receipt exist.
 
+The root `pnpm run:termix:permission-audit-agent` CLI applies the same clean,
+published-release and byte-exact committed-input boundary to Task 02. It writes
+only a new capture under `evidence/termix/runs/permission-audit/agent/` and the
+lane cannot reach its fixed RPC/A2A calls until the request proves chain-97
+registration and a verified hire receipt. This entrypoint does not create a
+final bundle or benchmark result by itself.
+
 `runVenusHealthManualTermixMethod` is the matching non-agent session state
 machine. It consumes operator events without calling an agent or network:
 positive monotonic active segments, exact read-only exchanges from either of

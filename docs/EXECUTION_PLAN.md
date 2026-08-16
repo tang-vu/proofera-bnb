@@ -159,9 +159,10 @@ closed, and the response must bind the exact bundle with no execution. A valid
 synthetic bundle produced matching canonical digests through the local and
 public endpoint on 2026-08-17. This is an availability/parity smoke only, not a
 TermiX invocation, registered identity, hire receipt, final-bundle audit or
-performance result. Both Task 02 create-only CLIs, the final frozen bundle,
-real manual transcript, sourced cost and second-review artifacts remain
-required.
+performance result. The create-only agent CLI is now implemented and rejects
+missing exact invocation before Git, network or output access. The Task 02
+manual CLI, final frozen bundle, real manual transcript, sourced cost and
+second-review artifacts remain required.
 
 ## Milestone 5 — submission-grade product (`PLANNED`)
 
