@@ -17,6 +17,7 @@ import {
 } from "./schemas.js";
 
 export const TERMIX_TIMED_RUNNER_PROTOCOL_VERSION = "proofera-termix-timed-runner-v1.0.0" as const;
+export const TERMIX_AGENT_REGISTRY_CHAIN_PARAMETER = "agent-registry-chain-id" as const;
 
 export const TermixRunnerIdSchema = z.enum([
   "pancake-lp-agent-v1",
@@ -125,6 +126,7 @@ export const TermixTimedRunRequestSchema = z
       });
     }
 
+    const agentRegistryChainId = expectedAgentRegistryChainId(request.declaration, context);
     if (request.method.kind === "agent") {
       if (request.method.agentReference.state !== "registered") {
         context.addIssue({
@@ -133,12 +135,13 @@ export const TermixTimedRunRequestSchema = z
           message: "Timed agent runs require a registered ERC-8004 identity"
         });
       } else if (
-        request.method.agentReference.chainId !== request.declaration.environment.chainId
+        agentRegistryChainId !== null &&
+        request.method.agentReference.chainId !== agentRegistryChainId
       ) {
         context.addIssue({
           code: "custom",
           path: ["method", "agentReference", "chainId"],
-          message: "Registered agent chain must match the declaration"
+          message: "Registered agent chain must match the declaration's registry-chain binding"
         });
       }
       if (request.hireReceipt === null) {
@@ -147,11 +150,14 @@ export const TermixTimedRunRequestSchema = z
           path: ["hireReceipt"],
           message: "Timed agent runs require a verified ProofEra hire receipt"
         });
-      } else if (request.hireReceipt.chainId !== request.declaration.environment.chainId) {
+      } else if (
+        agentRegistryChainId !== null &&
+        request.hireReceipt.chainId !== agentRegistryChainId
+      ) {
         context.addIssue({
           code: "custom",
           path: ["hireReceipt", "chainId"],
-          message: "Hire receipt chain must match the declaration"
+          message: "Hire receipt chain must match the declaration's registry-chain binding"
         });
       }
     } else if (request.hireReceipt !== null) {
@@ -162,6 +168,38 @@ export const TermixTimedRunRequestSchema = z
       });
     }
   });
+
+function expectedAgentRegistryChainId(
+  declaration: BenchmarkDeclaration,
+  context: z.RefinementCtx
+): number | null {
+  const parameterIndex = declaration.environment.parameters.findIndex(
+    ({ key }) => key === TERMIX_AGENT_REGISTRY_CHAIN_PARAMETER
+  );
+  if (parameterIndex < 0) return declaration.environment.chainId;
+  const parameter = declaration.environment.parameters[parameterIndex];
+  if (
+    parameter?.value.encoding !== "decimal_integer" ||
+    !/^[1-9][0-9]*$/u.test(parameter.value.value)
+  ) {
+    context.addIssue({
+      code: "custom",
+      path: ["declaration", "environment", "parameters", parameterIndex, "value"],
+      message: "Agent registry chain binding must be a positive decimal integer"
+    });
+    return null;
+  }
+  const value = BigInt(parameter.value.value);
+  if (value > BigInt(Number.MAX_SAFE_INTEGER)) {
+    context.addIssue({
+      code: "custom",
+      path: ["declaration", "environment", "parameters", parameterIndex, "value"],
+      message: "Agent registry chain binding exceeds the safe integer range"
+    });
+    return null;
+  }
+  return Number(value);
+}
 
 export type TermixTimedRunRequest = z.input<typeof TermixTimedRunRequestSchema>;
 type ValidatedTermixTimedRunRequest = z.output<typeof TermixTimedRunRequestSchema>;

@@ -12,6 +12,7 @@
     "build": "pnpm --filter @proofera/web build",
     "capture:pancake:public-position": "node ./scripts/capture-pancake-public-position-benefit.mjs",
     "collect:termix:venus": "node --no-warnings --conditions=react-server --experimental-loader ./scripts/typescript-extension-loader.mjs ./scripts/collect-termix-venus-exact-block.ts",
+    "run:termix:pancake-lp-agent": "node --no-warnings --conditions=react-server --experimental-loader ./scripts/termix-typescript-loader.mjs ./scripts/run-termix-pancake-lp-agent.ts",
     "run:termix:venus-agent": "node --no-warnings --conditions=react-server --experimental-loader ./scripts/termix-typescript-loader.mjs ./scripts/run-termix-venus-health-agent.ts",
     "dev": "pnpm --filter @proofera/web dev",
     "format": "prettier --write .",
@@ -23,9 +24,9 @@
     "initialize:pta-wbnb:testnet": "node -e \"process.stderr.write('Blocked: use the audited phase-minus-one command in docs/deployment.md.');process.exit(1)\"",
     "start": "pnpm --filter @proofera/web start",
     "test": "pnpm --recursive --if-present run test && pnpm test:evidence",
-    "test:evidence": "node --test scripts/bsc-testnet-pta-deployment-evidence.test.mjs scripts/bsc-testnet-pta-wbnb-pool-readiness-evidence.test.mjs scripts/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript.test.mjs scripts/capture-pancake-public-position-benefit.test.mjs scripts/pancake-initializer-publication/publication.test.mjs scripts/pancake-initializer-review/review.test.mjs scripts/pancake-pool-external-review-request/review-request.test.mjs scripts/pancake-pool-init-code-review/review.test.mjs scripts/pancake-pool-owner-designated-review/review.test.mjs scripts/pancake-selector-review/review.test.mjs scripts/termix-venus-development-evidence.test.mjs scripts/termix-venus-health-agent-runner.test.mjs scripts/wbnb-source-verification/evidence.test.mjs",
+    "test:evidence": "node --test scripts/bsc-testnet-pta-deployment-evidence.test.mjs scripts/bsc-testnet-pta-wbnb-pool-readiness-evidence.test.mjs scripts/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript.test.mjs scripts/capture-pancake-public-position-benefit.test.mjs scripts/generate-termix-lp-preregistration-v2.test.mjs scripts/pancake-initializer-publication/publication.test.mjs scripts/pancake-initializer-review/review.test.mjs scripts/pancake-pool-external-review-request/review-request.test.mjs scripts/pancake-pool-init-code-review/review.test.mjs scripts/pancake-pool-owner-designated-review/review.test.mjs scripts/pancake-selector-review/review.test.mjs scripts/termix-pancake-lp-agent-runner.test.mjs scripts/termix-venus-development-evidence.test.mjs scripts/termix-venus-health-agent-runner.test.mjs scripts/wbnb-source-verification/evidence.test.mjs",
     "test:e2e": "pnpm --filter @proofera/web test:e2e",
-    "typecheck": "pnpm --recursive --if-present run typecheck && tsc -p scripts/tsconfig.pta-deployment.json && tsc -p scripts/tsconfig.pta-wbnb-pool-initialization.json && tsc -p scripts/tsconfig.termix-venus-collector.json && tsc -p scripts/tsconfig.termix-venus-health-runner.json",
+    "typecheck": "pnpm --recursive --if-present run typecheck && tsc -p scripts/tsconfig.pta-deployment.json && tsc -p scripts/tsconfig.pta-wbnb-pool-initialization.json && tsc -p scripts/tsconfig.termix-pancake-lp-runner.json && tsc -p scripts/tsconfig.termix-venus-collector.json && tsc -p scripts/tsconfig.termix-venus-health-runner.json",
     "verify": "pnpm format:check && pnpm lint && pnpm security:secrets && pnpm typecheck && pnpm test && pnpm build"
   },
   "devDependencies": {

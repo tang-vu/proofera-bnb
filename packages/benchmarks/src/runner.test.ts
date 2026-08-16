@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { canonicalJson, sha256Bytes } from "./canonical.js";
 import {
+  TERMIX_AGENT_REGISTRY_CHAIN_PARAMETER,
   TERMIX_TIMED_RUNNER_PROTOCOL_VERSION,
   runTermixTimedMethod,
   type TermixMethodExecution,
@@ -209,6 +210,40 @@ describe("TermiX fixed timed runner", () => {
     expect(capture.methodKind).toBe("manual");
     expect(capture.hireReceipt).toBeNull();
     expect(capture.boundaries.agentWasRegisteredBeforeStart).toBe(false);
+  });
+
+  it("separately binds a task data chain and the ERC-8004/hire chain", async () => {
+    const candidate = request();
+    candidate.declaration.environment.kind = "mainnet";
+    candidate.declaration.environment.chainId = 56;
+    candidate.declaration.environment.networkName = "BNB Smart Chain Mainnet data replay";
+    candidate.declaration.environment.parameters.push({
+      key: TERMIX_AGENT_REGISTRY_CHAIN_PARAMETER,
+      value: { encoding: "decimal_integer", value: "97" }
+    });
+    candidate.declarationSha256 = sha256Bytes(
+      canonicalJson(normalizeBenchmarkDeclaration(candidate.declaration))
+    );
+    const execute = vi.fn(async () => execution());
+    await expect(
+      runTermixTimedMethod({ request: candidate, clock: clock(), execute })
+    ).resolves.toBeDefined();
+    expect(execute).toHaveBeenCalledOnce();
+
+    const registryChainParameter = candidate.declaration.environment.parameters.at(-1);
+    if (registryChainParameter === undefined) throw new Error("Missing registry-chain fixture");
+    registryChainParameter.value = {
+      encoding: "decimal_integer",
+      value: "56"
+    };
+    candidate.declarationSha256 = sha256Bytes(
+      canonicalJson(normalizeBenchmarkDeclaration(candidate.declaration))
+    );
+    const rejectedExecutor = vi.fn(async () => execution());
+    await expect(
+      runTermixTimedMethod({ request: candidate, clock: clock(), execute: rejectedExecutor })
+    ).rejects.toThrow();
+    expect(rejectedExecutor).not.toHaveBeenCalled();
   });
 
   it.each([

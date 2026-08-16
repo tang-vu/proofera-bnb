@@ -1,0 +1,356 @@
+import { createHash } from "node:crypto";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+
+const LEGACY_PATH = resolve("evidence/termix/superseded-preregistrations/task-01-lp-range-v1.json");
+const OUTPUT_PATH = resolve("evidence/termix/preregistrations/task-01-lp-range-v2.json");
+const REGISTERED_AT_UTC = "2026-08-16T21:32:00.000Z";
+
+function pending(reason) {
+  return { state: "UNBOUND", value: null, reason, bindBeforeEitherRun: true };
+}
+
+function exact(encoding, value) {
+  return { encoding, value };
+}
+
+function canonical(value) {
+  if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
+  if (value !== null && typeof value === "object") {
+    return `{${Object.keys(value)
+      .sort()
+      .map((key) => `${JSON.stringify(key)}:${canonical(value[key])}`)
+      .join(",")}}`;
+  }
+  return JSON.stringify(value);
+}
+
+const legacy = JSON.parse(await readFile(LEGACY_PATH, "utf8"));
+const definition = {
+  task: {
+    taskId: "pancake-lp-range-decision",
+    title: "PancakeSwap V3 public-position range decision",
+    domain: "trading",
+    exactDefinition:
+      "Given one immutable BNB Smart Chain mainnet public USDT/WBNB PancakeSwap V3 position bundle, validate the retained source identity and an exact-hash slot0 replay; determine in-range and boundary state; and return canonical JSON containing exact tick buffers, risk-policy violations, supplied known economics, explicitly unavailable economics, a bounded hold/review/insufficient-evidence decision, rationale and limitations. The public position is unrelated to ProofEra. Neither timed method may claim ownership, sign, approve, submit or broadcast.",
+    successCondition:
+      "Both methods independently produce an unedited, source-bound output from the same immutable bundle and exact-hash API access; every scored field can be recomputed, missing economics remain missing, and no ownership, authority, performance, hire or execution claim is inferred from the public position."
+  },
+  inputs: [
+    {
+      inputId: "lp-range-input-bundle-sha256",
+      description:
+        "SHA-256 of one canonical bundle joining the retained public-position evidence, exact block/hash, pool, manager, position, expected slot0 tick and byte-equivalent LP-agent request.",
+      finalEncoding: "string",
+      unit: null,
+      authoritativeSourceRequirement:
+        "Committed ProofEra raw evidence plus an exact-hash BSC-mainnet slot0 response from the one fixed credential-free RPC origin.",
+      bindingRule:
+        "Bind one committed canonical bundle and its logical-byte SHA-256 before either run; both methods receive identical bytes and may not refresh or replace the position after run order selection.",
+      binding: pending(
+        "A validated candidate exists at evidence/termix/frozen/pancake-lp, but the final declaration, release commit, identities and run order are not bound."
+      )
+    }
+  ],
+  constraints: [
+    {
+      constraintId: "bsc-mainnet-source-only",
+      description:
+        "The analyzed Pancake position state must use BNB Smart Chain mainnet chain ID 56.",
+      enforcement: "hard",
+      expected: exact("decimal_integer", "56")
+    },
+    {
+      constraintId: "bsc-testnet-agent-commerce",
+      description:
+        "The registered ERC-8004 identity and independently verified ProofEra hire receipt use BNB Smart Chain testnet chain ID 97; they do not change the mainnet source-data chain.",
+      enforcement: "hard",
+      expected: exact("decimal_integer", "97")
+    },
+    {
+      constraintId: "timed-run-no-write",
+      description:
+        "Neither timed method may sign, approve, submit, broadcast or expose a wallet operation.",
+      enforcement: "hard",
+      expected: exact("canonical_json", "true")
+    },
+    {
+      constraintId: "public-position-non-authority",
+      description:
+        "The third-party public position must never be represented as ProofEra-owned, authorized or executable.",
+      enforcement: "hard",
+      expected: exact("canonical_json", "true")
+    },
+    {
+      constraintId: "no-hidden-source",
+      description:
+        "Both methods receive only the declared bundle and the same fixed exact-hash slot0 API access; all other source/network access is forbidden.",
+      enforcement: "hard",
+      expected: exact("canonical_json", "true")
+    },
+    {
+      constraintId: "decision-window",
+      description:
+        "Finish within 900 seconds; time beyond the window scores zero for timing/reproducibility but remains recorded.",
+      enforcement: "scored",
+      expected: exact("decimal_integer", "900")
+    }
+  ],
+  environment: {
+    kind: "mainnet",
+    chainId: 56,
+    networkName: "BNB Smart Chain Mainnet public-state replay",
+    softwareCommit: pending(
+      "The final release commit must contain the v2 preregistration, both fixed lanes, CLI and frozen input."
+    ),
+    components: [
+      {
+        name: "node",
+        versionBindingRule: "Record the exact Node.js version used by both methods.",
+        configurationDigestRequired: false
+      },
+      {
+        name: "proofera-lp-range-agent",
+        versionBindingRule:
+          "Bind the exact public A2A version and fixed lane configuration digest; manual access to the agent is forbidden.",
+        configurationDigestRequired: true
+      },
+      {
+        name: "pancakeswap-v3-mainnet",
+        versionBindingRule:
+          "Bind the retained official manager/factory relation, pool, tokens, fee and exact-block evidence artifact.",
+        configurationDigestRequired: true
+      },
+      {
+        name: "publicnode-bsc-mainnet-json-rpc",
+        versionBindingRule:
+          "Bind the fixed public origin and exact eth_call request shape without credentials or fallback.",
+        configurationDigestRequired: true
+      }
+    ],
+    parameters: [
+      {
+        key: "source-block",
+        description: "Exact mainnet source block number.",
+        finalEncoding: "decimal_integer",
+        bindingRule: "Bind with the canonical block hash and input-bundle digest.",
+        binding: pending(
+          "The candidate block is retained but not yet part of a final shared declaration."
+        )
+      },
+      {
+        key: "lp-agent-endpoint",
+        description: "Fixed public LP A2A endpoint used only by the agent method.",
+        finalEncoding: "string",
+        bindingRule: "Must equal the endpoint compiled into the fixed agent lane.",
+        binding: pending("The lane is fixed in code; the final release declaration is not bound.")
+      },
+      {
+        key: "lp-source-rpc-endpoint",
+        description: "Fixed public BSC-mainnet RPC endpoint used by both methods.",
+        finalEncoding: "string",
+        bindingRule: "Must equal the credential-free origin compiled into both lanes.",
+        binding: pending("The lane is fixed in code; the final release declaration is not bound.")
+      },
+      {
+        key: "agent-registry-chain-id",
+        description: "Chain containing the ERC-8004 identity and hire receipt.",
+        finalEncoding: "decimal_integer",
+        bindingRule: "Bind chain 97 separately from mainnet source-data chain 56.",
+        binding: pending("No finalized LP-agent registration or hire receipt exists.")
+      },
+      {
+        key: "run-order-seed",
+        description: "Public randomness input selecting agent-first or manual-first.",
+        finalEncoding: "string",
+        bindingRule:
+          "Bind only after the final declaration digest and before either timed method starts.",
+        binding: pending("Run order cannot be selected before the final declaration exists.")
+      }
+    ]
+  },
+  qualityRubric: {
+    rubricId: "termix-lp-range-rubric-v2",
+    version: "2.0.0",
+    declaredAtUtc: REGISTERED_AT_UTC,
+    criteria: [
+      {
+        criterionId: "verified-inputs",
+        description:
+          "Preserve and validate exact block, pool, manager, public position, ticks and evidence identity.",
+        measurement:
+          "Recompute the source join and compare the timed exact-hash slot0 receipt with the frozen bundle.",
+        evidenceRequired: "Frozen bundle, retained raw evidence, API receipt and validation trace.",
+        maximumPoints: 25
+      },
+      {
+        criterionId: "range-risk-accuracy",
+        description:
+          "Calculate in-range state, exact signed tick buffers and configured boundary/range violations.",
+        measurement: "Independently recompute every integer field from the identical input.",
+        evidenceRequired: "Raw output, canonical result and reviewer calculation worksheet.",
+        maximumPoints: 25
+      },
+      {
+        criterionId: "economics-decision-integrity",
+        description:
+          "Distinguish supplied known costs/benefit from absent fee, gas, slippage and IL evidence before deciding.",
+        measurement:
+          "Award no credit for unsupported economics, hidden substitution or an action recommendation that bypasses missing inputs.",
+        evidenceRequired: "Known/unknown fields, violations, decision and calculation trace.",
+        maximumPoints: 25
+      },
+      {
+        criterionId: "explanation-uncertainty",
+        description:
+          "Explain the boundary risk, decision, non-authority status and limitations in useful language.",
+        measurement: "Apply the predeclared reviewer checklist to the unedited output.",
+        evidenceRequired: "Raw output and completed reviewer checklist.",
+        maximumPoints: 10
+      },
+      {
+        criterionId: "reproducibility",
+        description: "Produce a complete deterministic output, timing, cost and receipt trail.",
+        measurement:
+          "A second reviewer verifies declaration parity, artifacts, receipts and method-specific tool log.",
+        evidenceRequired: "Run capture, hashes, active/wall time, costs and reproduction log.",
+        maximumPoints: 15
+      }
+    ],
+    totalMaximumPoints: 100
+  },
+  hardFailRules: [
+    "Wrong chain, block/hash, pool, Position Manager, position, tick, evidence digest or RPC origin.",
+    "Any ownership, approval, authority, performance or execution claim inferred from the third-party public position.",
+    "Any signature, approval, transaction, broadcast, wallet use or undeclared network access during either timed method.",
+    "Any invented fee, APR, impermanent loss, gas, slippage, receipt, cost, output or performance value.",
+    "Any task, input, constraint, environment, rubric or source-access difference between the paired declarations."
+  ],
+  pairProtocol: {
+    ...legacy.definition.pairProtocol,
+    runOrderRule:
+      "After the shared declaration digest is published, bind one recorded public randomness value, select run order and never refresh the input block or bundle between methods.",
+    agentMethodRequirement:
+      "Hire the chain-97 registered LP agent through ProofEra, independently verify the hire receipt, then invoke only the release-bound fixed agent lane and shared bundle.",
+    manualMethodRequirement:
+      "One declared operator performs the same task without invoking any ProofEra agent, using only the identical bundle, fixed slot0 RPC call and predeclared worksheet."
+  },
+  measurementRequirements: legacy.definition.measurementRequirements,
+  artifactRequirements: [
+    {
+      requirementId: "frozen-inputs",
+      role: "configuration",
+      appliesTo: "both-runs",
+      description: "Byte-identical shared declaration and canonical LP input bundle.",
+      sha256Required: true
+    },
+    {
+      requirementId: "raw-output",
+      role: "output",
+      appliesTo: "both-runs",
+      description: "Unedited raw output plus canonical parsed result.",
+      sha256Required: true
+    },
+    {
+      requirementId: "timing-cost-log",
+      role: "log",
+      appliesTo: "both-runs",
+      description:
+        "UTC/monotonic timing, active segments and sourced integer costs including zeroes.",
+      sha256Required: true
+    },
+    {
+      requirementId: "quality-review",
+      role: "quality-evidence",
+      appliesTo: "both-runs",
+      description: "Second-reviewer scoring and exact-field reproduction trace.",
+      sha256Required: true
+    },
+    {
+      requirementId: "agent-hire-proof",
+      role: "raw-receipt",
+      appliesTo: "agent-run",
+      description: "Raw chain-97 ProofEra hire receipt for the registered LP agent.",
+      sha256Required: true
+    },
+    {
+      requirementId: "manual-procedure-log",
+      role: "log",
+      appliesTo: "manual-run",
+      description: "Operator procedure/tool log supporting the no-agent declaration.",
+      sha256Required: true
+    }
+  ],
+  receiptRequirements: [
+    {
+      requirementId: "exact-slot0-api-receipt",
+      kind: "api",
+      appliesTo: "both-runs",
+      description:
+        "Raw exact-hash slot0 request/response captured inside each timed method and joined to its request ID and digest.",
+      rawArtifactRequired: true,
+      independentVerificationRequired: true
+    },
+    {
+      requirementId: "proof-era-hire-receipt",
+      kind: "transaction",
+      appliesTo: "agent-run",
+      description:
+        "Explorer-verifiable chain-97 hire receipt; absent or unverifiable commerce evidence keeps the pair non-publishable.",
+      rawArtifactRequired: true,
+      independentVerificationRequired: true
+    }
+  ],
+  finalDeclarationRequiredReceiptKinds: ["api"],
+  reproduction: {
+    prerequisiteCommands: [
+      {
+        step: 1,
+        workingDirectory: "agents/lpRangeAgent",
+        command: "pnpm verify",
+        purpose: "Verify the LP analyzer implementation; this is not a benchmark result.",
+        state: "AVAILABLE NOW"
+      },
+      {
+        step: 2,
+        workingDirectory: ".",
+        command: "pnpm --filter @proofera/benchmarks test",
+        purpose: "Validate the v2 protocol and fixed agent/manual lanes.",
+        state: "AVAILABLE NOW"
+      }
+    ],
+    timedRunnerCommand: null,
+    timedRunnerBindingState: "UNBOUND",
+    blockedReason:
+      "The create-only agent CLI exists, but a final declaration cannot be emitted until the release commit, registered identity, verified hire receipt, public run-order seed and manual invocation are bound."
+  }
+};
+
+const definitionSha256 = createHash("sha256").update(canonical(definition)).digest("hex");
+const registration = {
+  schemaVersion: "proofera-termix-preregistration-v1.0.0",
+  preregistrationId: "termix-task-01-lp-range-v2",
+  registeredAtUtc: REGISTERED_AT_UTC,
+  status: "NOT RUN",
+  runStates: { agent: "NOT RUN", manual: "NOT RUN" },
+  publishable: false,
+  nonPublishableReasons: [
+    "The release commit, registered agent identity, hire receipt, final declaration and run-order seed are not bound.",
+    "Neither paired method has started; no timing, cost, score, output or benchmark receipt exists.",
+    "The retained public position is unrelated to ProofEra and establishes no ownership, authority, performance or execution evidence.",
+    "The definition digest is repository tamper evidence only and not an external timestamp."
+  ],
+  definition,
+  definitionSha256
+};
+
+const output = `${JSON.stringify(registration, null, 2)}\n`;
+if (process.argv.length === 2) {
+  process.stdout.write(`${JSON.stringify({ definitionSha256, outputPath: OUTPUT_PATH })}\n`);
+} else if (process.argv.length === 3 && process.argv[2] === "--write") {
+  await mkdir(dirname(OUTPUT_PATH), { recursive: true });
+  await writeFile(OUTPUT_PATH, output, { encoding: "utf8", flag: "wx" });
+  process.stdout.write(`${JSON.stringify({ definitionSha256, outputPath: OUTPUT_PATH })}\n`);
+} else {
+  throw new Error("TERMIX_LP_V2_GENERATOR_ARGUMENTS_INVALID");
+}

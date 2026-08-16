@@ -1,0 +1,7 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["run-termix-pancake-lp-agent.ts", "../packages/benchmarks/src/**/*.ts"]
+}

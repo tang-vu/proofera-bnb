@@ -6,7 +6,10 @@ import typescript from "typescript";
 
 const LOADER_PATH = fileURLToPath(import.meta.url);
 const REPOSITORY_ROOT = resolvePath(dirname(LOADER_PATH), "..");
-const EXACT_ENTRYPOINT = resolvePath(REPOSITORY_ROOT, "scripts/run-termix-venus-health-agent.ts");
+const EXACT_ENTRYPOINTS = new Set([
+  resolvePath(REPOSITORY_ROOT, "scripts/run-termix-venus-health-agent.ts"),
+  resolvePath(REPOSITORY_ROOT, "scripts/run-termix-pancake-lp-agent.ts")
+]);
 const BENCHMARK_SOURCE_DIRECTORY = resolvePath(REPOSITORY_ROOT, "packages/benchmarks/src");
 const RELATIVE_WITHOUT_EXTENSION = /^(?:\.\.?\/).+[^./]$/u;
 const RELATIVE_JAVASCRIPT = /^(?:\.\.?\/).+\.js$/u;
@@ -17,7 +20,7 @@ function isWithin(parent, candidate) {
 }
 
 function isAdmittedTypeScript(path) {
-  return path === EXACT_ENTRYPOINT || isWithin(BENCHMARK_SOURCE_DIRECTORY, path);
+  return EXACT_ENTRYPOINTS.has(path) || isWithin(BENCHMARK_SOURCE_DIRECTORY, path);
 }
 
 async function resolveTypeScriptCandidate(specifier, parentURL) {

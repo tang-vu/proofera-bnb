@@ -6,13 +6,19 @@ Status: **NOT RUN**. Nothing in this directory is a benchmark result or a publis
 
 | File                            | Task                             | Definition SHA-256                                                 | State                             |
 | ------------------------------- | -------------------------------- | ------------------------------------------------------------------ | --------------------------------- |
-| `task-01-lp-range.json`         | PancakeSwap V3 LP range decision | `edc4ae168600c9de5008adb59bf6cd2b6bd85333713c9b17afc76116fc13239d` | agent `NOT RUN`; manual `NOT RUN` |
+| `task-01-lp-range-v2.json`      | PancakeSwap V3 LP range decision | `9ac77645f2dd0ade20203b911cba18ce52b7b016fae8d9e73aa2919440b572ab` | agent `NOT RUN`; manual `NOT RUN` |
 | `task-02-permission-audit.json` | Altana/Pancake permission audit  | `1191c85c4f36881be0736ced51fc6c23e24286101543bf0838346b0e2ed95645` | agent `NOT RUN`; manual `NOT RUN` |
 | `task-03-venus-health.json`     | Venus health-factor replay       | `c15ed1089fdeb75eab7db3134f08c011fd71bfe02ec2c3dbf3052592973c8c55` | agent `NOT RUN`; manual `NOT RUN` |
 
+Task 01 v1 required a ProofEra-controlled PTA/WBNB testnet position that never
+existed. It was never run and remains byte-for-byte preserved under
+`superseded-preregistrations/`; v2 is a new digest rather than a rewrite. V2
+uses the retained public USDT/WBNB mainnet position strictly for read-only
+decision support, with source chain 56 separated from ERC-8004/hire chain 97.
+
 The digest covers the exact task, required input-binding rules, fixed constraints, environment-binding rules, rubric, hard-fail rules, parity controls, measurements, artifacts, receipts and reproduction plan. It is local tamper evidence, not an external timestamp or proof that a run occurred. Changing a definition requires a new version and digest; it must not overwrite the protocol used by a started run.
 
-Exact account, position, blocks, policies, registered agent identities, final configurations, release commit and timed invocation commands are deliberately `UNBOUND`. The Venus agent lane endpoint is code-fixed, but that does not bind the final task declaration or create a run. Treating placeholder values as exact benchmark inputs would create false evidence. A protocol stays non-publishable until those fields are frozen once into one `BenchmarkDeclaration` and that byte-equivalent declaration is used by both runs.
+Exact final declarations, registered agent identities, hire receipts, release commit, run-order seeds and timed invocation commands remain deliberately `UNBOUND`. A compact LP input candidate and both LP lanes now exist, and the Venus endpoint is code-fixed, but neither fact creates a run. Treating candidate values as final run evidence would create false evidence. A protocol stays non-publishable until all bindings are frozen once into one `BenchmarkDeclaration` and that byte-equivalent declaration is used by both runs.
 
 Validate the preregistrations and paired-run harness:
 
@@ -21,7 +27,7 @@ pnpm --filter @proofera/benchmarks typecheck
 pnpm --filter @proofera/benchmarks test
 ```
 
-The tests perform no network request, wallet operation, transaction, real timing measurement or result generation. Subprocess tests prove the Venus CLI fails before network access when its exact invocation is absent. Task-specific prerequisite commands are recorded inside each JSON file. Their final timed invocations remain `null` until exact inputs, identity and hire evidence exist.
+The tests perform no network request, wallet operation, transaction, real timing measurement or result generation. Subprocess tests prove both production agent CLIs fail before network access when exact invocation material is absent. Task-specific prerequisite commands are recorded inside each JSON file. Their final timed invocations remain `null` until the release, identity, hire and run-order bindings exist.
 
 Future raw run material belongs in a new run-ID directory, never inside `preregistrations/`. It must include the frozen declaration, raw inputs and outputs, UTC and monotonic timing, active-time segments, sourced integer costs, API/transaction receipts when required, rubric-complete second review, hashes, reproduction logs and limitations. Secrets and signer material are forbidden.
 
@@ -36,6 +42,16 @@ published source commit and byte-exact committed request, then writes one new
 capture beneath `runs/venus-health/`. The command is not currently runnable as
 a benchmark because no final request, registered agent identity or verified
 hire receipt exists.
+
+The create-only LP agent runner is available as:
+
+```text
+pnpm run:termix:pancake-lp-agent -- --execute-exact-pancake-lp-agent-run --input-bundle evidence/termix/frozen/pancake-lp/116342186-7152618.canonical-json
+```
+
+It requires a clean published commit, the tracked byte-exact bundle, chain-97
+registration and verified hire receipt before its exact-hash mainnet RPC read
+or public A2A request can occur. No final invocation or LP benchmark run exists.
 
 The read-only Venus preparation collector can be run against two fixed public BSC-testnet RPC origins without changing a preregistration:
 

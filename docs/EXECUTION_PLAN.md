@@ -131,13 +131,15 @@ Acceptance criteria:
 - Three TermiX agent-vs-manual tasks have raw outputs, timers, costs, quality rubric, receipts, reproduction, and limitations; at least one is trading/security.
 - ERC-8183 hiring and/or x402/B402 is added only if the core session journey is stable and the official SDK path remains current.
 
-Current TermiX execution capability: the strict timed core, fixed Venus agent
-lane and create-only CLI are implemented. The CLI accepts no shell command or
-secret, requires a clean published commit plus byte-exact committed canonical
-request, preserves the raw A2A response and cannot pass the outer gate without
-a registered ERC-8004 identity and independently verified hire receipt. No
-final Venus invocation or paired run exists; LP, permission-audit, manual
-session CLI/transcript, cost and second-review artifacts remain required.
+Current TermiX execution capability: the strict timed core plus fixed LP and
+Venus agent/manual lanes are implemented. Both agent CLIs accept no shell
+command or secret, require a clean published commit plus byte-exact committed
+canonical input, preserve raw API/A2A responses and cannot reach network access
+without a registered ERC-8004 identity and independently verified hire
+receipt. LP v2 also separates its mainnet source-data chain from testnet
+identity/hire receipts and preserves the never-run v1 definition. No final
+invocation or paired run exists; permission-audit lanes, manual session
+CLI/transcript, sourced cost and second-review artifacts remain required.
 
 ## Milestone 5 — submission-grade product (`PLANNED`)
 

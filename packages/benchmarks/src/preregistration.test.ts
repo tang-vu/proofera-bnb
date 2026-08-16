@@ -12,8 +12,11 @@ import {
 const preregistrationDirectory = fileURLToPath(
   new URL("../../../evidence/termix/preregistrations/", import.meta.url)
 );
+const supersededPreregistrationDirectory = fileURLToPath(
+  new URL("../../../evidence/termix/superseded-preregistrations/", import.meta.url)
+);
 const expectedFiles = [
-  "task-01-lp-range.json",
+  "task-01-lp-range-v2.json",
   "task-02-permission-audit.json",
   "task-03-venus-health.json"
 ] as const;
@@ -38,6 +41,34 @@ describe("TermiX preregistration evidence", () => {
       "autonomous-session-permission-audit",
       "venus-health-factor-decision"
     ]);
+  });
+
+  it("preserves the never-run LP v1 protocol while making v2 the sole active task 01", () => {
+    expect(readdirSync(supersededPreregistrationDirectory).sort()).toEqual([
+      "task-01-lp-range-v1.json"
+    ]);
+    const legacy = BenchmarkPreregistrationSchema.parse(
+      JSON.parse(
+        readFileSync(`${supersededPreregistrationDirectory}task-01-lp-range-v1.json`, "utf8")
+      ) as unknown
+    );
+    const active = loadPreregistrations()[0];
+    expect(legacy.preregistrationId).toBe("termix-task-01-lp-range-v1");
+    expect(legacy.definitionSha256).toBe(
+      "edc4ae168600c9de5008adb59bf6cd2b6bd85333713c9b17afc76116fc13239d"
+    );
+    expect(active?.preregistrationId).toBe("termix-task-01-lp-range-v2");
+    expect(active?.definitionSha256).toBe(
+      "9ac77645f2dd0ade20203b911cba18ce52b7b016fae8d9e73aa2919440b572ab"
+    );
+    expect(legacy.status).toBe("NOT RUN");
+    expect(active?.status).toBe("NOT RUN");
+    expect(active?.definition.environment).toMatchObject({ kind: "mainnet", chainId: 56 });
+    expect(
+      active?.definition.constraints.find(
+        ({ constraintId }) => constraintId === "bsc-testnet-agent-commerce"
+      )?.expected
+    ).toEqual({ encoding: "decimal_integer", value: "97" });
   });
 
   it("keeps every input, environment parameter, final declaration and timed command unbound", () => {

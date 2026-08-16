@@ -1,0 +1,241 @@
+import { execFileSync } from "node:child_process";
+import { randomUUID } from "node:crypto";
+import { constants } from "node:fs";
+import { access, link, lstat, open, readFile, realpath, unlink } from "node:fs/promises";
+import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
+import { fileURLToPath } from "node:url";
+
+import {
+  TermixTimedRunRequestSchema,
+  canonicalJson,
+  runPancakeLpAgentTermixMethod,
+  sha256Bytes
+} from "../packages/benchmarks/src/index";
+
+const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const INPUT_PREFIX = "evidence/termix/frozen/pancake-lp/";
+const INPUT_SUFFIX = ".canonical-json";
+const OUTPUT_DIRECTORY = "evidence/termix/runs/pancake-lp";
+const MAXIMUM_STDIN_BYTES = 2_000_000;
+const MAXIMUM_GIT_OUTPUT_BYTES = 4_000_000;
+
+interface Invocation {
+  readonly timedRunRequest: unknown;
+  readonly inputBundleSha256: string;
+}
+
+function parseArguments(args: readonly string[]): string {
+  const normalized = args[0] === "--" ? args.slice(1) : args;
+  if (
+    normalized.length !== 3 ||
+    normalized[0] !== "--execute-exact-pancake-lp-agent-run" ||
+    normalized[1] !== "--input-bundle" ||
+    normalized[2] === undefined
+  ) {
+    throw new Error("TERMIX_PANCAKE_LP_CLI_ARGUMENTS_INVALID");
+  }
+  return validateRepositoryPath(normalized[2]);
+}
+
+function validateRepositoryPath(value: string): string {
+  if (
+    !value.startsWith(INPUT_PREFIX) ||
+    !value.endsWith(INPUT_SUFFIX) ||
+    value.includes("\\") ||
+    value.split("/").includes("..") ||
+    isAbsolute(value) ||
+    !/^[A-Za-z0-9._/-]+$/u.test(value)
+  ) {
+    throw new Error("TERMIX_PANCAKE_LP_INPUT_PATH_INVALID");
+  }
+  return value;
+}
+
+async function readBoundedStdin(): Promise<string> {
+  const chunks: Buffer[] = [];
+  let bytes = 0;
+  for await (const chunk of process.stdin) {
+    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk as string);
+    bytes += buffer.length;
+    if (bytes > MAXIMUM_STDIN_BYTES) throw new Error("TERMIX_PANCAKE_LP_STDIN_TOO_LARGE");
+    chunks.push(buffer);
+  }
+  if (bytes === 0) throw new Error("TERMIX_PANCAKE_LP_STDIN_REQUIRED");
+  return Buffer.concat(chunks).toString("utf8");
+}
+
+function parseInvocation(text: string): Invocation {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text) as unknown;
+  } catch {
+    throw new Error("TERMIX_PANCAKE_LP_INVOCATION_JSON_INVALID");
+  }
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    throw new Error("TERMIX_PANCAKE_LP_INVOCATION_INVALID");
+  }
+  const record = parsed as Record<string, unknown>;
+  if (Object.keys(record).sort().join(",") !== "inputBundleSha256,timedRunRequest") {
+    throw new Error("TERMIX_PANCAKE_LP_INVOCATION_INVALID");
+  }
+  if (
+    typeof record.inputBundleSha256 !== "string" ||
+    !/^[0-9a-f]{64}$/u.test(record.inputBundleSha256)
+  ) {
+    throw new Error("TERMIX_PANCAKE_LP_INVOCATION_DIGEST_INVALID");
+  }
+  return {
+    timedRunRequest: record.timedRunRequest,
+    inputBundleSha256: record.inputBundleSha256
+  };
+}
+
+function gitText(args: readonly string[]): string {
+  return execFileSync("git", args, {
+    cwd: REPOSITORY_ROOT,
+    encoding: "utf8",
+    maxBuffer: MAXIMUM_GIT_OUTPUT_BYTES,
+    windowsHide: true
+  }).trim();
+}
+
+function gitBytes(args: readonly string[]): Buffer {
+  return execFileSync("git", args, {
+    cwd: REPOSITORY_ROOT,
+    encoding: "buffer",
+    maxBuffer: MAXIMUM_GIT_OUTPUT_BYTES,
+    windowsHide: true
+  });
+}
+
+function verifyReleaseState(sourceCommitSha: string): void {
+  if (gitText(["status", "--porcelain=v1", "--untracked-files=all"]) !== "") {
+    throw new Error("TERMIX_PANCAKE_LP_REPOSITORY_DIRTY");
+  }
+  const head = gitText(["rev-parse", "HEAD"]);
+  const published = gitText(["rev-parse", "origin/main"]);
+  if (head !== sourceCommitSha) throw new Error("TERMIX_PANCAKE_LP_SOURCE_COMMIT_MISMATCH");
+  if (published !== head) throw new Error("TERMIX_PANCAKE_LP_SOURCE_NOT_PUBLISHED");
+}
+
+async function verifyCommittedInput(repositoryPath: string): Promise<string> {
+  const absolutePath = resolve(REPOSITORY_ROOT, ...repositoryPath.split("/"));
+  await assertCanonicalPathWithinRepository(absolutePath);
+  gitText(["ls-files", "--error-unmatch", "--", repositoryPath]);
+  const workingBytes = await readFile(absolutePath);
+  const committedBytes = gitBytes(["show", `HEAD:${repositoryPath}`]);
+  if (!workingBytes.equals(committedBytes)) {
+    throw new Error("TERMIX_PANCAKE_LP_INPUT_NOT_COMMITTED");
+  }
+  const text = workingBytes.toString("utf8");
+  if (!text.endsWith("\n") || text.endsWith("\r\n") || text.slice(0, -1).includes("\n")) {
+    throw new Error("TERMIX_PANCAKE_LP_INPUT_FILE_INVALID");
+  }
+  return text.slice(0, -1);
+}
+
+async function assertCanonicalPathWithinRepository(absolutePath: string): Promise<void> {
+  const repositoryRealPath = await realpath(REPOSITORY_ROOT);
+  const candidateRealPath = await realpath(absolutePath);
+  const local = relative(repositoryRealPath, candidateRealPath);
+  if (
+    local === "" ||
+    local === ".." ||
+    local.startsWith(`..${sep}`) ||
+    isAbsolute(local) ||
+    resolve(absolutePath).toLowerCase() !== resolve(candidateRealPath).toLowerCase()
+  ) {
+    throw new Error("TERMIX_PANCAKE_LP_INPUT_PATH_UNTRUSTED");
+  }
+  let cursor = repositoryRealPath;
+  for (const segment of local.split(sep)) {
+    cursor = resolve(cursor, segment);
+    if ((await lstat(cursor)).isSymbolicLink()) {
+      throw new Error("TERMIX_PANCAKE_LP_INPUT_PATH_UNTRUSTED");
+    }
+  }
+}
+
+async function assertOutputAvailable(runId: string): Promise<string> {
+  const outputDirectory = resolve(REPOSITORY_ROOT, ...OUTPUT_DIRECTORY.split("/"));
+  await assertCanonicalPathWithinRepository(outputDirectory);
+  const outputPath = resolve(outputDirectory, `${runId}.json`);
+  const local = relative(outputDirectory, outputPath);
+  if (local === "" || local.startsWith(`..${sep}`) || isAbsolute(local)) {
+    throw new Error("TERMIX_PANCAKE_LP_OUTPUT_PATH_INVALID");
+  }
+  try {
+    await access(outputPath, constants.F_OK);
+    throw new Error("TERMIX_PANCAKE_LP_OUTPUT_ALREADY_EXISTS");
+  } catch (error) {
+    if (error instanceof Error && error.message === "TERMIX_PANCAKE_LP_OUTPUT_ALREADY_EXISTS") {
+      throw error;
+    }
+    if (!isMissingFileError(error)) throw error;
+  }
+  return outputPath;
+}
+
+async function writeCaptureCreateOnly(outputPath: string, body: string): Promise<void> {
+  const temporaryPath = resolve(dirname(outputPath), `.${randomUUID()}.partial`);
+  let temporaryExists = false;
+  try {
+    const handle = await open(temporaryPath, "wx", 0o600);
+    temporaryExists = true;
+    try {
+      await handle.writeFile(body, { encoding: "utf8" });
+      await handle.sync();
+    } finally {
+      await handle.close();
+    }
+    await link(temporaryPath, outputPath);
+    await unlink(temporaryPath);
+    temporaryExists = false;
+  } finally {
+    if (temporaryExists) await unlink(temporaryPath).catch(() => undefined);
+  }
+}
+
+function isMissingFileError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code?: unknown }).code === "ENOENT"
+  );
+}
+
+async function main(): Promise<void> {
+  const inputPath = parseArguments(process.argv.slice(2));
+  const invocation = parseInvocation(await readBoundedStdin());
+  const timedRequest = TermixTimedRunRequestSchema.parse(invocation.timedRunRequest);
+  verifyReleaseState(timedRequest.sourceCommitSha);
+  const inputBundleCanonicalJson = await verifyCommittedInput(inputPath);
+  if (sha256Bytes(inputBundleCanonicalJson) !== invocation.inputBundleSha256) {
+    throw new Error("TERMIX_PANCAKE_LP_INPUT_DIGEST_MISMATCH");
+  }
+  const outputPath = await assertOutputAvailable(timedRequest.runId);
+  const capture = await runPancakeLpAgentTermixMethod({
+    request: timedRequest,
+    inputBundleCanonicalJson,
+    inputBundleSha256: invocation.inputBundleSha256,
+    clock: {
+      monotonicClockLabel: "Node.js process.hrtime.bigint",
+      utcNow: () => new Date(),
+      monotonicNowNanoseconds: () => process.hrtime.bigint()
+    }
+  });
+  await writeCaptureCreateOnly(outputPath, `${canonicalJson(capture)}\n`);
+  process.stdout.write(`${relative(REPOSITORY_ROOT, outputPath).replaceAll("\\", "/")}\n`);
+}
+
+main().catch((error: unknown) => {
+  const message =
+    error instanceof Error && /^[A-Z0-9_]+$/u.test(error.message)
+      ? error.message
+      : error instanceof Error
+        ? error.constructor.name
+        : "Error";
+  process.stderr.write(`TermiX Pancake LP agent runner failed: ${message}\n`);
+  process.exitCode = 1;
+});

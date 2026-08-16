@@ -46,19 +46,19 @@ Costs remain grouped by denomination; no hidden exchange-rate conversion or aggr
 | 02 — autonomous-session permission audit | **NOT RUN**          | **NOT RUN**   | No          |
 | 03 — Venus health-factor replay          | **NOT RUN**          | **NOT RUN**   | No          |
 
-## Task 01 — PancakeSwap LP range decision and bounded call plan
+## Task 01 — PancakeSwap public-position LP range decision
 
-Track alignment: trading, PancakeSwap, Altana, TermiX and the marketplace. Preregistration: [`task-01-lp-range.json`](../evidence/termix/preregistrations/task-01-lp-range.json), definition SHA-256 `edc4ae168600c9de5008adb59bf6cd2b6bd85333713c9b17afc76116fc13239d`.
+Track alignment: trading, PancakeSwap, TermiX and the marketplace. Active preregistration: [`task-01-lp-range-v2.json`](../evidence/termix/preregistrations/task-01-lp-range-v2.json), definition SHA-256 `9ac77645f2dd0ade20203b911cba18ce52b7b016fae8d9e73aa2919440b572ab`. The never-run PTA/WBNB v1 protocol remains unchanged under [`superseded-preregistrations/`](../evidence/termix/superseded-preregistrations/task-01-lp-range-v1.json); v2 does not rewrite it.
 
-Exact task: from one frozen BSC testnet PancakeSwap V3 PTA/WBNB position/source bundle and one identical bounded policy, decide retain versus range change and emit a canonical direct-call plan. The output must separate known costs from unavailable fee or impermanent-loss evidence. The timed task is construction and analysis only—no signature or broadcast. A separately approved execution demonstration is outside the paired score.
+Exact task: from one immutable BSC-mainnet public USDT/WBNB Pancake V3 position bundle, validate the retained source and an exact-hash `slot0` replay; calculate in-range and boundary state; and return exact tick buffers, policy violations, supplied known economics, explicitly unavailable economics, a bounded decision, rationale and limitations. Position `7152618` belongs to an unrelated public address. Both methods are read-only and may never infer ProofEra ownership, authority, performance or execution.
 
-Inputs still to bind: eligible position/pool/manager and exact block; raw ownership, token, decimal, tick, liquidity and fee observations; observation window; recipient; capital/spend cap; range movement; quote TTL; slippage/minimum amounts; gas ceiling; expiry; release commit; registered/hireable agent; and timed runner.
+The shared candidate bundle is retained at [`116342186-7152618.canonical-json`](../evidence/termix/frozen/pancake-lp/116342186-7152618.canonical-json), logical SHA-256 `3459eb2566621c4d74acef68c84849e59b74214c7a21d7d20b8bbc6352dda945`. It binds the exact evidence-file digest, block/hash, pool, manager, position, expected tick and byte-equivalent agent request. It remains a candidate, not a final declaration or result. Still to bind: release commit, chain-97 registered/hireable agent, verified hire receipt, endpoint/configuration values, public run-order seed, exact method invocations and manual procedure transcript.
 
-Fixed constraints include chain ID 97, no timed writes, identical source access and the reviewed direct selector set (`mint`, `increaseLiquidity`, `decreaseLiquidity`, `collect`) with multicall/arbitrary dispatch forbidden.
+Fixed constraints separate source-data chain 56 from ERC-8004/hire chain 97; require identical bundle and exact-hash `slot0` access; forbid all timed wallet/write activity and undeclared network access; and preserve the third-party non-authority label.
 
-Rubric (100): verified inputs 20; policy/calldata safety 25; evidence-supported net-benefit decision 25; explanation/uncertainty 15; reproducibility 15. Wrong chain/contract/token/position/recipient/decimals/block, any timed write/unsafe selector, fabricated value, or pair mismatch is a hard fail.
+Rubric (100): verified inputs 25; range/risk accuracy 25; economics/decision integrity 25; explanation/uncertainty 10; reproducibility 15. Wrong source/commerce chain, block/hash, contract, position, tick, evidence digest or RPC origin; any timed write/wallet use; any ownership/performance overclaim; fabricated value; undeclared access; or paired mismatch is a hard fail.
 
-Required evidence: frozen declaration/input bundle; raw and canonical outputs; active/wall time and sourced costs; second-reviewer score/reproduction log; an API receipt in each run; a real ProofEra hire/activation receipt for the agent method. No such receipt currently exists.
+Both fixed lanes now bind the same input digest. The agent lane rechecks exact-hash `slot0` before calling the public LP A2A endpoint and cannot enter either network call without registration plus verified hire evidence. The manual lane accepts exactly one matching RPC exchange during positive operator-active time, retains the unedited canonical output, and leaves its no-agent declaration for independent tool-log review. Required final evidence remains: one frozen declaration; both raw/canonical outputs; wall/active time and sourced costs; both exact API receipts; chain-97 hire evidence for the agent method; and rubric-complete second review. None is a completed run yet.
 
 Available prerequisite commands—not experiment commands:
 
@@ -72,6 +72,12 @@ From the repository root:
 
 ```bash
 pnpm --filter @proofera/benchmarks test
+```
+
+Available release-gated agent command—not currently runnable as a benchmark:
+
+```bash
+pnpm run:termix:pancake-lp-agent -- --execute-exact-pancake-lp-agent-run --input-bundle evidence/termix/frozen/pancake-lp/116342186-7152618.canonical-json
 ```
 
 Timed reproduction command: **UNBOUND**. Agent result: **NOT RUN**. Manual result: **NOT RUN**.
