@@ -72,6 +72,11 @@ describe.skipIf(!RUN_READINESS)("deployed ProofEra PostgreSQL readiness", () => 
     } finally {
       client.release();
     }
+    if (verification.status === "blocked") {
+      throw new Error(
+        `LP deployment schema verification blocked: ${verification.failedChecks.join(",")}`
+      );
+    }
     expect(verification).toMatchObject({ postgresMajor: 17, status: "ready" });
     expect(isVerifiedAltanaLpReservationSchemaReady(verification)).toBe(true);
 
