@@ -132,7 +132,7 @@ bag deploy prepare
 
 Before deployment, inspect generated manifests, endpoint health behavior, IAM/quota, region, secret injection and whether `--skip-register` is required. ProofEra's browser-passkey Altana session is not assumed equivalent to Studio's native/local Altana provisioning. The worker must receive the ProofEra-scoped signer through the reviewed KMS seam and pass independent authority verification.
 
-All four analyzers have hardened public A2A/MCP runtimes and fail-independent CI matrix entries: LP Range 17 tests, Grid Trading 24, Yield Optimisation 33, and Health-Factor Guardian 37. Their durable endpoints and public health/Card probes pass. Dedicated registration wallets and current A2A identity metadata exist, but balances and ERC-8004 identities do not; see the [agent registration runbook](./agent-registration.md). Analyzer availability alone is not execution or outcome evidence.
+All four analyzers have hardened public A2A/MCP runtimes and fail-independent CI matrix entries: LP Range 17 tests, Grid Trading 24, Yield Optimisation 33, and Health-Factor Guardian 42. Their durable endpoints and public health/Card probes pass. Dedicated registration wallets and current A2A identity metadata exist, but balances and ERC-8004 identities do not; see the [agent registration runbook](./agent-registration.md). Analyzer availability alone is not execution or outcome evidence.
 
 Prepare durable self-host/AWS hosting first. Start the 48-hour BNB-managed trial only when a testnet evidence capture window is scheduled. Agent ERC-8004 registration is a separate, custody-specific admin operation; do not assume Studio/Altana can sign it generically.
 

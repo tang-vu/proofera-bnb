@@ -14,6 +14,16 @@ The summary exposes raw paired deltas only when the underlying fields are comple
 
 `runTermixTimedMethod` is the fail-closed timing core for the six fixed ProofEra lanes (three preregistered tasks × agent/manual). It accepts no shell command. Before invoking a lane adapter it requires a clean commit matching the normalized declaration digest; agent lanes additionally require a registered ERC-8004 reference and a SHA-256-bound, independently verified hire receipt. Captures retain UTC and monotonic wall time, bounded non-overlapping active segments, raw output/API response bytes and hashes, and the raw public hire receipt. This runner does not bind a preregistration, hire an agent, score output, or make a run publishable by itself.
 
+`runVenusHealthAgentTermixMethod` implements only the fixed public Health
+Guardian agent lane. Its endpoint, A2A method, safety limits and redirect policy
+are configuration-digest bound; the canonical request digest, endpoint and
+configuration must also appear in the shared declaration. It captures the raw
+A2A response and rejects malformed envelopes, mismatched IDs, agent errors,
+oversized responses or any output that widens the analyzer's five false trust
+and execution flags. The outer runner still rejects missing ERC-8004 identity
+or verified hire receipt before this lane can make its HTTP request. The A2A
+receipt does not independently authenticate the frozen Venus RPC evidence.
+
 ```bash
 pnpm --filter @proofera/benchmarks typecheck
 pnpm --filter @proofera/benchmarks test

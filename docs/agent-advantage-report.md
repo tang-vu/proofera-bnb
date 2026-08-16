@@ -1,14 +1,14 @@
 # ProofEra agent advantage report
 
-Updated: 2026-08-12. Overall status: **NOT RUN — NON-PUBLISHABLE**.
+Updated: 2026-08-17. Overall status: **NOT RUN — NON-PUBLISHABLE**.
 
-This is ProofEra's TermiX paired-experiment ledger. Exactly three ProofEra-versus-manual tasks are preregistered. No agent or manual run has started, and no time, cost, score, output, receipt, endpoint, transaction hash or advantage is claimed.
+This is ProofEra's TermiX paired-experiment ledger. Exactly three ProofEra-versus-manual tasks are preregistered. No agent or manual run has started, and no benchmark time, cost, score, output, receipt, transaction hash or advantage is claimed. Public analyzer endpoints are availability evidence only, not experiment receipts.
 
 ## Harness audit and preregistration boundary
 
 The existing `packages/benchmarks` paired-run schema is strict about evidence that already has exact values: it requires each run to carry the same normalized task, inputs, constraints, environment, receipt kinds and rubric; keeps timing and costs exact; joins receipts to hashed raw artifacts; distinguishes incomplete, unverified and verified records; and enables publication only when both runs are verified. It does not execute a task or infer a winner.
 
-That run schema cannot honestly represent today's state because the judged blocks, accounts, positions, policies, release commit, live agent identities and runners do not exist. Encoding placeholders as final `BenchmarkDeclaration` values would misrepresent them as exact inputs. `BenchmarkPreregistrationSchema` therefore models only a pre-run protocol:
+That run schema cannot honestly represent today's state because the judged blocks, accounts, positions, policies, release commit, live agent identities, final declarations and most fixed lane adapters do not exist. Encoding placeholders as final `BenchmarkDeclaration` values would misrepresent them as exact inputs. `BenchmarkPreregistrationSchema` therefore models only a pre-run protocol:
 
 - both method states are exactly `NOT RUN` and `publishable` is exactly `false`;
 - every not-yet-known input, environment parameter, release commit and timed runner command is explicitly `UNBOUND`/`null` with a reason;
@@ -73,6 +73,15 @@ From the repository root:
 ```bash
 pnpm --filter @proofera/benchmarks test
 ```
+
+The fixed `runVenusHealthAgentTermixMethod` lane is now implemented and tested.
+It digest-binds the canonical Health request, public endpoint and lane
+configuration; preserves the raw A2A response; and rejects redirects,
+malformed envelopes, mismatched IDs, agent errors, oversized responses or
+widened trust/execution flags. The outer timed runner rejects an unregistered
+agent or missing independently verified hire receipt before the lane can make
+an HTTP request. This is runner capability only: the final declaration and
+command remain unbound, and the lane has not been invoked as a TermiX run.
 
 Timed reproduction command: **UNBOUND**. Agent result: **NOT RUN**. Manual result: **NOT RUN**.
 
