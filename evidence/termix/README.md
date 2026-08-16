@@ -24,3 +24,11 @@ pnpm --filter @proofera/benchmarks test
 The tests perform no network request, agent invocation, wallet operation, transaction, timing measurement or result generation. Task-specific prerequisite commands are recorded inside each JSON file. Their timed runner commands remain `null` until a real reproducible runner and exact inputs exist.
 
 Future raw run material belongs in a new run-ID directory, never inside `preregistrations/`. It must include the frozen declaration, raw inputs and outputs, UTC and monotonic timing, active-time segments, sourced integer costs, API/transaction receipts when required, rubric-complete second review, hashes, reproduction logs and limitations. Secrets and signer material are forbidden.
+
+The read-only Venus preparation collector can be run against two fixed public BSC-testnet RPC origins without changing a preregistration:
+
+```text
+pnpm collect:termix:venus -- --account <address> --latest-finalized
+```
+
+It enumerates the official Core Pool's complete `getAllMarkets` set, binds one finalized block/hash, retains exact account snapshots, market parameters, runtime code and oracle prices, and requires both providers to agree before deriving health-factor evidence with Venus's integer truncation order. It rejects VAI debt because the current Health Guardian input cannot represent that debt. The default command prints only a non-publishable summary. `--write-development-evidence` writes a new immutable development capture only from a clean commit; that capture remains `NOT_RUN` and is not a hire receipt, alert receipt, frozen benchmark declaration or TermiX result.

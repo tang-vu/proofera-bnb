@@ -42,6 +42,7 @@ function provider(providerId: string, publicSourceUrl: string) {
         vTokenBalanceRaw: "1411021975758406",
         borrowBalanceRaw: "192053000000",
         exchangeRateMantissaRaw: "200776461931237",
+        oraclePriceStatus: "available",
         oraclePriceMantissaRaw: "1000000000000000000"
       }
     ]
@@ -105,5 +106,30 @@ describe("Venus Core exact-block evidence", () => {
     const result = buildVenusCoreExactBlockEvidence([first, second]);
     expect(result.healthFactorE18Raw).toBeNull();
     expect(result.limitations.join(" ")).toContain("must never be presented as infinite or safe");
+  });
+
+  it("permits an unavailable oracle only for a market with no account position", () => {
+    const first = provider("one", "https://one.example/rpc");
+    const second = provider("two", "https://two.example/rpc");
+    for (const observation of [first, second]) {
+      const market = observation.markets.at(0);
+      if (market === undefined) throw new Error("Missing fixture");
+      market.vTokenBalanceRaw = "0";
+      market.borrowBalanceRaw = "0";
+      market.oraclePriceStatus = "unavailable";
+      market.oraclePriceMantissaRaw = "0";
+      observation.assetsIn = [];
+    }
+    expect(buildVenusCoreExactBlockEvidence([first, second]).positions).toEqual([]);
+
+    const active = provider("three", "https://three.example/rpc");
+    const activePeer = provider("four", "https://four.example/rpc");
+    for (const observation of [active, activePeer]) {
+      const market = observation.markets.at(0);
+      if (market === undefined) throw new Error("Missing fixture");
+      market.oraclePriceStatus = "unavailable";
+      market.oraclePriceMantissaRaw = "0";
+    }
+    expect(() => buildVenusCoreExactBlockEvidence([active, activePeer])).toThrow();
   });
 });

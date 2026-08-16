@@ -52,6 +52,7 @@ const marketSchema = z.strictObject({
   vTokenBalanceRaw: uint256Schema,
   borrowBalanceRaw: uint256Schema,
   exchangeRateMantissaRaw: uint256Schema,
+  oraclePriceStatus: z.enum(["available", "unavailable"]),
   oraclePriceMantissaRaw: uint256Schema
 });
 
@@ -123,7 +124,9 @@ export const venusCoreExactBlockProviderObservationSchema = z
       }
       if (
         (market.vTokenBalanceRaw !== "0" || market.borrowBalanceRaw !== "0") &&
-        (!market.isListed || market.oraclePriceMantissaRaw === "0")
+        (!market.isListed ||
+          market.oraclePriceStatus !== "available" ||
+          market.oraclePriceMantissaRaw === "0")
       ) {
         context.addIssue({
           code: "custom",

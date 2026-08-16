@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "paths": {
+      "viem": ["../packages/integrations/node_modules/viem/_types/index.d.ts"]
+    },
+    "types": ["node"]
+  },
+  "include": ["collect-termix-venus-exact-block.ts"]
+}
