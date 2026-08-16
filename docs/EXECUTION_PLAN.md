@@ -155,8 +155,11 @@ and verified hire are outer pre-network gates, the complete RPC plan runs before
 the one fixed A2A skill, declaration endpoint/component/input drift fails
 closed, and the response must bind the exact bundle with no execution. The
 deployed LP endpoint does not advertise or serve that audit skill yet. That
-public skill, both CLIs, the final frozen bundle, real manual transcript,
-sourced cost and second-review artifacts remain required.
+public skill is implemented and independently verified in the local LP-agent
+deployment package, with byte-identical canonical parity against the benchmark
+engine, but has not been released to the running endpoint. Deployment, both
+CLIs, the final frozen bundle, real manual transcript, sourced cost and
+second-review artifacts remain required.
 
 ## Milestone 5 — submission-grade product (`PLANNED`)
 

@@ -2,9 +2,11 @@
 
 This workspace contains a deterministic, read-only PancakeSwap V3 LP range
 evidence analyzer for BSC mainnet (56) and testnet (97). The deployed Studio
-package is `app/agent` and exposes only `analyze_lp_range` over A2A and MCP.
+package is `app/agent`; it exposes `analyze_lp_range` over A2A and MCP plus the
+strict deterministic `audit_altana_permission_bundle` skill over A2A.
 
-It has no wallet, signer, Altana session, ERC-8183 or x402 seller, LLM, chain
+The audit skill consumes only a caller-supplied secret-free, digest-linked
+bundle and performs no network access. It has no wallet, signer, Altana session, ERC-8183 or x402 seller, LLM, chain
 tool, storage, or budget path. A future rebalance is owned by ProofEra's
 separate scoped execution worker after explicit permission review; this
 reference analyzer can only return decision support with

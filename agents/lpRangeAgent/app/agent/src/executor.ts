@@ -9,6 +9,7 @@ import {
 } from "@a2a-js/sdk/server";
 
 import { handleLpAnalysisA2a } from "./lpAnalysis.js";
+import { handlePermissionAuditA2a, PERMISSION_AUDIT_SKILL } from "./permissionAudit.js";
 
 /** A2A adapter exposing only the deterministic read-only LP analysis skill. */
 export class LpRangeAnalysisExecutor implements AgentExecutor {
@@ -25,11 +26,13 @@ export class LpRangeAnalysisExecutor implements AgentExecutor {
             }
           : data.skill === "analyze_lp_range"
             ? { ...handleLpAnalysisA2a(data) }
-            : {
-                error: "UNKNOWN_SKILL",
-                skills: ["analyze_lp_range"],
-                executionEnabled: false
-              };
+            : data.skill === PERMISSION_AUDIT_SKILL
+              ? { ...handlePermissionAuditA2a(data) }
+              : {
+                  error: "UNKNOWN_SKILL",
+                  skills: ["analyze_lp_range", PERMISSION_AUDIT_SKILL],
+                  executionEnabled: false
+                };
     } catch (error) {
       const name = error instanceof Error ? error.constructor.name : "Error";
       throw A2AError.internalError(`${name}: deterministic analysis failed`);

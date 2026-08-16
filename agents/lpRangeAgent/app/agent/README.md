@@ -14,6 +14,13 @@ always `false`. `review_rebalance` means human review only. ProofEra's separate
 scoped worker owns any future execution, receipt reconciliation, and revoke
 flow.
 
+`audit_altana_permission_bundle` is an A2A-only deterministic audit of one
+strict secret-free BSC-testnet permission bundle. It validates evidence joins,
+grant/revoke lifecycle metadata, code-policy parity, seeded authority defects
+and the three enforcement layers. It never fetches a source, handles a secret,
+or performs a grant, retry, revoke, signature, submission, broadcast or state
+mutation. `executionPerformed` is always `false`.
+
 ## Runtime contract
 
 `studio.toml` declares only an AgentCore runtime with A2A and MCP faces on BSC

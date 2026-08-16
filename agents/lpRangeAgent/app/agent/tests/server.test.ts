@@ -140,7 +140,7 @@ test("loopback HTTP exposes honest A2A and sanitized bounded failures", async ()
     assert.equal(card.securitySchemes, undefined);
     assert.deepEqual(
       (card.skills as Array<{ id: string }>).map(({ id }) => id),
-      ["analyze_lp_range"]
+      ["analyze_lp_range", "audit_altana_permission_bundle"]
     );
 
     const jsonRpcBody = JSON.stringify({

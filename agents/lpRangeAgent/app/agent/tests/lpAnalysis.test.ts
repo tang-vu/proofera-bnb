@@ -218,15 +218,16 @@ test("MCP adapter returns matching JSON text and structured content", () => {
   assert.equal(response.structuredContent.decision, "hold");
 });
 
-test("AgentCard advertises only honest read-only LP analysis", () => {
+test("AgentCard advertises only honest read-only evidence analysis", () => {
   const card = buildAgentCard();
   assert.deepEqual(
     card.skills.map(({ id }) => id),
-    ["analyze_lp_range"]
+    ["analyze_lp_range", "audit_altana_permission_bundle"]
   );
   assert.equal(card.security, undefined);
   assert.equal(card.securitySchemes, undefined);
   assert.match(card.skills[0]?.description ?? "", /executionEnabled is always false/i);
+  assert.match(card.skills[1]?.description ?? "", /executionPerformed is always false/i);
   assert.doesNotMatch(card.description, /commerce|seller|signer/i);
 });
 
