@@ -1,8 +1,10 @@
 import { expect, test } from "@playwright/test";
 
-test("exposes honest Venus liquidity entry links", async ({ page }) => {
+test("exposes health-category and raw Venus evidence entry links", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("link", { name: "Inspect raw Venus liquidity" })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Explore Health monitoring agents" })
+  ).toHaveAttribute("href", "/marketplace?category=health-factor-monitoring");
 
   await page.goto("/marketplace");
   await expect(
@@ -13,8 +15,7 @@ test("exposes honest Venus liquidity entry links", async ({ page }) => {
 });
 
 test("opens the Venus reader in a no-read state", async ({ page }) => {
-  await page.goto("/");
-  await page.getByRole("link", { name: "Inspect raw Venus liquidity" }).click();
+  await page.goto("/venus-health");
 
   await expect(page).toHaveURL(/\/venus-health$/);
   await expect(

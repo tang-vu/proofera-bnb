@@ -93,14 +93,29 @@ test("explains the evidence-first marketplace and exposes all four categories", 
   await expect(page.getByRole("heading", { name: /hire agents by proof/i })).toBeVisible();
   await expect(page.getByRole("link", { name: "Find an agent" })).toBeVisible();
 
-  for (const category of [
-    "LP rebalancing",
-    "Grid trading",
-    "Yield optimisation",
-    "Health monitoring"
-  ]) {
-    await expect(page.getByRole("heading", { name: category })).toBeVisible();
+  for (const [label, category] of [
+    ["LP rebalancing", "lp-rebalancing"],
+    ["Grid trading", "grid-trading"],
+    ["Yield optimisation", "yield-optimisation"],
+    ["Health monitoring", "health-factor-monitoring"]
+  ] as const) {
+    await expect(page.getByRole("heading", { name: label })).toBeVisible();
+    await expect(page.getByRole("link", { name: `Explore ${label} agents` })).toHaveAttribute(
+      "href",
+      `/marketplace?category=${category}`
+    );
   }
+});
+
+test("category entry preserves the selected financial job without instructions", async ({
+  page
+}) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Explore Grid trading agents" }).click();
+
+  await expect(page).toHaveURL(/\/marketplace\?category=grid-trading$/);
+  await expect(page.getByLabel("Financial job")).toHaveValue("grid-trading");
+  await expect(page.getByLabel("Current mandate").getByRole("heading")).toHaveText("Grid trading");
 });
 
 test("primary call to action reaches a non-dead marketplace route", async ({ page }) => {
@@ -119,8 +134,7 @@ test("primary call to action reaches a non-dead marketplace route", async ({ pag
 });
 
 test("opens the Pancake position reader in an honest no-read state", async ({ page }) => {
-  await page.goto("/");
-  await page.getByRole("link", { name: "Inspect a Pancake position" }).click();
+  await page.goto("/pancake-position");
 
   await expect(page).toHaveURL(/\/pancake-position$/);
   await expect(
@@ -134,8 +148,7 @@ test("opens the Pancake position reader in an honest no-read state", async ({ pa
 });
 
 test("opens LP configuration without implying a wallet connection", async ({ page }) => {
-  await page.goto("/");
-  await page.getByRole("link", { name: "Configure LP boundaries" }).click();
+  await page.goto("/lp-activate");
 
   await expect(page).toHaveURL(/\/lp-activate$/);
   await expect(

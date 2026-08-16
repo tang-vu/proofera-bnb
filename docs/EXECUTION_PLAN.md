@@ -1,8 +1,20 @@
 # ProofEra execution plan
 
-Updated: 2026-08-14
+Updated: 2026-08-16
 Deadline: 2026-09-09 12:00 UTC
 Operating principle: complete and verify the highest-value unblocked judge journey before expanding breadth.
+
+## Winner path
+
+The official page was rechecked on 2026-08-16. The main prize remains winner-takes-all: $30,000 equivalent plus adoption as the canonical BNB Agent Studio marketplace. The explicit rubric is the end-to-end journey, decision-useful live data, and equal first-class coverage of all four agent categories. Work is therefore ordered as follows:
+
+1. Make the zero-instruction `land → choose a job → discover → understand → activate` journey coherent across all four categories.
+2. Deploy four durable Agent Studio endpoints and record BSC registrations before treating deeper LP execution as judge-eligible breadth.
+3. Attach comparable, source/time/methodology-bound evidence and category-specific configuration to every live agent.
+4. Complete one bounded Altana session lifecycle and one real PancakeSwap benefit receipt without weakening the other three categories.
+5. Run the three preregistered TermiX pairs, publish only complete results, then freeze the public judge build and submission evidence.
+
+The first UX correction removes diagnostic-route clutter from the landing hero and makes every category card a direct, query-bound marketplace entry. Playwright verifies that the selected financial job survives navigation without instructions. Local verification remains authoritative until GitHub Actions can start jobs; runs are currently rejected before step execution because the repository owner's account reports a failed payment or spending-limit condition.
 
 ## Status legend
 
@@ -28,11 +40,11 @@ Evidence:
 - [`requirements-traceability.md`](./requirements-traceability.md)
 - Root [`AGENTS.md`](../AGENTS.md)
 
-Completed evidence includes the exact Studio CLI compatibility/scaffold/doctor spike, dependency compatibility checks, Venus/Lista reads, deployment constraints and verification requirements. The implementation record was updated on 2026-08-12; official-source facts were last checked on 2026-08-11. Fast-moving packages and official competition pages remain re-check items before deployment/submission rather than blockers to implementation.
+Completed evidence includes the exact Studio CLI compatibility/scaffold/doctor spike, dependency compatibility checks, Venus/Lista reads, deployment constraints and verification requirements. The implementation record was updated on 2026-08-16; official competition facts were last checked on 2026-08-16. Fast-moving packages and official competition pages remain re-check items before deployment/submission rather than blockers to implementation.
 
-## Milestone 1 — winning LP vertical slice (`ACTIVE`)
+## Milestone 1 — winning marketplace journey (`ACTIVE`)
 
-Goal: one coherent PancakeSwap LP-range agent journey from discovery through revoke on BSC testnet.
+Goal: one coherent four-category marketplace journey, with LP rebalancing as the deepest bounded execution proof rather than the only first-class product path.
 
 Acceptance criteria defined before implementation:
 

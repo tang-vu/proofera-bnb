@@ -1,6 +1,6 @@
 # ProofEra research record
 
-Last implementation update: **2026-08-13 UTC**. Official-source facts last checked: **2026-08-11 UTC**.
+Last implementation update: **2026-08-16 UTC**. Official-source facts last checked: **2026-08-16 UTC**.
 Status: phase-0 time box complete; deployment-critical facts remain on a revalidation watchlist. Facts below are verified from primary sources unless marked uncertain. Package and contract values are pinned only after documentation and published artifacts agree.
 
 ## Repository and environment ground truth
@@ -14,7 +14,7 @@ Status: phase-0 time box complete; deployment-critical facts remain on a revalid
 
 ## Canonical hackathon requirements
 
-Source: [The Smart Money Era: Build the Era](https://www.bnbchain.org/en/hackathons/smart-money-era), page data checked 2026-08-11; CMS last updated 2026-08-05.
+Source: [The Smart Money Era: Build the Era](https://www.bnbchain.org/en/hackathons/smart-money-era), page data checked 2026-08-16; CMS last updated 2026-08-05.
 
 - Build window: 2026-08-05 12:00 UTC through **2026-09-09 12:00 UTC**.
 - Main prize: $30,000 equivalent plus official adoption as the canonical BNB Agent Studio marketplace.

@@ -3,19 +3,23 @@ import Link from "next/link";
 const categories = [
   {
     name: "LP rebalancing",
-    description: "Keep concentrated liquidity productive inside bounded ranges."
+    description: "Keep concentrated liquidity productive inside bounded ranges.",
+    category: "lp-rebalancing"
   },
   {
     name: "Grid trading",
-    description: "Run a price grid with visible drawdown, turnover, fills, and costs."
+    description: "Run a price grid with visible drawdown, turnover, fills, and costs.",
+    category: "grid-trading"
   },
   {
     name: "Yield optimisation",
-    description: "Compare sustainable net yield, liquidity, exposure, and exit constraints."
+    description: "Compare sustainable net yield, liquidity, exposure, and exit constraints.",
+    category: "yield-optimisation"
   },
   {
     name: "Health monitoring",
-    description: "Watch lending risk and intervene under an explicit liquidation policy."
+    description: "Watch lending risk and intervene under an explicit liquidation policy.",
+    category: "health-factor-monitoring"
   }
 ] as const;
 
@@ -56,23 +60,11 @@ export default function HomePage() {
           <Link className="button button-primary" href="/marketplace">
             Find an agent
           </Link>
-          <Link className="button button-secondary" href="/pancake-position">
-            Inspect a Pancake position
-          </Link>
-          <Link className="button button-secondary" href="/lp-activate">
-            Configure LP boundaries
-          </Link>
           <Link className="button button-secondary" href="/mission-control">
-            Open Mission Control
-          </Link>
-          <Link className="button button-secondary" href="/venus-health">
-            Inspect raw Venus liquidity
-          </Link>
-          <Link className="button button-secondary" href="/yield-sources">
-            Inspect raw Lista sources
+            See active mandates
           </Link>
           <a className="button button-secondary" href="#method">
-            Inspect the method
+            How proof works
           </a>
         </div>
         <dl className="trust-strip" aria-label="ProofEra product rules">
@@ -104,12 +96,20 @@ export default function HomePage() {
         </div>
         <div className="category-grid">
           {categories.map((category, index) => (
-            <article className="category-card" key={category.name}>
+            <Link
+              aria-label={`Explore ${category.name} agents`}
+              className="category-card category-card-link"
+              href={`/marketplace?category=${category.category}`}
+              key={category.name}
+            >
               <span className="category-number">0{index + 1}</span>
               <h3>{category.name}</h3>
               <p>{category.description}</p>
               <span className="evidence-state">Local analyzer tested · live BSC agent pending</span>
-            </article>
+              <span className="category-card-action" aria-hidden="true">
+                Explore agents →
+              </span>
+            </Link>
           ))}
         </div>
       </section>
