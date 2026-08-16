@@ -2,6 +2,8 @@
 
 This directory holds reproducible, non-secret evidence for judged claims. It must never contain fabricated transaction hashes, invented benchmark output, private keys, session signers, wallet passwords, API keys, or encrypted keystores.
 
+`altana/preparations/125493138-bsc-testnet-readiness.json` is a read-only, two-provider checkpoint of the exact Altana SDK 0.7.0 BSC-testnet network surface. It retains relay capabilities, runtime hashes, registration fee, SDK file hashes and raw public transcripts. Its own classification denies wallet/signer creation, grants, execution, revocation and receipts.
+
 Each evidence run will use a manifest containing:
 
 - stable run ID and task definition;
