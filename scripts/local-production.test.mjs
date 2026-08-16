@@ -97,6 +97,17 @@ test("public smoke probe covers the marketplace, every agent, and every Agent Ca
     assert.match(source, new RegExp(hostname.replaceAll(".", "\\.")));
   }
   assert.match(source, /\.well-known\/agent-card\.json/);
+  for (const skillId of [
+    "analyze_lp_range",
+    "audit_altana_permission_bundle",
+    "analyze_grid_trading",
+    "analyze_yield_opportunities",
+    "analyze_venus_health_factor"
+  ]) {
+    assert.match(source, new RegExp(skillId));
+  }
+  assert.match(source, /body\.skills\.map\(\(skill\) => skill\.id\)/);
+  assert.match(source, /JSON\.stringify\(expectedSkills\)/);
   assert.match(source, /executionEnabled === false/);
   assert.match(source, /marketplace-readiness/);
   assert.match(source, /body\?\.build === expectedBuild/);

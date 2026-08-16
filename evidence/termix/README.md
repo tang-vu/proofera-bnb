@@ -20,6 +20,8 @@ The digest covers the exact task, required input-binding rules, fixed constraint
 
 Exact final declarations, registered agent identities, hire receipts, release commit, run-order seeds and timed invocation commands remain deliberately `UNBOUND`. A compact LP input candidate and both LP lanes now exist, and the Venus endpoint is code-fixed, but neither fact creates a run. Treating candidate values as final run evidence would create false evidence. A protocol stays non-publishable until all bindings are frozen once into one `BenchmarkDeclaration` and that byte-equivalent declaration is used by both runs.
 
+Task 02's deterministic `audit_altana_permission_bundle` skill is live on the public LP A2A endpoint and its Agent Card advertises that exact ID. A valid synthetic local/public smoke on 2026-08-17 returned matching bundle digests and `executionPerformed: false`. This is capability availability/parity only: it is not a frozen Task 02 input, registered identity, verified hire, timed run, raw benchmark transcript, receipt, scored finding or advantage claim. Both Task 02 create-only CLIs and all final bindings remain absent.
+
 Validate the preregistrations and paired-run harness:
 
 ```bash

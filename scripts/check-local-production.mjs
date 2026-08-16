@@ -12,16 +12,20 @@ if (expectedBuild !== undefined && !/^[A-Za-z0-9._-]{1,128}$/.test(expectedBuild
 const marketplaceOrigin = publicMode ? "https://proofera.tangvu.dev" : "http://127.0.0.1:3030";
 const agentOrigins = publicMode
   ? [
-      ["lp-range", "https://proofera-lp.tangvu.dev"],
-      ["grid-trading", "https://proofera-grid.tangvu.dev"],
-      ["yield-optimisation", "https://proofera-yield.tangvu.dev"],
-      ["health-factor", "https://proofera-health.tangvu.dev"]
+      [
+        "lp-range",
+        "https://proofera-lp.tangvu.dev",
+        ["analyze_lp_range", "audit_altana_permission_bundle"]
+      ],
+      ["grid-trading", "https://proofera-grid.tangvu.dev", ["analyze_grid_trading"]],
+      ["yield-optimisation", "https://proofera-yield.tangvu.dev", ["analyze_yield_opportunities"]],
+      ["health-factor", "https://proofera-health.tangvu.dev", ["analyze_venus_health_factor"]]
     ]
   : [
-      ["lp-range", "http://127.0.0.1:9101"],
-      ["grid-trading", "http://127.0.0.1:9102"],
-      ["yield-optimisation", "http://127.0.0.1:9103"],
-      ["health-factor", "http://127.0.0.1:9104"]
+      ["lp-range", "http://127.0.0.1:9101", []],
+      ["grid-trading", "http://127.0.0.1:9102", []],
+      ["yield-optimisation", "http://127.0.0.1:9103", []],
+      ["health-factor", "http://127.0.0.1:9104", []]
     ];
 
 const probes = [
@@ -39,13 +43,15 @@ const probes = [
     validate: (body) => body?.status === "HEALTHY" && body?.executionEnabled === false
   })),
   ...(publicMode
-    ? agentOrigins.map(([name, origin]) => ({
+    ? agentOrigins.map(([name, origin, expectedSkills]) => ({
         name: `${name}-card`,
         url: `${origin}/.well-known/agent-card.json`,
         validate: (body) =>
           body?.url === `${origin}/` &&
           body?.protocolVersion === "0.3.0" &&
-          body?.skills?.length > 0
+          Array.isArray(body?.skills) &&
+          body.skills.every((skill) => skill !== null && typeof skill === "object") &&
+          JSON.stringify(body.skills.map((skill) => skill.id)) === JSON.stringify(expectedSkills)
       }))
     : []),
   ...(publicMode && expectedBuild !== undefined

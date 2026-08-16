@@ -32,7 +32,7 @@ The owner's always-on Windows host serves the production build through a named C
 - Yield Optimisation: `https://proofera-yield.tangvu.dev`;
 - Health-Factor Guardian: `https://proofera-health.tangvu.dev`.
 
-Run `node scripts/check-local-production.mjs` for loopback liveness and `node scripts/check-local-production.mjs --public` for HTTPS liveness plus Agent Card identity. A release probe additionally requires the exact published commit and rejects both a mismatched health build and a `misconfigured` readiness response:
+Run `node scripts/check-local-production.mjs` for loopback liveness and `node scripts/check-local-production.mjs --public` for HTTPS liveness plus Agent Card identity. The public probe requires each card's exact ordered skill contract: LP exposes `analyze_lp_range` and `audit_altana_permission_bundle`; Grid exposes `analyze_grid_trading`; Yield exposes `analyze_yield_opportunities`; Health exposes `analyze_venus_health_factor`. A release probe additionally requires the exact published commit and rejects both a mismatched health build and a `misconfigured` readiness response:
 
 ```powershell
 $releaseCommit = (git rev-parse HEAD).Trim()

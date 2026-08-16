@@ -1,6 +1,6 @@
 # ProofEra execution plan
 
-Updated: 2026-08-16
+Updated: 2026-08-17
 Deadline: 2026-09-09 12:00 UTC
 Operating principle: complete and verify the highest-value unblocked judge journey before expanding breadth.
 
@@ -16,7 +16,7 @@ The official page was rechecked on 2026-08-16. The main prize remains winner-tak
 
 The first UX correction removes diagnostic-route clutter from the landing hero and makes every category card a direct, query-bound marketplace entry. Playwright verifies that the selected financial job survives navigation without instructions. Local verification remains authoritative until GitHub Actions can start jobs; runs are currently rejected before step execution because the repository owner's account reports a failed payment or spending-limit condition.
 
-The marketplace and four read-only analyzers now have durable HTTPS endpoints on the owner's always-on Windows host, supervised by PM2 behind a named Cloudflare Tunnel. Repeatable local/public probes cover marketplace health, analyzer health, and exact Agent Card URLs. This closes only the endpoint-hosting part of Milestone 1: all analyzers still declare execution disabled, and BSC/ERC-8004 registrations, evidence-backed live data, activation authority, and receipts remain required.
+The marketplace and four read-only analyzers now have durable HTTPS endpoints on the owner's always-on Windows host, supervised by PM2 behind a named Cloudflare Tunnel. Repeatable local/public probes cover marketplace health, analyzer health, exact Agent Card URLs, and the exact advertised skill IDs for each agent. This closes only the endpoint-hosting part of Milestone 1: all analyzers still declare execution disabled, and BSC/ERC-8004 registrations, evidence-backed live data, activation authority, and receipts remain required.
 
 The Windows release topology now fails closed without an immutable build identifier. Its release probe binds the public health response to the exact published commit and requires readiness to be honestly `not_ready`, never `misconfigured`; a PM2 monitor repeats the same marketplace/agent/Card/readiness checks every five minutes. External alert delivery, rollback exercise, deployed data/worker probes, and a genuinely ready activation path remain open.
 
@@ -150,16 +150,18 @@ block hash; it exposes no arbitrary RPC method. Its public agent/manual lanes
 are now partially closed: the manual lane requires positive timed work, every
 digest-bound artifact exactly once, the complete fixed RPC plan, the five
 preregistered declaration input joins, no hire receipt and a canonical
-`agentInvoked: false` output. The fixed agent lane is now implemented but not live: registration
+`agentInvoked: false` output. The fixed agent lane is implemented and its
+deterministic, non-executing A2A skill is live on the public LP endpoint:
+registration
 and verified hire are outer pre-network gates, the complete RPC plan runs before
 the one fixed A2A skill, declaration endpoint/component/input drift fails
-closed, and the response must bind the exact bundle with no execution. The
-deployed LP endpoint does not advertise or serve that audit skill yet. That
-public skill is implemented and independently verified in the local LP-agent
-deployment package, with byte-identical canonical parity against the benchmark
-engine, but has not been released to the running endpoint. Deployment, both
-CLIs, the final frozen bundle, real manual transcript, sourced cost and
-second-review artifacts remain required.
+closed, and the response must bind the exact bundle with no execution. A valid
+synthetic bundle produced matching canonical digests through the local and
+public endpoint on 2026-08-17. This is an availability/parity smoke only, not a
+TermiX invocation, registered identity, hire receipt, final-bundle audit or
+performance result. Both Task 02 create-only CLIs, the final frozen bundle,
+real manual transcript, sourced cost and second-review artifacts remain
+required.
 
 ## Milestone 5 — submission-grade product (`PLANNED`)
 
