@@ -42,7 +42,7 @@ const EXPECTED_AGENT_OWNERS = Object.freeze({
 });
 const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const REPOSITORY_ROOT = resolve(PACKAGE_ROOT, "..", "..");
-const PREPARE_SCRIPT = resolve(PACKAGE_ROOT, "scripts", "prepare-deployment.mjs");
+const PREPARE_SCRIPT = resolve(PACKAGE_ROOT, "scripts", "prepare-recovery.mjs");
 const ARTIFACT_PATH = resolve(
   PACKAGE_ROOT,
   "artifacts",
@@ -56,6 +56,8 @@ const CONTRACT_SCOPE = Object.freeze([
   "contracts/testnet-hire-receipt/package.json",
   "contracts/testnet-hire-receipt/pnpm-lock.yaml",
   "contracts/testnet-hire-receipt/scripts/prepare-deployment.mjs",
+  "contracts/testnet-hire-receipt/scripts/prepare-recovery.mjs",
+  "contracts/testnet-hire-receipt/scripts/hire-runtime-bytecode.mjs",
   "contracts/testnet-hire-receipt/scripts/execute-approved.mjs"
 ]);
 
@@ -199,7 +201,7 @@ function regenerate(preparation) {
 
 function validatePreparation(preparation, artifactBytes) {
   if (
-    preparation.schemaVersion !== "proofera-testnet-hire-deployment-preparation-v1.0.0" ||
+    preparation.schemaVersion !== "proofera-testnet-hire-recovery-preparation-v1.0.0" ||
     preparation.classification?.authorization !== false ||
     preparation.classification?.broadcast !== false ||
     preparation.chainId !== Number(CHAIN_ID) ||
@@ -208,14 +210,21 @@ function validatePreparation(preparation, artifactBytes) {
     preparation.hires?.length !== 3 ||
     preparation.deployment?.artifactSha256 !== `0x${sha256(artifactBytes)}` ||
     preparation.deployment?.dataKeccak256 !== keccak256(preparation.deployment.data) ||
+    preparation.recovery?.deploymentTransactionHash !== DEPLOYMENT_TX_HASH ||
+    preparation.recovery?.requiredDeploymentStatus !== "confirmed_finalized" ||
+    getAddress(preparation.recovery?.recoveredContract) !==
+      getAddress(preparation.contractAddress) ||
     decimal(preparation.deployment.nonce, "HIRE_EXECUTION_DEPLOYMENT_NONCE_INVALID") !==
       decimal(preparation.deployerNonce, "HIRE_EXECUTION_NONCE_INVALID") ||
     decimal(preparation.deployment.gasLimit, "HIRE_EXECUTION_DEPLOYMENT_GAS_INVALID") !==
       400_000n ||
     decimal(preparation.bounds?.maxGasPriceWei, "HIRE_EXECUTION_GAS_PRICE_CAP_INVALID") !==
       200_000_000n ||
+    preparation.bounds?.deploymentCount !== 0 ||
+    decimal(preparation.bounds?.maxNetworkFeeWei, "HIRE_EXECUTION_NETWORK_FEE_CAP_INVALID") !==
+      120_000_000_000_000n ||
     decimal(preparation.bounds?.maxTotalSpendWei, "HIRE_EXECUTION_SPEND_CAP_INVALID") !==
-      230_000_000_000_000n
+      RECOVERY_MAX_TOTAL_SPEND_WEI
   ) {
     fail("HIRE_EXECUTION_PREPARATION_INVALID");
   }
