@@ -191,6 +191,18 @@ and decodes every hire event. Unknown broadcast/receipt outcomes halt all later
 transactions. These controls are execution capability, not authorization or
 receipt evidence.
 
+The exact V2 approval was exercised once on 2026-08-17. Its two-provider
+preflight passed at nonce `5`, balance `87934297300000000 wei`, deployment gas
+estimate `355696`, and empty predicted address, but custody loading failed
+before any `signed` event or journal existed. The cause was a runner-only byte
+boundary: a random 48-byte DPAPI password was converted through UTF-8 before
+ethers decrypted the keystore. The independent live custody probe still passed
+address, ACL, digest, DPAPI, MAC and unlock checks. Release `c80cae5` now passes
+the exact bytes directly to ethers and adds a regression test; its V3
+preparation/proposal is new and unapproved. V2 is closed and cannot authorize
+the changed runner. No signature, broadcast, nonce consumption, deployment or
+hire receipt resulted from the V2 attempt.
+
 The create-only `capture:termix:hires` collector is also implemented and still
 non-invoked. Given the exact deployment and three hire hashes, it requires a
 clean published release, then joins normalized transactions, receipts and
