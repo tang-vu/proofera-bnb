@@ -8,8 +8,10 @@ created before broadcast and is never overwritten.
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import os
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -22,6 +24,8 @@ CHAIN_ID = 97
 RPC_ENDPOINT = "https://data-seed-prebsc-2-s2.binance.org:8545"
 SOURCE = "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49"
 KEYSTORE_NAME = "UTC--2026-08-12T09-45-30.464Z--997cd959798f7c925076eaeff5855c5c2c1e5a49.keystore.json"
+PASSWORD_BLOB_NAME = "deployer-password.dpapi"
+PASSWORD_BYTES = 48
 FUNDING_WEI = 3_000_000_000_000_000
 GAS_LIMIT = 21_000
 MAX_GAS_PRICE_WEI = 200_000_000
@@ -51,6 +55,66 @@ def write_exclusive(path: Path, value: dict[str, Any]) -> None:
         os.fsync(handle.fileno())
 
 
+def unprotect_password(protected: bytes) -> bytearray:
+    powershell = Path(
+        r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+    )
+    if not powershell.is_file():
+        fail("pinned Windows PowerShell executable is unavailable")
+    script = r"""
+$ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
+$protectedBytes = $null
+$clearBytes = $null
+try {
+  $inputStream = [Console]::OpenStandardInput()
+  $memory = [System.IO.MemoryStream]::new()
+  $inputStream.CopyTo($memory)
+  $protectedBytes = $memory.ToArray()
+  $memory.Dispose()
+  $null = Add-Type -AssemblyName System.Security
+  $clearBytes = [System.Security.Cryptography.ProtectedData]::Unprotect(
+    $protectedBytes,
+    $null,
+    [System.Security.Cryptography.DataProtectionScope]::CurrentUser
+  )
+  $outputStream = [Console]::OpenStandardOutput()
+  $outputStream.Write($clearBytes, 0, $clearBytes.Length)
+  $outputStream.Flush()
+} catch {
+  exit 31
+} finally {
+  if ($null -ne $protectedBytes) { [Array]::Clear($protectedBytes, 0, $protectedBytes.Length) }
+  if ($null -ne $clearBytes) { [Array]::Clear($clearBytes, 0, $clearBytes.Length) }
+}
+"""
+    encoded = base64.b64encode(script.encode("utf-16le")).decode("ascii")
+    completed = subprocess.run(
+        [
+            str(powershell),
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-EncodedCommand",
+            encoded,
+        ],
+        input=protected,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        check=False,
+        timeout=15,
+        env={
+            "SystemRoot": os.environ.get("SystemRoot", r"C:\Windows"),
+            "WINDIR": os.environ.get("WINDIR", r"C:\Windows"),
+        },
+    )
+    if completed.returncode != 0 or len(completed.stdout) != PASSWORD_BYTES:
+        fail("DPAPI password unprotect failed")
+    return bytearray(completed.stdout)
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--execute-approved", action="store_true")
@@ -63,18 +127,16 @@ def main() -> None:
     args = parse_args()
     if not args.execute_approved:
         fail("missing explicit --execute-approved gate")
-    password = os.environ.get("DEPLOYER_KEYSTORE_PASSWORD")
-    if not password:
-        fail("DEPLOYER_KEYSTORE_PASSWORD is required")
-
     custody_dir = args.custody_dir.resolve(strict=True)
     expected_suffix = Path("ProofEra") / "wallets" / "bsc-testnet"
     if tuple(custody_dir.parts[-3:]) != tuple(expected_suffix.parts):
         fail("custody path is outside the pinned ProofEra BSC testnet location")
     keystore_path = custody_dir / KEYSTORE_NAME
     keystore = json.loads(keystore_path.read_text(encoding="utf-8"))
-    private_key = bytearray(Account.decrypt(keystore, password))
+    password = unprotect_password((custody_dir / PASSWORD_BLOB_NAME).read_bytes())
+    private_key = bytearray()
     try:
+        private_key.extend(Account.decrypt(keystore, password))
         account = Account.from_key(private_key)
         if account.address.lower() != SOURCE.lower():
             fail("decrypted source does not match the approved funding wallet")
@@ -161,6 +223,7 @@ def main() -> None:
         )
     finally:
         private_key[:] = b"\x00" * len(private_key)
+        password[:] = b"\x00" * len(password)
 
 
 if __name__ == "__main__":
