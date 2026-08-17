@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -92,4 +93,53 @@ test("collector rejects missing invocation before Git, DNS, TLS or HTTP", () => 
     result.stderr,
     /PRODUCTION_RELEASE_(HEAD_MISMATCH|DNS_RESPONSE_INVALID|TLS_FAILED|HTTP_RESPONSE_INVALID)/u
   );
+});
+
+test("retained rehearsal binds DNS agreement, TLS authorization and eleven exact responses", async () => {
+  const manifestUrl = new URL(
+    "../evidence/submission/release-probes/155f03ae84e505c8d7c981296699bac30fd16ee6/rehearsal/manifest.json",
+    import.meta.url
+  );
+  const bytes = await readFile(manifestUrl);
+  const manifest = JSON.parse(bytes.toString("utf8"));
+  assert.equal(
+    createHash("sha256").update(bytes).digest("hex"),
+    "489ef6855bff29921937725492df5ab836f31a16c65301454e7400ab47726052"
+  );
+  assert.equal(manifest.schemaVersion, "proofera-production-release-evidence-v1.0.0");
+  assert.equal(manifest.sourceCommit, "155f03ae84e505c8d7c981296699bac30fd16ee6");
+  assert.equal(manifest.mode, "rehearsal");
+  assert.deepEqual(manifest.classification, {
+    artifact: "production_release_rehearsal",
+    externalHttpMonitoring: false,
+    finalReleaseCheck: false,
+    hackathonEntrySubmitted: false,
+    independentDnsResolvers: 2,
+    onchainReceiptEvidenceIntroduced: false,
+    readOnly: true,
+    submissionReady: false
+  });
+  assert.equal(manifest.dns.length, 5);
+  assert.ok(
+    manifest.dns.every(
+      ({ resolverAgreement, resolvers }) => resolverAgreement && resolvers.length === 2
+    )
+  );
+  assert.equal(manifest.tls.length, 5);
+  assert.ok(
+    manifest.tls.every(
+      ({ authorized, protocol, validToUtc }) =>
+        authorized &&
+        protocol === "TLSv1.3" &&
+        Date.parse(validToUtc) >= Date.parse(manifest.judgingThroughUtc)
+    )
+  );
+  assert.equal(manifest.http.length, 11);
+  assert.deepEqual(manifest.summary, {
+    dnsAgreement: true,
+    exactBuildObserved: true,
+    httpObservationCount: 11,
+    tlsAuthorized: true
+  });
+  assert.equal(manifest.http.find(({ key }) => key === "marketplace-readiness")?.status, 503);
 });
