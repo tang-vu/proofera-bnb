@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "proofera-testnet-hire-approval-proposal-v1.0.0",
+  "approvalId": "HIRE-TERMIX-2026-08-17-V5",
+  "state": "proposed_unapproved",
+  "authorization": false,
+  "broadcast": false,
+  "sourceCommit": "6857e2e141858913ec2168d136c83b850024636c",
+  "preparation": {
+    "path": "evidence/termix/hire-preparations/1787288386-hire-termix-v5-recovery.json",
+    "sha256": "44a5fd0779c9ae81ef257484805b26cdfd682f065a89360ea35c60bf80ea1389"
+  },
+  "scope": {
+    "chainId": 97,
+    "source": "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49",
+    "identityRegistry": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+    "predictedContract": "0x052fd2940Aa46F0Ae6660e0bf9eBDEdb6F610b1A",
+    "expiryUtc": "2026-08-21T04:59:46Z",
+    "expiryUnix": "1787288386",
+    "transactionCount": 3,
+    "mainnet": false,
+    "tokenApproval": false,
+    "recoveryDeploymentTransaction": "0x7fa5ad3e7b33dfb6dfccdfd06c6e54cc2d833d5aa005ec3f01c98cf72be3ddcf"
+  },
+  "transactions": [
+    {
+      "kind": "hire",
+      "slug": "pancake-lp-range-decision",
+      "nonce": "6",
+      "to": "0x052fd2940Aa46F0Ae6660e0bf9eBDEdb6F610b1A",
+      "selector": "0xc7d43bd2",
+      "agentId": "1825",
+      "engagementId": "0xa3959c83bef9efbf0ce853b7c7f4d84504e658fad4724b9a45a48e65310762c2",
+      "taskHash": "0x8e10c4ad3064c7d2d2016aa33f699de27d22c83cc9f59649b5b07fba3c696ca1",
+      "calldataKeccak256": "0x3733883fb3bcc55718d09d1733401cea3675a3f8b1bd95e9422f32e69a5d93d3",
+      "valueWei": "10000000000000",
+      "gasLimit": "200000"
+    },
+    {
+      "kind": "hire",
+      "slug": "autonomous-session-permission-audit",
+      "nonce": "7",
+      "to": "0x052fd2940Aa46F0Ae6660e0bf9eBDEdb6F610b1A",
+      "selector": "0xc7d43bd2",
+      "agentId": "1825",
+      "engagementId": "0xb0568b852938419e5856e215153a1bbb1399b2ad99348b94da45af7b1fda5240",
+      "taskHash": "0x9700ae940654ce9429c62de3a5725cf142be9a25778972e4b3a2e7092bfb4bc6",
+      "calldataKeccak256": "0x2b221a0e8c925cba64c1e8237d5358b82ad2bbe5a544591ae78cbe2d184fbcf9",
+      "valueWei": "10000000000000",
+      "gasLimit": "200000"
+    },
+    {
+      "kind": "hire",
+      "slug": "venus-health-factor-decision",
+      "nonce": "8",
+      "to": "0x052fd2940Aa46F0Ae6660e0bf9eBDEdb6F610b1A",
+      "selector": "0xc7d43bd2",
+      "agentId": "1828",
+      "engagementId": "0x085067f6a9f231b9da56b2f02ae8265fa7f255f014ec39730b463303437c5a25",
+      "taskHash": "0xe3bf9df48c39e6fb6bfcae0bcbd3fc3a66bbf997601df0a1fbc8ee046282f7b8",
+      "calldataKeccak256": "0xaa4ce892c09e246fe876427e163972fbd0cc409f8a438d65b843431d11892de1",
+      "valueWei": "10000000000000",
+      "gasLimit": "200000"
+    }
+  ],
+  "bounds": {
+    "signingGasPriceWei": "120000000",
+    "maxGasPriceWei": "200000000",
+    "totalHirePaymentWei": "30000000000000",
+    "maxNetworkFeeWei": "120000000000000",
+    "maxTotalSpendWei": "150000000000000"
+  },
+  "observedAtUtc": "2026-08-17T09:43:05.201Z",
+  "observations": [
+    {
+      "provider": "bnb-chain",
+      "url": "https://data-seed-prebsc-2-s2.binance.org:8545",
+      "chainId": "0x61",
+      "latestNonce": "0x6",
+      "pendingNonce": "0x6",
+      "balanceWei": "87892088860000000",
+      "gasPriceWei": "100000000",
+      "runtimeBytes": 1355,
+      "runtimeKeccak256": "0xf5e90b8e01c3b3cc9e9d629dce7ec367ba41e21cc64842decd9e5f4ab69a46ec",
+      "deploymentReceiptStatus": "0x1",
+      "deploymentBlock": "125583149",
+      "deploymentContract": "0x052fd2940aa46f0ae6660e0bf9ebdedb6f610b1a",
+      "deploymentInputKeccak256": "0x4863a8aa92fe7548c49ea0c2dd09f9f3499abc75f64b949c298bcdab92da3821",
+      "hireGasEstimates": ["69858", "69846", "69858"],
+      "storedEngagementReceipts": [
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "headNumber": "125585330",
+      "headHash": "0xda8126f6615c0ab0a175f67aa191f395ed77adfbfb0ebf16f9452ee9db70780d",
+      "headTimestamp": "1786959778"
+    },
+    {
+      "provider": "publicnode",
+      "url": "https://bsc-testnet-rpc.publicnode.com",
+      "chainId": "0x61",
+      "latestNonce": "0x6",
+      "pendingNonce": "0x6",
+      "balanceWei": "87892088860000000",
+      "gasPriceWei": "100000000",
+      "runtimeBytes": 1355,
+      "runtimeKeccak256": "0xf5e90b8e01c3b3cc9e9d629dce7ec367ba41e21cc64842decd9e5f4ab69a46ec",
+      "deploymentReceiptStatus": "0x1",
+      "deploymentBlock": "125583149",
+      "deploymentContract": "0x052fd2940aa46f0ae6660e0bf9ebdedb6f610b1a",
+      "deploymentInputKeccak256": "0x4863a8aa92fe7548c49ea0c2dd09f9f3499abc75f64b949c298bcdab92da3821",
+      "hireGasEstimates": ["69858", "69846", "69858"],
+      "storedEngagementReceipts": [
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "headNumber": "125585336",
+      "headHash": "0xf219f4f55537017d598e22f92eaa661f2fef26ce78b3addb4f27153476b3180d",
+      "headTimestamp": "1786959780"
+    }
+  ],
+  "requiredApprovalText": "Tôi phê duyệt gói HIRE-TERMIX-2026-08-17-V5 theo đúng recovery preparation SHA-256 44a5fd0779c9ae81ef257484805b26cdfd682f065a89360ea35c60bf80ea1389 và các giới hạn đã nêu.",
+  "unknownOutcomePolicy": {
+    "blindRetry": false,
+    "continueAfterFailure": false,
+    "action": "Stop all later transactions, preserve the pre-broadcast journal, and reconcile the exact signed hash through both fixed RPCs before any separately approved recovery."
+  },
+  "claims": {
+    "approved": false,
+    "signed": false,
+    "broadcast": false,
+    "deployed": true,
+    "hireReceipts": false,
+    "taskCompletion": false,
+    "agentPerformance": false,
+    "executionAuthority": false
+  },
+  "recoveryEvidence": {
+    "deploymentTransactionHash": "0x7fa5ad3e7b33dfb6dfccdfd06c6e54cc2d833d5aa005ec3f01c98cf72be3ddcf",
+    "deploymentStatus": "confirmed_finalized",
+    "deploymentBlock": "125583149",
+    "contractAddress": "0x052fd2940Aa46F0Ae6660e0bf9eBDEdb6F610b1A",
+    "deploymentInputKeccak256": "0x4863a8aa92fe7548c49ea0c2dd09f9f3499abc75f64b949c298bcdab92da3821",
+    "runtimeBytes": 1355,
+    "runtimeKeccak256": "0xf5e90b8e01c3b3cc9e9d629dce7ec367ba41e21cc64842decd9e5f4ab69a46ec"
+  }
+}
