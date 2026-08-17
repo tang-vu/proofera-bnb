@@ -28,6 +28,8 @@ Users begin with a financial job—protect a Venus loan, manage Pancake concentr
 
 ## Submission evidence — incomplete
 
+The machine-readable closure ledger is [`evidence/submission/readiness.json`](../evidence/submission/readiness.json). `pnpm submission:check` verifies the current honest state and digest-binds every referenced artifact; `pnpm submission:require-ready` remains intentionally red until all seven gates carry their required final evidence. Neither a normal green build nor the default status command is submission approval.
+
 | Item                          | Value                                                        |
 | ----------------------------- | ------------------------------------------------------------ |
 | Public marketplace URL        | `https://proofera.tangvu.dev`; activation not ready          |

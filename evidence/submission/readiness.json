@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "proofera-submission-readiness-v1.0.0",
+  "updatedAtUtc": "2026-08-17T00:00:00.000Z",
+  "readyForSubmission": false,
+  "gates": [
+    {
+      "gateId": "production-release",
+      "state": "deployed_unfrozen",
+      "claim": "The marketplace and four read-only analyzers are publicly reachable, but the final judging release and retained external probe are not frozen.",
+      "blockers": [
+        "Freeze the final published commit and retain an independently reviewable public probe artifact."
+      ],
+      "artifacts": []
+    },
+    {
+      "gateId": "agent-registration",
+      "state": "prepared_only",
+      "claim": "Four registration preparations exist; no agent registration transaction or owned ERC-8004 identity exists.",
+      "blockers": [
+        "Fund and register all four dedicated agent wallets on BSC testnet with explorer-verifiable receipts."
+      ],
+      "artifacts": [
+        {
+          "kind": "preparation",
+          "path": "evidence/erc8004/preparations/125490457-four-agent-registration-preparation.json",
+          "sha256": "30e9d4d7e86fd7e2af79913843b847411859afc7a0a6ca1da5ecba64d649ed2d"
+        }
+      ]
+    },
+    {
+      "gateId": "altana-lifecycle",
+      "state": "prepared_only",
+      "claim": "The Altana SDK and BSC-testnet contract surface were read-only prepared; no grant, execution, revoke or negative-authority receipt exists.",
+      "blockers": [
+        "Complete and re-observe one bounded grant, execution and revoke lifecycle with explorer-verifiable receipts."
+      ],
+      "artifacts": [
+        {
+          "kind": "preparation",
+          "path": "evidence/altana/preparations/125493138-bsc-testnet-readiness.json",
+          "sha256": "959e1b6fc66da8e65d1ff7c610c2e6b147ad99852bb1948a1c4ca61707fc1c98"
+        }
+      ]
+    },
+    {
+      "gateId": "pancake-benefit",
+      "state": "read_only_only",
+      "claim": "A third-party public-position analysis is retained; it proves no ownership, execution, receipt or realized benefit.",
+      "blockers": [
+        "Retain a controlled Pancake transaction receipt and before/after result against the frozen manual baseline net of known costs."
+      ],
+      "artifacts": [
+        {
+          "kind": "read_only_capture",
+          "path": "evidence/pancake/runs/public-position/116342186-7152618.json",
+          "sha256": "37947165be883e0a2dc4582fbdbf57ffd38f1a2cc5fa7295fdd9451d08087786"
+        }
+      ]
+    },
+    {
+      "gateId": "termix-pairs",
+      "state": "preregistered_only",
+      "claim": "Exactly three paired protocols are preregistered; all six methods remain NOT RUN and no advantage is publishable.",
+      "blockers": [
+        "Run, independently adjudicate and retain all three frozen agent/manual pairs with required receipts."
+      ],
+      "artifacts": [
+        {
+          "kind": "preregistration",
+          "path": "evidence/termix/preregistrations/task-01-lp-range-v2.json",
+          "sha256": "cbf38909853e714bac1d062b7cacf9da7384b436032aab7bbbb540e7542b02e9"
+        },
+        {
+          "kind": "preregistration",
+          "path": "evidence/termix/preregistrations/task-02-permission-audit.json",
+          "sha256": "5227e73038118243742867156f66aedb95afd8f57f86b55e6f4302a2330a040d"
+        },
+        {
+          "kind": "preregistration",
+          "path": "evidence/termix/preregistrations/task-03-venus-health.json",
+          "sha256": "8a094c7c72b8d5be471691d632b52bd854a9d716079a3f58edc7ce9d538f4ec3"
+        }
+      ]
+    },
+    {
+      "gateId": "demo",
+      "state": "not_recorded",
+      "claim": "The five-minute demo script is a target script; no final video or clean-room playback check exists.",
+      "blockers": [
+        "Record the final release journey and retain the video plus a timestamped evidence-link playback check."
+      ],
+      "artifacts": []
+    },
+    {
+      "gateId": "submission",
+      "state": "draft",
+      "claim": "Submission copy is a draft and the hackathon entry has not been frozen or evidenced.",
+      "blockers": [
+        "Freeze evidence-backed copy and retain the final hackathon entry receipt or authoritative submission record."
+      ],
+      "artifacts": []
+    }
+  ]
+}
