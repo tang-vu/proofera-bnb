@@ -202,6 +202,17 @@ runner while keeping task completion, performance, execution authority and
 TermiX completion false. Four deterministic collector/validator tests pass;
 no receipt output exists before the approved transactions finalize.
 
+The Venus lane now has a real frozen public-replay input and fair order rather
+than placeholders. Source release `3ba85859ced39b457da819d27637d3fc02101c5d`
+binds the retained two-provider window, non-authority account selection,
+read-only guardian policy, agent `1828`, endpoint/configuration and manual
+procedure. Declaration commit `e5c48b9` predates committed randomness block
+`125568071`; both RPCs agreed on the finalized block hash and LSB `0`, forcing
+agent-first. The retained declaration/order verifier passes. This closes only
+input and order preparation: hire, agent run, manual run, scoring, intervention
+and result claims remain false, and the forced manual run cannot legally start
+before the agent hire gate closes.
+
 ## Milestone 5 — submission-grade product (`PLANNED`)
 
 Acceptance criteria:

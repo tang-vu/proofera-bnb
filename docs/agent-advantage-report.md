@@ -123,7 +123,11 @@ This is the strongest third task because it is a high-stakes, objectively replay
 
 Exact task: replay one frozen BSC testnet Venus account window; calculate health factor at every observation; identify the first warning/critical crossing, minimum health factor and alert latency; then choose no action, alert-only or a bounded unsigned intervention plan under one identical policy. The timed comparison never signs or broadcasts.
 
-Inputs still to bind: authorized testnet account; reviewed markets/comptroller/oracle; exact block window; raw collateral/debt/price/config responses; integer scales; timestamps; warning/critical/liquidation thresholds; latency target; action/repay/spend/expiry/recipient/confirmation policy; registered/hireable guardian; manual worksheet; release commit; and timed runner.
+The final shared input is now frozen at [`3ba85859ced3-125563831-125564152.canonical-json`](../evidence/termix/frozen/venus-health/3ba85859ced3-125563831-125564152.canonical-json), SHA-256 `2aae6eb07730c2dc6bd6333261e57a6d352fc7ea21572ef5f71c3652b194c7ba`. It binds the three-observation, two-provider BSC-testnet window `125563831`-`125564152`, the official Core Pool Comptroller/oracle context, integer operands and policy. The selected account is explicitly an unrelated public replay subject: ownership and execution authority are false.
+
+The normalized declaration SHA-256 is `987a9e2a728807d6fbd4d5f1d9bb066187288320fa48ec62ab214d89aebed472`, bound to source release `3ba85859ced39b457da819d27637d3fc02101c5d` and ERC-8004 agent `1828`. It was published in commit `e5c48b9` before BSC-testnet randomness block `125568071`. Both fixed RPCs later agreed on hash `0x64e197a460b7edc8e015d9e10110eff0be37158100feaa230708991fcdce5d0c`; LSB `0` forces `agent` then `manual`. Retained verifier tests prove the publication ordering, finality, provider agreement, request/declaration digests and non-authority claims.
+
+Still missing: a verified paid hire receipt, both timed runs in the forced order, sourced timing/cost records, second-review recomputation/scoring and final paired validation.
 
 Rubric (100): state/calculation 30; threshold/latency 20; safe policy compliance 25; explanation/uncertainty 10; evidence/reproducibility 15. Wrong network/account/market/scale/oracle/window, floating-point financial arithmetic, stale-source substitution, unsupported intervention or any timed write is a hard fail.
 
@@ -156,18 +160,18 @@ no-agent declaration is not self-authenticating and remains a second-review
 gate. These are runner capabilities only: the exact final invocations remain
 unbound, and neither lane has been invoked as a TermiX run.
 
-Available release-gated commands—not currently runnable as a benchmark:
+Release-gated commands; the forced agent-first command remains blocked until a verified hire receipt is supplied through the exact stdin invocation:
 
 ```bash
-pnpm run:termix:venus-agent -- --execute-exact-venus-health-agent-run --request-input evidence/termix/frozen/venus-health/<bound-request>.canonical-json
-pnpm run:termix:venus-manual -- --execute-exact-venus-health-manual-run --request-input evidence/termix/frozen/venus-health/<bound-request>.canonical-json
+pnpm run:termix:venus-agent -- --execute-exact-venus-health-agent-run --request-input evidence/termix/frozen/venus-health/3ba85859ced3-125563831-125564152.canonical-json
+pnpm run:termix:venus-manual -- --execute-exact-venus-health-manual-run --request-input evidence/termix/frozen/venus-health/3ba85859ced3-125563831-125564152.canonical-json
 ```
 
 The manual CLI consumes bounded LF-only UTF-8 NDJSON, makes no network or agent
 request itself, and writes create-only beneath
 `evidence/termix/runs/venus-health/manual/`.
 
-Timed reproduction command: **UNBOUND**. Agent result: **NOT RUN**. Manual result: **NOT RUN**.
+Request paths and run order are **BOUND**. Exact stdin method envelopes remain unavailable until the hire collector emits the verified receipt. Agent result: **NOT RUN**. Manual result: **NOT RUN**.
 
 ## Freeze, run and publication gates
 
