@@ -318,6 +318,7 @@ async function recordBrowserVideo(sourceCommit, mode, temporaryDirectory) {
   const browser = await chromium.launch({ headless: true });
   const retainedScenes = [];
   let video;
+  const rawPath = join(temporaryDirectory, "browser-tour.webm");
   try {
     const context = await browser.newContext({
       colorScheme: "light",
@@ -354,12 +355,11 @@ async function recordBrowserVideo(sourceCommit, mode, temporaryDirectory) {
       await tour(page, holdMs);
     }
     await context.close();
+    if (video === null || video === undefined) fail("PUBLIC_DEMO_VIDEO_RECORDING_MISSING");
+    await video.saveAs(rawPath);
   } finally {
     await browser.close();
   }
-  if (video === null || video === undefined) fail("PUBLIC_DEMO_VIDEO_RECORDING_MISSING");
-  const rawPath = join(temporaryDirectory, "browser-tour.webm");
-  await video.saveAs(rawPath);
   return Object.freeze({ playwrightVersion, rawPath, scenes: retainedScenes });
 }
 

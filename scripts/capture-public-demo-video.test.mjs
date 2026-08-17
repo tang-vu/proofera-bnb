@@ -64,6 +64,10 @@ test("capture fixes six public scenes and performs no wallet or transaction acti
     source,
     /eth_sendRawTransaction|eth_sendTransaction|wallet_|privateKey|page\.click|page\.fill/u
   );
+  const contextClose = source.indexOf("await context.close()");
+  const videoSave = source.indexOf("await video.saveAs(rawPath)");
+  const browserClose = source.indexOf("await browser.close()", contextClose);
+  assert.ok(contextClose >= 0 && contextClose < videoSave && videoSave < browserClose);
 });
 
 test("capture rejects missing invocation before Git, media tools or network", () => {
