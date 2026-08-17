@@ -210,6 +210,18 @@ commit existence during preparation and adds a regression test. V3 is closed;
 its approval cannot authorize V4. The V4 preparation/proposal is new and
 unapproved. No transaction resulted from the V3 attempt.
 
+The exact V4 approval reached broadcast on 2026-08-17. Deployment transaction
+`0x7fa5ad3e7b33dfb6dfccdfd06c6e54cc2d833d5aa005ec3f01c98cf72be3ddcf`
+confirmed successfully at block `125583149` and created
+`0x052fd2940Aa46F0Ae6660e0bf9eBDEdb6F610b1A`; both fixed providers agree on
+the receipt and 1,355-byte runtime. The runner then stopped before any hire
+signature because it compared the deployed runtime against artifact bytecode
+whose two identity-registry immutable slots were still zero placeholders. V4
+is closed after exactly one transaction. The V5 recovery runner materializes
+the reviewed immutable layout, requires the exact finalized V4 deployment and
+three unused engagement IDs, starts at nonce `6`, and can send only the three
+bounded hires after separate approval.
+
 The create-only `capture:termix:hires` collector is also implemented and still
 non-invoked. Given the exact deployment and three hire hashes, it requires a
 clean published release, then joins normalized transactions, receipts and

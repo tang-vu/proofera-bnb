@@ -15,15 +15,19 @@ import { fileURLToPath } from "node:url";
 
 import { Interface, Transaction, Wallet, getAddress, keccak256 } from "ethers";
 
+import { materializeRuntimeBytecode } from "./hire-runtime-bytecode.mjs";
+
 const CHAIN_ID = 97n;
 const SOURCE = "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49";
 const REGISTRY = "0x8004A818BFB912233c491871b3d84c89A494BD9e";
-const APPROVAL_ID = "HIRE-TERMIX-2026-08-17-V4";
+const APPROVAL_ID = "HIRE-TERMIX-2026-08-17-V5";
+const DEPLOYMENT_TX_HASH = "0x7fa5ad3e7b33dfb6dfccdfd06c6e54cc2d833d5aa005ec3f01c98cf72be3ddcf";
 const KEYSTORE_NAME =
   "UTC--2026-08-12T09-45-30.464Z--997cd959798f7c925076eaeff5855c5c2c1e5a49.keystore.json";
 const PASSWORD_BLOB_NAME = "deployer-password.dpapi";
 const PASSWORD_BYTES = 48;
 const SIGNING_GAS_PRICE_WEI = 120_000_000n;
+const RECOVERY_MAX_TOTAL_SPEND_WEI = 150_000_000_000_000n;
 const FINALITY_DEPTH = 12n;
 const RPCS = Object.freeze([
   Object.freeze({
@@ -97,7 +101,7 @@ function quantity(value, code) {
 
 function parseArguments(argv) {
   const expected = [
-    "--execute-approved-hire-termix",
+    "--execute-approved-hire-termix-recovery",
     "--approval-id",
     "--preparation",
     "--preparation-sha256",
@@ -258,19 +262,31 @@ function requireSame(values, code) {
   return values[0];
 }
 
-async function preflight(preparation) {
+async function preflight(preparation, artifact) {
   const chainIds = await allRpc("eth_chainId", []);
   if (chainIds.some((value) => quantity(value, "HIRE_EXECUTION_CHAIN_INVALID") !== CHAIN_ID)) {
     fail("HIRE_EXECUTION_WRONG_CHAIN");
   }
-  const nonce = decimal(preparation.deployerNonce, "HIRE_EXECUTION_NONCE_INVALID");
-  const [latest, pending, balances, gasPrices, predictedCode, registryCode] = await Promise.all([
+  const deploymentNonce = decimal(preparation.deployerNonce, "HIRE_EXECUTION_NONCE_INVALID");
+  const nonce = deploymentNonce + 1n;
+  const [
+    latest,
+    pending,
+    balances,
+    gasPrices,
+    predictedCode,
+    registryCode,
+    receipts,
+    transactions
+  ] = await Promise.all([
     allRpc("eth_getTransactionCount", [SOURCE, "latest"]),
     allRpc("eth_getTransactionCount", [SOURCE, "pending"]),
     allRpc("eth_getBalance", [SOURCE, "latest"]),
     allRpc("eth_gasPrice", []),
     allRpc("eth_getCode", [preparation.contractAddress, "latest"]),
-    allRpc("eth_getCode", [REGISTRY, "latest"])
+    allRpc("eth_getCode", [REGISTRY, "latest"]),
+    allRpc("eth_getTransactionReceipt", [DEPLOYMENT_TX_HASH]),
+    allRpc("eth_getTransactionByHash", [DEPLOYMENT_TX_HASH])
   ]);
   if (
     latest.some((value) => quantity(value, "HIRE_EXECUTION_NONCE_INVALID") !== nonce) ||
@@ -278,8 +294,11 @@ async function preflight(preparation) {
   ) {
     fail("HIRE_EXECUTION_NONCE_MISMATCH");
   }
-  const maxSpend = decimal(preparation.bounds.maxTotalSpendWei, "HIRE_EXECUTION_SPEND_CAP_INVALID");
-  if (balances.some((value) => quantity(value, "HIRE_EXECUTION_BALANCE_INVALID") < maxSpend)) {
+  if (
+    balances.some(
+      (value) => quantity(value, "HIRE_EXECUTION_BALANCE_INVALID") < RECOVERY_MAX_TOTAL_SPEND_WEI
+    )
+  ) {
     fail("HIRE_EXECUTION_BALANCE_INSUFFICIENT");
   }
   const gasCap = decimal(preparation.bounds.maxGasPriceWei, "HIRE_EXECUTION_GAS_PRICE_CAP_INVALID");
@@ -289,31 +308,89 @@ async function preflight(preparation) {
   ) {
     fail("HIRE_EXECUTION_GAS_PRICE_EXCEEDS_CAP");
   }
-  if (predictedCode.some((value) => value !== "0x"))
-    fail("HIRE_EXECUTION_PREDICTED_ADDRESS_OCCUPIED");
   if (registryCode.some((value) => typeof value !== "string" || value === "0x")) {
     fail("HIRE_EXECUTION_REGISTRY_CODE_MISSING");
   }
-  const estimates = await allRpc("eth_estimateGas", [
-    { from: SOURCE, data: preparation.deployment.data, value: "0x0" }
-  ]);
-  const estimate = requireSame(estimates, "HIRE_EXECUTION_DEPLOYMENT_ESTIMATE_MISMATCH");
+  const expectedRuntime = materializeRuntimeBytecode(artifact, REGISTRY).toLowerCase();
   if (
-    quantity(estimate, "HIRE_EXECUTION_DEPLOYMENT_ESTIMATE_INVALID") >
-    decimal(preparation.deployment.gasLimit, "HIRE_EXECUTION_DEPLOYMENT_GAS_INVALID")
+    predictedCode.some(
+      (value) => typeof value !== "string" || value.toLowerCase() !== expectedRuntime
+    )
   ) {
-    fail("HIRE_EXECUTION_DEPLOYMENT_GAS_EXCEEDS_CAP");
+    fail("HIRE_EXECUTION_DEPLOYED_CODE_MISMATCH");
+  }
+  if (receipts.some((receipt) => receipt === null) || transactions.some((tx) => tx === null)) {
+    fail("HIRE_EXECUTION_DEPLOYMENT_EVIDENCE_MISSING");
+  }
+  const normalizedReceipts = receipts.map((receipt) => {
+    const normalized = { ...receipt };
+    delete normalized.blockTimestamp;
+    return normalized;
+  });
+  const receipt = requireSame(
+    normalizedReceipts,
+    "HIRE_EXECUTION_DEPLOYMENT_RECEIPT_PROVIDER_MISMATCH"
+  );
+  const transaction = requireSame(
+    transactions.map((tx) => {
+      const normalized = { ...tx };
+      delete normalized.blockTimestamp;
+      return normalized;
+    }),
+    "HIRE_EXECUTION_DEPLOYMENT_TRANSACTION_PROVIDER_MISMATCH"
+  );
+  if (
+    exactHex(receipt.transactionHash, 32, "HIRE_EXECUTION_DEPLOYMENT_HASH_INVALID") !==
+      DEPLOYMENT_TX_HASH ||
+    quantity(receipt.status, "HIRE_EXECUTION_DEPLOYMENT_STATUS_INVALID") !== 1n ||
+    getAddress(receipt.contractAddress) !== getAddress(preparation.contractAddress) ||
+    getAddress(transaction.from) !== SOURCE ||
+    transaction.to !== null ||
+    quantity(transaction.nonce, "HIRE_EXECUTION_DEPLOYMENT_NONCE_INVALID") !== deploymentNonce ||
+    transaction.input.toLowerCase() !== preparation.deployment.data.toLowerCase() ||
+    quantity(transaction.value, "HIRE_EXECUTION_DEPLOYMENT_VALUE_INVALID") !== 0n ||
+    quantity(transaction.gas, "HIRE_EXECUTION_DEPLOYMENT_GAS_INVALID") !== 400_000n ||
+    quantity(transaction.gasPrice, "HIRE_EXECUTION_DEPLOYMENT_GAS_PRICE_INVALID") !==
+      SIGNING_GAS_PRICE_WEI
+  ) {
+    fail("HIRE_EXECUTION_DEPLOYMENT_EVIDENCE_INVALID");
+  }
+  const heads = await allRpc("eth_blockNumber", []);
+  const deploymentBlock = quantity(receipt.blockNumber, "HIRE_EXECUTION_DEPLOYMENT_BLOCK_INVALID");
+  if (
+    heads.some(
+      (head) =>
+        quantity(head, "HIRE_EXECUTION_HEAD_BLOCK_INVALID") < deploymentBlock + FINALITY_DEPTH
+    )
+  ) {
+    fail("HIRE_EXECUTION_DEPLOYMENT_NOT_FINAL");
+  }
+  const contractInterface = new Interface(artifact.abi);
+  for (const hire of preparation.hires) {
+    const stored = await allRpc("eth_call", [
+      {
+        to: preparation.contractAddress,
+        data: contractInterface.encodeFunctionData("receiptByEngagement", [hire.engagementId])
+      },
+      "latest"
+    ]);
+    if (
+      stored.some(
+        (value) =>
+          exactHex(value, 32, "HIRE_EXECUTION_EXISTING_RECEIPT_INVALID") !== `0x${"0".repeat(64)}`
+      )
+    ) {
+      fail("HIRE_EXECUTION_ENGAGEMENT_ALREADY_USED");
+    }
   }
   emit("preflight", {
     approvalId: APPROVAL_ID,
     balanceWei: quantity(balances[0], "HIRE_EXECUTION_BALANCE_INVALID").toString(),
     chainId: Number(CHAIN_ID),
-    deploymentGasEstimate: quantity(
-      estimate,
-      "HIRE_EXECUTION_DEPLOYMENT_ESTIMATE_INVALID"
-    ).toString(),
+    deploymentBlock: deploymentBlock.toString(),
+    deploymentTransactionHash: DEPLOYMENT_TX_HASH,
     nonce: nonce.toString(),
-    predictedAddress: preparation.contractAddress,
+    recoveredContract: preparation.contractAddress,
     signingGasPriceWei: SIGNING_GAS_PRICE_WEI.toString()
   });
 }
@@ -514,28 +591,6 @@ async function execute(preparation, artifact, wallet) {
   const localAppData = process.env.LOCALAPPDATA;
   if (typeof localAppData !== "string") fail("HIRE_EXECUTION_LOCALAPPDATA_MISSING");
   const journalDir = resolve(localAppData, "ProofEra", "testnet-hire-journal", APPROVAL_ID);
-  const deployment = {
-    chainId: Number(CHAIN_ID),
-    nonce: Number(decimal(preparation.deployment.nonce, "HIRE_EXECUTION_NONCE_INVALID")),
-    data: preparation.deployment.data,
-    value: 0n,
-    gasLimit: decimal(preparation.deployment.gasLimit, "HIRE_EXECUTION_DEPLOYMENT_GAS_INVALID"),
-    gasPrice: SIGNING_GAS_PRICE_WEI,
-    type: 0
-  };
-  const deploymentReceipt = await sendOne(wallet, journalDir, deployment, "deploy");
-  if (getAddress(deploymentReceipt.contractAddress) !== getAddress(preparation.contractAddress)) {
-    fail("HIRE_EXECUTION_DEPLOYED_ADDRESS_MISMATCH");
-  }
-  const code = await allRpc("eth_getCode", [preparation.contractAddress, "latest"]);
-  if (
-    code.some(
-      (value) =>
-        typeof value !== "string" || value.toLowerCase() !== artifact.deployedBytecode.toLowerCase()
-    )
-  ) {
-    fail("HIRE_EXECUTION_DEPLOYED_CODE_MISMATCH");
-  }
   const contractInterface = new Interface(artifact.abi);
   for (const hire of preparation.hires) {
     const expectedOwner = getAddress(EXPECTED_AGENT_OWNERS[hire.agentId]);
@@ -618,7 +673,7 @@ async function main() {
   validateRelease(args, preparationBytes, preparation);
   validatePreparation(preparation, artifactBytes);
   regenerate(preparation);
-  await preflight(preparation);
+  await preflight(preparation, artifact);
   const wallet = await loadWallet();
   await execute(preparation, artifact, wallet);
 }
