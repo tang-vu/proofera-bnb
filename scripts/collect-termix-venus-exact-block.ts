@@ -26,6 +26,17 @@ import {
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const FINALITY_BLOCKS = 30n;
 const MAX_TRANSCRIPT_BYTES = 12 * 1024 * 1024;
+const JSON_FORMAT_OPTIONS = Object.freeze({
+  arrowParens: "always" as const,
+  endOfLine: "lf" as const,
+  parser: "json",
+  printWidth: 100,
+  proseWrap: "preserve" as const,
+  semi: true,
+  singleQuote: false,
+  tabWidth: 2,
+  trailingComma: "none" as const
+});
 const COMPTROLLER = VENUS_CORE_POOL_BSC_DEPLOYMENTS[97].comptroller;
 const PROVIDERS = Object.freeze([
   Object.freeze({
@@ -518,7 +529,7 @@ async function main(): Promise<void> {
               evidence: blockEvidence,
               providerCaptures: blockCaptures
             }),
-            { parser: "json" }
+            JSON_FORMAT_OPTIONS
           );
           return {
             blockNumber: blockEvidence.blockNumber,
@@ -559,7 +570,7 @@ async function main(): Promise<void> {
         `venus-core-exact-window-${firstBlock.toString()}-${lastBlock.toString()}-` +
         `${accountSuffix}.json`;
       const path = resolve(ROOT, "evidence", "development", fileName);
-      const manifestBody = await format(JSON.stringify(manifest), { parser: "json" });
+      const manifestBody = await format(JSON.stringify(manifest), JSON_FORMAT_OPTIONS);
       await writeFile(path, manifestBody, {
         encoding: "utf8",
         flag: "wx"
@@ -569,7 +580,7 @@ async function main(): Promise<void> {
     }
     const fileName = `venus-core-exact-block-${lastBlock.toString()}-${accountSuffix}.json`;
     const path = resolve(ROOT, "evidence", "development", fileName);
-    const body = await format(JSON.stringify(artifact), { parser: "json" });
+    const body = await format(JSON.stringify(artifact), JSON_FORMAT_OPTIONS);
     await writeFile(path, body, {
       encoding: "utf8",
       flag: "wx"

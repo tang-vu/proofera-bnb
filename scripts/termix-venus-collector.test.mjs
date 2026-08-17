@@ -61,7 +61,10 @@ test("Venus collector captures an ordered finalized window before one create-onl
   assert.match(source, /sha256: sha256\(body\)/);
   assert.match(source, /import \{ format \} from "prettier"/);
   assert.match(source, /await format\(/);
-  assert.match(source, /\{ parser: "json" \}/);
+  assert.match(source, /JSON_FORMAT_OPTIONS/);
+  assert.match(source, /printWidth: 100/);
+  assert.match(source, /trailingComma: "none"/);
+  assert.match(source, /endOfLine: "lf"/);
   assert.match(source, /flag: "wx"/);
 });
 
