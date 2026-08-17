@@ -180,5 +180,21 @@ For each task, in order:
 5. Execute both methods with injected timing and raw output/receipt capture; do not repair outputs after the fact.
 6. Have a second reviewer reproduce calculations, verify receipts and score every rubric criterion.
 7. Validate the complete pair with `PairedBenchmarkSchema`. Failed/inconclusive runs stay visible.
+8. Commit all three verified pairs and independent adjudications, then use the exact-release final
+   compiler to produce separate digest-bound `paired_report`, `raw_runs` and `adjudication`
+   artifacts. The compiler rejects any missing task, unverified lane, null comparison or digest
+   mismatch and never infers a universal winner.
+
+After all six runs and three reviews—not before—the release-gated compilation command is:
+
+```powershell
+$releaseCommit = (git rev-parse HEAD).Trim()
+$canonicalInvocation | corepack pnpm compile:termix:final $releaseCommit
+```
+
+`$canonicalInvocation` must be one canonical JSON value containing exactly the three task IDs and
+their committed pair/adjudication paths. The generated files are create-only under
+`evidence/submission/final/termix/<releaseCommit>/`; their existence does not replace the required
+manual opening of explorer links and source artifacts.
 
 A task becomes publishable only when both complete runs are independently verified by the harness and every external receipt/source link is manually opened. “Agent advantage” is then reported per task and per measure only. Three experiments cannot support a universal productivity claim.

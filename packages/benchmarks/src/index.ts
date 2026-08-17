@@ -1,4 +1,5 @@
 export * from "./canonical.js";
+export * from "./finalReport.js";
 export * from "./pair.js";
 export * from "./permissionAudit.js";
 export * from "./permissionAuditAgentLane.js";

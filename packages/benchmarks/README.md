@@ -65,6 +65,22 @@ agent or network call and writes only a new capture under
 `evidence/termix/runs/permission-audit/manual/`. Independent tool-log review
 is still required for the no-agent declaration.
 
+`compileTermixFinalBundle` is the final fail-closed reporting boundary. It accepts exactly the
+three preregistered task IDs, three fully verified pair summaries and three independent
+adjudications that join the exact pair and declaration digests. It emits separate paired-report,
+raw-run and adjudication manifests, preserves task-level time/cost/quality deltas, and always states
+that three comparisons are not a universal agent-advantage or financial-guarantee claim. A verified
+label with null comparisons, a duplicate task, mismatched digest, incomplete check or unverified
+lane is rejected.
+
+The root `pnpm compile:termix:final <40-hex-release>` entrypoint adds the filesystem and release
+boundary. It accepts only one canonical-JSON stdin invocation naming the three tracked pair files
+under `evidence/termix/final-pairs/` and their matching tracked adjudications under
+`evidence/termix/adjudications/`. It requires a clean published `HEAD`, validates each complete pair,
+re-hashes every adjudication evidence reference, and writes three create-only outputs beneath
+`evidence/submission/final/termix/<release>/`. The compiler cannot run a method, score an output,
+verify a receipt by itself, or turn missing evidence into a report.
+
 `runVenusHealthManualTermixMethod` is the matching non-agent session state
 machine. It consumes operator events without calling an agent or network:
 positive monotonic active segments, exact read-only exchanges from either of
