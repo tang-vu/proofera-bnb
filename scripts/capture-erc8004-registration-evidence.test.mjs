@@ -46,6 +46,12 @@ test("registration evidence capture fixes four wallets, two providers and final 
   assert.match(source, /executionAuthority: false/u);
 });
 
+test("transaction agreement ignores only the non-standard provider timestamp extension", () => {
+  assert.match(source, /Reflect\.deleteProperty\(transaction, "blockTimestamp"\)/u);
+  assert.match(source, /registerTransactions\.map\(transactionForAgreement\)/u);
+  assert.match(source, /updateTransactions\.map\(transactionForAgreement\)/u);
+});
+
 test("registration evidence capture rejects missing invocation before Git or network", () => {
   const result = spawnSync(process.execPath, [scriptPath], {
     encoding: "utf8",

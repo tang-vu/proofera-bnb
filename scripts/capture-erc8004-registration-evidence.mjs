@@ -207,6 +207,16 @@ function requireAgreement(values, code) {
   return values[0];
 }
 
+function transactionForAgreement(value) {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return value;
+  // PublicNode adds this non-standard convenience field while the BNB Chain
+  // seed RPC omits it. The canonical block hash/number and every standard
+  // transaction field remain subject to exact two-provider agreement.
+  const transaction = structuredClone(value);
+  Reflect.deleteProperty(transaction, "blockTimestamp");
+  return transaction;
+}
+
 async function providerValues(method, params) {
   return Promise.all(PROVIDERS.map((provider) => rpc(provider, method, params)));
 }
@@ -293,7 +303,7 @@ async function capture(argumentsValue) {
       fail("ERC8004_REGISTRATION_EVIDENCE_TRANSACTION_PENDING_OR_UNKNOWN");
     }
     const registerTransaction = requireAgreement(
-      registerTransactions,
+      registerTransactions.map(transactionForAgreement),
       "ERC8004_REGISTRATION_EVIDENCE_PROVIDER_TRANSACTION_MISMATCH"
     );
     const registerReceipt = requireAgreement(
@@ -301,7 +311,7 @@ async function capture(argumentsValue) {
       "ERC8004_REGISTRATION_EVIDENCE_PROVIDER_RECEIPT_MISMATCH"
     );
     const updateTransaction = requireAgreement(
-      updateTransactions,
+      updateTransactions.map(transactionForAgreement),
       "ERC8004_REGISTRATION_EVIDENCE_PROVIDER_TRANSACTION_MISMATCH"
     );
     const updateReceipt = requireAgreement(
