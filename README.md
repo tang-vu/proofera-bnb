@@ -233,6 +233,6 @@ See [AGENTS.md](./AGENTS.md) for engineering invariants and `docs/security.md` a
 - [Deployment and testnet evidence runbook](./docs/deployment.md)
 - [PTA/WBNB Pancake V3 read-only preparation](./docs/pancake-v3-testnet-pta-wbnb-preparation.md)
 - [TermiX agent-advantage protocol](./docs/agent-advantage-report.md)
-- [Demo script](./docs/demo-script.md) and [submission record](./docs/submission.md)
+- [Demo script](./docs/demo-script.md), [judge scorecard](./docs/judge-scorecard.md), [pitch deck draft](./docs/pitch-deck.md), and [submission record](./docs/submission.md)
 
 The generated LP reference workspace is under `agents/lpRangeAgent`. Its current local doctor record proves toolchain readiness only; no wallet, live endpoint, ERC-8004 registration or transaction exists yet.

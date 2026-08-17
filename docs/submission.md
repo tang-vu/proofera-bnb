@@ -32,6 +32,8 @@ Users begin with a financial job—protect a Venus loan, manage Pancake concentr
 
 The machine-readable closure ledger is [`evidence/submission/readiness.json`](../evidence/submission/readiness.json). `pnpm submission:check` verifies the current honest state and digest-binds every referenced artifact; `pnpm submission:require-ready` remains intentionally red until all seven gates carry their required final evidence. Neither a normal green build nor the default status command is submission approval.
 
+The judge-facing claim/evidence/missing-evidence map is maintained in [`judge-scorecard.md`](./judge-scorecard.md). The ten-slide narrative is drafted in [`pitch-deck.md`](./pitch-deck.md); it remains a source document, not an exported or submitted deck, and its bracketed fields must be filled only from final receipts and paired-run evidence.
+
 | Item                          | Value                                                        |
 | ----------------------------- | ------------------------------------------------------------ |
 | Public marketplace URL        | `https://proofera.tangvu.dev`; activation not ready          |
