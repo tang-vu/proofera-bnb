@@ -3,5 +3,10 @@
   "compilerOptions": {
     "types": ["node"]
   },
-  "include": ["run-termix-pancake-lp-agent.ts", "../packages/benchmarks/src/**/*.ts"]
+  "include": [
+    "run-termix-pancake-lp-agent.ts",
+    "run-termix-pancake-lp-manual.ts",
+    "termix-manual-runner-support.ts",
+    "../packages/benchmarks/src/**/*.ts"
+  ]
 }

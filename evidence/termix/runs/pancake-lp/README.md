@@ -9,3 +9,6 @@ independently verified.
 The runner rechecks the frozen Pancake `slot0` state at the exact block hash,
 then invokes the fixed public LP A2A endpoint. It has no wallet, signer,
 approval, transaction, broadcast, or evidence-overwrite path.
+
+The matching manual runner writes separately under `manual/`; it consumes a
+bounded operator NDJSON stream and makes no network or agent request itself.

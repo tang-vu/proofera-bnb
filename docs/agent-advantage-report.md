@@ -80,6 +80,16 @@ Available release-gated agent command—not currently runnable as a benchmark:
 pnpm run:termix:pancake-lp-agent -- --execute-exact-pancake-lp-agent-run --input-bundle evidence/termix/frozen/pancake-lp/116342186-7152618.canonical-json
 ```
 
+Available release-gated manual command—also not currently runnable as a benchmark:
+
+```bash
+pnpm run:termix:pancake-lp-manual -- --execute-exact-pancake-lp-manual-run --input-bundle evidence/termix/frozen/pancake-lp/116342186-7152618.canonical-json
+```
+
+The manual CLI accepts only bounded LF-only UTF-8 NDJSON, makes no network or
+agent request itself, timestamps each operator event as consumed, and writes a
+new immutable capture beneath `evidence/termix/runs/pancake-lp/manual/`.
+
 Timed reproduction command: **UNBOUND**. Agent result: **NOT RUN**. Manual result: **NOT RUN**.
 
 ## Task 02 — Altana/Pancake autonomous-session permission audit
@@ -133,7 +143,7 @@ From the repository root:
 pnpm --filter @proofera/benchmarks test
 ```
 
-The fixed agent/manual Venus lanes and root create-only agent CLI are
+The fixed agent/manual Venus lanes and root create-only agent/manual CLIs are
 implemented and tested. The agent path digest-binds the canonical request,
 public endpoint and configuration; preserves the raw A2A response; verifies a
 clean published source commit and committed input; and rejects malformed or
@@ -145,6 +155,17 @@ and binds canonical output to the same request digest and procedure. Its
 no-agent declaration is not self-authenticating and remains a second-review
 gate. These are runner capabilities only: the exact final invocations remain
 unbound, and neither lane has been invoked as a TermiX run.
+
+Available release-gated commands—not currently runnable as a benchmark:
+
+```bash
+pnpm run:termix:venus-agent -- --execute-exact-venus-health-agent-run --request-input evidence/termix/frozen/venus-health/<bound-request>.canonical-json
+pnpm run:termix:venus-manual -- --execute-exact-venus-health-manual-run --request-input evidence/termix/frozen/venus-health/<bound-request>.canonical-json
+```
+
+The manual CLI consumes bounded LF-only UTF-8 NDJSON, makes no network or agent
+request itself, and writes create-only beneath
+`evidence/termix/runs/venus-health/manual/`.
 
 Timed reproduction command: **UNBOUND**. Agent result: **NOT RUN**. Manual result: **NOT RUN**.
 

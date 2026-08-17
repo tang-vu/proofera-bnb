@@ -3,5 +3,10 @@
   "compilerOptions": {
     "types": ["node"]
   },
-  "include": ["run-termix-venus-health-agent.ts", "../packages/benchmarks/src/**/*.ts"]
+  "include": [
+    "run-termix-venus-health-agent.ts",
+    "run-termix-venus-health-manual.ts",
+    "termix-manual-runner-support.ts",
+    "../packages/benchmarks/src/**/*.ts"
+  ]
 }

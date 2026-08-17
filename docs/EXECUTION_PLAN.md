@@ -132,11 +132,14 @@ Acceptance criteria:
 - ERC-8183 hiring and/or x402/B402 is added only if the core session journey is stable and the official SDK path remains current.
 
 Current TermiX execution capability: the strict timed core plus fixed LP and
-Venus agent/manual lanes are implemented. Both agent CLIs accept no shell
+Venus agent/manual lanes and all four corresponding create-only CLIs are
+implemented. Both agent CLIs accept no shell
 command or secret, require a clean published commit plus byte-exact committed
 canonical input, preserve raw API/A2A responses and cannot reach network access
 without a registered ERC-8004 identity and independently verified hire
-receipt. LP v2 also separates its mainnet source-data chain from testnet
+receipt. The matching manual CLIs consume bounded LF-only UTF-8 NDJSON, perform
+no network or agent request themselves, timestamp positive operator work and
+write only new immutable captures. LP v2 also separates its mainnet source-data chain from testnet
 identity/hire receipts and preserves the never-run v1 definition. No final
 invocation or paired run exists. Task 02 now has a strict deterministic,
 read-only permission-audit engine that rejects unbound evidence, reports each

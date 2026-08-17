@@ -8,3 +8,6 @@ response all pass the runner gates. A runner failure must not create a capture.
 
 No private key, wallet secret, session signer, environment value or bearer
 credential belongs in this directory.
+
+The matching manual runner writes separately under `manual/`; it consumes a
+bounded operator NDJSON stream and makes no network or agent request itself.

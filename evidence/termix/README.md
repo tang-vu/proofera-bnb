@@ -55,6 +55,17 @@ It requires a clean published commit, the tracked byte-exact bundle, chain-97
 registration and verified hire receipt before its exact-hash mainnet RPC read
 or public A2A request can occur. No final invocation or LP benchmark run exists.
 
+The matching create-only LP manual runner is available as:
+
+```text
+pnpm run:termix:pancake-lp-manual -- --execute-exact-pancake-lp-manual-run --input-bundle evidence/termix/frozen/pancake-lp/116342186-7152618.canonical-json
+```
+
+Its bounded LF-only UTF-8 NDJSON input binds the timed request and bundle digest,
+then timestamps operator-active segments, the one exact read-only `slot0`
+exchange, and the unedited canonical worksheet output. It makes no network or
+agent request itself and writes create-only under `runs/pancake-lp/manual/`.
+
 The create-only Task 02 agent runner is available as:
 
 ```text
@@ -78,3 +89,14 @@ pnpm collect:termix:venus -- --account <address> --latest-finalized
 ```
 
 It enumerates the official Core Pool's complete `getAllMarkets` set, binds one finalized block/hash, retains exact account snapshots, market parameters, runtime code and oracle prices, and requires both providers to agree before deriving health-factor evidence with Venus's integer truncation order. It rejects VAI debt because the current Health Guardian input cannot represent that debt. The default command prints only a non-publishable summary. `--write-development-evidence` writes a new immutable development capture only from a clean commit; that capture remains `NOT_RUN` and is not a hire receipt, alert receipt, frozen benchmark declaration or TermiX result.
+
+The matching create-only Venus manual runner is available as:
+
+```text
+pnpm run:termix:venus-manual -- --execute-exact-venus-health-manual-run --request-input evidence/termix/frozen/venus-health/<bound-request>.canonical-json
+```
+
+Its bounded LF-only UTF-8 NDJSON input binds the same timed request and request
+digest, then timestamps operator-active segments, fixed read-only RPC exchanges,
+and the unedited canonical worksheet output. It makes no network or agent request
+itself and writes create-only under `runs/venus-health/manual/`.
