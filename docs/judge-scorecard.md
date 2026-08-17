@@ -12,14 +12,14 @@ The differentiator is not agent count. It is the evidence and authority layer be
 
 ## Main-track score control
 
-| Judge signal                       | Current proof                                                                                                                                                    | Must close before final claim                                                                                               | Demo moment             |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
-| End-to-end journey                 | Public landing, streamed marketplace, reference dossiers, four configuration surfaces, honest empty Mission Control, and `/proof` are live                       | Wire one registered/hired agent through permission preview, activation, receipt reconciliation, Mission Control, and revoke | 0:00–4:05               |
-| Decision-useful live data          | Typed ERC-8004/8004scan ingestion; exact-block Pancake and Venus readers; explicit unavailable/stale/null states                                                 | Freeze current data timestamps and receipt-linked outcome/cost evidence for the judged action                               | 0:35–1:25 and 2:30–3:30 |
-| Four first-class categories        | LP, grid, yield, and health each have a public analyzer, category contract, dossier, configuration surface, and exact Agent Card skill                           | Register all four on BSC and retain identity/marketplace evidence; do not imply equal execution history                     | 4:35–5:00               |
-| Usability without Studio knowledge | Goal-first landing, plain-language mandate forms, permission ownership labels, failure-safe copy                                                                 | Clean-room run with a new viewer; retain mobile/keyboard evidence for the frozen release                                    | Throughout              |
-| Trust and safety                   | Missing evidence lowers confidence; write targets/selectors/caps/expiry are explicit; unknown outcomes are not retried; revoke requires negative authority proof | Complete one real Altana grant/execute/revoke lifecycle and negative post-revoke attempt                                    | 1:25–4:05               |
-| Production credibility             | Durable custom-domain deployment, PM2 supervision, exact-build public probe, proof room, six-scene rehearsal                                                     | Freeze final release, retain independent public probe/uptime record and rollback exercise                                   | Before recording        |
+| Judge signal                       | Current proof                                                                                                                                                                                   | Must close before final claim                                                                                               | Demo moment             |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| End-to-end journey                 | Public landing, streamed marketplace, reference dossiers, four configuration surfaces, honest empty Mission Control, and `/proof` are live                                                      | Wire one registered/hired agent through permission preview, activation, receipt reconciliation, Mission Control, and revoke | 0:00–4:05               |
+| Decision-useful live data          | Typed ERC-8004/8004scan ingestion; exact-block Pancake and Venus readers; explicit unavailable/stale/null states                                                                                | Freeze current data timestamps and receipt-linked outcome/cost evidence for the judged action                               | 0:35–1:25 and 2:30–3:30 |
+| Four first-class categories        | LP, grid, yield, and health each have a public analyzer, category contract, dossier, configuration surface, exact Agent Card skill, and finalized BSC-testnet ERC-8004 identity (`1825`–`1828`) | Keep all four public through judging and show equal discovery depth without implying equal execution history                | 4:35–5:00               |
+| Usability without Studio knowledge | Goal-first landing, plain-language mandate forms, permission ownership labels, failure-safe copy                                                                                                | Clean-room run with a new viewer; retain mobile/keyboard evidence for the frozen release                                    | Throughout              |
+| Trust and safety                   | Missing evidence lowers confidence; write targets/selectors/caps/expiry are explicit; unknown outcomes are not retried; revoke requires negative authority proof                                | Complete one real Altana grant/execute/revoke lifecycle and negative post-revoke attempt                                    | 1:25–4:05               |
+| Production credibility             | Durable custom-domain deployment, PM2 supervision, exact-build public probe, proof room, six-scene rehearsal                                                                                    | Freeze final release, retain independent public probe/uptime record and rollback exercise                                   | Before recording        |
 
 ## Partner-track score control
 
@@ -52,12 +52,12 @@ Eligibility story: prove a real, measurable benefit to an LP or trader; a logo o
 
 Recorded rubric: service value 30%, measured agent advantage 30%, high-stakes category/track record 20%, and marketplace quality 20%. At least three real agent-versus-manual tasks must report time, cost, output quality, and raw outputs; at least one must be trading, equities, or security.
 
-| Weighted signal                  | ProofEra design                                                           | Missing evidence                                               |
-| -------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| Service value — 30%              | Marketplace discovery plus fixed hire-gated agent lanes                   | Four registrations, verified hire receipts, final declarations |
-| Measured advantage — 30%         | Deterministic paired schema, fixed timing/cost/rubric, no inferred winner | All six real method runs and independent adjudication          |
-| High stakes / track record — 20% | Pancake LP, permission security, and Venus health protocols               | Receipt-complete task inputs and observation limitations       |
-| Marketplace quality — 20%        | Public four-category UI, proof room, evidence-first controls              | Final zero-instruction hire journey and clean-room demo        |
+| Weighted signal                  | ProofEra design                                                                      | Missing evidence                                                            |
+| -------------------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| Service value — 30%              | Marketplace discovery, four verified registrations, and fixed hire-gated agent lanes | Three verified hire receipts and the remaining permission-audit declaration |
+| Measured advantage — 30%         | Deterministic paired schema, fixed timing/cost/rubric, no inferred winner            | All six real method runs and independent adjudication                       |
+| High stakes / track record — 20% | Pancake LP, permission security, and Venus health protocols                          | Receipt-complete task inputs and observation limitations                    |
+| Marketplace quality — 20%        | Public four-category UI, proof room, evidence-first controls                         | Final zero-instruction hire journey and clean-room demo                     |
 
 The three frozen pairs are:
 
@@ -69,21 +69,21 @@ Every method is still `NOT RUN`; no advantage may be narrated before the final p
 
 ## Submission asset matrix
 
-| Asset              | Current state                                                 | Final gate                                                 |
-| ------------------ | ------------------------------------------------------------- | ---------------------------------------------------------- |
-| Public product     | Live on `proofera.tangvu.dev`; exact-build 11/11 probe passes | Freeze final commit and retain independent probe           |
-| Four public agents | A2A/MCP endpoints and five skill IDs live                     | Four BSC registrations and hire evidence                   |
-| Source repository  | Public, strict verification and evidence manifests            | Frozen release commit and hosted CI record                 |
-| Proof room         | Public seven-gate ledger                                      | All seven gates verified by final artifacts                |
-| Demo               | Six-scene exact-build rehearsal retained                      | Final video and timestamped clean-room playback check      |
-| Pitch deck         | Draft in [`pitch-deck.md`](./pitch-deck.md)                   | Export/freeze only after receipts and paired numbers exist |
-| Submission copy    | Evidence-backed draft in [`submission.md`](./submission.md)   | Final copy plus authoritative entry receipt                |
+| Asset              | Current state                                                                                        | Final gate                                                 |
+| ------------------ | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Public product     | Live on `proofera.tangvu.dev`; exact-build 11/11 probe passes                                        | Freeze final commit and retain independent probe           |
+| Four public agents | A2A/MCP endpoints and five skill IDs live; BSC-testnet identities `1825`–`1828` are receipt-verified | Retain final-release availability and real hire evidence   |
+| Source repository  | Public, strict verification and evidence manifests                                                   | Frozen release commit and hosted CI record                 |
+| Proof room         | Public seven-gate ledger                                                                             | All seven gates verified by final artifacts                |
+| Demo               | Six-scene exact-build rehearsal retained                                                             | Final video and timestamped clean-room playback check      |
+| Pitch deck         | Draft in [`pitch-deck.md`](./pitch-deck.md)                                                          | Export/freeze only after receipts and paired numbers exist |
+| Submission copy    | Evidence-backed draft in [`submission.md`](./submission.md)                                          | Final copy plus authoritative entry receipt                |
 
 Submission-flow watch: as rechecked on 2026-08-17, both canonical calls to action still lead to a registration-only Google Form with no final artifact fields. The form's partner checkbox omits Altana while the canonical page retains its eligibility section. Do not substitute that registration response for the final-entry receipt or infer a partner-track decision from the inconsistent checkbox.
 
 ## Red-team narration rules
 
-- Never say “live agent” when only the endpoint is live; say “public analyzer, BSC identity pending.”
+- Never let “live agent” imply execution, hiring, or performance merely because its endpoint and BSC identity are live; name each proven layer separately.
 - Never say “Altana-secured” without grant, execution, revoke, and negative-authority evidence.
 - Never say “Pancake benefit” from a read-only boundary warning; separate decision usefulness from realized economics.
 - Never say “faster,” “cheaper,” or “better” before all three TermiX pairs pass the preregistered rubric.

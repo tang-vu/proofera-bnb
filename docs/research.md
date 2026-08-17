@@ -1,6 +1,6 @@
 # ProofEra research record
 
-Last implementation update: **2026-08-17 UTC**. Official-source facts last checked: **2026-08-17 UTC**.
+Last implementation update: **2026-08-17 UTC**. Official-source facts last checked: **2026-08-17 08:34 UTC**.
 Status: phase-0 time box complete; deployment-critical facts remain on a revalidation watchlist. Facts below are verified from primary sources unless marked uncertain. Package and contract values are pinned only after documentation and published artifacts agree.
 
 ## Repository and environment ground truth
@@ -27,6 +27,7 @@ Source: [The Smart Money Era: Build the Era](https://www.bnbchain.org/en/hackath
 - Altana eligibility requires agents on their own Altana wallets, real allowlist/spend/expiry limits, Keystore registration, real session-key transactions, in-product inspection/revoke, explorer evidence, and submitted wallet addresses. Testnet qualifies; mainnet is stronger.
 - TermiX weighs service value 30%, measured agent advantage 30%, high-stakes category/track record 20%, and marketplace quality 20%. The required report contains at least three real agent-vs-manual tasks with time, cost, output quality, raw outputs, and at least one trading/equities/security task.
 - PancakeSwap awards the best real benefit for traders or LPs; a logo-only integration does not qualify.
+- Rechecked from the canonical production page at 2026-08-17 08:34 UTC: HTTP `200`, the Aug 5–Sep 9 UTC window, $30,000 main prize, public/live eligibility, four-category depth, Altana explorer/session requirements, TermiX weights/report minimums, and Pancake real-benefit language were unchanged. The server timestamp was `2026-08-17T08:34:16.549Z`; this observation refreshes the rule watch only and is not submission evidence.
 - Rechecked directly from the production host at 2026-08-17 02:45 UTC: the canonical page returned HTTP `200`, and both “Submit Project” and “Apply as Hacker” still pointed to the same Google Form, `Build the Era Hackathon Registration`. The form collects builder/team identity, project name/pitch/description, GitHub link, prototype stage, experience, availability and a possible-prize wallet; it does not collect a deck, demo video, deployed identities/contracts, receipts, paired-run evidence or a final submission package. Its current sub-prize checkbox lists PancakeSwap, AltLayer and TermiX but not Altana, while the canonical page still contains the Altana eligibility section. Treat this as a registration-form/page inconsistency, not evidence that Altana was removed. Judging is shown through 2026-09-23. Monitor for a replacement submission flow, corrected partner selection and Phase 2 disclosure; target an internal submission freeze at least 24 hours early.
 
 ## BNB Chain, Agent Studio, and agent standards
