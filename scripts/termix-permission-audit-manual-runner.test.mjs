@@ -11,6 +11,10 @@ const loaderSource = await readFile(
   new URL("./termix-typescript-loader.mjs", import.meta.url),
   "utf8"
 );
+const releaseSource = await readFile(
+  new URL("./termix-release-state.mjs", import.meta.url),
+  "utf8"
+);
 
 test("permission audit manual CLI fixes release, NDJSON timing stream, and create-only output", () => {
   assert.match(source, /--execute-exact-permission-audit-manual-run/u);
@@ -20,8 +24,11 @@ test("permission audit manual CLI fixes release, NDJSON timing stream, and creat
   assert.match(source, /runPermissionAuditManualTermixMethod/u);
   assert.match(source, /events: parseEvents\(lineIterator\)/u);
   assert.match(source, /process\.hrtime\.bigint/u);
-  assert.match(source, /gitText\(\["status", "--porcelain=v1", "--untracked-files=all"\]\)/u);
-  assert.match(source, /gitText\(\["rev-parse", "origin\/main"\]\)/u);
+  assert.match(source, /verifyTermixPublishedReleaseState/u);
+  assert.match(releaseSource, /"status", "--porcelain=v1", "--untracked-files=all"/u);
+  assert.match(releaseSource, /"rev-parse", "origin\/main"/u);
+  assert.match(releaseSource, /"merge-base", "--is-ancestor"/u);
+  assert.match(releaseSource, /"diff",\s*"--quiet"/u);
   assert.match(source, /gitBytes\(\["show", `HEAD:\$\{repositoryPath\}`\]\)/u);
   assert.match(source, /open\(temporaryPath, "wx", 0o600\)/u);
   assert.match(source, /link\(temporaryPath, outputPath\)/u);

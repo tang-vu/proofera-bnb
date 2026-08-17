@@ -11,13 +11,20 @@ const loaderSource = await readFile(
   new URL("./termix-typescript-loader.mjs", import.meta.url),
   "utf8"
 );
+const releaseSource = await readFile(
+  new URL("./termix-release-state.mjs", import.meta.url),
+  "utf8"
+);
 
 test("permission audit agent CLI fixes release, bundle, lane, and create-only output", () => {
   assert.match(source, /--execute-exact-permission-audit-agent-run/u);
   assert.match(source, /evidence\/termix\/frozen\/permission-audit\//u);
   assert.match(source, /evidence\/termix\/runs\/permission-audit\/agent/u);
-  assert.match(source, /gitText\(\["status", "--porcelain=v1", "--untracked-files=all"\]\)/u);
-  assert.match(source, /gitText\(\["rev-parse", "origin\/main"\]\)/u);
+  assert.match(source, /verifyTermixPublishedReleaseState/u);
+  assert.match(releaseSource, /"status", "--porcelain=v1", "--untracked-files=all"/u);
+  assert.match(releaseSource, /"rev-parse", "origin\/main"/u);
+  assert.match(releaseSource, /"merge-base", "--is-ancestor"/u);
+  assert.match(releaseSource, /"diff",\s*"--quiet"/u);
   assert.match(source, /gitBytes\(\["show", `HEAD:\$\{repositoryPath\}`\]\)/u);
   assert.match(source, /runPermissionAuditAgentTermixMethod/u);
   assert.match(source, /open\(temporaryPath, "wx", 0o600\)/u);

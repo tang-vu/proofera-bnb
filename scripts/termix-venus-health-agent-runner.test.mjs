@@ -11,13 +11,20 @@ const loaderSource = await readFile(
   new URL("./termix-typescript-loader.mjs", import.meta.url),
   "utf8"
 );
+const releaseSource = await readFile(
+  new URL("./termix-release-state.mjs", import.meta.url),
+  "utf8"
+);
 
 test("Venus timed CLI fixes release, input, endpoint lane, and create-only output boundaries", () => {
   assert.match(source, /--execute-exact-venus-health-agent-run/);
   assert.match(source, /evidence\/termix\/frozen\/venus-health\//);
   assert.match(source, /evidence\/termix\/runs\/venus-health/);
-  assert.match(source, /gitText\(\["status", "--porcelain=v1", "--untracked-files=all"\]\)/);
-  assert.match(source, /gitText\(\["rev-parse", "origin\/main"\]\)/);
+  assert.match(source, /verifyTermixPublishedReleaseState/);
+  assert.match(releaseSource, /"status", "--porcelain=v1", "--untracked-files=all"/);
+  assert.match(releaseSource, /"rev-parse", "origin\/main"/);
+  assert.match(releaseSource, /"merge-base", "--is-ancestor"/);
+  assert.match(releaseSource, /"diff",\s*"--quiet"/);
   assert.match(source, /gitBytes\(\["show", `HEAD:\$\{repositoryPath\}`\]\)/);
   assert.match(source, /runVenusHealthAgentTermixMethod/);
   assert.match(source, /open\(temporaryPath, "wx", 0o600\)/);

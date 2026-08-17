@@ -11,6 +11,7 @@ import {
   runVenusHealthAgentTermixMethod,
   sha256Bytes
 } from "../packages/benchmarks/src/index";
+import { verifyTermixPublishedReleaseState } from "./termix-release-state.mjs";
 
 const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const INPUT_PREFIX = "evidence/termix/frozen/venus-health/";
@@ -109,13 +110,19 @@ function gitBytes(args: readonly string[]): Buffer {
 }
 
 function verifyReleaseState(sourceCommitSha: string): void {
-  if (gitText(["status", "--porcelain=v1", "--untracked-files=all"]) !== "") {
-    throw new Error("TERMIX_VENUS_REPOSITORY_DIRTY");
-  }
-  const head = gitText(["rev-parse", "HEAD"]);
-  const published = gitText(["rev-parse", "origin/main"]);
-  if (head !== sourceCommitSha) throw new Error("TERMIX_VENUS_SOURCE_COMMIT_MISMATCH");
-  if (published !== head) throw new Error("TERMIX_VENUS_SOURCE_NOT_PUBLISHED");
+  verifyTermixPublishedReleaseState({
+    repositoryRoot: REPOSITORY_ROOT,
+    sourceCommitSha,
+    protectedPaths: [
+      "package.json",
+      "pnpm-lock.yaml",
+      "packages/benchmarks/src",
+      "scripts/run-termix-venus-health-agent.ts",
+      "scripts/termix-release-state.mjs",
+      "scripts/termix-typescript-loader.mjs"
+    ],
+    errorPrefix: "TERMIX_VENUS"
+  });
 }
 
 async function verifyCommittedInput(repositoryPath: string): Promise<string> {

@@ -8,6 +8,15 @@ runTermixManualCli({
   outputDirectory: "evidence/termix/runs/pancake-lp/manual",
   invocationDigestKey: "inputBundleSha256",
   errorPrefix: "TERMIX_PANCAKE_LP_MANUAL",
+  releaseProtectedPaths: [
+    "package.json",
+    "pnpm-lock.yaml",
+    "packages/benchmarks/src",
+    "scripts/run-termix-pancake-lp-manual.ts",
+    "scripts/termix-manual-runner-support.ts",
+    "scripts/termix-release-state.mjs",
+    "scripts/termix-typescript-loader.mjs"
+  ],
   args: process.argv.slice(2),
   run: ({ request, inputCanonicalJson, inputSha256, events, clock }) =>
     runPancakeLpManualTermixMethod({

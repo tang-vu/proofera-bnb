@@ -8,6 +8,15 @@ runTermixManualCli({
   outputDirectory: "evidence/termix/runs/venus-health/manual",
   invocationDigestKey: "requestInputSha256",
   errorPrefix: "TERMIX_VENUS_MANUAL",
+  releaseProtectedPaths: [
+    "package.json",
+    "pnpm-lock.yaml",
+    "packages/benchmarks/src",
+    "scripts/run-termix-venus-health-manual.ts",
+    "scripts/termix-manual-runner-support.ts",
+    "scripts/termix-release-state.mjs",
+    "scripts/termix-typescript-loader.mjs"
+  ],
   args: process.argv.slice(2),
   run: ({ request, inputSha256, events, clock }) =>
     runVenusHealthManualTermixMethod({

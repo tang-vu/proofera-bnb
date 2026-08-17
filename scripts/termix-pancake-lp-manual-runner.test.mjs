@@ -15,6 +15,10 @@ const loaderSource = await readFile(
   new URL("./termix-typescript-loader.mjs", import.meta.url),
   "utf8"
 );
+const releaseSource = await readFile(
+  new URL("./termix-release-state.mjs", import.meta.url),
+  "utf8"
+);
 
 test("Pancake LP manual CLI fixes release, NDJSON timing, and create-only output", () => {
   assert.match(source, /--execute-exact-pancake-lp-manual-run/u);
@@ -24,11 +28,11 @@ test("Pancake LP manual CLI fixes release, NDJSON timing, and create-only output
   assert.match(supportSource, /readBoundedLines/u);
   assert.match(supportSource, /events: parseEvents\(config, lineIterator\)/u);
   assert.match(supportSource, /process\.hrtime\.bigint/u);
-  assert.match(
-    supportSource,
-    /gitText\(\["status", "--porcelain=v1", "--untracked-files=all"\]\)/u
-  );
-  assert.match(supportSource, /gitText\(\["rev-parse", "origin\/main"\]\)/u);
+  assert.match(supportSource, /verifyTermixPublishedReleaseState/u);
+  assert.match(releaseSource, /"status", "--porcelain=v1", "--untracked-files=all"/u);
+  assert.match(releaseSource, /"rev-parse", "origin\/main"/u);
+  assert.match(releaseSource, /"merge-base", "--is-ancestor"/u);
+  assert.match(releaseSource, /"diff",\s*"--quiet"/u);
   assert.match(supportSource, /gitBytes\(\["show", `HEAD:\$\{repositoryPath\}`\]\)/u);
   assert.match(supportSource, /isCanonicalJsonText\(inputCanonicalJson\)/u);
   assert.match(supportSource, /open\(temporaryPath, "wx", 0o600\)/u);

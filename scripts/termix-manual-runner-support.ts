@@ -12,6 +12,7 @@ import {
   sha256Bytes,
   type TermixRunnerClock
 } from "../packages/benchmarks/src/index";
+import { verifyTermixPublishedReleaseState } from "./termix-release-state.mjs";
 
 const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const MAXIMUM_LINE_BYTES = 2_000_000;
@@ -39,6 +40,7 @@ export interface TermixManualCliConfig {
   readonly outputDirectory: string;
   readonly invocationDigestKey: string;
   readonly errorPrefix: string;
+  readonly releaseProtectedPaths: readonly string[];
   readonly args: readonly string[];
   readonly run: (options: ManualRunOptions) => Promise<unknown>;
 }
@@ -155,12 +157,12 @@ function gitBytes(args: readonly string[]): Buffer {
 }
 
 function verifyReleaseState(config: TermixManualCliConfig, sourceCommitSha: string): void {
-  if (gitText(["status", "--porcelain=v1", "--untracked-files=all"]) !== "") {
-    fail(config, "REPOSITORY_DIRTY");
-  }
-  const head = gitText(["rev-parse", "HEAD"]);
-  if (head !== sourceCommitSha) fail(config, "SOURCE_COMMIT_MISMATCH");
-  if (gitText(["rev-parse", "origin/main"]) !== head) fail(config, "SOURCE_NOT_PUBLISHED");
+  verifyTermixPublishedReleaseState({
+    repositoryRoot: REPOSITORY_ROOT,
+    sourceCommitSha,
+    protectedPaths: config.releaseProtectedPaths,
+    errorPrefix: config.errorPrefix
+  });
 }
 
 async function assertCanonicalPathWithinRepository(

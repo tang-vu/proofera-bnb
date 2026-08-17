@@ -11,6 +11,10 @@ const supportSource = await readFile(
   new URL("./termix-manual-runner-support.ts", import.meta.url),
   "utf8"
 );
+const releaseSource = await readFile(
+  new URL("./termix-release-state.mjs", import.meta.url),
+  "utf8"
+);
 
 test("Venus Health manual CLI fixes release, NDJSON timing, and create-only output", () => {
   assert.match(source, /--execute-exact-venus-health-manual-run/u);
@@ -20,6 +24,9 @@ test("Venus Health manual CLI fixes release, NDJSON timing, and create-only outp
   assert.match(supportSource, /readBoundedLines/u);
   assert.match(supportSource, /events: parseEvents\(config, lineIterator\)/u);
   assert.match(supportSource, /isCanonicalJsonText\(inputCanonicalJson\)/u);
+  assert.match(supportSource, /verifyTermixPublishedReleaseState/u);
+  assert.match(releaseSource, /"merge-base", "--is-ancestor"/u);
+  assert.match(releaseSource, /"diff",\s*"--quiet"/u);
   assert.match(supportSource, /open\(temporaryPath, "wx", 0o600\)/u);
   assert.match(supportSource, /link\(temporaryPath, outputPath\)/u);
   assert.doesNotMatch(
