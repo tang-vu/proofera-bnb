@@ -18,7 +18,7 @@ The first UX correction removes diagnostic-route clutter from the landing hero a
 
 The marketplace and four read-only analyzers now have durable HTTPS endpoints on the owner's always-on Windows host, supervised by PM2 behind a named Cloudflare Tunnel. Repeatable local/public probes cover marketplace health, analyzer health, exact Agent Card URLs, and the exact advertised skill IDs for each agent. This closes only the endpoint-hosting part of Milestone 1: all analyzers still declare execution disabled, and BSC/ERC-8004 registrations, evidence-backed live data, activation authority, and receipts remain required.
 
-The Windows release topology now fails closed without an immutable build identifier. Its release probe binds the public health response to the exact published commit and requires readiness to be honestly `not_ready`, never `misconfigured`; a PM2 monitor repeats the same marketplace/agent/Card/readiness checks every five minutes. External alert delivery, rollback exercise, deployed data/worker probes, and a genuinely ready activation path remain open.
+The Windows release topology now fails closed without an immutable build identifier. Its release probe binds the public health response to the exact published commit and requires readiness to be honestly `not_ready`, never `misconfigured`; a PM2 monitor repeats the same marketplace/agent/Card/readiness checks every five minutes. The public `/proof` route renders the exact build, four endpoint skill contracts and the committed seven-gate submission ledger, including blockers and digest-bound artifacts. External alert delivery, rollback exercise, deployed data/worker probes, final release freeze, and a genuinely ready activation path remain open.
 
 ## Status legend
 

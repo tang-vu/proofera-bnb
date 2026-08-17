@@ -17,6 +17,7 @@ Users begin with a financial job—protect a Venus loan, manage Pancake concentr
 - Includes four exact-pinned, hardened, non-executing self-hosted A2A/MCP reference analyzers: LP Range (17 tests), Grid Trading (24), Yield Optimisation (33), and Health-Factor Guardian (42). All four expose public HTTPS health and Agent Card endpoints. A two-provider, 42-call read-only preparation at finalized BSC-testnet block `125490457` retained exact initial ERC-8004 calldata and gas estimates, but also proved every dedicated wallet still had zero balance, zero nonce and zero owned identity. None is therefore ERC-8004-registered, execution-enabled, or eligible for a live marketplace claim. Studio 0.0.5 does not classify the TypeScript runtimes as AgentCore-deployable, and ProofEra does not claim otherwise.
 - Uses typed adapter boundaries, exact versions and evidence manifests that can survive undisclosed Phase 2 requirements.
 - Treats permission inspection, status reconciliation and revoke as core marketplace features.
+- Exposes a public `/proof` room that renders the committed seven-gate closure ledger, exact public Agent Card skills, build identity, blockers and artifact SHA-256 values. It deliberately labels all current gates incomplete; the page is an evidence index, not a readiness claim.
 
 ## Partner-track story
 

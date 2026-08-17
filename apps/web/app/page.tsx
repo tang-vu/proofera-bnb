@@ -35,6 +35,7 @@ export default function HomePage() {
         </Link>
         <div className="nav-links">
           <Link href="/marketplace">Marketplace</Link>
+          <Link href="/proof">Proof room</Link>
           <Link className="nav-optional" href="/mission-control">
             Mission Control
           </Link>
@@ -105,7 +106,7 @@ export default function HomePage() {
               <span className="category-number">0{index + 1}</span>
               <h3>{category.name}</h3>
               <p>{category.description}</p>
-              <span className="evidence-state">Local analyzer tested · live BSC agent pending</span>
+              <span className="evidence-state">Public analyzer live · BSC identity pending</span>
               <span className="category-card-action" aria-hidden="true">
                 Explore agents →
               </span>

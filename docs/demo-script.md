@@ -1,6 +1,6 @@
 # ProofEra judge demo script
 
-Updated: 2026-08-12. This is the target five-minute script, not a description of the current browser build. Four local development dossiers and configuration-only category mandate surfaces exist, but permission confirmation, activation, execution, populated Mission Control, revoke, live-agent evidence, and every bracketed evidence field remain unavailable until their real deployment/run paths are implemented and verified.
+Updated: 2026-08-17. This is the target five-minute script, not a claim that the final run exists. The marketplace, four public read-only analyzers, category dossiers/configuration surfaces, and `/proof` judge evidence index are live. Permission confirmation, activation, execution, populated Mission Control, revoke, registered identities, paired runs, and every bracketed evidence field remain unavailable until their real receipt/run paths are completed and verified.
 
 ## Pre-demo truth check
 
@@ -11,10 +11,13 @@ Updated: 2026-08-12. This is the target five-minute script, not a description of
 - Pancake pool/position and TermiX raw run manifests open.
 - No control depends on a fixture, placeholder endpoint or pre-seeded fake hash.
 - The permission preview and activation controls are visibly wired to the server-owned policy and live authority state; the current standalone model/renderer is not sufficient to run this segment.
+- `/proof` shows the exact final build, all seven closure gates, four Agent Cards/skills, and no `verified` gate unless `pnpm submission:require-ready` passes on the clean published release.
 
 ## 0:00–0:35 — thesis and intent
 
 “Agent directories tell you who claims to exist. ProofEra answers whether an agent deserves authority over capital.” Start from “automate a CAKE/BNB LP,” then set capital, balanced risk, horizon and assets. Point out that the marketplace begins from a financial job, not protocol vocabulary.
+
+Open `/proof` briefly before leaving the thesis: the judge can see the public build, exact agent skills, artifact hashes, and every still-open receipt gate without relying on narration.
 
 ## 0:35–1:25 — live discovery and evidence
 

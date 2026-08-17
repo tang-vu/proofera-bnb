@@ -229,3 +229,20 @@ test("provides a working skip link and keeps Marketplace navigation visible", as
     })
   ).toBeVisible();
 });
+
+test("opens the judge proof room without promoting incomplete gates", async ({ page }) => {
+  await page.goto("/");
+  await page
+    .getByRole("navigation", { name: "Primary navigation" })
+    .getByRole("link", { name: "Proof room" })
+    .click();
+
+  await expect(page).toHaveURL(/\/proof$/u);
+  await expect(
+    page.getByRole("heading", { name: "Proof, including what is missing." })
+  ).toBeVisible();
+  await expect(page.getByText("No — gates remain open")).toBeVisible();
+  await expect(page.locator("[data-gate-id]")).toHaveCount(7);
+  await expect(page.locator('[data-gate-state="verified"]')).toHaveCount(0);
+  await expect(page.getByText("ERC-8004 registration not evidenced")).toHaveCount(4);
+});
