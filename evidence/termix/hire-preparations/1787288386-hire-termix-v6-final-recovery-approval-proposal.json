@@ -1,0 +1,147 @@
+{
+  "schemaVersion": "proofera-testnet-hire-approval-proposal-v1.0.0",
+  "approvalId": "HIRE-TERMIX-2026-08-17-V6",
+  "state": "proposed_unapproved",
+  "authorization": false,
+  "broadcast": false,
+  "sourceCommit": "7d61dc8b3a7841f7ec6aef9724506471280282ea",
+  "preparation": {
+    "path": "evidence/termix/hire-preparations/1787288386-hire-termix-v6-final-recovery.json",
+    "sha256": "0b03c0668e2d4cddd2d31533bbe6155f422255d405b706c167c9c8d765e8e63d"
+  },
+  "scope": {
+    "chainId": 97,
+    "source": "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49",
+    "identityRegistry": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+    "predictedContract": "0x052fd2940Aa46F0Ae6660e0bf9eBDEdb6F610b1A",
+    "expiryUtc": "2026-08-21T04:59:46Z",
+    "expiryUnix": "1787288386",
+    "transactionCount": 1,
+    "mainnet": false,
+    "tokenApproval": false,
+    "recoveryDeploymentTransaction": "0x7fa5ad3e7b33dfb6dfccdfd06c6e54cc2d833d5aa005ec3f01c98cf72be3ddcf"
+  },
+  "transactions": [
+    {
+      "kind": "hire",
+      "slug": "venus-health-factor-decision",
+      "nonce": "8",
+      "to": "0x052fd2940Aa46F0Ae6660e0bf9eBDEdb6F610b1A",
+      "selector": "0xc7d43bd2",
+      "agentId": "1828",
+      "engagementId": "0x491b00ecbfba3ff6ffd86e0356e687fcb68c20a35a63aa0c809a927fae010b70",
+      "taskHash": "0xe3bf9df48c39e6fb6bfcae0bcbd3fc3a66bbf997601df0a1fbc8ee046282f7b8",
+      "calldataKeccak256": "0xc9569cfc916b3574da32d7d38893c0cb135c60a046dd5397e6a50a2596e8ad2c",
+      "valueWei": "10000000000000",
+      "gasLimit": "200000"
+    }
+  ],
+  "bounds": {
+    "signingGasPriceWei": "120000000",
+    "maxGasPriceWei": "200000000",
+    "totalHirePaymentWei": "10000000000000",
+    "maxNetworkFeeWei": "40000000000000",
+    "maxTotalSpendWei": "50000000000000"
+  },
+  "observedAtUtc": "2026-08-17T10:06:12.422Z",
+  "observations": [
+    {
+      "provider": "bnb-chain",
+      "url": "https://data-seed-prebsc-2-s2.binance.org:8545",
+      "chainId": "0x61",
+      "latestNonce": "0x8",
+      "pendingNonce": "0x8",
+      "balanceWei": "87855530060000000",
+      "gasPriceWei": "100000000",
+      "runtimeBytes": 1355,
+      "runtimeKeccak256": "0xf5e90b8e01c3b3cc9e9d629dce7ec367ba41e21cc64842decd9e5f4ab69a46ec",
+      "completedHires": [
+        {
+          "transactionHash": "0x068b450a9867d220cc1eda156e9eb3cb6b8037901a7f7feaaa126aa7e1169747",
+          "status": "0x1",
+          "blockNumber": "125587411",
+          "storedReceiptHash": "0xadb671a0c7142031633a18c5ba2bf5890dfc5edaf6dd0b760ac02244c5c55910"
+        },
+        {
+          "transactionHash": "0x0ec15407ab12df85e1a50e39f2316033c31aa28bca756bab6f7ac41a14023e6c",
+          "status": "0x1",
+          "blockNumber": "125587418",
+          "storedReceiptHash": "0xfb5c1bf05526ba1b0e3d28398a96b8619a852496c1b4bcfbd1298d66554d1e27"
+        }
+      ],
+      "remainingHireGasEstimate": "69846",
+      "remainingStoredReceipt": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "headNumber": "125588417",
+      "headHash": "0x84a6e9cb3df8c9a4daae2ddd1e16070a20beaa6e315421cee5aba5db256d5f68",
+      "headTimestamp": "1786961167"
+    },
+    {
+      "provider": "publicnode",
+      "url": "https://bsc-testnet-rpc.publicnode.com",
+      "chainId": "0x61",
+      "latestNonce": "0x8",
+      "pendingNonce": "0x8",
+      "balanceWei": "87855530060000000",
+      "gasPriceWei": "100000000",
+      "runtimeBytes": 1355,
+      "runtimeKeccak256": "0xf5e90b8e01c3b3cc9e9d629dce7ec367ba41e21cc64842decd9e5f4ab69a46ec",
+      "completedHires": [
+        {
+          "transactionHash": "0x068b450a9867d220cc1eda156e9eb3cb6b8037901a7f7feaaa126aa7e1169747",
+          "status": "0x1",
+          "blockNumber": "125587411",
+          "storedReceiptHash": "0xadb671a0c7142031633a18c5ba2bf5890dfc5edaf6dd0b760ac02244c5c55910"
+        },
+        {
+          "transactionHash": "0x0ec15407ab12df85e1a50e39f2316033c31aa28bca756bab6f7ac41a14023e6c",
+          "status": "0x1",
+          "blockNumber": "125587418",
+          "storedReceiptHash": "0xfb5c1bf05526ba1b0e3d28398a96b8619a852496c1b4bcfbd1298d66554d1e27"
+        }
+      ],
+      "remainingHireGasEstimate": "69846",
+      "remainingStoredReceipt": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "headNumber": "125588423",
+      "headHash": "0x4af5090e91e0ddab17b8a08688b7bd02c085a034482739f4e4f93abe0c635901",
+      "headTimestamp": "1786961169"
+    }
+  ],
+  "requiredApprovalText": "Tôi phê duyệt gói HIRE-TERMIX-2026-08-17-V6 theo đúng final recovery preparation SHA-256 0b03c0668e2d4cddd2d31533bbe6155f422255d405b706c167c9c8d765e8e63d và các giới hạn đã nêu.",
+  "unknownOutcomePolicy": {
+    "blindRetry": false,
+    "continueAfterFailure": false,
+    "action": "Stop all later transactions, preserve the pre-broadcast journal, and reconcile the exact signed hash through both fixed RPCs before any separately approved recovery."
+  },
+  "claims": {
+    "approved": false,
+    "signed": false,
+    "broadcast": false,
+    "deployed": true,
+    "priorHireReceipts": true,
+    "remainingHireReceipt": false,
+    "taskCompletion": false,
+    "agentPerformance": false,
+    "executionAuthority": false
+  },
+  "recoveryEvidence": {
+    "deploymentTransactionHash": "0x7fa5ad3e7b33dfb6dfccdfd06c6e54cc2d833d5aa005ec3f01c98cf72be3ddcf",
+    "deploymentStatus": "confirmed_finalized",
+    "deploymentBlock": "125583149",
+    "contractAddress": "0x052fd2940Aa46F0Ae6660e0bf9eBDEdb6F610b1A",
+    "deploymentInputKeccak256": "0x4863a8aa92fe7548c49ea0c2dd09f9f3499abc75f64b949c298bcdab92da3821",
+    "runtimeBytes": 1355,
+    "runtimeKeccak256": "0xf5e90b8e01c3b3cc9e9d629dce7ec367ba41e21cc64842decd9e5f4ab69a46ec",
+    "completedHires": [
+      {
+        "engagementId": "0xa3959c83bef9efbf0ce853b7c7f4d84504e658fad4724b9a45a48e65310762c2",
+        "receiptHash": "0xadb671a0c7142031633a18c5ba2bf5890dfc5edaf6dd0b760ac02244c5c55910",
+        "transactionHash": "0x068b450a9867d220cc1eda156e9eb3cb6b8037901a7f7feaaa126aa7e1169747"
+      },
+      {
+        "engagementId": "0xb0568b852938419e5856e215153a1bbb1399b2ad99348b94da45af7b1fda5240",
+        "receiptHash": "0xfb5c1bf05526ba1b0e3d28398a96b8619a852496c1b4bcfbd1298d66554d1e27",
+        "transactionHash": "0x0ec15407ab12df85e1a50e39f2316033c31aa28bca756bab6f7ac41a14023e6c"
+      }
+    ]
+  }
+}

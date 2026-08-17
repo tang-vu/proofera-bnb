@@ -6,9 +6,9 @@ import { test } from "node:test";
 import { Interface, keccak256 } from "ethers";
 
 const preparationPath =
-  "../../evidence/termix/hire-preparations/1787288386-hire-termix-v5-recovery.json";
+  "../../evidence/termix/hire-preparations/1787288386-hire-termix-v6-final-recovery.json";
 const proposalPath =
-  "../../evidence/termix/hire-preparations/1787288386-hire-termix-v5-recovery-approval-proposal.json";
+  "../../evidence/termix/hire-preparations/1787288386-hire-termix-v6-final-recovery-approval-proposal.json";
 const artifactPath = "artifacts/src/ProofEraTestnetHireReceipt.sol/ProofEraTestnetHireReceipt.json";
 const preparationBytes = readFileSync(preparationPath);
 const preparation = JSON.parse(preparationBytes.toString("utf8"));
@@ -18,25 +18,22 @@ const contractInterface = new Interface(artifact.abi);
 
 test("approval proposal binds the exact unsigned preparation and remains unapproved", () => {
   const digest = createHash("sha256").update(preparationBytes).digest("hex");
-  assert.equal(digest, "44a5fd0779c9ae81ef257484805b26cdfd682f065a89360ea35c60bf80ea1389");
+  assert.equal(digest, "0b03c0668e2d4cddd2d31533bbe6155f422255d405b706c167c9c8d765e8e63d");
   assert.equal(proposal.preparation.sha256, digest);
   assert.equal(proposal.sourceCommit, preparation.sourceCommit);
-  assert.equal(proposal.approvalId, "HIRE-TERMIX-2026-08-17-V5");
+  assert.equal(proposal.approvalId, "HIRE-TERMIX-2026-08-17-V6");
   assert.equal(proposal.state, "proposed_unapproved");
   assert.equal(proposal.authorization, false);
   assert.equal(proposal.broadcast, false);
   assert.equal(proposal.claims.deployed, true);
-  assert.ok(
-    Object.entries(proposal.claims)
-      .filter(([claim]) => claim !== "deployed")
-      .every(([, value]) => value === false)
-  );
+  assert.equal(proposal.claims.priorHireReceipts, true);
+  assert.equal(proposal.claims.remainingHireReceipt, false);
   assert.match(proposal.requiredApprovalText, new RegExp(digest, "u"));
-  assert.match(proposal.requiredApprovalText, /HIRE-TERMIX-2026-08-17-V5/u);
+  assert.match(proposal.requiredApprovalText, /HIRE-TERMIX-2026-08-17-V6/u);
 });
 
-test("three recovery transaction rows match decoded hire bytes", () => {
-  assert.equal(proposal.transactions.length, 3);
+test("one final recovery transaction row matches decoded hire bytes", () => {
+  assert.equal(proposal.transactions.length, 1);
   assert.ok(proposal.transactions.every(({ kind }) => kind === "hire"));
   assert.equal(
     proposal.recoveryEvidence.deploymentTransactionHash,
@@ -46,6 +43,7 @@ test("three recovery transaction rows match decoded hire bytes", () => {
     proposal.recoveryEvidence.deploymentInputKeccak256,
     preparation.deployment.dataKeccak256
   );
+  assert.deepEqual(proposal.recoveryEvidence.completedHires, preparation.recovery.completedHires);
 
   for (const [index, reviewed] of proposal.transactions.entries()) {
     const prepared = preparation.hires[index];
@@ -74,7 +72,7 @@ test("proposal arithmetic and both read-only provider observations agree", () =>
     (total, transaction) => total + BigInt(transaction.valueWei),
     0n
   );
-  assert.equal(transactionGas, 600_000n);
+  assert.equal(transactionGas, 200_000n);
   assert.equal(payments.toString(), proposal.bounds.totalHirePaymentWei);
   assert.equal(
     (transactionGas * BigInt(proposal.bounds.maxGasPriceWei)).toString(),
@@ -87,16 +85,16 @@ test("proposal arithmetic and both read-only provider observations agree", () =>
   assert.equal(proposal.observations.length, 2);
   for (const observation of proposal.observations) {
     assert.equal(observation.chainId, "0x61");
-    assert.equal(observation.latestNonce, "0x6");
-    assert.equal(observation.pendingNonce, "0x6");
-    assert.equal(observation.balanceWei, "87892088860000000");
+    assert.equal(observation.latestNonce, "0x8");
+    assert.equal(observation.pendingNonce, "0x8");
+    assert.equal(observation.balanceWei, "87855530060000000");
     assert.equal(observation.gasPriceWei, "100000000");
     assert.equal(observation.runtimeBytes, 1355);
     assert.equal(observation.runtimeKeccak256, proposal.recoveryEvidence.runtimeKeccak256);
-    assert.equal(observation.deploymentReceiptStatus, "0x1");
-    assert.equal(observation.deploymentBlock, "125583149");
-    assert.deepEqual(observation.hireGasEstimates, ["69858", "69846", "69858"]);
-    assert.ok(observation.storedEngagementReceipts.every((value) => BigInt(value) === 0n));
+    assert.equal(observation.completedHires.length, 2);
+    assert.ok(observation.completedHires.every(({ status }) => status === "0x1"));
+    assert.equal(observation.remainingHireGasEstimate, "69846");
+    assert.equal(BigInt(observation.remainingStoredReceipt), 0n);
   }
   assert.ok(
     proposal.observations.every(
