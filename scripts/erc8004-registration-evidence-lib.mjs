@@ -80,7 +80,7 @@ function addressTopic(address) {
 }
 
 export function finalRegistrationUri(preparedAgent, agentId) {
-  if (typeof agentId !== "bigint" || agentId < 0n) {
+  if (typeof agentId !== "bigint" || agentId < 0n || agentId > BigInt(Number.MAX_SAFE_INTEGER)) {
     throw new Error("ERC8004_REGISTRATION_AGENT_ID_INVALID");
   }
   const template = structuredClone(preparedAgent?.completionTemplate?.agentUriTemplate);
@@ -94,7 +94,10 @@ export function finalRegistrationUri(preparedAgent, agentId) {
   ) {
     throw new Error("ERC8004_REGISTRATION_URI_TEMPLATE_INVALID");
   }
-  template.registrations[0].agentId = agentId.toString();
+  // SDK 0.4.2 emits the EIP-8004 agentId as a JSON integer. Keep the
+  // placeholder string only in the pre-registration template, then bind the
+  // receipt-derived value using the SDK's exact serialized type.
+  template.registrations[0].agentId = Number(agentId);
   return `data:application/json;base64,${Buffer.from(canonical(template), "utf8").toString("base64")}`;
 }
 

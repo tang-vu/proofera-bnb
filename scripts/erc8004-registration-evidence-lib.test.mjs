@@ -107,13 +107,20 @@ test("final registration URI replaces only the receipt-derived agent ID", () => 
   );
   assert.deepEqual(decoded.registrations, [
     {
-      agentId: agentId.toString(),
+      agentId: Number(agentId),
       agentRegistry: `eip155:${CHAIN_ID}:${REGISTRY}`
     }
   ]);
   assert.equal(
     preparedAgent.completionTemplate.agentUriTemplate.registrations[0].agentId,
     FINAL_URI_PLACEHOLDER
+  );
+});
+
+test("final registration URI refuses an agent ID that JSON cannot represent exactly", () => {
+  assert.throws(
+    () => finalRegistrationUri(preparedAgent, BigInt(Number.MAX_SAFE_INTEGER) + 1n),
+    /ERC8004_REGISTRATION_AGENT_ID_INVALID/u
   );
 });
 
