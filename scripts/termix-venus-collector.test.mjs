@@ -49,10 +49,21 @@ test("Venus collector captures an ordered finalized window before one create-onl
   assert.match(source, /--blocks/);
   assert.match(source, /COLLECTOR_BLOCK_WINDOW_INVALID/);
   assert.match(source, /block <= \(parsed\[position - 1\] \?\? 0n\)/);
-  assert.match(source, /for \(const block of blockNumbers\)/);
+  assert.match(source, /for \(const block of fixedBlocks\)/);
   assert.match(source, /block > minimumHead - FINALITY_BLOCKS/);
   assert.match(source, /proofera-termix-venus-development-window-v1\.0\.0/);
   assert.match(source, /venus-core-exact-window-/);
   assert.match(source, /observationCount: evidenceWindow\.length/);
   assert.match(source, /writeFile\(path/);
+});
+
+test("Venus collector can acquire a live window without historical-state substitution", () => {
+  assert.match(source, /--live-window/);
+  assert.match(source, /COLLECTOR_LIVE_WINDOW_INVALID/);
+  assert.match(source, /observations < 3/);
+  assert.match(source, /spacingSeconds < 60/);
+  assert.match(source, /minimumProviderHead/);
+  assert.match(source, /block <= previous/);
+  assert.match(source, /await waitMilliseconds\(options\.liveWindow\.spacingSeconds \* 1_000\)/);
+  assert.doesNotMatch(source, /archive fallback|fixture fallback/i);
 });

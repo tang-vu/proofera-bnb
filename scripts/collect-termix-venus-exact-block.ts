@@ -84,6 +84,7 @@ interface CliOptions {
   readonly account: Address;
   readonly blockNumber: bigint | null;
   readonly blockWindow: readonly bigint[] | null;
+  readonly liveWindow: { readonly observations: number; readonly spacingSeconds: number } | null;
   readonly latestFinalized: boolean;
   readonly writeDevelopmentEvidence: boolean;
 }
@@ -92,6 +93,7 @@ function parseCli(args: readonly string[]): CliOptions {
   let account: Address | null = null;
   let blockNumber: bigint | null = null;
   let blockWindow: readonly bigint[] | null = null;
+  let liveWindow: CliOptions["liveWindow"] = null;
   let latestFinalized = false;
   let writeDevelopmentEvidence = false;
   for (let index = 0; index < args.length; index += 1) {
@@ -123,6 +125,26 @@ function parseCli(args: readonly string[]): CliOptions {
       }
       blockWindow = parsed;
       index += 1;
+    } else if (argument === "--live-window") {
+      const value = args[index + 1];
+      if (value === undefined || !/^[0-9]+,[0-9]+$/.test(value)) {
+        throw new Error("COLLECTOR_LIVE_WINDOW_INVALID");
+      }
+      const [observationsText, spacingText] = value.split(",");
+      const observations = Number(observationsText);
+      const spacingSeconds = Number(spacingText);
+      if (
+        !Number.isSafeInteger(observations) ||
+        observations < 3 ||
+        observations > 16 ||
+        !Number.isSafeInteger(spacingSeconds) ||
+        spacingSeconds < 60 ||
+        spacingSeconds > 600
+      ) {
+        throw new Error("COLLECTOR_LIVE_WINDOW_INVALID");
+      }
+      liveWindow = { observations, spacingSeconds };
+      index += 1;
     } else if (argument === "--write-development-evidence") {
       writeDevelopmentEvidence = true;
     } else {
@@ -130,10 +152,21 @@ function parseCli(args: readonly string[]): CliOptions {
     }
   }
   if (account === null) throw new Error("COLLECTOR_ACCOUNT_REQUIRED");
-  if ([blockNumber !== null, latestFinalized, blockWindow !== null].filter(Boolean).length !== 1) {
+  if (
+    [blockNumber !== null, latestFinalized, blockWindow !== null, liveWindow !== null].filter(
+      Boolean
+    ).length !== 1
+  ) {
     throw new Error("COLLECTOR_EXACTLY_ONE_BLOCK_MODE_REQUIRED");
   }
-  return { account, blockNumber, blockWindow, latestFinalized, writeDevelopmentEvidence };
+  return {
+    account,
+    blockNumber,
+    blockWindow,
+    liveWindow,
+    latestFinalized,
+    writeDevelopmentEvidence
+  };
 }
 
 function parseJson(text: string): unknown {
@@ -378,8 +411,7 @@ async function gitState(): Promise<{ commit: string; clean: boolean }> {
   return { commit: commit.trim(), clean: status.trim().length === 0 };
 }
 
-async function main(): Promise<void> {
-  const options = parseCli(process.argv.slice(2));
+async function minimumProviderHead(): Promise<bigint> {
   const heads = await Promise.all(
     PROVIDERS.map(async (provider) => {
       const client = createPublicClient({
@@ -389,23 +421,53 @@ async function main(): Promise<void> {
       return client.getBlockNumber();
     })
   );
-  const minimumHead = heads.reduce((minimum, head) => (head < minimum ? head : minimum));
-  const blockNumbers = options.latestFinalized
-    ? [minimumHead - FINALITY_BLOCKS]
-    : (options.blockWindow ?? (options.blockNumber === null ? [] : [options.blockNumber]));
-  if (
-    blockNumbers.length === 0 ||
-    blockNumbers.some((block) => block <= 0n || block > minimumHead - FINALITY_BLOCKS)
-  ) {
-    throw new Error("COLLECTOR_BLOCK_NOT_FINALIZED");
-  }
+  return heads.reduce((minimum, head) => (head < minimum ? head : minimum));
+}
+
+function waitMilliseconds(milliseconds: number): Promise<void> {
+  return new Promise((resolveWait) => setTimeout(resolveWait, milliseconds));
+}
+
+async function main(): Promise<void> {
+  const options = parseCli(process.argv.slice(2));
+  const blockNumbers: bigint[] = [];
   const windowResults = [];
-  for (const block of blockNumbers) {
-    windowResults.push(
-      await Promise.all(
-        PROVIDERS.map((provider) => collectProvider(provider, options.account, block))
-      )
-    );
+  if (options.liveWindow !== null) {
+    for (let index = 0; index < options.liveWindow.observations; index += 1) {
+      const block = (await minimumProviderHead()) - FINALITY_BLOCKS;
+      const previous = blockNumbers.at(-1);
+      if (block <= 0n || (previous !== undefined && block <= previous)) {
+        throw new Error("COLLECTOR_LIVE_WINDOW_BLOCK_ORDER_INVALID");
+      }
+      blockNumbers.push(block);
+      windowResults.push(
+        await Promise.all(
+          PROVIDERS.map((provider) => collectProvider(provider, options.account, block))
+        )
+      );
+      if (index + 1 < options.liveWindow.observations) {
+        await waitMilliseconds(options.liveWindow.spacingSeconds * 1_000);
+      }
+    }
+  } else {
+    const minimumHead = await minimumProviderHead();
+    const fixedBlocks = options.latestFinalized
+      ? [minimumHead - FINALITY_BLOCKS]
+      : (options.blockWindow ?? (options.blockNumber === null ? [] : [options.blockNumber]));
+    if (
+      fixedBlocks.length === 0 ||
+      fixedBlocks.some((block) => block <= 0n || block > minimumHead - FINALITY_BLOCKS)
+    ) {
+      throw new Error("COLLECTOR_BLOCK_NOT_FINALIZED");
+    }
+    for (const block of fixedBlocks) {
+      blockNumbers.push(block);
+      windowResults.push(
+        await Promise.all(
+          PROVIDERS.map((provider) => collectProvider(provider, options.account, block))
+        )
+      );
+    }
   }
   const evidenceWindow = windowResults.map((results) =>
     buildVenusCoreExactBlockEvidence(results.map(({ observation }) => observation))
