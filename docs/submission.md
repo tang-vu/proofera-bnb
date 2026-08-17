@@ -34,6 +34,8 @@ Users begin with a financial job—protect a Venus loan, manage Pancake concentr
 
 The machine-readable closure ledger is [`evidence/submission/readiness.json`](../evidence/submission/readiness.json). `pnpm submission:check` verifies the current honest state and digest-binds every referenced artifact; `pnpm submission:require-ready` remains intentionally red until all seven gates carry their required final evidence. Neither a normal green build nor the default status command is submission approval.
 
+The canonical page and linked form were rechecked at 2026-08-17 02:45 UTC. Both public calls to action still open the same registration-only Google Form, which has no deck, demo, receipt or final-evidence upload fields. Its current partner checkbox lists PancakeSwap, AltLayer and TermiX but omits Altana even though the canonical page still publishes Altana eligibility. ProofEra therefore keeps a host-independent final bundle ready, monitors for the actual submission/Phase 2 flow, and does not interpret the registration form as a completed hackathon entry or Altana's omission as a track-removal decision.
+
 The judge-facing claim/evidence/missing-evidence map is maintained in [`judge-scorecard.md`](./judge-scorecard.md). The ten-slide narrative is drafted in [`pitch-deck.md`](./pitch-deck.md); it remains a source document, not an exported or submitted deck, and its bracketed fields must be filled only from final receipts and paired-run evidence.
 
 | Item                          | Value                                                        |

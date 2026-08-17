@@ -79,6 +79,8 @@ Every method is still `NOT RUN`; no advantage may be narrated before the final p
 | Pitch deck         | Draft in [`pitch-deck.md`](./pitch-deck.md)                   | Export/freeze only after receipts and paired numbers exist |
 | Submission copy    | Evidence-backed draft in [`submission.md`](./submission.md)   | Final copy plus authoritative entry receipt                |
 
+Submission-flow watch: as rechecked on 2026-08-17, both canonical calls to action still lead to a registration-only Google Form with no final artifact fields. The form's partner checkbox omits Altana while the canonical page retains its eligibility section. Do not substitute that registration response for the final-entry receipt or infer a partner-track decision from the inconsistent checkbox.
+
 ## Red-team narration rules
 
 - Never say “live agent” when only the endpoint is live; say “public analyzer, BSC identity pending.”
