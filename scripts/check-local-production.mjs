@@ -57,6 +57,16 @@ const probes = [
   ...(publicMode && expectedBuild !== undefined
     ? [
         {
+          name: "marketplace-proof-room",
+          url: `${marketplaceOrigin}/proof`,
+          responseKind: "text",
+          validate: (body) =>
+            typeof body === "string" &&
+            body.includes(expectedBuild) &&
+            body.includes("No — gates remain open") &&
+            body.includes("audit_altana_permission_bundle")
+        },
+        {
           name: "marketplace-readiness",
           url: `${marketplaceOrigin}/api/readiness`,
           expectedStatus: 503,
@@ -80,9 +90,12 @@ for (const probe of probes) {
       signal: AbortSignal.timeout(5_000)
     });
     const contentType = response.headers.get("content-type") ?? "";
-    const body = contentType.toLowerCase().includes("application/json")
-      ? await response.json()
-      : null;
+    const body =
+      probe.responseKind === "text"
+        ? await response.text()
+        : contentType.toLowerCase().includes("application/json")
+          ? await response.json()
+          : null;
     const statusAccepted =
       probe.expectedStatus === undefined ? response.ok : response.status === probe.expectedStatus;
     if (!statusAccepted || !probe.validate(body)) {

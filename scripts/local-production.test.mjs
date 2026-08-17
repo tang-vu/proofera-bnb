@@ -110,6 +110,10 @@ test("public smoke probe covers the marketplace, every agent, and every Agent Ca
   assert.match(source, /JSON\.stringify\(expectedSkills\)/);
   assert.match(source, /executionEnabled === false/);
   assert.match(source, /marketplace-readiness/);
+  assert.match(source, /marketplace-proof-room/);
+  assert.match(source, /body\.includes\(expectedBuild\)/);
+  assert.match(source, /No — gates remain open/);
+  assert.match(source, /audit_altana_permission_bundle/);
   assert.match(source, /body\?\.build === expectedBuild/);
 });
 
