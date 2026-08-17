@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "proofera-public-demo-video-v1.0.0",
+  "classification": {
+    "artifact": "public_demo_video_rehearsal",
+    "audioPresent": false,
+    "browserAutomation": true,
+    "finalDemoCheck": false,
+    "hackathonEntrySubmitted": false,
+    "onchainReceiptEvidenceIntroduced": false,
+    "playbackDecoded": true,
+    "submissionReady": false,
+    "videoRecorded": true
+  },
+  "sourceCommit": "f3218e712db9eb001c577b5d116e5b0bc1a1067c",
+  "observedAtUtc": "2026-08-17T02:24:36.109Z",
+  "publicHealth": {
+    "build": "f3218e712db9eb001c577b5d116e5b0bc1a1067c",
+    "responseDate": "Mon, 17 Aug 2026 02:24:35 GMT",
+    "status": 200,
+    "url": "https://proofera.tangvu.dev/api/health"
+  },
+  "captureEnvironment": {
+    "browser": "chromium",
+    "locale": "en-US",
+    "playwrightVersion": "1.62.1",
+    "reducedMotion": "reduce",
+    "viewport": {
+      "height": 900,
+      "width": 1440
+    }
+  },
+  "voiceover": null,
+  "scenes": [
+    {
+      "assertions": [
+        "Hire agents by proof,",
+        "Four jobs. Equal scrutiny."
+      ],
+      "holdMs": 3000,
+      "httpStatus": 200,
+      "key": "home",
+      "title": "ProofEra — Hire agents by proof",
+      "url": "https://proofera.tangvu.dev/"
+    },
+    {
+      "assertions": [
+        "Start with the job.",
+        "Four analyzers. Zero invented agents."
+      ],
+      "holdMs": 3000,
+      "httpStatus": 200,
+      "key": "marketplace",
+      "title": "Agent marketplace — ProofEra",
+      "url": "https://proofera.tangvu.dev/marketplace"
+    },
+    {
+      "assertions": [
+        "LP Range Analyzer",
+        "Every execution gate is closed."
+      ],
+      "holdMs": 3000,
+      "httpStatus": 200,
+      "key": "lp-passport",
+      "title": "LP Range Analyzer reference dossier — ProofEra",
+      "url": "https://proofera.tangvu.dev/reference-analyzers/lp-rebalancing"
+    },
+    {
+      "assertions": [
+        "Set boundaries before authority.",
+        "Define the boundaries"
+      ],
+      "holdMs": 3000,
+      "httpStatus": 200,
+      "key": "lp-configuration",
+      "title": "LP configuration readiness — ProofEra",
+      "url": "https://proofera.tangvu.dev/lp-activate"
+    },
+    {
+      "assertions": [
+        "Proof, including what is missing.",
+        "Seven gates."
+      ],
+      "holdMs": 3000,
+      "httpStatus": 200,
+      "key": "proof-room",
+      "title": "Proof room — ProofEra",
+      "url": "https://proofera.tangvu.dev/proof"
+    },
+    {
+      "assertions": [
+        "Mission Control begins with verified state."
+      ],
+      "holdMs": 3000,
+      "httpStatus": 200,
+      "key": "mission-control",
+      "title": "Mission Control — ProofEra",
+      "url": "https://proofera.tangvu.dev/mission-control"
+    }
+  ],
+  "media": {
+    "bytes": 2624808,
+    "path": "proofera-rehearsal-demo.webm",
+    "probe": {
+      "audioStreams": [],
+      "durationSeconds": "21.560",
+      "formatNames": "matroska,webm",
+      "videoStream": {
+        "codecName": "vp8",
+        "height": 900,
+        "width": 1440
+      }
+    },
+    "sha256": "7e53d9a7a91109c041e24eb7a7613e8c86333089068f71bc1c468b6e017dcf92"
+  },
+  "limitations": [
+    "This rehearsal proves only that the exact public release rendered and that the retained silent browser recording decoded.",
+    "It is not the narrated final demo, a clean-room playback, an uptime record, a transaction receipt, or a hackathon submission receipt.",
+    "Dynamic upstream data outside the asserted text is not independently authenticated by this artifact."
+  ]
+}
