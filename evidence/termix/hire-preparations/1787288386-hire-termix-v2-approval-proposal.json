@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "proofera-testnet-hire-approval-proposal-v1.0.0",
+  "approvalId": "HIRE-TERMIX-2026-08-17-V2",
+  "state": "proposed_unapproved",
+  "authorization": false,
+  "broadcast": false,
+  "sourceCommit": "63e396a289c6d72dd3ed80331600ecb253dcceb3",
+  "preparation": {
+    "path": "evidence/termix/hire-preparations/1787288386-hire-termix-v2.json",
+    "sha256": "139ea342618d8f07b9c030210722b9ca15da2d67f933dc56e229061e67f55b3e"
+  },
+  "scope": {
+    "chainId": 97,
+    "source": "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49",
+    "identityRegistry": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+    "predictedContract": "0x052fd2940Aa46F0Ae6660e0bf9eBDEdb6F610b1A",
+    "expiryUtc": "2026-08-21T04:59:46Z",
+    "expiryUnix": "1787288386",
+    "transactionCount": 4,
+    "mainnet": false,
+    "tokenApproval": false
+  },
+  "transactions": [
+    {
+      "kind": "deploy",
+      "nonce": "5",
+      "to": null,
+      "valueWei": "0",
+      "gasLimit": "400000",
+      "dataKeccak256": "0x4863a8aa92fe7548c49ea0c2dd09f9f3499abc75f64b949c298bcdab92da3821",
+      "artifactSha256": "0xe1e3d57e35cc9ed8130e27acb25933fc52a89b54d891c3694f3bd61a201374ba"
+    },
+    {
+      "kind": "hire",
+      "slug": "pancake-lp-range-decision",
+      "nonce": "6",
+      "to": "0x052fd2940Aa46F0Ae6660e0bf9eBDEdb6F610b1A",
+      "selector": "0xc7d43bd2",
+      "agentId": "1825",
+      "engagementId": "0xb72d2cf053072f2158aa5d4ad0741f34d427bc6d92b0ea79d15af29366e1959d",
+      "taskHash": "0x8e10c4ad3064c7d2d2016aa33f699de27d22c83cc9f59649b5b07fba3c696ca1",
+      "calldataKeccak256": "0x10763d229d5283d71ad39c3c5fe506ca1c14bb7fe42c656cc29a10a047687116",
+      "valueWei": "10000000000000",
+      "gasLimit": "200000"
+    },
+    {
+      "kind": "hire",
+      "slug": "autonomous-session-permission-audit",
+      "nonce": "7",
+      "to": "0x052fd2940Aa46F0Ae6660e0bf9eBDEdb6F610b1A",
+      "selector": "0xc7d43bd2",
+      "agentId": "1825",
+      "engagementId": "0x8e2eb191cd1d211e34a13c3cc7b173fcc2d5b8ef1b21c84defd08afe9168ab79",
+      "taskHash": "0x9700ae940654ce9429c62de3a5725cf142be9a25778972e4b3a2e7092bfb4bc6",
+      "calldataKeccak256": "0x9c1bca4b165afabd1fb2b82ceb5d7e6a5307b0eff4e4d87fa2b37ed1f8681475",
+      "valueWei": "10000000000000",
+      "gasLimit": "200000"
+    },
+    {
+      "kind": "hire",
+      "slug": "venus-health-factor-decision",
+      "nonce": "8",
+      "to": "0x052fd2940Aa46F0Ae6660e0bf9eBDEdb6F610b1A",
+      "selector": "0xc7d43bd2",
+      "agentId": "1828",
+      "engagementId": "0x0d3e2f6fdfd6bd5f190e73726081e87886cbf9f0a644ec58d97ba708472e6929",
+      "taskHash": "0xe3bf9df48c39e6fb6bfcae0bcbd3fc3a66bbf997601df0a1fbc8ee046282f7b8",
+      "calldataKeccak256": "0x4ea99e0de7ad69dbac042efc8a9cbedcb574561f0680ae3a5c22da7909bc873e",
+      "valueWei": "10000000000000",
+      "gasLimit": "200000"
+    }
+  ],
+  "bounds": {
+    "signingGasPriceWei": "120000000",
+    "maxGasPriceWei": "200000000",
+    "totalHirePaymentWei": "30000000000000",
+    "maxNetworkFeeWei": "200000000000000",
+    "maxTotalSpendWei": "230000000000000"
+  },
+  "observedAtUtc": "2026-08-17T05:00:37.9757078Z",
+  "observations": [
+    {
+      "provider": "bnb-chain",
+      "url": "https://data-seed-prebsc-2-s2.binance.org:8545",
+      "chainId": "0x61",
+      "latestNonce": "0x5",
+      "pendingNonce": "0x5",
+      "balanceWei": "87934297300000000",
+      "gasPriceWei": "100000000",
+      "predictedCode": "0x",
+      "deploymentGasEstimate": "355696",
+      "headNumber": "125547683",
+      "headHash": "0x1bcbbc0a0c6e25ec3d244988cc32d8445a7dedd4b533d8b1126dc9da2878d3fc",
+      "headTimestamp": "1786942834"
+    },
+    {
+      "provider": "publicnode",
+      "url": "https://bsc-testnet-rpc.publicnode.com",
+      "chainId": "0x61",
+      "latestNonce": "0x5",
+      "pendingNonce": "0x5",
+      "balanceWei": "87934297300000000",
+      "gasPriceWei": "100000000",
+      "predictedCode": "0x",
+      "deploymentGasEstimate": "355696",
+      "headNumber": "125547687",
+      "headHash": "0xb6a6de9082df0e3fe170df2a3e6c0ee66413785d869055762259549cf25acb10",
+      "headTimestamp": "1786942836"
+    }
+  ],
+  "requiredApprovalText": "Tôi phê duyệt gói HIRE-TERMIX-2026-08-17-V2 theo đúng preparation SHA-256 139ea342618d8f07b9c030210722b9ca15da2d67f933dc56e229061e67f55b3e và các giới hạn đã nêu.",
+  "unknownOutcomePolicy": {
+    "blindRetry": false,
+    "continueAfterFailure": false,
+    "action": "Stop all later transactions, preserve the pre-broadcast journal, and reconcile the exact signed hash through both fixed RPCs before any separately approved recovery."
+  },
+  "claims": {
+    "approved": false,
+    "signed": false,
+    "broadcast": false,
+    "deployed": false,
+    "hireReceipts": false,
+    "taskCompletion": false,
+    "agentPerformance": false,
+    "executionAuthority": false
+  }
+}
