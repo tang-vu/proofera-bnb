@@ -94,16 +94,17 @@ Useful local routes:
 
 ## Repository map
 
-| Path                            | Purpose                                                                                                            |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `apps/web`                      | Marketplace UI and server routes                                                                                   |
-| `packages/domain`               | Evidence schemas, Proof Score, intent matching, publication and activation policy                                  |
-| `packages/integrations`         | Runtime-validated protocol and registry adapters                                                                   |
-| `packages/benchmarks`           | Paired TermiX experiment validation, hashes, costs, rubrics, and receipt joins                                     |
-| `agents`                        | Isolated reference-agent workspaces; pinning and Studio packaging are verified per agent                           |
-| `contracts/testnet-fixed-asset` | Isolated fixed-supply BSC-testnet artifact/source package plus offline deployment and pool-initializer preparation |
-| `docs`                          | Research, architecture, security, methodology, deployment, and submission records                                  |
-| `evidence`                      | Reproducible non-secret raw outputs and receipt manifests                                                          |
+| Path                             | Purpose                                                                                                            |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `apps/web`                       | Marketplace UI and server routes                                                                                   |
+| `packages/domain`                | Evidence schemas, Proof Score, intent matching, publication and activation policy                                  |
+| `packages/integrations`          | Runtime-validated protocol and registry adapters                                                                   |
+| `packages/benchmarks`            | Paired TermiX experiment validation, hashes, costs, rubrics, and receipt joins                                     |
+| `agents`                         | Isolated reference-agent workspaces; pinning and Studio packaging are verified per agent                           |
+| `contracts/testnet-fixed-asset`  | Isolated fixed-supply BSC-testnet artifact/source package plus offline deployment and pool-initializer preparation |
+| `contracts/testnet-hire-receipt` | Isolated chain-97 paid-hire receipt contract and unsigned deployment/calldata preparation                          |
+| `docs`                           | Research, architecture, security, methodology, deployment, and submission records                                  |
+| `evidence`                       | Reproducible non-secret raw outputs and receipt manifests                                                          |
 
 ## Local development
 
@@ -145,6 +146,16 @@ pnpm verify
 ```
 
 That command compiles and tests locally; it never reads a signer or RPC endpoint and never deploys.
+
+The isolated paid-hire receipt gate is also offline and separate:
+
+```bash
+cd contracts/testnet-hire-receipt
+pnpm install --frozen-lockfile
+pnpm verify:offline
+```
+
+It verifies a no-admin, no-custody chain-97 contract that pays the current ERC-8004 owner atomically and records one immutable task-bound event per engagement. The preparation command emits unsigned bytes only. No contract is deployed and no hire exists until a separately approved transaction package is broadcast and independently re-observed.
 
 The Pancake inspector also has an opt-in, read-only provider check. It is skipped by routine CI because a live position can be burned and public RPC availability is external state. The route publishes only the second of two reads: one unsplit latest Multicall3 snapshot, reconciled to its exact block identity. Supply a currently existing position and its factory-resolved pool when refreshing evidence:
 

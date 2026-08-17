@@ -1,0 +1,32 @@
+{
+  "name": "@proofera/testnet-hire-receipt",
+  "version": "0.1.0",
+  "private": true,
+  "description": "BSC-testnet-only paid hire receipt fixture for ProofEra benchmark evidence",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "packageManager": "pnpm@11.20.0",
+  "scripts": {
+    "clean": "hardhat clean",
+    "compile": "hardhat build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "node --check hardhat.config.js && node --check scripts/prepare-deployment.mjs && node --check test/deployment-preparation.test.mjs",
+    "prepare:deployment": "node scripts/prepare-deployment.mjs",
+    "test": "pnpm compile && pnpm test:solidity && pnpm test:node",
+    "test:node": "node --test test/deployment-preparation.test.mjs",
+    "test:solidity": "hardhat test solidity",
+    "verify:offline": "pnpm format:check && pnpm lint && pnpm clean && pnpm compile && pnpm test:solidity && pnpm test:node",
+    "verify": "pnpm verify:offline && pnpm audit --prod --audit-level moderate"
+  },
+  "dependencies": {
+    "viem": "2.55.13"
+  },
+  "devDependencies": {
+    "hardhat": "3.11.1",
+    "prettier": "3.9.6",
+    "prettier-plugin-solidity": "2.4.0"
+  }
+}

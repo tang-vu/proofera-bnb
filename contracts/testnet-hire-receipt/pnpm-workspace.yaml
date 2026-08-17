@@ -1,0 +1,10 @@
+packages:
+  - "."
+
+allowBuilds:
+  esbuild: true
+
+minimumReleaseAge: 1440
+
+minimumReleaseAgeExclude:
+  - viem@2.55.13

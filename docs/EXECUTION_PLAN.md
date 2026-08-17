@@ -169,6 +169,16 @@ is timestamped as the operator emits each artifact/RPC/output event; it has no
 agent or network call. The final frozen bundle, real manual transcript, sourced
 cost and second-review artifacts remain required.
 
+The isolated `contracts/testnet-hire-receipt` package now supplies the missing
+receipt mechanism without weakening the runner schema. Its chain-97-only,
+no-admin contract resolves `ownerOf(agentId)` from the immutable ERC-8004
+registry, atomically forwards a bounded tBNB payment, prevents engagement-ID
+reuse and emits a task/expiry-bound receipt hash. Six Solidity tests and three
+unsigned-preparation tests pass, and CI reproduces the offline gate. This is
+deployment preparation only: no contract or hire transaction exists, and a
+successful future event would prove a paid testnet engagement—not task
+completion, execution authority or agent performance.
+
 ## Milestone 5 — submission-grade product (`PLANNED`)
 
 Acceptance criteria:

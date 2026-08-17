@@ -10,6 +10,7 @@ pnpm-lock.yaml
 .studio
 **/.studio
 contracts/testnet-fixed-asset
+contracts/testnet-hire-receipt
 evidence/development/pancake-v3-selector-paths
 # Exact JSON.stringify output from the fixed read-only RPC evidence collector.
 evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json
