@@ -33,7 +33,7 @@ test("public demo rehearsal fixes six honest judge-facing scenes", () => {
   ]) {
     assert.match(source, new RegExp(path.replaceAll("/", "\\/"), "u"));
   }
-  assert.match(source, /No — gates remain open\./u);
+  assert.match(source, /No — gates remain open/u);
   assert.match(source, /videoRecorded: false/u);
   assert.match(source, /onchainReceiptEvidenceIntroduced: false/u);
   assert.match(source, /hackathonEntrySubmitted: false/u);

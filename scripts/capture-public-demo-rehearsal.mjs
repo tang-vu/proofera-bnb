@@ -160,7 +160,7 @@ async function capture(sourceCommit) {
       if (scene.key === "proof-room") {
         await page.getByText(sourceCommit, { exact: true }).waitFor({ state: "visible" });
         await page
-          .getByText("No — gates remain open.", { exact: true })
+          .getByText("No — gates remain open", { exact: true })
           .waitFor({ state: "visible" });
       }
       const screenshotPath = resolve(outputDirectory, scene.screenshot);
