@@ -1,6 +1,6 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-17T02:42:13.123Z",
+  "updatedAtUtc": "2026-08-17T02:54:00.000Z",
   "readyForSubmission": false,
   "gates": [
     {
@@ -28,8 +28,8 @@
       "artifacts": [
         {
           "kind": "preparation",
-          "path": "evidence/erc8004/preparations/125517740-four-agent-registration-preparation.json",
-          "sha256": "d8658ac30eea8eef286ee9d9be425315c2c8462233be12c307efc197dec8c833"
+          "path": "evidence/erc8004/preparations/125530553-four-agent-registration-preparation.json",
+          "sha256": "b5b6ec7a8201c0934086b3218e522203d547ac15d403c8fd8491730448ecae48"
         }
       ]
     },
