@@ -43,3 +43,22 @@ node scripts/prepare-agent-registration-manifest.mjs --prepare-exact-registratio
 ```
 
 The current retained preparation is `evidence/erc8004/preparations/125510593-four-agent-registration-preparation.json`. The earlier block-`125490457` artifact remains immutable historical evidence.
+
+## Receipt evidence capture
+
+After—and only after—all eight registration/URI-update transactions have confirmed, run the create-only read-side collector from a clean, published release that contains a freshly generated preparation. Git must prove the preparation's clean `sourceBaseCommit` is an ancestor of that release, and the preparation bytes must match `HEAD`. The command order is part of the evidence contract:
+
+```powershell
+$releaseCommit = (git rev-parse HEAD).Trim()
+$preparation = "evidence/erc8004/preparations/<finalized-block>-four-agent-registration-preparation.json"
+corepack pnpm capture:erc8004:registration $releaseCommit `
+  --preparation $preparation `
+  --lp-range-register <0x64-hex> --lp-range-uri-update <0x64-hex> `
+  --grid-trading-register <0x64-hex> --grid-trading-uri-update <0x64-hex> `
+  --yield-optimisation-register <0x64-hex> --yield-optimisation-uri-update <0x64-hex> `
+  --health-factor-register <0x64-hex> --health-factor-uri-update <0x64-hex>
+```
+
+The collector performs no signing or transaction submission. It requires two providers to agree on all eight transactions and receipts, derives each `agentId` only from the registry's unique ERC-721 mint event, decodes the exact `setAgentURI` call, and re-reads `ownerOf`, `tokenURI`, and wallet `balanceOf` at one shared finalized block. Initial registration calldata must equal the committed preparation byte-for-byte. Its gas-cost field is only `gasUsed × effectiveGasPrice`; it does not infer who paid or sponsored gas.
+
+Even a valid output proves only BSC-testnet identity ownership and final URI at the observed block. It keeps marketplace eligibility, hiring, execution authority, endpoint performance, and strategy performance false until their separate evidence exists. A pending/unknown receipt, provider disagreement, duplicate hash/agent ID, unexpected mint, URI drift, or non-finalized transaction fails closed and produces no manifest.
