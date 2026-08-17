@@ -28,12 +28,12 @@ test("runner fixes chain, source, registry, providers, approval, gas and task ow
     "const CHAIN_ID = 97n;",
     'const SOURCE = "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49";',
     'const REGISTRY = "0x8004A818BFB912233c491871b3d84c89A494BD9e";',
-    'const APPROVAL_ID = "HIRE-TERMIX-2026-08-17-V5";',
+    'const APPROVAL_ID = "HIRE-TERMIX-2026-08-17-V6";',
     'const DEPLOYMENT_TX_HASH = "0x7fa5ad3e7b33dfb6dfccdfd06c6e54cc2d833d5aa005ec3f01c98cf72be3ddcf";',
     'url: "https://data-seed-prebsc-2-s2.binance.org:8545"',
     'url: "https://bsc-testnet-rpc.publicnode.com"',
     "const SIGNING_GAS_PRICE_WEI = 120_000_000n;",
-    "const RECOVERY_MAX_TOTAL_SPEND_WEI = 150_000_000_000_000n;",
+    "const RECOVERY_MAX_TOTAL_SPEND_WEI = 50_000_000_000_000n;",
     '1825: "0xAd03eF7e21c35FD1446c153f6eE5e6165F696990"',
     '1828: "0x708cb7F2b974d94005E762A140c469F1125e0cB4"'
   ]) {
@@ -49,6 +49,7 @@ test("recovery verifies the finalized deployment and unused engagements before a
   assert.match(prefix, /eth_getTransactionReceipt/u);
   assert.match(prefix, /eth_getTransactionByHash/u);
   assert.match(prefix, /receiptByEngagement/u);
+  assert.match(prefix, /HIRE_EXECUTION_COMPLETED_HIRE_STATE_MISMATCH/u);
   assert.match(prefix, /HIRE_EXECUTION_DEPLOYMENT_NOT_FINAL/u);
   assert.doesNotMatch(source, /sendOne\([^)]*"deploy"/u);
 });

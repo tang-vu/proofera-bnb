@@ -20,14 +20,26 @@ import { materializeRuntimeBytecode } from "./hire-runtime-bytecode.mjs";
 const CHAIN_ID = 97n;
 const SOURCE = "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49";
 const REGISTRY = "0x8004A818BFB912233c491871b3d84c89A494BD9e";
-const APPROVAL_ID = "HIRE-TERMIX-2026-08-17-V5";
+const APPROVAL_ID = "HIRE-TERMIX-2026-08-17-V6";
 const DEPLOYMENT_TX_HASH = "0x7fa5ad3e7b33dfb6dfccdfd06c6e54cc2d833d5aa005ec3f01c98cf72be3ddcf";
+const COMPLETED_HIRES = Object.freeze([
+  Object.freeze({
+    engagementId: "0xa3959c83bef9efbf0ce853b7c7f4d84504e658fad4724b9a45a48e65310762c2",
+    receiptHash: "0xadb671a0c7142031633a18c5ba2bf5890dfc5edaf6dd0b760ac02244c5c55910",
+    transactionHash: "0x068b450a9867d220cc1eda156e9eb3cb6b8037901a7f7feaaa126aa7e1169747"
+  }),
+  Object.freeze({
+    engagementId: "0xb0568b852938419e5856e215153a1bbb1399b2ad99348b94da45af7b1fda5240",
+    receiptHash: "0xfb5c1bf05526ba1b0e3d28398a96b8619a852496c1b4bcfbd1298d66554d1e27",
+    transactionHash: "0x0ec15407ab12df85e1a50e39f2316033c31aa28bca756bab6f7ac41a14023e6c"
+  })
+]);
 const KEYSTORE_NAME =
   "UTC--2026-08-12T09-45-30.464Z--997cd959798f7c925076eaeff5855c5c2c1e5a49.keystore.json";
 const PASSWORD_BLOB_NAME = "deployer-password.dpapi";
 const PASSWORD_BYTES = 48;
 const SIGNING_GAS_PRICE_WEI = 120_000_000n;
-const RECOVERY_MAX_TOTAL_SPEND_WEI = 150_000_000_000_000n;
+const RECOVERY_MAX_TOTAL_SPEND_WEI = 50_000_000_000_000n;
 const FINALITY_DEPTH = 12n;
 const RPCS = Object.freeze([
   Object.freeze({
@@ -103,7 +115,7 @@ function quantity(value, code) {
 
 function parseArguments(argv) {
   const expected = [
-    "--execute-approved-hire-termix-recovery",
+    "--execute-approved-hire-termix-final-recovery",
     "--approval-id",
     "--preparation",
     "--preparation-sha256",
@@ -207,11 +219,12 @@ function validatePreparation(preparation, artifactBytes) {
     preparation.chainId !== Number(CHAIN_ID) ||
     getAddress(preparation.deployer) !== SOURCE ||
     getAddress(preparation.identityRegistry) !== REGISTRY ||
-    preparation.hires?.length !== 3 ||
+    preparation.hires?.length !== 1 ||
     preparation.deployment?.artifactSha256 !== `0x${sha256(artifactBytes)}` ||
     preparation.deployment?.dataKeccak256 !== keccak256(preparation.deployment.data) ||
     preparation.recovery?.deploymentTransactionHash !== DEPLOYMENT_TX_HASH ||
     preparation.recovery?.requiredDeploymentStatus !== "confirmed_finalized" ||
+    stableJson(preparation.recovery?.completedHires) !== stableJson(COMPLETED_HIRES) ||
     getAddress(preparation.recovery?.recoveredContract) !==
       getAddress(preparation.contractAddress) ||
     decimal(preparation.deployment.nonce, "HIRE_EXECUTION_DEPLOYMENT_NONCE_INVALID") !==
@@ -221,20 +234,23 @@ function validatePreparation(preparation, artifactBytes) {
     decimal(preparation.bounds?.maxGasPriceWei, "HIRE_EXECUTION_GAS_PRICE_CAP_INVALID") !==
       200_000_000n ||
     preparation.bounds?.deploymentCount !== 0 ||
+    preparation.bounds?.hireCount !== 1 ||
+    decimal(preparation.bounds?.totalHirePaymentWei, "HIRE_EXECUTION_PAYMENT_CAP_INVALID") !==
+      10_000_000_000_000n ||
     decimal(preparation.bounds?.maxNetworkFeeWei, "HIRE_EXECUTION_NETWORK_FEE_CAP_INVALID") !==
-      120_000_000_000_000n ||
+      40_000_000_000_000n ||
     decimal(preparation.bounds?.maxTotalSpendWei, "HIRE_EXECUTION_SPEND_CAP_INVALID") !==
       RECOVERY_MAX_TOTAL_SPEND_WEI
   ) {
     fail("HIRE_EXECUTION_PREPARATION_INVALID");
   }
-  const expectedAgents = ["1825", "1825", "1828"];
+  const expectedAgents = ["1828"];
   for (const [index, hire] of preparation.hires.entries()) {
     if (
       hire.agentId !== expectedAgents[index] ||
       getAddress(hire.to) !== getAddress(preparation.contractAddress) ||
       decimal(hire.nonce, "HIRE_EXECUTION_HIRE_NONCE_INVALID") !==
-        decimal(preparation.deployerNonce, "HIRE_EXECUTION_NONCE_INVALID") + BigInt(index) + 1n ||
+        decimal(preparation.deployerNonce, "HIRE_EXECUTION_NONCE_INVALID") + BigInt(index) + 3n ||
       decimal(hire.gasLimit, "HIRE_EXECUTION_HIRE_GAS_INVALID") !== 200_000n ||
       decimal(hire.paymentWei, "HIRE_EXECUTION_PAYMENT_INVALID") !== 10_000_000_000_000n ||
       !hire.calldata.startsWith("0xc7d43bd2")
@@ -277,7 +293,7 @@ async function preflight(preparation, artifact) {
     fail("HIRE_EXECUTION_WRONG_CHAIN");
   }
   const deploymentNonce = decimal(preparation.deployerNonce, "HIRE_EXECUTION_NONCE_INVALID");
-  const nonce = deploymentNonce + 1n;
+  const nonce = deploymentNonce + 3n;
   const [
     latest,
     pending,
@@ -375,6 +391,56 @@ async function preflight(preparation, artifact) {
     fail("HIRE_EXECUTION_DEPLOYMENT_NOT_FINAL");
   }
   const contractInterface = new Interface(artifact.abi);
+  for (const completed of COMPLETED_HIRES) {
+    const completedReceipts = await allRpc("eth_getTransactionReceipt", [
+      completed.transactionHash
+    ]);
+    if (completedReceipts.some((completedReceipt) => completedReceipt === null)) {
+      fail("HIRE_EXECUTION_COMPLETED_HIRE_RECEIPT_MISSING");
+    }
+    const completedReceipt = requireSame(
+      completedReceipts.map((value) => {
+        const normalized = { ...value };
+        delete normalized.blockTimestamp;
+        return normalized;
+      }),
+      "HIRE_EXECUTION_COMPLETED_HIRE_RECEIPT_PROVIDER_MISMATCH"
+    );
+    const completedBlock = quantity(
+      completedReceipt.blockNumber,
+      "HIRE_EXECUTION_COMPLETED_HIRE_BLOCK_INVALID"
+    );
+    if (
+      quantity(completedReceipt.status, "HIRE_EXECUTION_COMPLETED_HIRE_STATUS_INVALID") !== 1n ||
+      exactHex(
+        completedReceipt.transactionHash,
+        32,
+        "HIRE_EXECUTION_COMPLETED_HIRE_HASH_INVALID"
+      ) !== completed.transactionHash ||
+      heads.some(
+        (head) =>
+          quantity(head, "HIRE_EXECUTION_HEAD_BLOCK_INVALID") < completedBlock + FINALITY_DEPTH
+      )
+    ) {
+      fail("HIRE_EXECUTION_COMPLETED_HIRE_EVIDENCE_INVALID");
+    }
+    const storedCompleted = await allRpc("eth_call", [
+      {
+        to: preparation.contractAddress,
+        data: contractInterface.encodeFunctionData("receiptByEngagement", [completed.engagementId])
+      },
+      "latest"
+    ]);
+    if (
+      storedCompleted.some(
+        (value) =>
+          exactHex(value, 32, "HIRE_EXECUTION_COMPLETED_HIRE_STATE_INVALID") !==
+          completed.receiptHash
+      )
+    ) {
+      fail("HIRE_EXECUTION_COMPLETED_HIRE_STATE_MISMATCH");
+    }
+  }
   for (const hire of preparation.hires) {
     const stored = await allRpc("eth_call", [
       {

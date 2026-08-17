@@ -18,7 +18,7 @@ const argumentsList = [
   COMMIT
 ];
 
-test("prepares only three bounded recovery hires against the finalized deployment", () => {
+test("prepares only the final bounded recovery hire against prior finalized receipts", () => {
   const preparation = JSON.parse(
     execFileSync(process.execPath, argumentsList, { encoding: "utf8" })
   );
@@ -30,12 +30,13 @@ test("prepares only three bounded recovery hires against the finalized deploymen
   );
   assert.equal(preparation.recovery.recoveredContract, preparation.contractAddress);
   assert.equal(preparation.bounds.deploymentCount, 0);
-  assert.equal(preparation.bounds.hireCount, 3);
-  assert.equal(preparation.bounds.maxNetworkFeeWei, "120000000000000");
-  assert.equal(preparation.bounds.maxTotalSpendWei, "150000000000000");
+  assert.equal(preparation.bounds.hireCount, 1);
+  assert.equal(preparation.bounds.maxNetworkFeeWei, "40000000000000");
+  assert.equal(preparation.bounds.maxTotalSpendWei, "50000000000000");
+  assert.equal(preparation.recovery.completedHires.length, 2);
   assert.deepEqual(
     preparation.hires.map(({ nonce }) => nonce),
-    ["6", "7", "8"]
+    ["8"]
   );
 });
 

@@ -222,6 +222,16 @@ the reviewed immutable layout, requires the exact finalized V4 deployment and
 three unused engagement IDs, starts at nonce `6`, and can send only the three
 bounded hires after separate approval.
 
+The exact V5 approval confirmed the LP hire at block `125587411` and the
+permission-audit hire at block `125587418`. Immediately afterward, one provider
+lagged the new nonce, so the per-transaction two-provider nonce gate stopped
+before signing the Venus hire. Both providers subsequently agree on nonce `8`,
+both successful receipts and their stored engagement receipt hashes; the Venus
+engagement remains unused. V5 is closed after exactly two transactions. V6 is a
+separately approved final-recovery boundary with no deploy path, two immutable
+completed-hire prerequisites, only the Venus hire at nonce `8`, and a maximum
+total spend of `50000000000000 wei`.
+
 The create-only `capture:termix:hires` collector is also implemented and still
 non-invoked. Given the exact deployment and three hire hashes, it requires a
 clean published release, then joins normalized transactions, receipts and
