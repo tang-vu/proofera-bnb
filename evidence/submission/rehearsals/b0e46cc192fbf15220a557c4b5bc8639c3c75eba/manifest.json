@@ -1,0 +1,115 @@
+{
+  "schemaVersion": "proofera-public-demo-rehearsal-v1.0.0",
+  "classification": {
+    "artifact": "public_demo_rehearsal",
+    "browserAutomation": true,
+    "finalDemoCheck": false,
+    "hackathonEntrySubmitted": false,
+    "onchainReceiptEvidenceIntroduced": false,
+    "submissionReady": false,
+    "videoRecorded": false
+  },
+  "sourceCommit": "b0e46cc192fbf15220a557c4b5bc8639c3c75eba",
+  "observedAtUtc": "2026-08-17T00:46:46.288Z",
+  "publicHealth": {
+    "build": "b0e46cc192fbf15220a557c4b5bc8639c3c75eba",
+    "responseDate": "Mon, 17 Aug 2026 00:46:45 GMT",
+    "status": 200,
+    "url": "https://proofera.tangvu.dev/api/health"
+  },
+  "captureEnvironment": {
+    "browser": "chromium",
+    "locale": "en-US",
+    "playwrightVersion": "1.62.1",
+    "reducedMotion": "reduce",
+    "viewport": {
+      "height": 900,
+      "width": 1440
+    }
+  },
+  "scenes": [
+    {
+      "assertions": [
+        "Hire agents by proof,",
+        "Four jobs. Equal scrutiny."
+      ],
+      "httpStatus": 200,
+      "key": "home",
+      "screenshot": "01-home.png",
+      "screenshotBytes": 349691,
+      "screenshotSha256": "17ec26129de06d75bc734adf8ff7261a01522702fb36997ade98613f8c439d61",
+      "title": "ProofEra — Hire agents by proof",
+      "url": "https://proofera.tangvu.dev/"
+    },
+    {
+      "assertions": [
+        "Start with the job.",
+        "Four analyzers. Zero invented agents."
+      ],
+      "httpStatus": 200,
+      "key": "marketplace",
+      "screenshot": "02-marketplace.png",
+      "screenshotBytes": 653459,
+      "screenshotSha256": "84d7ffeaa751ad5361c078c02edd50617cc93a54924b3de727bf73f00cbc42c9",
+      "title": "Agent marketplace — ProofEra",
+      "url": "https://proofera.tangvu.dev/marketplace"
+    },
+    {
+      "assertions": [
+        "LP Range Analyzer",
+        "Every execution gate is closed."
+      ],
+      "httpStatus": 200,
+      "key": "lp-passport",
+      "screenshot": "03-lp-passport.png",
+      "screenshotBytes": 621661,
+      "screenshotSha256": "4b8ede5d8533840b87b199056d8d028390d6877dedc04f127537e46d8c020cdd",
+      "title": "LP Range Analyzer reference dossier — ProofEra",
+      "url": "https://proofera.tangvu.dev/reference-analyzers/lp-rebalancing"
+    },
+    {
+      "assertions": [
+        "Set boundaries before authority.",
+        "Define the boundaries"
+      ],
+      "httpStatus": 200,
+      "key": "lp-configuration",
+      "screenshot": "04-lp-configuration.png",
+      "screenshotBytes": 286597,
+      "screenshotSha256": "406fb2b5725fd3514b91510b97e475a1753d0c1190666179fd09323ebee5bd9f",
+      "title": "LP configuration readiness — ProofEra",
+      "url": "https://proofera.tangvu.dev/lp-activate"
+    },
+    {
+      "assertions": [
+        "Proof, including what is missing.",
+        "Seven gates. No inferred receipts."
+      ],
+      "httpStatus": 200,
+      "key": "proof-room",
+      "screenshot": "05-proof-room.png",
+      "screenshotBytes": 433969,
+      "screenshotSha256": "18ee1d5fde0df2950fba3a072a8f9bb57c10efbb2a3fa9b6a8b45f89f8982339",
+      "title": "Proof room — ProofEra",
+      "url": "https://proofera.tangvu.dev/proof"
+    },
+    {
+      "assertions": [
+        "Mission Control begins with verified state.",
+        "No active agent session exists."
+      ],
+      "httpStatus": 200,
+      "key": "mission-control",
+      "screenshot": "06-mission-control.png",
+      "screenshotBytes": 292317,
+      "screenshotSha256": "4d7dcad4e33c91331f284406d3b63f0d6b77f91c020cc98b0c0fbf36e9fe157d",
+      "title": "Mission Control — ProofEra",
+      "url": "https://proofera.tangvu.dev/mission-control"
+    }
+  ],
+  "limitations": [
+    "Screenshots prove only that the listed public pages rendered the asserted text at capture time.",
+    "This rehearsal is not a demo video, uptime record, accessibility audit, wallet ceremony, transaction receipt, agent registration, execution proof, performance result, or hackathon submission receipt.",
+    "Dynamic upstream data outside the asserted text is not independently authenticated by this artifact."
+  ]
+}
