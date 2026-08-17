@@ -1,6 +1,8 @@
+import { spawnSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import process from "node:process";
+import { fileURLToPath } from "node:url";
 
 import {
   encodeDeployData,
@@ -19,6 +21,8 @@ const PAYMENT_WEI = parseEther("0.00001");
 const DEPLOYMENT_GAS_LIMIT = 400_000n;
 const HIRE_GAS_LIMIT = 200_000n;
 const MAX_GAS_PRICE_WEI = 200_000_000n;
+const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const REPOSITORY_ROOT = resolve(PACKAGE_ROOT, "..", "..");
 const TASKS = Object.freeze([
   Object.freeze({ agentId: 1825n, slug: "pancake-lp-range-decision" }),
   Object.freeze({ agentId: 1825n, slug: "autonomous-session-permission-audit" }),
@@ -56,6 +60,13 @@ function parseArguments(argv) {
   if (!/^[0-9a-f]{40}$/u.test(values["source-commit"])) {
     throw new Error("HIRE_PREPARATION_COMMIT_INVALID");
   }
+  const sourceExists = spawnSync("git", ["cat-file", "-e", `${values["source-commit"]}^{commit}`], {
+    cwd: REPOSITORY_ROOT,
+    stdio: "ignore"
+  });
+  if (sourceExists.status !== 0) {
+    throw new Error("HIRE_PREPARATION_COMMIT_NOT_FOUND");
+  }
   return Object.freeze({
     deployer: values.deployer,
     nonce: BigInt(values.nonce),
@@ -65,6 +76,7 @@ function parseArguments(argv) {
 }
 
 const artifactPath = resolve(
+  PACKAGE_ROOT,
   "artifacts/src/ProofEraTestnetHireReceipt.sol/ProofEraTestnetHireReceipt.json"
 );
 

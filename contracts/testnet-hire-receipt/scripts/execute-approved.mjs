@@ -18,7 +18,7 @@ import { Interface, Transaction, Wallet, getAddress, keccak256 } from "ethers";
 const CHAIN_ID = 97n;
 const SOURCE = "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49";
 const REGISTRY = "0x8004A818BFB912233c491871b3d84c89A494BD9e";
-const APPROVAL_ID = "HIRE-TERMIX-2026-08-17-V3";
+const APPROVAL_ID = "HIRE-TERMIX-2026-08-17-V4";
 const KEYSTORE_NAME =
   "UTC--2026-08-12T09-45-30.464Z--997cd959798f7c925076eaeff5855c5c2c1e5a49.keystore.json";
 const PASSWORD_BLOB_NAME = "deployer-password.dpapi";

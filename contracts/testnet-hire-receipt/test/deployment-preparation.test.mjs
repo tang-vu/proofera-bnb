@@ -6,7 +6,10 @@ import { test } from "node:test";
 import { decodeFunctionData, getContractAddress, keccak256 } from "viem";
 
 const DEPLOYER = "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49";
-const COMMIT = "0123456789abcdef0123456789abcdef01234567";
+const COMMIT = execFileSync("git", ["rev-parse", "HEAD"], {
+  cwd: "../..",
+  encoding: "utf8"
+}).trim();
 const NONCE = 12n;
 const EXPIRY = 2_000_086_400n;
 const artifact = JSON.parse(
@@ -74,6 +77,27 @@ test("fails closed on malformed preparation arguments", () => {
   assert.equal(result.status, 1);
   assert.equal(result.stdout, "");
   assert.equal(result.stderr, "HIRE_PREPARATION_ARGUMENTS_INVALID\n");
+});
+
+test("fails closed when a syntactically valid source commit does not exist", () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      "scripts/prepare-deployment.mjs",
+      "--deployer",
+      DEPLOYER,
+      "--nonce",
+      NONCE.toString(),
+      "--expires-at",
+      EXPIRY.toString(),
+      "--source-commit",
+      "0000000000000000000000000000000000000000"
+    ],
+    { encoding: "utf8" }
+  );
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout, "");
+  assert.equal(result.stderr, "HIRE_PREPARATION_COMMIT_NOT_FOUND\n");
 });
 
 test("preparation script contains no signing or broadcast primitive", () => {

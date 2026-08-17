@@ -28,7 +28,7 @@ test("runner fixes chain, source, registry, providers, approval, gas and task ow
     "const CHAIN_ID = 97n;",
     'const SOURCE = "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49";',
     'const REGISTRY = "0x8004A818BFB912233c491871b3d84c89A494BD9e";',
-    'const APPROVAL_ID = "HIRE-TERMIX-2026-08-17-V3";',
+    'const APPROVAL_ID = "HIRE-TERMIX-2026-08-17-V4";',
     'url: "https://data-seed-prebsc-2-s2.binance.org:8545"',
     'url: "https://bsc-testnet-rpc.publicnode.com"',
     "const SIGNING_GAS_PRICE_WEI = 120_000_000n;",
