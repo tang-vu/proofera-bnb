@@ -1,0 +1,1302 @@
+{
+  "schemaVersion": "proofera-erc8004-registration-preparation-v1.0.0",
+  "classification": {
+    "artifact": "read_only_preparation",
+    "fundingExecuted": false,
+    "registrationExecuted": false,
+    "registrationReceiptEvidence": false,
+    "signingPerformed": false
+  },
+  "sourceBaseCommit": "3fb6099f83f4ce12187694734e999f60a053b8df",
+  "network": {
+    "name": "bsc-testnet",
+    "chainId": 97,
+    "registry": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+    "registryCodeHash": "0xd0e45b1d89fa9b6cc7e97c1f155d64180e5c232aaccf9900ef9d4fd738c02b41",
+    "blockNumber": "125517740",
+    "blockHash": "0x6274e868d4bbd2d6c8f0c3e0f965dd88025ccc2f7b9c4932efd19ac6c7353c1c",
+    "observedAtUtc": "2026-08-17T01:15:59.000Z",
+    "finalityDepth": "12",
+    "providers": [
+      {
+        "name": "bnb-chain",
+        "url": "https://data-seed-prebsc-2-s2.binance.org:8545"
+      },
+      {
+        "name": "publicnode",
+        "url": "https://bsc-testnet-rpc.publicnode.com"
+      }
+    ]
+  },
+  "toolchain": {
+    "bagVersion": "0.0.5",
+    "bnbagentSdkVersion": "0.4.2",
+    "protocol": "A2A",
+    "protocolVersion": "0.3.0",
+    "sdkRegisterFlow": [
+      "register(string,(string,bytes)[])",
+      "setAgentURI(uint256,string)"
+    ]
+  },
+  "costBoundary": {
+    "fundingPerWalletWei": "3000000000000000",
+    "fundingTotalWei": "12000000000000000",
+    "gasLimitCapPerTransaction": "1000000",
+    "gasPriceCapWei": "200000000",
+    "maximumRegistrationTransactions": 2,
+    "maximumRegistrationGasCostPerAgentWei": "400000000000000",
+    "maximumRegistrationGasCostAllAgentsWei": "1600000000000000",
+    "observedGasPriceWeiByProvider": {
+      "bnb-chain": "100000000",
+      "publicnode": "100000000"
+    },
+    "observedGasPriceWithinCap": true,
+    "approvalScope": "Any funding, signing, registration, retry, or completion transaction remains separately and explicitly approval-gated."
+  },
+  "agents": [
+    {
+      "key": "lp-range",
+      "wallet": "0xAd03eF7e21c35FD1446c153f6eE5e6165F696990",
+      "publicSurface": {
+        "root": "https://proofera-lp.tangvu.dev/",
+        "ping": {
+          "bodySha256": "da26643f449c2c4d17ab8fb551b3bd59b0bfb1c69b14135d0744d5b5152d396d",
+          "responseBody": "{\"status\":\"HEALTHY\",\"executionEnabled\":false}",
+          "status": 200,
+          "url": "https://proofera-lp.tangvu.dev/ping"
+        },
+        "agentCard": {
+          "bodySha256": "6136752dfca9bde86cdea31c70a2308509a5eef1046a0380af349c966f89dd72",
+          "responseBody": "{\"name\":\"ProofEra LP Risk Evidence Agent\",\"description\":\"Deterministic, read-only PancakeSwap LP range and scoped permission evidence analysis on BSC mainnet and testnet.\",\"url\":\"https://proofera-lp.tangvu.dev/\",\"version\":\"1.0.0\",\"protocolVersion\":\"0.3.0\",\"preferredTransport\":\"JSONRPC\",\"capabilities\":{\"streaming\":false},\"defaultInputModes\":[\"application/json\"],\"defaultOutputModes\":[\"application/json\"],\"skills\":[{\"id\":\"analyze_lp_range\",\"name\":\"Analyze a PancakeSwap V3 LP range\",\"description\":\"Send exactly one bounded JSON data part {\\\"skill\\\":\\\"analyze_lp_range\\\", ...} with a caller-supplied BSC block/time/source snapshot, V3 ticks, exact decimal minor-unit economics, capital, and risk constraints. Returns deterministic range status, tick buffers, violations, known net benefit or null, methodology, provenance, and hold/review_rebalance/insufficient_evidence. The snapshot is not independently attested and executionEnabled is always false. This agent never fetches, negotiates, signs, approves, rebalances, submits, or holds a wallet.\",\"tags\":[\"pancakeswap-v3\",\"lp-range\",\"risk\",\"read-only\",\"bnb-chain\"],\"inputModes\":[\"application/json\"],\"outputModes\":[\"application/json\"]},{\"id\":\"audit_altana_permission_bundle\",\"name\":\"Audit a frozen Altana permission bundle\",\"description\":\"Send exactly one bounded JSON data part {\\\"skill\\\":\\\"audit_altana_permission_bundle\\\",\\\"bundle\\\":...}. Validates a secret-free, evidence-linked BSC testnet permission bundle and deterministically returns findings plus a corrected three-layer least-authority table. It never fetches, signs, grants, retries, revokes, submits, broadcasts, stores secrets or mutates durable state; executionPerformed is always false.\",\"tags\":[\"altana\",\"permission-audit\",\"security\",\"read-only\",\"bnb-chain\"],\"inputModes\":[\"application/json\"],\"outputModes\":[\"application/json\"]}]}",
+          "status": 200,
+          "url": "https://proofera-lp.tangvu.dev/.well-known/agent-card.json"
+        }
+      },
+      "initialRegistration": {
+        "decodedAgentUri": {
+          "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+          "name": "ProofEra LP Risk Evidence Agent",
+          "description": "Deterministic, read-only PancakeSwap LP range and scoped permission evidence analysis on BSC mainnet and testnet.",
+          "image": "",
+          "services": [
+            {
+              "name": "A2A",
+              "endpoint": "https://proofera-lp.tangvu.dev/.well-known/agent-card.json",
+              "version": "0.3.0"
+            }
+          ],
+          "registrations": []
+        },
+        "agentUri": "data:application/json;base64,eyJkZXNjcmlwdGlvbiI6IkRldGVybWluaXN0aWMsIHJlYWQtb25seSBQYW5jYWtlU3dhcCBMUCByYW5nZSBhbmQgc2NvcGVkIHBlcm1pc3Npb24gZXZpZGVuY2UgYW5hbHlzaXMgb24gQlNDIG1haW5uZXQgYW5kIHRlc3RuZXQuIiwiaW1hZ2UiOiIiLCJuYW1lIjoiUHJvb2ZFcmEgTFAgUmlzayBFdmlkZW5jZSBBZ2VudCIsInJlZ2lzdHJhdGlvbnMiOltdLCJzZXJ2aWNlcyI6W3siZW5kcG9pbnQiOiJodHRwczovL3Byb29mZXJhLWxwLnRhbmd2dS5kZXYvLndlbGwta25vd24vYWdlbnQtY2FyZC5qc29uIiwibmFtZSI6IkEyQSIsInZlcnNpb24iOiIwLjMuMCJ9XSwidHlwZSI6Imh0dHBzOi8vZWlwcy5ldGhlcmV1bS5vcmcvRUlQUy9laXAtODAwNCNyZWdpc3RyYXRpb24tdjEifQ==",
+        "metadata": [
+          {
+            "key": "built_with",
+            "value": "https://github.com/bnb-chain/bnbagent-sdk#v0.4.2"
+          }
+        ],
+        "transaction": {
+          "calldata": "0x8ea42286000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000002a00000000000000000000000000000000000000000000000000000000000000221646174613a6170706c69636174696f6e2f6a736f6e3b6261736536342c65794a6b5a584e6a636d6c7764476c7662694936496b526c6447567962576c7561584e3061574d7349484a6c5957517462323573655342515957356a5957746c553364686343424d554342795957356e5a534268626d516763324e766347566b4948426c636d317063334e70623234675a585a705a475675593255675957356862486c7a61584d6762323467516c4e4449473168615735755a5851675957356b4948526c633352755a58517549697769615731685a3255694f6949694c434a755957316c496a6f6955484a7662325a46636d456754464167556d6c7a61794246646d6c6b5a57356a5a5342425a32567564434973496e4a6c5a326c7a64484a6864476c76626e4d694f6c74644c434a7a5a584a3261574e6c63794936573373695a57356b63473970626e51694f694a6f64485277637a6f764c3342796232396d5a584a684c5778774c6e5268626d64326453356b5a5859764c6e646c6247777461323576643234765957646c626e5174593246795a4335716332397549697769626d46745a534936496b457951534973496e5a6c636e4e70623234694f6949774c6a4d754d434a395853776964486c775a534936496d68306448427a4f6938765a576c776379356c6447686c636d563162533576636d637652556c515579396c615841744f4441774e434e795a576470633352795958527062323474646a456966513d3d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000a6275696c745f7769746800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003068747470733a2f2f6769746875622e636f6d2f626e622d636861696e2f626e626167656e742d73646b2376302e342e3200000000000000000000000000000000",
+          "calldataBytesSha256": "4701c1a5e6500b6f5f37450a786d90d6e950b506daa8dd39ff53a4c0af929f7c",
+          "function": "register(string,(string,bytes)[])",
+          "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+          "valueWei": "0"
+        }
+      },
+      "completionTemplate": {
+        "binding": "Replace <agentId-from-confirmed-Registered-event> only after transaction 1 is confirmed; regenerate the canonical URI with registrations[0].agentId set to that exact integer.",
+        "function": "setAgentURI(uint256,string)",
+        "agentUriTemplate": {
+          "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+          "name": "ProofEra LP Risk Evidence Agent",
+          "description": "Deterministic, read-only PancakeSwap LP range and scoped permission evidence analysis on BSC mainnet and testnet.",
+          "image": "",
+          "services": [
+            {
+              "name": "A2A",
+              "endpoint": "https://proofera-lp.tangvu.dev/.well-known/agent-card.json",
+              "version": "0.3.0"
+            }
+          ],
+          "registrations": [
+            {
+              "agentId": "<agentId-from-confirmed-Registered-event>",
+              "agentRegistry": "eip155:97:0x8004A818BFB912233c491871b3d84c89A494BD9e"
+            }
+          ]
+        },
+        "calldata": null,
+        "calldataStatus": "not_knowable_before_confirmed_registration",
+        "gasEstimate": null,
+        "gasEstimateStatus": "not_knowable_before_confirmed_registration",
+        "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+        "valueWei": "0"
+      },
+      "observations": [
+        {
+          "provider": "bnb-chain",
+          "balanceWei": "0",
+          "nonce": "0",
+          "ownedAgentCount": "0",
+          "registerGasEstimate": {
+            "gas": "633793",
+            "status": "available"
+          }
+        },
+        {
+          "provider": "publicnode",
+          "balanceWei": "0",
+          "nonce": "0",
+          "ownedAgentCount": "0",
+          "registerGasEstimate": {
+            "gas": "633793",
+            "status": "available"
+          }
+        }
+      ],
+      "readiness": {
+        "alreadyRegistered": false,
+        "funded": false,
+        "registrationAuthorized": false,
+        "status": "blocked_unfunded"
+      }
+    },
+    {
+      "key": "grid-trading",
+      "wallet": "0xFBfFa9BA36d578AFF2d05EDe840Fc7088e70ADB8",
+      "publicSurface": {
+        "root": "https://proofera-grid.tangvu.dev/",
+        "ping": {
+          "bodySha256": "da26643f449c2c4d17ab8fb551b3bd59b0bfb1c69b14135d0744d5b5152d396d",
+          "responseBody": "{\"status\":\"HEALTHY\",\"executionEnabled\":false}",
+          "status": 200,
+          "url": "https://proofera-grid.tangvu.dev/ping"
+        },
+        "agentCard": {
+          "bodySha256": "db789971aaf2220dc6ad11e95809c2dedb1ff62026a4fdaf195c9f1b1675a788",
+          "responseBody": "{\"name\":\"ProofEra Grid Trading Evidence Agent\",\"description\":\"Deterministic, read-only BSC grid candidate analysis backed only by caller-supplied evidence.\",\"url\":\"https://proofera-grid.tangvu.dev/\",\"version\":\"1.0.0\",\"protocolVersion\":\"0.3.0\",\"preferredTransport\":\"JSONRPC\",\"capabilities\":{\"streaming\":false},\"defaultInputModes\":[\"application/json\"],\"defaultOutputModes\":[\"application/json\"],\"skills\":[{\"id\":\"analyze_grid_trading\",\"name\":\"Analyze a bounded BSC grid candidate\",\"description\":\"Analyze explicitly sourced current price, arithmetic grid range, fee, round-trip gas, exact capital minor units, and caller risk constraints for BSC 56 or 97. Returns hold, review_grid, or insufficient_evidence with provenance and methodology. Realized performance remains unknown. Read-only: executionEnabled is always false.\",\"tags\":[\"grid-trading\",\"risk\",\"evidence\",\"read-only\",\"bnb-chain\"],\"inputModes\":[\"application/json\"],\"outputModes\":[\"application/json\"]}]}",
+          "status": 200,
+          "url": "https://proofera-grid.tangvu.dev/.well-known/agent-card.json"
+        }
+      },
+      "initialRegistration": {
+        "decodedAgentUri": {
+          "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+          "name": "ProofEra Grid Trading Evidence Agent",
+          "description": "Deterministic, read-only BSC grid candidate analysis backed only by caller-supplied evidence.",
+          "image": "",
+          "services": [
+            {
+              "name": "A2A",
+              "endpoint": "https://proofera-grid.tangvu.dev/.well-known/agent-card.json",
+              "version": "0.3.0"
+            }
+          ],
+          "registrations": []
+        },
+        "agentUri": "data:application/json;base64,eyJkZXNjcmlwdGlvbiI6IkRldGVybWluaXN0aWMsIHJlYWQtb25seSBCU0MgZ3JpZCBjYW5kaWRhdGUgYW5hbHlzaXMgYmFja2VkIG9ubHkgYnkgY2FsbGVyLXN1cHBsaWVkIGV2aWRlbmNlLiIsImltYWdlIjoiIiwibmFtZSI6IlByb29mRXJhIEdyaWQgVHJhZGluZyBFdmlkZW5jZSBBZ2VudCIsInJlZ2lzdHJhdGlvbnMiOltdLCJzZXJ2aWNlcyI6W3siZW5kcG9pbnQiOiJodHRwczovL3Byb29mZXJhLWdyaWQudGFuZ3Z1LmRldi8ud2VsbC1rbm93bi9hZ2VudC1jYXJkLmpzb24iLCJuYW1lIjoiQTJBIiwidmVyc2lvbiI6IjAuMy4wIn1dLCJ0eXBlIjoiaHR0cHM6Ly9laXBzLmV0aGVyZXVtLm9yZy9FSVBTL2VpcC04MDA0I3JlZ2lzdHJhdGlvbi12MSJ9",
+        "metadata": [
+          {
+            "key": "built_with",
+            "value": "https://github.com/bnb-chain/bnbagent-sdk#v0.4.2"
+          }
+        ],
+        "transaction": {
+          "calldata": "0x8ea4228600000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000280000000000000000000000000000000000000000000000000000000000000020d646174613a6170706c69636174696f6e2f6a736f6e3b6261736536342c65794a6b5a584e6a636d6c7764476c7662694936496b526c6447567962576c7561584e3061574d7349484a6c59575174623235736553424355304d675a334a705a43426a5957356b61575268644755675957356862486c7a61584d67596d466a6132566b4947397562486b67596e6b6759324673624756794c584e31634842736157566b494756326157526c626d4e6c4c694973496d6c745957646c496a6f6949697769626d46745a534936496c42796232396d52584a68494564796157516756484a685a476c755a794246646d6c6b5a57356a5a5342425a32567564434973496e4a6c5a326c7a64484a6864476c76626e4d694f6c74644c434a7a5a584a3261574e6c63794936573373695a57356b63473970626e51694f694a6f64485277637a6f764c3342796232396d5a584a684c57647961575175644746755a335a314c6d526c646938756432567362433172626d3933626939685a3256756443316a59584a6b4c6d707a623234694c434a755957316c496a6f6951544a4249697769646d567963326c7662694936496a41754d793477496e31644c434a306558426c496a6f696148523063484d364c79396c6158427a4c6d5630614756795a5856744c6d39795a793946535642544c325670634330344d44413049334a6c5a326c7a64484a6864476c76626931324d534a39000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000a6275696c745f7769746800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003068747470733a2f2f6769746875622e636f6d2f626e622d636861696e2f626e626167656e742d73646b2376302e342e3200000000000000000000000000000000",
+          "calldataBytesSha256": "bf3b91a92ba657cd38e5939cb436c3ba04d21302d4c29bb4d22b45748acb41e8",
+          "function": "register(string,(string,bytes)[])",
+          "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+          "valueWei": "0"
+        }
+      },
+      "completionTemplate": {
+        "binding": "Replace <agentId-from-confirmed-Registered-event> only after transaction 1 is confirmed; regenerate the canonical URI with registrations[0].agentId set to that exact integer.",
+        "function": "setAgentURI(uint256,string)",
+        "agentUriTemplate": {
+          "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+          "name": "ProofEra Grid Trading Evidence Agent",
+          "description": "Deterministic, read-only BSC grid candidate analysis backed only by caller-supplied evidence.",
+          "image": "",
+          "services": [
+            {
+              "name": "A2A",
+              "endpoint": "https://proofera-grid.tangvu.dev/.well-known/agent-card.json",
+              "version": "0.3.0"
+            }
+          ],
+          "registrations": [
+            {
+              "agentId": "<agentId-from-confirmed-Registered-event>",
+              "agentRegistry": "eip155:97:0x8004A818BFB912233c491871b3d84c89A494BD9e"
+            }
+          ]
+        },
+        "calldata": null,
+        "calldataStatus": "not_knowable_before_confirmed_registration",
+        "gasEstimate": null,
+        "gasEstimateStatus": "not_knowable_before_confirmed_registration",
+        "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+        "valueWei": "0"
+      },
+      "observations": [
+        {
+          "provider": "bnb-chain",
+          "balanceWei": "0",
+          "nonce": "0",
+          "ownedAgentCount": "0",
+          "registerGasEstimate": {
+            "gas": "610541",
+            "status": "available"
+          }
+        },
+        {
+          "provider": "publicnode",
+          "balanceWei": "0",
+          "nonce": "0",
+          "ownedAgentCount": "0",
+          "registerGasEstimate": {
+            "gas": "610541",
+            "status": "available"
+          }
+        }
+      ],
+      "readiness": {
+        "alreadyRegistered": false,
+        "funded": false,
+        "registrationAuthorized": false,
+        "status": "blocked_unfunded"
+      }
+    },
+    {
+      "key": "yield-optimisation",
+      "wallet": "0x62Af37A6FD89374684C00e2402FD96143f96ee85",
+      "publicSurface": {
+        "root": "https://proofera-yield.tangvu.dev/",
+        "ping": {
+          "bodySha256": "da26643f449c2c4d17ab8fb551b3bd59b0bfb1c69b14135d0744d5b5152d396d",
+          "responseBody": "{\"status\":\"HEALTHY\",\"executionEnabled\":false}",
+          "status": 200,
+          "url": "https://proofera-yield.tangvu.dev/ping"
+        },
+        "agentCard": {
+          "bodySha256": "d00eb470ded02ced07ef18079df1d3f71e287b6f1449b284fe84b05a9bd49626",
+          "responseBody": "{\"name\":\"yieldOptimisationAgent-agent\",\"description\":\"ProofEra deterministic yield route evidence analyzer for BSC mainnet and testnet. Read-only; missing evidence lowers confidence.\",\"url\":\"https://proofera-yield.tangvu.dev/\",\"version\":\"2.0.0\",\"protocolVersion\":\"0.3.0\",\"preferredTransport\":\"JSONRPC\",\"capabilities\":{\"streaming\":false},\"defaultInputModes\":[\"application/json\"],\"defaultOutputModes\":[\"application/json\"],\"skills\":[{\"id\":\"analyze_yield_opportunities\",\"name\":\"Analyze sourced BSC yield opportunities\",\"description\":\"Send a bounded JSON data part {\\\"skill\\\":\\\"analyze_yield_opportunities\\\", ...} with caller-supplied BSC vault snapshots, source locators, documented APY scales, capital and horizon, liquidity, withdrawal constraints, protocol exposure, dimensioned cost valuation, fee reconciliation, route history, and user risk limits. Returns per-opportunity hold/review_route/insufficient_evidence decisions, exact decimal strings, provenance, and a structured caller-supplied trust boundary. Every result is marketplace-, activation-, and execution-ineligible and executionEnabled=false. It never fetches, signs, connects a wallet, routes capital, or writes onchain.\",\"tags\":[\"yield\",\"vaults\",\"risk\",\"read-only\",\"bnb-chain\"],\"inputModes\":[\"application/json\"],\"outputModes\":[\"application/json\"]}]}",
+          "status": 200,
+          "url": "https://proofera-yield.tangvu.dev/.well-known/agent-card.json"
+        }
+      },
+      "initialRegistration": {
+        "decodedAgentUri": {
+          "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+          "name": "yieldOptimisationAgent-agent",
+          "description": "ProofEra deterministic yield route evidence analyzer for BSC mainnet and testnet. Read-only; missing evidence lowers confidence.",
+          "image": "",
+          "services": [
+            {
+              "name": "A2A",
+              "endpoint": "https://proofera-yield.tangvu.dev/.well-known/agent-card.json",
+              "version": "0.3.0"
+            }
+          ],
+          "registrations": []
+        },
+        "agentUri": "data:application/json;base64,eyJkZXNjcmlwdGlvbiI6IlByb29mRXJhIGRldGVybWluaXN0aWMgeWllbGQgcm91dGUgZXZpZGVuY2UgYW5hbHl6ZXIgZm9yIEJTQyBtYWlubmV0IGFuZCB0ZXN0bmV0LiBSZWFkLW9ubHk7IG1pc3NpbmcgZXZpZGVuY2UgbG93ZXJzIGNvbmZpZGVuY2UuIiwiaW1hZ2UiOiIiLCJuYW1lIjoieWllbGRPcHRpbWlzYXRpb25BZ2VudC1hZ2VudCIsInJlZ2lzdHJhdGlvbnMiOltdLCJzZXJ2aWNlcyI6W3siZW5kcG9pbnQiOiJodHRwczovL3Byb29mZXJhLXlpZWxkLnRhbmd2dS5kZXYvLndlbGwta25vd24vYWdlbnQtY2FyZC5qc29uIiwibmFtZSI6IkEyQSIsInZlcnNpb24iOiIwLjMuMCJ9XSwidHlwZSI6Imh0dHBzOi8vZWlwcy5ldGhlcmV1bS5vcmcvRUlQUy9laXAtODAwNCNyZWdpc3RyYXRpb24tdjEifQ==",
+        "metadata": [
+          {
+            "key": "built_with",
+            "value": "https://github.com/bnb-chain/bnbagent-sdk#v0.4.2"
+          }
+        ],
+        "transaction": {
+          "calldata": "0x8ea42286000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000002a00000000000000000000000000000000000000000000000000000000000000235646174613a6170706c69636174696f6e2f6a736f6e3b6261736536342c65794a6b5a584e6a636d6c7764476c7662694936496c42796232396d52584a684947526c6447567962576c7561584e3061574d6765576c6c62475167636d3931644755675a585a705a475675593255675957356862486c365a5849675a6d397949454a545179427459576c75626d5630494746755a4342305a584e30626d56304c6942535a57466b4c57397562486b374947317063334e70626d63675a585a705a47567559325567624739335a584a7a49474e76626d5a705a4756755932557549697769615731685a3255694f6949694c434a755957316c496a6f6965576c6c624752506348527062576c7a59585270623235425a325675644331685a32567564434973496e4a6c5a326c7a64484a6864476c76626e4d694f6c74644c434a7a5a584a3261574e6c63794936573373695a57356b63473970626e51694f694a6f64485277637a6f764c3342796232396d5a584a684c586c705a57786b4c6e5268626d64326453356b5a5859764c6e646c6247777461323576643234765957646c626e5174593246795a4335716332397549697769626d46745a534936496b457951534973496e5a6c636e4e70623234694f6949774c6a4d754d434a395853776964486c775a534936496d68306448427a4f6938765a576c776379356c6447686c636d563162533576636d637652556c515579396c615841744f4441774e434e795a576470633352795958527062323474646a456966513d3d00000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000a6275696c745f7769746800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003068747470733a2f2f6769746875622e636f6d2f626e622d636861696e2f626e626167656e742d73646b2376302e342e3200000000000000000000000000000000",
+          "calldataBytesSha256": "4054dfcd31e38f662d0cbb66f8a4b4c9b93583b3e73ee7a4a699238d6253e689",
+          "function": "register(string,(string,bytes)[])",
+          "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+          "valueWei": "0"
+        }
+      },
+      "completionTemplate": {
+        "binding": "Replace <agentId-from-confirmed-Registered-event> only after transaction 1 is confirmed; regenerate the canonical URI with registrations[0].agentId set to that exact integer.",
+        "function": "setAgentURI(uint256,string)",
+        "agentUriTemplate": {
+          "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+          "name": "yieldOptimisationAgent-agent",
+          "description": "ProofEra deterministic yield route evidence analyzer for BSC mainnet and testnet. Read-only; missing evidence lowers confidence.",
+          "image": "",
+          "services": [
+            {
+              "name": "A2A",
+              "endpoint": "https://proofera-yield.tangvu.dev/.well-known/agent-card.json",
+              "version": "0.3.0"
+            }
+          ],
+          "registrations": [
+            {
+              "agentId": "<agentId-from-confirmed-Registered-event>",
+              "agentRegistry": "eip155:97:0x8004A818BFB912233c491871b3d84c89A494BD9e"
+            }
+          ]
+        },
+        "calldata": null,
+        "calldataStatus": "not_knowable_before_confirmed_registration",
+        "gasEstimate": null,
+        "gasEstimateStatus": "not_knowable_before_confirmed_registration",
+        "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+        "valueWei": "0"
+      },
+      "observations": [
+        {
+          "provider": "bnb-chain",
+          "balanceWei": "0",
+          "nonce": "0",
+          "ownedAgentCount": "0",
+          "registerGasEstimate": {
+            "gas": "634036",
+            "status": "available"
+          }
+        },
+        {
+          "provider": "publicnode",
+          "balanceWei": "0",
+          "nonce": "0",
+          "ownedAgentCount": "0",
+          "registerGasEstimate": {
+            "gas": "634036",
+            "status": "available"
+          }
+        }
+      ],
+      "readiness": {
+        "alreadyRegistered": false,
+        "funded": false,
+        "registrationAuthorized": false,
+        "status": "blocked_unfunded"
+      }
+    },
+    {
+      "key": "health-factor",
+      "wallet": "0x708cb7F2b974d94005E762A140c469F1125e0cB4",
+      "publicSurface": {
+        "root": "https://proofera-health.tangvu.dev/",
+        "ping": {
+          "bodySha256": "1d3b752992cfc7b5e0b16cb1ecc90c03c507abbd43f92ae535713880b87e151b",
+          "responseBody": "{\"status\":\"HEALTHY\",\"sourceContentsVerified\":false,\"freshnessAttestedByAgent\":false,\"marketplaceEligible\":false,\"activationEligible\":false,\"executionEnabled\":false}",
+          "status": 200,
+          "url": "https://proofera-health.tangvu.dev/ping"
+        },
+        "agentCard": {
+          "bodySha256": "1dbebabf5de5e24055f66e9ff1a7ad17a2aa3c5a6177e3d61c64b8b39e989d24",
+          "responseBody": "{\"name\":\"ProofEra Health-Factor Guardian Evidence Agent\",\"description\":\"Deterministic, read-only Venus Core Pool health-factor and monitoring-evidence analysis.\",\"url\":\"https://proofera-health.tangvu.dev/\",\"version\":\"1.0.0\",\"protocolVersion\":\"0.3.0\",\"preferredTransport\":\"JSONRPC\",\"capabilities\":{\"streaming\":false},\"defaultInputModes\":[\"application/json\"],\"defaultOutputModes\":[\"application/json\"],\"skills\":[{\"id\":\"analyze_venus_health_factor\",\"name\":\"Analyze Venus Core Pool health-factor evidence\",\"description\":\"Analyze a complete caller-supplied same-block Venus Core Pool collateral/debt snapshot for BSC 56 or 97 using account-specific effective liquidation thresholds, exact fixed-point arithmetic, observation history, alert receipts, and user policy. Returns hold, monitor, review_intervention, or insufficient_evidence. Read-only: executionEnabled is always false.\",\"tags\":[\"venus\",\"health-factor\",\"liquidation-risk\",\"read-only\",\"bnb-chain\"],\"inputModes\":[\"application/json\"],\"outputModes\":[\"application/json\"]}]}",
+          "status": 200,
+          "url": "https://proofera-health.tangvu.dev/.well-known/agent-card.json"
+        }
+      },
+      "initialRegistration": {
+        "decodedAgentUri": {
+          "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+          "name": "ProofEra Health-Factor Guardian Evidence Agent",
+          "description": "Deterministic, read-only Venus Core Pool health-factor and monitoring-evidence analysis.",
+          "image": "",
+          "services": [
+            {
+              "name": "A2A",
+              "endpoint": "https://proofera-health.tangvu.dev/.well-known/agent-card.json",
+              "version": "0.3.0"
+            }
+          ],
+          "registrations": []
+        },
+        "agentUri": "data:application/json;base64,eyJkZXNjcmlwdGlvbiI6IkRldGVybWluaXN0aWMsIHJlYWQtb25seSBWZW51cyBDb3JlIFBvb2wgaGVhbHRoLWZhY3RvciBhbmQgbW9uaXRvcmluZy1ldmlkZW5jZSBhbmFseXNpcy4iLCJpbWFnZSI6IiIsIm5hbWUiOiJQcm9vZkVyYSBIZWFsdGgtRmFjdG9yIEd1YXJkaWFuIEV2aWRlbmNlIEFnZW50IiwicmVnaXN0cmF0aW9ucyI6W10sInNlcnZpY2VzIjpbeyJlbmRwb2ludCI6Imh0dHBzOi8vcHJvb2ZlcmEtaGVhbHRoLnRhbmd2dS5kZXYvLndlbGwta25vd24vYWdlbnQtY2FyZC5qc29uIiwibmFtZSI6IkEyQSIsInZlcnNpb24iOiIwLjMuMCJ9XSwidHlwZSI6Imh0dHBzOi8vZWlwcy5ldGhlcmV1bS5vcmcvRUlQUy9laXAtODAwNCNyZWdpc3RyYXRpb24tdjEifQ==",
+        "metadata": [
+          {
+            "key": "built_with",
+            "value": "https://github.com/bnb-chain/bnbagent-sdk#v0.4.2"
+          }
+        ],
+        "transaction": {
+          "calldata": "0x8ea42286000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000002800000000000000000000000000000000000000000000000000000000000000219646174613a6170706c69636174696f6e2f6a736f6e3b6261736536342c65794a6b5a584e6a636d6c7764476c7662694936496b526c6447567962576c7561584e3061574d7349484a6c5957517462323573655342575a5735316379424462334a6c4946427662327767614756686248526f4c575a685933527663694268626d51676257397561585276636d6c755a79316c646d6c6b5a57356a5a534268626d467365584e70637934694c434a706257466e5a53493649694973496d3568625755694f694a51636d39765a6b5679595342495a57467364476774526d466a644739794945643159584a6b61574675494556326157526c626d4e6c4945466e5a57353049697769636d566e61584e30636d4630615739756379493657313073496e4e6c636e5a705932567a496a706265794a6c626d527762326c7564434936496d68306448427a4f69387663484a7662325a6c636d4574614756686248526f4c6e5268626d64326453356b5a5859764c6e646c6247777461323576643234765957646c626e5174593246795a4335716332397549697769626d46745a534936496b457951534973496e5a6c636e4e70623234694f6949774c6a4d754d434a395853776964486c775a534936496d68306448427a4f6938765a576c776379356c6447686c636d563162533576636d637652556c515579396c615841744f4441774e434e795a576470633352795958527062323474646a456966513d3d000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000a6275696c745f7769746800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003068747470733a2f2f6769746875622e636f6d2f626e622d636861696e2f626e626167656e742d73646b2376302e342e3200000000000000000000000000000000",
+          "calldataBytesSha256": "5d9b9fb4e8e7e32f722ecd702c554eb63eeac8e0e00292f3c4799f67f0fceeda",
+          "function": "register(string,(string,bytes)[])",
+          "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+          "valueWei": "0"
+        }
+      },
+      "completionTemplate": {
+        "binding": "Replace <agentId-from-confirmed-Registered-event> only after transaction 1 is confirmed; regenerate the canonical URI with registrations[0].agentId set to that exact integer.",
+        "function": "setAgentURI(uint256,string)",
+        "agentUriTemplate": {
+          "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+          "name": "ProofEra Health-Factor Guardian Evidence Agent",
+          "description": "Deterministic, read-only Venus Core Pool health-factor and monitoring-evidence analysis.",
+          "image": "",
+          "services": [
+            {
+              "name": "A2A",
+              "endpoint": "https://proofera-health.tangvu.dev/.well-known/agent-card.json",
+              "version": "0.3.0"
+            }
+          ],
+          "registrations": [
+            {
+              "agentId": "<agentId-from-confirmed-Registered-event>",
+              "agentRegistry": "eip155:97:0x8004A818BFB912233c491871b3d84c89A494BD9e"
+            }
+          ]
+        },
+        "calldata": null,
+        "calldataStatus": "not_knowable_before_confirmed_registration",
+        "gasEstimate": null,
+        "gasEstimateStatus": "not_knowable_before_confirmed_registration",
+        "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+        "valueWei": "0"
+      },
+      "observations": [
+        {
+          "provider": "bnb-chain",
+          "balanceWei": "0",
+          "nonce": "0",
+          "ownedAgentCount": "0",
+          "registerGasEstimate": {
+            "gas": "610688",
+            "status": "available"
+          }
+        },
+        {
+          "provider": "publicnode",
+          "balanceWei": "0",
+          "nonce": "0",
+          "ownedAgentCount": "0",
+          "registerGasEstimate": {
+            "gas": "610688",
+            "status": "available"
+          }
+        }
+      ],
+      "readiness": {
+        "alreadyRegistered": false,
+        "funded": false,
+        "registrationAuthorized": false,
+        "status": "blocked_unfunded"
+      }
+    }
+  ],
+  "rpcTranscript": [
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-1",
+        "jsonrpc": "2.0",
+        "method": "eth_chainId",
+        "params": []
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "result": "0x61",
+        "id": "erc8004-publicnode-1"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-1",
+        "jsonrpc": "2.0",
+        "method": "eth_chainId",
+        "params": []
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-1",
+        "result": "0x61"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-3",
+        "jsonrpc": "2.0",
+        "method": "eth_blockNumber",
+        "params": []
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-3",
+        "result": "0x77b3fb8"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-3",
+        "jsonrpc": "2.0",
+        "method": "eth_blockNumber",
+        "params": []
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "result": "0x77b3fb8",
+        "id": "erc8004-publicnode-3"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-5",
+        "jsonrpc": "2.0",
+        "method": "eth_getBlockByNumber",
+        "params": [
+          "0x77b3fac",
+          false
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-5",
+        "result": {
+          "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "withdrawals": [],
+          "hash": "0x6274e868d4bbd2d6c8f0c3e0f965dd88025ccc2f7b9c4932efd19ac6c7353c1c",
+          "parentHash": "0xe5b0faa41fd2d68e7ffd248ec59681cbd07075edd8914dbd9945cc64fdab79c4",
+          "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+          "miner": "0xf9a1db0d6f22bd78ffaeccbc8f47c83df9fbdbcf",
+          "stateRoot": "0xacd4c63088628e9553695b655beabbaa91787469ed77ebad22550e6832fe71bc",
+          "transactionsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "receiptsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "difficulty": "0x2",
+          "number": "0x77b3fac",
+          "gasLimit": "0x5ee6e70",
+          "gasUsed": "0x0",
+          "timestamp": "0x6a8260cf",
+          "extraData": "0xdb8301070688363962333735386389676f312e32352e3131836c696e9efa6af5f8b48201ffb8609260ca8b9d16886cacb77a18cc231b5a75ccbcfc77b7826933939f99171827d90566340257beea258fca5e57b9febaed0725b5f5b4ed94a063456b2f9b47fcfb4dea47a30fc1c4ea0ed04afc0cea439c8ea07fe1519c40f0cfd831fe72a7fafef84c84077b3faaa098fcef87de52c43f955664b337974838d6298dabaeb901d433810b87e0f91c6c84077b3faba0e5b0faa41fd2d68e7ffd248ec59681cbd07075edd8914dbd9945cc64fdab79c4808524974283a5b18a541b89fd88a8816e00238b50124d6b4118507a913e563cc366893b74ea73f680cba91b54d56e4aadd01f5247b25e897d905663ce054d704b01",
+          "mixHash": "0x00000000000000000000000000000000000000000000000000000000000001f4",
+          "nonce": "0x0000000000000000",
+          "size": "0x381",
+          "totalDifficulty": "0xef263ca",
+          "baseFeePerGas": "0x0",
+          "transactions": [],
+          "uncles": [],
+          "blobGasUsed": "0x0",
+          "excessBlobGas": "0x0",
+          "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "requestsHash": "0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "milliTimestamp": "0x1a00d4a2a8c"
+        }
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-5",
+        "jsonrpc": "2.0",
+        "method": "eth_getBlockByNumber",
+        "params": [
+          "0x77b3fac",
+          false
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-5",
+        "result": {
+          "hash": "0x6274e868d4bbd2d6c8f0c3e0f965dd88025ccc2f7b9c4932efd19ac6c7353c1c",
+          "parentHash": "0xe5b0faa41fd2d68e7ffd248ec59681cbd07075edd8914dbd9945cc64fdab79c4",
+          "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+          "miner": "0xf9a1db0d6f22bd78ffaeccbc8f47c83df9fbdbcf",
+          "stateRoot": "0xacd4c63088628e9553695b655beabbaa91787469ed77ebad22550e6832fe71bc",
+          "transactionsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "receiptsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "difficulty": "0x2",
+          "number": "0x77b3fac",
+          "gasLimit": "0x5ee6e70",
+          "gasUsed": "0x0",
+          "timestamp": "0x6a8260cf",
+          "extraData": "0xdb8301070688363962333735386389676f312e32352e3131836c696e9efa6af5f8b48201ffb8609260ca8b9d16886cacb77a18cc231b5a75ccbcfc77b7826933939f99171827d90566340257beea258fca5e57b9febaed0725b5f5b4ed94a063456b2f9b47fcfb4dea47a30fc1c4ea0ed04afc0cea439c8ea07fe1519c40f0cfd831fe72a7fafef84c84077b3faaa098fcef87de52c43f955664b337974838d6298dabaeb901d433810b87e0f91c6c84077b3faba0e5b0faa41fd2d68e7ffd248ec59681cbd07075edd8914dbd9945cc64fdab79c4808524974283a5b18a541b89fd88a8816e00238b50124d6b4118507a913e563cc366893b74ea73f680cba91b54d56e4aadd01f5247b25e897d905663ce054d704b01",
+          "mixHash": "0x00000000000000000000000000000000000000000000000000000000000001f4",
+          "nonce": "0x0000000000000000",
+          "baseFeePerGas": "0x0",
+          "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "blobGasUsed": "0x0",
+          "excessBlobGas": "0x0",
+          "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "requestsHash": "0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "totalDifficulty": "0xef263ca",
+          "size": "0x382",
+          "milliTimestamp": "0x1a00d4a2a8c",
+          "uncles": [],
+          "transactions": [],
+          "withdrawals": []
+        }
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-7",
+        "jsonrpc": "2.0",
+        "method": "eth_getCode",
+        "params": [
+          "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-7",
+        "result": "0x60806040527f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc545f9081906001600160a01b0316368280378136915af43d5f803e156048573d5ff35b3d5ffdfea2646970667358221220d25633e50c873a78e74176feb55eabe7e699db80eeb0380952dba33544b2c7f664736f6c63430008180033"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-7",
+        "jsonrpc": "2.0",
+        "method": "eth_getCode",
+        "params": [
+          "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-7",
+        "result": "0x60806040527f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc545f9081906001600160a01b0316368280378136915af43d5f803e156048573d5ff35b3d5ffdfea2646970667358221220d25633e50c873a78e74176feb55eabe7e699db80eeb0380952dba33544b2c7f664736f6c63430008180033"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-9",
+        "jsonrpc": "2.0",
+        "method": "eth_gasPrice",
+        "params": []
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-9",
+        "result": "0x5f5e100"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-9",
+        "jsonrpc": "2.0",
+        "method": "eth_gasPrice",
+        "params": []
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-9",
+        "result": "0x5f5e100"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-11",
+        "jsonrpc": "2.0",
+        "method": "eth_getBalance",
+        "params": [
+          "0xAd03eF7e21c35FD1446c153f6eE5e6165F696990",
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-11",
+        "result": "0x0"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-12",
+        "jsonrpc": "2.0",
+        "method": "eth_getTransactionCount",
+        "params": [
+          "0xAd03eF7e21c35FD1446c153f6eE5e6165F696990",
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-12",
+        "result": "0x0"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-13",
+        "jsonrpc": "2.0",
+        "method": "eth_call",
+        "params": [
+          {
+            "data": "0x70a08231000000000000000000000000ad03ef7e21c35fd1446c153f6ee5e6165f696990",
+            "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e"
+          },
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-13",
+        "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-14",
+        "jsonrpc": "2.0",
+        "method": "eth_estimateGas",
+        "params": [
+          {
+            "data": "0x8ea42286000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000002a00000000000000000000000000000000000000000000000000000000000000221646174613a6170706c69636174696f6e2f6a736f6e3b6261736536342c65794a6b5a584e6a636d6c7764476c7662694936496b526c6447567962576c7561584e3061574d7349484a6c5957517462323573655342515957356a5957746c553364686343424d554342795957356e5a534268626d516763324e766347566b4948426c636d317063334e70623234675a585a705a475675593255675957356862486c7a61584d6762323467516c4e4449473168615735755a5851675957356b4948526c633352755a58517549697769615731685a3255694f6949694c434a755957316c496a6f6955484a7662325a46636d456754464167556d6c7a61794246646d6c6b5a57356a5a5342425a32567564434973496e4a6c5a326c7a64484a6864476c76626e4d694f6c74644c434a7a5a584a3261574e6c63794936573373695a57356b63473970626e51694f694a6f64485277637a6f764c3342796232396d5a584a684c5778774c6e5268626d64326453356b5a5859764c6e646c6247777461323576643234765957646c626e5174593246795a4335716332397549697769626d46745a534936496b457951534973496e5a6c636e4e70623234694f6949774c6a4d754d434a395853776964486c775a534936496d68306448427a4f6938765a576c776379356c6447686c636d563162533576636d637652556c515579396c615841744f4441774e434e795a576470633352795958527062323474646a456966513d3d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000a6275696c745f7769746800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003068747470733a2f2f6769746875622e636f6d2f626e622d636861696e2f626e626167656e742d73646b2376302e342e3200000000000000000000000000000000",
+            "from": "0xAd03eF7e21c35FD1446c153f6eE5e6165F696990",
+            "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+            "value": "0x0"
+          },
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-14",
+        "result": "0x9abc1"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-15",
+        "jsonrpc": "2.0",
+        "method": "eth_getBalance",
+        "params": [
+          "0xAd03eF7e21c35FD1446c153f6eE5e6165F696990",
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-15",
+        "result": "0x0"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-16",
+        "jsonrpc": "2.0",
+        "method": "eth_getTransactionCount",
+        "params": [
+          "0xAd03eF7e21c35FD1446c153f6eE5e6165F696990",
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-16",
+        "result": "0x0"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-17",
+        "jsonrpc": "2.0",
+        "method": "eth_call",
+        "params": [
+          {
+            "data": "0x70a08231000000000000000000000000ad03ef7e21c35fd1446c153f6ee5e6165f696990",
+            "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e"
+          },
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-17",
+        "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-18",
+        "jsonrpc": "2.0",
+        "method": "eth_estimateGas",
+        "params": [
+          {
+            "data": "0x8ea42286000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000002a00000000000000000000000000000000000000000000000000000000000000221646174613a6170706c69636174696f6e2f6a736f6e3b6261736536342c65794a6b5a584e6a636d6c7764476c7662694936496b526c6447567962576c7561584e3061574d7349484a6c5957517462323573655342515957356a5957746c553364686343424d554342795957356e5a534268626d516763324e766347566b4948426c636d317063334e70623234675a585a705a475675593255675957356862486c7a61584d6762323467516c4e4449473168615735755a5851675957356b4948526c633352755a58517549697769615731685a3255694f6949694c434a755957316c496a6f6955484a7662325a46636d456754464167556d6c7a61794246646d6c6b5a57356a5a5342425a32567564434973496e4a6c5a326c7a64484a6864476c76626e4d694f6c74644c434a7a5a584a3261574e6c63794936573373695a57356b63473970626e51694f694a6f64485277637a6f764c3342796232396d5a584a684c5778774c6e5268626d64326453356b5a5859764c6e646c6247777461323576643234765957646c626e5174593246795a4335716332397549697769626d46745a534936496b457951534973496e5a6c636e4e70623234694f6949774c6a4d754d434a395853776964486c775a534936496d68306448427a4f6938765a576c776379356c6447686c636d563162533576636d637652556c515579396c615841744f4441774e434e795a576470633352795958527062323474646a456966513d3d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000a6275696c745f7769746800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003068747470733a2f2f6769746875622e636f6d2f626e622d636861696e2f626e626167656e742d73646b2376302e342e3200000000000000000000000000000000",
+            "from": "0xAd03eF7e21c35FD1446c153f6eE5e6165F696990",
+            "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+            "value": "0x0"
+          },
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-18",
+        "result": "0x9abc1"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-19",
+        "jsonrpc": "2.0",
+        "method": "eth_getBalance",
+        "params": [
+          "0xFBfFa9BA36d578AFF2d05EDe840Fc7088e70ADB8",
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-19",
+        "result": "0x0"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-20",
+        "jsonrpc": "2.0",
+        "method": "eth_getTransactionCount",
+        "params": [
+          "0xFBfFa9BA36d578AFF2d05EDe840Fc7088e70ADB8",
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-20",
+        "result": "0x0"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-21",
+        "jsonrpc": "2.0",
+        "method": "eth_call",
+        "params": [
+          {
+            "data": "0x70a08231000000000000000000000000fbffa9ba36d578aff2d05ede840fc7088e70adb8",
+            "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e"
+          },
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-21",
+        "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-22",
+        "jsonrpc": "2.0",
+        "method": "eth_estimateGas",
+        "params": [
+          {
+            "data": "0x8ea4228600000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000280000000000000000000000000000000000000000000000000000000000000020d646174613a6170706c69636174696f6e2f6a736f6e3b6261736536342c65794a6b5a584e6a636d6c7764476c7662694936496b526c6447567962576c7561584e3061574d7349484a6c59575174623235736553424355304d675a334a705a43426a5957356b61575268644755675957356862486c7a61584d67596d466a6132566b4947397562486b67596e6b6759324673624756794c584e31634842736157566b494756326157526c626d4e6c4c694973496d6c745957646c496a6f6949697769626d46745a534936496c42796232396d52584a68494564796157516756484a685a476c755a794246646d6c6b5a57356a5a5342425a32567564434973496e4a6c5a326c7a64484a6864476c76626e4d694f6c74644c434a7a5a584a3261574e6c63794936573373695a57356b63473970626e51694f694a6f64485277637a6f764c3342796232396d5a584a684c57647961575175644746755a335a314c6d526c646938756432567362433172626d3933626939685a3256756443316a59584a6b4c6d707a623234694c434a755957316c496a6f6951544a4249697769646d567963326c7662694936496a41754d793477496e31644c434a306558426c496a6f696148523063484d364c79396c6158427a4c6d5630614756795a5856744c6d39795a793946535642544c325670634330344d44413049334a6c5a326c7a64484a6864476c76626931324d534a39000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000a6275696c745f7769746800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003068747470733a2f2f6769746875622e636f6d2f626e622d636861696e2f626e626167656e742d73646b2376302e342e3200000000000000000000000000000000",
+            "from": "0xFBfFa9BA36d578AFF2d05EDe840Fc7088e70ADB8",
+            "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+            "value": "0x0"
+          },
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-22",
+        "result": "0x950ed"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-23",
+        "jsonrpc": "2.0",
+        "method": "eth_getBalance",
+        "params": [
+          "0xFBfFa9BA36d578AFF2d05EDe840Fc7088e70ADB8",
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-23",
+        "result": "0x0"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-24",
+        "jsonrpc": "2.0",
+        "method": "eth_getTransactionCount",
+        "params": [
+          "0xFBfFa9BA36d578AFF2d05EDe840Fc7088e70ADB8",
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-24",
+        "result": "0x0"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-25",
+        "jsonrpc": "2.0",
+        "method": "eth_call",
+        "params": [
+          {
+            "data": "0x70a08231000000000000000000000000fbffa9ba36d578aff2d05ede840fc7088e70adb8",
+            "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e"
+          },
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-25",
+        "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-26",
+        "jsonrpc": "2.0",
+        "method": "eth_estimateGas",
+        "params": [
+          {
+            "data": "0x8ea4228600000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000280000000000000000000000000000000000000000000000000000000000000020d646174613a6170706c69636174696f6e2f6a736f6e3b6261736536342c65794a6b5a584e6a636d6c7764476c7662694936496b526c6447567962576c7561584e3061574d7349484a6c59575174623235736553424355304d675a334a705a43426a5957356b61575268644755675957356862486c7a61584d67596d466a6132566b4947397562486b67596e6b6759324673624756794c584e31634842736157566b494756326157526c626d4e6c4c694973496d6c745957646c496a6f6949697769626d46745a534936496c42796232396d52584a68494564796157516756484a685a476c755a794246646d6c6b5a57356a5a5342425a32567564434973496e4a6c5a326c7a64484a6864476c76626e4d694f6c74644c434a7a5a584a3261574e6c63794936573373695a57356b63473970626e51694f694a6f64485277637a6f764c3342796232396d5a584a684c57647961575175644746755a335a314c6d526c646938756432567362433172626d3933626939685a3256756443316a59584a6b4c6d707a623234694c434a755957316c496a6f6951544a4249697769646d567963326c7662694936496a41754d793477496e31644c434a306558426c496a6f696148523063484d364c79396c6158427a4c6d5630614756795a5856744c6d39795a793946535642544c325670634330344d44413049334a6c5a326c7a64484a6864476c76626931324d534a39000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000a6275696c745f7769746800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003068747470733a2f2f6769746875622e636f6d2f626e622d636861696e2f626e626167656e742d73646b2376302e342e3200000000000000000000000000000000",
+            "from": "0xFBfFa9BA36d578AFF2d05EDe840Fc7088e70ADB8",
+            "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+            "value": "0x0"
+          },
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-26",
+        "result": "0x950ed"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-27",
+        "jsonrpc": "2.0",
+        "method": "eth_getBalance",
+        "params": [
+          "0x62Af37A6FD89374684C00e2402FD96143f96ee85",
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-27",
+        "result": "0x0"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-28",
+        "jsonrpc": "2.0",
+        "method": "eth_getTransactionCount",
+        "params": [
+          "0x62Af37A6FD89374684C00e2402FD96143f96ee85",
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-28",
+        "result": "0x0"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-29",
+        "jsonrpc": "2.0",
+        "method": "eth_call",
+        "params": [
+          {
+            "data": "0x70a0823100000000000000000000000062af37a6fd89374684c00e2402fd96143f96ee85",
+            "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e"
+          },
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-29",
+        "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-30",
+        "jsonrpc": "2.0",
+        "method": "eth_estimateGas",
+        "params": [
+          {
+            "data": "0x8ea42286000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000002a00000000000000000000000000000000000000000000000000000000000000235646174613a6170706c69636174696f6e2f6a736f6e3b6261736536342c65794a6b5a584e6a636d6c7764476c7662694936496c42796232396d52584a684947526c6447567962576c7561584e3061574d6765576c6c62475167636d3931644755675a585a705a475675593255675957356862486c365a5849675a6d397949454a545179427459576c75626d5630494746755a4342305a584e30626d56304c6942535a57466b4c57397562486b374947317063334e70626d63675a585a705a47567559325567624739335a584a7a49474e76626d5a705a4756755932557549697769615731685a3255694f6949694c434a755957316c496a6f6965576c6c624752506348527062576c7a59585270623235425a325675644331685a32567564434973496e4a6c5a326c7a64484a6864476c76626e4d694f6c74644c434a7a5a584a3261574e6c63794936573373695a57356b63473970626e51694f694a6f64485277637a6f764c3342796232396d5a584a684c586c705a57786b4c6e5268626d64326453356b5a5859764c6e646c6247777461323576643234765957646c626e5174593246795a4335716332397549697769626d46745a534936496b457951534973496e5a6c636e4e70623234694f6949774c6a4d754d434a395853776964486c775a534936496d68306448427a4f6938765a576c776379356c6447686c636d563162533576636d637652556c515579396c615841744f4441774e434e795a576470633352795958527062323474646a456966513d3d00000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000a6275696c745f7769746800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003068747470733a2f2f6769746875622e636f6d2f626e622d636861696e2f626e626167656e742d73646b2376302e342e3200000000000000000000000000000000",
+            "from": "0x62Af37A6FD89374684C00e2402FD96143f96ee85",
+            "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+            "value": "0x0"
+          },
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-30",
+        "result": "0x9acb4"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-31",
+        "jsonrpc": "2.0",
+        "method": "eth_getBalance",
+        "params": [
+          "0x62Af37A6FD89374684C00e2402FD96143f96ee85",
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-31",
+        "result": "0x0"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-32",
+        "jsonrpc": "2.0",
+        "method": "eth_getTransactionCount",
+        "params": [
+          "0x62Af37A6FD89374684C00e2402FD96143f96ee85",
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-32",
+        "result": "0x0"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-33",
+        "jsonrpc": "2.0",
+        "method": "eth_call",
+        "params": [
+          {
+            "data": "0x70a0823100000000000000000000000062af37a6fd89374684c00e2402fd96143f96ee85",
+            "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e"
+          },
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-33",
+        "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-34",
+        "jsonrpc": "2.0",
+        "method": "eth_estimateGas",
+        "params": [
+          {
+            "data": "0x8ea42286000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000002a00000000000000000000000000000000000000000000000000000000000000235646174613a6170706c69636174696f6e2f6a736f6e3b6261736536342c65794a6b5a584e6a636d6c7764476c7662694936496c42796232396d52584a684947526c6447567962576c7561584e3061574d6765576c6c62475167636d3931644755675a585a705a475675593255675957356862486c365a5849675a6d397949454a545179427459576c75626d5630494746755a4342305a584e30626d56304c6942535a57466b4c57397562486b374947317063334e70626d63675a585a705a47567559325567624739335a584a7a49474e76626d5a705a4756755932557549697769615731685a3255694f6949694c434a755957316c496a6f6965576c6c624752506348527062576c7a59585270623235425a325675644331685a32567564434973496e4a6c5a326c7a64484a6864476c76626e4d694f6c74644c434a7a5a584a3261574e6c63794936573373695a57356b63473970626e51694f694a6f64485277637a6f764c3342796232396d5a584a684c586c705a57786b4c6e5268626d64326453356b5a5859764c6e646c6247777461323576643234765957646c626e5174593246795a4335716332397549697769626d46745a534936496b457951534973496e5a6c636e4e70623234694f6949774c6a4d754d434a395853776964486c775a534936496d68306448427a4f6938765a576c776379356c6447686c636d563162533576636d637652556c515579396c615841744f4441774e434e795a576470633352795958527062323474646a456966513d3d00000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000a6275696c745f7769746800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003068747470733a2f2f6769746875622e636f6d2f626e622d636861696e2f626e626167656e742d73646b2376302e342e3200000000000000000000000000000000",
+            "from": "0x62Af37A6FD89374684C00e2402FD96143f96ee85",
+            "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+            "value": "0x0"
+          },
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-34",
+        "result": "0x9acb4"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-35",
+        "jsonrpc": "2.0",
+        "method": "eth_getBalance",
+        "params": [
+          "0x708cb7F2b974d94005E762A140c469F1125e0cB4",
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-35",
+        "result": "0x0"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-36",
+        "jsonrpc": "2.0",
+        "method": "eth_getTransactionCount",
+        "params": [
+          "0x708cb7F2b974d94005E762A140c469F1125e0cB4",
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-36",
+        "result": "0x0"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-37",
+        "jsonrpc": "2.0",
+        "method": "eth_call",
+        "params": [
+          {
+            "data": "0x70a08231000000000000000000000000708cb7f2b974d94005e762a140c469f1125e0cb4",
+            "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e"
+          },
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-37",
+        "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "provider": "bnb-chain",
+      "request": {
+        "id": "erc8004-bnb-chain-38",
+        "jsonrpc": "2.0",
+        "method": "eth_estimateGas",
+        "params": [
+          {
+            "data": "0x8ea42286000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000002800000000000000000000000000000000000000000000000000000000000000219646174613a6170706c69636174696f6e2f6a736f6e3b6261736536342c65794a6b5a584e6a636d6c7764476c7662694936496b526c6447567962576c7561584e3061574d7349484a6c5957517462323573655342575a5735316379424462334a6c4946427662327767614756686248526f4c575a685933527663694268626d51676257397561585276636d6c755a79316c646d6c6b5a57356a5a534268626d467365584e70637934694c434a706257466e5a53493649694973496d3568625755694f694a51636d39765a6b5679595342495a57467364476774526d466a644739794945643159584a6b61574675494556326157526c626d4e6c4945466e5a57353049697769636d566e61584e30636d4630615739756379493657313073496e4e6c636e5a705932567a496a706265794a6c626d527762326c7564434936496d68306448427a4f69387663484a7662325a6c636d4574614756686248526f4c6e5268626d64326453356b5a5859764c6e646c6247777461323576643234765957646c626e5174593246795a4335716332397549697769626d46745a534936496b457951534973496e5a6c636e4e70623234694f6949774c6a4d754d434a395853776964486c775a534936496d68306448427a4f6938765a576c776379356c6447686c636d563162533576636d637652556c515579396c615841744f4441774e434e795a576470633352795958527062323474646a456966513d3d000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000a6275696c745f7769746800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003068747470733a2f2f6769746875622e636f6d2f626e622d636861696e2f626e626167656e742d73646b2376302e342e3200000000000000000000000000000000",
+            "from": "0x708cb7F2b974d94005E762A140c469F1125e0cB4",
+            "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+            "value": "0x0"
+          },
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-bnb-chain-38",
+        "result": "0x95180"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-39",
+        "jsonrpc": "2.0",
+        "method": "eth_getBalance",
+        "params": [
+          "0x708cb7F2b974d94005E762A140c469F1125e0cB4",
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-39",
+        "result": "0x0"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-40",
+        "jsonrpc": "2.0",
+        "method": "eth_getTransactionCount",
+        "params": [
+          "0x708cb7F2b974d94005E762A140c469F1125e0cB4",
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-40",
+        "result": "0x0"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-41",
+        "jsonrpc": "2.0",
+        "method": "eth_call",
+        "params": [
+          {
+            "data": "0x70a08231000000000000000000000000708cb7f2b974d94005e762a140c469f1125e0cb4",
+            "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e"
+          },
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-41",
+        "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "provider": "publicnode",
+      "request": {
+        "id": "erc8004-publicnode-42",
+        "jsonrpc": "2.0",
+        "method": "eth_estimateGas",
+        "params": [
+          {
+            "data": "0x8ea42286000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000002800000000000000000000000000000000000000000000000000000000000000219646174613a6170706c69636174696f6e2f6a736f6e3b6261736536342c65794a6b5a584e6a636d6c7764476c7662694936496b526c6447567962576c7561584e3061574d7349484a6c5957517462323573655342575a5735316379424462334a6c4946427662327767614756686248526f4c575a685933527663694268626d51676257397561585276636d6c755a79316c646d6c6b5a57356a5a534268626d467365584e70637934694c434a706257466e5a53493649694973496d3568625755694f694a51636d39765a6b5679595342495a57467364476774526d466a644739794945643159584a6b61574675494556326157526c626d4e6c4945466e5a57353049697769636d566e61584e30636d4630615739756379493657313073496e4e6c636e5a705932567a496a706265794a6c626d527762326c7564434936496d68306448427a4f69387663484a7662325a6c636d4574614756686248526f4c6e5268626d64326453356b5a5859764c6e646c6247777461323576643234765957646c626e5174593246795a4335716332397549697769626d46745a534936496b457951534973496e5a6c636e4e70623234694f6949774c6a4d754d434a395853776964486c775a534936496d68306448427a4f6938765a576c776379356c6447686c636d563162533576636d637652556c515579396c615841744f4441774e434e795a576470633352795958527062323474646a456966513d3d000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000a6275696c745f7769746800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003068747470733a2f2f6769746875622e636f6d2f626e622d636861696e2f626e626167656e742d73646b2376302e342e3200000000000000000000000000000000",
+            "from": "0x708cb7F2b974d94005E762A140c469F1125e0cB4",
+            "to": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+            "value": "0x0"
+          },
+          "0x77b3fac"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "erc8004-publicnode-42",
+        "result": "0x95180"
+      }
+    }
+  ]
+}
