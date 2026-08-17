@@ -16,6 +16,9 @@ import {
 const CHAIN_ID = 97;
 const REGISTRY = "0x8004A818BFB912233c491871b3d84c89A494BD9e";
 const PAYMENT_WEI = parseEther("0.00001");
+const DEPLOYMENT_GAS_LIMIT = 400_000n;
+const HIRE_GAS_LIMIT = 200_000n;
+const MAX_GAS_PRICE_WEI = 200_000_000n;
 const TASKS = Object.freeze([
   Object.freeze({ agentId: 1825n, slug: "pancake-lp-range-decision" }),
   Object.freeze({ agentId: 1825n, slug: "autonomous-session-permission-audit" }),
@@ -78,7 +81,7 @@ try {
     from: args.deployer,
     nonce: args.nonce
   });
-  const hires = TASKS.map((task) => {
+  const hires = TASKS.map((task, index) => {
     const taskHash = keccak256(stringToHex(`proofera-termix:${task.slug}:v1`));
     const engagementId = keccak256(
       stringToHex(`proofera:${args.sourceCommit}:${task.slug}:${task.agentId.toString()}`)
@@ -92,6 +95,8 @@ try {
       }),
       engagementId,
       expiresAt: args.expiresAt.toString(),
+      gasLimit: HIRE_GAS_LIMIT.toString(),
+      nonce: (args.nonce + BigInt(index) + 1n).toString(),
       paymentWei: PAYMENT_WEI.toString(),
       slug: task.slug,
       taskHash,
@@ -116,6 +121,8 @@ try {
       data: deploymentData,
       dataKeccak256: keccak256(deploymentData),
       artifactSha256: sha256(artifactBytes),
+      gasLimit: DEPLOYMENT_GAS_LIMIT.toString(),
+      nonce: args.nonce.toString(),
       valueWei: "0"
     },
     hires,
@@ -125,7 +132,16 @@ try {
       paymentPerHireWei: PAYMENT_WEI.toString(),
       totalHirePaymentWei: (PAYMENT_WEI * BigInt(hires.length)).toString(),
       contractMaxPaymentWei: parseEther("0.01").toString(),
-      contractMaxHireDurationSeconds: "604800"
+      contractMaxHireDurationSeconds: "604800",
+      maxGasPriceWei: MAX_GAS_PRICE_WEI.toString(),
+      maxNetworkFeeWei: (
+        (DEPLOYMENT_GAS_LIMIT + HIRE_GAS_LIMIT * BigInt(hires.length)) *
+        MAX_GAS_PRICE_WEI
+      ).toString(),
+      maxTotalSpendWei: (
+        PAYMENT_WEI * BigInt(hires.length) +
+        (DEPLOYMENT_GAS_LIMIT + HIRE_GAS_LIMIT * BigInt(hires.length)) * MAX_GAS_PRICE_WEI
+      ).toString()
     },
     caveats: [
       "This manifest is unsigned preparation and authorizes no transaction.",

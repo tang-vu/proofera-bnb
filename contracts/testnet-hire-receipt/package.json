@@ -13,15 +13,16 @@
     "compile": "hardhat build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint": "node --check hardhat.config.js && node --check scripts/prepare-deployment.mjs && node --check test/deployment-preparation.test.mjs",
+    "lint": "node --check hardhat.config.js && node --check scripts/prepare-deployment.mjs && node --check scripts/execute-approved.mjs && node --check test/deployment-preparation.test.mjs && node --check test/execution-boundary.test.mjs",
     "prepare:deployment": "node scripts/prepare-deployment.mjs",
     "test": "pnpm compile && pnpm test:solidity && pnpm test:node",
-    "test:node": "node --test test/deployment-preparation.test.mjs",
+    "test:node": "node --test test/deployment-preparation.test.mjs test/execution-boundary.test.mjs",
     "test:solidity": "hardhat test solidity",
     "verify:offline": "pnpm format:check && pnpm lint && pnpm clean && pnpm compile && pnpm test:solidity && pnpm test:node",
     "verify": "pnpm verify:offline && pnpm audit --prod --audit-level moderate"
   },
   "dependencies": {
+    "ethers": "6.17.0",
     "viem": "2.55.13"
   },
   "devDependencies": {

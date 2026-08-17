@@ -44,11 +44,16 @@ test("prepares one exact deployment and three bounded hires", () => {
   assert.equal(manifest.deployment.dataKeccak256, keccak256(manifest.deployment.data));
   assert.equal(manifest.bounds.hireCount, 3);
   assert.equal(manifest.bounds.totalHirePaymentWei, "30000000000000");
+  assert.equal(manifest.bounds.maxGasPriceWei, "200000000");
+  assert.equal(manifest.bounds.maxNetworkFeeWei, "200000000000000");
+  assert.equal(manifest.bounds.maxTotalSpendWei, "230000000000000");
+  assert.equal(manifest.deployment.gasLimit, "400000");
+  assert.equal(manifest.deployment.nonce, NONCE.toString());
   assert.deepEqual(
     manifest.hires.map(({ agentId }) => agentId),
     ["1825", "1825", "1828"]
   );
-  for (const hire of manifest.hires) {
+  for (const [index, hire] of manifest.hires.entries()) {
     const decoded = decodeFunctionData({ abi: artifact.abi, data: hire.calldata });
     assert.equal(decoded.functionName, "hire");
     assert.equal(decoded.args[0].toString(), hire.agentId);
@@ -56,6 +61,8 @@ test("prepares one exact deployment and three bounded hires", () => {
     assert.equal(decoded.args[2], hire.taskHash);
     assert.equal(decoded.args[3].toString(), hire.expiresAt);
     assert.equal(hire.paymentWei, "10000000000000");
+    assert.equal(hire.gasLimit, "200000");
+    assert.equal(hire.nonce, (NONCE + BigInt(index) + 1n).toString());
     assert.equal(hire.to, manifest.contractAddress);
   }
 });

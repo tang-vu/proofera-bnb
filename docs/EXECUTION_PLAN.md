@@ -173,11 +173,23 @@ The isolated `contracts/testnet-hire-receipt` package now supplies the missing
 receipt mechanism without weakening the runner schema. Its chain-97-only,
 no-admin contract resolves `ownerOf(agentId)` from the immutable ERC-8004
 registry, atomically forwards a bounded tBNB payment, prevents engagement-ID
-reuse and emits a task/expiry-bound receipt hash. Six Solidity tests and three
-unsigned-preparation tests pass, and CI reproduces the offline gate. This is
+reuse and emits a task/expiry-bound receipt hash. Six Solidity tests and seven
+preparation/execution-boundary tests pass, and CI defines the offline gate. This is
 deployment preparation only: no contract or hire transaction exists, and a
 successful future event would prove a paid testnet engagement—not task
 completion, execution authority or agent performance.
+
+The bounded operator runner is now implemented but remains non-invoked. Its
+exact flag and approval ID gate precede preparation, Git, RPC and custody
+access. It accepts only a digest-bound committed preparation, a clean published
+HEAD and unchanged contract scope; regenerates the full manifest; compares two
+fixed BSC-testnet RPCs; and rechecks nonce, balance and gas before every
+signature. The short-lived worker decrypts only the pinned current-user DPAPI
+keystore, journals public transaction fields before one-provider broadcast,
+requires two-provider receipt agreement, checks exact deployed runtime bytes
+and decodes every hire event. Unknown broadcast/receipt outcomes halt all later
+transactions. These controls are execution capability, not authorization or
+receipt evidence.
 
 ## Milestone 5 — submission-grade product (`PLANNED`)
 
