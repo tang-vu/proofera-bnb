@@ -207,7 +207,7 @@ test("keeps authorization, provider time and runner-latency boundaries fail clos
         policy: policy(),
         accountAuthorization: lateAuthorization
       }),
-    /VENUS_WINDOW_AUTHORIZATION_TOO_LATE/
+    /VENUS_WINDOW_ACCOUNT_BINDING_TOO_LATE/
   );
 
   const futureProvider = window();
@@ -249,4 +249,28 @@ test("keeps authorization, provider time and runner-latency boundaries fail clos
       }),
     /VENUS_WINDOW_HEALTH_INPUT_NOT_DECISION_READY/
   );
+});
+
+test("accepts an explicitly non-authoritative public testnet replay binding", () => {
+  const build = buildHealthFactorInputFromExactWindow({
+    evidenceWindow: window(),
+    analysisAtUtc: "2026-08-11T10:00:30.000Z",
+    policy: policy(),
+    accountAuthorization: {
+      state: "public_testnet_replay_non_authority",
+      account: ACCOUNT,
+      selectedAtUtc: "2026-08-11T09:00:00.000Z",
+      selectionArtifactSha256: "cd".repeat(32),
+      reference: "Public chain replay subject selected before evidence capture",
+      ownershipClaimed: false,
+      executionAuthorityClaimed: false
+    }
+  });
+
+  assert.equal(build.bindings.accountAuthorization.state, "public_testnet_replay_non_authority");
+  const result = analyzeHealthFactor(build.input);
+  assert.equal(result.sourceContentsVerified, false);
+  assert.equal(result.activationEligible, false);
+  assert.equal(result.executionEnabled, false);
+  assert.match(build.limitations.join(" "), /neither ownership nor execution authority/);
 });

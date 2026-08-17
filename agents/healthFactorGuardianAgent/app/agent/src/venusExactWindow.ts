@@ -209,15 +209,28 @@ export const venusCoreExactBlockEvidenceForWindowSchema = z
     }
   });
 
-const accountAuthorizationSchema = z
-  .object({
-    state: z.literal("explicit_testnet_authorization"),
-    account: addressSchema,
-    authorizedAtUtc: utcSchema,
-    authorizationArtifactSha256: sha256Schema,
-    reference: z.string().trim().min(1).max(500)
-  })
-  .strict();
+const accountBindingSchema = z.discriminatedUnion("state", [
+  z
+    .object({
+      state: z.literal("explicit_testnet_authorization"),
+      account: addressSchema,
+      authorizedAtUtc: utcSchema,
+      authorizationArtifactSha256: sha256Schema,
+      reference: z.string().trim().min(1).max(500)
+    })
+    .strict(),
+  z
+    .object({
+      state: z.literal("public_testnet_replay_non_authority"),
+      account: addressSchema,
+      selectedAtUtc: utcSchema,
+      selectionArtifactSha256: sha256Schema,
+      reference: z.string().trim().min(1).max(500),
+      ownershipClaimed: z.literal(false),
+      executionAuthorityClaimed: z.literal(false)
+    })
+    .strict()
+]);
 
 export interface BuildHealthFactorExactWindowOptions {
   readonly evidenceWindow: readonly unknown[];
@@ -230,7 +243,7 @@ export interface HealthFactorExactWindowBuild {
   readonly schemaVersion: "proofera-health-factor-exact-window-build-v1.0.0";
   readonly input: HealthFactorAnalysisInput;
   readonly bindings: {
-    readonly accountAuthorization: z.output<typeof accountAuthorizationSchema>;
+    readonly accountAuthorization: z.output<typeof accountBindingSchema>;
     readonly firstBlockNumber: string;
     readonly lastBlockNumber: string;
     readonly observationCount: number;
@@ -361,7 +374,7 @@ export function buildHealthFactorInputFromExactWindow(
 ): HealthFactorExactWindowBuild {
   const analysisAtUtc = utcSchema.parse(options.analysisAtUtc);
   const analysisTime = Date.parse(analysisAtUtc);
-  const authorization = accountAuthorizationSchema.parse(options.accountAuthorization);
+  const authorization = accountBindingSchema.parse(options.accountAuthorization);
   if (options.evidenceWindow.length === 0 || options.evidenceWindow.length > 128) {
     throw new Error("VENUS_WINDOW_SIZE_INVALID");
   }
@@ -412,8 +425,12 @@ export function buildHealthFactorInputFromExactWindow(
       }
     }
   }
-  if (Date.parse(authorization.authorizedAtUtc) > Date.parse(first.blockTimestampUtc)) {
-    throw new Error("VENUS_WINDOW_AUTHORIZATION_TOO_LATE");
+  const bindingTime =
+    authorization.state === "explicit_testnet_authorization"
+      ? authorization.authorizedAtUtc
+      : authorization.selectedAtUtc;
+  if (Date.parse(bindingTime) > Date.parse(first.blockTimestampUtc)) {
+    throw new Error("VENUS_WINDOW_ACCOUNT_BINDING_TOO_LATE");
   }
   if (options.policy.minimumAlertReceipts !== 0) {
     throw new Error("VENUS_WINDOW_RUNNER_LATENCY_REQUIRES_ZERO_INTERNAL_RECEIPTS");
@@ -531,7 +548,9 @@ export function buildHealthFactorInputFromExactWindow(
     },
     limitations: [
       "The adapter validates and transforms caller-supplied exact-block artifacts but performs no fresh RPC read.",
-      "The authorization binding identifies a reviewed artifact digest; the adapter does not authenticate the human principal behind it.",
+      authorization.state === "explicit_testnet_authorization"
+        ? "The authorization binding identifies a reviewed artifact digest; the adapter does not authenticate the human principal behind it."
+        : "The account is an unrelated public testnet replay subject; the binding claims neither ownership nor execution authority.",
       "Runner-level API and hire receipts remain separate TermiX gates and are not fabricated as Health Guardian alert receipts.",
       "The produced Health Guardian input remains caller_supplied_unverified and cannot authorize or execute an intervention."
     ]
