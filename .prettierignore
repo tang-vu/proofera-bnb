@@ -17,6 +17,8 @@ evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-
 evidence/erc8004/preparations/*.json
 # Byte-exact JSON.stringify outputs from the fixed ERC-8004 receipt collector.
 evidence/erc8004/registrations/*.json
+# Byte-exact JSON.stringify outputs from the fixed Altana lifecycle collector.
+evidence/altana/lifecycles/*.json
 # Byte-exact manifests from the public demo rehearsal collector.
 evidence/submission/rehearsals/*/manifest.json
 **/wallets
