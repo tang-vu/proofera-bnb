@@ -110,7 +110,7 @@ async function exactHealth(sourceCommit) {
   const body = await response.json();
   if (
     body?.service !== "proofera-marketplace" ||
-    body?.status !== "healthy" ||
+    body?.status !== "ok" ||
     body?.build !== sourceCommit
   ) {
     fail("PUBLIC_DEMO_REHEARSAL_BUILD_MISMATCH");

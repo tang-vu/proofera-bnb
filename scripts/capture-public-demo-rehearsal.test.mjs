@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 const scriptUrl = new URL("./capture-public-demo-rehearsal.mjs", import.meta.url);
 const scriptPath = fileURLToPath(scriptUrl);
 const source = await readFile(scriptUrl, "utf8");
+const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
 
 test("public demo rehearsal is exact-release gated and create-only", () => {
   assert.match(source, /--capture-exact-public-demo-rehearsal/u);
@@ -15,6 +16,10 @@ test("public demo rehearsal is exact-release gated and create-only", () => {
   assert.match(source, /status", "--porcelain=v1", "--untracked-files=all/u);
   assert.match(source, /await mkdir\(outputDirectory\)/u);
   assert.match(source, /flag: "wx"/u);
+  assert.equal(
+    packageJson.scripts["capture:demo:rehearsal"],
+    "node ./scripts/capture-public-demo-rehearsal.mjs --capture-exact-public-demo-rehearsal --source-base-commit"
+  );
 });
 
 test("public demo rehearsal fixes six honest judge-facing scenes", () => {

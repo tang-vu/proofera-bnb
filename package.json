@@ -11,7 +11,7 @@
   "scripts": {
     "build": "pnpm --filter @proofera/web build",
     "capture:pancake:public-position": "node ./scripts/capture-pancake-public-position-benefit.mjs",
-    "capture:demo:rehearsal": "node ./scripts/capture-public-demo-rehearsal.mjs",
+    "capture:demo:rehearsal": "node ./scripts/capture-public-demo-rehearsal.mjs --capture-exact-public-demo-rehearsal --source-base-commit",
     "collect:termix:venus": "node --no-warnings --conditions=react-server --experimental-loader ./scripts/typescript-extension-loader.mjs ./scripts/collect-termix-venus-exact-block.ts",
     "run:termix:pancake-lp-agent": "node --no-warnings --conditions=react-server --experimental-loader ./scripts/termix-typescript-loader.mjs ./scripts/run-termix-pancake-lp-agent.ts",
     "run:termix:permission-audit-agent": "node --no-warnings --conditions=react-server --experimental-loader ./scripts/termix-typescript-loader.mjs ./scripts/run-termix-permission-audit-agent.ts",
