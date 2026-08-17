@@ -157,17 +157,17 @@ test("current registration preparation binds the five deployed skill contracts",
   const manifest = JSON.parse(
     await readFile(
       new URL(
-        "../evidence/erc8004/preparations/125517740-four-agent-registration-preparation.json",
+        "../evidence/erc8004/preparations/125530553-four-agent-registration-preparation.json",
         import.meta.url
       ),
       "utf8"
     )
   );
-  assert.equal(manifest.sourceBaseCommit, "3fb6099f83f4ce12187694734e999f60a053b8df");
-  assert.equal(manifest.network.blockNumber, "125517740");
+  assert.equal(manifest.sourceBaseCommit, "e10e2415dac8deb183dcc2fbdf7bd09fe0f44fc4");
+  assert.equal(manifest.network.blockNumber, "125530553");
   assert.equal(
     manifest.network.blockHash,
-    "0x6274e868d4bbd2d6c8f0c3e0f965dd88025ccc2f7b9c4932efd19ac6c7353c1c"
+    "0x2611ead874d30b1f38bfbac2103fa1dac095a0e9a35a4fc127103b88071706b3"
   );
   assert.equal(manifest.rpcTranscript.length, 42);
   assert.deepEqual(
