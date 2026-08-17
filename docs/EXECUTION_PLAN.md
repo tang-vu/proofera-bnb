@@ -191,6 +191,17 @@ and decodes every hire event. Unknown broadcast/receipt outcomes halt all later
 transactions. These controls are execution capability, not authorization or
 receipt evidence.
 
+The create-only `capture:termix:hires` collector is also implemented and still
+non-invoked. Given the exact deployment and three hire hashes, it requires a
+clean published release, then joins normalized transactions, receipts and
+canonical blocks across the same two RPCs. At one common block at least 12 deep
+it verifies exact runtime bytes, ERC-8004 owners, decoded event fields, the
+contract's receipt-hash formula and each stored engagement receipt. Its output
+contains three byte-hashed `verifiedHireReceipt` objects accepted by the timed
+runner while keeping task completion, performance, execution authority and
+TermiX completion false. Four deterministic collector/validator tests pass;
+no receipt output exists before the approved transactions finalize.
+
 ## Milestone 5 — submission-grade product (`PLANNED`)
 
 Acceptance criteria:
