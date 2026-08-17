@@ -8,6 +8,7 @@ const LOADER_PATH = fileURLToPath(import.meta.url);
 const REPOSITORY_ROOT = resolvePath(dirname(LOADER_PATH), "..");
 const EXACT_ENTRYPOINTS = new Set([
   resolvePath(REPOSITORY_ROOT, "scripts/freeze-termix-pancake-lp-declaration.ts"),
+  resolvePath(REPOSITORY_ROOT, "scripts/freeze-termix-venus-health-declaration.ts"),
   resolvePath(REPOSITORY_ROOT, "scripts/compile-termix-final-evidence.ts"),
   resolvePath(REPOSITORY_ROOT, "scripts/run-termix-venus-health-agent.ts"),
   resolvePath(REPOSITORY_ROOT, "scripts/run-termix-venus-health-manual.ts"),
@@ -18,6 +19,13 @@ const EXACT_ENTRYPOINTS = new Set([
   resolvePath(REPOSITORY_ROOT, "scripts/termix-manual-runner-support.ts")
 ]);
 const BENCHMARK_SOURCE_DIRECTORY = resolvePath(REPOSITORY_ROOT, "packages/benchmarks/src");
+const EXACT_HEALTH_AGENT_SOURCES = new Set([
+  resolvePath(
+    REPOSITORY_ROOT,
+    "agents/healthFactorGuardianAgent/app/agent/src/healthFactorAnalysis.ts"
+  ),
+  resolvePath(REPOSITORY_ROOT, "agents/healthFactorGuardianAgent/app/agent/src/venusExactWindow.ts")
+]);
 const RELATIVE_WITHOUT_EXTENSION = /^(?:\.\.?\/).+[^./]$/u;
 const RELATIVE_JAVASCRIPT = /^(?:\.\.?\/).+\.js$/u;
 
@@ -27,7 +35,11 @@ function isWithin(parent, candidate) {
 }
 
 function isAdmittedTypeScript(path) {
-  return EXACT_ENTRYPOINTS.has(path) || isWithin(BENCHMARK_SOURCE_DIRECTORY, path);
+  return (
+    EXACT_ENTRYPOINTS.has(path) ||
+    EXACT_HEALTH_AGENT_SOURCES.has(path) ||
+    isWithin(BENCHMARK_SOURCE_DIRECTORY, path)
+  );
 }
 
 async function resolveTypeScriptCandidate(specifier, parentURL) {

@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "types": ["node"]
+  },
+  "include": [
+    "freeze-termix-venus-health-declaration.ts",
+    "../packages/benchmarks/src/**/*.ts",
+    "../agents/healthFactorGuardianAgent/app/agent/src/healthFactorAnalysis.ts",
+    "../agents/healthFactorGuardianAgent/app/agent/src/venusExactWindow.ts"
+  ]
+}
