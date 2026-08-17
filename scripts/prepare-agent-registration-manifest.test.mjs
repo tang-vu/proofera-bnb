@@ -34,6 +34,25 @@ test("registration preparation fixes the reviewed chain, registry, SDK and walle
   }
 });
 
+test("registration preparation binds the exact public agent metadata and skill contracts", () => {
+  assert.match(source, /ProofEra LP Risk Evidence Agent/u);
+  assert.match(
+    source,
+    /Deterministic, read-only PancakeSwap LP range and scoped permission evidence analysis on BSC mainnet and testnet\./u
+  );
+  for (const skillId of [
+    "analyze_lp_range",
+    "audit_altana_permission_bundle",
+    "analyze_grid_trading",
+    "analyze_yield_opportunities",
+    "analyze_venus_health_factor"
+  ]) {
+    assert.match(source, new RegExp(`skills: \\[?[^\\]]*${skillId}|${skillId}`, "u"));
+  }
+  assert.match(source, /skillIds\.length !== agent\.skills\.length/u);
+  assert.match(source, /skillId !== agent\.skills\[index\]/u);
+});
+
 test("registration preparation requires two-provider agreement and preserves unknown step two", () => {
   assert.match(source, /data-seed-prebsc-2-s2\.binance\.org/u);
   assert.match(source, /bsc-testnet-rpc\.publicnode\.com/u);

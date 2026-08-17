@@ -32,9 +32,10 @@ const AGENTS = Object.freeze([
     key: "lp-range",
     wallet: "0xAd03eF7e21c35FD1446c153f6eE5e6165F696990",
     root: "https://proofera-lp.tangvu.dev/",
-    name: "ProofEra LP Range Evidence Agent",
+    name: "ProofEra LP Risk Evidence Agent",
     description:
-      "Deterministic, read-only PancakeSwap V3 LP range evidence analysis on BSC mainnet and testnet."
+      "Deterministic, read-only PancakeSwap LP range and scoped permission evidence analysis on BSC mainnet and testnet.",
+    skills: ["analyze_lp_range", "audit_altana_permission_bundle"]
   },
   {
     key: "grid-trading",
@@ -42,7 +43,8 @@ const AGENTS = Object.freeze([
     root: "https://proofera-grid.tangvu.dev/",
     name: "ProofEra Grid Trading Evidence Agent",
     description:
-      "Deterministic, read-only BSC grid candidate analysis backed only by caller-supplied evidence."
+      "Deterministic, read-only BSC grid candidate analysis backed only by caller-supplied evidence.",
+    skills: ["analyze_grid_trading"]
   },
   {
     key: "yield-optimisation",
@@ -50,7 +52,8 @@ const AGENTS = Object.freeze([
     root: "https://proofera-yield.tangvu.dev/",
     name: "yieldOptimisationAgent-agent",
     description:
-      "ProofEra deterministic yield route evidence analyzer for BSC mainnet and testnet. Read-only; missing evidence lowers confidence."
+      "ProofEra deterministic yield route evidence analyzer for BSC mainnet and testnet. Read-only; missing evidence lowers confidence.",
+    skills: ["analyze_yield_opportunities"]
   },
   {
     key: "health-factor",
@@ -58,7 +61,8 @@ const AGENTS = Object.freeze([
     root: "https://proofera-health.tangvu.dev/",
     name: "ProofEra Health-Factor Guardian Evidence Agent",
     description:
-      "Deterministic, read-only Venus Core Pool health-factor and monitoring-evidence analysis."
+      "Deterministic, read-only Venus Core Pool health-factor and monitoring-evidence analysis.",
+    skills: ["analyze_venus_health_factor"]
   }
 ]);
 
@@ -219,11 +223,20 @@ function decodeUint256(value, code) {
 }
 
 function validateCard(agent, card) {
+  const skillIds = Array.isArray(card.skills)
+    ? card.skills.map((skill) =>
+        skill !== null && typeof skill === "object" && typeof skill.id === "string"
+          ? skill.id
+          : null
+      )
+    : [];
   if (
     card.name !== agent.name ||
     card.description !== agent.description ||
     card.protocolVersion !== PROTOCOL_VERSION ||
-    card.url !== agent.root
+    card.url !== agent.root ||
+    skillIds.length !== agent.skills.length ||
+    skillIds.some((skillId, index) => skillId !== agent.skills[index])
   ) {
     fail("ERC8004_AGENT_CARD_MISMATCH");
   }
