@@ -44,3 +44,15 @@ test("Venus collector retains exact-block raw inputs and explicit oracle unavail
   assert.match(source, /block\.hash/);
   assert.match(source, /vaiRepayAmountRaw/);
 });
+
+test("Venus collector captures an ordered finalized window before one create-only write", () => {
+  assert.match(source, /--blocks/);
+  assert.match(source, /COLLECTOR_BLOCK_WINDOW_INVALID/);
+  assert.match(source, /block <= \(parsed\[position - 1\] \?\? 0n\)/);
+  assert.match(source, /for \(const block of blockNumbers\)/);
+  assert.match(source, /block > minimumHead - FINALITY_BLOCKS/);
+  assert.match(source, /proofera-termix-venus-development-window-v1\.0\.0/);
+  assert.match(source, /venus-core-exact-window-/);
+  assert.match(source, /observationCount: evidenceWindow\.length/);
+  assert.match(source, /writeFile\(path/);
+});

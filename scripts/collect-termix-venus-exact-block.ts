@@ -83,6 +83,7 @@ interface RpcTranscriptEntry {
 interface CliOptions {
   readonly account: Address;
   readonly blockNumber: bigint | null;
+  readonly blockWindow: readonly bigint[] | null;
   readonly latestFinalized: boolean;
   readonly writeDevelopmentEvidence: boolean;
 }
@@ -90,6 +91,7 @@ interface CliOptions {
 function parseCli(args: readonly string[]): CliOptions {
   let account: Address | null = null;
   let blockNumber: bigint | null = null;
+  let blockWindow: readonly bigint[] | null = null;
   let latestFinalized = false;
   let writeDevelopmentEvidence = false;
   for (let index = 0; index < args.length; index += 1) {
@@ -110,6 +112,17 @@ function parseCli(args: readonly string[]): CliOptions {
       index += 1;
     } else if (argument === "--latest-finalized") {
       latestFinalized = true;
+    } else if (argument === "--blocks") {
+      const value = args[index + 1];
+      if (value === undefined || !/^[1-9][0-9]*(?:,[1-9][0-9]*){2,15}$/.test(value)) {
+        throw new Error("COLLECTOR_BLOCK_WINDOW_INVALID");
+      }
+      const parsed = value.split(",").map(BigInt);
+      if (parsed.some((block, position) => position > 0 && block <= (parsed[position - 1] ?? 0n))) {
+        throw new Error("COLLECTOR_BLOCK_WINDOW_INVALID");
+      }
+      blockWindow = parsed;
+      index += 1;
     } else if (argument === "--write-development-evidence") {
       writeDevelopmentEvidence = true;
     } else {
@@ -117,10 +130,10 @@ function parseCli(args: readonly string[]): CliOptions {
     }
   }
   if (account === null) throw new Error("COLLECTOR_ACCOUNT_REQUIRED");
-  if ((blockNumber === null) === !latestFinalized) {
+  if ([blockNumber !== null, latestFinalized, blockWindow !== null].filter(Boolean).length !== 1) {
     throw new Error("COLLECTOR_EXACTLY_ONE_BLOCK_MODE_REQUIRED");
   }
-  return { account, blockNumber, latestFinalized, writeDevelopmentEvidence };
+  return { account, blockNumber, blockWindow, latestFinalized, writeDevelopmentEvidence };
 }
 
 function parseJson(text: string): unknown {
@@ -377,35 +390,55 @@ async function main(): Promise<void> {
     })
   );
   const minimumHead = heads.reduce((minimum, head) => (head < minimum ? head : minimum));
-  const blockNumber = options.latestFinalized ? minimumHead - FINALITY_BLOCKS : options.blockNumber;
-  if (blockNumber === null || blockNumber <= 0n || blockNumber > minimumHead - FINALITY_BLOCKS) {
+  const blockNumbers = options.latestFinalized
+    ? [minimumHead - FINALITY_BLOCKS]
+    : (options.blockWindow ?? (options.blockNumber === null ? [] : [options.blockNumber]));
+  if (
+    blockNumbers.length === 0 ||
+    blockNumbers.some((block) => block <= 0n || block > minimumHead - FINALITY_BLOCKS)
+  ) {
     throw new Error("COLLECTOR_BLOCK_NOT_FINALIZED");
   }
-  const results = await Promise.all(
-    PROVIDERS.map((provider) => collectProvider(provider, options.account, blockNumber))
+  const windowResults = [];
+  for (const block of blockNumbers) {
+    windowResults.push(
+      await Promise.all(
+        PROVIDERS.map((provider) => collectProvider(provider, options.account, block))
+      )
+    );
+  }
+  const evidenceWindow = windowResults.map((results) =>
+    buildVenusCoreExactBlockEvidence(results.map(({ observation }) => observation))
   );
-  const evidence = buildVenusCoreExactBlockEvidence(results.map(({ observation }) => observation));
+  const evidence = evidenceWindow.at(-1);
+  if (evidence === undefined) throw new Error("COLLECTOR_BLOCK_WINDOW_EMPTY");
   const repository = await gitState();
+  const windowMode = blockNumbers.length > 1;
   const artifact = {
-    schemaVersion: "proofera-termix-venus-development-capture-v1.0.0",
+    schemaVersion: windowMode
+      ? "proofera-termix-venus-development-window-v1.0.0"
+      : "proofera-termix-venus-development-capture-v1.0.0",
     status: "DEVELOPMENT_READ_ONLY",
     publishable: false,
     termixRunStatus: "NOT_RUN",
     sourceCommit: repository.commit,
     sourceCommitClean: repository.clean,
     capturedAtUtc: new Date().toISOString(),
-    evidence,
-    providerCaptures: results
+    ...(windowMode ? { evidenceWindow } : { evidence }),
+    providerCaptures: windowMode ? windowResults : windowResults[0]
   };
   if (options.writeDevelopmentEvidence) {
     if (!repository.clean) throw new Error("COLLECTOR_DIRTY_WORKTREE");
     const accountSuffix = options.account.slice(-8).toLowerCase();
-    const path = resolve(
-      ROOT,
-      "evidence",
-      "development",
-      `venus-core-exact-block-${blockNumber.toString()}-${accountSuffix}.json`
-    );
+    const firstBlock = blockNumbers[0];
+    const lastBlock = blockNumbers.at(-1);
+    if (firstBlock === undefined || lastBlock === undefined) {
+      throw new Error("COLLECTOR_BLOCK_WINDOW_EMPTY");
+    }
+    const fileName = windowMode
+      ? `venus-core-exact-window-${firstBlock.toString()}-${lastBlock.toString()}-${accountSuffix}.json`
+      : `venus-core-exact-block-${lastBlock.toString()}-${accountSuffix}.json`;
+    const path = resolve(ROOT, "evidence", "development", fileName);
     await writeFile(path, `${JSON.stringify(artifact, null, 2)}\n`, {
       encoding: "utf8",
       flag: "wx"
@@ -422,12 +455,16 @@ async function main(): Promise<void> {
         sourceCommit: repository.commit,
         sourceCommitClean: repository.clean,
         account: evidence.account,
-        blockNumber: evidence.blockNumber,
-        blockHash: evidence.blockHash,
+        firstBlockNumber: evidenceWindow[0]?.blockNumber,
+        lastBlockNumber: evidence.blockNumber,
+        lastBlockHash: evidence.blockHash,
+        observationCount: evidenceWindow.length,
         marketsEnumerated: evidence.marketsEnumerated,
         positions: evidence.positions.length,
         healthFactorE18Raw: evidence.healthFactorE18Raw,
-        providerTranscriptSha256: results.map(({ transcriptSha256 }) => transcriptSha256)
+        providerTranscriptSha256: windowResults.flatMap((results) =>
+          results.map(({ transcriptSha256 }) => transcriptSha256)
+        )
       },
       null,
       2
