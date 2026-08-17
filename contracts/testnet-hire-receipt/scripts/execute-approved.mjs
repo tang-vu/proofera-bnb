@@ -18,7 +18,7 @@ import { Interface, Transaction, Wallet, getAddress, keccak256 } from "ethers";
 const CHAIN_ID = 97n;
 const SOURCE = "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49";
 const REGISTRY = "0x8004A818BFB912233c491871b3d84c89A494BD9e";
-const APPROVAL_ID = "HIRE-TERMIX-2026-08-17-V2";
+const APPROVAL_ID = "HIRE-TERMIX-2026-08-17-V3";
 const KEYSTORE_NAME =
   "UTC--2026-08-12T09-45-30.464Z--997cd959798f7c925076eaeff5855c5c2c1e5a49.keystore.json";
 const PASSWORD_BLOB_NAME = "deployer-password.dpapi";
@@ -377,16 +377,14 @@ async function loadWallet() {
   if (custody !== expected) fail("HIRE_EXECUTION_CUSTODY_PATH_INVALID");
   const protectedBytes = readFileSync(resolve(custody, PASSWORD_BLOB_NAME));
   const passwordBytes = unprotectPassword(protectedBytes);
-  let password = passwordBytes.toString("utf8");
   try {
     const wallet = await Wallet.fromEncryptedJson(
       readFileSync(resolve(custody, KEYSTORE_NAME), "utf8"),
-      password
+      passwordBytes
     );
     if (wallet.address !== SOURCE) fail("HIRE_EXECUTION_WALLET_MISMATCH");
     return wallet;
   } finally {
-    password = "";
     passwordBytes.fill(0);
     protectedBytes.fill(0);
   }
