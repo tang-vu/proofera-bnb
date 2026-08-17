@@ -21,6 +21,8 @@ evidence/erc8004/registrations/*.json
 evidence/altana/lifecycles/*.json
 # Byte-exact manifests from the public demo rehearsal collector.
 evidence/submission/rehearsals/*/manifest.json
+# Byte-exact manifests from the final/rehearsal demo video collector.
+evidence/submission/demo-videos/*/*/manifest.json
 **/wallets
 **/*keystore*.json
 *.pem

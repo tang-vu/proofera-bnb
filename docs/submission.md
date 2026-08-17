@@ -19,6 +19,7 @@ Users begin with a financial job—protect a Venus loan, manage Pancake concentr
 - Treats permission inspection, status reconciliation and revoke as core marketplace features.
 - Exposes a public `/proof` room that renders the committed seven-gate closure ledger, exact public Agent Card skills, build identity, blockers and artifact SHA-256 values. It deliberately labels all current gates incomplete; the page is an evidence index, not a readiness claim.
 - Retains a six-scene, full-page public-browser rehearsal bound to exact production commit `b0e46cc192fbf15220a557c4b5bc8639c3c75eba`. The manifest verifies render assertions and screenshot hashes while explicitly denying video, final-demo, receipt, and submission claims.
+- Provides an exact-release [demo-video pipeline](./final-demo.md) with separate rehearsal/final modes. Final mode stays unavailable until production, registration, Altana, Pancake and TermiX gates are verified, requires committed narration, and validates duration, audio/video streams and full FFmpeg decoding. The pipeline exists, but no video has been recorded.
 
 ## Partner-track story
 
