@@ -13,6 +13,8 @@ contracts/testnet-fixed-asset
 evidence/development/pancake-v3-selector-paths
 # Exact JSON.stringify output from the fixed read-only RPC evidence collector.
 evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json
+# Byte-exact JSON.stringify outputs from the fixed ERC-8004 preflight collector.
+evidence/erc8004/preparations/*.json
 **/wallets
 **/*keystore*.json
 *.pem

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-17T00:00:00.000Z",
+  "updatedAtUtc": "2026-08-17T00:22:23.000Z",
   "readyForSubmission": false,
   "gates": [
     {
@@ -15,15 +15,15 @@
     {
       "gateId": "agent-registration",
       "state": "prepared_only",
-      "claim": "Four registration preparations exist; no agent registration transaction or owned ERC-8004 identity exists.",
+      "claim": "A current four-agent registration preparation binds five public skills; no agent registration transaction or owned ERC-8004 identity exists.",
       "blockers": [
         "Fund and register all four dedicated agent wallets on BSC testnet with explorer-verifiable receipts."
       ],
       "artifacts": [
         {
           "kind": "preparation",
-          "path": "evidence/erc8004/preparations/125490457-four-agent-registration-preparation.json",
-          "sha256": "30e9d4d7e86fd7e2af79913843b847411859afc7a0a6ca1da5ecba64d649ed2d"
+          "path": "evidence/erc8004/preparations/125510593-four-agent-registration-preparation.json",
+          "sha256": "40bb10ed4c14b3c9feeb6ab5031510bb607ec8f145403edf47f689eac807197d"
         }
       ]
     },

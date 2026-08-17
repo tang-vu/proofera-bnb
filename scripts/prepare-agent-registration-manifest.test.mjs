@@ -7,6 +7,7 @@ const source = await readFile(
   new URL("./prepare-agent-registration-manifest.mjs", import.meta.url),
   "utf8"
 );
+const prettierIgnore = await readFile(new URL("../.prettierignore", import.meta.url), "utf8");
 
 test("registration preparation is read-only, exact-flagged, and create-only", () => {
   assert.match(source, /--prepare-exact-registration-manifest/u);
@@ -16,6 +17,7 @@ test("registration preparation is read-only, exact-flagged, and create-only", ()
     source,
     /eth_sendRawTransaction|eth_sendTransaction|privateKey|WALLET_PASSWORD/u
   );
+  assert.match(prettierIgnore, /^evidence\/erc8004\/preparations\/\*\.json$/mu);
 });
 
 test("registration preparation fixes the reviewed chain, registry, SDK and wallets", () => {
@@ -149,4 +151,52 @@ test("retained registration preparation proves only read-only preflight state", 
     assert.ok(allowedMethods.has(exchange.request.method));
     assert.equal(exchange.response.error, undefined);
   }
+});
+
+test("current registration preparation binds the five deployed skill contracts", async () => {
+  const manifest = JSON.parse(
+    await readFile(
+      new URL(
+        "../evidence/erc8004/preparations/125510593-four-agent-registration-preparation.json",
+        import.meta.url
+      ),
+      "utf8"
+    )
+  );
+  assert.equal(manifest.sourceBaseCommit, "3f4cb7917239a78084bfe5f645eba9886b2ea6b0");
+  assert.equal(manifest.network.blockNumber, "125510593");
+  assert.equal(
+    manifest.network.blockHash,
+    "0xe76d2810151e23e7ac6513f667fe22825c571514ccf2faa904b3d55e2b32c612"
+  );
+  assert.equal(manifest.rpcTranscript.length, 42);
+  assert.deepEqual(
+    manifest.agents.map((agent) => ({
+      key: agent.key,
+      skills: JSON.parse(agent.publicSurface.agentCard.responseBody).skills.map(({ id }) => id),
+      status: agent.readiness.status
+    })),
+    [
+      {
+        key: "lp-range",
+        skills: ["analyze_lp_range", "audit_altana_permission_bundle"],
+        status: "blocked_unfunded"
+      },
+      {
+        key: "grid-trading",
+        skills: ["analyze_grid_trading"],
+        status: "blocked_unfunded"
+      },
+      {
+        key: "yield-optimisation",
+        skills: ["analyze_yield_opportunities"],
+        status: "blocked_unfunded"
+      },
+      {
+        key: "health-factor",
+        skills: ["analyze_venus_health_factor"],
+        status: "blocked_unfunded"
+      }
+    ]
+  );
 });
