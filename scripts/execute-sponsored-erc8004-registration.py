@@ -1,4 +1,4 @@
-"""Execute one explicitly approved, gas-sponsored BSC testnet registration.
+"""Execute one explicitly approved BSC testnet ERC-8004 registration.
 
 This operator-only runner deliberately handles one agent at a time. It binds the
 first call byte-for-byte to a committed ProofEra preparation and emits only
@@ -17,6 +17,7 @@ from typing import Any
 
 from bnbagent import AgentEndpoint, ERC8004Agent, EVMWalletProvider
 from bnbagent.core.contract_mixin import min_gas_price_wei
+from bnbagent.erc8004.contract import ContractInterface
 from bnbagent.wallets.intents import ERC8004_REGISTER, Intent
 
 
@@ -88,6 +89,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--preparation", required=True, type=Path)
     parser.add_argument("--agent-key", required=True)
     parser.add_argument("--wallets-dir", required=True, type=Path)
+    parser.add_argument("--mode", required=True, choices=("sponsored", "self-paid"))
     return parser.parse_args()
 
 
@@ -129,8 +131,18 @@ def main() -> None:
         fail("SDK RPC returned the wrong chain ID")
     if sdk.contract.contract_address.lower() != EXPECTED_REGISTRY.lower():
         fail("SDK selected the wrong registry")
-    if sdk.contract.paymaster is None:
-        fail("SDK paymaster is unavailable; refusing self-paid fallback")
+    if args.mode == "sponsored":
+        if sdk.contract.paymaster is None:
+            fail("SDK paymaster is unavailable; refusing implicit self-paid fallback")
+    else:
+        sdk.contract = ContractInterface(
+            web3=sdk.web3,
+            contract_address=EXPECTED_REGISTRY,
+            wallet_provider=wallet,
+            paymaster=None,
+        )
+        if int(sdk.web3.eth.get_balance(wallet.address)) < 3_000_000_000_000_000:
+            fail("self-paid wallet has less than the approved 0.003 tBNB funding")
 
     metadata = [{"key": "built_with", "value": EXPECTED_BUILT_WITH}]
     metadata_bytes = [
@@ -154,7 +166,12 @@ def main() -> None:
         wallet=wallet.address,
         chainId=EXPECTED_CHAIN_ID,
         registry=EXPECTED_REGISTRY,
-        paymaster=sdk.contract.paymaster.paymaster_url,
+        mode=args.mode,
+        paymaster=(
+            sdk.contract.paymaster.paymaster_url
+            if sdk.contract.paymaster is not None
+            else None
+        ),
     )
 
     # SDK 0.4.2 builds named dictionaries for tuple[] metadata, while Web3
