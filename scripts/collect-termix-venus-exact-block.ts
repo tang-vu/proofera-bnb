@@ -5,6 +5,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 
+import { format } from "prettier";
 import {
   createPublicClient,
   defineChain,
@@ -498,36 +499,37 @@ async function main(): Promise<void> {
       throw new Error("COLLECTOR_BLOCK_WINDOW_EMPTY");
     }
     if (windowMode) {
-      const captureArtifacts = evidenceWindow.map((blockEvidence, index) => {
-        const blockCaptures = windowResults[index];
-        if (blockCaptures === undefined) throw new Error("COLLECTOR_BLOCK_CAPTURE_MISSING");
-        const relativePath =
-          `evidence/development/venus-core-exact-window-${firstBlock.toString()}-` +
-          `${lastBlock.toString()}-${accountSuffix}.block-${blockEvidence.blockNumber}.json`;
-        const body = `${JSON.stringify(
-          {
-            schemaVersion: "proofera-termix-venus-development-window-block-v1.0.0",
-            status: "DEVELOPMENT_READ_ONLY",
-            publishable: false,
-            termixRunStatus: "NOT_RUN",
-            sourceCommit: repository.commit,
-            sourceCommitClean: repository.clean,
-            capturedAtUtc: artifact.capturedAtUtc,
-            evidence: blockEvidence,
-            providerCaptures: blockCaptures
-          },
-          null,
-          2
-        )}\n`;
-        return {
-          blockNumber: blockEvidence.blockNumber,
-          blockHash: blockEvidence.blockHash,
-          path: relativePath,
-          sha256: sha256(body),
-          bytes: Buffer.byteLength(body),
-          body
-        };
-      });
+      const captureArtifacts = await Promise.all(
+        evidenceWindow.map(async (blockEvidence, index) => {
+          const blockCaptures = windowResults[index];
+          if (blockCaptures === undefined) throw new Error("COLLECTOR_BLOCK_CAPTURE_MISSING");
+          const relativePath =
+            `evidence/development/venus-core-exact-window-${firstBlock.toString()}-` +
+            `${lastBlock.toString()}-${accountSuffix}.block-${blockEvidence.blockNumber}.json`;
+          const body = await format(
+            JSON.stringify({
+              schemaVersion: "proofera-termix-venus-development-window-block-v1.0.0",
+              status: "DEVELOPMENT_READ_ONLY",
+              publishable: false,
+              termixRunStatus: "NOT_RUN",
+              sourceCommit: repository.commit,
+              sourceCommitClean: repository.clean,
+              capturedAtUtc: artifact.capturedAtUtc,
+              evidence: blockEvidence,
+              providerCaptures: blockCaptures
+            }),
+            { parser: "json" }
+          );
+          return {
+            blockNumber: blockEvidence.blockNumber,
+            blockHash: blockEvidence.blockHash,
+            path: relativePath,
+            sha256: sha256(body),
+            bytes: Buffer.byteLength(body),
+            body
+          };
+        })
+      );
       const manifest = {
         schemaVersion: "proofera-termix-venus-development-window-v1.1.0",
         status: "DEVELOPMENT_READ_ONLY",
@@ -557,7 +559,8 @@ async function main(): Promise<void> {
         `venus-core-exact-window-${firstBlock.toString()}-${lastBlock.toString()}-` +
         `${accountSuffix}.json`;
       const path = resolve(ROOT, "evidence", "development", fileName);
-      await writeFile(path, `${JSON.stringify(manifest, null, 2)}\n`, {
+      const manifestBody = await format(JSON.stringify(manifest), { parser: "json" });
+      await writeFile(path, manifestBody, {
         encoding: "utf8",
         flag: "wx"
       });
@@ -566,7 +569,8 @@ async function main(): Promise<void> {
     }
     const fileName = `venus-core-exact-block-${lastBlock.toString()}-${accountSuffix}.json`;
     const path = resolve(ROOT, "evidence", "development", fileName);
-    await writeFile(path, `${JSON.stringify(artifact, null, 2)}\n`, {
+    const body = await format(JSON.stringify(artifact), { parser: "json" });
+    await writeFile(path, body, {
       encoding: "utf8",
       flag: "wx"
     });

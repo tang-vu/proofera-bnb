@@ -59,6 +59,9 @@ test("Venus collector captures an ordered finalized window before one create-onl
   assert.match(source, /proofera-termix-venus-development-window-block-v1\.0\.0/);
   assert.match(source, /captureArtifacts: captureArtifacts\.map/);
   assert.match(source, /sha256: sha256\(body\)/);
+  assert.match(source, /import \{ format \} from "prettier"/);
+  assert.match(source, /await format\(/);
+  assert.match(source, /\{ parser: "json" \}/);
   assert.match(source, /flag: "wx"/);
 });
 
