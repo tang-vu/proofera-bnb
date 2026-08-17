@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -82,4 +83,37 @@ test("capture rejects missing invocation before Git, media tools or network", ()
     result.stderr,
     /PUBLIC_DEMO_VIDEO_(HEAD_MISMATCH|FFPROBE_FAILED|HEALTH_INVALID)/u
   );
+});
+
+test("retained silent rehearsal binds the exact release and decoded media bytes", async () => {
+  const directory = new URL(
+    "../evidence/submission/demo-videos/f3218e712db9eb001c577b5d116e5b0bc1a1067c/rehearsal/",
+    import.meta.url
+  );
+  const manifestBytes = await readFile(new URL("manifest.json", directory));
+  const manifest = JSON.parse(manifestBytes.toString("utf8"));
+  assert.equal(manifest.schemaVersion, "proofera-public-demo-video-v1.0.0");
+  assert.equal(manifest.sourceCommit, "f3218e712db9eb001c577b5d116e5b0bc1a1067c");
+  assert.deepEqual(manifest.classification, {
+    artifact: "public_demo_video_rehearsal",
+    audioPresent: false,
+    browserAutomation: true,
+    finalDemoCheck: false,
+    hackathonEntrySubmitted: false,
+    onchainReceiptEvidenceIntroduced: false,
+    playbackDecoded: true,
+    submissionReady: false,
+    videoRecorded: true
+  });
+  assert.equal(manifest.scenes.length, 6);
+  assert.equal(manifest.media.probe.durationSeconds, "21.560");
+  assert.deepEqual(manifest.media.probe.audioStreams, []);
+  assert.deepEqual(manifest.media.probe.videoStream, {
+    codecName: "vp8",
+    height: 900,
+    width: 1440
+  });
+  const mediaBytes = await readFile(new URL(manifest.media.path, directory));
+  assert.equal(mediaBytes.length, manifest.media.bytes);
+  assert.equal(createHash("sha256").update(mediaBytes).digest("hex"), manifest.media.sha256);
 });

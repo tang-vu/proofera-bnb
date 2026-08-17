@@ -1,6 +1,6 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-17T01:15:59.000Z",
+  "updatedAtUtc": "2026-08-17T02:24:36.109Z",
   "readyForSubmission": false,
   "gates": [
     {
@@ -85,7 +85,7 @@
     {
       "gateId": "demo",
       "state": "not_recorded",
-      "claim": "A six-scene exact-build public-browser rehearsal is retained; no final video or clean-room playback check exists.",
+      "claim": "Six-scene screenshot and silent-video exact-build public-browser rehearsals are retained; no narrated final video or clean-room playback check exists.",
       "blockers": [
         "Record the final release journey and retain the video plus a timestamped evidence-link playback check."
       ],
@@ -94,6 +94,16 @@
           "kind": "rehearsal",
           "path": "evidence/submission/rehearsals/b0e46cc192fbf15220a557c4b5bc8639c3c75eba/manifest.json",
           "sha256": "ff96fe3cfa49fddbf58c279d4e4b012fcbfe9e697b21f8d6c1d174708f098e39"
+        },
+        {
+          "kind": "video_rehearsal_manifest",
+          "path": "evidence/submission/demo-videos/f3218e712db9eb001c577b5d116e5b0bc1a1067c/rehearsal/manifest.json",
+          "sha256": "77ceccc62be73d2b3f3622845173a912f0adc99150e4c003f473f4979971e860"
+        },
+        {
+          "kind": "video_rehearsal",
+          "path": "evidence/submission/demo-videos/f3218e712db9eb001c577b5d116e5b0bc1a1067c/rehearsal/proofera-rehearsal-demo.webm",
+          "sha256": "7e53d9a7a91109c041e24eb7a7613e8c86333089068f71bc1c468b6e017dcf92"
         }
       ]
     },
