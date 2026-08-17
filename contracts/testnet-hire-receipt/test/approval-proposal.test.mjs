@@ -17,7 +17,7 @@ const contractInterface = new Interface(artifact.abi);
 
 test("approval proposal binds the exact unsigned preparation and remains unapproved", () => {
   const digest = createHash("sha256").update(preparationBytes).digest("hex");
-  assert.equal(digest, "139ea342618d8f07b9c030210722b9ca15da2d67f933dc56e229061e67f55b3e");
+  assert.equal(digest, "d2f945588c3dd7d8403c713e7119ea3f53bc9bea6ce5ead073dc91b7037b6a5b");
   assert.equal(proposal.preparation.sha256, digest);
   assert.equal(proposal.sourceCommit, preparation.sourceCommit);
   assert.equal(proposal.approvalId, "HIRE-TERMIX-2026-08-17-V2");

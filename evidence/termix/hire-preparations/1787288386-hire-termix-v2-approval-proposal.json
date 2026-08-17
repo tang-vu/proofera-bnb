@@ -4,10 +4,10 @@
   "state": "proposed_unapproved",
   "authorization": false,
   "broadcast": false,
-  "sourceCommit": "63e396a289c6d72dd3ed80331600ecb253dcceb3",
+  "sourceCommit": "e9bb678843c689b8aa8963fa25b431f375d9f125",
   "preparation": {
     "path": "evidence/termix/hire-preparations/1787288386-hire-termix-v2.json",
-    "sha256": "139ea342618d8f07b9c030210722b9ca15da2d67f933dc56e229061e67f55b3e"
+    "sha256": "d2f945588c3dd7d8403c713e7119ea3f53bc9bea6ce5ead073dc91b7037b6a5b"
   },
   "scope": {
     "chainId": 97,
@@ -37,9 +37,9 @@
       "to": "0x052fd2940Aa46F0Ae6660e0bf9eBDEdb6F610b1A",
       "selector": "0xc7d43bd2",
       "agentId": "1825",
-      "engagementId": "0xb72d2cf053072f2158aa5d4ad0741f34d427bc6d92b0ea79d15af29366e1959d",
+      "engagementId": "0x4673c086dd6b3c665ab5bc51b1f56b7349a0a126c9712115ebf35e334805cbe2",
       "taskHash": "0x8e10c4ad3064c7d2d2016aa33f699de27d22c83cc9f59649b5b07fba3c696ca1",
-      "calldataKeccak256": "0x10763d229d5283d71ad39c3c5fe506ca1c14bb7fe42c656cc29a10a047687116",
+      "calldataKeccak256": "0xa6a6d18e3a68ba5290e820fa11b758e72125ff85ea4bc7b061705932df909b2b",
       "valueWei": "10000000000000",
       "gasLimit": "200000"
     },
@@ -50,9 +50,9 @@
       "to": "0x052fd2940Aa46F0Ae6660e0bf9eBDEdb6F610b1A",
       "selector": "0xc7d43bd2",
       "agentId": "1825",
-      "engagementId": "0x8e2eb191cd1d211e34a13c3cc7b173fcc2d5b8ef1b21c84defd08afe9168ab79",
+      "engagementId": "0xe391fd8ac4e291dd5f4e985e3e87afb76d495e1b05ab839edeaf8e7276a3f315",
       "taskHash": "0x9700ae940654ce9429c62de3a5725cf142be9a25778972e4b3a2e7092bfb4bc6",
-      "calldataKeccak256": "0x9c1bca4b165afabd1fb2b82ceb5d7e6a5307b0eff4e4d87fa2b37ed1f8681475",
+      "calldataKeccak256": "0xcf7ace446e04b802a914f82e8043b407d3be3d280865853f5b49480b26bcc467",
       "valueWei": "10000000000000",
       "gasLimit": "200000"
     },
@@ -63,9 +63,9 @@
       "to": "0x052fd2940Aa46F0Ae6660e0bf9eBDEdb6F610b1A",
       "selector": "0xc7d43bd2",
       "agentId": "1828",
-      "engagementId": "0x0d3e2f6fdfd6bd5f190e73726081e87886cbf9f0a644ec58d97ba708472e6929",
+      "engagementId": "0x651a02df89b079605be73e88edbaf4c3182e69318f4c87d7e7ae6c7e53bba541",
       "taskHash": "0xe3bf9df48c39e6fb6bfcae0bcbd3fc3a66bbf997601df0a1fbc8ee046282f7b8",
-      "calldataKeccak256": "0x4ea99e0de7ad69dbac042efc8a9cbedcb574561f0680ae3a5c22da7909bc873e",
+      "calldataKeccak256": "0x96fd914e3d5b78cfc2dc96a8711ffe5ed9cbae28f304ec27ca4ddd86e2ebf12f",
       "valueWei": "10000000000000",
       "gasLimit": "200000"
     }
@@ -108,7 +108,7 @@
       "headTimestamp": "1786942836"
     }
   ],
-  "requiredApprovalText": "Tôi phê duyệt gói HIRE-TERMIX-2026-08-17-V2 theo đúng preparation SHA-256 139ea342618d8f07b9c030210722b9ca15da2d67f933dc56e229061e67f55b3e và các giới hạn đã nêu.",
+  "requiredApprovalText": "Tôi phê duyệt gói HIRE-TERMIX-2026-08-17-V2 theo đúng preparation SHA-256 d2f945588c3dd7d8403c713e7119ea3f53bc9bea6ce5ead073dc91b7037b6a5b và các giới hạn đã nêu.",
   "unknownOutcomePolicy": {
     "blindRetry": false,
     "continueAfterFailure": false,
