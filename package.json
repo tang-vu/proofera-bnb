@@ -18,6 +18,7 @@
     "capture:erc8004:registration": "node ./scripts/capture-erc8004-registration-evidence.mjs --capture-exact-four-agent-registration --source-base-commit",
     "capture:termix:hires": "node ./scripts/capture-termix-hire-evidence.mjs --capture-finalized --source-commit",
     "capture:termix:pancake-lp-order": "node ./scripts/capture-termix-pancake-lp-run-order.mjs",
+    "capture:termix:venus-order": "node ./scripts/capture-termix-venus-health-run-order.mjs",
     "collect:termix:venus": "node --no-warnings --conditions=react-server --experimental-loader ./scripts/typescript-extension-loader.mjs ./scripts/collect-termix-venus-exact-block.ts",
     "compile:termix:final": "node --no-warnings --conditions=react-server --experimental-loader ./scripts/termix-typescript-loader.mjs ./scripts/compile-termix-final-evidence.ts --compile-exact-termix-final-evidence --source-base-commit",
     "freeze:termix:pancake-lp": "node --no-warnings --conditions=react-server --experimental-loader ./scripts/termix-typescript-loader.mjs ./scripts/freeze-termix-pancake-lp-declaration.ts",
