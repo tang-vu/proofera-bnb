@@ -1,6 +1,6 @@
 # ProofEra submission draft
 
-Updated: 2026-08-17. Status: copy in progress; the marketplace and four read-only analyzer endpoints are public and one Pancake public-position benefit capture is retained, while BSC registration, Altana/Pancake execution, TermiX paired evidence, activation, and final release evidence remain incomplete.
+Updated: 2026-08-17. Status: copy in progress; the marketplace and four read-only analyzer endpoints are public, one Pancake public-position benefit capture and one six-scene public demo rehearsal are retained, while BSC registration, Altana/Pancake execution, TermiX paired evidence, activation, final demo video, and final release evidence remain incomplete.
 
 ## Core copy
 
@@ -18,6 +18,7 @@ Users begin with a financial job—protect a Venus loan, manage Pancake concentr
 - Uses typed adapter boundaries, exact versions and evidence manifests that can survive undisclosed Phase 2 requirements.
 - Treats permission inspection, status reconciliation and revoke as core marketplace features.
 - Exposes a public `/proof` room that renders the committed seven-gate closure ledger, exact public Agent Card skills, build identity, blockers and artifact SHA-256 values. It deliberately labels all current gates incomplete; the page is an evidence index, not a readiness claim.
+- Retains a six-scene, full-page public-browser rehearsal bound to exact production commit `b0e46cc192fbf15220a557c4b5bc8639c3c75eba`. The manifest verifies render assertions and screenshot hashes while explicitly denying video, final-demo, receipt, and submission claims.
 
 ## Partner-track story
 
@@ -41,7 +42,7 @@ The machine-readable closure ledger is [`evidence/submission/readiness.json`](..
 | Grant/execute/revoke receipts | NOT EXECUTED                                                 |
 | Pancake benefit run           | READ-ONLY PUBLIC POSITION CAPTURED; EXECUTION NOT RUN        |
 | TermiX three-task report      | NOT RUN                                                      |
-| Demo video                    | NOT RECORDED                                                 |
+| Demo video                    | SIX-SCENE PUBLIC REHEARSAL RETAINED; VIDEO NOT RECORDED      |
 | CI/public smoke evidence      | LOCAL GATES AND PUBLIC SMOKE PASS; HOSTED CI BILLING-BLOCKED |
 | PTA fixture deployment        | FINALIZED CHAIN 97; NOT POOL/LP EVIDENCE                     |
 | PTA/WBNB pool readiness       | READ-ONLY SNAPSHOT; NO POOL OR WRITE                         |

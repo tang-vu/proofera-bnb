@@ -1,6 +1,19 @@
 # ProofEra judge demo script
 
-Updated: 2026-08-17. This is the target five-minute script, not a claim that the final run exists. The marketplace, four public read-only analyzers, category dossiers/configuration surfaces, and `/proof` judge evidence index are live. Permission confirmation, activation, execution, populated Mission Control, revoke, registered identities, paired runs, and every bracketed evidence field remain unavailable until their real receipt/run paths are completed and verified.
+Updated: 2026-08-17. This is the target five-minute script, not a claim that the final run exists. The marketplace, four public read-only analyzers, category dossiers/configuration surfaces, and `/proof` judge evidence index are live. A six-scene public-browser rehearsal is retained, but it is not a video or final demo check. Permission confirmation, activation, execution, populated Mission Control, revoke, registered identities, paired runs, and every bracketed evidence field remain unavailable until their real receipt/run paths are completed and verified.
+
+## Retained public rehearsal
+
+The create-only rehearsal at [`evidence/submission/rehearsals/b0e46cc192fbf15220a557c4b5bc8639c3c75eba/manifest.json`](../evidence/submission/rehearsals/b0e46cc192fbf15220a557c4b5bc8639c3c75eba/manifest.json) binds production commit `b0e46cc192fbf15220a557c4b5bc8639c3c75eba`, HTTP 200 responses, asserted text, and SHA-256 values for full-page captures of home, marketplace, LP dossier, LP configuration, proof room, and empty Mission Control. It deliberately records `videoRecorded: false`, `finalDemoCheck: false`, and `submissionReady: false`.
+
+Reproduce only from a clean commit already published to `origin/main` and deployed as the exact public build:
+
+```powershell
+$releaseCommit = (git rev-parse HEAD).Trim()
+corepack pnpm capture:demo:rehearsal $releaseCommit
+```
+
+This command performs GET-only browser navigation and creates a new commit-named directory. It does not click, fill a form, connect a wallet, submit a transaction, authenticate evidence, or replace the final video plus timestamped clean-room playback check.
 
 ## Pre-demo truth check
 

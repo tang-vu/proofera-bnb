@@ -1,6 +1,6 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-17T00:22:23.000Z",
+  "updatedAtUtc": "2026-08-17T00:46:46.288Z",
   "readyForSubmission": false,
   "gates": [
     {
@@ -85,11 +85,17 @@
     {
       "gateId": "demo",
       "state": "not_recorded",
-      "claim": "The five-minute demo script is a target script; no final video or clean-room playback check exists.",
+      "claim": "A six-scene exact-build public-browser rehearsal is retained; no final video or clean-room playback check exists.",
       "blockers": [
         "Record the final release journey and retain the video plus a timestamped evidence-link playback check."
       ],
-      "artifacts": []
+      "artifacts": [
+        {
+          "kind": "rehearsal",
+          "path": "evidence/submission/rehearsals/b0e46cc192fbf15220a557c4b5bc8639c3c75eba/manifest.json",
+          "sha256": "ff96fe3cfa49fddbf58c279d4e4b012fcbfe9e697b21f8d6c1d174708f098e39"
+        }
+      ]
     },
     {
       "gateId": "submission",
