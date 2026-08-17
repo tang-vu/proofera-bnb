@@ -23,6 +23,8 @@ evidence/altana/lifecycles/*.json
 evidence/submission/rehearsals/*/manifest.json
 # Byte-exact manifests from the final/rehearsal demo video collector.
 evidence/submission/demo-videos/*/*/manifest.json
+# Byte-exact manifests from the production release collector.
+evidence/submission/release-probes/*/*/manifest.json
 **/wallets
 **/*keystore*.json
 *.pem
