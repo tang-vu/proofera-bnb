@@ -198,10 +198,17 @@ before any `signed` event or journal existed. The cause was a runner-only byte
 boundary: a random 48-byte DPAPI password was converted through UTF-8 before
 ethers decrypted the keystore. The independent live custody probe still passed
 address, ACL, digest, DPAPI, MAC and unlock checks. Release `c80cae5` now passes
-the exact bytes directly to ethers and adds a regression test; its V3
-preparation/proposal is new and unapproved. V2 is closed and cannot authorize
-the changed runner. No signature, broadcast, nonce consumption, deployment or
-hire receipt resulted from the V2 attempt.
+the exact bytes directly to ethers and adds a regression test. V2 is closed and
+cannot authorize the changed runner. No signature, broadcast, nonce
+consumption, deployment or hire receipt resulted from the V2 attempt.
+
+The exact V3 approval was also exercised once on 2026-08-17, but its preparation
+named a syntactically valid 40-hex source commit that did not exist. The runner
+failed at its source-ancestry boundary before RPC, custody, signing or broadcast.
+Release `3b119f9d053054ac34b4b74e039c2c1bd4640437` now requires `git cat-file`
+commit existence during preparation and adds a regression test. V3 is closed;
+its approval cannot authorize V4. The V4 preparation/proposal is new and
+unapproved. No transaction resulted from the V3 attempt.
 
 The create-only `capture:termix:hires` collector is also implemented and still
 non-invoked. Given the exact deployment and three hire hashes, it requires a

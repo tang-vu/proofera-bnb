@@ -5,9 +5,9 @@ import { test } from "node:test";
 
 import { Interface, keccak256 } from "ethers";
 
-const preparationPath = "../../evidence/termix/hire-preparations/1787288386-hire-termix-v3.json";
+const preparationPath = "../../evidence/termix/hire-preparations/1787288386-hire-termix-v4.json";
 const proposalPath =
-  "../../evidence/termix/hire-preparations/1787288386-hire-termix-v3-approval-proposal.json";
+  "../../evidence/termix/hire-preparations/1787288386-hire-termix-v4-approval-proposal.json";
 const artifactPath = "artifacts/src/ProofEraTestnetHireReceipt.sol/ProofEraTestnetHireReceipt.json";
 const preparationBytes = readFileSync(preparationPath);
 const preparation = JSON.parse(preparationBytes.toString("utf8"));
@@ -17,16 +17,16 @@ const contractInterface = new Interface(artifact.abi);
 
 test("approval proposal binds the exact unsigned preparation and remains unapproved", () => {
   const digest = createHash("sha256").update(preparationBytes).digest("hex");
-  assert.equal(digest, "3e646c7cfdbd299771e4424457697bcbb1d66170e44c4b6356908dbf48531e3c");
+  assert.equal(digest, "eab35fcdf09812d378b5fad4686dbcf4ae650044d846b577f6f510b2f5e80442");
   assert.equal(proposal.preparation.sha256, digest);
   assert.equal(proposal.sourceCommit, preparation.sourceCommit);
-  assert.equal(proposal.approvalId, "HIRE-TERMIX-2026-08-17-V3");
+  assert.equal(proposal.approvalId, "HIRE-TERMIX-2026-08-17-V4");
   assert.equal(proposal.state, "proposed_unapproved");
   assert.equal(proposal.authorization, false);
   assert.equal(proposal.broadcast, false);
   assert.ok(Object.values(proposal.claims).every((value) => value === false));
   assert.match(proposal.requiredApprovalText, new RegExp(digest, "u"));
-  assert.match(proposal.requiredApprovalText, /HIRE-TERMIX-2026-08-17-V3/u);
+  assert.match(proposal.requiredApprovalText, /HIRE-TERMIX-2026-08-17-V4/u);
 });
 
 test("four transaction review rows match deployment and decoded hire bytes", () => {
