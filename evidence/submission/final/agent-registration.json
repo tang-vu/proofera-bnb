@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "proofera-final-agent-registration-gate-v1.0.0",
+  "classification": {
+    "bscTestnetIdentityRegistrationVerified": true,
+    "executionAuthority": false,
+    "hireReceiptEvidence": false,
+    "mainnetIdentity": false,
+    "marketplaceEligibilityProven": false,
+    "performanceEvidence": false
+  },
+  "sourceCommit": "05a5907ced5bbb8f5e02d5137ea603c46a7ec2a3",
+  "network": {
+    "chainId": 97,
+    "registry": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+    "finalizedBlockNumber": "125541239",
+    "observedAtUtc": "2026-08-17T04:12:14.000Z"
+  },
+  "rawEvidence": {
+    "path": "evidence/erc8004/registrations/125541239-four-agent-registration-evidence.json",
+    "sha256": "060e70579727598b8c118ede6ee2e44d653f99ce08d27c446471ed645f52a028"
+  },
+  "agents": [
+    {
+      "key": "lp-range",
+      "agentId": "1825",
+      "owner": "0xAd03eF7e21c35FD1446c153f6eE5e6165F696990",
+      "registrationTransactionHash": "0x361e388cf4877d11598def2e1eaeff7659dfaf1ae2c31b9f3700d866ac892386",
+      "uriUpdateTransactionHash": "0xa4eebfd1e3ffb668826d52eee8a6932befc9f1e7256ff8dda2dcac1f44627f3c"
+    },
+    {
+      "key": "grid-trading",
+      "agentId": "1826",
+      "owner": "0xFBfFa9BA36d578AFF2d05EDe840Fc7088e70ADB8",
+      "registrationTransactionHash": "0xcb5545d7aa66e25b7b2b3c448210ea00fabc9d68aa43174ee97e4e2d1ffda1ce",
+      "uriUpdateTransactionHash": "0x38fa0d8f70b320ebfafa56c65a76dffa3f902c20f2d8e6a0dee665d157dbf6da"
+    },
+    {
+      "key": "yield-optimisation",
+      "agentId": "1827",
+      "owner": "0x62Af37A6FD89374684C00e2402FD96143f96ee85",
+      "registrationTransactionHash": "0xaf6f972f26569a7ca6a031997a740a47fcf5bccaf207012b17c4409607153fd7",
+      "uriUpdateTransactionHash": "0xfdbe954babb7762cf68cd718e2948ccc39b02f082077db2ebedc473b75bb1f36"
+    },
+    {
+      "key": "health-factor",
+      "agentId": "1828",
+      "owner": "0x708cb7F2b974d94005E762A140c469F1125e0cB4",
+      "registrationTransactionHash": "0xec45aa43bf7826203a8ed5c65adfd9eb3115e10307ce3103bc0594dfa345e463",
+      "uriUpdateTransactionHash": "0xcb5babfd1c1b9da252d530fe5edcc93f37341c59476a631831bf0b1e33c94f6f"
+    }
+  ]
+}
