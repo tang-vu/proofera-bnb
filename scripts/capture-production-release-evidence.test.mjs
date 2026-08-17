@@ -57,6 +57,7 @@ test("collector binds official Google and Cloudflare DoH plus authorized TLS", (
   assert.match(source, /https:\/\/cloudflare-dns\.com\/dns-query/u);
   assert.match(source, /developers\.cloudflare\.com\/1\.1\.1\.1\/encryption\/dns-over-https/u);
   assert.match(source, /PRODUCTION_RELEASE_DNS_RESOLVER_DISAGREEMENT/u);
+  assert.match(source, /questionName\.toLowerCase\(\)\.replace\(\/\\\.\$\/u, ""\) !== hostname/u);
   assert.match(source, /rejectUnauthorized: true/u);
   assert.match(source, /servername: hostname/u);
   assert.match(source, /PRODUCTION_RELEASE_TLS_JUDGING_WINDOW_UNCOVERED/u);

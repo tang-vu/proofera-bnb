@@ -317,13 +317,14 @@ async function queryDns(resolver, hostname) {
   const url = `${resolver.endpoint}?name=${encodeURIComponent(hostname)}&type=A`;
   const response = await fetchExact(url, 200, "application/dns-json");
   const body = exactJson(response.bytes, "PRODUCTION_RELEASE_DNS_JSON_INVALID");
-  const expectedQuestion = `${hostname}.`;
+  const questionName = body?.Question?.[0]?.name;
   if (
     body?.Status !== 0 ||
     body?.TC !== false ||
     !Array.isArray(body?.Question) ||
     body.Question.length !== 1 ||
-    body.Question[0]?.name?.toLowerCase() !== expectedQuestion ||
+    typeof questionName !== "string" ||
+    questionName.toLowerCase().replace(/\.$/u, "") !== hostname ||
     body.Question[0]?.type !== 1 ||
     !Array.isArray(body?.Answer)
   ) {
