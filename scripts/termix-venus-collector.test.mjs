@@ -55,6 +55,11 @@ test("Venus collector captures an ordered finalized window before one create-onl
   assert.match(source, /venus-core-exact-window-/);
   assert.match(source, /observationCount: evidenceWindow\.length/);
   assert.match(source, /writeFile\(path/);
+  assert.match(source, /proofera-termix-venus-development-window-v1\.1\.0/);
+  assert.match(source, /proofera-termix-venus-development-window-block-v1\.0\.0/);
+  assert.match(source, /captureArtifacts: captureArtifacts\.map/);
+  assert.match(source, /sha256: sha256\(body\)/);
+  assert.match(source, /flag: "wx"/);
 });
 
 test("Venus collector can acquire a live window without historical-state substitution", () => {

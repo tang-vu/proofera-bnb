@@ -431,7 +431,7 @@ function waitMilliseconds(milliseconds: number): Promise<void> {
 async function main(): Promise<void> {
   const options = parseCli(process.argv.slice(2));
   const blockNumbers: bigint[] = [];
-  const windowResults = [];
+  const windowResults: Array<Array<Awaited<ReturnType<typeof collectProvider>>>> = [];
   if (options.liveWindow !== null) {
     for (let index = 0; index < options.liveWindow.observations; index += 1) {
       const block = (await minimumProviderHead()) - FINALITY_BLOCKS;
@@ -497,9 +497,74 @@ async function main(): Promise<void> {
     if (firstBlock === undefined || lastBlock === undefined) {
       throw new Error("COLLECTOR_BLOCK_WINDOW_EMPTY");
     }
-    const fileName = windowMode
-      ? `venus-core-exact-window-${firstBlock.toString()}-${lastBlock.toString()}-${accountSuffix}.json`
-      : `venus-core-exact-block-${lastBlock.toString()}-${accountSuffix}.json`;
+    if (windowMode) {
+      const captureArtifacts = evidenceWindow.map((blockEvidence, index) => {
+        const blockCaptures = windowResults[index];
+        if (blockCaptures === undefined) throw new Error("COLLECTOR_BLOCK_CAPTURE_MISSING");
+        const relativePath =
+          `evidence/development/venus-core-exact-window-${firstBlock.toString()}-` +
+          `${lastBlock.toString()}-${accountSuffix}.block-${blockEvidence.blockNumber}.json`;
+        const body = `${JSON.stringify(
+          {
+            schemaVersion: "proofera-termix-venus-development-window-block-v1.0.0",
+            status: "DEVELOPMENT_READ_ONLY",
+            publishable: false,
+            termixRunStatus: "NOT_RUN",
+            sourceCommit: repository.commit,
+            sourceCommitClean: repository.clean,
+            capturedAtUtc: artifact.capturedAtUtc,
+            evidence: blockEvidence,
+            providerCaptures: blockCaptures
+          },
+          null,
+          2
+        )}\n`;
+        return {
+          blockNumber: blockEvidence.blockNumber,
+          blockHash: blockEvidence.blockHash,
+          path: relativePath,
+          sha256: sha256(body),
+          bytes: Buffer.byteLength(body),
+          body
+        };
+      });
+      const manifest = {
+        schemaVersion: "proofera-termix-venus-development-window-v1.1.0",
+        status: "DEVELOPMENT_READ_ONLY",
+        publishable: false,
+        termixRunStatus: "NOT_RUN",
+        sourceCommit: repository.commit,
+        sourceCommitClean: repository.clean,
+        capturedAtUtc: artifact.capturedAtUtc,
+        evidenceWindow,
+        captureArtifacts: captureArtifacts.map(
+          ({ blockNumber, blockHash, path, sha256: digest, bytes }) => ({
+            blockNumber,
+            blockHash,
+            path,
+            sha256: digest,
+            bytes
+          })
+        )
+      };
+      for (const capture of captureArtifacts) {
+        await writeFile(resolve(ROOT, capture.path), capture.body, {
+          encoding: "utf8",
+          flag: "wx"
+        });
+      }
+      const fileName =
+        `venus-core-exact-window-${firstBlock.toString()}-${lastBlock.toString()}-` +
+        `${accountSuffix}.json`;
+      const path = resolve(ROOT, "evidence", "development", fileName);
+      await writeFile(path, `${JSON.stringify(manifest, null, 2)}\n`, {
+        encoding: "utf8",
+        flag: "wx"
+      });
+      process.stdout.write(`${path}\n`);
+      return;
+    }
+    const fileName = `venus-core-exact-block-${lastBlock.toString()}-${accountSuffix}.json`;
     const path = resolve(ROOT, "evidence", "development", fileName);
     await writeFile(path, `${JSON.stringify(artifact, null, 2)}\n`, {
       encoding: "utf8",
