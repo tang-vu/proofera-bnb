@@ -341,6 +341,43 @@ const relatedRoutes = {
   }
 } as const;
 
+const registrationEvidencePath =
+  "evidence/erc8004/registrations/125541239-four-agent-registration-evidence.json";
+
+const registeredIdentities = {
+  "lp-rebalancing": {
+    ownerAddress: "0xAd03eF7e21c35FD1446c153f6eE5e6165F696990",
+    erc8004TokenId: "1825",
+    registrationTransactionHash:
+      "0x361e388cf4877d11598def2e1eaeff7659dfaf1ae2c31b9f3700d866ac892386"
+  },
+  "grid-trading": {
+    ownerAddress: "0xFBfFa9BA36d578AFF2d05EDe840Fc7088e70ADB8",
+    erc8004TokenId: "1826",
+    registrationTransactionHash:
+      "0xcb5545d7aa66e25b7b2b3c448210ea00fabc9d68aa43174ee97e4e2d1ffda1ce"
+  },
+  "yield-optimisation": {
+    ownerAddress: "0x62Af37A6FD89374684C00e2402FD96143f96ee85",
+    erc8004TokenId: "1827",
+    registrationTransactionHash:
+      "0xaf6f972f26569a7ca6a031997a740a47fcf5bccaf207012b17c4409607153fd7"
+  },
+  "health-factor-monitoring": {
+    ownerAddress: "0x708cb7F2b974d94005E762A140c469F1125e0cB4",
+    erc8004TokenId: "1828",
+    registrationTransactionHash:
+      "0xec45aa43bf7826203a8ed5c65adfd9eb3115e10307ce3103bc0594dfa345e463"
+  }
+} as const satisfies Record<
+  ReferenceAnalyzerCategory,
+  Readonly<{
+    ownerAddress: string;
+    erc8004TokenId: string;
+    registrationTransactionHash: string;
+  }>
+>;
+
 const metricBaseSchema = z.strictObject({
   id: z.string().regex(/^[a-z][a-z0-9_]{2,63}$/),
   label: z.string().min(1).max(80),
@@ -372,7 +409,7 @@ const provenanceSchema = z.strictObject({
     .string()
     .min(1)
     .max(180)
-    .regex(/^(?:agents|docs)\/[A-Za-z0-9._/-]+$/)
+    .regex(/^(?:agents|docs|evidence)\/[A-Za-z0-9._/-]+$/)
     .refine((value) => !value.includes("..") && !value.includes("://"))
 });
 
@@ -393,18 +430,18 @@ const passportSchema = z.strictObject({
   category: referenceAnalyzerCategorySchema,
   coverage: coverageSchema,
   eligibility: z.strictObject({
-    liveBscAgent: z.literal(false),
-    erc8004Registered: z.literal(false),
+    liveBscAgent: z.literal(true),
+    erc8004Registered: z.literal(true),
     marketplaceEligible: z.literal(false),
     activationEligible: z.literal(false),
     executionEnabled: z.literal(false),
     hireable: z.literal(false)
   }),
   identity: z.strictObject({
-    chainId: z.null(),
-    ownerAddress: z.null(),
-    erc8004TokenId: z.null(),
-    registrationTransactionHash: z.null(),
+    chainId: z.literal(97),
+    ownerAddress: z.string().regex(/^0x[0-9a-f]{40}$/i),
+    erc8004TokenId: z.string().regex(/^(?:0|[1-9][0-9]*)$/),
+    registrationTransactionHash: z.string().regex(/^0x[0-9a-f]{64}$/),
     registeredAt: z.null(),
     lastActivityAt: z.null(),
     executionCount: z.null(),
@@ -413,11 +450,11 @@ const passportSchema = z.strictObject({
     uptime: z.null(),
     riskLevel: z.literal("unknown"),
     reputation: z.literal("unknown"),
-    dataFreshness: z.literal("unknown_no_observation"),
+    dataFreshness: z.literal("finalized_bsc_testnet_observation"),
     latestExecutionReceipt: z.null()
   }),
   metrics: z.array(metricSchema).length(8),
-  provenance: z.array(provenanceSchema).length(4),
+  provenance: z.array(provenanceSchema).length(5),
   relatedRoute: relatedRouteSchema
 });
 
@@ -457,6 +494,7 @@ function methodologyForMetric(
 function buildPassport(coverage: ReferenceAgentCoverage): ReferenceAnalyzerPassport {
   const category = coverage.category;
   const paths = repositoryProvenance[category];
+  const identity = registeredIdentities[category];
   const parsed = passportSchema.parse({
     schemaVersion: 1,
     category,
@@ -470,10 +508,10 @@ function buildPassport(coverage: ReferenceAgentCoverage): ReferenceAnalyzerPassp
       hireable: false
     },
     identity: {
-      chainId: null,
-      ownerAddress: null,
-      erc8004TokenId: null,
-      registrationTransactionHash: null,
+      chainId: 97,
+      ownerAddress: identity.ownerAddress,
+      erc8004TokenId: identity.erc8004TokenId,
+      registrationTransactionHash: identity.registrationTransactionHash,
       registeredAt: null,
       lastActivityAt: null,
       executionCount: null,
@@ -482,7 +520,7 @@ function buildPassport(coverage: ReferenceAgentCoverage): ReferenceAnalyzerPassp
       uptime: null,
       riskLevel: "unknown",
       reputation: "unknown",
-      dataFreshness: "unknown_no_observation",
+      dataFreshness: "finalized_bsc_testnet_observation",
       latestExecutionReceipt: null
     },
     metrics: metricSeeds[category].map((metric) => ({
@@ -503,6 +541,11 @@ function buildPassport(coverage: ReferenceAgentCoverage): ReferenceAnalyzerPassp
         kind: "repository_path",
         label: "Shared metric methodology",
         path: "docs/data-methodology.md"
+      },
+      {
+        kind: "repository_path",
+        label: "Finalized ERC-8004 evidence",
+        path: registrationEvidencePath
       }
     ],
     relatedRoute: relatedRoutes[category]
@@ -510,7 +553,7 @@ function buildPassport(coverage: ReferenceAgentCoverage): ReferenceAnalyzerPassp
 
   if (
     parsed.coverage.category !== category ||
-    parsed.coverage.state !== "local_development_analyzer"
+    parsed.coverage.state !== "registered_bsc_testnet_analyzer"
   ) {
     throw new TypeError("Reference analyzer coverage does not match its dossier category.");
   }

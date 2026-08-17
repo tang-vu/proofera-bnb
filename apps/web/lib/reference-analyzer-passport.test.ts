@@ -29,31 +29,55 @@ describe("reference analyzer passports", () => {
         referenceAnalyzerMetricIds[passport.category]
       );
       expect(passport.metrics).toHaveLength(8);
-      expect(passport.provenance).toHaveLength(4);
+      expect(passport.provenance).toHaveLength(5);
     }
   });
 
-  it("keeps every agent, hiring, activation, and execution eligibility flag false", () => {
+  it("keeps marketplace, hiring, activation, and execution flags false after registration", () => {
     for (const passport of referenceAnalyzerPassports) {
       expect(passport.eligibility).toEqual({
-        liveBscAgent: false,
-        erc8004Registered: false,
+        liveBscAgent: true,
+        erc8004Registered: true,
         marketplaceEligible: false,
         activationEligible: false,
         executionEnabled: false,
         hireable: false
       });
-      expect(passport.coverage.state).toBe("local_development_analyzer");
+      expect(passport.coverage.state).toBe("registered_bsc_testnet_analyzer");
     }
   });
 
-  it("represents absent identity, activity, performance, and receipts explicitly", () => {
+  it("binds finalized identities while keeping activity, performance, and execution absent", () => {
+    const identities = {
+      "lp-rebalancing": [
+        "0xAd03eF7e21c35FD1446c153f6eE5e6165F696990",
+        "1825",
+        "0x361e388cf4877d11598def2e1eaeff7659dfaf1ae2c31b9f3700d866ac892386"
+      ],
+      "grid-trading": [
+        "0xFBfFa9BA36d578AFF2d05EDe840Fc7088e70ADB8",
+        "1826",
+        "0xcb5545d7aa66e25b7b2b3c448210ea00fabc9d68aa43174ee97e4e2d1ffda1ce"
+      ],
+      "yield-optimisation": [
+        "0x62Af37A6FD89374684C00e2402FD96143f96ee85",
+        "1827",
+        "0xaf6f972f26569a7ca6a031997a740a47fcf5bccaf207012b17c4409607153fd7"
+      ],
+      "health-factor-monitoring": [
+        "0x708cb7F2b974d94005E762A140c469F1125e0cB4",
+        "1828",
+        "0xec45aa43bf7826203a8ed5c65adfd9eb3115e10307ce3103bc0594dfa345e463"
+      ]
+    } as const;
     for (const passport of referenceAnalyzerPassports) {
+      const [ownerAddress, erc8004TokenId, registrationTransactionHash] =
+        identities[passport.category];
       expect(passport.identity).toEqual({
-        chainId: null,
-        ownerAddress: null,
-        erc8004TokenId: null,
-        registrationTransactionHash: null,
+        chainId: 97,
+        ownerAddress,
+        erc8004TokenId,
+        registrationTransactionHash,
         registeredAt: null,
         lastActivityAt: null,
         executionCount: null,
@@ -62,7 +86,7 @@ describe("reference analyzer passports", () => {
         uptime: null,
         riskLevel: "unknown",
         reputation: "unknown",
-        dataFreshness: "unknown_no_observation",
+        dataFreshness: "finalized_bsc_testnet_observation",
         latestExecutionReceipt: null
       });
 
@@ -139,7 +163,7 @@ describe("reference analyzer passports", () => {
     for (const passport of referenceAnalyzerPassports) {
       for (const source of passport.provenance) {
         expect(source.kind).toBe("repository_path");
-        expect(source.path).toMatch(/^(?:agents|docs)\/[A-Za-z0-9._/-]+$/);
+        expect(source.path).toMatch(/^(?:agents|docs|evidence)\/[A-Za-z0-9._/-]+$/);
         expect(source.path).not.toContain("..");
         expect(source.path).not.toContain("://");
       }

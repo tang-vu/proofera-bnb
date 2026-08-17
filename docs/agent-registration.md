@@ -1,6 +1,6 @@
 # ProofEra agent registration runbook
 
-Updated: 2026-08-17. This record prepares four BSC testnet ERC-8004 registrations. It is not registration or transaction evidence.
+Updated: 2026-08-17. This record covers the preparation and finalized evidence for four BSC testnet ERC-8004 registrations.
 
 ## Current BNB Agent Studio boundary
 
@@ -10,18 +10,24 @@ Do not claim that these analyzers were deployed by AgentCore. Their public A2A e
 
 ## Dedicated registration wallets
 
-| Category               | Public endpoint                       | Registration wallet                          |
-| ---------------------- | ------------------------------------- | -------------------------------------------- |
-| LP Range               | `https://proofera-lp.tangvu.dev/`     | `0xAd03eF7e21c35FD1446c153f6eE5e6165F696990` |
-| Grid Trading           | `https://proofera-grid.tangvu.dev/`   | `0xFBfFa9BA36d578AFF2d05EDe840Fc7088e70ADB8` |
-| Yield Optimisation     | `https://proofera-yield.tangvu.dev/`  | `0x62Af37A6FD89374684C00e2402FD96143f96ee85` |
-| Health-Factor Guardian | `https://proofera-health.tangvu.dev/` | `0x708cb7F2b974d94005E762A140c469F1125e0cB4` |
+| Category               | Public endpoint                       | Registration wallet                          | Agent ID |
+| ---------------------- | ------------------------------------- | -------------------------------------------- | -------- |
+| LP Range               | `https://proofera-lp.tangvu.dev/`     | `0xAd03eF7e21c35FD1446c153f6eE5e6165F696990` | `1825`   |
+| Grid Trading           | `https://proofera-grid.tangvu.dev/`   | `0xFBfFa9BA36d578AFF2d05EDe840Fc7088e70ADB8` | `1826`   |
+| Yield Optimisation     | `https://proofera-yield.tangvu.dev/`  | `0x62Af37A6FD89374684C00e2402FD96143f96ee85` | `1827`   |
+| Health-Factor Guardian | `https://proofera-health.tangvu.dev/` | `0x708cb7F2b974d94005E762A140c469F1125e0cB4` | `1828`   |
 
 Each encrypted Web3 Secret Storage file is under its agent workspace's ignored `.studio/wallets` directory, outside `app/agent`. Its independent random password is stored only as a current-user DPAPI blob outside the repository. Neither location is a KMS, portable backup, mainnet wallet, user-capital wallet, Altana signer, or browser passkey.
 
-A retained read-only preparation at finalized block `125530553` made 42 calls across the BNB Chain seed RPC and PublicNode. Both providers agreed on the block hash, registry runtime, `0.1 gwei` gas price, zero balance, zero nonce, zero registry `balanceOf`, and the initial registration gas estimate for every wallet. The artifact includes each exact first-step calldata and the current public Agent Card response, including all five advertised skill IDs across four agents. It does **not** prove funding, signing, registration, or a receipt.
+A retained read-only preparation at finalized block `125530553` made 42 calls across the BNB Chain seed RPC and PublicNode. Both providers agreed on the block hash, registry runtime, `0.1 gwei` gas price, zero balance, zero nonce, zero registry `balanceOf`, and the initial registration gas estimate for every wallet. That artifact remains a historical pre-state and does **not** by itself prove funding, signing, registration, or a receipt.
 
-Studio 0.0.5's self-paid registration path blocks below `0.002 tBNB` because SDK `0.4.2` performs `register(string,(string,bytes)[])` and then `setAgentURI(uint256,string)`. The second calldata and estimate cannot be known exactly until the first confirmed receipt supplies `agentId`; the preparation keeps them null instead of inventing them. The bounded proposal is `0.003 tBNB` per wallet (`0.012 tBNB` total), with at most two registration transactions per wallet, `1,000,000` gas per transaction, and `0.2 gwei` gas-price cap. This is a review boundary, not approval. Use the official faucet or a separately approved bounded testnet funding transaction, then re-observe balance and current registration state before signing. The residual balance of ProofEra's older PTA deployment wallet is not authority to fund these accounts.
+The owner approved the bounded BSC-testnet operation: `0.003 tBNB` per wallet (`0.012 tBNB` total), at most two registry transactions per wallet, `1,000,000` gas per transaction, and a `0.2 gwei` gas-price cap. The four funding transactions and all eight registry transactions used `0.12 gwei`; every registry gas limit stayed below the cap. No mainnet transaction was made. The finalized collector intentionally reports receipt gas cost without inferring who economically funded it.
+
+## Finalized registration evidence
+
+The create-only collector produced `evidence/erc8004/registrations/125541239-four-agent-registration-evidence.json` with SHA-256 `060e70579727598b8c118ede6ee2e44d653f99ce08d27c446471ed645f52a028`. At common finalized block `125541239`, the BNB Chain seed RPC and PublicNode agreed on all eight transactions and receipts, exact prepared registration calldata, mint-derived IDs `1825` through `1828`, final owner, final canonical SDK URI, and one owned identity per wallet.
+
+This closes only BSC-testnet identity registration and URI publication. The artifact explicitly keeps marketplace eligibility, hire receipts, execution authority, strategy performance, and mainnet status false.
 
 ## Registration gate
 
@@ -42,7 +48,7 @@ Reproduce the create-only preflight from a reviewed clean base commit:
 node scripts/prepare-agent-registration-manifest.mjs --prepare-exact-registration-manifest --source-base-commit <40-hex-commit>
 ```
 
-The current retained preparation is `evidence/erc8004/preparations/125530553-four-agent-registration-preparation.json`. The earlier block-`125517740`, block-`125510593` and block-`125490457` artifacts remain immutable historical evidence.
+The current retained preparation is `evidence/erc8004/preparations/125530553-four-agent-registration-preparation.json`; its corresponding finalized receipt evidence is `evidence/erc8004/registrations/125541239-four-agent-registration-evidence.json`. Earlier preparation artifacts remain immutable historical evidence.
 
 ## Receipt evidence capture
 

@@ -16,9 +16,9 @@ const referenceAgentCoverageSchema = z.strictObject({
     z.string().min(1).max(100),
     z.string().min(1).max(100)
   ]),
-  state: z.literal("local_development_analyzer"),
-  liveBscAgent: z.literal(false),
-  erc8004Registered: z.literal(false),
+  state: z.literal("registered_bsc_testnet_analyzer"),
+  liveBscAgent: z.literal(true),
+  erc8004Registered: z.literal(true),
   marketplaceEligible: z.literal(false),
   activationEligible: z.literal(false),
   executionEnabled: z.literal(false),
@@ -39,14 +39,14 @@ const unparsedReferenceAgentCoverage = [
       "gas drag and net benefit",
       "bounded rebalance decision"
     ],
-    state: "local_development_analyzer",
-    liveBscAgent: false,
-    erc8004Registered: false,
+    state: "registered_bsc_testnet_analyzer",
+    liveBscAgent: true,
+    erc8004Registered: true,
     marketplaceEligible: false,
     activationEligible: false,
     executionEnabled: false,
     boundary:
-      "Deterministic analysis only. It has no wallet, registration, authority, execution, or performance receipt."
+      "BSC-testnet identity 1825 is finalized. Analysis remains read-only with no authority, execution, hire, or performance receipt."
   },
   {
     category: "grid-trading",
@@ -59,14 +59,14 @@ const unparsedReferenceAgentCoverage = [
       "turnover and grid range",
       "fees, slippage, and gas costs"
     ],
-    state: "local_development_analyzer",
-    liveBscAgent: false,
-    erc8004Registered: false,
+    state: "registered_bsc_testnet_analyzer",
+    liveBscAgent: true,
+    erc8004Registered: true,
     marketplaceEligible: false,
     activationEligible: false,
     executionEnabled: false,
     boundary:
-      "Deterministic analysis only. Claimed fills and receipts remain caller-supplied until independently verified."
+      "BSC-testnet identity 1826 is finalized. Claimed fills and performance receipts remain caller-supplied until independently verified."
   },
   {
     category: "yield-optimisation",
@@ -79,14 +79,14 @@ const unparsedReferenceAgentCoverage = [
       "protocol exposure and concentration",
       "route history and all-in costs"
     ],
-    state: "local_development_analyzer",
-    liveBscAgent: false,
-    erc8004Registered: false,
+    state: "registered_bsc_testnet_analyzer",
+    liveBscAgent: true,
+    erc8004Registered: true,
     marketplaceEligible: false,
     activationEligible: false,
     executionEnabled: false,
     boundary:
-      "Deterministic analysis only. APY scale, route receipts, realized returns, and risk stay unknown without evidence."
+      "BSC-testnet identity 1827 is finalized. APY scale, route receipts, realized returns, and risk stay unknown without evidence."
   },
   {
     category: "health-factor-monitoring",
@@ -99,14 +99,14 @@ const unparsedReferenceAgentCoverage = [
       "alert latency and breach coverage",
       "intervention policy and receipts"
     ],
-    state: "local_development_analyzer",
-    liveBscAgent: false,
-    erc8004Registered: false,
+    state: "registered_bsc_testnet_analyzer",
+    liveBscAgent: true,
+    erc8004Registered: true,
     marketplaceEligible: false,
     activationEligible: false,
     executionEnabled: false,
     boundary:
-      "Deterministic analysis only. Execution claims remain unverified and every marketplace or authority flag is false."
+      "BSC-testnet identity 1828 is finalized. Execution, hiring, marketplace eligibility, and authority remain unverified and false."
   }
 ] as const;
 

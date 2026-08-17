@@ -10,12 +10,12 @@ describe("reference agent coverage", () => {
     );
   });
 
-  it("cannot be mistaken for live, registered, hireable, or executable agents", () => {
+  it("separates finalized testnet registration from marketplace and execution eligibility", () => {
     for (const item of referenceAgentCoverage) {
       expect(item).toMatchObject({
-        state: "local_development_analyzer",
-        liveBscAgent: false,
-        erc8004Registered: false,
+        state: "registered_bsc_testnet_analyzer",
+        liveBscAgent: true,
+        erc8004Registered: true,
         marketplaceEligible: false,
         activationEligible: false,
         executionEnabled: false
