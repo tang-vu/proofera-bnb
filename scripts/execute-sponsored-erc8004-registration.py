@@ -17,6 +17,7 @@ from typing import Any
 
 from bnbagent import AgentEndpoint, ERC8004Agent, EVMWalletProvider
 from bnbagent.core.contract_mixin import min_gas_price_wei
+from bnbagent.wallets.intents import ERC8004_REGISTER, Intent
 
 
 EXPECTED_CHAIN_ID = 97
@@ -133,8 +134,7 @@ def main() -> None:
 
     metadata = [{"key": "built_with", "value": EXPECTED_BUILT_WITH}]
     metadata_bytes = [
-        {"metadataKey": item["key"], "metadataValue": item["value"].encode("utf-8")}
-        for item in metadata
+        (item["key"], item["value"].encode("utf-8")) for item in metadata
     ]
     register_function = sdk.contract.contract.functions.register(initial_uri, metadata_bytes)
     actual_calldata = register_function._encode_transaction_data()
@@ -157,10 +157,30 @@ def main() -> None:
         paymaster=sdk.contract.paymaster.paymaster_url,
     )
 
-    register_result = sdk.contract.register_agent(agent_uri=initial_uri, metadata=None)
-    register_hash = normalized_hash(register_result["transactionHash"])
-    agent_id = register_result.get("agentId")
-    if receipt_status(register_result.get("receipt")) != 1 or agent_id is None:
+    # SDK 0.4.2 builds named dictionaries for tuple[] metadata, while Web3
+    # 7.16 requires positional tuples. Execute the already verified function
+    # through the SDK's same paymaster-aware executor and parse the same event.
+    register_execution = sdk.contract._executor.execute(
+        Intent(
+            name=ERC8004_REGISTER,
+            kwargs={"agent_uri": initial_uri, "metadata": metadata},
+            call=register_function,
+            description="registration",
+        )
+    )
+    register_receipt = register_execution.get("receipt")
+    register_hash = normalized_hash(register_execution["transactionHash"])
+    agent_id = register_execution.get("agentId")
+    if agent_id is None and getattr(register_receipt, "logs", None):
+        registered_event = sdk.contract.contract.events.Registered()
+        for log in register_receipt.logs:
+            try:
+                event_data = registered_event.process_log(log)
+                agent_id = event_data["args"]["agentId"]
+                break
+            except Exception:
+                continue
+    if receipt_status(register_receipt) != 1 or agent_id is None:
         fail("register transaction did not produce a successful receipt and agent ID")
     emit(
         "confirmed",
