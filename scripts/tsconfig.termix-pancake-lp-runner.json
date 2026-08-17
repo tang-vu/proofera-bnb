@@ -4,6 +4,7 @@
     "types": ["node"]
   },
   "include": [
+    "freeze-termix-pancake-lp-declaration.ts",
     "run-termix-pancake-lp-agent.ts",
     "run-termix-pancake-lp-manual.ts",
     "termix-manual-runner-support.ts",
