@@ -1,0 +1,175 @@
+{
+  "schemaVersion": "proofera-termix-venus-development-window-v1.1.0",
+  "status": "DEVELOPMENT_READ_ONLY",
+  "publishable": false,
+  "termixRunStatus": "NOT_RUN",
+  "sourceCommit": "076b2aabaa6da536a786f3589d7123e051198a1a",
+  "sourceCommitClean": true,
+  "capturedAtUtc": "2026-08-17T07:04:26.385Z",
+  "evidenceWindow": [
+    {
+      "schemaVersion": "proofera-venus-core-exact-block-evidence-v1.0.0",
+      "chainId": 97,
+      "account": "0x64DF36Cb7ef4ab5191A21b68e48954D09D4FBf6B",
+      "comptrollerAddress": "0x94d1820b2D1c7c7452A163983Dc888CEC546b77D",
+      "blockNumber": "125563831",
+      "blockHash": "0x0e19da49d360ce1f49cefe8dfbb107f166f61110b2e385b660aa521542f39bb2",
+      "blockTimestampUtc": "2026-08-17T07:01:41.000Z",
+      "oracleAddress": "0x3cD69251D04A28d887Ac14cbe2E14c52F3D57823",
+      "marketsEnumerated": 46,
+      "assetsIn": ["0xb7526572FFE56AB9D7489838Bf2E18e3323b441A"],
+      "positions": [
+        {
+          "vTokenAddress": "0xb7526572FFE56AB9D7489838Bf2E18e3323b441A",
+          "vTokenSymbol": "vUSDT",
+          "underlyingSymbol": "USDT",
+          "vTokenBalanceRaw": "20597817892698811",
+          "borrowBalanceRaw": "1294557000000",
+          "exchangeRateMantissaRaw": "200776461931237",
+          "oraclePriceMantissaRaw": "500000000000000000000000000000",
+          "effectiveLiquidationThresholdMantissaRaw": "800000000000000000",
+          "suppliedValueUsdE18Raw": "2067778499999997576215516",
+          "adjustedCollateralValueUsdE18Raw": "1654222799999991881627045",
+          "debtValueUsdE18Raw": "647278500000000000000000"
+        }
+      ],
+      "adjustedCollateralValueUsdE18Raw": "1654222799999991881627045",
+      "debtValueUsdE18Raw": "647278500000000000000000",
+      "healthFactorE18Raw": "2555658499393988648",
+      "providerAttestations": [
+        {
+          "providerId": "publicnode-bsc-testnet",
+          "publicSourceUrl": "https://bsc-testnet-rpc.publicnode.com",
+          "observedAtUtc": "2026-08-17T07:01:58.576Z"
+        },
+        {
+          "providerId": "bnbchain-testnet-dataseed",
+          "publicSourceUrl": "https://bsc-testnet-dataseed.bnbchain.org",
+          "observedAtUtc": "2026-08-17T07:01:57.969Z"
+        }
+      ],
+      "limitations": [
+        "This is read-only exact-block evidence, not a transaction, alert-delivery receipt, or authorization.",
+        "A null health factor means no enumerated debt; it must never be presented as infinite or safe.",
+        "The observation is benchmark preparation until a frozen TermiX declaration and required hire receipt exist."
+      ]
+    },
+    {
+      "schemaVersion": "proofera-venus-core-exact-block-evidence-v1.0.0",
+      "chainId": 97,
+      "account": "0x64DF36Cb7ef4ab5191A21b68e48954D09D4FBf6B",
+      "comptrollerAddress": "0x94d1820b2D1c7c7452A163983Dc888CEC546b77D",
+      "blockNumber": "125563991",
+      "blockHash": "0x6c94ce635d3c6910014b5665459b88aefe995f65d90d4d19ad8c2e41c366d73e",
+      "blockTimestampUtc": "2026-08-17T07:02:53.000Z",
+      "oracleAddress": "0x3cD69251D04A28d887Ac14cbe2E14c52F3D57823",
+      "marketsEnumerated": 46,
+      "assetsIn": ["0xb7526572FFE56AB9D7489838Bf2E18e3323b441A"],
+      "positions": [
+        {
+          "vTokenAddress": "0xb7526572FFE56AB9D7489838Bf2E18e3323b441A",
+          "vTokenSymbol": "vUSDT",
+          "underlyingSymbol": "USDT",
+          "vTokenBalanceRaw": "20597817892698811",
+          "borrowBalanceRaw": "1294557000000",
+          "exchangeRateMantissaRaw": "200776461931237",
+          "oraclePriceMantissaRaw": "500000000000000000000000000000",
+          "effectiveLiquidationThresholdMantissaRaw": "800000000000000000",
+          "suppliedValueUsdE18Raw": "2067778499999997576215516",
+          "adjustedCollateralValueUsdE18Raw": "1654222799999991881627045",
+          "debtValueUsdE18Raw": "647278500000000000000000"
+        }
+      ],
+      "adjustedCollateralValueUsdE18Raw": "1654222799999991881627045",
+      "debtValueUsdE18Raw": "647278500000000000000000",
+      "healthFactorE18Raw": "2555658499393988648",
+      "providerAttestations": [
+        {
+          "providerId": "publicnode-bsc-testnet",
+          "publicSourceUrl": "https://bsc-testnet-rpc.publicnode.com",
+          "observedAtUtc": "2026-08-17T07:03:10.832Z"
+        },
+        {
+          "providerId": "bnbchain-testnet-dataseed",
+          "publicSourceUrl": "https://bsc-testnet-dataseed.bnbchain.org",
+          "observedAtUtc": "2026-08-17T07:03:10.187Z"
+        }
+      ],
+      "limitations": [
+        "This is read-only exact-block evidence, not a transaction, alert-delivery receipt, or authorization.",
+        "A null health factor means no enumerated debt; it must never be presented as infinite or safe.",
+        "The observation is benchmark preparation until a frozen TermiX declaration and required hire receipt exist."
+      ]
+    },
+    {
+      "schemaVersion": "proofera-venus-core-exact-block-evidence-v1.0.0",
+      "chainId": 97,
+      "account": "0x64DF36Cb7ef4ab5191A21b68e48954D09D4FBf6B",
+      "comptrollerAddress": "0x94d1820b2D1c7c7452A163983Dc888CEC546b77D",
+      "blockNumber": "125564152",
+      "blockHash": "0xa747f9afbe9ade666c3b0e11fc9291ff209fe25d1d7ef8514d64c133f7909d70",
+      "blockTimestampUtc": "2026-08-17T07:04:05.000Z",
+      "oracleAddress": "0x3cD69251D04A28d887Ac14cbe2E14c52F3D57823",
+      "marketsEnumerated": 46,
+      "assetsIn": ["0xb7526572FFE56AB9D7489838Bf2E18e3323b441A"],
+      "positions": [
+        {
+          "vTokenAddress": "0xb7526572FFE56AB9D7489838Bf2E18e3323b441A",
+          "vTokenSymbol": "vUSDT",
+          "underlyingSymbol": "USDT",
+          "vTokenBalanceRaw": "20597817892698811",
+          "borrowBalanceRaw": "1294557000000",
+          "exchangeRateMantissaRaw": "200776461931237",
+          "oraclePriceMantissaRaw": "500000000000000000000000000000",
+          "effectiveLiquidationThresholdMantissaRaw": "800000000000000000",
+          "suppliedValueUsdE18Raw": "2067778499999997576215516",
+          "adjustedCollateralValueUsdE18Raw": "1654222799999991881627045",
+          "debtValueUsdE18Raw": "647278500000000000000000"
+        }
+      ],
+      "adjustedCollateralValueUsdE18Raw": "1654222799999991881627045",
+      "debtValueUsdE18Raw": "647278500000000000000000",
+      "healthFactorE18Raw": "2555658499393988648",
+      "providerAttestations": [
+        {
+          "providerId": "publicnode-bsc-testnet",
+          "publicSourceUrl": "https://bsc-testnet-rpc.publicnode.com",
+          "observedAtUtc": "2026-08-17T07:04:22.868Z"
+        },
+        {
+          "providerId": "bnbchain-testnet-dataseed",
+          "publicSourceUrl": "https://bsc-testnet-dataseed.bnbchain.org",
+          "observedAtUtc": "2026-08-17T07:04:22.390Z"
+        }
+      ],
+      "limitations": [
+        "This is read-only exact-block evidence, not a transaction, alert-delivery receipt, or authorization.",
+        "A null health factor means no enumerated debt; it must never be presented as infinite or safe.",
+        "The observation is benchmark preparation until a frozen TermiX declaration and required hire receipt exist."
+      ]
+    }
+  ],
+  "captureArtifacts": [
+    {
+      "blockNumber": "125563831",
+      "blockHash": "0x0e19da49d360ce1f49cefe8dfbb107f166f61110b2e385b660aa521542f39bb2",
+      "path": "evidence/development/venus-core-exact-window-125563831-125564152-9d4fbf6b.block-125563831.json",
+      "sha256": "c20d5847609dbaa4ae1da26646e23355f8615f9504c8d18893a0aa20b8cc0ca7",
+      "bytes": 811381
+    },
+    {
+      "blockNumber": "125563991",
+      "blockHash": "0x6c94ce635d3c6910014b5665459b88aefe995f65d90d4d19ad8c2e41c366d73e",
+      "path": "evidence/development/venus-core-exact-window-125563831-125564152-9d4fbf6b.block-125563991.json",
+      "sha256": "fea6ebad9d5a756aed73e69ded366a229c0cffb3bc64712beb7fb67f54990ea6",
+      "bytes": 811417
+    },
+    {
+      "blockNumber": "125564152",
+      "blockHash": "0xa747f9afbe9ade666c3b0e11fc9291ff209fe25d1d7ef8514d64c133f7909d70",
+      "path": "evidence/development/venus-core-exact-window-125563831-125564152-9d4fbf6b.block-125564152.json",
+      "sha256": "5e922b938eccf842c70648b37cbf7ae4f90c94817845151ec1564c9ca480943c",
+      "bytes": 810005
+    }
+  ]
+}
