@@ -184,7 +184,10 @@ function fixture() {
 }
 
 test("builds three runner-compatible finalized hire receipts without performance claims", () => {
-  const manifest = validateAndBuildHireEvidence(fixture());
+  const input = fixture();
+  input.preparation = structuredClone(input.preparation);
+  delete input.preparation.bounds;
+  const manifest = validateAndBuildHireEvidence(input);
   assert.equal(manifest.claims.contractDeployed, true);
   assert.equal(manifest.claims.threePaidHiresFinalized, true);
   assert.equal(manifest.claims.termixRunsCompleted, false);

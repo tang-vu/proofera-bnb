@@ -339,6 +339,10 @@ export function validateAndBuildHireEvidence(input) {
     (sum, operation) => sum + BigInt(operation.gasCostWei),
     0n
   );
+  const totalHirePayment = preparation.hires.reduce(
+    (sum, prepared) => sum + decimal(prepared.paymentWei, "HIRE_EVIDENCE_PREPARED_PAYMENT_INVALID"),
+    0n
+  );
   return {
     schemaVersion: HIRE_EVIDENCE_SCHEMA_VERSION,
     classification: {
@@ -366,11 +370,9 @@ export function validateAndBuildHireEvidence(input) {
     },
     hires: hireReceipts,
     economics: {
-      totalHirePaymentWei: preparation.bounds.totalHirePaymentWei,
+      totalHirePaymentWei: totalHirePayment.toString(),
       totalGasCostWei: totalGasCost.toString(),
-      totalObservedSpendWei: (
-        totalGasCost + BigInt(preparation.bounds.totalHirePaymentWei)
-      ).toString()
+      totalObservedSpendWei: (totalGasCost + totalHirePayment).toString()
     },
     claims: {
       contractDeployed: true,
