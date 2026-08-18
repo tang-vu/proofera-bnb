@@ -58,3 +58,32 @@ test("replacement LP re-freeze preserves input with a larger future-block margin
     /^evidence\/termix\/declarations\/pancake-lp\/6e657638c684-125722978\.json$/mu
   );
 });
+
+const archiveReplacementBytes = await readFile(
+  new URL("../evidence/termix/declarations/pancake-lp/fd5d0e54eb0f-125727528.json", import.meta.url)
+);
+const archiveReplacement = JSON.parse(archiveReplacementBytes.toString("utf8"));
+
+test("archive LP re-freeze preserves input and binds the reviewed replay endpoint", () => {
+  assert.equal(
+    createHash("sha256").update(archiveReplacementBytes).digest("hex"),
+    "542acfce857ce4036f97db9693f128ba26e9f41d803189618a56acaa4f9a6049"
+  );
+  assert.equal(archiveReplacement.sourceCommitSha, "fd5d0e54eb0f61ce2aa411cf695fffbf17586798");
+  assert.equal(archiveReplacement.input.sha256, frozen.input.sha256);
+  assert.equal(archiveReplacement.randomnessCommitment.blockNumber, "125727528");
+  assert.equal(
+    archiveReplacement.declarationSha256,
+    "8ceacb8b116af3e97873185888835bd48ed0862771db66aad0f93e3275769a4f"
+  );
+  const replayEndpoint = archiveReplacement.declaration.environment.parameters.find(
+    ({ key }) => key === "lp-source-rpc-endpoint"
+  );
+  assert.equal(replayEndpoint?.value.value, "https://bnb.api.onfinality.io/public");
+  assert.equal(archiveReplacement.claims.runOrderResolved, false);
+  assert.equal(archiveReplacement.claims.result, false);
+  assert.match(
+    prettierIgnore,
+    /^evidence\/termix\/declarations\/pancake-lp\/fd5d0e54eb0f-125727528\.json$/mu
+  );
+});

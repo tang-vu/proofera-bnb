@@ -1,0 +1,250 @@
+{
+  "schemaVersion": "proofera-termix-frozen-declaration-v1.0.0",
+  "state": "frozen-awaiting-randomness-and-runs",
+  "sourceCommitSha": "fd5d0e54eb0f61ce2aa411cf695fffbf17586798",
+  "input": {
+    "path": "evidence/termix/frozen/pancake-lp/116342186-7152618.canonical-json",
+    "sha256": "3459eb2566621c4d74acef68c84849e59b74214c7a21d7d20b8bbc6352dda945"
+  },
+  "registeredAgent": {
+    "chainId": 97,
+    "registryAddress": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+    "agentId": "1825"
+  },
+  "randomnessCommitment": {
+    "chainId": 97,
+    "blockNumber": "125727528",
+    "finalityConfirmations": "12",
+    "mapping": "least-significant bit of the finalized block hash: 0=agent-first, 1=manual-first",
+    "providers": [
+      "https://data-seed-prebsc-2-s2.binance.org:8545",
+      "https://bsc-testnet-rpc.publicnode.com"
+    ]
+  },
+  "declaration": {
+    "benchmarkId": "pancake-lp-public-position-v2",
+    "task": {
+      "taskId": "pancake-lp-range-decision",
+      "title": "PancakeSwap V3 public-position range decision",
+      "domain": "trading",
+      "exactDefinition": "Given the immutable BNB Smart Chain mainnet public-position bundle, validate its retained identity and exact-hash slot0 replay; determine range and boundary state; then return canonical JSON with exact tick buffers, policy violations, only supplied economics, a bounded hold/review/insufficient-evidence decision, rationale and limitations. The position is unrelated to ProofEra and neither method may write onchain.",
+      "successCondition": "Both methods use identical declaration and input bytes, produce source-bound recomputable output, preserve missing economics, and make no ownership, authority, performance or execution claim from the public position."
+    },
+    "inputs": [
+      {
+        "inputId": "lp-range-input-bundle-sha256",
+        "description": "SHA-256 of the shared canonical LP input bundle.",
+        "value": {
+          "encoding": "string",
+          "value": "3459eb2566621c4d74acef68c84849e59b74214c7a21d7d20b8bbc6352dda945"
+        },
+        "unit": null
+      },
+      {
+        "inputId": "source-evidence-sha256",
+        "description": "SHA-256 of the retained public-position source evidence.",
+        "value": {
+          "encoding": "string",
+          "value": "37947165be883e0a2dc4582fbdbf57ffd38f1a2cc5fa7295fdd9451d08087786"
+        },
+        "unit": null
+      }
+    ],
+    "constraints": [
+      {
+        "constraintId": "bsc-mainnet-source-only",
+        "description": "The analyzed source state is BNB Smart Chain mainnet chain ID 56.",
+        "enforcement": "hard",
+        "expected": {
+          "encoding": "decimal_integer",
+          "value": "56"
+        }
+      },
+      {
+        "constraintId": "bsc-testnet-agent-commerce",
+        "description": "ERC-8004 identity and hire commerce are isolated to BSC testnet chain ID 97.",
+        "enforcement": "hard",
+        "expected": {
+          "encoding": "decimal_integer",
+          "value": "97"
+        }
+      },
+      {
+        "constraintId": "decision-window",
+        "description": "Finish within 900 seconds; overruns remain recorded and lose timing credit.",
+        "enforcement": "scored",
+        "expected": {
+          "encoding": "decimal_integer",
+          "value": "900"
+        }
+      },
+      {
+        "constraintId": "no-hidden-source",
+        "description": "Only the bundle and fixed exact-hash slot0 RPC access are allowed.",
+        "enforcement": "hard",
+        "expected": {
+          "encoding": "canonical_json",
+          "value": "true"
+        }
+      },
+      {
+        "constraintId": "public-position-non-authority",
+        "description": "The third-party position is never ProofEra-owned, authorized or executable.",
+        "enforcement": "hard",
+        "expected": {
+          "encoding": "canonical_json",
+          "value": "true"
+        }
+      },
+      {
+        "constraintId": "timed-run-no-write",
+        "description": "Neither method may sign, approve, submit, broadcast or access a wallet.",
+        "enforcement": "hard",
+        "expected": {
+          "encoding": "canonical_json",
+          "value": "true"
+        }
+      }
+    ],
+    "environment": {
+      "kind": "mainnet",
+      "chainId": 56,
+      "networkName": "BNB Smart Chain Mainnet public-state replay",
+      "softwareCommitSha": "fd5d0e54eb0f61ce2aa411cf695fffbf17586798",
+      "components": [
+        {
+          "name": "manual-procedure",
+          "version": "proofera-termix-pancake-lp-manual-v1.0.0",
+          "configurationSha256": "5bf8d21d160b999df3438f0f345d9a2393fce931dccd7f73350f788ffa01df07"
+        },
+        {
+          "name": "node",
+          "version": "v24.14.1",
+          "configurationSha256": null
+        },
+        {
+          "name": "proofera-lp-range-agent-lane",
+          "version": "1.0.0",
+          "configurationSha256": "ac21f6c193d2c0c571cdce130087b7deb82f29d83d3e4700947d5d8647b21ec4"
+        },
+        {
+          "name": "retained-pancakeswap-position",
+          "version": "116342186",
+          "configurationSha256": "37947165be883e0a2dc4582fbdbf57ffd38f1a2cc5fa7295fdd9451d08087786"
+        }
+      ],
+      "parameters": [
+        {
+          "key": "agent-registry-chain-id",
+          "value": {
+            "encoding": "decimal_integer",
+            "value": "97"
+          }
+        },
+        {
+          "key": "erc8004-registry",
+          "value": {
+            "encoding": "evm_address",
+            "value": "0x8004A818BFB912233c491871b3d84c89A494BD9e"
+          }
+        },
+        {
+          "key": "lp-agent-endpoint",
+          "value": {
+            "encoding": "string",
+            "value": "https://proofera-lp.tangvu.dev/"
+          }
+        },
+        {
+          "key": "lp-agent-id",
+          "value": {
+            "encoding": "decimal_integer",
+            "value": "1825"
+          }
+        },
+        {
+          "key": "lp-source-rpc-endpoint",
+          "value": {
+            "encoding": "string",
+            "value": "https://bnb.api.onfinality.io/public"
+          }
+        },
+        {
+          "key": "run-order-randomness-commitment",
+          "value": {
+            "encoding": "canonical_json",
+            "value": "{\"blockNumber\":\"125727528\",\"chainId\":97,\"finalityConfirmations\":\"12\",\"mapping\":\"least-significant bit of the finalized block hash: 0=agent-first, 1=manual-first\",\"providers\":[\"https://data-seed-prebsc-2-s2.binance.org:8545\",\"https://bsc-testnet-rpc.publicnode.com\"]}"
+          }
+        },
+        {
+          "key": "source-block",
+          "value": {
+            "encoding": "decimal_integer",
+            "value": "116342186"
+          }
+        },
+        {
+          "key": "source-block-hash",
+          "value": {
+            "encoding": "string",
+            "value": "0xe0dae09e27c2b8dfcb8d603794289a7b3b221b078e41169cc61b5233aee385bb"
+          }
+        }
+      ]
+    },
+    "qualityRubric": {
+      "rubricId": "termix-lp-range-rubric-v2",
+      "version": "2.0.0",
+      "declaredAtUtc": "2026-08-16T21:32:00.000Z",
+      "criteria": [
+        {
+          "criterionId": "economics-decision-integrity",
+          "description": "Keep absent economics unavailable and make only a supported bounded decision.",
+          "measurement": "Reject unsupported economics, substitutions and action recommendations.",
+          "evidenceRequired": "Known/unknown fields, violations, decision and trace.",
+          "maximumPoints": 25
+        },
+        {
+          "criterionId": "explanation-uncertainty",
+          "description": "Explain risk, decision, non-authority and limitations.",
+          "measurement": "Apply the fixed checklist to unedited output.",
+          "evidenceRequired": "Raw output and reviewer checklist.",
+          "maximumPoints": 10
+        },
+        {
+          "criterionId": "range-risk-accuracy",
+          "description": "Calculate exact range state, tick buffers and policy violations.",
+          "measurement": "Independently recompute every integer field.",
+          "evidenceRequired": "Raw output, canonical result and reviewer worksheet.",
+          "maximumPoints": 25
+        },
+        {
+          "criterionId": "reproducibility",
+          "description": "Produce deterministic output, timing, cost and receipt evidence.",
+          "measurement": "Verify declaration parity, hashes, receipts and tool logs.",
+          "evidenceRequired": "Run captures, hashes, timings, costs and reproduction log.",
+          "maximumPoints": 15
+        },
+        {
+          "criterionId": "verified-inputs",
+          "description": "Preserve and validate exact source identity and slot0 state.",
+          "measurement": "Recompute the source join and exact-hash slot0 receipt.",
+          "evidenceRequired": "Frozen bundle, raw evidence, API receipt and trace.",
+          "maximumPoints": 25
+        }
+      ],
+      "totalMaximumPoints": 100
+    },
+    "requiredReceiptKinds": [
+      "api"
+    ]
+  },
+  "declarationSha256": "8ceacb8b116af3e97873185888835bd48ed0862771db66aad0f93e3275769a4f",
+  "claims": {
+    "hired": false,
+    "runOrderResolved": false,
+    "agentRun": false,
+    "manualRun": false,
+    "result": false
+  }
+}
