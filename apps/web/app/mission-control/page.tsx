@@ -15,6 +15,9 @@ export default function MissionControlPage() {
         </Link>
         <div className="nav-links">
           <Link href="/marketplace">Marketplace</Link>
+          <Link className="nav-optional" href="/operator-ceremony">
+            Operator ceremony
+          </Link>
           <Link className="nav-optional" href="/lp-activate">
             LP configuration
           </Link>
@@ -42,6 +45,9 @@ export default function MissionControlPage() {
             A configuration alone never creates authority.
           </p>
           <div className="hero-actions">
+            <Link className="button button-primary" href="/operator-ceremony">
+              Begin operator ceremony
+            </Link>
             <Link className="button button-primary" href="/lp-activate">
               Configure LP boundaries
             </Link>

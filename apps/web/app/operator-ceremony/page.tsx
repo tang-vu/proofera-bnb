@@ -1,0 +1,41 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+
+import { CeremonyConsole } from "./ceremony-console";
+
+export const metadata: Metadata = { title: "Operator ceremony" };
+
+export default function OperatorCeremonyPage() {
+  return (
+    <main id="main-content" tabIndex={-1}>
+      <nav className="shell nav" aria-label="Primary navigation">
+        <Link className="wordmark" href="/" aria-label="ProofEra home">
+          <span aria-hidden="true" className="mark">
+            P
+          </span>
+          ProofEra
+        </Link>
+        <div className="nav-links">
+          <Link href="/marketplace">Marketplace</Link>
+          <Link className="nav-optional" href="/proof">
+            Proof room
+          </Link>
+          <span className="nav-current">Operator ceremony</span>
+          <span className="network-pill">Testnet only</span>
+        </div>
+      </nav>
+
+      <header className="shell marketplace-hero ceremony-hero">
+        <span className="eyebrow">ONE GUIDED SESSION / HUMAN CHECKPOINTS PRESERVED</span>
+        <h1>Start once. Stay inside one ceremony.</h1>
+        <p className="lede">
+          ProofEra groups the remaining human work into one place while keeping manual judgment,
+          passkey presence, receipts, and revocation distinct. Starting the session creates no
+          evidence by itself.
+        </p>
+      </header>
+
+      <CeremonyConsole />
+    </main>
+  );
+}
