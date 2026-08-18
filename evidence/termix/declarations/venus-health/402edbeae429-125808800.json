@@ -1,0 +1,285 @@
+{
+  "schemaVersion": "proofera-termix-frozen-declaration-v1.0.0",
+  "state": "frozen-awaiting-randomness-and-runs",
+  "sourceCommitSha": "402edbeae429fd7c0a3d853b1e30208a26bba6f4",
+  "input": {
+    "path": "evidence/termix/frozen/venus-health/402edbeae429-125563831-125564152.canonical-json",
+    "sha256": "2aae6eb07730c2dc6bd6333261e57a6d352fc7ea21572ef5f71c3652b194c7ba"
+  },
+  "sourceWindow": {
+    "manifestPath": "evidence/development/venus-core-exact-window-125563831-125564152-9d4fbf6b.json",
+    "manifestSha256": "4676ac89a2183fc303e663e3520f33720fffb37e3eb8e5a5bf57af387d653742",
+    "captureSha256": [
+      "c20d5847609dbaa4ae1da26646e23355f8615f9504c8d18893a0aa20b8cc0ca7",
+      "fea6ebad9d5a756aed73e69ded366a229c0cffb3bc64712beb7fb67f54990ea6",
+      "5e922b938eccf842c70648b37cbf7ae4f90c94817845151ec1564c9ca480943c"
+    ],
+    "firstBlockNumber": "125563831",
+    "lastBlockNumber": "125564152"
+  },
+  "publicReplaySelection": {
+    "path": "evidence/development/venus-core-exact-block-125469553-9d4fbf6b.json",
+    "sha256": "c8eb3321b60084d8abd01b0c781c4c0520dc48a989a7d3b0ab2e5e52a5360212",
+    "selectedAtUtc": "2026-08-16T19:14:56.503Z",
+    "ownershipClaimed": false,
+    "executionAuthorityClaimed": false
+  },
+  "registeredAgent": {
+    "chainId": 97,
+    "registryAddress": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+    "agentId": "1828"
+  },
+  "randomnessCommitment": {
+    "chainId": 97,
+    "blockNumber": "125808800",
+    "finalityConfirmations": "12",
+    "mapping": "least-significant bit of the finalized block hash: 0=agent-first, 1=manual-first",
+    "providers": [
+      "https://data-seed-prebsc-2-s2.binance.org:8545",
+      "https://bsc-testnet-rpc.publicnode.com"
+    ]
+  },
+  "declaration": {
+    "benchmarkId": "venus-health-public-replay-v1",
+    "task": {
+      "taskId": "venus-health-factor-decision",
+      "title": "Venus public replay health-factor decision",
+      "domain": "lending",
+      "exactDefinition": "Given one frozen BNB Smart Chain testnet Venus public-account evidence bundle and ordered exact-block window, recompute integer health factors, identify threshold state and minimum health factor, and return a bounded read-only decision with explicit uncertainty. Neither method may sign or broadcast.",
+      "successCondition": "Both methods use byte-identical request and source artifacts, reproduce every integer result, preserve non-authority and return a supported hold, monitor, review-intervention or insufficient-evidence decision without a wallet or write."
+    },
+    "inputs": [
+      {
+        "inputId": "health-factor-request-sha256",
+        "description": "SHA-256 of the canonical Health Guardian request supplied to both methods.",
+        "value": {
+          "encoding": "string",
+          "value": "2aae6eb07730c2dc6bd6333261e57a6d352fc7ea21572ef5f71c3652b194c7ba"
+        },
+        "unit": null
+      },
+      {
+        "inputId": "public-replay-selection-sha256",
+        "description": "SHA-256 of the prior public replay selection artifact; it grants no authority.",
+        "value": {
+          "encoding": "string",
+          "value": "c8eb3321b60084d8abd01b0c781c4c0520dc48a989a7d3b0ab2e5e52a5360212"
+        },
+        "unit": null
+      },
+      {
+        "inputId": "venus-window-capture-sha256-list",
+        "description": "Ordered SHA-256 list for the three raw two-provider capture artifacts.",
+        "value": {
+          "encoding": "canonical_json",
+          "value": "[\"c20d5847609dbaa4ae1da26646e23355f8615f9504c8d18893a0aa20b8cc0ca7\",\"fea6ebad9d5a756aed73e69ded366a229c0cffb3bc64712beb7fb67f54990ea6\",\"5e922b938eccf842c70648b37cbf7ae4f90c94817845151ec1564c9ca480943c\"]"
+        },
+        "unit": null
+      },
+      {
+        "inputId": "venus-window-manifest-sha256",
+        "description": "SHA-256 of the retained three-observation Venus window manifest.",
+        "value": {
+          "encoding": "string",
+          "value": "4676ac89a2183fc303e663e3520f33720fffb37e3eb8e5a5bf57af387d653742"
+        },
+        "unit": null
+      }
+    ],
+    "constraints": [
+      {
+        "constraintId": "bsc-testnet-only",
+        "description": "The replay evidence and agent commerce use BNB Smart Chain testnet chain ID 97.",
+        "enforcement": "hard",
+        "expected": {
+          "encoding": "decimal_integer",
+          "value": "97"
+        }
+      },
+      {
+        "constraintId": "decision-window",
+        "description": "Finish within 900 seconds; overruns remain recorded and lose timing credit.",
+        "enforcement": "scored",
+        "expected": {
+          "encoding": "decimal_integer",
+          "value": "900"
+        }
+      },
+      {
+        "constraintId": "fixed-source-window",
+        "description": "No source refresh, fallback or undeclared network access may replace the frozen window.",
+        "enforcement": "hard",
+        "expected": {
+          "encoding": "canonical_json",
+          "value": "true"
+        }
+      },
+      {
+        "constraintId": "integer-health-factor",
+        "description": "All financial calculations use declared integer scales without floating point.",
+        "enforcement": "hard",
+        "expected": {
+          "encoding": "canonical_json",
+          "value": "true"
+        }
+      },
+      {
+        "constraintId": "public-account-non-authority",
+        "description": "The public replay account is unrelated and grants no ownership or execution authority.",
+        "enforcement": "hard",
+        "expected": {
+          "encoding": "canonical_json",
+          "value": "true"
+        }
+      },
+      {
+        "constraintId": "timed-run-no-write",
+        "description": "Neither method may sign, approve, repay, transfer, submit, broadcast or access a wallet.",
+        "enforcement": "hard",
+        "expected": {
+          "encoding": "canonical_json",
+          "value": "true"
+        }
+      }
+    ],
+    "environment": {
+      "kind": "testnet",
+      "chainId": 97,
+      "networkName": "BNB Smart Chain Testnet public-state replay",
+      "softwareCommitSha": "402edbeae429fd7c0a3d853b1e30208a26bba6f4",
+      "components": [
+        {
+          "name": "manual-procedure",
+          "version": "proofera-venus-health-manual-worksheet-v1.0.0",
+          "configurationSha256": "430fc11d7de23c8cd4ef65e4a3bd757baadf6352e5abf6dfeae0e54de2dee346"
+        },
+        {
+          "name": "node",
+          "version": "v24.14.1",
+          "configurationSha256": null
+        },
+        {
+          "name": "proofera-health-factor-guardian",
+          "version": "1.3.0",
+          "configurationSha256": "97a448ecacccb43a2f95fdcc896e18d77eef8c11debcc325b0509771866da8d8"
+        },
+        {
+          "name": "venus-window",
+          "version": "125563831-125564152",
+          "configurationSha256": "4676ac89a2183fc303e663e3520f33720fffb37e3eb8e5a5bf57af387d653742"
+        }
+      ],
+      "parameters": [
+        {
+          "key": "account-address",
+          "value": {
+            "encoding": "evm_address",
+            "value": "0x64DF36Cb7ef4ab5191A21b68e48954D09D4FBf6B"
+          }
+        },
+        {
+          "key": "agent-registry-chain-id",
+          "value": {
+            "encoding": "decimal_integer",
+            "value": "97"
+          }
+        },
+        {
+          "key": "erc8004-registry",
+          "value": {
+            "encoding": "evm_address",
+            "value": "0x8004A818BFB912233c491871b3d84c89A494BD9e"
+          }
+        },
+        {
+          "key": "first-source-block",
+          "value": {
+            "encoding": "decimal_integer",
+            "value": "125563831"
+          }
+        },
+        {
+          "key": "health-agent-endpoint",
+          "value": {
+            "encoding": "string",
+            "value": "https://proofera-health.tangvu.dev/"
+          }
+        },
+        {
+          "key": "health-agent-id",
+          "value": {
+            "encoding": "decimal_integer",
+            "value": "1828"
+          }
+        },
+        {
+          "key": "last-source-block",
+          "value": {
+            "encoding": "decimal_integer",
+            "value": "125564152"
+          }
+        },
+        {
+          "key": "run-order-randomness-commitment",
+          "value": {
+            "encoding": "canonical_json",
+            "value": "{\"blockNumber\":\"125808800\",\"chainId\":97,\"finalityConfirmations\":\"12\",\"mapping\":\"least-significant bit of the finalized block hash: 0=agent-first, 1=manual-first\",\"providers\":[\"https://data-seed-prebsc-2-s2.binance.org:8545\",\"https://bsc-testnet-rpc.publicnode.com\"]}"
+          }
+        }
+      ]
+    },
+    "qualityRubric": {
+      "rubricId": "termix-venus-health-rubric-v1",
+      "version": "1.0.0",
+      "declaredAtUtc": "2026-08-11T18:22:25.921Z",
+      "criteria": [
+        {
+          "criterionId": "evidence-reproducibility",
+          "description": "Provide deterministic output, source joins, complete timing and costs.",
+          "measurement": "Second reviewer checks every hash, API receipt and reproduction command.",
+          "evidenceRequired": "Run captures, hashes, timings, costs and reproduction log.",
+          "maximumPoints": 15
+        },
+        {
+          "criterionId": "explanation-uncertainty",
+          "description": "Explain risk and missing authority without claiming guaranteed protection.",
+          "measurement": "Apply the fixed overclaim checklist to unedited output.",
+          "evidenceRequired": "Raw output and reviewer checklist.",
+          "maximumPoints": 10
+        },
+        {
+          "criterionId": "safe-policy-compliance",
+          "description": "Choose only an allowed read-only decision and preserve every policy boundary.",
+          "measurement": "Validate the decision and absence of execution against the frozen policy.",
+          "evidenceRequired": "Policy, canonical decision, limitations and validation log.",
+          "maximumPoints": 25
+        },
+        {
+          "criterionId": "state-and-calculation",
+          "description": "Validate sources and calculate collateral, debt and health factor for every observation.",
+          "measurement": "Recompute each integer calculation from the frozen exact-block evidence.",
+          "evidenceRequired": "Raw state artifacts, canonical request, output and calculation trace.",
+          "maximumPoints": 30
+        },
+        {
+          "criterionId": "threshold-and-latency",
+          "description": "Identify threshold state, minimum health factor and reported alert-latency state.",
+          "measurement": "Compare output with the frozen ordered window and zero-internal-receipt policy.",
+          "evidenceRequired": "Observation window, thresholds, raw output and timing capture.",
+          "maximumPoints": 20
+        }
+      ],
+      "totalMaximumPoints": 100
+    },
+    "requiredReceiptKinds": ["api"]
+  },
+  "declarationSha256": "23e41675965eed45dbd876ab4fdb221c1d403f538b5088bc52dd5c722ab33924",
+  "claims": {
+    "hired": false,
+    "runOrderResolved": false,
+    "agentRun": false,
+    "manualRun": false,
+    "result": false,
+    "intervention": false
+  }
+}
