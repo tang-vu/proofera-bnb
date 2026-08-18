@@ -1,8 +1,8 @@
 # ProofEra agent advantage report
 
-Updated: 2026-08-17. Overall status: **NOT RUN — NON-PUBLISHABLE**.
+Updated: 2026-08-18. Overall status: **NOT RUN — NON-PUBLISHABLE**.
 
-This is ProofEra's TermiX paired-experiment ledger. Exactly three ProofEra-versus-manual tasks are preregistered. No agent or manual run has started, and no benchmark time, cost, score, output, receipt, transaction hash or advantage is claimed. Public analyzer endpoints are availability evidence only, not experiment receipts.
+This is ProofEra's TermiX paired-experiment ledger. Exactly three ProofEra-versus-manual tasks are preregistered. The hire contract deployment and three paid BSC-testnet hires are independently finalized in [`125715654-7fa5ad3e.json`](../evidence/termix/hire-receipts/125715654-7fa5ad3e.json); they establish commerce prerequisites only. No agent or manual benchmark run has started, and no benchmark time, score, task output, completion, performance or advantage is claimed. Public analyzer endpoints are availability evidence only, not experiment receipts.
 
 ## Harness audit and preregistration boundary
 
@@ -52,7 +52,7 @@ Track alignment: trading, PancakeSwap, TermiX and the marketplace. Active prereg
 
 Exact task: from one immutable BSC-mainnet public USDT/WBNB Pancake V3 position bundle, validate the retained source and an exact-hash `slot0` replay; calculate in-range and boundary state; and return exact tick buffers, policy violations, supplied known economics, explicitly unavailable economics, a bounded decision, rationale and limitations. Position `7152618` belongs to an unrelated public address. Both methods are read-only and may never infer ProofEra ownership, authority, performance or execution.
 
-The shared candidate bundle is retained at [`116342186-7152618.canonical-json`](../evidence/termix/frozen/pancake-lp/116342186-7152618.canonical-json), logical SHA-256 `3459eb2566621c4d74acef68c84849e59b74214c7a21d7d20b8bbc6352dda945`. It binds the exact evidence-file digest, block/hash, pool, manager, position, expected tick and byte-equivalent agent request. It remains a candidate, not a final declaration or result. Still to bind: release commit, chain-97 registered/hireable agent, verified hire receipt, endpoint/configuration values, public run-order seed, exact method invocations and manual procedure transcript.
+The shared candidate bundle is retained at [`116342186-7152618.canonical-json`](../evidence/termix/frozen/pancake-lp/116342186-7152618.canonical-json), logical SHA-256 `3459eb2566621c4d74acef68c84849e59b74214c7a21d7d20b8bbc6352dda945`. It binds the exact evidence-file digest, block/hash, pool, manager, position, expected tick and byte-equivalent agent request. The chain-97 registration, paid hire receipt, declaration and finalized agent-first order now exist. The bundle remains an input, not a result; both exact method invocations, manual transcript, second review and paired validation are still absent.
 
 Fixed constraints separate source-data chain 56 from ERC-8004/hire chain 97; require identical bundle and exact-hash `slot0` access; forbid all timed wallet/write activity and undeclared network access; and preserve the third-party non-authority label.
 

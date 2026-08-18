@@ -1,0 +1,138 @@
+{
+  "schemaVersion": "proofera-termix-hire-evidence-v1.0.0",
+  "classification": {
+    "artifact": "finalized_paid_testnet_hire_evidence",
+    "taskCompletion": false,
+    "agentPerformance": false,
+    "executionAuthority": false,
+    "mainnet": false
+  },
+  "sourceCommit": "897f8dfd03fe2e4e612341150112bd5c8de114fe",
+  "preparation": {
+    "path": "evidence/termix/hire-preparations/125626011-actual-execution-join-v1.json",
+    "sha256": "464190282bc2dd8cef56b4dba54e942d51c3f48b1e07a0879beeff43d737cb17"
+  },
+  "chainId": 97,
+  "providers": [
+    {
+      "name": "bnb-chain",
+      "url": "https://data-seed-prebsc-2-s2.binance.org:8545"
+    },
+    {
+      "name": "publicnode",
+      "url": "https://bsc-testnet-rpc.publicnode.com"
+    }
+  ],
+  "finalBlock": {
+    "number": "125715654",
+    "hash": "0xdf234c6fea0956e70b11b3ee7f38aef4c9297c47be0925c5a1cf95f2fc33c316",
+    "timestamp": "1787018445",
+    "finalityDepth": "12"
+  },
+  "contract": {
+    "address": "0x052fd2940aa46f0ae6660e0bf9ebdedb6f610b1a",
+    "runtimeBytes": 1355,
+    "runtimeKeccak256": "0xf5e90b8e01c3b3cc9e9d629dce7ec367ba41e21cc64842decd9e5f4ab69a46ec",
+    "deployment": {
+      "transactionHash": "0x7fa5ad3e7b33dfb6dfccdfd06c6e54cc2d833d5aa005ec3f01c98cf72be3ddcf",
+      "blockNumber": "125583149",
+      "blockHash": "0xdb976a49b4cd38b57f887715d7ddf54e268839a9a9728c5587fd86f9c53760f4",
+      "transactionIndex": "0",
+      "gasUsed": "351737",
+      "effectiveGasPriceWei": "120000000",
+      "gasCostWei": "42208440000000"
+    }
+  },
+  "hires": [
+    {
+      "slug": "pancake-lp-range-decision",
+      "agentId": "1825",
+      "event": {
+        "engagementId": "0xa3959c83bef9efbf0ce853b7c7f4d84504e658fad4724b9a45a48e65310762c2",
+        "agentId": "1825",
+        "hirer": "0x997cd959798f7c925076eaeff5855c5c2c1e5a49",
+        "agentOwner": "0xad03ef7e21c35fd1446c153f6ee5e6165f696990",
+        "taskHash": "0x8e10c4ad3064c7d2d2016aa33f699de27d22c83cc9f59649b5b07fba3c696ca1",
+        "expiresAt": "1787288386",
+        "paymentWei": "10000000000000",
+        "receiptHash": "0xadb671a0c7142031633a18c5ba2bf5890dfc5edaf6dd0b760ac02244c5c55910"
+      },
+      "termixHireReceipt": {
+        "state": "verified",
+        "chainId": 97,
+        "transactionHash": "0x068b450a9867d220cc1eda156e9eb3cb6b8037901a7f7feaaa126aa7e1169747",
+        "explorerUrl": "https://testnet.bscscan.com/tx/0x068b450a9867d220cc1eda156e9eb3cb6b8037901a7f7feaaa126aa7e1169747",
+        "observedAtUtc": "2026-08-17T09:58:34.000Z",
+        "verifiedAtUtc": "2026-08-18T02:00:53.931Z",
+        "verifier": "ProofEra two-provider finalized hire collector v1",
+        "verificationMethod": "Two fixed BSC-testnet RPCs agreed on transaction, receipt and canonical block; exact calldata, ERC-8004 owner, runtime, event, receipt hash and finalized mapping state were verified.",
+        "rawReceipt": "{\"blockHash\":\"0x48c9593fa5deea5610d68662064ab3eadf1340085b1a7f6f1cec59eac26cefcf\",\"blockNumber\":\"0x77c4fd3\",\"contractAddress\":null,\"cumulativeGasUsed\":\"0x10d89\",\"effectiveGasPrice\":\"0x7270e00\",\"from\":\"0x997cd959798f7c925076eaeff5855c5c2c1e5a49\",\"gasUsed\":\"0x10d89\",\"logs\":[{\"address\":\"0x052fd2940aa46f0ae6660e0bf9ebdedb6f610b1a\",\"blockHash\":\"0x48c9593fa5deea5610d68662064ab3eadf1340085b1a7f6f1cec59eac26cefcf\",\"blockNumber\":\"0x77c4fd3\",\"data\":\"0x000000000000000000000000ad03ef7e21c35fd1446c153f6ee5e6165f6969908e10c4ad3064c7d2d2016aa33f699de27d22c83cc9f59649b5b07fba3c696ca1000000000000000000000000000000000000000000000000000000006a87db42000000000000000000000000000000000000000000000000000009184e72a000adb671a0c7142031633a18c5ba2bf5890dfc5edaf6dd0b760ac02244c5c55910\",\"logIndex\":\"0x0\",\"removed\":false,\"topics\":[\"0x056bb0724c406420fb4961e32735016984ec1231d987795e31fa362aa79eb947\",\"0xa3959c83bef9efbf0ce853b7c7f4d84504e658fad4724b9a45a48e65310762c2\",\"0x0000000000000000000000000000000000000000000000000000000000000721\",\"0x000000000000000000000000997cd959798f7c925076eaeff5855c5c2c1e5a49\"],\"transactionHash\":\"0x068b450a9867d220cc1eda156e9eb3cb6b8037901a7f7feaaa126aa7e1169747\",\"transactionIndex\":\"0x0\"}],\"logsBloom\":\"0x00000000000000000000000000000080000000000000010000010000000000000000400000000000000000000000000001000000000000000000000000000000000000010000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001202000000000001000000800000000004000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\"status\":\"0x1\",\"to\":\"0x052fd2940aa46f0ae6660e0bf9ebdedb6f610b1a\",\"transactionHash\":\"0x068b450a9867d220cc1eda156e9eb3cb6b8037901a7f7feaaa126aa7e1169747\",\"transactionIndex\":\"0x0\",\"type\":\"0x0\"}",
+        "rawReceiptSha256": "d4908ec938daefdb6aff31f661948576a483bdf1a622d4f54dc47906b2f7e3a9"
+      }
+    },
+    {
+      "slug": "autonomous-session-permission-audit",
+      "agentId": "1825",
+      "event": {
+        "engagementId": "0xb0568b852938419e5856e215153a1bbb1399b2ad99348b94da45af7b1fda5240",
+        "agentId": "1825",
+        "hirer": "0x997cd959798f7c925076eaeff5855c5c2c1e5a49",
+        "agentOwner": "0xad03ef7e21c35fd1446c153f6ee5e6165f696990",
+        "taskHash": "0x9700ae940654ce9429c62de3a5725cf142be9a25778972e4b3a2e7092bfb4bc6",
+        "expiresAt": "1787288386",
+        "paymentWei": "10000000000000",
+        "receiptHash": "0xfb5c1bf05526ba1b0e3d28398a96b8619a852496c1b4bcfbd1298d66554d1e27"
+      },
+      "termixHireReceipt": {
+        "state": "verified",
+        "chainId": 97,
+        "transactionHash": "0x0ec15407ab12df85e1a50e39f2316033c31aa28bca756bab6f7ac41a14023e6c",
+        "explorerUrl": "https://testnet.bscscan.com/tx/0x0ec15407ab12df85e1a50e39f2316033c31aa28bca756bab6f7ac41a14023e6c",
+        "observedAtUtc": "2026-08-17T09:58:37.000Z",
+        "verifiedAtUtc": "2026-08-18T02:00:53.931Z",
+        "verifier": "ProofEra two-provider finalized hire collector v1",
+        "verificationMethod": "Two fixed BSC-testnet RPCs agreed on transaction, receipt and canonical block; exact calldata, ERC-8004 owner, runtime, event, receipt hash and finalized mapping state were verified.",
+        "rawReceipt": "{\"blockHash\":\"0x44085d12b761d8530c690c0522a3db00c39c2e7a1035ca9730797a8650319b82\",\"blockNumber\":\"0x77c4fda\",\"contractAddress\":null,\"cumulativeGasUsed\":\"0x3bda09\",\"effectiveGasPrice\":\"0x7270e00\",\"from\":\"0x997cd959798f7c925076eaeff5855c5c2c1e5a49\",\"gasUsed\":\"0x10d7d\",\"logs\":[{\"address\":\"0x052fd2940aa46f0ae6660e0bf9ebdedb6f610b1a\",\"blockHash\":\"0x44085d12b761d8530c690c0522a3db00c39c2e7a1035ca9730797a8650319b82\",\"blockNumber\":\"0x77c4fda\",\"data\":\"0x000000000000000000000000ad03ef7e21c35fd1446c153f6ee5e6165f6969909700ae940654ce9429c62de3a5725cf142be9a25778972e4b3a2e7092bfb4bc6000000000000000000000000000000000000000000000000000000006a87db42000000000000000000000000000000000000000000000000000009184e72a000fb5c1bf05526ba1b0e3d28398a96b8619a852496c1b4bcfbd1298d66554d1e27\",\"logIndex\":\"0x35\",\"removed\":false,\"topics\":[\"0x056bb0724c406420fb4961e32735016984ec1231d987795e31fa362aa79eb947\",\"0xb0568b852938419e5856e215153a1bbb1399b2ad99348b94da45af7b1fda5240\",\"0x0000000000000000000000000000000000000000000000000000000000000721\",\"0x000000000000000000000000997cd959798f7c925076eaeff5855c5c2c1e5a49\"],\"transactionHash\":\"0x0ec15407ab12df85e1a50e39f2316033c31aa28bca756bab6f7ac41a14023e6c\",\"transactionIndex\":\"0x6\"}],\"logsBloom\":\"0x00000000000000000000000000000080000000000000010000000000000000000000400000000000000000000000000001000000000000000000000000000000000000000000000000000000000002000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001200000000000001000000800000000004000000000040008000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000000000000000\",\"status\":\"0x1\",\"to\":\"0x052fd2940aa46f0ae6660e0bf9ebdedb6f610b1a\",\"transactionHash\":\"0x0ec15407ab12df85e1a50e39f2316033c31aa28bca756bab6f7ac41a14023e6c\",\"transactionIndex\":\"0x6\",\"type\":\"0x0\"}",
+        "rawReceiptSha256": "caef380d77093cb7434f844c55e0357427fd9f9be890c8929347d5bfb97adadf"
+      }
+    },
+    {
+      "slug": "venus-health-factor-decision",
+      "agentId": "1828",
+      "event": {
+        "engagementId": "0x491b00ecbfba3ff6ffd86e0356e687fcb68c20a35a63aa0c809a927fae010b70",
+        "agentId": "1828",
+        "hirer": "0x997cd959798f7c925076eaeff5855c5c2c1e5a49",
+        "agentOwner": "0x708cb7f2b974d94005e762a140c469f1125e0cb4",
+        "taskHash": "0xe3bf9df48c39e6fb6bfcae0bcbd3fc3a66bbf997601df0a1fbc8ee046282f7b8",
+        "expiresAt": "1787288386",
+        "paymentWei": "10000000000000",
+        "receiptHash": "0x47decb66a70689ed202c25a3193f34a83faea9c6c5d007bd112f433a491f2b6e"
+      },
+      "termixHireReceipt": {
+        "state": "verified",
+        "chainId": 97,
+        "transactionHash": "0xfa53e2c826d574bf12835e34e7396e6a362e509b76682b4d468b4db86cbb4ea6",
+        "explorerUrl": "https://testnet.bscscan.com/tx/0xfa53e2c826d574bf12835e34e7396e6a362e509b76682b4d468b4db86cbb4ea6",
+        "observedAtUtc": "2026-08-17T14:48:04.000Z",
+        "verifiedAtUtc": "2026-08-18T02:00:53.931Z",
+        "verifier": "ProofEra two-provider finalized hire collector v1",
+        "verificationMethod": "Two fixed BSC-testnet RPCs agreed on transaction, receipt and canonical block; exact calldata, ERC-8004 owner, runtime, event, receipt hash and finalized mapping state were verified.",
+        "rawReceipt": "{\"blockHash\":\"0x38f42020b0316938fbccf3fa9f53533836c2b993935834e4e83c3dd16fc22d75\",\"blockNumber\":\"0x77ce69b\",\"contractAddress\":null,\"cumulativeGasUsed\":\"0x61e9b\",\"effectiveGasPrice\":\"0x7270e00\",\"from\":\"0x997cd959798f7c925076eaeff5855c5c2c1e5a49\",\"gasUsed\":\"0x10d7d\",\"logs\":[{\"address\":\"0x052fd2940aa46f0ae6660e0bf9ebdedb6f610b1a\",\"blockHash\":\"0x38f42020b0316938fbccf3fa9f53533836c2b993935834e4e83c3dd16fc22d75\",\"blockNumber\":\"0x77ce69b\",\"data\":\"0x000000000000000000000000708cb7f2b974d94005e762a140c469f1125e0cb4e3bf9df48c39e6fb6bfcae0bcbd3fc3a66bbf997601df0a1fbc8ee046282f7b8000000000000000000000000000000000000000000000000000000006a87db42000000000000000000000000000000000000000000000000000009184e72a00047decb66a70689ed202c25a3193f34a83faea9c6c5d007bd112f433a491f2b6e\",\"logIndex\":\"0xa\",\"removed\":false,\"topics\":[\"0x056bb0724c406420fb4961e32735016984ec1231d987795e31fa362aa79eb947\",\"0x491b00ecbfba3ff6ffd86e0356e687fcb68c20a35a63aa0c809a927fae010b70\",\"0x0000000000000000000000000000000000000000000000000000000000000724\",\"0x000000000000000000000000997cd959798f7c925076eaeff5855c5c2c1e5a49\"],\"transactionHash\":\"0xfa53e2c826d574bf12835e34e7396e6a362e509b76682b4d468b4db86cbb4ea6\",\"transactionIndex\":\"0x1\"}],\"logsBloom\":\"0x00000000000000100000000000000000000000000000010000000000000000000000400000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000010000000000040000000000000000001000000000000001000000800000000004000000000000008000000000000040800000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\"status\":\"0x1\",\"to\":\"0x052fd2940aa46f0ae6660e0bf9ebdedb6f610b1a\",\"transactionHash\":\"0xfa53e2c826d574bf12835e34e7396e6a362e509b76682b4d468b4db86cbb4ea6\",\"transactionIndex\":\"0x1\",\"type\":\"0x0\"}",
+        "rawReceiptSha256": "d5c04e2a82f2f36a3d8afc2dc96283e653854e08cc9b088d61b731b0c37ff89e"
+      }
+    }
+  ],
+  "economics": {
+    "totalHirePaymentWei": "30000000000000",
+    "totalGasCostWei": "67045920000000",
+    "totalObservedSpendWei": "97045920000000"
+  },
+  "claims": {
+    "contractDeployed": true,
+    "threePaidHiresFinalized": true,
+    "termixRunsCompleted": false,
+    "taskCompletion": false,
+    "agentPerformance": false
+  }
+}
