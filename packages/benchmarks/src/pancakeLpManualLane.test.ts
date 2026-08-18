@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { canonicalJson, sha256Bytes } from "./canonical.js";
 import {
   PANCAKE_LP_INPUT_BUNDLE_SCHEMA_VERSION,
+  PANCAKE_LP_SOURCE_EVIDENCE_RPC_ENDPOINT,
   PANCAKE_LP_SOURCE_RPC_ENDPOINT
 } from "./pancakeLpAgentLane.js";
 import {
@@ -34,7 +35,7 @@ const INPUT = canonicalJson({
     chainId: 56,
     blockNumber: "116342186",
     blockHash: BLOCK_HASH,
-    rpcEndpointUrl: PANCAKE_LP_SOURCE_RPC_ENDPOINT,
+    rpcEndpointUrl: PANCAKE_LP_SOURCE_EVIDENCE_RPC_ENDPOINT,
     poolAddress: POOL,
     positionManagerAddress: MANAGER,
     positionId: "7152618",

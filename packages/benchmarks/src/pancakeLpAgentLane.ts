@@ -13,7 +13,8 @@ import { EvmAddressSchema, RepositoryPathSchema, Sha256Schema } from "./schemas.
 export const PANCAKE_LP_AGENT_LANE_VERSION =
   "proofera-termix-pancake-lp-agent-lane-v1.0.0" as const;
 export const PANCAKE_LP_AGENT_ENDPOINT = "https://proofera-lp.tangvu.dev/" as const;
-export const PANCAKE_LP_SOURCE_RPC_ENDPOINT = "https://bsc-rpc.publicnode.com" as const;
+export const PANCAKE_LP_SOURCE_EVIDENCE_RPC_ENDPOINT = "https://bsc-rpc.publicnode.com" as const;
+export const PANCAKE_LP_SOURCE_RPC_ENDPOINT = "https://bnb.api.onfinality.io/public" as const;
 export const PANCAKE_LP_INPUT_BUNDLE_SCHEMA_VERSION =
   "proofera-termix-pancake-lp-input-v1.0.0" as const;
 export const PANCAKE_LP_INPUT_DIGEST_ID = "lp-range-input-bundle-sha256" as const;
@@ -34,7 +35,7 @@ export const PancakeLpInputBundleSchema = z
       chainId: z.literal(56),
       blockNumber: z.string().regex(UINT_STRING),
       blockHash: z.string().regex(HEX_32),
-      rpcEndpointUrl: z.literal(PANCAKE_LP_SOURCE_RPC_ENDPOINT),
+      rpcEndpointUrl: z.literal(PANCAKE_LP_SOURCE_EVIDENCE_RPC_ENDPOINT),
       poolAddress: EvmAddressSchema,
       positionManagerAddress: EvmAddressSchema,
       positionId: z.string().regex(UINT_STRING),
@@ -200,7 +201,9 @@ async function executePancakeLpAgentLane(
   );
   const rpcEnd = validMonotonic(clock);
   if (rpcEnd < rpcStart) throw new Error("TERMIX_PANCAKE_LP_CLOCK_REVERSED");
-  const parsedRpc = rpcResponseSchema.parse(rpcResponse.parsed);
+  const parsedRpcResult = rpcResponseSchema.safeParse(rpcResponse.parsed);
+  if (!parsedRpcResult.success) throw new Error("TERMIX_PANCAKE_LP_RPC_RESPONSE_INVALID");
+  const parsedRpc = parsedRpcResult.data;
   if (parsedRpc.id !== rpcId || decodeSlot0Tick(parsedRpc.result) !== source.expectedCurrentTick) {
     throw new Error("TERMIX_PANCAKE_LP_RPC_STATE_MISMATCH");
   }
@@ -230,7 +233,9 @@ async function executePancakeLpAgentLane(
   const agentEnd = validMonotonic(clock);
   if (agentEnd < agentStart) throw new Error("TERMIX_PANCAKE_LP_CLOCK_REVERSED");
   const agentObservedAtUtc = validUtc(clock.utcNow());
-  const envelope = agentResponseSchema.parse(agentResponse.parsed);
+  const envelopeResult = agentResponseSchema.safeParse(agentResponse.parsed);
+  if (!envelopeResult.success) throw new Error("TERMIX_PANCAKE_LP_A2A_RESPONSE_INVALID");
+  const envelope = envelopeResult.data;
   if (envelope.id !== requestId) throw new Error("TERMIX_PANCAKE_LP_A2A_ID_MISMATCH");
   const output = envelope.result.parts[0]?.data;
   if (output === undefined) throw new Error("TERMIX_PANCAKE_LP_A2A_OUTPUT_MISSING");

@@ -12,3 +12,17 @@ approval, transaction, broadcast, or evidence-overwrite path.
 
 The matching manual runner writes separately under `manual/`; it consumes a
 bounded operator NDJSON stream and makes no network or agent request itself.
+
+The first invocation bound to the valid `125722978` agent-first order produced
+no capture: its exact-hash PublicNode replay failed closed because that provider
+had pruned the historical state. A separate read-only probe reproduced the
+provider error. The source evidence remains bound to the endpoint that captured
+it; a later declaration must separately bind a reviewed archive replay endpoint
+before retrying the timed method.
+
+The replacement candidate is OnFinality's documented, rate-limited public BNB
+endpoint, `https://bnb.api.onfinality.io/public`. The provider's BNB support page
+at `https://documentation.onfinality.io/support/bnb-chain` explicitly lists
+archive access and `eth_call`; a bounded probe returned the expected canonical
+`slot0` ABI result for the frozen block hash. This is capability evidence, not
+an uptime guarantee or a completed timed run.

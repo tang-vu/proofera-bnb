@@ -6,6 +6,7 @@ import {
   PANCAKE_LP_AGENT_ENDPOINT,
   PANCAKE_LP_AGENT_LANE_CONFIGURATION_SHA256,
   PANCAKE_LP_INPUT_BUNDLE_SCHEMA_VERSION,
+  PANCAKE_LP_SOURCE_EVIDENCE_RPC_ENDPOINT,
   PANCAKE_LP_SOURCE_RPC_ENDPOINT,
   PancakeLpInputBundleSchema,
   decodeSlot0Tick,
@@ -41,7 +42,7 @@ function bundle() {
       chainId: 56 as const,
       blockNumber: "116342186",
       blockHash: BLOCK_HASH,
-      rpcEndpointUrl: PANCAKE_LP_SOURCE_RPC_ENDPOINT,
+      rpcEndpointUrl: PANCAKE_LP_SOURCE_EVIDENCE_RPC_ENDPOINT,
       poolAddress: POOL,
       positionManagerAddress: MANAGER,
       positionId: "7152618",
@@ -342,6 +343,28 @@ describe("fixed Pancake LP Agent TermiX lane", () => {
       })
     ).rejects.toThrow("TERMIX_PANCAKE_LP_RPC_STATE_MISMATCH");
     expect(fetchRequest).toHaveBeenCalledOnce();
+  });
+
+  it("classifies a pruned archive response without exposing schema internals", async () => {
+    const fetchRequest: PancakeLpLaneFetch = async (_url, init) => {
+      const requestBody = JSON.parse(init.body) as { id: string };
+      return response(
+        JSON.stringify({
+          jsonrpc: "2.0",
+          id: requestBody.id,
+          error: { code: -32603, message: "state is pruned" }
+        })
+      );
+    };
+    await expect(
+      runPancakeLpAgentTermixMethod({
+        request: request(),
+        inputBundleCanonicalJson: INPUT,
+        inputBundleSha256: INPUT_SHA256,
+        clock: clock(),
+        fetch: fetchRequest
+      })
+    ).rejects.toThrow("TERMIX_PANCAKE_LP_RPC_RESPONSE_INVALID");
   });
 
   it.each([
