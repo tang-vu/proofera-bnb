@@ -28,6 +28,8 @@ evidence/submission/demo-videos/*/*/manifest.json
 evidence/submission/release-probes/*/*/manifest.json
 # Byte-exact canonical output from the Venus agent-first timed runner.
 evidence/termix/runs/venus-health/venus-health-agent-20260818-v1.json
+# Byte-exact JSON.stringify output from the LP declaration freezer.
+evidence/termix/declarations/pancake-lp/68dc21421c60-125719944.json
 **/wallets
 **/*keystore*.json
 *.pem
