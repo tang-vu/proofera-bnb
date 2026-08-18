@@ -67,6 +67,18 @@ const lanes = [
     componentName: "proofera-health-factor-guardian",
     digestKey: "requestInputSha256",
     outputPath: "evidence/termix/invocations/venus-health-agent-20260818-v1.canonical-json"
+  },
+  {
+    laneId: "venus-health-v2",
+    taskId: "venus-health-factor-decision",
+    declarationPath: "evidence/termix/declarations/venus-health/402edbeae429-125808800.json",
+    runOrderPath: "evidence/termix/declarations/venus-health/402edbeae429-125808800.run-order.json",
+    runId: "venus-health-agent-20260818-v2",
+    runnerId: "venus-health-agent-v1",
+    label: "Registered ProofEra Health-Factor Guardian",
+    componentName: "proofera-health-factor-guardian",
+    digestKey: "requestInputSha256",
+    outputPath: "evidence/termix/invocations/venus-health-agent-20260818-v2.canonical-json"
   }
 ];
 
