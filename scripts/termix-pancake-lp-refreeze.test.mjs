@@ -121,3 +121,35 @@ test("label-bound archive re-freeze advances the lane configuration digest", () 
   assert.equal(labelledArchive.claims.runOrderResolved, false);
   assert.equal(labelledArchive.claims.result, false);
 });
+
+const labelledOrder = JSON.parse(
+  await readFile(
+    new URL(
+      "../evidence/termix/declarations/pancake-lp/e8aca589ca9f-125731663.run-order.json",
+      import.meta.url
+    ),
+    "utf8"
+  )
+);
+
+test("label-bound archive run order requires manual before agent", () => {
+  assert.equal(labelledOrder.declaration.sha256, labelledArchive.declarationSha256);
+  assert.equal(labelledOrder.randomness.blockNumber, "125731663");
+  assert.equal(
+    labelledOrder.randomness.blockHash,
+    "0x130ded808c3a8c887c0b8bbfa01f50c3ff9d82df88f73dc68c0cda286314b7f5"
+  );
+  assert.equal(labelledOrder.randomness.leastSignificantBit, 1);
+  assert.deepEqual(labelledOrder.randomness.runOrder, ["manual", "agent"]);
+  assert.equal(labelledOrder.observations.length, 2);
+  for (const observation of labelledOrder.observations) {
+    assert.ok(BigInt(observation.headNumber) >= 125731675n);
+    assert.equal(observation.block.hash, labelledOrder.randomness.blockHash);
+  }
+  assert.deepEqual(labelledOrder.claims, {
+    hireVerified: false,
+    agentRun: false,
+    manualRun: false,
+    result: false
+  });
+});

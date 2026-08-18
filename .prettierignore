@@ -38,6 +38,7 @@ evidence/termix/declarations/pancake-lp/e8aca589ca9f-125731663.json
 # Byte-exact JSON.stringify output from the finalized LP run-order collector.
 evidence/termix/declarations/pancake-lp/6e657638c684-125722978.run-order.json
 evidence/termix/declarations/pancake-lp/fd5d0e54eb0f-125727528.run-order.json
+evidence/termix/declarations/pancake-lp/e8aca589ca9f-125731663.run-order.json
 **/wallets
 **/*keystore*.json
 *.pem

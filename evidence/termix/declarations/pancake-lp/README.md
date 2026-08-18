@@ -32,3 +32,8 @@ release binds that label into the lane digest.
 `4e6196cf44597ac0f1c47daa4c6960a4e8646ba5c13a562d33b3d59a168f1905`,
 is the fresh commitment for randomness block `125731663`. It remains
 preparation only until publication ordering, finality and run order are proven.
+At 12 confirmations both fixed RPCs agreed on block hash
+`0x130ded808c3a8c887c0b8bbfa01f50c3ff9d82df88f73dc68c0cda286314b7f5`.
+Least-significant bit `1` fixes the order to manual then agent. Neither method
+has run under this corrected declaration, and the agent lane must remain gated
+until the independent manual capture exists.
