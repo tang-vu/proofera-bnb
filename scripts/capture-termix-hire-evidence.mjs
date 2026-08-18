@@ -18,6 +18,7 @@ const RPCS = Object.freeze([
   Object.freeze({ name: "bnb-chain", url: "https://data-seed-prebsc-2-s2.binance.org:8545" }),
   Object.freeze({ name: "publicnode", url: "https://bsc-testnet-rpc.publicnode.com" })
 ]);
+let activeStage = "ARGUMENTS";
 
 function fail(code) {
   throw new Error(code);
@@ -290,9 +291,13 @@ function writeExclusive(path, manifest) {
 
 async function main() {
   const args = parseArguments(process.argv.slice(2));
+  activeStage = "RELEASE";
   validateRelease(args.sourceCommit);
+  activeStage = "PREPARATION";
   const committed = committedPreparation(args.preparationPath);
+  activeStage = "COLLECTION";
   const manifest = await collect(args, committed);
+  activeStage = "OUTPUT";
   const output = resolve(
     OUTPUT_DIRECTORY,
     `${manifest.finalBlock.number}-${args.deploymentHash.slice(2, 10)}.json`
@@ -309,7 +314,7 @@ try {
   const code =
     error instanceof Error && /^HIRE_(?:CAPTURE|EVIDENCE)_[A-Z0-9_]+$/u.test(error.message)
       ? error.message
-      : "HIRE_CAPTURE_FAILED";
+      : `HIRE_CAPTURE_${activeStage}_FAILED`;
   process.stderr.write(`${code}\n`);
   process.exitCode = 1;
 }

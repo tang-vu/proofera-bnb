@@ -34,6 +34,11 @@ test("hire evidence capture rejects a missing invocation before Git or network",
   assert.match(result.stderr, /^HIRE_CAPTURE_EXACT_FLAG_REQUIRED\r?\n$/u);
 });
 
+test("hire evidence capture classifies unexpected failures without exposing internals", () => {
+  assert.match(source, /HIRE_CAPTURE_\$\{activeStage\}_FAILED/u);
+  assert.doesNotMatch(source, /error\.stack|error\.cause/u);
+});
+
 function runCli(args) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, ["./scripts/capture-termix-hire-evidence.mjs", ...args], {
