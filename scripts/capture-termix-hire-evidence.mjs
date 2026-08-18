@@ -195,7 +195,7 @@ function ownerCalldata(agentId) {
 }
 
 function receiptStateCalldata(engagementId) {
-  return `0x0afdca31${engagementId.slice(2)}`;
+  return `0x86807df6${engagementId.slice(2)}`;
 }
 
 async function collect(args, committed) {
