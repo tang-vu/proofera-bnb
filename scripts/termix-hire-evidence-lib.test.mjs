@@ -22,6 +22,14 @@ const OWNERS = {
   1828: "0x708cb7F2b974d94005E762A140c469F1125e0cB4"
 };
 
+function materializeRuntime(runtimeCode) {
+  const bytes = Buffer.from(runtimeCode.slice(2), "hex");
+  const registryWord = Buffer.alloc(32);
+  Buffer.from(preparation.identityRegistry.slice(2), "hex").copy(registryWord, 12);
+  for (const start of [148, 625]) registryWord.copy(bytes, start);
+  return `0x${bytes.toString("hex")}`;
+}
+
 function hexQuantity(value) {
   return `0x${BigInt(value).toString(16)}`;
 }
@@ -161,7 +169,7 @@ function fixture() {
     deployment,
     hires,
     finalBlock: { number: "0x73", hash: blockHashFor(115), timestamp: "0x6a87d000" },
-    runtimeCode: runtime.runtimeCode,
+    runtimeCode: materializeRuntime(runtime.runtimeCode),
     ownerStates: OWNERS,
     receiptStates,
     verifiedAtUtc: "2026-08-17T05:10:00.000Z",

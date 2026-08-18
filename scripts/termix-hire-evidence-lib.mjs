@@ -6,7 +6,7 @@ export const HIRE_EVIDENCE_SCHEMA_VERSION = "proofera-termix-hire-evidence-v1.0.
 export const HIRE_EVENT_TOPIC =
   "0x056bb0724c406420fb4961e32735016984ec1231d987795e31fa362aa79eb947";
 export const EXPECTED_RUNTIME_KECCAK256 =
-  "0x94e27499304419676bd233d5f31038bffae7294d9ef2cf1e237129ca4fa9b68a";
+  "0xf5e90b8e01c3b3cc9e9d629dce7ec367ba41e21cc64842decd9e5f4ab69a46ec";
 export const EXPECTED_RUNTIME_BYTES = 1355;
 export const FINALITY_DEPTH = 12n;
 

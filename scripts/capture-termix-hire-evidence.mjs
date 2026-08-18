@@ -307,7 +307,7 @@ try {
   await main();
 } catch (error) {
   const code =
-    error instanceof Error && /^HIRE_CAPTURE_[A-Z0-9_]+$/u.test(error.message)
+    error instanceof Error && /^HIRE_(?:CAPTURE|EVIDENCE)_[A-Z0-9_]+$/u.test(error.message)
       ? error.message
       : "HIRE_CAPTURE_FAILED";
   process.stderr.write(`${code}\n`);
