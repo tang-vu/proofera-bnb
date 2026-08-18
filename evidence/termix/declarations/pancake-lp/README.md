@@ -19,3 +19,8 @@ declaration SHA-256
 It preserves the input digest while binding the reviewed OnFinality archive
 replay lane and future BSC-testnet randomness block `125727528`. It remains a
 declaration only until publication ordering, finality and run order are proven.
+The published commitment later resolved at 12 confirmations: both fixed RPCs
+agreed on block hash
+`0xb721583badb2d8de9a1dd6d1705644d646781259c811800a477d901fc30c80f4`;
+least-significant bit `0` fixes the order to agent then manual. The retained
+`.run-order.json` claims no completed run or result.
