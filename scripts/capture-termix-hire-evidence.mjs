@@ -200,10 +200,12 @@ function receiptStateCalldata(engagementId) {
 }
 
 async function collect(args, committed) {
+  activeStage = "CHAIN";
   const chainIds = await Promise.all(RPCS.map((provider) => rpc(provider, "eth_chainId", [])));
   if (chainIds.some((chainId) => quantity(chainId, "HIRE_CAPTURE_CHAIN_INVALID") !== 97n)) {
     fail("HIRE_CAPTURE_WRONG_CHAIN");
   }
+  activeStage = "OPERATIONS";
   const hashes = [args.deploymentHash, ...args.hireHashes];
   const providerOperations = await Promise.all(
     RPCS.map((provider) => Promise.all(hashes.map((hash) => operation(provider, hash))))
@@ -214,6 +216,7 @@ async function collect(args, committed) {
       "HIRE_CAPTURE_PROVIDER_OPERATION_MISMATCH"
     )
   );
+  activeStage = "FINAL_BLOCK";
   const heads = await Promise.all(RPCS.map((provider) => rpc(provider, "eth_blockNumber", [])));
   const minimumHead = heads
     .map((head) => quantity(head, "HIRE_CAPTURE_HEAD_INVALID"))
@@ -229,12 +232,14 @@ async function collect(args, committed) {
     "HIRE_CAPTURE_FINAL_BLOCK_MISMATCH"
   );
   const blockSelector = { blockHash: finalBlock.hash, requireCanonical: true };
+  activeStage = "RUNTIME";
   const code = requireSame(
     await Promise.all(
       RPCS.map((provider) => rpc(provider, "eth_getCode", [CONTRACT, blockSelector]))
     ),
     "HIRE_CAPTURE_RUNTIME_MISMATCH"
   );
+  activeStage = "OWNERS";
   const agentIds = [...new Set(committed.value.hires.map(({ agentId }) => agentId))];
   const ownerStates = {};
   for (const agentId of agentIds) {
@@ -248,6 +253,7 @@ async function collect(args, committed) {
     );
     ownerStates[agentId] = `0x${result.slice(-40)}`;
   }
+  activeStage = "RECEIPTS";
   const receiptStates = {};
   for (const { engagementId } of committed.value.hires) {
     receiptStates[engagementId.toLowerCase()] = requireSame(
@@ -262,6 +268,7 @@ async function collect(args, committed) {
       "HIRE_CAPTURE_RECEIPT_STATE_MISMATCH"
     );
   }
+  activeStage = "BUILD";
   return validateAndBuildHireEvidence({
     preparation: committed.value,
     hashes: { deployment: args.deploymentHash, hires: args.hireHashes },

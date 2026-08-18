@@ -36,6 +36,17 @@ test("hire evidence capture rejects a missing invocation before Git or network",
 
 test("hire evidence capture classifies unexpected failures without exposing internals", () => {
   assert.match(source, /HIRE_CAPTURE_\$\{activeStage\}_FAILED/u);
+  for (const stage of [
+    "CHAIN",
+    "OPERATIONS",
+    "FINAL_BLOCK",
+    "RUNTIME",
+    "OWNERS",
+    "RECEIPTS",
+    "BUILD"
+  ]) {
+    assert.match(source, new RegExp(`activeStage = "${stage}"`, "u"));
+  }
   assert.doesNotMatch(source, /error\.stack|error\.cause/u);
 });
 
