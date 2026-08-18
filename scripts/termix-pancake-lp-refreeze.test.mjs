@@ -87,3 +87,37 @@ test("archive LP re-freeze preserves input and binds the reviewed replay endpoin
     /^evidence\/termix\/declarations\/pancake-lp\/fd5d0e54eb0f-125727528\.json$/mu
   );
 });
+
+const labelledArchiveBytes = await readFile(
+  new URL("../evidence/termix/declarations/pancake-lp/e8aca589ca9f-125731663.json", import.meta.url)
+);
+const labelledArchive = JSON.parse(labelledArchiveBytes.toString("utf8"));
+
+test("label-bound archive re-freeze advances the lane configuration digest", () => {
+  assert.equal(
+    createHash("sha256").update(labelledArchiveBytes).digest("hex"),
+    "d34e708898fe33cfae91a95894188b1bb77c1360e7887a424bf92cc8592453a9"
+  );
+  assert.equal(labelledArchive.sourceCommitSha, "e8aca589ca9f3d2e7812bf754efee2188e6f9123");
+  assert.equal(labelledArchive.input.sha256, frozen.input.sha256);
+  assert.equal(labelledArchive.randomnessCommitment.blockNumber, "125731663");
+  assert.equal(
+    labelledArchive.declarationSha256,
+    "4e6196cf44597ac0f1c47daa4c6960a4e8646ba5c13a562d33b3d59a168f1905"
+  );
+  const component = labelledArchive.declaration.environment.components.find(
+    ({ name }) => name === "proofera-lp-range-agent-lane"
+  );
+  assert.equal(
+    component?.configurationSha256,
+    "6395774d0e37db2710ef0fa86ad7990463d8b6d79632b3116e0f389ba9c3dd5b"
+  );
+  assert.notEqual(
+    component?.configurationSha256,
+    archiveReplacement.declaration.environment.components.find(
+      ({ name }) => name === "proofera-lp-range-agent-lane"
+    )?.configurationSha256
+  );
+  assert.equal(labelledArchive.claims.runOrderResolved, false);
+  assert.equal(labelledArchive.claims.result, false);
+});

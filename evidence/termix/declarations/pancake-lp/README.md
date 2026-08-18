@@ -24,3 +24,11 @@ agreed on block hash
 `0xb721583badb2d8de9a1dd6d1705644d646781259c811800a477d901fc30c80f4`;
 least-significant bit `0` fixes the order to agent then manual. The retained
 `.run-order.json` claims no completed run or result.
+
+The resulting v3 agent capture is retained but excluded because its receipt
+provider label did not match the exact OnFinality endpoint. The corrected
+release binds that label into the lane digest.
+`e8aca589ca9f-125731663.json`, declaration SHA-256
+`4e6196cf44597ac0f1c47daa4c6960a4e8646ba5c13a562d33b3d59a168f1905`,
+is the fresh commitment for randomness block `125731663`. It remains
+preparation only until publication ordering, finality and run order are proven.
