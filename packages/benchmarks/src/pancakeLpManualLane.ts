@@ -4,6 +4,7 @@ import { canonicalJson, isCanonicalJsonText, sha256Bytes } from "./canonical.js"
 import {
   PANCAKE_LP_INPUT_DIGEST_ID,
   PANCAKE_LP_SOURCE_RPC_ENDPOINT,
+  PANCAKE_LP_SOURCE_RPC_PROVIDER,
   PancakeLpInputBundleSchema,
   decodeSlot0Tick,
   type PancakeLpInputBundle
@@ -18,7 +19,7 @@ import {
 import { Sha256Schema } from "./schemas.js";
 
 export const PANCAKE_LP_MANUAL_PROCEDURE_VERSION =
-  "proofera-termix-pancake-lp-manual-v1.0.0" as const;
+  "proofera-termix-pancake-lp-manual-v1.1.0" as const;
 
 const MAXIMUM_EVENTS = 100;
 const MAXIMUM_API_BODY_BYTES = 2_000_000;
@@ -149,7 +150,7 @@ async function consumeManualEvents(
       validateRpcExchange(event, bundle);
       apiResponses.push({
         receiptId: event.exchangeId,
-        provider: "PublicNode BSC mainnet JSON-RPC",
+        provider: PANCAKE_LP_SOURCE_RPC_PROVIDER,
         endpointUrl: event.endpointUrl,
         requestId: event.exchangeId,
         observedAtUtc: validUtc(clock.utcNow()),
@@ -198,7 +199,7 @@ function validateManualBindings(
     .join(",");
   if (
     tools !==
-    "human-reviewed-canonical-json-worksheet:1.0.0,publicnode-bsc-mainnet-json-rpc:eth-json-rpc"
+    "human-reviewed-canonical-json-worksheet:1.0.0,onfinality-bsc-mainnet-archive-json-rpc:eth-json-rpc"
   ) {
     throw new Error("TERMIX_PANCAKE_LP_MANUAL_TOOLS_MISMATCH");
   }

@@ -124,7 +124,7 @@ function request(): TermixTimedRunRequest {
       procedureVersion: PANCAKE_LP_MANUAL_PROCEDURE_VERSION,
       tools: [
         { name: "human-reviewed-canonical-json-worksheet", version: "1.0.0" },
-        { name: "publicnode-bsc-mainnet-json-rpc", version: "eth-json-rpc" }
+        { name: "onfinality-bsc-mainnet-archive-json-rpc", version: "eth-json-rpc" }
       ]
     },
     sourceCommitSha: COMMIT,
@@ -221,6 +221,7 @@ describe("fixed Pancake LP manual TermiX lane", () => {
     expect(capture.methodKind).toBe("manual");
     expect(capture.output.body).toBe(manualOutput());
     expect(capture.apiResponses).toHaveLength(1);
+    expect(capture.apiResponses[0]?.provider).toBe("OnFinality BSC mainnet archive JSON-RPC");
     expect(capture.timing.activeDurationNanoseconds).toBe("700");
     expect(capture.hireReceipt).toBeNull();
   });
