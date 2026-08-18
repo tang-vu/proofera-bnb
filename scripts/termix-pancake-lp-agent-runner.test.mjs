@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 
@@ -11,6 +12,9 @@ const loaderSource = await readFile(
 const releaseSource = await readFile(
   new URL("./termix-release-state.mjs", import.meta.url),
   "utf8"
+);
+const supersededCaptureBytes = await readFile(
+  new URL("../evidence/termix/runs/pancake-lp/pancake-lp-agent-20260818-v3.json", import.meta.url)
 );
 
 test("Pancake LP timed CLI fixes release, input, endpoint lane, and create-only output", () => {
@@ -52,6 +56,26 @@ test("Pancake LP timed CLI rejects empty stdin before Git, network, or output", 
   assert.equal(result.code, 1);
   assert.match(result.stderr, /TERMIX_PANCAKE_LP_STDIN_REQUIRED/u);
   assert.equal(result.stdout, "");
+});
+
+test("retained LP archive capture is immutable but excluded for its stale provider label", () => {
+  assert.equal(
+    createHash("sha256").update(supersededCaptureBytes).digest("hex"),
+    "ef03325fdeeded09707266b71806c4f187024cd4613f6d6e35fff41d3df79b83"
+  );
+  const capture = JSON.parse(supersededCaptureBytes.toString("utf8"));
+  assert.equal(capture.runId, "pancake-lp-agent-20260818-v3");
+  assert.equal(capture.methodKind, "agent");
+  assert.equal(capture.boundaries.agentWasRegisteredBeforeStart, true);
+  assert.equal(capture.boundaries.hireReceiptWasVerifiedBeforeStart, true);
+  assert.equal(capture.apiResponses.length, 2);
+  assert.equal(capture.apiResponses[0].endpointUrl, "https://bnb.api.onfinality.io/public");
+  assert.equal(capture.apiResponses[0].provider, "PublicNode BSC mainnet JSON-RPC");
+  assert.equal(
+    capture.output.sha256,
+    "e7564a74e1319f3274406d667cf4949cabc31343d7717b7082018d1b41771501"
+  );
+  assert.equal(JSON.parse(capture.output.body).executionEnabled, false);
 });
 
 function runCli(args) {

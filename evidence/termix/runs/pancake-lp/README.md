@@ -26,3 +26,11 @@ at `https://documentation.onfinality.io/support/bnb-chain` explicitly lists
 archive access and `eth_call`; a bounded probe returned the expected canonical
 `slot0` ABI result for the frozen block hash. This is capability evidence, not
 an uptime guarantee or a completed timed run.
+
+`pancake-lp-agent-20260818-v3.json` is a real create-only agent-first capture,
+but it is excluded from the final pair. Its exact endpoint URL and response body
+are OnFinality while the human-readable provider label incorrectly remained
+`PublicNode BSC mainnet JSON-RPC`. The run performed no write and returned
+`executionEnabled: false`, but ProofEra does not silently repair immutable
+evidence or publish a mislabeled receipt as the final method result. A later
+release must bind the provider label into its lane configuration and re-freeze.

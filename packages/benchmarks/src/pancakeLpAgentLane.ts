@@ -15,6 +15,7 @@ export const PANCAKE_LP_AGENT_LANE_VERSION =
 export const PANCAKE_LP_AGENT_ENDPOINT = "https://proofera-lp.tangvu.dev/" as const;
 export const PANCAKE_LP_SOURCE_EVIDENCE_RPC_ENDPOINT = "https://bsc-rpc.publicnode.com" as const;
 export const PANCAKE_LP_SOURCE_RPC_ENDPOINT = "https://bnb.api.onfinality.io/public" as const;
+export const PANCAKE_LP_SOURCE_RPC_PROVIDER = "OnFinality BSC mainnet archive JSON-RPC" as const;
 export const PANCAKE_LP_INPUT_BUNDLE_SCHEMA_VERSION =
   "proofera-termix-pancake-lp-input-v1.0.0" as const;
 export const PANCAKE_LP_INPUT_DIGEST_ID = "lp-range-input-bundle-sha256" as const;
@@ -134,6 +135,7 @@ const LANE_CONFIGURATION = Object.freeze({
   protocolVersion: PANCAKE_LP_AGENT_LANE_VERSION,
   endpointUrl: PANCAKE_LP_AGENT_ENDPOINT,
   sourceRpcUrl: PANCAKE_LP_SOURCE_RPC_ENDPOINT,
+  sourceRpcProvider: PANCAKE_LP_SOURCE_RPC_PROVIDER,
   transport: "A2A JSON-RPC message/send plus exact-hash JSON-RPC eth_call",
   skill: "analyze_lp_range",
   requestDigestInputId: PANCAKE_LP_INPUT_DIGEST_ID,
@@ -246,7 +248,7 @@ async function executePancakeLpAgentLane(
     apiResponses: [
       {
         receiptId: rpcId,
-        provider: "PublicNode BSC mainnet JSON-RPC",
+        provider: PANCAKE_LP_SOURCE_RPC_PROVIDER,
         endpointUrl: PANCAKE_LP_SOURCE_RPC_ENDPOINT,
         requestId: rpcId,
         observedAtUtc: rpcObservedAtUtc,
