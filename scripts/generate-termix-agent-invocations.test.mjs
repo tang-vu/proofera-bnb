@@ -13,6 +13,9 @@ test("agent invocation generator is create-only and fixes agent-first declaratio
   assert.match(source, /order\.randomness\.runOrder\.join\(","\) !== "agent,manual"/u);
   assert.match(source, /proofera-termix-timed-runner-v1\.0\.0/u);
   assert.match(source, /125715654-7fa5ad3e\.json/u);
+  assert.match(source, /6e657638c684-125722978\.run-order\.json/u);
+  assert.match(source, /selectedLane\(process\.argv\.slice\(2\)\)/u);
+  assert.match(source, /TERMIX_AGENT_INVOCATION_LANE_INVALID/u);
   assert.doesNotMatch(source, /fetch\(|eth_send|privateKey|WALLET_PASSWORD/u);
 });
 
@@ -22,6 +25,13 @@ for (const retained of [
     sha256: "b1f998af1fe21ee4e23cadd9aeac884dbe70b3f1a4418107608c8e41c315de6d",
     digestKey: "inputBundleSha256",
     runId: "pancake-lp-agent-20260818-v1",
+    transactionHash: "0x068b450a9867d220cc1eda156e9eb3cb6b8037901a7f7feaaa126aa7e1169747"
+  },
+  {
+    path: "../evidence/termix/invocations/pancake-lp-agent-20260818-v2.canonical-json",
+    sha256: "7a487729eccf1e1198dece262a053a7c218f3ecb0f516a5901c8152c0d7dd6b5",
+    digestKey: "inputBundleSha256",
+    runId: "pancake-lp-agent-20260818-v2",
     transactionHash: "0x068b450a9867d220cc1eda156e9eb3cb6b8037901a7f7feaaa126aa7e1169747"
   },
   {

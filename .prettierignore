@@ -31,6 +31,8 @@ evidence/termix/runs/venus-health/venus-health-agent-20260818-v1.json
 # Byte-exact JSON.stringify output from the LP declaration freezer.
 evidence/termix/declarations/pancake-lp/68dc21421c60-125719944.json
 evidence/termix/declarations/pancake-lp/6e657638c684-125722978.json
+# Byte-exact JSON.stringify output from the finalized LP run-order collector.
+evidence/termix/declarations/pancake-lp/6e657638c684-125722978.run-order.json
 **/wallets
 **/*keystore*.json
 *.pem

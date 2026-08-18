@@ -9,6 +9,7 @@ const PROTOCOL_VERSION = "proofera-termix-timed-runner-v1.0.0";
 
 const lanes = [
   {
+    laneId: "pancake-lp-v1",
     taskId: "pancake-lp-range-decision",
     declarationPath: "evidence/termix/declarations/pancake-lp/2137d7a962db-125555414.json",
     runOrderPath: "evidence/termix/declarations/pancake-lp/2137d7a962db-125555414.run-order.json",
@@ -20,6 +21,19 @@ const lanes = [
     outputPath: "evidence/termix/invocations/pancake-lp-agent-20260818-v1.canonical-json"
   },
   {
+    laneId: "pancake-lp-v2",
+    taskId: "pancake-lp-range-decision",
+    declarationPath: "evidence/termix/declarations/pancake-lp/6e657638c684-125722978.json",
+    runOrderPath: "evidence/termix/declarations/pancake-lp/6e657638c684-125722978.run-order.json",
+    runId: "pancake-lp-agent-20260818-v2",
+    runnerId: "pancake-lp-agent-v1",
+    label: "Registered ProofEra LP Range agent",
+    componentName: "proofera-lp-range-agent-lane",
+    digestKey: "inputBundleSha256",
+    outputPath: "evidence/termix/invocations/pancake-lp-agent-20260818-v2.canonical-json"
+  },
+  {
+    laneId: "venus-health-v1",
     taskId: "venus-health-factor-decision",
     declarationPath: "evidence/termix/declarations/venus-health/3ba85859ced3-125568071.json",
     runOrderPath: "evidence/termix/declarations/venus-health/3ba85859ced3-125568071.run-order.json",
@@ -31,6 +45,20 @@ const lanes = [
     outputPath: "evidence/termix/invocations/venus-health-agent-20260818-v1.canonical-json"
   }
 ];
+
+function selectedLane(args) {
+  const normalized = args[0] === "--" ? args.slice(1) : args;
+  if (
+    normalized.length !== 2 ||
+    normalized[0] !== "--lane" ||
+    !/^[a-z0-9-]+$/u.test(normalized[1])
+  ) {
+    throw new Error("TERMIX_AGENT_INVOCATION_ARGUMENTS_INVALID");
+  }
+  const lane = lanes.find((candidate) => candidate.laneId === normalized[1]);
+  if (lane === undefined) throw new Error("TERMIX_AGENT_INVOCATION_LANE_INVALID");
+  return lane;
+}
 
 async function json(path) {
   return JSON.parse(await readFile(resolve(ROOT, path), "utf8"));
@@ -60,8 +88,9 @@ async function writeExclusive(path, body) {
 }
 
 const hireEvidence = await json(HIRE_PATH);
+const lane = selectedLane(process.argv.slice(2));
 
-for (const lane of lanes) {
+{
   const frozen = await json(lane.declarationPath);
   const order = await json(lane.runOrderPath);
   if (order.randomness.runOrder.join(",") !== "agent,manual") {
