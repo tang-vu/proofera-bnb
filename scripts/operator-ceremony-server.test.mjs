@@ -99,6 +99,21 @@ test("local server rejects requests without its bootstrap session", async (conte
   assert.deepEqual(await crossOriginWrite.json(), { error: "CEREMONY_REQUEST_AUTH_INVALID" });
 });
 
+test("loopback root recovers a browser session without a query token", async (context) => {
+  const instance = await createCeremonyServer({ openBrowser: false });
+  context.after(() => new Promise((resolvePromise) => instance.server.close(resolvePromise)));
+
+  const recovery = await fetch(`http://127.0.0.1:${instance.port}/`, { redirect: "manual" });
+  assert.equal(recovery.status, 303);
+  assert.equal(recovery.headers.get("location"), "/");
+  assert.match(recovery.headers.get("set-cookie"), /HttpOnly; SameSite=Strict/);
+
+  const cookie = recovery.headers.get("set-cookie").split(";", 1)[0];
+  const page = await fetch(`http://127.0.0.1:${instance.port}/`, { headers: { cookie } });
+  assert.equal(page.status, 200);
+  assert.match(await page.text(), /ProofEra operator ceremony/);
+});
+
 test("canonical serializer is deterministic for nested worksheet output", () => {
   assert.equal(canonicalJson({ z: 2, a: { d: 4, c: 3 } }), '{"a":{"c":3,"d":4},"z":2}');
 });

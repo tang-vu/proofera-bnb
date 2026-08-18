@@ -420,6 +420,19 @@ export async function createCeremonyServer({ port = 0, openBrowser = true } = {}
         response.end();
         return;
       }
+      if (
+        request.method === "GET" &&
+        url.pathname === "/" &&
+        !hasSessionCookie(request, sessionToken)
+      ) {
+        response.writeHead(303, {
+          ...securityHeaders(),
+          location: "/",
+          "set-cookie": `proofera_ceremony=${sessionToken}; HttpOnly; SameSite=Strict; Path=/`
+        });
+        response.end();
+        return;
+      }
       if (!hasSessionCookie(request, sessionToken)) {
         response.writeHead(403, securityHeaders());
         response.end("Forbidden\n");
@@ -693,7 +706,7 @@ export async function createCeremonyServer({ port = 0, openBrowser = true } = {}
     server.listen(port, "127.0.0.1", resolvePromise);
   });
   const actualPort = server.address().port;
-  const bootstrapUrl = `http://127.0.0.1:${actualPort}/?bootstrap=${bootstrapToken}`;
+  const bootstrapUrl = `http://127.0.0.1:${actualPort}/`;
   if (openBrowser) {
     const opener = spawn("explorer.exe", [bootstrapUrl], {
       detached: true,

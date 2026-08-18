@@ -170,8 +170,8 @@ agent or network call. The final frozen bundle, real manual transcript, sourced
 cost and second-review artifacts remain required.
 
 The Windows-host owner can start `Start ProofEra Ceremony.cmd` once to open a
-loopback-only guided worksheet. The launcher bootstraps an HttpOnly,
-SameSite-strict local session, rejects non-loopback hosts and cross-origin or
+loopback-only guided worksheet. A root request on the loopback-only listener
+bootstraps an HttpOnly, SameSite-strict local session, rejects non-loopback hosts and cross-origin or
 missing-CSRF writes, and never exposes its write surface through the public
 marketplace. It feeds the already frozen LP and Venus manual CLIs incrementally
 so positive operator review time and exact read-only RPC exchanges remain in
