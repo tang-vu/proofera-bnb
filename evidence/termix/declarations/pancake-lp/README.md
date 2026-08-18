@@ -37,3 +37,11 @@ At 12 confirmations both fixed RPCs agreed on block hash
 Least-significant bit `1` fixes the order to manual then agent. Neither method
 has run under this corrected declaration, and the agent lane must remain gated
 until the independent manual capture exists.
+
+That declaration was superseded before either method ran because the manual
+procedure still carried stale PublicNode tool metadata. Release `f8b57f2`
+corrects the manual endpoint, provider label, tool name and procedure version.
+`f8b57f2b1842-125735511.json`, declaration SHA-256
+`776c41fd1043d0541f2c67d2cb6a7306bf7738def026bb78b36b868b6ca9edd3`,
+is the fresh commitment for randomness block `125735511`; it is preparation
+only until finalized run-order evidence exists.

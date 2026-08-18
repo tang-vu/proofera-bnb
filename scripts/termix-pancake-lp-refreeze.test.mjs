@@ -153,3 +153,32 @@ test("label-bound archive run order requires manual before agent", () => {
     result: false
   });
 });
+
+const completeProviderBytes = await readFile(
+  new URL("../evidence/termix/declarations/pancake-lp/f8b57f2b1842-125735511.json", import.meta.url)
+);
+const completeProvider = JSON.parse(completeProviderBytes.toString("utf8"));
+
+test("complete provider-bound re-freeze advances the manual procedure", () => {
+  assert.equal(
+    createHash("sha256").update(completeProviderBytes).digest("hex"),
+    "9754a0ffcc64d3c9fcbe90ee7d39c7d57cd8ed58039e9a7dbcbad9c6ec3f71b4"
+  );
+  assert.equal(completeProvider.sourceCommitSha, "f8b57f2b184266d8620d6590d663cd91d41db1ea");
+  assert.equal(completeProvider.input.sha256, frozen.input.sha256);
+  assert.equal(completeProvider.randomnessCommitment.blockNumber, "125735511");
+  assert.equal(
+    completeProvider.declarationSha256,
+    "776c41fd1043d0541f2c67d2cb6a7306bf7738def026bb78b36b868b6ca9edd3"
+  );
+  const manual = completeProvider.declaration.environment.components.find(
+    ({ name }) => name === "manual-procedure"
+  );
+  assert.equal(manual?.version, "proofera-termix-pancake-lp-manual-v1.1.0");
+  assert.equal(
+    manual?.configurationSha256,
+    "7921f9492890a0f2a485dcd57dc78876ed00f8bce2213f61733b04298f4af09b"
+  );
+  assert.equal(completeProvider.claims.runOrderResolved, false);
+  assert.equal(completeProvider.claims.result, false);
+});
