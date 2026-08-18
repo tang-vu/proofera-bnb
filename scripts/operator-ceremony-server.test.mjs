@@ -23,7 +23,7 @@ async function json(path) {
 
 test("manual invocations retain the frozen declarations and no hire receipt", async () => {
   const lp = await json("evidence/termix/declarations/pancake-lp/f8b57f2b1842-125735511.json");
-  const venus = await json("evidence/termix/declarations/venus-health/3ba85859ced3-125568071.json");
+  const venus = await json("evidence/termix/declarations/venus-health/402edbeae429-125808800.json");
   const lpInvocation = buildManualInvocation({ declaration: lp, lane: "lp" });
   const venusInvocation = buildManualInvocation({ declaration: venus, lane: "venus" });
 
@@ -38,7 +38,7 @@ test("manual invocations retain the frozen declarations and no hire receipt", as
 test("worksheets recompute source-bound LP and Venus integer values without agent output", async () => {
   const lpInput = await json("evidence/termix/frozen/pancake-lp/116342186-7152618.canonical-json");
   const venusInput = await json(
-    "evidence/termix/frozen/venus-health/3ba85859ced3-125563831-125564152.canonical-json"
+    "evidence/termix/frozen/venus-health/402edbeae429-125563831-125564152.canonical-json"
   );
   const lp = buildLpWorksheet(lpInput, -64059);
   const venus = buildVenusWorksheet(venusInput);

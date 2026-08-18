@@ -12,11 +12,11 @@ const ASSET_ROOT = resolve(ROOT, "scripts", "operator-ceremony");
 const LP_INPUT_PATH = "evidence/termix/frozen/pancake-lp/116342186-7152618.canonical-json";
 const LP_DECLARATION_PATH = "evidence/termix/declarations/pancake-lp/f8b57f2b1842-125735511.json";
 const VENUS_INPUT_PATH =
-  "evidence/termix/frozen/venus-health/3ba85859ced3-125563831-125564152.canonical-json";
+  "evidence/termix/frozen/venus-health/402edbeae429-125563831-125564152.canonical-json";
 const VENUS_DECLARATION_PATH =
-  "evidence/termix/declarations/venus-health/3ba85859ced3-125568071.json";
+  "evidence/termix/declarations/venus-health/402edbeae429-125808800.json";
 const LP_RUN_ID = "pancake-lp-manual-20260818-v1";
-const VENUS_RUN_ID = "venus-health-manual-20260818-v1";
+const VENUS_RUN_ID = "venus-health-manual-20260818-v2";
 const LP_OUTPUT_PATH = `evidence/termix/runs/pancake-lp/manual/${LP_RUN_ID}.json`;
 const VENUS_OUTPUT_PATH = `evidence/termix/runs/venus-health/manual/${VENUS_RUN_ID}.json`;
 const LP_RPC_ENDPOINT = "https://bnb.api.onfinality.io/public";
