@@ -169,6 +169,19 @@ is timestamped as the operator emits each artifact/RPC/output event; it has no
 agent or network call. The final frozen bundle, real manual transcript, sourced
 cost and second-review artifacts remain required.
 
+The Windows-host owner can start `Start ProofEra Ceremony.cmd` once to open a
+loopback-only guided worksheet. The launcher bootstraps an HttpOnly,
+SameSite-strict local session, rejects non-loopback hosts and cross-origin or
+missing-CSRF writes, and never exposes its write surface through the public
+marketplace. It feeds the already frozen LP and Venus manual CLIs incrementally
+so positive operator review time and exact read-only RPC exchanges remain in
+their normal create-only captures. A human must explicitly attest no-agent use,
+choose the decision and supply their rationale. After each successful capture,
+the launcher refuses unrelated worktree changes and publishes only that capture
+before the next release-gated lane can start. The wrapper is transport and
+worksheet presentation, not an agent, operator-identity proof, passkey ceremony
+or authority receipt.
+
 The isolated `contracts/testnet-hire-receipt` package now supplies the missing
 receipt mechanism without weakening the runner schema. Its chain-97-only,
 no-admin contract resolves `ownerOf(agentId)` from the immutable ERC-8004

@@ -13,8 +13,7 @@ const steps = [
     state: "Human result required",
     detail:
       "Review the frozen PancakeSwap position, reproduce the exact-hash slot0 read, and enter your own bounded decision. The registered agent must not be used.",
-    command:
-      "pnpm run:termix:pancake-lp-manual -- --execute-exact-pancake-lp-manual-run --input-bundle evidence/termix/frozen/pancake-lp/116342186-7152618.canonical-json"
+    localRunner: true
   },
   {
     number: "02",
@@ -22,8 +21,7 @@ const steps = [
     state: "Human result required",
     detail:
       "Review the frozen Venus window, recompute the integer health factors, and enter your own read-only decision without invoking the Health Guardian agent.",
-    command:
-      "pnpm run:termix:venus-manual -- --execute-exact-venus-health-manual-run --request-input evidence/termix/frozen/venus-health/3ba85859ced3-125563831-125564152.canonical-json"
+    localRunner: true
   },
   {
     number: "03",
@@ -74,12 +72,13 @@ export function CeremonyConsole() {
           <span className="state-badge state-caution">No ceremony in progress</span>
           <h2 id="ceremony-start-heading">One entry point. Four evidence checkpoints.</h2>
           <p>
-            This button starts one guided browser session. It does not manufacture a manual result,
-            invoke a passkey, submit a transaction, or claim that any checkpoint passed.
+            This public page cannot write benchmark evidence. The button reveals the local-only
+            launcher that runs on the owner&apos;s Windows host; it does not manufacture a manual
+            result, invoke a passkey, submit a transaction, or claim that a checkpoint passed.
           </p>
         </div>
         <button className="button button-primary" onClick={beginCeremony} type="button">
-          Begin operator ceremony
+          Show local runner
         </button>
       </section>
     );
@@ -109,6 +108,16 @@ export function CeremonyConsole() {
         </dl>
       </div>
 
+      <aside className="ceremony-local-runner" aria-label="Local ceremony launcher">
+        <span>On the always-on Windows host</span>
+        <code>Start ProofEra Ceremony.cmd</code>
+        <p>
+          Double-click this tracked launcher in the repository root. It opens a private 127.0.0.1
+          worksheet, records timed manual events, and commits only an isolated validated capture.
+          This public page never receives the worksheet answers.
+        </p>
+      </aside>
+
       <ol className="ceremony-step-list">
         {steps.map((step) => (
           <li className="ceremony-step" key={step.number}>
@@ -120,10 +129,10 @@ export function CeremonyConsole() {
               </div>
             </div>
             <p>{step.detail}</p>
-            {"command" in step ? (
-              <div className="ceremony-command" aria-label={`${step.title} command`}>
-                <span>Run from the repository root</span>
-                <code>{step.command}</code>
+            {"localRunner" in step ? (
+              <div className="ceremony-command" aria-label={`${step.title} local runner boundary`}>
+                <span>Handled inside the local ceremony runner</span>
+                <code>No raw NDJSON or terminal command entry required.</code>
               </div>
             ) : null}
             {"href" in step ? (

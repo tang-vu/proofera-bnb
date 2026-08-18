@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="__CSRF_TOKEN__" />
+    <title>ProofEra — Local operator ceremony</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/client.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <span class="eyebrow">LOCAL-ONLY / 127.0.0.1 / TESTNET</span>
+        <h1>ProofEra operator ceremony</h1>
+        <p>
+          Runner này ghi hai baseline thủ công thật. Nó không gọi agent, không giữ khóa ví và không
+          biến thiếu receipt thành kết luận.
+        </p>
+      </header>
+
+      <section class="status" aria-live="polite">
+        <strong id="phase-label">Đang kiểm tra phiên…</strong>
+        <span id="error-label"></span>
+      </section>
+
+      <section class="panel" id="lp-panel">
+        <div class="heading">
+          <span class="number">01</span>
+          <div>
+            <h2>LP manual baseline</h2>
+            <p>Exact-hash slot0 + worksheet độc lập, không gọi LP agent.</p>
+          </div>
+        </div>
+        <button id="lp-start" type="button">Bắt đầu worksheet LP</button>
+        <div id="lp-workspace" hidden></div>
+      </section>
+
+      <section class="panel" id="venus-panel">
+        <div class="heading">
+          <span class="number">02</span>
+          <div>
+            <h2>Venus manual baseline</h2>
+            <p>Ba quan sát, số nguyên 18 decimals, không gọi Health Guardian agent.</p>
+          </div>
+        </div>
+        <button id="venus-start" type="button" disabled>Bắt đầu worksheet Venus</button>
+        <div id="venus-workspace" hidden></div>
+      </section>
+
+      <section class="panel blocked">
+        <div class="heading">
+          <span class="number">03</span>
+          <div>
+            <h2>Altana grant → execute → revoke</h2>
+            <p>
+              Chưa mở: cần passkey final-origin, dedicated session signer và eligible write target.
+              Hai manual capture không tự tạo authority.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

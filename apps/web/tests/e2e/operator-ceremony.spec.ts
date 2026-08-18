@@ -16,16 +16,17 @@ test("starts one honest operator session and keeps it through a reload", async (
   ).toBeVisible();
   await expect(page.getByText(/starting the session creates no evidence by itself/i)).toBeVisible();
 
-  await page.getByRole("button", { name: "Begin operator ceremony" }).click();
+  await page.getByRole("button", { name: "Show local runner" }).click();
 
   await expect(page.getByRole("heading", { name: /keep this page open/i })).toBeVisible();
   await expect(page.getByText("Nothing completed by this page")).toBeVisible();
   await expect(page.getByText("Human result required")).toHaveCount(2);
   await expect(page.getByText("Authority prerequisites absent")).toBeVisible();
   await expect(page.getByText("Waits for a real grant")).toBeVisible();
+  await expect(page.getByText("Start ProofEra Ceremony.cmd")).toBeVisible();
   await expectNoHorizontalOverflow(page);
 
   await page.reload();
   await expect(page.getByRole("heading", { name: /keep this page open/i })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Begin operator ceremony" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Show local runner" })).toHaveCount(0);
 });
