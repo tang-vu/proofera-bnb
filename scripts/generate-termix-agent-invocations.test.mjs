@@ -42,6 +42,13 @@ for (const retained of [
     transactionHash: "0x068b450a9867d220cc1eda156e9eb3cb6b8037901a7f7feaaa126aa7e1169747"
   },
   {
+    path: "../evidence/termix/invocations/pancake-lp-agent-20260818-v4.canonical-json",
+    sha256: "76dc1d4326b69bfaec25282fc501f1fdc3ef2759a7b1167dc953b5f70fcd070a",
+    digestKey: "inputBundleSha256",
+    runId: "pancake-lp-agent-20260818-v4",
+    transactionHash: "0x068b450a9867d220cc1eda156e9eb3cb6b8037901a7f7feaaa126aa7e1169747"
+  },
+  {
     path: "../evidence/termix/invocations/venus-health-agent-20260818-v1.canonical-json",
     sha256: "3cbbaf5ae6edb93f8efd64283540b6ba13971dc367391293a4106f8ccfeda8be",
     digestKey: "requestInputSha256",

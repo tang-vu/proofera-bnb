@@ -44,4 +44,8 @@ corrects the manual endpoint, provider label, tool name and procedure version.
 `f8b57f2b1842-125735511.json`, declaration SHA-256
 `776c41fd1043d0541f2c67d2cb6a7306bf7738def026bb78b36b868b6ca9edd3`,
 is the fresh commitment for randomness block `125735511`; it is preparation
-only until finalized run-order evidence exists.
+only until finalized run-order evidence exists. At 12 confirmations both fixed
+RPCs agreed on block hash
+`0xb02660a1fcb188366aa8769aeac96c3035cab3667cb0f6c752e719fbafb97464`;
+least-significant bit `0` fixes the order to agent then manual. The retained
+run-order artifact claims neither method has run and no result exists.

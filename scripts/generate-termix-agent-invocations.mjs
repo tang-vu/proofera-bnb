@@ -45,6 +45,18 @@ const lanes = [
     outputPath: "evidence/termix/invocations/pancake-lp-agent-20260818-v3.canonical-json"
   },
   {
+    laneId: "pancake-lp-v4",
+    taskId: "pancake-lp-range-decision",
+    declarationPath: "evidence/termix/declarations/pancake-lp/f8b57f2b1842-125735511.json",
+    runOrderPath: "evidence/termix/declarations/pancake-lp/f8b57f2b1842-125735511.run-order.json",
+    runId: "pancake-lp-agent-20260818-v4",
+    runnerId: "pancake-lp-agent-v1",
+    label: "Registered ProofEra LP Range agent",
+    componentName: "proofera-lp-range-agent-lane",
+    digestKey: "inputBundleSha256",
+    outputPath: "evidence/termix/invocations/pancake-lp-agent-20260818-v4.canonical-json"
+  },
+  {
     laneId: "venus-health-v1",
     taskId: "venus-health-factor-decision",
     declarationPath: "evidence/termix/declarations/venus-health/3ba85859ced3-125568071.json",
