@@ -9,7 +9,9 @@ import {
   buildManualInvocation,
   buildVenusWorksheet,
   canonicalJson,
-  createCeremonyServer
+  createCeremonyServer,
+  recommendedLpConclusion,
+  recommendedVenusConclusion
 } from "./operator-ceremony-server.mjs";
 
 const ROOT = resolve(import.meta.dirname, "..");
@@ -63,6 +65,8 @@ test("worksheets recompute source-bound LP and Venus integer values without agen
   assert.equal(venus.observations.length, 3);
   assert.equal(venus.minimumHealthFactor.scaledValueFloor, "2555658499393988648");
   assert.equal(venus.windowSeconds, 144);
+  assert.equal(recommendedLpConclusion(lp).decision, "insufficient_evidence");
+  assert.equal(recommendedVenusConclusion(venus).decision, "hold");
 });
 
 test("local server rejects requests without its bootstrap session", async (context) => {

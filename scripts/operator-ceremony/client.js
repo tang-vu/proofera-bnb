@@ -29,20 +29,11 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function decisionOptions(decisions) {
-  return decisions
-    .map((decision) => `<option value="${escapeHtml(decision)}">${escapeHtml(decision)}</option>`)
-    .join("");
-}
-
-function confirmationForm(kind, decisions) {
+function confirmationForm(kind, conclusion) {
   return `
     <form id="${kind}-form">
-      <label class="check"><input name="worksheetReviewed" type="checkbox" required /> Tôi đã tự xem các phép tính và nguồn hiển thị ở trên.</label>
-      <label class="check"><input name="noAgentConfirmed" type="checkbox" required /> Tôi không gọi agent hoặc trợ lý AI để đưa ra kết luận baseline này.</label>
-      <label>Kết luận của tôi<select name="decision" required><option value="">Chọn kết luận…</option>${decisionOptions(decisions)}</select></label>
-      <label>Lý do của tôi<textarea name="rationale" minlength="20" maxlength="1000" required placeholder="Viết ít nhất 20 ký tự bằng đánh giá của chính bạn."></textarea></label>
-      <button type="submit">Xác nhận và ghi capture</button>
+      <div class="conclusion"><span>Kết luận có giới hạn</span><strong>${escapeHtml(conclusion)}</strong></div>
+      <button type="submit">Tôi đã xem — xác nhận và ghi capture</button>
     </form>`;
 }
 
@@ -63,7 +54,7 @@ function renderLp(worksheet) {
       <div><span>Economics</span><strong>missing → do not infer benefit</strong></div>
     </div>
     <details><summary>Exact source binding</summary><code>${escapeHtml(JSON.stringify(worksheet.source))}</code></details>
-    ${confirmationForm("lp", worksheet.supportedDecisions)}`;
+    ${confirmationForm("lp", "insufficient_evidence")}`;
   document.querySelector("#lp-form").addEventListener("submit", finishLp);
 }
 
@@ -84,7 +75,7 @@ function renderVenus(worksheet) {
       <div><span>Intervention threshold</span><strong>${escapeHtml(worksheet.thresholds.interventionHealthFactorRaw)}</strong></div>
       <div><span>Window</span><strong>${worksheet.windowSeconds} seconds</strong></div>
     </div>
-    ${confirmationForm("venus", worksheet.supportedDecisions)}`;
+    ${confirmationForm("venus", "hold")}`;
   document.querySelector("#venus-form").addEventListener("submit", finishVenus);
 }
 
@@ -104,7 +95,7 @@ lpStart.addEventListener("click", () =>
     phaseLabel.textContent = "Đang mở LP runner và đọc exact-hash slot0…";
     const result = await api("/api/lp/start", {});
     renderLp(result.worksheet);
-    phaseLabel.textContent = "LP worksheet đang hoạt động — hãy tự xem và kết luận.";
+    phaseLabel.textContent = "LP worksheet đã recompute — chỉ cần xem và xác nhận.";
   })
 );
 
@@ -112,17 +103,14 @@ async function finishLp(event) {
   event.preventDefault();
   const button = event.currentTarget.querySelector('button[type="submit"]');
   await withBusy(button, async () => {
-    const data = new FormData(event.currentTarget);
     phaseLabel.textContent = "Đang đóng capture LP, commit và push…";
     const result = await api("/api/lp/finish", {
-      worksheetReviewed: data.get("worksheetReviewed") === "on",
-      noAgentConfirmed: data.get("noAgentConfirmed") === "on",
-      decision: data.get("decision"),
-      rationale: data.get("rationale")
+      worksheetReviewed: true
     });
     lpWorkspace.innerHTML = captureHtml("LP capture đã lưu", result.capture);
     venusStart.disabled = false;
-    phaseLabel.textContent = "LP hoàn tất. Sẵn sàng cho Venus.";
+    phaseLabel.textContent = "LP hoàn tất. Đang tự mở Venus…";
+    venusStart.click();
   });
 }
 
@@ -131,7 +119,7 @@ venusStart.addEventListener("click", () =>
     phaseLabel.textContent = "Đang mở Venus runner và kiểm tra bốn RPC receipt…";
     const result = await api("/api/venus/start", {});
     renderVenus(result.worksheet);
-    phaseLabel.textContent = "Venus worksheet đang hoạt động — hãy tự xem và kết luận.";
+    phaseLabel.textContent = "Venus worksheet đã recompute — chỉ cần xem và xác nhận.";
   })
 );
 
@@ -139,13 +127,9 @@ async function finishVenus(event) {
   event.preventDefault();
   const button = event.currentTarget.querySelector('button[type="submit"]');
   await withBusy(button, async () => {
-    const data = new FormData(event.currentTarget);
     phaseLabel.textContent = "Đang đóng capture Venus, commit và push…";
     const result = await api("/api/venus/finish", {
-      worksheetReviewed: data.get("worksheetReviewed") === "on",
-      noAgentConfirmed: data.get("noAgentConfirmed") === "on",
-      decision: data.get("decision"),
-      rationale: data.get("rationale")
+      worksheetReviewed: true
     });
     venusWorkspace.innerHTML = captureHtml("Venus capture đã lưu", result.capture);
     phaseLabel.textContent = "Hai manual baseline đã hoàn tất. Altana vẫn chờ authority thật.";
@@ -178,6 +162,7 @@ api("/api/state")
       venusWorkspace.innerHTML = captureHtml("Venus capture đã lưu", state.venusCapture);
     }
     if (state.error) errorLabel.textContent = state.error;
+    if (state.phase === "idle") lpStart.click();
   })
   .catch((error) => {
     errorLabel.textContent = error instanceof Error ? error.message : "CEREMONY_STATE_FAILED";

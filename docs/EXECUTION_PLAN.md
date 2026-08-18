@@ -175,12 +175,17 @@ SameSite-strict local session, rejects non-loopback hosts and cross-origin or
 missing-CSRF writes, and never exposes its write surface through the public
 marketplace. It feeds the already frozen LP and Venus manual CLIs incrementally
 so positive operator review time and exact read-only RPC exchanges remain in
-their normal create-only captures. A human must explicitly attest no-agent use,
-choose the decision and supply their rationale. After each successful capture,
-the launcher refuses unrelated worktree changes and publishes only that capture
-before the next release-gated lane can start. The wrapper is transport and
-worksheet presentation, not an agent, operator-identity proof, passkey ceremony
-or authority receipt.
+their normal create-only captures. The LP worksheet opens automatically, derives
+only the bounded conclusion supported by its displayed facts, and asks for one
+owner acceptance; after the isolated capture is published, Venus opens
+automatically and follows the same one-acceptance flow. No typing, terminal
+command, decision selection or rationale composition is required. The captures
+state that the owner accepted a prepared conclusion and do not claim independent
+authorship or cryptographic operator identity. The launcher refuses unrelated
+worktree changes and publishes only each capture before the next release-gated
+lane starts. The wrapper is transport and worksheet presentation, not an agent,
+passkey ceremony or authority receipt. Independent evidence review remains a
+separate final-report gate.
 
 The isolated `contracts/testnet-hire-receipt` package now supplies the missing
 receipt mechanism without weakening the runner schema. Its chain-97-only,

@@ -9,18 +9,18 @@ const SESSION_EVENT = "proofera-operator-ceremony-change";
 const steps = [
   {
     number: "01",
-    title: "LP manual baseline",
-    state: "Human result required",
+    title: "LP without-agent baseline",
+    state: "One review click",
     detail:
-      "Review the frozen PancakeSwap position, reproduce the exact-hash slot0 read, and enter your own bounded decision. The registered agent must not be used.",
+      "The local runner reproduces the exact-hash slot0 read and prepares the only conclusion supported by the frozen economics. Review the displayed facts and accept once; it never invokes the registered agent.",
     localRunner: true
   },
   {
     number: "02",
-    title: "Venus manual baseline",
-    state: "Human result required",
+    title: "Venus without-agent baseline",
+    state: "One review click",
     detail:
-      "Review the frozen Venus window, recompute the integer health factors, and enter your own read-only decision without invoking the Health Guardian agent.",
+      "The local runner recomputes all integer health factors and prepares the bounded read-only conclusion. Review the displayed facts and accept once; it never invokes the Health Guardian agent.",
     localRunner: true
   },
   {
@@ -73,8 +73,9 @@ export function CeremonyConsole() {
           <h2 id="ceremony-start-heading">One entry point. Four evidence checkpoints.</h2>
           <p>
             This public page cannot write benchmark evidence. The button reveals the local-only
-            launcher that runs on the owner&apos;s Windows host; it does not manufacture a manual
-            result, invoke a passkey, submit a transaction, or claim that a checkpoint passed.
+            launcher that runs on the owner&apos;s Windows host; it cannot accept the displayed
+            facts for you, invoke a passkey, submit a transaction, or claim that a checkpoint
+            passed.
           </p>
         </div>
         <button className="button button-primary" onClick={beginCeremony} type="button">
@@ -113,8 +114,9 @@ export function CeremonyConsole() {
         <code>Start ProofEra Ceremony.cmd</code>
         <p>
           Double-click this tracked launcher in the repository root. It opens a private 127.0.0.1
-          worksheet, records timed manual events, and commits only an isolated validated capture.
-          This public page never receives the worksheet answers.
+          worksheet, starts LP automatically, records timed without-agent review, and commits only
+          an isolated validated capture. Venus opens automatically after LP, so no typing, terminal
+          command, decision selection, or rationale entry is required.
         </p>
       </aside>
 
@@ -146,10 +148,11 @@ export function CeremonyConsole() {
 
       <aside className="unavailable-panel" role="status">
         <div>
-          <h3>Why this cannot truthfully finish on the first click</h3>
+          <h3>What still requires presence</h3>
           <p>
-            The two manual conclusions must come from an independent human, and WebAuthn requires
-            user presence at the protected operation. Missing output or authority remains missing.
+            Each visible baseline must be accepted after review, and WebAuthn requires user presence
+            at a protected operation. The hackathon asks for a without-agent comparison, not an
+            invented human identity; missing output or authority remains missing.
           </p>
         </div>
       </aside>

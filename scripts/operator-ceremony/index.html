@@ -14,8 +14,8 @@
         <span class="eyebrow">LOCAL-ONLY / 127.0.0.1 / TESTNET</span>
         <h1>ProofEra operator ceremony</h1>
         <p>
-          Runner này ghi hai baseline thủ công thật. Nó không gọi agent, không giữ khóa ví và không
-          biến thiếu receipt thành kết luận.
+          Runner này recompute hai baseline không dùng agent. Bạn chỉ xem kết quả có giới hạn và xác
+          nhận; runner không giữ khóa ví hoặc biến thiếu receipt thành kết luận.
         </p>
       </header>
 
@@ -28,11 +28,11 @@
         <div class="heading">
           <span class="number">01</span>
           <div>
-            <h2>LP manual baseline</h2>
-            <p>Exact-hash slot0 + worksheet độc lập, không gọi LP agent.</p>
+            <h2>LP without-agent baseline</h2>
+            <p>Exact-hash slot0 + worksheet có giới hạn, không gọi LP agent.</p>
           </div>
         </div>
-        <button id="lp-start" type="button">Bắt đầu worksheet LP</button>
+        <button id="lp-start" type="button">Thử mở lại worksheet LP</button>
         <div id="lp-workspace" hidden></div>
       </section>
 
@@ -40,11 +40,11 @@
         <div class="heading">
           <span class="number">02</span>
           <div>
-            <h2>Venus manual baseline</h2>
+            <h2>Venus without-agent baseline</h2>
             <p>Ba quan sát, số nguyên 18 decimals, không gọi Health Guardian agent.</p>
           </div>
         </div>
-        <button id="venus-start" type="button" disabled>Bắt đầu worksheet Venus</button>
+        <button id="venus-start" type="button" disabled>Thử mở lại worksheet Venus</button>
         <div id="venus-workspace" hidden></div>
       </section>
 

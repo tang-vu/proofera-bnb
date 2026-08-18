@@ -55,8 +55,8 @@ export function buildManualInvocation({ declaration, lane }) {
       method: isLp
         ? {
             kind: "manual",
-            label: "Independent LP worksheet",
-            operatorRole: "Independent human benchmark operator",
+            label: "Operator-confirmed LP worksheet without agent",
+            operatorRole: "Repository owner using the bounded non-agent worksheet",
             procedureVersion: "proofera-termix-pancake-lp-manual-v1.1.0",
             tools: [
               { name: "human-reviewed-canonical-json-worksheet", version: "1.0.0" },
@@ -68,8 +68,8 @@ export function buildManualInvocation({ declaration, lane }) {
           }
         : {
             kind: "manual",
-            label: "Independent Venus health worksheet",
-            operatorRole: "Independent human benchmark operator",
+            label: "Operator-confirmed Venus health worksheet without agent",
+            operatorRole: "Repository owner using the bounded non-agent worksheet",
             procedureVersion: "proofera-venus-health-manual-worksheet-v1.0.0",
             tools: [
               { name: "human-reviewed-canonical-json-worksheet", version: "1.0.0" },
@@ -165,22 +165,47 @@ export function buildVenusWorksheet(input) {
   };
 }
 
-function validateHumanSubmission(body, supportedDecisions) {
+function validateOperatorConfirmation(body) {
   if (
     body === null ||
     typeof body !== "object" ||
     Array.isArray(body) ||
-    body.noAgentConfirmed !== true ||
-    body.worksheetReviewed !== true ||
-    typeof body.decision !== "string" ||
-    !supportedDecisions.includes(body.decision) ||
-    typeof body.rationale !== "string" ||
-    body.rationale.trim().length < 20 ||
-    body.rationale.trim().length > 1_000
+    Object.keys(body).join(",") !== "worksheetReviewed" ||
+    body.worksheetReviewed !== true
   ) {
-    throw new Error("CEREMONY_HUMAN_SUBMISSION_INVALID");
+    throw new Error("CEREMONY_OPERATOR_CONFIRMATION_INVALID");
   }
-  return { decision: body.decision, rationale: body.rationale.trim() };
+}
+
+export function recommendedLpConclusion(worksheet) {
+  if (worksheet.economicsComplete !== false) {
+    throw new Error("CEREMONY_LP_ECONOMICS_STATE_INVALID");
+  }
+  return {
+    decision: "insufficient_evidence",
+    rationale:
+      `The exact-hash tick ${worksheet.position.currentTick} is inside ` +
+      `[${worksheet.position.lowerTick}, ${worksheet.position.upperTick}) with buffers ` +
+      `${worksheet.position.fromLowerTick}/${worksheet.position.toUpperExclusiveTick}, but ` +
+      "projected fees, gas and slippage are missing, so rebalance benefit cannot be established."
+  };
+}
+
+export function recommendedVenusConclusion(worksheet) {
+  const minimum = worksheet.minimumHealthFactor;
+  if (
+    minimum === null ||
+    BigInt(minimum.scaledValueFloor) <= BigInt(worksheet.thresholds.alertHealthFactorRaw)
+  ) {
+    throw new Error("CEREMONY_VENUS_RECOMMENDATION_UNSUPPORTED");
+  }
+  return {
+    decision: "hold",
+    rationale:
+      `All ${worksheet.observations.length} frozen observations recompute to a minimum health ` +
+      `factor of ${minimum.decimalValueFloor}, above the alert threshold, across the ` +
+      `${worksheet.windowSeconds}-second window; no write is authorized or performed.`
+  };
 }
 
 function fixedCommand(lane) {
@@ -459,7 +484,7 @@ export async function createCeremonyServer({ port = 0, openBrowser = true } = {}
           writeEvent(runner, {
             event: "active_start",
             segmentId: "independent-lp-review",
-            description: "Independent human reviewed the frozen LP worksheet"
+            description: "Repository owner reviewed the bounded non-agent LP worksheet"
           });
           const exchangeId = `${LP_RUN_ID}-lp-slot0`;
           const exchange = await rpc(LP_RPC_ENDPOINT, {
@@ -498,15 +523,12 @@ export async function createCeremonyServer({ port = 0, openBrowser = true } = {}
         if (state.phase !== "lp_active" || state.lpRunner === null) {
           throw new Error("CEREMONY_PHASE_INVALID");
         }
-        const submission = validateHumanSubmission(await requestJson(request), [
-          "hold",
-          "review_rebalance",
-          "insufficient_evidence"
-        ]);
+        validateOperatorConfirmation(await requestJson(request));
+        const submission = recommendedLpConclusion(state.lpWorksheet);
         const outputBody = canonicalJson({
           schemaVersion: "proofera-termix-pancake-lp-manual-output-v1.0.0",
           manualProcedureVersion: "proofera-termix-pancake-lp-manual-v1.1.0",
-          operatorRole: "Independent human benchmark operator",
+          operatorRole: "Repository owner using the bounded non-agent worksheet",
           inputBundleSha256: sha256(canonicalJson(await readJson(LP_INPUT_PATH))),
           agentInvoked: false,
           result: {
@@ -519,7 +541,7 @@ export async function createCeremonyServer({ port = 0, openBrowser = true } = {}
             signedOrBroadcast: false
           },
           limitations: [
-            "The worksheet is a human-reviewed read-only calculation and does not prove operator identity by itself.",
+            "The bounded conclusion was prepared from displayed deterministic facts and accepted by the repository owner; this does not prove operator identity or independent authorship.",
             "Rebalance economics are unavailable, and this public position grants no ownership or execution authority.",
             "No agent, wallet, signature, approval, or transaction was used in this manual lane."
           ]
@@ -563,7 +585,7 @@ export async function createCeremonyServer({ port = 0, openBrowser = true } = {}
           writeEvent(runner, {
             event: "active_start",
             segmentId: "independent-venus-review",
-            description: "Independent human reviewed the frozen Venus integer worksheet"
+            description: "Repository owner reviewed the bounded non-agent Venus integer worksheet"
           });
           const requests = [
             {
@@ -605,16 +627,12 @@ export async function createCeremonyServer({ port = 0, openBrowser = true } = {}
         if (state.phase !== "venus_active" || state.venusRunner === null) {
           throw new Error("CEREMONY_PHASE_INVALID");
         }
-        const submission = validateHumanSubmission(await requestJson(request), [
-          "hold",
-          "monitor",
-          "review_intervention",
-          "insufficient_evidence"
-        ]);
+        validateOperatorConfirmation(await requestJson(request));
+        const submission = recommendedVenusConclusion(state.venusWorksheet);
         const outputBody = canonicalJson({
           schemaVersion: "proofera-termix-venus-health-manual-output-v1.0.0",
           manualProcedureVersion: "proofera-venus-health-manual-worksheet-v1.0.0",
-          operatorRole: "Independent human benchmark operator",
+          operatorRole: "Repository owner using the bounded non-agent worksheet",
           requestInputSha256: sha256(canonicalJson(await readJson(VENUS_INPUT_PATH))),
           agentInvoked: false,
           result: {
@@ -630,7 +648,7 @@ export async function createCeremonyServer({ port = 0, openBrowser = true } = {}
             signedOrBroadcast: false
           },
           limitations: [
-            "The worksheet is a human-reviewed integer calculation and does not prove operator identity by itself.",
+            "The bounded conclusion was prepared from displayed deterministic facts and accepted by the repository owner; this does not prove operator identity or independent authorship.",
             "The public replay account grants no ownership or execution authority.",
             "No agent, wallet, signature, approval, or transaction was used in this manual lane."
           ]

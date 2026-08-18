@@ -26,12 +26,12 @@ export default function OperatorCeremonyPage() {
       </nav>
 
       <header className="shell marketplace-hero ceremony-hero">
-        <span className="eyebrow">ONE GUIDED SESSION / HUMAN CHECKPOINTS PRESERVED</span>
+        <span className="eyebrow">BOUNDED NON-AGENT BASELINES / MINIMAL OWNER INPUT</span>
         <h1>Start once. Stay inside one ceremony.</h1>
         <p className="lede">
-          ProofEra groups the remaining human work into one place while keeping manual judgment,
-          passkey presence, receipts, and revocation distinct. Starting the session creates no
-          evidence by itself.
+          ProofEra precomputes the bounded non-agent worksheets and asks the owner only to review
+          and accept each displayed conclusion. Passkey presence, receipts, and revocation remain
+          separate security transitions. Starting the session creates no evidence by itself.
         </p>
       </header>
 

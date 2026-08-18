@@ -8,8 +8,8 @@ describe("operator ceremony page", () => {
     const html = renderToStaticMarkup(<OperatorCeremonyPage />);
 
     expect(html).toContain("Show local runner");
-    expect(html).toContain("does not manufacture a manual result");
-    expect(html).toContain("does not");
+    expect(html).toContain("cannot accept the displayed facts");
+    expect(html).toContain("BOUNDED NON-AGENT BASELINES");
     expect(html).toContain("submit a transaction");
     expect(html).not.toContain("Ceremony complete");
     expect(html).not.toContain("Authority granted");
