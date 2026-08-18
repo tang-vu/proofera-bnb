@@ -171,7 +171,7 @@ The manual CLI consumes bounded LF-only UTF-8 NDJSON, makes no network or agent
 request itself, and writes create-only beneath
 `evidence/termix/runs/venus-health/manual/`.
 
-Request paths and run order are **BOUND**. Exact stdin method envelopes remain unavailable until the hire collector emits the verified receipt. Agent result: **NOT RUN**. Manual result: **NOT RUN**.
+Request paths, run order and the paid hire receipt are **BOUND**. The agent-first lane completed on 2026-08-18 and retained `venus-health-agent-20260818-v1.json`, SHA-256 `6f3037fce19c42b6d6ee2eb8142fecc17febb3e07e1800476842939a2906540f`, with one `2,513,993,700 ns` active A2A segment and a bounded `hold` output. This is not yet a publishable comparison: manual result **NOT RUN**, second review absent, paired result absent, no advantage claimed.
 
 ## Freeze, run and publication gates
 

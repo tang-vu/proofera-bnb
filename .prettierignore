@@ -26,6 +26,8 @@ evidence/submission/rehearsals/*/manifest.json
 evidence/submission/demo-videos/*/*/manifest.json
 # Byte-exact manifests from the production release collector.
 evidence/submission/release-probes/*/*/manifest.json
+# Byte-exact canonical output from the Venus agent-first timed runner.
+evidence/termix/runs/venus-health/venus-health-agent-20260818-v1.json
 **/wallets
 **/*keystore*.json
 *.pem
