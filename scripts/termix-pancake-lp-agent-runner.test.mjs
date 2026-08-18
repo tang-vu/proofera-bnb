@@ -16,6 +16,9 @@ const releaseSource = await readFile(
 const supersededCaptureBytes = await readFile(
   new URL("../evidence/termix/runs/pancake-lp/pancake-lp-agent-20260818-v3.json", import.meta.url)
 );
+const admissibleCaptureBytes = await readFile(
+  new URL("../evidence/termix/runs/pancake-lp/pancake-lp-agent-20260818-v4.json", import.meta.url)
+);
 
 test("Pancake LP timed CLI fixes release, input, endpoint lane, and create-only output", () => {
   assert.match(source, /--execute-exact-pancake-lp-agent-run/u);
@@ -76,6 +79,29 @@ test("retained LP archive capture is immutable but excluded for its stale provid
     "e7564a74e1319f3274406d667cf4949cabc31343d7717b7082018d1b41771501"
   );
   assert.equal(JSON.parse(capture.output.body).executionEnabled, false);
+});
+
+test("retained provider-bound LP agent half-run has exact read-only receipts", () => {
+  assert.equal(
+    createHash("sha256").update(admissibleCaptureBytes).digest("hex"),
+    "633b5f874516c1ad4bd7819ee6a180524b7bcc07a9c37e4d116e3cc83d094d19"
+  );
+  const capture = JSON.parse(admissibleCaptureBytes.toString("utf8"));
+  assert.equal(capture.runId, "pancake-lp-agent-20260818-v4");
+  assert.equal(capture.sourceCommitSha, "f8b57f2b184266d8620d6590d663cd91d41db1ea");
+  assert.equal(capture.methodKind, "agent");
+  assert.equal(capture.boundaries.repositoryWasCleanBeforeStart, true);
+  assert.equal(capture.boundaries.agentWasRegisteredBeforeStart, true);
+  assert.equal(capture.boundaries.hireReceiptWasVerifiedBeforeStart, true);
+  assert.equal(capture.apiResponses.length, 2);
+  assert.equal(capture.apiResponses[0].provider, "OnFinality BSC mainnet archive JSON-RPC");
+  assert.equal(capture.apiResponses[0].endpointUrl, "https://bnb.api.onfinality.io/public");
+  assert.equal(capture.apiResponses[1].provider, "ProofEra LP Range Agent A2A");
+  assert.equal(capture.apiResponses[1].endpointUrl, "https://proofera-lp.tangvu.dev/");
+  assert.ok(BigInt(capture.timing.activeDurationNanoseconds) > 0n);
+  const output = JSON.parse(capture.output.body);
+  assert.equal(output.decision, "insufficient_evidence");
+  assert.equal(output.executionEnabled, false);
 });
 
 function runCli(args) {

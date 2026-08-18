@@ -1,7 +1,7 @@
 # Pancake LP TermiX captures
 
 The production agent CLI writes one create-only canonical capture per run ID
-to this directory. No run exists yet. A capture is unreachable until the
+to this directory. A capture is unreachable until the
 shared declaration is release-bound, the repository is clean and published,
 the LP agent has a registered ERC-8004 identity, and a hire receipt has been
 independently verified.
@@ -34,3 +34,11 @@ are OnFinality while the human-readable provider label incorrectly remained
 `executionEnabled: false`, but ProofEra does not silently repair immutable
 evidence or publish a mislabeled receipt as the final method result. A later
 release must bind the provider label into its lane configuration and re-freeze.
+
+`pancake-lp-agent-20260818-v4.json` is the admissible agent-first half-run for
+the fully provider-bound declaration. It retains one OnFinality exact-hash
+`slot0` receipt and one public LP A2A receipt, with registered identity and paid
+hire gates verified before timing. The output is read-only,
+`executionEnabled: false`, and decides `insufficient_evidence`. The manual half,
+independent adjudication and paired result remain absent; no performance or
+agent-advantage claim is publishable.
