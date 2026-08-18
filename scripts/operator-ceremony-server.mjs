@@ -324,6 +324,11 @@ function publicError(error) {
     : "CEREMONY_INTERNAL_ERROR";
 }
 
+export function runnerFailureCode(completed, fallback) {
+  const match = completed.stderr.match(/failed: ([A-Z0-9_]+)(?:\r?\n|$)/u);
+  return match?.[1] ?? fallback;
+}
+
 function responseJson(response, status, value) {
   response.writeHead(status, {
     "content-type": "application/json; charset=utf-8",
@@ -566,7 +571,7 @@ export async function createCeremonyServer({ port = 0, openBrowser = true } = {}
         state.lpRunner = null;
         if (completed.code !== 0 || !completed.stdout.trim().endsWith(LP_OUTPUT_PATH)) {
           state.phase = "error";
-          throw new Error("CEREMONY_LP_RUNNER_FAILED");
+          throw new Error(runnerFailureCode(completed, "CEREMONY_LP_RUNNER_FAILED"));
         }
         let commitSha;
         try {
@@ -676,7 +681,7 @@ export async function createCeremonyServer({ port = 0, openBrowser = true } = {}
         state.venusRunner = null;
         if (completed.code !== 0 || !completed.stdout.trim().endsWith(VENUS_OUTPUT_PATH)) {
           state.phase = "error";
-          throw new Error("CEREMONY_VENUS_RUNNER_FAILED");
+          throw new Error(runnerFailureCode(completed, "CEREMONY_VENUS_RUNNER_FAILED"));
         }
         let commitSha;
         try {

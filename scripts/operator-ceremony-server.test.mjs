@@ -11,7 +11,8 @@ import {
   canonicalJson,
   createCeremonyServer,
   recommendedLpConclusion,
-  recommendedVenusConclusion
+  recommendedVenusConclusion,
+  runnerFailureCode
 } from "./operator-ceremony-server.mjs";
 
 const ROOT = resolve(import.meta.dirname, "..");
@@ -116,4 +117,21 @@ test("loopback root recovers a browser session without a query token", async (co
 
 test("canonical serializer is deterministic for nested worksheet output", () => {
   assert.equal(canonicalJson({ z: 2, a: { d: 4, c: 3 } }), '{"a":{"c":3,"d":4},"z":2}');
+});
+
+test("runner failures retain only the sanitized CLI code", () => {
+  assert.equal(
+    runnerFailureCode(
+      {
+        stderr:
+          "TermiX Venus Health manual runner failed: TERMIX_VENUS_MANUAL_RPC_RESPONSE_INVALID\n"
+      },
+      "CEREMONY_VENUS_RUNNER_FAILED"
+    ),
+    "TERMIX_VENUS_MANUAL_RPC_RESPONSE_INVALID"
+  );
+  assert.equal(
+    runnerFailureCode({ stderr: "untrusted detail" }, "CEREMONY_VENUS_RUNNER_FAILED"),
+    "CEREMONY_VENUS_RUNNER_FAILED"
+  );
 });

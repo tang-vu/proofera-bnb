@@ -32,6 +32,9 @@ evidence/termix/runs/venus-health/venus-health-agent-20260818-v1.json
 evidence/termix/runs/pancake-lp/pancake-lp-agent-20260818-v3.json
 # Byte-exact canonical output from the admissible LP agent-first timed runner.
 evidence/termix/runs/pancake-lp/pancake-lp-agent-20260818-v4.json
+# Byte-exact canonical outputs from the operator-confirmed no-agent timed runners.
+evidence/termix/runs/pancake-lp/manual/*.json
+evidence/termix/runs/venus-health/manual/*.json
 # Byte-exact JSON.stringify output from the LP declaration freezer.
 evidence/termix/declarations/pancake-lp/68dc21421c60-125719944.json
 evidence/termix/declarations/pancake-lp/6e657638c684-125722978.json
