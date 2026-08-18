@@ -9,7 +9,7 @@ const bytes = await readFile(
 const prettierIgnore = await readFile(new URL("../.prettierignore", import.meta.url), "utf8");
 const frozen = JSON.parse(bytes.toString("utf8"));
 
-test("LP re-freeze preserves input and commits future randomness without result claims", () => {
+test("retained late LP re-freeze remains non-result preparation", () => {
   assert.equal(
     createHash("sha256").update(bytes).digest("hex"),
     "d0b3159e35c01e8e1c2a50f6d6898aa37cec38bae60cf9cfb06e139e545bb1aa"
@@ -31,5 +31,30 @@ test("LP re-freeze preserves input and commits future randomness without result 
   assert.match(
     prettierIgnore,
     /^evidence\/termix\/declarations\/pancake-lp\/68dc21421c60-125719944\.json$/mu
+  );
+});
+
+const replacementBytes = await readFile(
+  new URL("../evidence/termix/declarations/pancake-lp/6e657638c684-125722978.json", import.meta.url)
+);
+const replacement = JSON.parse(replacementBytes.toString("utf8"));
+
+test("replacement LP re-freeze preserves input with a larger future-block margin", () => {
+  assert.equal(
+    createHash("sha256").update(replacementBytes).digest("hex"),
+    "58a5fa936ef6598efc4919e73a5fd7576f1ba7fbc4a6be387c221129cd7a5086"
+  );
+  assert.equal(replacement.sourceCommitSha, "6e657638c6846e909171b3abd365c396da5f4d53");
+  assert.equal(replacement.input.sha256, frozen.input.sha256);
+  assert.equal(replacement.randomnessCommitment.blockNumber, "125722978");
+  assert.equal(
+    replacement.declarationSha256,
+    "811f485549e1894ed237d167d85cd17f33610fac951c13862e07f09daa815df9"
+  );
+  assert.equal(replacement.claims.runOrderResolved, false);
+  assert.equal(replacement.claims.result, false);
+  assert.match(
+    prettierIgnore,
+    /^evidence\/termix\/declarations\/pancake-lp\/6e657638c684-125722978\.json$/mu
   );
 });

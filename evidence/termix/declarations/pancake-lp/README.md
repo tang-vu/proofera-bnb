@@ -7,4 +7,6 @@ must prove the finalized hash and resolve its least-significant bit before eithe
 
 These artifacts do not prove a hire, a run, a result, position ownership or execution authority.
 
-`68dc21421c60-125719944.json` re-freezes the unchanged LP input on source release `68dc21421c60f5e9ec06e51948c1d7c7901c3191`, declaration SHA-256 `ecbf0b89674f9d5070ec23675fc3bbe3be91c8c4c559eb2a5e737bd35f39712b`, for future randomness block `125719944`. The earlier declaration remains immutable; its runner correctly refused execution after protected `package.json` and loader scope expanded to add later TermiX lanes. The re-freeze is not a run-order resolution or benchmark result.
+`68dc21421c60-125719944.json` was the first attempt to re-freeze after the earlier runner correctly refused protected release-scope drift. Full verification completed too slowly for BSC testnet's observed block rate: commit `6e65763` was published only after head `125720478`, so randomness block `125719944` was already known. This artifact is retained as failed preparation and must never select run order.
+
+`6e657638c684-125722978.json` is the replacement commitment on source release `6e657638c6846e909171b3abd365c396da5f4d53`, declaration SHA-256 `811f485549e1894ed237d167d85cd17f33610fac951c13862e07f09daa815df9`, for future randomness block `125722978`. It preserves the unchanged LP input and uses a larger publication margin. It remains only a frozen declaration until a later two-provider finalized collector proves publication ordering and resolves the block hash.
