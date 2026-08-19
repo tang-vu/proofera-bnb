@@ -1,6 +1,6 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-19T00:00:00.000Z",
+  "updatedAtUtc": "2026-08-19T02:01:39.693Z",
   "readyForSubmission": false,
   "gates": [
     {
@@ -119,6 +119,16 @@
         "Record the final release journey and retain the video plus a timestamped evidence-link playback check."
       ],
       "artifacts": [
+        {
+          "kind": "current_video_rehearsal_manifest",
+          "path": "evidence/submission/demo-videos/f3bd7d4daf231acd096f7b241376feb02575dd36/rehearsal/manifest.json",
+          "sha256": "5d212380175a11b9163bf9c053b02716d6164da6e099f744953d2f50f89875c2"
+        },
+        {
+          "kind": "current_video_rehearsal",
+          "path": "evidence/submission/demo-videos/f3bd7d4daf231acd096f7b241376feb02575dd36/rehearsal/proofera-rehearsal-demo.webm",
+          "sha256": "b90c07a650544947752bc1b375afc4b9a51eacd216e2784e36260b61d3c9e5e7"
+        },
         {
           "kind": "rehearsal",
           "path": "evidence/submission/rehearsals/b0e46cc192fbf15220a557c4b5bc8639c3c75eba/manifest.json",
