@@ -1,6 +1,6 @@
 # ProofEra final demo runbook
 
-Updated: 2026-08-17. This runbook prepares the required demo asset; it is not evidence that a final
+Updated: 2026-08-19. This runbook prepares the required demo asset; it is not evidence that a final
 video or hackathon entry exists.
 
 ## Gate order
@@ -40,6 +40,8 @@ $releaseCommit = (git rev-parse HEAD).Trim()
 corepack pnpm capture:demo:video $releaseCommit --mode final `
   --voiceover evidence/submission/narration/proofera-final-demo.mp3
 ```
+
+Use `docs/demo-script.md` as the canonical shot list and spoken-content boundary. The narration below is a timing scaffold; every bracketed value must be replaced from the final retained artifacts before recording the MP3.
 
 ## Five-minute narration map
 

@@ -1,67 +1,91 @@
 # ProofEra judge demo script
 
-Updated: 2026-08-17. This is the target five-minute script, not a claim that the final run exists. The marketplace, four public read-only analyzers, category dossiers/configuration surfaces, and `/proof` judge evidence index are live. A six-scene public-browser rehearsal is retained, but it is not a video or final demo check. Permission confirmation, activation, execution, populated Mission Control, revoke, registered identities, paired runs, and every bracketed evidence field remain unavailable until their real receipt/run paths are completed and verified.
+Updated: 2026-08-19. This is the production script and shot list, not evidence that the final video has been recorded. Keep the final cut between 4:00 and 5:30. Never show a secret, wallet export, environment file, passkey credential payload, or session signer.
 
-## Retained public rehearsal
+## Current recording boundary
 
-The create-only rehearsal at [`evidence/submission/rehearsals/b0e46cc192fbf15220a557c4b5bc8639c3c75eba/manifest.json`](../evidence/submission/rehearsals/b0e46cc192fbf15220a557c4b5bc8639c3c75eba/manifest.json) binds production commit `b0e46cc192fbf15220a557c4b5bc8639c3c75eba`, HTTP 200 responses, asserted text, and SHA-256 values for full-page captures of home, marketplace, LP dossier, LP configuration, proof room, and empty Mission Control. It deliberately records `videoRecorded: false`, `finalDemoCheck: false`, and `submissionReady: false`.
+Ready to show now:
 
-Reproduce only from a clean commit already published to `origin/main` and deployed as the exact public build:
+- the public marketplace and four read-only analyzers;
+- four receipt-verified ERC-8004 identities and three finalized testnet hires;
+- the Proof Room with exact build, artifact paths, hashes, and honest blockers;
+- the retained LP and Venus agent/manual raw captures;
+- the local operator ceremony explaining why manual judgment, passkey presence, execution, and revoke are separate transitions.
+
+Do not record the final cut yet. The following must exist first: real Altana grant/execute/revoke receipts and a negative-authority probe; controlled Pancake before/after evidence; Task 02 raw lanes; independent adjudication and final compilation of all three TermiX pairs; final production freeze. Until then, use rehearsal mode only.
+
+## One-session operator checklist
+
+1. Close notifications, password managers, terminal history, and every tab that could reveal a secret.
+2. Open the public product, BscScan receipt tabs, Proof Room, Mission Control, and the final TermiX report before recording.
+3. Verify `pnpm submission:check`; final recording is allowed only when its first five gates are `verified` and the demo gate is `not_recorded`.
+4. Record at 1440x900 with browser zoom 100%. Keep the cursor deliberate and avoid scrolling while speaking.
+5. Use the committed MP3 voice-over with the exact-release capture command in `docs/final-demo.md`.
+6. Play the generated MP4 end to end on a separate viewer boundary and retain the clean-room check before submission.
+
+## 0:00-0:30 — thesis
+
+Visual: landing page, then the four financial jobs.
+
+Narration: “Agent registries prove that an identity exists. They do not prove that an agent deserves authority over capital. ProofEra is the evidence and control layer between ERC-8004 identity and a user’s wallet. Its governing rule is simple: missing evidence stays missing.”
+
+## 0:30-1:10 — discover by job
+
+Visual: marketplace and one LP Passport; briefly switch across grid, yield, and health.
+
+Narration: “Users start with a financial outcome: manage concentrated liquidity, run a bounded grid, compare sustainable yield, or protect a Venus loan. Each category exposes decision-useful metrics, sources, freshness, downside, costs, and unknowns. One return number cannot safely represent four different jobs.”
+
+Show all four testnet identity links. Say only that registration and paid hires are verified; do not equate either with performance.
+
+## 1:10-1:55 — evidence before score
+
+Visual: LP Range Passport and the public-position raw capture.
+
+Narration: “For this frozen Pancake position, the exact-block replay places the current tick one tick above the lower boundary. The analyzer returns insufficient evidence because projected fees, gas, and slippage are missing. ProofEra refuses to turn a range trigger into a profit claim.”
+
+Show the source block, exact-hash read, decision, limitations, and testnet/mainnet labels. Do not claim ownership of the public position.
+
+## 1:55-2:45 — bound authority
+
+Visual: LP activation configuration and permission preview.
+
+Narration: “Before authority exists, ProofEra fixes the chain, direct target, selector, token and recipient, spend cap, deadline, expiry, quote age, and enforcement owner. Generic routers and undeclared multicalls are denied. The admin passkey remains in the browser; the scoped session signer belongs only in the encrypted worker boundary.”
+
+After the real lifecycle exists, show the exact grant and execute explorer links. Never expose calldata containing secrets or signer material.
+
+## 2:45-3:25 — execute, reconcile, revoke
+
+Visual: Mission Control lifecycle timeline, execute receipt, revoke receipt, and negative-authority probe.
+
+Narration: “A button press is not a receipt. ProofEra treats pending and unknown outcomes explicitly and never blind-retries an uncertain grant. The bounded action is joined to its finalized receipt. Revoke is complete only after both the revoke receipt and a fresh onchain probe show that the scoped session no longer has authority.”
+
+If any receipt is pending or missing during rehearsal, show the honest blocked state and skip the claim.
+
+## 3:25-4:20 — measured agent advantage
+
+Visual: final TermiX paired report, then raw LP and Venus captures.
+
+Narration template: “Three tasks were preregistered before execution: Pancake LP range analysis, an Altana permission audit, and Venus health-factor replay. The same frozen evidence and rubric are used for agent and manual lanes. [Insert only the final adjudicated time, cost, and quality values.] Raw outputs and reviewer limitations remain linked, so the comparison can be reproduced instead of trusted as marketing.”
+
+Do not narrate a winner until the compiler accepts all three pairs and their independent adjudications.
+
+## 4:20-5:00 — proof and close
+
+Visual: Proof Room, exact build, seven gates, then product URL.
+
+Narration: “The Proof Room is a closure ledger, not a victory page. Every verified gate links to retained evidence and a SHA-256; every missing gate stays visible. BNB Agent Studio makes autonomous agents easier to create. ProofEra makes them safer to choose, bound, observe, and revoke. Hire agents by proof, not promises.”
+
+## Rehearsal command
+
+Run only from a clean commit already pushed and deployed as the exact public build:
 
 ```powershell
 $releaseCommit = (git rev-parse HEAD).Trim()
-corepack pnpm capture:demo:rehearsal $releaseCommit
+corepack pnpm capture:demo:video $releaseCommit --mode rehearsal
 ```
 
-This command performs GET-only browser navigation and creates a new commit-named directory. It does not click, fill a form, connect a wallet, submit a transaction, authenticate evidence, or replace the final video plus timestamped clean-room playback check.
+The final MP4 command remains gated and is documented in `docs/final-demo.md`.
 
-## Pre-demo truth check
+## Failure-safe rule
 
-- Public URL and four agent endpoints healthy through the judging window.
-- Final build commit and data-source timestamps recorded.
-- Testnet/mainnet badges visible and accurate.
-- Altana wallet, key, grant, execute and revoke explorer links open in clean tabs.
-- Pancake pool/position and TermiX raw run manifests open.
-- No control depends on a fixture, placeholder endpoint or pre-seeded fake hash.
-- The permission preview and activation controls are visibly wired to the server-owned policy and live authority state; the current standalone model/renderer is not sufficient to run this segment.
-- `/proof` shows the exact final build, all seven closure gates, four Agent Cards/skills, and no `verified` gate unless `pnpm submission:require-ready` passes on the clean published release.
-
-## 0:00–0:35 — thesis and intent
-
-“Agent directories tell you who claims to exist. ProofEra answers whether an agent deserves authority over capital.” Start from “automate a CAKE/BNB LP,” then set capital, balanced risk, horizon and assets. Point out that the marketplace begins from a financial job, not protocol vocabulary.
-
-Open `/proof` briefly before leaving the thesis: the judge can see the public build, exact agent skills, artifact hashes, and every still-open receipt gate without relying on narration.
-
-## 0:35–1:25 — live discovery and evidence
-
-Show the live ERC-8004/8004scan source timestamp and an unavailable/empty-state distinction. Open one source record. Explain that identity is observed but capability remains unverified until endpoint, activity and evidence checks pass. Open the curated LP Passport and show source/method/time/freshness/null states for range time, fee APR, IL estimate, rebalance frequency, gas drag and net outcome.
-
-Show Proof Score formula/version, missing-evidence penalty and sample/confidence warning. Compare two to four agents; highlight worst outcome, permissions, costs and why the highest return is not automatically recommended.
-
-## 1:25–2:30 — configure and inspect authority
-
-Choose the curated testnet LP agent. Configure capital, range limits, slippage, deadline and expiry. The permission preview leads with worst case: target/function rows, raw token cap per period, wallet/recipient, network, code identity and revoke consequence.
-
-Identify enforcement owner for every rule: Altana/onchain, ProofEra runtime, or wallet confirmation. Show that generic routers/multicall are denied and the decoded direct Position Manager operation matches the policy hash. Confirm with the passkey only after the judge sees the exact scope.
-
-## 2:30–3:30 — execute and prove outcome
-
-Show grant state and Keystore authority read. If the grant is uncertain, demonstrate that ProofEra disables retry/action and probes instead; never force a happy path. Run the current simulation, then the pre-funded minimal testnet action. Show `callsId`, transaction status, BscScan details and Altana explorer [LINKS TO INSERT].
-
-Open Mission Control: allocation, outcome/cost, session cap/expiry and source-linked Proof Stream. Show that a pending state does not look confirmed.
-
-## 3:30–4:05 — revoke
-
-Request revoke with the admin passkey. While pending, show the authority as still active/pending. After account/Keystore reads confirm invalidity, show revoked state and a negative execution attempt [RECEIPT/LINK TO INSERT]. Explain recovery fallback on the final RP-ID domain.
-
-## 4:05–4:35 — partner advantage
-
-Show the Pancake before/after or agent/manual result net of gas, fees and slippage [RUN ID]. Open TermiX's three paired task manifests, including LP trading and permission security, with time/cost/quality and raw evidence. Show Altana explorer session evidence. Mention ERC-8183/x402 only if their real, current flows are complete.
-
-## 4:35–5:00 — equal depth and adoption
-
-Switch across LP, grid, yield and health passports to show the same trust/permission/state primitives and genuinely category-specific metrics. Close with maintainability: typed adapters, no silent mock fallback, source provenance, durable Studio-hosted agents and a clean path for third-party ERC-8004 ingestion.
-
-## Failure-safe narration
-
-An upstream outage is a demo feature only in the sense that ProofEra tells the truth: show unavailable/last-good stale, timestamp and confidence reduction. Do not switch to a fixture. A rejected biometric returns to configuration. A reverted or unknown transaction stays failed/unknown with no invented hash and no blind retry.
+An upstream outage, rejected passkey, reverted transaction, or missing receipt is shown as unavailable, rejected, failed, or unknown with its timestamp. Never switch to a fixture, paste a fabricated hash, or narrate an intended result as completed.

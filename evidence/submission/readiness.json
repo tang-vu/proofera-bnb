@@ -1,6 +1,6 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-17T04:12:14.000Z",
+  "updatedAtUtc": "2026-08-19T00:00:00.000Z",
   "readyForSubmission": false,
   "gates": [
     {
@@ -69,9 +69,9 @@
     {
       "gateId": "termix-pairs",
       "state": "preregistered_only",
-      "claim": "Exactly three paired protocols are preregistered; all six methods remain NOT RUN and no advantage is publishable.",
+      "claim": "Exactly three paired protocols are preregistered. The LP and Venus agent/manual raw captures exist, but neither pair has independent adjudication or a final paired report; Task 02 remains unbound and unrun. No advantage is publishable.",
       "blockers": [
-        "Run, independently adjudicate and retain all three frozen agent/manual pairs with required receipts."
+        "Complete the receipt-bound Task 02 pair, independently adjudicate all three pairs, and compile the final paired report."
       ],
       "artifacts": [
         {
@@ -88,6 +88,26 @@
           "kind": "preregistration",
           "path": "evidence/termix/preregistrations/task-03-venus-health.json",
           "sha256": "8a094c7c72b8d5be471691d632b52bd854a9d716079a3f58edc7ce9d538f4ec3"
+        },
+        {
+          "kind": "lp_agent_raw_capture",
+          "path": "evidence/termix/runs/pancake-lp/pancake-lp-agent-20260818-v4.json",
+          "sha256": "633b5f874516c1ad4bd7819ee6a180524b7bcc07a9c37e4d116e3cc83d094d19"
+        },
+        {
+          "kind": "lp_manual_raw_capture",
+          "path": "evidence/termix/runs/pancake-lp/manual/pancake-lp-manual-20260818-v1.json",
+          "sha256": "5ee72fc3008dde7e94115ea1243eaf8c940be56c1c64753e33707722215cb3b6"
+        },
+        {
+          "kind": "venus_agent_raw_capture",
+          "path": "evidence/termix/runs/venus-health/venus-health-agent-20260818-v2.json",
+          "sha256": "8b5506f8ee76f9d7146da88017881a9accebd3a7891a6f50fb7c209eb82f1881"
+        },
+        {
+          "kind": "venus_manual_raw_capture",
+          "path": "evidence/termix/runs/venus-health/manual/venus-health-manual-20260818-v2.json",
+          "sha256": "67978cfa3557fedfbc38d660f0980340b1665fc8cf11d012d914d755c5b25cc6"
         }
       ]
     },

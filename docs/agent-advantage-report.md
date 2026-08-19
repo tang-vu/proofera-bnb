@@ -1,8 +1,8 @@
 # ProofEra agent advantage report
 
-Updated: 2026-08-18. Overall status: **NOT RUN — NON-PUBLISHABLE**.
+Updated: 2026-08-19. Overall status: **PARTIAL RAW CAPTURE — NON-PUBLISHABLE**.
 
-This is ProofEra's TermiX paired-experiment ledger. Exactly three ProofEra-versus-manual tasks are preregistered. The hire contract deployment and three paid BSC-testnet hires are independently finalized in [`125715654-7fa5ad3e.json`](../evidence/termix/hire-receipts/125715654-7fa5ad3e.json); they establish commerce prerequisites only. No agent or manual benchmark run has started, and no benchmark time, score, task output, completion, performance or advantage is claimed. Public analyzer endpoints are availability evidence only, not experiment receipts.
+This is ProofEra's TermiX paired-experiment ledger. Exactly three ProofEra-versus-manual tasks are preregistered. The hire contract deployment and three paid BSC-testnet hires are independently finalized in [`125715654-7fa5ad3e.json`](../evidence/termix/hire-receipts/125715654-7fa5ad3e.json); they establish commerce prerequisites only. Task 01 and Task 03 each retain an agent and manual raw capture. Task 02 remains unbound because its final input requires the real Altana lifecycle receipts. No pair has independent adjudication or a compiler-accepted final report, so no performance or advantage is claimed.
 
 ## Harness audit and preregistration boundary
 
@@ -40,11 +40,11 @@ Run order is chosen from recorded public randomness only after declaration freez
 
 Costs remain grouped by denomination; no hidden exchange-rate conversion or aggregate winner is inferred. A hard fail remains visible rather than being removed from the comparison.
 
-| Preregistered task                       | ProofEra-hired agent | Without agent | Publishable |
-| ---------------------------------------- | -------------------- | ------------- | ----------- |
-| 01 — PancakeSwap LP range decision       | **NOT RUN**          | **NOT RUN**   | No          |
-| 02 — autonomous-session permission audit | **NOT RUN**          | **NOT RUN**   | No          |
-| 03 — Venus health-factor replay          | **NOT RUN**          | **NOT RUN**   | No          |
+| Preregistered task                       | ProofEra-hired agent | Without agent    | Publishable |
+| ---------------------------------------- | -------------------- | ---------------- | ----------- |
+| 01 — PancakeSwap LP range decision       | **RAW CAPTURED**     | **RAW CAPTURED** | No          |
+| 02 — autonomous-session permission audit | **NOT RUN**          | **NOT RUN**      | No          |
+| 03 — Venus health-factor replay          | **RAW CAPTURED**     | **RAW CAPTURED** | No          |
 
 ## Task 01 — PancakeSwap public-position LP range decision
 
@@ -58,7 +58,7 @@ Fixed constraints separate source-data chain 56 from ERC-8004/hire chain 97; req
 
 Rubric (100): verified inputs 25; range/risk accuracy 25; economics/decision integrity 25; explanation/uncertainty 10; reproducibility 15. Wrong source/commerce chain, block/hash, contract, position, tick, evidence digest or RPC origin; any timed write/wallet use; any ownership/performance overclaim; fabricated value; undeclared access; or paired mismatch is a hard fail.
 
-Both fixed lanes now bind the same input digest. The agent lane rechecks exact-hash `slot0` before calling the public LP A2A endpoint and cannot enter either network call without registration plus verified hire evidence. The manual lane accepts exactly one matching RPC exchange during positive operator-active time, retains the unedited canonical output, and leaves its no-agent declaration for independent tool-log review. Required final evidence remains: one frozen declaration; both raw/canonical outputs; wall/active time and sourced costs; both exact API receipts; chain-97 hire evidence for the agent method; and rubric-complete second review. None is a completed run yet.
+Both fixed lanes used declaration SHA-256 `776c41fd1043d0541f2c67d2cb6a7306bf7738def026bb78b36b868b6ca9edd3`. The retained agent capture is `pancake-lp-agent-20260818-v4`; the retained manual capture is `pancake-lp-manual-20260818-v1`. Both returned `insufficient_evidence` from the same exact-hash source and preserve their unedited outputs, timing, receipts and limitations. The manual no-agent declaration still requires independent tool-log review, rubric scoring and final paired validation.
 
 Available prerequisite commands—not experiment commands:
 
@@ -90,7 +90,7 @@ The manual CLI accepts only bounded LF-only UTF-8 NDJSON, makes no network or
 agent request itself, timestamps each operator event as consumed, and writes a
 new immutable capture beneath `evidence/termix/runs/pancake-lp/manual/`.
 
-Timed reproduction command: **UNBOUND**. Agent result: **NOT RUN**. Manual result: **NOT RUN**.
+Raw lanes: **CAPTURED**. Independent adjudication and final paired result: **NOT RUN / NON-PUBLISHABLE**.
 
 ## Task 02 — Altana/Pancake autonomous-session permission audit
 
@@ -127,7 +127,7 @@ The final shared input is now frozen at [`3ba85859ced3-125563831-125564152.canon
 
 The normalized declaration SHA-256 is `987a9e2a728807d6fbd4d5f1d9bb066187288320fa48ec62ab214d89aebed472`, bound to source release `3ba85859ced39b457da819d27637d3fc02101c5d` and ERC-8004 agent `1828`. It was published in commit `e5c48b9` before BSC-testnet randomness block `125568071`. Both fixed RPCs later agreed on hash `0x64e197a460b7edc8e015d9e10110eff0be37158100feaa230708991fcdce5d0c`; LSB `0` forces `agent` then `manual`. Retained verifier tests prove the publication ordering, finality, provider agreement, request/declaration digests and non-authority claims.
 
-Still missing: a verified paid hire receipt, both timed runs in the forced order, sourced timing/cost records, second-review recomputation/scoring and final paired validation.
+The original frozen release was superseded after a manual-release scope drift was detected. The valid replacement declaration SHA-256 is `23e41675965eed45dbd876ab4fdb221c1d403f538b5088bc52dd5c722ab33924`, bound to source release `402edbeae429fd7c0a3d853b1e30208a26bba6f4`. Its valid retained lanes are `venus-health-agent-20260818-v2` and `venus-health-manual-20260818-v2`; both returned `hold`. Still missing: independent tool-log review, rubric scoring and final paired validation.
 
 Rubric (100): state/calculation 30; threshold/latency 20; safe policy compliance 25; explanation/uncertainty 10; evidence/reproducibility 15. Wrong network/account/market/scale/oracle/window, floating-point financial arithmetic, stale-source substitution, unsupported intervention or any timed write is a hard fail.
 
@@ -157,8 +157,8 @@ network: it timestamps positive operator-active segments, accepts only exact
 read-only exchanges from two fixed BSC-testnet RPC origins inside active work,
 and binds canonical output to the same request digest and procedure. Its
 no-agent declaration is not self-authenticating and remains a second-review
-gate. These are runner capabilities only: the exact final invocations remain
-unbound, and neither lane has been invoked as a TermiX run.
+gate. These runner capabilities produced the valid v2 raw captures; independent
+review and final pairing remain separate gates.
 
 Release-gated commands; the forced agent-first command remains blocked until a verified hire receipt is supplied through the exact stdin invocation:
 
@@ -171,7 +171,7 @@ The manual CLI consumes bounded LF-only UTF-8 NDJSON, makes no network or agent
 request itself, and writes create-only beneath
 `evidence/termix/runs/venus-health/manual/`.
 
-Request paths, run order and the paid hire receipt are **BOUND**. The agent-first lane completed on 2026-08-18 and retained `venus-health-agent-20260818-v1.json`, SHA-256 `6f3037fce19c42b6d6ee2eb8142fecc17febb3e07e1800476842939a2906540f`, with one `2,513,993,700 ns` active A2A segment and a bounded `hold` output. This is not yet a publishable comparison: manual result **NOT RUN**, second review absent, paired result absent, no advantage claimed.
+Request paths, run order and the paid hire receipt are **BOUND**. The valid replacement lanes completed on 2026-08-18 and retained `venus-health-agent-20260818-v2.json` plus `manual/venus-health-manual-20260818-v2.json`. Their active durations are `852,940,800 ns` and `6,710,400 ns`; both produced the bounded decision `hold`. These raw values are not a publishable comparison: second review and paired validation are absent, so no advantage is claimed.
 
 ## Freeze, run and publication gates
 
