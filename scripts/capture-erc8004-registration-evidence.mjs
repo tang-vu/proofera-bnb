@@ -14,11 +14,6 @@ import {
   validateRegistrationPair
 } from "./erc8004-registration-evidence-lib.mjs";
 
-const integrationRequire = createRequire(
-  new URL("../packages/integrations/package.json", import.meta.url)
-);
-const { decodeFunctionResult, encodeFunctionData, keccak256 } = integrationRequire("viem");
-
 const EXECUTE_FLAG = "--capture-exact-four-agent-registration";
 const SOURCE_COMMIT_ARGUMENT = "--source-base-commit";
 const PREPARATION_ARGUMENT = "--preparation";
@@ -96,6 +91,15 @@ function exactArguments(argv) {
     transactions: Object.freeze(transactions)
   });
 }
+
+// Reject an inexact invocation before loading the integration dependency graph. Besides keeping the
+// collector fail-fast, this preserves the stronger boundary promised by the CLI: an invalid command
+// cannot reach Git, package initialization, or any network-capable code.
+const argumentsValue = exactArguments(process.argv.slice(2));
+const integrationRequire = createRequire(
+  new URL("../packages/integrations/package.json", import.meta.url)
+);
+const { decodeFunctionResult, encodeFunctionData, keccak256 } = integrationRequire("viem");
 
 function gitText(args) {
   return execFileSync("git", args, {
@@ -475,6 +479,5 @@ async function capture(argumentsValue) {
   return { output, sha256: sha256(bytes) };
 }
 
-const argumentsValue = exactArguments(process.argv.slice(2));
 const result = await capture(argumentsValue);
 process.stdout.write(`${JSON.stringify(result)}\n`);

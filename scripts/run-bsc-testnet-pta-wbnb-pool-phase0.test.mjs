@@ -517,7 +517,7 @@ test(
     );
     const result = spawnSync(
       "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-      ["-NoLogo", "-NoProfile", "-NonInteractive", "-File", probe],
+      ["-NoLogo", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", probe],
       {
         cwd: ROOT,
         encoding: "utf8",
@@ -600,11 +600,19 @@ try {
     const executable = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
     const launch =
       `$child = Start-Process -FilePath '${escapePowerShellLiteral(executable)}' ` +
-      `-ArgumentList @('-NoLogo','-NoProfile','-NonInteractive','-File','${escapePowerShellLiteral(probe)}','${escapePowerShellLiteral(resultPath)}') ` +
+      `-ArgumentList @('-NoLogo','-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File','${escapePowerShellLiteral(probe)}','${escapePowerShellLiteral(resultPath)}') ` +
       "-WindowStyle Normal -PassThru -Wait; exit $child.ExitCode";
     const result = spawnSync(
       "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-      ["-NoLogo", "-NoProfile", "-NonInteractive", "-Command", launch],
+      [
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        launch
+      ],
       {
         cwd: ROOT,
         encoding: "utf8",
