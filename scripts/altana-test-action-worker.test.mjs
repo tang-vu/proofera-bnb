@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { validateAltanaTestActionConfig } from "./altana-test-action-worker.mjs";
+import {
+  normalizeAccountExpiry,
+  validateAltanaTestActionConfig
+} from "./altana-test-action-worker.mjs";
 
 const CONFIG_URL = new URL("../deploy/windows/altana-test-action.v1.json", import.meta.url);
 const SOURCE_URL = new URL("./altana-test-action-worker.mjs", import.meta.url);
@@ -33,6 +36,13 @@ test("worker source keeps custody encrypted and execution one-shot", async () =>
   assert.match(source, /"wallet_getCallsStatus", \[callsId\]/u);
   assert.doesNotMatch(source, /"wallet_getCallsStatus", \[\{\s*id:/u);
   assert.doesNotMatch(source, /console\.log|JSON\.stringify\((?:signer|.*_privateKey)/u);
+});
+
+test("authority expiry accepts viem uint40 number and bigint representations", () => {
+  assert.equal(normalizeAccountExpiry(1_787_330_074), 1_787_330_074);
+  assert.equal(normalizeAccountExpiry(1_787_330_074n), 1_787_330_074);
+  assert.throws(() => normalizeAccountExpiry(Number.NaN), /ALTANA_TEST_ACTION_AUTHORITY_INVALID/u);
+  assert.throws(() => normalizeAccountExpiry(2 ** 40), /ALTANA_TEST_ACTION_AUTHORITY_INVALID/u);
 });
 
 test("config rejects expanded calldata and mismatched signer bindings", async () => {

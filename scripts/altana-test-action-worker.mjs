@@ -19,6 +19,7 @@ const CONFIG_PATH = resolve(
 const POLL_INTERVAL_MS = 5_000;
 const RPC_TIMEOUT_MS = 20_000;
 const MAX_PUBLIC_FILE_BYTES = 32_768;
+const UINT40_MAX = 2 ** 40 - 1;
 const POWERSHELL = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
 const KEYSTORE = "0x6b8361C29d05D498b1a12B54A37310f94171E94A";
 const RELAY_URL = "https://testnet-relay.altana.network";
@@ -493,6 +494,21 @@ function authorityIds(config) {
   return Object.freeze({ accountKeyHash, keyStoreKeyId });
 }
 
+export function normalizeAccountExpiry(value) {
+  if (
+    typeof value === "number" &&
+    Number.isSafeInteger(value) &&
+    value >= 0 &&
+    value <= UINT40_MAX
+  ) {
+    return value;
+  }
+  if (typeof value === "bigint" && value >= 0n && value <= BigInt(UINT40_MAX)) {
+    return Number(value);
+  }
+  fail("ALTANA_TEST_ACTION_AUTHORITY_INVALID");
+}
+
 async function authorityAt(provider, config, ids) {
   const validData = encodeFunctionData({
     abi: KEYSTORE_ABI,
@@ -523,8 +539,7 @@ async function authorityAt(provider, config, ids) {
     fail("ALTANA_TEST_ACTION_AUTHORITY_INVALID");
   }
   const index = decoded[1].findIndex((value) => value.toLowerCase() === ids.accountKeyHash);
-  const expiry = index < 0 ? null : decoded[0][index]?.expiry;
-  if (expiry !== null && typeof expiry !== "bigint") fail("ALTANA_TEST_ACTION_AUTHORITY_INVALID");
+  const expiry = index < 0 ? null : normalizeAccountExpiry(decoded[0][index]?.expiry);
   if (typeof balanceRaw !== "string" || !/^0x[0-9a-f]+$/iu.test(balanceRaw)) {
     fail("ALTANA_TEST_ACTION_BALANCE_INVALID");
   }
@@ -536,7 +551,7 @@ async function authorityAt(provider, config, ids) {
         : valid === false && index < 0
           ? "absent"
           : "mismatch",
-    expiry: expiry === null ? null : Number(expiry),
+    expiry,
     balanceWei: BigInt(balanceRaw)
   });
 }
