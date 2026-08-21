@@ -1,0 +1,506 @@
+{
+  "schemaVersion": "proofera-production-release-evidence-v1.0.0",
+  "classification": {
+    "artifact": "production_release_rehearsal",
+    "externalHttpMonitoring": false,
+    "finalReleaseCheck": false,
+    "hackathonEntrySubmitted": false,
+    "independentDnsResolvers": 2,
+    "onchainReceiptEvidenceIntroduced": false,
+    "readOnly": true,
+    "submissionReady": false
+  },
+  "sourceCommit": "b68c6b6d1a2f7f1671f384b397cfd54386481934",
+  "mode": "rehearsal",
+  "observedAtUtc": "2026-08-21T10:26:50.411Z",
+  "completedAtUtc": "2026-08-21T10:26:54.469Z",
+  "judgingThroughUtc": "2026-09-23T23:59:59.000Z",
+  "topology": {
+    "agentCount": 4,
+    "hostCount": 5,
+    "marketplaceOrigin": "https://proofera.tangvu.dev"
+  },
+  "dns": [
+    {
+      "agreedAddresses": [
+        "104.21.39.243",
+        "172.67.172.42"
+      ],
+      "hostname": "proofera.tangvu.dev",
+      "resolverAgreement": true,
+      "resolvers": [
+        {
+          "addresses": [
+            "104.21.39.243",
+            "172.67.172.42"
+          ],
+          "authenticatedData": false,
+          "bodyBytes": 319,
+          "bodySha256": "d0362cd7f01aca57f496e53f19163a23ac991bdf6075906682158341b6fffa9d",
+          "documentation": "https://developers.google.com/speed/public-dns/docs/doh/json",
+          "resolver": "google-public-dns",
+          "responseDate": "Fri, 21 Aug 2026 10:26:49 GMT",
+          "url": "https://dns.google/resolve?name=proofera.tangvu.dev&type=A"
+        },
+        {
+          "addresses": [
+            "104.21.39.243",
+            "172.67.172.42"
+          ],
+          "authenticatedData": false,
+          "bodyBytes": 275,
+          "bodySha256": "026eb298d21f57aa794ce85f6dd177b3b87636c97cc4b3665207a56a625121cf",
+          "documentation": "https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https/make-api-requests/dns-json/",
+          "resolver": "cloudflare-1.1.1.1",
+          "responseDate": "Fri, 21 Aug 2026 10:26:49 GMT",
+          "url": "https://cloudflare-dns.com/dns-query?name=proofera.tangvu.dev&type=A"
+        }
+      ]
+    },
+    {
+      "agreedAddresses": [
+        "104.21.39.243",
+        "172.67.172.42"
+      ],
+      "hostname": "proofera-lp.tangvu.dev",
+      "resolverAgreement": true,
+      "resolvers": [
+        {
+          "addresses": [
+            "104.21.39.243",
+            "172.67.172.42"
+          ],
+          "authenticatedData": false,
+          "bodyBytes": 330,
+          "bodySha256": "0523c1ea78dbb83ea9fa39113cc70b228d221648e74598f870de09bac5ee680b",
+          "documentation": "https://developers.google.com/speed/public-dns/docs/doh/json",
+          "resolver": "google-public-dns",
+          "responseDate": "Fri, 21 Aug 2026 10:26:49 GMT",
+          "url": "https://dns.google/resolve?name=proofera-lp.tangvu.dev&type=A"
+        },
+        {
+          "addresses": [
+            "104.21.39.243",
+            "172.67.172.42"
+          ],
+          "authenticatedData": false,
+          "bodyBytes": 284,
+          "bodySha256": "0ac3ea21e5ef999e6f54407b8910854a8e35c0aaccbf82665e558dea5c722f4b",
+          "documentation": "https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https/make-api-requests/dns-json/",
+          "resolver": "cloudflare-1.1.1.1",
+          "responseDate": "Fri, 21 Aug 2026 10:26:49 GMT",
+          "url": "https://cloudflare-dns.com/dns-query?name=proofera-lp.tangvu.dev&type=A"
+        }
+      ]
+    },
+    {
+      "agreedAddresses": [
+        "104.21.39.243",
+        "172.67.172.42"
+      ],
+      "hostname": "proofera-grid.tangvu.dev",
+      "resolverAgreement": true,
+      "resolvers": [
+        {
+          "addresses": [
+            "104.21.39.243",
+            "172.67.172.42"
+          ],
+          "authenticatedData": false,
+          "bodyBytes": 335,
+          "bodySha256": "cfd8ff3a4242fae0ced315b5c8b205249e83fe444c9f5e14c1156b0f2525a755",
+          "documentation": "https://developers.google.com/speed/public-dns/docs/doh/json",
+          "resolver": "google-public-dns",
+          "responseDate": "Fri, 21 Aug 2026 10:26:49 GMT",
+          "url": "https://dns.google/resolve?name=proofera-grid.tangvu.dev&type=A"
+        },
+        {
+          "addresses": [
+            "104.21.39.243",
+            "172.67.172.42"
+          ],
+          "authenticatedData": false,
+          "bodyBytes": 290,
+          "bodySha256": "5abf0e4849a1bf50ddbd9fe9c30b100ae19d20c49ad632222c691d758854ae71",
+          "documentation": "https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https/make-api-requests/dns-json/",
+          "resolver": "cloudflare-1.1.1.1",
+          "responseDate": "Fri, 21 Aug 2026 10:26:49 GMT",
+          "url": "https://cloudflare-dns.com/dns-query?name=proofera-grid.tangvu.dev&type=A"
+        }
+      ]
+    },
+    {
+      "agreedAddresses": [
+        "104.21.39.243",
+        "172.67.172.42"
+      ],
+      "hostname": "proofera-yield.tangvu.dev",
+      "resolverAgreement": true,
+      "resolvers": [
+        {
+          "addresses": [
+            "104.21.39.243",
+            "172.67.172.42"
+          ],
+          "authenticatedData": false,
+          "bodyBytes": 339,
+          "bodySha256": "6159ecaaab3d96bc5357517a3fe7f1bd4e41fc1413a24db8c474f6c5b7fda110",
+          "documentation": "https://developers.google.com/speed/public-dns/docs/doh/json",
+          "resolver": "google-public-dns",
+          "responseDate": "Fri, 21 Aug 2026 10:26:49 GMT",
+          "url": "https://dns.google/resolve?name=proofera-yield.tangvu.dev&type=A"
+        },
+        {
+          "addresses": [
+            "104.21.39.243",
+            "172.67.172.42"
+          ],
+          "authenticatedData": false,
+          "bodyBytes": 293,
+          "bodySha256": "b1b9164d46a08660097bb1311805314f808e6ecf618772b1f20f4d61ac25ef33",
+          "documentation": "https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https/make-api-requests/dns-json/",
+          "resolver": "cloudflare-1.1.1.1",
+          "responseDate": "Fri, 21 Aug 2026 10:26:50 GMT",
+          "url": "https://cloudflare-dns.com/dns-query?name=proofera-yield.tangvu.dev&type=A"
+        }
+      ]
+    },
+    {
+      "agreedAddresses": [
+        "104.21.39.243",
+        "172.67.172.42"
+      ],
+      "hostname": "proofera-health.tangvu.dev",
+      "resolverAgreement": true,
+      "resolvers": [
+        {
+          "addresses": [
+            "104.21.39.243",
+            "172.67.172.42"
+          ],
+          "authenticatedData": false,
+          "bodyBytes": 339,
+          "bodySha256": "e5c7f4786151a78ff2fa05f7b53995a18d8692e3eb07737eda3cc72ad705765d",
+          "documentation": "https://developers.google.com/speed/public-dns/docs/doh/json",
+          "resolver": "google-public-dns",
+          "responseDate": "Fri, 21 Aug 2026 10:26:50 GMT",
+          "url": "https://dns.google/resolve?name=proofera-health.tangvu.dev&type=A"
+        },
+        {
+          "addresses": [
+            "104.21.39.243",
+            "172.67.172.42"
+          ],
+          "authenticatedData": false,
+          "bodyBytes": 296,
+          "bodySha256": "4bb6648616585eebc1b0c91b7bf89618210a6ff813b9e20a44b2a490a2228a8e",
+          "documentation": "https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https/make-api-requests/dns-json/",
+          "resolver": "cloudflare-1.1.1.1",
+          "responseDate": "Fri, 21 Aug 2026 10:26:50 GMT",
+          "url": "https://cloudflare-dns.com/dns-query?name=proofera-health.tangvu.dev&type=A"
+        }
+      ]
+    }
+  ],
+  "tls": [
+    {
+      "alpnProtocol": "h2",
+      "authorized": true,
+      "cipher": "TLS_AES_256_GCM_SHA384",
+      "fingerprint256": "4C:88:BE:E4:69:43:30:2D:82:05:B6:AB:0D:DB:75:8F:F2:6E:47:FD:BC:D7:65:1A:EB:06:F6:E0:D8:33:E7:9C",
+      "hostname": "proofera.tangvu.dev",
+      "issuer": {
+        "commonName": "WE1",
+        "organization": "Google Trust Services"
+      },
+      "protocol": "TLSv1.3",
+      "serialNumber": "A0A5D7EDB9010F8D0E77E579BD53F5F4",
+      "subjectCommonName": "tangvu.dev",
+      "validFromUtc": "2026-07-07T15:19:18.000Z",
+      "validToUtc": "2026-10-05T16:12:36.000Z"
+    },
+    {
+      "alpnProtocol": "h2",
+      "authorized": true,
+      "cipher": "TLS_AES_256_GCM_SHA384",
+      "fingerprint256": "4C:88:BE:E4:69:43:30:2D:82:05:B6:AB:0D:DB:75:8F:F2:6E:47:FD:BC:D7:65:1A:EB:06:F6:E0:D8:33:E7:9C",
+      "hostname": "proofera-lp.tangvu.dev",
+      "issuer": {
+        "commonName": "WE1",
+        "organization": "Google Trust Services"
+      },
+      "protocol": "TLSv1.3",
+      "serialNumber": "A0A5D7EDB9010F8D0E77E579BD53F5F4",
+      "subjectCommonName": "tangvu.dev",
+      "validFromUtc": "2026-07-07T15:19:18.000Z",
+      "validToUtc": "2026-10-05T16:12:36.000Z"
+    },
+    {
+      "alpnProtocol": "h2",
+      "authorized": true,
+      "cipher": "TLS_AES_256_GCM_SHA384",
+      "fingerprint256": "4C:88:BE:E4:69:43:30:2D:82:05:B6:AB:0D:DB:75:8F:F2:6E:47:FD:BC:D7:65:1A:EB:06:F6:E0:D8:33:E7:9C",
+      "hostname": "proofera-grid.tangvu.dev",
+      "issuer": {
+        "commonName": "WE1",
+        "organization": "Google Trust Services"
+      },
+      "protocol": "TLSv1.3",
+      "serialNumber": "A0A5D7EDB9010F8D0E77E579BD53F5F4",
+      "subjectCommonName": "tangvu.dev",
+      "validFromUtc": "2026-07-07T15:19:18.000Z",
+      "validToUtc": "2026-10-05T16:12:36.000Z"
+    },
+    {
+      "alpnProtocol": "h2",
+      "authorized": true,
+      "cipher": "TLS_AES_256_GCM_SHA384",
+      "fingerprint256": "4C:88:BE:E4:69:43:30:2D:82:05:B6:AB:0D:DB:75:8F:F2:6E:47:FD:BC:D7:65:1A:EB:06:F6:E0:D8:33:E7:9C",
+      "hostname": "proofera-yield.tangvu.dev",
+      "issuer": {
+        "commonName": "WE1",
+        "organization": "Google Trust Services"
+      },
+      "protocol": "TLSv1.3",
+      "serialNumber": "A0A5D7EDB9010F8D0E77E579BD53F5F4",
+      "subjectCommonName": "tangvu.dev",
+      "validFromUtc": "2026-07-07T15:19:18.000Z",
+      "validToUtc": "2026-10-05T16:12:36.000Z"
+    },
+    {
+      "alpnProtocol": "h2",
+      "authorized": true,
+      "cipher": "TLS_AES_256_GCM_SHA384",
+      "fingerprint256": "4C:88:BE:E4:69:43:30:2D:82:05:B6:AB:0D:DB:75:8F:F2:6E:47:FD:BC:D7:65:1A:EB:06:F6:E0:D8:33:E7:9C",
+      "hostname": "proofera-health.tangvu.dev",
+      "issuer": {
+        "commonName": "WE1",
+        "organization": "Google Trust Services"
+      },
+      "protocol": "TLSv1.3",
+      "serialNumber": "A0A5D7EDB9010F8D0E77E579BD53F5F4",
+      "subjectCommonName": "tangvu.dev",
+      "validFromUtc": "2026-07-07T15:19:18.000Z",
+      "validToUtc": "2026-10-05T16:12:36.000Z"
+    }
+  ],
+  "http": [
+    {
+      "bodyBytes": 119,
+      "bodySha256": "f14f672c7cf46370b5a48e374d550c6984550c21c5583a471f4d3fedd76d5c07",
+      "facts": {
+        "build": "b68c6b6d1a2f7f1671f384b397cfd54386481934",
+        "service": "proofera-marketplace",
+        "status": "ok"
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json",
+        "date": "Fri, 21 Aug 2026 10:26:50 GMT",
+        "proofEraService": "proofera-marketplace"
+      },
+      "key": "marketplace-health",
+      "status": 200,
+      "url": "https://proofera.tangvu.dev/api/health"
+    },
+    {
+      "bodyBytes": 494,
+      "bodySha256": "a2c89c0e697efc4a669edc7e172ecc1b284c0d77c97e407c43c65679d150ee95",
+      "facts": {
+        "build": "b68c6b6d1a2f7f1671f384b397cfd54386481934",
+        "activation": "unavailable",
+        "readyForActivation": false,
+        "readyForJudging": false,
+        "status": "not_ready"
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json",
+        "date": "Fri, 21 Aug 2026 10:26:51 GMT",
+        "proofEraService": "proofera-marketplace"
+      },
+      "key": "marketplace-readiness",
+      "status": 503,
+      "url": "https://proofera.tangvu.dev/api/readiness"
+    },
+    {
+      "bodyBytes": 50055,
+      "bodySha256": "199fc2be9f4ccf5a65fd32f7d0fb92348cabc394defc23db06c4b954dc73e0d7",
+      "facts": {
+        "buildVisible": true,
+        "openGatesVisible": true,
+        "permissionAuditSkillVisible": true
+      },
+      "headers": {
+        "cacheControl": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "date": "Fri, 21 Aug 2026 10:26:51 GMT",
+        "proofEraService": null
+      },
+      "key": "marketplace-proof-room",
+      "status": 200,
+      "url": "https://proofera.tangvu.dev/proof"
+    },
+    {
+      "bodyBytes": 45,
+      "bodySha256": "da26643f449c2c4d17ab8fb551b3bd59b0bfb1c69b14135d0744d5b5152d396d",
+      "facts": {
+        "executionEnabled": false,
+        "status": "HEALTHY"
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "date": "Fri, 21 Aug 2026 10:26:51 GMT",
+        "proofEraService": null
+      },
+      "key": "lp-range-ping",
+      "status": 200,
+      "url": "https://proofera-lp.tangvu.dev/ping"
+    },
+    {
+      "bodyBytes": 1847,
+      "bodySha256": "6136752dfca9bde86cdea31c70a2308509a5eef1046a0380af349c966f89dd72",
+      "facts": {
+        "protocolVersion": "0.3.0",
+        "skillIds": [
+          "analyze_lp_range",
+          "audit_altana_permission_bundle"
+        ],
+        "url": "https://proofera-lp.tangvu.dev/"
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "date": "Fri, 21 Aug 2026 10:26:51 GMT",
+        "proofEraService": null
+      },
+      "key": "lp-range-agent-card",
+      "status": 200,
+      "url": "https://proofera-lp.tangvu.dev/.well-known/agent-card.json"
+    },
+    {
+      "bodyBytes": 45,
+      "bodySha256": "da26643f449c2c4d17ab8fb551b3bd59b0bfb1c69b14135d0744d5b5152d396d",
+      "facts": {
+        "executionEnabled": false,
+        "status": "HEALTHY"
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "date": "Fri, 21 Aug 2026 10:26:52 GMT",
+        "proofEraService": null
+      },
+      "key": "grid-trading-ping",
+      "status": 200,
+      "url": "https://proofera-grid.tangvu.dev/ping"
+    },
+    {
+      "bodyBytes": 957,
+      "bodySha256": "db789971aaf2220dc6ad11e95809c2dedb1ff62026a4fdaf195c9f1b1675a788",
+      "facts": {
+        "protocolVersion": "0.3.0",
+        "skillIds": [
+          "analyze_grid_trading"
+        ],
+        "url": "https://proofera-grid.tangvu.dev/"
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "date": "Fri, 21 Aug 2026 10:26:52 GMT",
+        "proofEraService": null
+      },
+      "key": "grid-trading-agent-card",
+      "status": 200,
+      "url": "https://proofera-grid.tangvu.dev/.well-known/agent-card.json"
+    },
+    {
+      "bodyBytes": 45,
+      "bodySha256": "da26643f449c2c4d17ab8fb551b3bd59b0bfb1c69b14135d0744d5b5152d396d",
+      "facts": {
+        "executionEnabled": false,
+        "status": "HEALTHY"
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "date": "Fri, 21 Aug 2026 10:26:52 GMT",
+        "proofEraService": null
+      },
+      "key": "yield-optimisation-ping",
+      "status": 200,
+      "url": "https://proofera-yield.tangvu.dev/ping"
+    },
+    {
+      "bodyBytes": 1314,
+      "bodySha256": "d00eb470ded02ced07ef18079df1d3f71e287b6f1449b284fe84b05a9bd49626",
+      "facts": {
+        "protocolVersion": "0.3.0",
+        "skillIds": [
+          "analyze_yield_opportunities"
+        ],
+        "url": "https://proofera-yield.tangvu.dev/"
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "date": "Fri, 21 Aug 2026 10:26:53 GMT",
+        "proofEraService": null
+      },
+      "key": "yield-optimisation-agent-card",
+      "status": 200,
+      "url": "https://proofera-yield.tangvu.dev/.well-known/agent-card.json"
+    },
+    {
+      "bodyBytes": 164,
+      "bodySha256": "1d3b752992cfc7b5e0b16cb1ecc90c03c507abbd43f92ae535713880b87e151b",
+      "facts": {
+        "executionEnabled": false,
+        "status": "HEALTHY"
+      },
+      "headers": {
+        "cacheControl": null,
+        "contentType": "application/json; charset=utf-8",
+        "date": "Fri, 21 Aug 2026 10:26:53 GMT",
+        "proofEraService": null
+      },
+      "key": "health-factor-ping",
+      "status": 200,
+      "url": "https://proofera-health.tangvu.dev/ping"
+    },
+    {
+      "bodyBytes": 1024,
+      "bodySha256": "1dbebabf5de5e24055f66e9ff1a7ad17a2aa3c5a6177e3d61c64b8b39e989d24",
+      "facts": {
+        "protocolVersion": "0.3.0",
+        "skillIds": [
+          "analyze_venus_health_factor"
+        ],
+        "url": "https://proofera-health.tangvu.dev/"
+      },
+      "headers": {
+        "cacheControl": null,
+        "contentType": "application/json; charset=utf-8",
+        "date": "Fri, 21 Aug 2026 10:26:53 GMT",
+        "proofEraService": null
+      },
+      "key": "health-factor-agent-card",
+      "status": 200,
+      "url": "https://proofera-health.tangvu.dev/.well-known/agent-card.json"
+    }
+  ],
+  "summary": {
+    "dnsAgreement": true,
+    "exactBuildObserved": true,
+    "httpObservationCount": 11,
+    "tlsAuthorized": true
+  },
+  "limitations": [
+    "HTTP and TLS requests originated from the production host network, not an independent external uptime monitor.",
+    "Google and Cloudflare agreed on public A records; their AD fields are retained and resolver agreement is not represented as DNSSEC proof.",
+    "TLS, DNS, health, readiness and render observations prove bounded availability only; they do not prove ERC-8004 registration, authority, transactions, performance, judging uptime or hackathon submission.",
+    "Rehearsal mode does not freeze the production release or close the production-release readiness gate."
+  ]
+}

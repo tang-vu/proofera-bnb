@@ -1,20 +1,20 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-19T02:01:39.693Z",
+  "updatedAtUtc": "2026-08-21T10:26:54.469Z",
   "readyForSubmission": false,
   "gates": [
     {
       "gateId": "production-release",
       "state": "deployed_unfrozen",
-      "claim": "A two-resolver, five-host TLS and eleven-response exact-build public release rehearsal is retained; the final judging release and final probe are not frozen.",
+      "claim": "A two-resolver, five-host TLS and eleven-response rehearsal is retained for published build b68c6b6d1a2f7f1671f384b397cfd54386481934; the final judging release and final probe are not frozen.",
       "blockers": [
         "Freeze the final published commit and retain an independently reviewable public probe artifact."
       ],
       "artifacts": [
         {
           "kind": "release_rehearsal",
-          "path": "evidence/submission/release-probes/155f03ae84e505c8d7c981296699bac30fd16ee6/rehearsal/manifest.json",
-          "sha256": "489ef6855bff29921937725492df5ab836f31a16c65301454e7400ab47726052"
+          "path": "evidence/submission/release-probes/b68c6b6d1a2f7f1671f384b397cfd54386481934/rehearsal/manifest.json",
+          "sha256": "3bf2d5f9eb5263695bbfd6340568f1f052b03e523c1b4bafb123611bb30eaf71"
         }
       ]
     },
