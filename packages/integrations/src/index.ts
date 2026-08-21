@@ -3,6 +3,7 @@ export * from "./altana-bootstrap";
 export * from "./altana-grant";
 export * from "./altana-operations";
 export * from "./altana-session";
+export * from "./altana-test-action";
 export * from "./evm-code-identity";
 export * from "./lista-yield";
 export * from "./lp-context-assembly";

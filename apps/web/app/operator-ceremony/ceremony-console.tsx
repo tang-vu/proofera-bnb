@@ -1,9 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useSyncExternalStore } from "react";
 
+import type { AltanaTestActionConfig } from "@proofera/integrations";
+
 import { AltanaPasskeyCeremony } from "./altana-passkey-ceremony";
+import { AltanaSessionCeremony } from "./altana-session-ceremony";
 
 const SESSION_STORAGE_KEY = "proofera.operator-ceremony.started-at.v1";
 const SESSION_EVENT = "proofera-operator-ceremony-change";
@@ -28,11 +30,9 @@ const steps = [
   {
     number: "03",
     title: "Altana grant and test action",
-    state: "Passkey ceremony available",
+    state: "Ready after faucet funding",
     detail:
-      "Create or recover the device-bound admin passkey on the final HTTPS origin. This establishes no session authority by itself; a dedicated worker signer, eligible testnet target, exact grant and fresh authority probe remain separate gates.",
-    href: "/lp-activate",
-    linkLabel: "Review LP boundaries"
+      "The device-bound passkey grants one one-hour session scoped to PTA approve(address,uint256). The dedicated DPAPI worker signs only the pinned amount-0/value-0 calldata after two RPCs observe authority, then publishes only public receipt state."
   },
   {
     number: "04",
@@ -44,9 +44,14 @@ const steps = [
 ] as const;
 
 export function CeremonyConsole({
+  altanaTestAction,
   canonicalOrigin,
   rpId
-}: Readonly<{ canonicalOrigin: string; rpId: string }>) {
+}: Readonly<{
+  altanaTestAction: AltanaTestActionConfig;
+  canonicalOrigin: string;
+  rpId: string;
+}>) {
   const startedAt = useSyncExternalStore(
     (onStoreChange) => {
       window.addEventListener(SESSION_EVENT, onStoreChange);
@@ -92,6 +97,7 @@ export function CeremonyConsole({
         </section>
         <div className="shell ceremony-passkey-start">
           <AltanaPasskeyCeremony canonicalOrigin={canonicalOrigin} rpId={rpId} />
+          <AltanaSessionCeremony config={altanaTestAction} rpId={rpId} />
         </div>
       </>
     );
@@ -149,16 +155,12 @@ export function CeremonyConsole({
                 <code>No raw NDJSON or terminal command entry required.</code>
               </div>
             ) : null}
-            {"href" in step ? (
-              <Link className="button button-secondary" href={step.href}>
-                {step.linkLabel}
-              </Link>
-            ) : null}
           </li>
         ))}
       </ol>
 
       <AltanaPasskeyCeremony canonicalOrigin={canonicalOrigin} rpId={rpId} />
+      <AltanaSessionCeremony config={altanaTestAction} rpId={rpId} />
 
       <aside className="unavailable-panel" role="status">
         <div>

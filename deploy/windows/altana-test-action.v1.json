@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "chainId": 97,
+  "walletAddress": "0x91Aa0E6627bFF6C911B38CEd5F7885E063b7C27a",
+  "sessionKey": {
+    "schemaVersion": 1,
+    "custody": "worker-dpapi-current-user",
+    "curve": "secp256k1",
+    "publicKey": "0x0481b28f8d35bf3c63575e01886128f5d7f6c0ef323af114d3d759ccdafd88e18527cffed5aa7d44edd7580d71f0ae1b0681e5469522fdc1ce9191b5e94a8fd67d",
+    "address": "0xb5F0658E3bc0c3495729b87DE32f568Bdc995a11"
+  },
+  "action": {
+    "target": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc",
+    "functionSignature": "approve(address,uint256)",
+    "spender": "0xb5F0658E3bc0c3495729b87DE32f568Bdc995a11",
+    "amount": "0",
+    "valueWei": "0"
+  },
+  "permissions": {
+    "calls": [
+      {
+        "to": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc",
+        "signature": "approve(address,uint256)"
+      }
+    ],
+    "spend": [
+      {
+        "token": null,
+        "limit": "1",
+        "period": "day"
+      }
+    ]
+  },
+  "sessionLifetimeSeconds": 3600,
+  "minimumNativeBalanceWei": "5000000000000000"
+}

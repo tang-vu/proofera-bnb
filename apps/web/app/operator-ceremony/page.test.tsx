@@ -14,6 +14,9 @@ describe("operator ceremony page", () => {
     expect(html).toContain("Tạo Altana passkey");
     expect(html).toContain("Khôi phục ví đã có giao dịch");
     expect(html).toContain("ví counterfactual");
+    expect(html).toContain("Grant quyền testnet");
+    expect(html).toContain("PTA approve(address,uint256)");
+    expect(html).toContain("amount 0 · value 0");
     expect(html).not.toContain("Ceremony complete");
     expect(html).not.toContain("Authority granted");
   });

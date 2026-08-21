@@ -77,6 +77,25 @@ module.exports = {
       "https://proofera-health.tangvu.dev/"
     ),
     {
+      name: "proofera-altana-test-action-worker",
+      cwd: repositoryRoot,
+      script: "scripts/altana-test-action-worker.mjs",
+      args: "--run",
+      interpreter: process.execPath,
+      instances: 1,
+      exec_mode: "fork",
+      autorestart: true,
+      restart_delay: 5_000,
+      exp_backoff_restart_delay: 100,
+      max_memory_restart: "256M",
+      kill_timeout: 10_000,
+      time: true,
+      env: {
+        NODE_ENV: "production",
+        PROOFERA_BUILD_VERSION: buildVersion
+      }
+    },
+    {
       name: "proofera-monitor",
       cwd: repositoryRoot,
       script: "scripts/monitor-public-production.mjs",

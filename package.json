@@ -30,6 +30,8 @@
     "run:termix:venus-agent": "node --no-warnings --conditions=react-server --experimental-loader ./scripts/termix-typescript-loader.mjs ./scripts/run-termix-venus-health-agent.ts",
     "run:termix:venus-manual": "node --no-warnings --conditions=react-server --experimental-loader ./scripts/termix-typescript-loader.mjs ./scripts/run-termix-venus-health-manual.ts",
     "dev": "pnpm --filter @proofera/web dev",
+    "provision:altana:test-action": "node ./scripts/altana-test-action-worker.mjs --provision",
+    "worker:altana:test-action": "node ./scripts/altana-test-action-worker.mjs --run",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint . --max-warnings=0",

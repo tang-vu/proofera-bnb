@@ -107,6 +107,27 @@ The 2026-08-17 recovery drill first proved that a logical `pg_dump --create` res
 
 This is a real host-local staging deployment, not production activation evidence. Connections currently use loopback without TLS, no worker endpoint consumes either capability, and log-redaction, retention, off-host recovery, reboot recovery, final-origin/passkey, and signer/KMS ceremonies are still open. Therefore `deploymentConfigured` and `releaseReady` remain false and public `/api/readiness` must remain `503 not_ready`.
 
+## Bounded Altana test-action worker
+
+The operator ceremony has one local-only chain-97 worker for lifecycle evidence. It is deliberately narrower than the production LP activation composition:
+
+- tracked public configuration: `deploy/windows/altana-test-action.v1.json`;
+- pinned admin wallet: `0x91Aa0E6627bFF6C911B38CEd5F7885E063b7C27a`;
+- pinned worker address: `0xb5F0658E3bc0c3495729b87DE32f568Bdc995a11`;
+- target/call: non-economic PTA `0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc`, `approve(address,uint256)`, spender equal to the worker, amount `0`, native value `0`;
+- grant: chain `97`, one-hour lifetime, one-wei native daily spend cap, KeyStore registration enabled;
+- custody/state directory: `%LOCALAPPDATA%\ProofEra\altana-test-action-v1`, protected current-user ACL, DPAPI CurrentUser signer blob, create-only claim/submission/receipt files, and a strict secret-free `public-state.json` projection.
+
+Provision once with `pnpm provision:altana:test-action`. The command never prints the private key; on an existing complete boundary it returns only the retained public descriptor and refuses a partial secret/descriptor pair. The tracked config must be updated and reviewed to match that descriptor before starting the worker. The current host is already provisioned for the tracked descriptor; do not provision a replacement while its config or journals are active.
+
+The PM2 topology starts `proofera-altana-test-action-worker` with `--run`. It opens no socket. It polls the two fixed BSC-testnet RPCs and remains `waiting_authority` until both KeyStore validity and the derived Altana account key hash are present with one matching expiry. It then simulates the exact PTA zero approval, durably creates the execution claim, unwraps the signer, submits once with SDK `noWait: true`, and reconciles the returned `callsId` plus a dual-RPC successful receipt. A retained claim without a retained calls ID becomes terminal unknown and must not be deleted or retried. `lifecycle_complete` requires both RPCs to agree that KeyStore validity is false and the account key hash is absent; expiry-only disagreement blocks.
+
+The Next.js route `/api/operator-ceremony/altana-state` exposes only the strict public projection. The browser keeps the admin passkey device-bound, creates its grant-submitting fence before SDK invocation, and requires a separate Windows Hello ceremony for revoke. Browser local storage is not a production durable replay ledger; this operator path does not replace the canonical PostgreSQL grant-claim/activation composition.
+
+At this update the public projection is `waiting_authority`, the wallet balance is `0` wei, and no grant/execute/revoke receipt exists. Obtain faucet tBNB through an official BNB Chain faucet path, refresh the operator page, and require at least `5000000000000000` wei before the grant control enables. Faucet UI, captcha, Telegram/Discord identity, and user-presence prompts cannot be automated or treated as evidence. Do not use mainnet BNB to unblock this testnet ceremony.
+
+After a completed revoke, the KeyStore revocation is monotonic and this signer/config is consumed. Preserve the public files for evidence collection and provision a new versioned signer/config for any later run; never delete journals to manufacture a retry.
+
 ## Public marketplace checklist
 
 1. Reserve the durable domain before creating passkeys/evidence wallets.

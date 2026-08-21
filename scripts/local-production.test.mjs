@@ -17,9 +17,9 @@ const config = require(configPath);
 if (previousBuild === undefined) delete process.env.PROOFERA_BUILD_VERSION;
 else process.env.PROOFERA_BUILD_VERSION = previousBuild;
 
-test("local production topology is loopback-only and exposes six distinct processes", () => {
-  assert.equal(config.apps.length, 6);
-  assert.equal(new Set(config.apps.map(({ name }) => name)).size, 6);
+test("local production topology is loopback-only and exposes seven distinct processes", () => {
+  assert.equal(config.apps.length, 7);
+  assert.equal(new Set(config.apps.map(({ name }) => name)).size, 7);
 
   const ports = [];
   for (const application of config.apps) {
@@ -42,6 +42,14 @@ test("local production topology is loopback-only and exposes six distinct proces
       assert.equal(application.script, "scripts/monitor-public-production.mjs");
       assert.equal(application.env.PROOFERA_BUILD_VERSION, testBuild);
       assert.equal(application.env.PROOFERA_MONITOR_INTERVAL_MS, "300000");
+      continue;
+    }
+
+    if (application.name === "proofera-altana-test-action-worker") {
+      assert.equal(application.script, "scripts/altana-test-action-worker.mjs");
+      assert.equal(application.args, "--run");
+      assert.equal(application.env.PROOFERA_BUILD_VERSION, testBuild);
+      assert.deepEqual(Object.keys(application.env).sort(), ["NODE_ENV", "PROOFERA_BUILD_VERSION"]);
       continue;
     }
 

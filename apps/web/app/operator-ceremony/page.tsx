@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { altanaTestActionConfigSchema } from "@proofera/integrations";
+
+import altanaTestActionConfig from "../../../../deploy/windows/altana-test-action.v1.json";
+
 import { readPasskeyRuntimeConfig } from "../../lib/runtime-config";
 import { CeremonyConsole } from "./ceremony-console";
 
@@ -9,6 +13,7 @@ export const dynamic = "force-dynamic";
 
 export default function OperatorCeremonyPage() {
   const passkey = readPasskeyRuntimeConfig();
+  const altanaTestAction = altanaTestActionConfigSchema.parse(altanaTestActionConfig);
 
   return (
     <main id="main-content" tabIndex={-1}>
@@ -39,7 +44,11 @@ export default function OperatorCeremonyPage() {
         </p>
       </header>
 
-      <CeremonyConsole canonicalOrigin={passkey.origin} rpId={passkey.rpId} />
+      <CeremonyConsole
+        altanaTestAction={altanaTestAction}
+        canonicalOrigin={passkey.origin}
+        rpId={passkey.rpId}
+      />
     </main>
   );
 }

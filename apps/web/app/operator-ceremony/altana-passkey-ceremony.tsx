@@ -3,12 +3,12 @@
 import { useState, useSyncExternalStore } from "react";
 import { getAddress, isAddress, type Address } from "viem";
 
-const PASSKEY_WALLET_STORAGE_KEY = "proofera.altana.passkey-wallet.v1";
-const PASSKEY_WALLET_EVENT = "proofera-altana-passkey-wallet-change";
+export const PASSKEY_WALLET_STORAGE_KEY = "proofera.altana.passkey-wallet.v1";
+export const PASSKEY_WALLET_EVENT = "proofera-altana-passkey-wallet-change";
 
 type OperationPhase = "idle" | "creating" | "recovering" | "rejected" | "failed";
 
-interface StoredPasskeyWallet {
+export interface StoredPasskeyWallet {
   readonly schemaVersion: 1;
   readonly chainId: 97;
   readonly address: Address;
@@ -64,7 +64,7 @@ function exactStoredWallet(value: unknown, rpId: string): StoredPasskeyWallet | 
   };
 }
 
-function readStoredWallet(rpId: string): StoredPasskeyWallet | null {
+export function readStoredWallet(rpId: string): StoredPasskeyWallet | null {
   try {
     const raw = window.localStorage.getItem(PASSKEY_WALLET_STORAGE_KEY);
     if (raw === null || raw.length > 8_192) return null;
