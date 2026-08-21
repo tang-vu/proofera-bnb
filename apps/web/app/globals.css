@@ -169,6 +169,14 @@ select:focus-visible {
   flex: 0 0 auto;
 }
 
+.ceremony-start-with-passkey {
+  margin-bottom: 28px;
+}
+
+.ceremony-passkey-start .ceremony-passkey {
+  margin-bottom: 96px;
+}
+
 .ceremony-session-heading {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 0.55fr);
@@ -275,6 +283,57 @@ select:focus-visible {
   line-height: 1.65;
 }
 
+.ceremony-passkey {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 28px;
+  padding: 28px;
+  border: 1px solid var(--signal);
+  background: rgb(244 211 94 / 6%);
+}
+
+.ceremony-passkey-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.ceremony-passkey-heading h3,
+.ceremony-passkey > p {
+  margin-bottom: 0;
+}
+
+.ceremony-passkey-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.ceremony-passkey-wallet {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px 16px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.ceremony-passkey-wallet span {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.ceremony-passkey-wallet code {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 760px) {
   .ceremony-start {
     align-items: stretch;
@@ -282,6 +341,21 @@ select:focus-visible {
   }
 
   .ceremony-session-heading {
+    grid-template-columns: 1fr;
+  }
+
+  .ceremony-passkey-heading {
+    flex-direction: column;
+  }
+
+  .ceremony-passkey-actions,
+  .ceremony-passkey-actions .button,
+  .ceremony-passkey-wallet,
+  .ceremony-passkey-wallet .button {
+    width: 100%;
+  }
+
+  .ceremony-passkey-wallet {
     grid-template-columns: 1fr;
   }
 }

@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { readPasskeyRuntimeConfig } from "../../lib/runtime-config";
 import { CeremonyConsole } from "./ceremony-console";
 
 export const metadata: Metadata = { title: "Operator ceremony" };
+export const dynamic = "force-dynamic";
 
 export default function OperatorCeremonyPage() {
+  const passkey = readPasskeyRuntimeConfig();
+
   return (
     <main id="main-content" tabIndex={-1}>
       <nav className="shell nav" aria-label="Primary navigation">
@@ -35,7 +39,7 @@ export default function OperatorCeremonyPage() {
         </p>
       </header>
 
-      <CeremonyConsole />
+      <CeremonyConsole canonicalOrigin={passkey.origin} rpId={passkey.rpId} />
     </main>
   );
 }

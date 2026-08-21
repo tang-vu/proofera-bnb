@@ -21,9 +21,11 @@ test("starts one honest operator session and keeps it through a reload", async (
   await expect(page.getByRole("heading", { name: /keep this page open/i })).toBeVisible();
   await expect(page.getByText("Nothing completed by this page")).toBeVisible();
   await expect(page.getByText("One review click")).toHaveCount(2);
-  await expect(page.getByText("Authority prerequisites absent")).toBeVisible();
+  await expect(page.getByText("Passkey ceremony available")).toBeVisible();
   await expect(page.getByText("Waits for a real grant")).toBeVisible();
   await expect(page.getByText("Start ProofEra Ceremony.cmd")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Tạo Altana passkey" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Khôi phục passkey có sẵn" })).toBeVisible();
   await expectNoHorizontalOverflow(page);
 
   await page.reload();

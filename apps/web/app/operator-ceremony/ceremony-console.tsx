@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useSyncExternalStore } from "react";
 
+import { AltanaPasskeyCeremony } from "./altana-passkey-ceremony";
+
 const SESSION_STORAGE_KEY = "proofera.operator-ceremony.started-at.v1";
 const SESSION_EVENT = "proofera-operator-ceremony-change";
 
@@ -26,9 +28,9 @@ const steps = [
   {
     number: "03",
     title: "Altana grant and test action",
-    state: "Authority prerequisites absent",
+    state: "Passkey ceremony available",
     detail:
-      "The final-origin passkey, dedicated worker session signer, eligible write target, and fresh authority probe must exist before a grant can be requested. No passkey prompt is available yet.",
+      "Create or recover the device-bound admin passkey on the final HTTPS origin. This establishes no session authority by itself; a dedicated worker signer, eligible testnet target, exact grant and fresh authority probe remain separate gates.",
     href: "/lp-activate",
     linkLabel: "Review LP boundaries"
   },
@@ -41,7 +43,10 @@ const steps = [
   }
 ] as const;
 
-export function CeremonyConsole() {
+export function CeremonyConsole({
+  canonicalOrigin,
+  rpId
+}: Readonly<{ canonicalOrigin: string; rpId: string }>) {
   const startedAt = useSyncExternalStore(
     (onStoreChange) => {
       window.addEventListener(SESSION_EVENT, onStoreChange);
@@ -67,21 +72,28 @@ export function CeremonyConsole() {
 
   if (startedAt === null) {
     return (
-      <section className="shell ceremony-start" aria-labelledby="ceremony-start-heading">
-        <div>
-          <span className="state-badge state-caution">No ceremony in progress</span>
-          <h2 id="ceremony-start-heading">One entry point. Four evidence checkpoints.</h2>
-          <p>
-            This public page cannot write benchmark evidence. The button reveals the local-only
-            launcher that runs on the owner&apos;s Windows host; it cannot accept the displayed
-            facts for you, invoke a passkey, submit a transaction, or claim that a checkpoint
-            passed.
-          </p>
+      <>
+        <section
+          className="shell ceremony-start ceremony-start-with-passkey"
+          aria-labelledby="ceremony-start-heading"
+        >
+          <div>
+            <span className="state-badge state-caution">No ceremony in progress</span>
+            <h2 id="ceremony-start-heading">One entry point. Four evidence checkpoints.</h2>
+            <p>
+              This public page cannot write benchmark evidence. The button reveals the local-only
+              launcher that runs on the owner&apos;s Windows host; it cannot accept the displayed
+              facts for you, submit a transaction, or claim that a checkpoint passed.
+            </p>
+          </div>
+          <button className="button button-primary" onClick={beginCeremony} type="button">
+            Show local runner
+          </button>
+        </section>
+        <div className="shell ceremony-passkey-start">
+          <AltanaPasskeyCeremony canonicalOrigin={canonicalOrigin} rpId={rpId} />
         </div>
-        <button className="button button-primary" onClick={beginCeremony} type="button">
-          Show local runner
-        </button>
-      </section>
+      </>
     );
   }
 
@@ -145,6 +157,8 @@ export function CeremonyConsole() {
           </li>
         ))}
       </ol>
+
+      <AltanaPasskeyCeremony canonicalOrigin={canonicalOrigin} rpId={rpId} />
 
       <aside className="unavailable-panel" role="status">
         <div>
