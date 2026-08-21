@@ -17,7 +17,7 @@ flowchart LR
   S[BNB Agent Studio runtime] --> K
 ```
 
-The browser owns the user's passkey ceremony and must display exactly what will be granted. The final-origin operator page now exposes SDK 0.7.0 create/recover controls, validates the exact HTTPS origin and RP ID in the browser, and retains only the public credential descriptor locally on that device. The marketplace server owns data ingestion, recommendation rules, and policy preparation, but never an admin key or autonomous session private key. A dedicated worker/KMS would own only a scoped session signer. No concrete worker/KMS, passkey grant, or live authority is configured today. BSC and partner explorers remain the source of truth for onchain state.
+The browser owns the user's passkey ceremony and must display exactly what will be granted. The final-origin operator page now exposes SDK 0.7.0 create/recover controls, validates the exact HTTPS origin and RP ID in the browser, and retains only the public credential descriptor locally on that device. Recovery is explicitly limited to wallets whose first Altana transaction has already registered an admin key in the chain-97 KeyStore; a newly prepared counterfactual wallet is not mislabeled as recoverable, and a recovery failure cannot replace an already-retained local descriptor. The marketplace server owns data ingestion, recommendation rules, and policy preparation, but never an admin key or autonomous session private key. A dedicated worker/KMS would own only a scoped session signer. No concrete worker/KMS, passkey grant, or live authority is configured today. BSC and partner explorers remain the source of truth for onchain state.
 
 ## Repository boundaries
 

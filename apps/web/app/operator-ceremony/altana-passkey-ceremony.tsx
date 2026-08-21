@@ -81,6 +81,10 @@ function isUserRejection(error: unknown): boolean {
   );
 }
 
+function isUnregisteredCounterfactualWallet(error: unknown): boolean {
+  return error instanceof Error && error.message.includes("has no keys registered in KeyStore yet");
+}
+
 function browserSnapshot(canonicalOrigin: string, rpId: string): string {
   if (window.location.origin !== canonicalOrigin) return "origin_mismatch";
   if (
@@ -129,6 +133,7 @@ export function AltanaPasskeyCeremony({ canonicalOrigin, rpId }: AltanaPasskeyCe
   const busy = operationPhase === "creating" || operationPhase === "recovering";
   const available = snapshot === "idle" || snapshot.startsWith("ready:");
   const ready = walletAddress !== null;
+  const canCreateOrRecover = snapshot === "idle" && !busy;
   const message = operationMessage ?? defaultBoundaryMessage(snapshot, canonicalOrigin);
 
   async function retainWallet(result: unknown) {
@@ -161,12 +166,12 @@ export function AltanaPasskeyCeremony({ canonicalOrigin, rpId }: AltanaPasskeyCe
     window.dispatchEvent(new Event(PASSKEY_WALLET_EVENT));
     setOperationPhase("idle");
     setOperationMessage(
-      "Passkey đã sẵn sàng trên final origin. Chưa có session grant, quyền thực thi hay transaction receipt."
+      "Altana đã trả về ví và metadata passkey công khai đã được giữ trên thiết bị này. Không cần bấm Khôi phục ở cùng thiết bị. Session grant, quyền thực thi và transaction receipt vẫn chưa được tạo."
     );
   }
 
   async function createPasskeyWallet() {
-    if (!available || busy) return;
+    if (!canCreateOrRecover) return;
     setOperationPhase("creating");
     setOperationMessage("Đang chờ xác nhận WebAuthn trên thiết bị…");
     try {
@@ -178,13 +183,13 @@ export function AltanaPasskeyCeremony({ canonicalOrigin, rpId }: AltanaPasskeyCe
       setOperationMessage(
         isUserRejection(error)
           ? "Yêu cầu passkey đã bị hủy; chưa có quyền hay transaction nào được ghi nhận."
-          : "Không thể tạo passkey an toàn. Không có grant hay transaction nào được ghi nhận."
+          : "Altana chưa trả về một ví hoàn tất. Windows Hello có thể đã tạo credential cục bộ trước khi bước chuẩn bị ví dừng lại; không dùng nút Khôi phục cho credential chưa có giao dịch đầu tiên. Mã: ALTANA_CREATE_INCOMPLETE. Không có grant hay transaction nào được ghi nhận."
       );
     }
   }
 
   async function recoverPasskeyWallet() {
-    if (!available || busy) return;
+    if (!canCreateOrRecover) return;
     setOperationPhase("recovering");
     setOperationMessage("Chọn passkey ProofEra trong trình xác thực của thiết bị…");
     try {
@@ -196,7 +201,9 @@ export function AltanaPasskeyCeremony({ canonicalOrigin, rpId }: AltanaPasskeyCe
       setOperationMessage(
         isUserRejection(error)
           ? "Khôi phục passkey đã bị hủy; trạng thái authority không được suy diễn."
-          : "Không khôi phục được passkey từ KeyStore BSC testnet; trạng thái authority vẫn chưa biết."
+          : isUnregisteredCounterfactualWallet(error)
+            ? "Authenticator đã trả về ví, nhưng KeyStore chain 97 chưa có admin key on-chain. Đây là trạng thái counterfactual trước giao dịch Altana đầu tiên, không phải bằng chứng passkey bị mất hay authority đã tồn tại. Mã: ALTANA_KEYSTORE_NOT_REGISTERED."
+            : "Không khôi phục được passkey từ KeyStore BSC testnet; trạng thái authority vẫn chưa biết."
       );
     }
   }
@@ -219,28 +226,43 @@ export function AltanaPasskeyCeremony({ canonicalOrigin, rpId }: AltanaPasskeyCe
           <h3 id="altana-passkey-heading">Xác nhận Altana passkey</h3>
         </div>
         <span className={`state-badge ${ready ? "state-positive" : "state-caution"}`}>
-          {ready ? "Passkey ready" : "User presence required"}
+          {ready ? "Local passkey ready" : "User presence required"}
         </span>
       </div>
-      <p>{message}</p>
+      <p aria-live="polite" role="status">
+        {message}
+      </p>
       <div className="ceremony-passkey-actions">
         <button
           className="button button-primary"
-          disabled={!available || busy}
+          disabled={!available || !canCreateOrRecover}
           onClick={createPasskeyWallet}
           type="button"
         >
-          {operationPhase === "creating" ? "Đang chờ passkey…" : "Tạo Altana passkey"}
+          {ready
+            ? "Passkey đã tạo"
+            : operationPhase === "creating"
+              ? "Đang chờ passkey…"
+              : "Tạo Altana passkey"}
         </button>
         <button
           className="button button-secondary"
-          disabled={!available || busy}
+          disabled={!available || !canCreateOrRecover}
           onClick={recoverPasskeyWallet}
           type="button"
         >
-          {operationPhase === "recovering" ? "Đang khôi phục…" : "Khôi phục passkey có sẵn"}
+          {ready
+            ? "Không cần khôi phục"
+            : operationPhase === "recovering"
+              ? "Đang khôi phục…"
+              : "Khôi phục ví đã có giao dịch"}
         </button>
       </div>
+      <p className="registry-footnote">
+        Khôi phục từ KeyStore chỉ dùng cho ví đã đăng ký admin key qua giao dịch Altana đầu tiên.
+        Passkey vừa tạo có thể vẫn là ví counterfactual; nếu địa chỉ ví đang hiện bên dưới thì
+        metadata trên thiết bị này đã sẵn sàng và không cần khôi phục.
+      </p>
       {walletAddress === null ? null : (
         <div className="ceremony-passkey-wallet" role="status">
           <span>Altana wallet / chain 97</span>

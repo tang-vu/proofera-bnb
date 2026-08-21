@@ -12,7 +12,8 @@ describe("operator ceremony page", () => {
     expect(html).toContain("BOUNDED NON-AGENT BASELINES");
     expect(html).toContain("submit a transaction");
     expect(html).toContain("Tạo Altana passkey");
-    expect(html).toContain("Khôi phục passkey có sẵn");
+    expect(html).toContain("Khôi phục ví đã có giao dịch");
+    expect(html).toContain("ví counterfactual");
     expect(html).not.toContain("Ceremony complete");
     expect(html).not.toContain("Authority granted");
   });
