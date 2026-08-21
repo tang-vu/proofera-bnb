@@ -1,10 +1,16 @@
 import type { NextConfig } from "next";
 
 const production = process.env.NODE_ENV === "production";
+// Exact chain-97 browser endpoints pinned by @altananetwork/sdk 0.7.0 and reviewed in
+// evidence/altana/preparations/125493138-bsc-testnet-readiness.json. Do not broaden this list.
+const altanaBscTestnetConnectSources = [
+  "https://testnet-relay.altana.network",
+  "https://bsc-testnet-rpc.publicnode.com"
+] as const;
 const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
-  `connect-src 'self'${production ? "" : " ws: wss:"}`,
+  `connect-src 'self' ${altanaBscTestnetConnectSources.join(" ")}${production ? "" : " ws: wss:"}`,
   "font-src 'self' data:",
   "form-action 'self'",
   "frame-ancestors 'none'",

@@ -120,7 +120,7 @@ Altana enforces target/selector, spend and expiry, not these arguments. If a jud
 - External responses are parsed with strict/bounded schemas and bounded time/body limits. Raw payloads stay server/evidence-side.
 - User-controlled query values are finite enums; no query/cookie may select fixture publication or execution targets.
 - Names/descriptions render as text. External links use known HTTPS origins. Future endpoint fetches require SSRF controls and never forward credentials across redirects.
-- Current headers include CSP framing/base/object restrictions, HSTS, nosniff, referrer, opener/resource and permissions policies. CSP allowances must be tightened alongside the final Altana browser endpoints.
+- Current headers include CSP framing/base/object restrictions, HSTS, nosniff, referrer, opener/resource and permissions policies. Browser `connect-src` permits only self plus `https://testnet-relay.altana.network` and `https://bsc-testnet-rpc.publicnode.com`; these two chain-97 origins come from installed SDK `0.7.0` and are independently retained in `evidence/altana/preparations/125493138-bsc-testnet-readiness.json`. Wildcard HTTPS and mainnet endpoints remain denied.
 - Sensitive mutations require authenticated same-origin requests, CSRF/origin checks, rate limits, replay nonce and audit events.
 - Logs exclude authorization headers, API keys, cookies, WebAuthn payloads that reveal unnecessary material, private/session keys and raw signed calldata where it creates risk.
 

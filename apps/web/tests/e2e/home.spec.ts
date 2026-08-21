@@ -17,10 +17,22 @@ test("health endpoint identifies the ProofEra marketplace", async ({ request }) 
 test("serves the finance UI with clickjacking and content-type defenses", async ({ request }) => {
   const response = await request.get("/");
   const headers = response.headers();
+  const contentSecurityPolicy = headers["content-security-policy"];
 
   expect(response.ok()).toBe(true);
-  expect(headers["content-security-policy"]).toContain("frame-ancestors 'none'");
-  expect(headers["content-security-policy"]).toContain("object-src 'none'");
+  expect(contentSecurityPolicy).toContain("frame-ancestors 'none'");
+  expect(contentSecurityPolicy).toContain("object-src 'none'");
+  expect(contentSecurityPolicy).toContain(
+    "connect-src 'self' https://testnet-relay.altana.network https://bsc-testnet-rpc.publicnode.com"
+  );
+  const connectSources = contentSecurityPolicy
+    ? contentSecurityPolicy
+        .split(";")
+        .find((directive) => directive.trim().startsWith("connect-src "))
+        ?.trim()
+        .split(/\s+/)
+    : undefined;
+  expect(connectSources).not.toContain("https:");
   expect(headers["x-frame-options"]).toBe("DENY");
   expect(headers["x-content-type-options"]).toBe("nosniff");
   expect(headers["referrer-policy"]).toBe("strict-origin-when-cross-origin");
