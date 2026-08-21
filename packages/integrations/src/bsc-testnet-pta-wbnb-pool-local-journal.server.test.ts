@@ -80,16 +80,21 @@ try {
   $current = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
   $item = Get-Item -LiteralPath $path -Force
   if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'reparse' }
+  $existingAcl = Get-Acl -LiteralPath $item.FullName
+  $existingOwner = try {
+    ([System.Security.Principal.SecurityIdentifier]::new($existingAcl.Owner)).Value
+  } catch {
+    ([System.Security.Principal.NTAccount]::new($existingAcl.Owner)).Translate([System.Security.Principal.SecurityIdentifier]).Value
+  }
+  if ($existingOwner -ne $current.Value) { throw 'owner' }
   if ($item.PSIsContainer) {
     $inherit = [System.Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [System.Security.AccessControl.InheritanceFlags]::ObjectInherit
     $acl = [System.Security.AccessControl.DirectorySecurity]::new()
-    $acl.SetOwner($current)
     $acl.SetAccessRuleProtection($true, $false)
     [void]$acl.AddAccessRule([System.Security.AccessControl.FileSystemAccessRule]::new($current,[System.Security.AccessControl.FileSystemRights]::FullControl,$inherit,[System.Security.AccessControl.PropagationFlags]::None,[System.Security.AccessControl.AccessControlType]::Allow))
     [IO.Directory]::SetAccessControl($item.FullName, $acl)
   } else {
     $acl = [System.Security.AccessControl.FileSecurity]::new()
-    $acl.SetOwner($current)
     $acl.SetAccessRuleProtection($true, $false)
     [void]$acl.AddAccessRule([System.Security.AccessControl.FileSystemAccessRule]::new($current,[System.Security.AccessControl.FileSystemRights]::FullControl,[System.Security.AccessControl.AccessControlType]::Allow))
     [IO.File]::SetAccessControl($item.FullName, $acl)
@@ -1240,11 +1245,15 @@ describe("PTA/WBNB pool local append-only journal", () => {
     expect(SOURCE).toContain("GetFolderPath([Environment+SpecialFolder]::LocalApplicationData)");
     expect(SOURCE).toContain('"bsc-testnet-pta-wbnb-pool-v1"');
     expect(SOURCE).toContain('"bsc-testnet-pta-wbnb-pool-v2"');
+    expect(SOURCE).not.toContain(".SetOwner(");
     const validation = SOURCE.indexOf(
       "# All ancestors have been validated before the first ACL mutation."
     );
+    const ownerValidation = SOURCE.indexOf("$existingDirectoryOwner -ne $current.Value");
     const directoryAclWrite = SOURCE.indexOf("[IO.Directory]::SetAccessControl($cursor");
     expect(validation).toBeGreaterThan(0);
+    expect(ownerValidation).toBeGreaterThan(validation);
+    expect(directoryAclWrite).toBeGreaterThan(ownerValidation);
     expect(directoryAclWrite).toBeGreaterThan(validation);
     expect(SOURCE).toContain('await open(path, "wx", 0o600)');
     expect(SOURCE).toContain("await handle.sync()");

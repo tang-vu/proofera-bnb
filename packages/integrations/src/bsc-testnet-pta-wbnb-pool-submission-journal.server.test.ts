@@ -221,16 +221,21 @@ try {
   $current = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
   $item = Get-Item -LiteralPath $spec.path -Force
   if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'reparse' }
+  $existingAcl = Get-Acl -LiteralPath $item.FullName
+  $existingOwner = try {
+    ([System.Security.Principal.SecurityIdentifier]::new($existingAcl.Owner)).Value
+  } catch {
+    ([System.Security.Principal.NTAccount]::new($existingAcl.Owner)).Translate([System.Security.Principal.SecurityIdentifier]).Value
+  }
+  if ($existingOwner -ne $current.Value) { throw 'owner' }
   if ($item.PSIsContainer) {
     $inherit = [System.Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [System.Security.AccessControl.InheritanceFlags]::ObjectInherit
     $acl = [System.Security.AccessControl.DirectorySecurity]::new()
-    $acl.SetOwner($current)
     $acl.SetAccessRuleProtection($true, $false)
     [void]$acl.AddAccessRule([System.Security.AccessControl.FileSystemAccessRule]::new($current,[System.Security.AccessControl.FileSystemRights]::FullControl,$inherit,[System.Security.AccessControl.PropagationFlags]::None,[System.Security.AccessControl.AccessControlType]::Allow))
     [IO.Directory]::SetAccessControl($item.FullName, $acl)
   } else {
     $acl = [System.Security.AccessControl.FileSecurity]::new()
-    $acl.SetOwner($current)
     $acl.SetAccessRuleProtection($true, $false)
     [void]$acl.AddAccessRule([System.Security.AccessControl.FileSystemAccessRule]::new($current,[System.Security.AccessControl.FileSystemRights]::FullControl,[System.Security.AccessControl.AccessControlType]::Allow))
     [IO.File]::SetAccessControl($item.FullName, $acl)
@@ -583,6 +588,11 @@ describe("durable PTA/WBNB submission journal v3", () => {
     expect(SOURCE).toContain(
       'const SUBDIRECTORY = ["ProofEra", "operations", "bsc-testnet-pta-wbnb-pool-submission-v4"]'
     );
+    expect(SOURCE).not.toContain(".SetOwner(");
+    const ownerValidation = SOURCE.indexOf("$existingOwner -ne $current.Value");
+    const directoryAclWrite = SOURCE.indexOf("[IO.Directory]::SetAccessControl($cursor");
+    expect(ownerValidation).toBeGreaterThan(0);
+    expect(directoryAclWrite).toBeGreaterThan(ownerValidation);
     expect(SOURCE).toContain('const SIGNED_COMMIT_FILE = "01-signed-commit.v6.json"');
     expect(SOURCE).toContain('"bsc-testnet-pta-wbnb-pool-submission-v3"');
     expect(SOURCE).toContain('"01-signed-commit.v5.json"');

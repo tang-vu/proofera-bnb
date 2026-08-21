@@ -67,7 +67,7 @@ Visual: public `/proof` room plus one Passport evidence card.
 
 The LP endpoint also exposes `audit_altana_permission_bundle` for the preregistered security task.
 
-Current truth: four durable public analyzers and five exact Agent Card skills are live; ERC-8004 registrations are pending.
+Current truth: four durable public analyzers and five exact Agent Card skills are live. Finalized BSC-testnet ERC-8004 receipts bind Agent IDs `1825` through `1828`; marketplace eligibility, authority, execution, and performance remain unverified.
 
 ## Slide 6 — One bounded authority model
 

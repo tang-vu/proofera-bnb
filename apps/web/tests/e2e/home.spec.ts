@@ -127,9 +127,11 @@ test("primary call to action reaches a non-dead marketplace route", async ({ pag
   await expect(page.getByRole("heading", { name: "Define the mandate" })).toBeVisible();
   await expect(page.getByText("Recommendation withheld")).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Four analyzers. Zero invented agents." })
+    page.getByRole("heading", {
+      name: "Four registered analyzers. Zero invented performance."
+    })
   ).toBeVisible();
-  await expect(page.getByText("Local analyzer", { exact: true })).toHaveCount(4);
+  await expect(page.getByText("BSC testnet registered", { exact: true })).toHaveCount(4);
   await expect(page.getByText("Execution disabled", { exact: true })).toHaveCount(4);
 });
 
@@ -243,6 +245,7 @@ test("opens the judge proof room without promoting incomplete gates", async ({ p
   ).toBeVisible();
   await expect(page.getByText("No — gates remain open")).toBeVisible();
   await expect(page.locator("[data-gate-id]")).toHaveCount(7);
-  await expect(page.locator('[data-gate-state="verified"]')).toHaveCount(0);
-  await expect(page.getByText("ERC-8004 registration not evidenced")).toHaveCount(4);
+  await expect(page.locator('[data-gate-state="verified"]')).toHaveCount(1);
+  await expect(page.getByText(/BSC testnet ERC-8004 Agent ID/u)).toHaveCount(4);
+  await expect(page.getByText(/Execution disabled/u)).toHaveCount(4);
 });

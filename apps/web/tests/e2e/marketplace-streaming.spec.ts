@@ -17,7 +17,9 @@ test("the primary CTA reveals the intent and all analyzers independently of regi
   await expect(page.getByRole("heading", { name: "Start with the job." })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Define the mandate" })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Four analyzers. Zero invented agents." })
+    page.getByRole("heading", {
+      name: "Four registered analyzers. Zero invented performance."
+    })
   ).toBeVisible();
 
   for (const analyzer of expectedAnalyzers) {

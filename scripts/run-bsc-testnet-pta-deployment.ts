@@ -107,8 +107,14 @@ foreach ($segment in @('ProofEra', 'deployments', 'bsc-testnet-pta')) {
 }
 $item = Get-Item -LiteralPath $path -Force
 if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or $item.FullName -ne $expected) { exit 50 }
+$existingAcl = Get-Acl -LiteralPath $path
+$existingOwner = try {
+  ([System.Security.Principal.SecurityIdentifier]::new($existingAcl.Owner)).Value
+} catch {
+  ([System.Security.Principal.NTAccount]::new($existingAcl.Owner)).Translate([System.Security.Principal.SecurityIdentifier]).Value
+}
+if ($existingOwner -ne $current.Value) { exit 50 }
 $acl = [System.Security.AccessControl.DirectorySecurity]::new()
-$acl.SetOwner($current)
 $acl.SetAccessRuleProtection($true, $false)
 $rule = [System.Security.AccessControl.FileSystemAccessRule]::new(
   $current,

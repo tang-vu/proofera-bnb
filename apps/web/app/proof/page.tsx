@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import registrationEvidence from "../../../../evidence/submission/final/agent-registration.json";
 import readiness from "../../../../evidence/submission/readiness.json";
 import { publicBuildIdentifier } from "../../lib/runtime-readiness";
 
@@ -15,21 +16,25 @@ export const dynamic = "force-dynamic";
 
 const agents = [
   {
+    key: "lp-range",
     category: "LP range",
     endpoint: "https://proofera-lp.tangvu.dev",
     skills: ["analyze_lp_range", "audit_altana_permission_bundle"]
   },
   {
+    key: "grid-trading",
     category: "Grid trading",
     endpoint: "https://proofera-grid.tangvu.dev",
     skills: ["analyze_grid_trading"]
   },
   {
+    key: "yield-optimisation",
     category: "Yield optimisation",
     endpoint: "https://proofera-yield.tangvu.dev",
     skills: ["analyze_yield_opportunities"]
   },
   {
+    key: "health-factor",
     category: "Health factor",
     endpoint: "https://proofera-health.tangvu.dev",
     skills: ["analyze_venus_health_factor"]
@@ -98,29 +103,38 @@ export default function ProofRoomPage() {
         <div className="section-heading">
           <div>
             <span className="eyebrow">FOUR PUBLIC CAPABILITIES</span>
-            <h2 id="agents-heading">Live endpoints. Registration pending.</h2>
+            <h2 id="agents-heading">Live endpoints. BSC-testnet registration verified.</h2>
           </div>
           <p>
-            Each analyzer is deterministic and non-executing. Endpoint availability does not prove
-            ERC-8004 ownership, hiring, strategy performance, or transaction authority.
+            Each analyzer is deterministic and non-executing. Finalized ERC-8004 receipts prove
+            identity publication only; they do not prove hiring, strategy performance, or
+            transaction authority.
           </p>
         </div>
         <div className={styles.agentGrid}>
-          {agents.map((agent) => (
-            <article className={styles.agentCard} key={agent.category}>
-              <div className={styles.cardHeading}>
-                <h3>{agent.category}</h3>
-                <span className={styles.available}>Public</span>
-              </div>
-              <a href={`${agent.endpoint}/.well-known/agent-card.json`}>{agent.endpoint}</a>
-              <ul aria-label={`${agent.category} skills`}>
-                {agent.skills.map((skill) => (
-                  <li key={skill}>{skill}</li>
-                ))}
-              </ul>
-              <p>Execution disabled · ERC-8004 registration not evidenced</p>
-            </article>
-          ))}
+          {agents.map((agent) => {
+            const registration = registrationEvidence.agents.find(
+              (candidate) => candidate.key === agent.key
+            );
+            return (
+              <article className={styles.agentCard} key={agent.category}>
+                <div className={styles.cardHeading}>
+                  <h3>{agent.category}</h3>
+                  <span className={styles.available}>Public</span>
+                </div>
+                <a href={`${agent.endpoint}/.well-known/agent-card.json`}>{agent.endpoint}</a>
+                <ul aria-label={`${agent.category} skills`}>
+                  {agent.skills.map((skill) => (
+                    <li key={skill}>{skill}</li>
+                  ))}
+                </ul>
+                <p>
+                  BSC testnet ERC-8004 Agent ID {registration?.agentId ?? "unknown"} · Execution
+                  disabled
+                </p>
+              </article>
+            );
+          })}
         </div>
       </section>
 

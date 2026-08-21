@@ -3,7 +3,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 import { constants as fileConstants } from "node:fs";
 import { lstat, open, readdir, realpath } from "node:fs/promises";
-import { dirname, relative, resolve, sep, win32 } from "node:path";
+import { dirname, isAbsolute, relative, resolve, sep, win32 } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isProxy } from "node:util/types";
 
@@ -30,6 +30,14 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-submission-reconciler.server";
 
 const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
+
+function isOutsideRepository(candidate: string): boolean {
+  const relation = relative(REPOSITORY_ROOT, candidate);
+  return (
+    relation !== "" &&
+    (isAbsolute(relation) || relation === ".." || relation.startsWith(`..${sep}`))
+  );
+}
 const SUBDIRECTORY = ["ProofEra", "operations", "bsc-testnet-pta-wbnb-pool-submission-v4"] as const;
 const GENERATION_3_SUBDIRECTORY = [
   "ProofEra",
@@ -1286,9 +1294,15 @@ try {
     if ($child.PSIsContainer -or ($allowed -notcontains $child.Name) -or (($child.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) -or $child.LinkType) { throw 'child' }
   }
   $current = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
+  $existingAcl = Get-Acl -LiteralPath $cursor
+  $existingOwner = try {
+    ([System.Security.Principal.SecurityIdentifier]::new($existingAcl.Owner)).Value
+  } catch {
+    ([System.Security.Principal.NTAccount]::new($existingAcl.Owner)).Translate([System.Security.Principal.SecurityIdentifier]).Value
+  }
+  if ($existingOwner -ne $current.Value) { throw 'owner' }
   $inherit = [System.Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [System.Security.AccessControl.InheritanceFlags]::ObjectInherit
   $acl = [System.Security.AccessControl.DirectorySecurity]::new()
-  $acl.SetOwner($current)
   $acl.SetAccessRuleProtection($true, $false)
   [void]$acl.AddAccessRule([System.Security.AccessControl.FileSystemAccessRule]::new($current,[System.Security.AccessControl.FileSystemRights]::FullControl,$inherit,[System.Security.AccessControl.PropagationFlags]::None,[System.Security.AccessControl.AccessControlType]::Allow))
   [IO.Directory]::SetAccessControl($cursor, $acl)
@@ -1334,8 +1348,14 @@ try {
   $file = Get-Item -LiteralPath $spec.file -Force
   if (-not $directory.PSIsContainer -or $file.PSIsContainer -or (($directory.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) -or (($file.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) -or [IO.Path]::GetDirectoryName($file.FullName) -ne $directory.FullName) { throw 'path' }
   $current = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
+  $existingAcl = Get-Acl -LiteralPath $file.FullName
+  $existingOwner = try {
+    ([System.Security.Principal.SecurityIdentifier]::new($existingAcl.Owner)).Value
+  } catch {
+    ([System.Security.Principal.NTAccount]::new($existingAcl.Owner)).Translate([System.Security.Principal.SecurityIdentifier]).Value
+  }
+  if ($existingOwner -ne $current.Value) { throw 'owner' }
   $acl = [System.Security.AccessControl.FileSecurity]::new()
-  $acl.SetOwner($current)
   $acl.SetAccessRuleProtection($true, $false)
   [void]$acl.AddAccessRule([System.Security.AccessControl.FileSystemAccessRule]::new($current,[System.Security.AccessControl.FileSystemRights]::FullControl,[System.Security.AccessControl.AccessControlType]::Allow))
   [IO.File]::SetAccessControl($file.FullName, $acl)
@@ -2040,12 +2060,7 @@ export async function createWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournal
     throw new Error("PTA_WBNB_POOL_SUBMISSION_JOURNAL_TEST_DIRECTORY_INVALID");
   }
   const directory = resolve(untrustedDirectory);
-  const relation = relative(REPOSITORY_ROOT, directory);
-  if (
-    relation === "" ||
-    (!relation.startsWith(`..${sep}`) && relation !== "..") ||
-    !(await verifyPaths(directory, []))
-  ) {
+  if (!isOutsideRepository(directory) || !(await verifyPaths(directory, []))) {
     throw new Error("PTA_WBNB_POOL_SUBMISSION_JOURNAL_TEST_DIRECTORY_INVALID");
   }
   return durableJournalFacade(createWindowsAdapter(directory));
@@ -2066,8 +2081,7 @@ export async function openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJ
     return recoveryBlocked();
   }
   const directory = resolve(untrustedDirectory);
-  const relation = relative(REPOSITORY_ROOT, directory);
-  if (relation === "" || (!relation.startsWith(`..${sep}`) && relation !== "..")) {
+  if (!isOutsideRepository(directory)) {
     return recoveryBlocked();
   }
   return openExistingAtDirectory(directory);
@@ -2088,8 +2102,7 @@ export async function probeWindowsBscTestnetPtaWbnbPoolPredecessorSubmissionJour
     return predecessorProbeBlocked();
   }
   const directory = resolve(untrustedDirectory);
-  const relation = relative(REPOSITORY_ROOT, directory);
-  if (relation === "" || (!relation.startsWith(`..${sep}`) && relation !== "..")) {
+  if (!isOutsideRepository(directory)) {
     return predecessorProbeBlocked();
   }
   return probePredecessorAtDirectory(directory);
@@ -2110,8 +2123,7 @@ export async function probeWindowsBscTestnetPtaWbnbPoolGeneration3SubmissionJour
     return generation3ProbeBlocked();
   }
   const directory = resolve(untrustedDirectory);
-  const relation = relative(REPOSITORY_ROOT, directory);
-  if (relation === "" || (!relation.startsWith(`..${sep}`) && relation !== "..")) {
+  if (!isOutsideRepository(directory)) {
     return generation3ProbeBlocked();
   }
   return probeGeneration3AtDirectory(directory);
@@ -2133,8 +2145,7 @@ export async function openExistingWindowsBscTestnetPtaWbnbPoolSubmissionJournalF
     return terminalRecoveryBlocked();
   }
   const directory = resolve(untrustedDirectory);
-  const relation = relative(REPOSITORY_ROOT, directory);
-  if (relation === "" || (!relation.startsWith(`..${sep}`) && relation !== "..")) {
+  if (!isOutsideRepository(directory)) {
     return terminalRecoveryBlocked();
   }
   return openTerminalRecoveryAtDirectory(directory, expectedState);

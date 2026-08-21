@@ -391,19 +391,21 @@ export default async function MarketplacePage({ searchParams }: MarketplacePageP
         <div className="section-heading">
           <div>
             <span className="eyebrow">02 · FIRST-PARTY DEVELOPMENT COVERAGE</span>
-            <h2 id="reference-coverage-heading">Four analyzers. Zero invented agents.</h2>
+            <h2 id="reference-coverage-heading">
+              Four registered analyzers. Zero invented performance.
+            </h2>
           </div>
           <p>
             These repository-backed analyzers define the evidence contract for every required
-            category. They are not live BSC identities, recommendations, performance records, or
-            hireable agents.
+            category and have finalized BSC-testnet identities. Registration alone does not make
+            them recommendations, performance records, marketplace-eligible, or hireable.
           </p>
         </div>
         <div className="category-grid">
           {referenceAgentCoverage.map((reference) => (
             <article className="category-card" key={reference.category}>
               <div className="agent-card-topline">
-                <span className="state-badge state-unknown">Local analyzer</span>
+                <span className="state-badge state-available">BSC testnet registered</span>
                 <span className="state-badge state-caution">Execution disabled</span>
               </div>
               <p className="mono-kicker">{reference.skill}</p>
@@ -417,8 +419,8 @@ export default async function MarketplacePage({ searchParams }: MarketplacePageP
               <p className="registry-footnote">
                 <strong>Method:</strong> {reference.methodologyVersion}
                 <br />
-                <strong>Registration:</strong> absent · <strong>marketplace eligibility:</strong>{" "}
-                false
+                <strong>Registration:</strong> finalized on BSC testnet ·{" "}
+                <strong>marketplace eligibility:</strong> false
               </p>
               <Link className="text-link" href={`/reference-analyzers/${reference.category}`}>
                 Open {reference.name} dossier

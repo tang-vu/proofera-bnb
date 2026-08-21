@@ -28,14 +28,16 @@ describe("Proof room", () => {
       expect(html).toContain(skill);
     }
     expect(html).toContain("No — gates remain open");
-    expect(html).toContain("ERC-8004 registration not evidenced");
+    expect(html).toContain("BSC-testnet registration verified");
+    for (const agentId of ["1825", "1826", "1827", "1828"]) {
+      expect(html).toContain(`Agent ID ${agentId}`);
+    }
   });
 
   it("does not render successful receipt or submission claims from the incomplete ledger", () => {
     const html = renderToStaticMarkup(<ProofRoomPage />);
 
     expect(html).not.toContain('Submission-ready</dt><dd class="verified');
-    expect(html).not.toContain("Registration verified");
     expect(html).not.toContain("Execution verified");
     expect(html).not.toContain("TermiX advantage verified");
   });

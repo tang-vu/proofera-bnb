@@ -3,7 +3,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 import { constants as fileConstants } from "node:fs";
 import { lstat, open, readdir, realpath } from "node:fs/promises";
-import { dirname, relative, resolve, sep, win32 } from "node:path";
+import { dirname, isAbsolute, relative, resolve, sep, win32 } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isProxy } from "node:util/types";
 
@@ -46,6 +46,14 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 
 const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
+
+function isOutsideRepository(candidate: string): boolean {
+  const relation = relative(REPOSITORY_ROOT, candidate);
+  return (
+    relation !== "" &&
+    (isAbsolute(relation) || relation === ".." || relation.startsWith(`..${sep}`))
+  );
+}
 const LEGACY_JOURNAL_SUBDIRECTORY = [
   "ProofEra",
   "operations",
@@ -2724,9 +2732,15 @@ try {
   }
 
   $current = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
+  $existingDirectoryAcl = Get-Acl -LiteralPath $cursor
+  $existingDirectoryOwner = try {
+    ([System.Security.Principal.SecurityIdentifier]::new($existingDirectoryAcl.Owner)).Value
+  } catch {
+    ([System.Security.Principal.NTAccount]::new($existingDirectoryAcl.Owner)).Translate([System.Security.Principal.SecurityIdentifier]).Value
+  }
+  if ($existingDirectoryOwner -ne $current.Value) { throw 'pre-owner' }
   $inherit = [System.Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [System.Security.AccessControl.InheritanceFlags]::ObjectInherit
   $directoryAcl = [System.Security.AccessControl.DirectorySecurity]::new()
-  $directoryAcl.SetOwner($current)
   $directoryAcl.SetAccessRuleProtection($true, $false)
   $directoryRule = [System.Security.AccessControl.FileSystemAccessRule]::new(
     $current,
@@ -2773,8 +2787,14 @@ try {
   $current = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
   $directoryAcl = Get-Acl -LiteralPath $directory.FullName
   if (-not $directoryAcl.AreAccessRulesProtected) { throw 'directory-inheritance' }
+  $existingFileAcl = Get-Acl -LiteralPath $file.FullName
+  $existingFileOwner = try {
+    ([System.Security.Principal.SecurityIdentifier]::new($existingFileAcl.Owner)).Value
+  } catch {
+    ([System.Security.Principal.NTAccount]::new($existingFileAcl.Owner)).Translate([System.Security.Principal.SecurityIdentifier]).Value
+  }
+  if ($existingFileOwner -ne $current.Value) { throw 'file-owner' }
   $fileAcl = [System.Security.AccessControl.FileSecurity]::new()
-  $fileAcl.SetOwner($current)
   $fileAcl.SetAccessRuleProtection($true, $false)
   $rule = [System.Security.AccessControl.FileSystemAccessRule]::new(
     $current,
@@ -3442,8 +3462,7 @@ export async function openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalAtSynt
     return recoveryBlocked();
   }
   const directory = resolve(untrustedDirectory);
-  const relation = relative(REPOSITORY_ROOT, directory);
-  if (relation === "" || (!relation.startsWith(`..${sep}`) && relation !== "..")) {
+  if (!isOutsideRepository(directory)) {
     return recoveryBlocked();
   }
   const opened = await openExistingLocalAtDirectory(directory, 1);
@@ -3467,8 +3486,7 @@ export async function openExistingWindowsBscTestnetPtaWbnbPoolActiveLocalJournal
     return recoveryBlocked();
   }
   const directory = resolve(untrustedDirectory);
-  const relation = relative(REPOSITORY_ROOT, directory);
-  if (relation === "" || (!relation.startsWith(`..${sep}`) && relation !== "..")) {
+  if (!isOutsideRepository(directory)) {
     return recoveryBlocked();
   }
   const opened = await openExistingLocalAtDirectory(

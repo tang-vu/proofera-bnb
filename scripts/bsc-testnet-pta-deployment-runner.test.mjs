@@ -86,6 +86,10 @@ test("isolated worker rejects caller-selected custody and journal paths", () => 
 
 test("runner source keeps exact one-shot, child isolation, journal-before-broadcast boundaries", () => {
   const source = readFileSync(ENTRY, "utf8");
+  assert.equal(source.includes(".SetOwner("), false);
+  const existingOwnerCheck = source.indexOf("$existingOwner -ne $current.Value");
+  const journalAclWrite = source.indexOf("[IO.Directory]::SetAccessControl($path");
+  assert.ok(existingOwnerCheck >= 0 && journalAclWrite > existingOwnerCheck);
   for (const required of [
     'const EXACT_EXECUTION_FLAG = "--execute-exact-pta-chain-97"',
     "createBscTestnetPtaOneShotSignerCore",

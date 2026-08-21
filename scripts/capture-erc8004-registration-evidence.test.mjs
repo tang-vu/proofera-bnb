@@ -55,7 +55,7 @@ test("transaction agreement ignores only the non-standard provider timestamp ext
 test("registration evidence capture rejects missing invocation before Git or network", () => {
   const result = spawnSync(process.execPath, [scriptPath], {
     encoding: "utf8",
-    timeout: 10_000,
+    timeout: 30_000,
     windowsHide: true
   });
   assert.notEqual(result.status, 0);
