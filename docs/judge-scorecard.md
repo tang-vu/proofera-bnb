@@ -1,6 +1,6 @@
 # ProofEra judge scorecard
 
-Updated: 2026-08-17. This is an internal pre-submission control sheet derived from the official Smart Money Era page review recorded in [`research.md`](./research.md). It is not a judging result, partner endorsement, or submission receipt. Every “current proof” item must remain independently inspectable; every open item blocks the corresponding claim.
+Updated: 2026-08-22. This is an internal pre-submission control sheet derived from the official Smart Money Era page review recorded in [`research.md`](./research.md). It is not a judging result, partner endorsement, or submission receipt. Every “current proof” item must remain independently inspectable; every open item blocks the corresponding claim.
 
 ## Top-1 thesis
 
@@ -18,7 +18,7 @@ The differentiator is not agent count. It is the evidence and authority layer be
 | Decision-useful live data          | Typed ERC-8004/8004scan ingestion; exact-block Pancake and Venus readers; explicit unavailable/stale/null states                                                                                | Freeze current data timestamps and receipt-linked outcome/cost evidence for the judged action                               | 0:35–1:25 and 2:30–3:30 |
 | Four first-class categories        | LP, grid, yield, and health each have a public analyzer, category contract, dossier, configuration surface, exact Agent Card skill, and finalized BSC-testnet ERC-8004 identity (`1825`–`1828`) | Keep all four public through judging and show equal discovery depth without implying equal execution history                | 4:35–5:00               |
 | Usability without Studio knowledge | Goal-first landing, plain-language mandate forms, permission ownership labels, failure-safe copy                                                                                                | Clean-room run with a new viewer; retain mobile/keyboard evidence for the frozen release                                    | Throughout              |
-| Trust and safety                   | Missing evidence lowers confidence; write targets/selectors/caps/expiry are explicit; unknown outcomes are not retried; revoke requires negative authority proof                                | Complete one real Altana grant/execute/revoke lifecycle and negative post-revoke attempt                                    | 1:25–4:05               |
+| Trust and safety                   | Bounded v2 grant/execute/revoke receipts, exact PTA zero Approval and finalized negative-authority evidence are retained with single-archive historical limits explicit                         | Wire the bounded evidence into the final product journey; do not present it as a Pancake/economic effect                    | 1:25–4:05               |
 | Production credibility             | Durable custom-domain deployment, PM2 supervision, exact-build public probe, proof room, six-scene rehearsal                                                                                    | Freeze final release, retain independent public probe/uptime record and rollback exercise                                   | Before recording        |
 
 ## Partner-track score control
@@ -27,15 +27,15 @@ The differentiator is not agent count. It is the evidence and authority layer be
 
 Eligibility story: an agent uses its own Altana session identity; calls, spend, and expiry are real; Keystore registration and session transactions are explorer-verifiable; inspection and revoke live in the product.
 
-| Required evidence                        | Current state                                                                      | Closure artifact                                                              |
-| ---------------------------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Agent-controlled scoped session identity | Public-descriptor and signer-handoff implementation tested; no live signer/session | Account/key explorer links plus authority probe                               |
-| Real call allowlist, spend cap, expiry   | Exact SDK 0.7.0 policy and attestation boundaries implemented                      | Decoded grant receipt joined to exact policy                                  |
-| Keystore registration                    | Two-provider readiness capture proves contracts/config only                        | Registered key record and fee-bearing receipt                                 |
-| Real session transaction                 | Execute lifecycle and reconciliation code tested                                   | Altana `callsId`, BscScan receipt, decoded action                             |
-| In-product inspection and revoke         | Honest empty Mission Control and revoke truth rule are public                      | Revoke receipt plus exact absent-authority probe and denied follow-up attempt |
+| Required evidence                        | Current state                                                                         | Closure artifact                                                         |
+| ---------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Agent-controlled scoped session identity | V2 session authority was present for execute and is now absent                        | Lifecycle artifact plus public account/key observations                  |
+| Real call allowlist, spend cap, expiry   | Static policy joins exact expiry and PTA zero Approval; exact intent not precommitted | Ceremony source, onchain expiry, grant and execute receipt               |
+| Keystore registration                    | Grant receipt and PublicNode historical KeyStore/account reads retained               | Single-archive historical authority; two-provider claim explicitly false |
+| Real session transaction                 | Calls ID joins successful PTA zero-Approval receipt                                   | `0xc09b…dfcb` plus transaction `0xad65…268e`                             |
+| In-product inspection and revoke         | Revoke receipt plus finalized two-provider authority absence retained                 | `0x71f2…a1db`, transaction `0x72e7…ceb7`, finalized block `126543819`    |
 
-No Altana partner claim is final until all five rows have the linked evidence.
+The five bounded lifecycle rows now have linked evidence. This closes only the testnet lifecycle gate: the session signature is not directly decoded, historical authority has one archive provider, and the action proves no Pancake/economic effect.
 
 ### PancakeSwap
 

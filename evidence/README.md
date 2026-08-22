@@ -4,6 +4,8 @@ This directory holds reproducible, non-secret evidence for judged claims. It mus
 
 `altana/preparations/125493138-bsc-testnet-readiness.json` is a read-only, two-provider checkpoint of the exact Altana SDK 0.7.0 BSC-testnet network surface. It retains relay capabilities, runtime hashes, registration fee, SDK file hashes and raw public transcripts. Its own classification denies wallet/signer creation, grants, execution, revocation and receipts.
 
+`altana/lifecycles/126543819-72e7cf94-altana-lifecycle.json` is the retained bounded v2 chain-97 lifecycle, SHA-256 `e001d4f9eb8e87d95408206e72c937c1ff8cd68d9885898a4d02aabdfe661b19`. It joins successful grant, execute, and revoke receipts; execute/revoke relay calls IDs; the exact PTA `Approval(wallet, session, 0)` event; PublicNode canonical authority presence/expiry at grant and execute plus absence at revoke; and two-provider absence at a later finalized checkpoint. The exact expiry-bearing intent was reconstructed after the ceremony from the unchanged static policy plus onchain expiry and was not separately precommitted. The fixed BNB Chain public node had pruned historical state, so two-provider historical authority is false. The zero Approval is not a nonzero state transition, economic benefit, PancakeSwap/LP action, or performance result. A byte-identical copy under `submission/final/altana-lifecycle.json` closes only the submission ledger's Altana lifecycle gate.
+
 Each evidence run will use a manifest containing:
 
 - stable run ID and task definition;

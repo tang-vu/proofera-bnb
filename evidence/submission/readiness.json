@@ -1,6 +1,6 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-21T10:26:54.469Z",
+  "updatedAtUtc": "2026-08-22T09:34:27.032Z",
   "readyForSubmission": false,
   "gates": [
     {
@@ -38,16 +38,29 @@
     },
     {
       "gateId": "altana-lifecycle",
-      "state": "prepared_only",
-      "claim": "The Altana SDK and BSC-testnet contract surface were read-only prepared; no grant, execution, revoke or negative-authority receipt exists.",
-      "blockers": [
-        "Complete and re-observe one bounded grant, execution and revoke lifecycle with explorer-verifiable receipts."
-      ],
+      "state": "verified",
+      "claim": "The bounded chain-97 v2 lifecycle has successful grant, execute and revoke receipts, relay joins, an exact PTA zero-Approval event, canonical historical authority observations and two-provider final authority absence. Historical authority is single-provider, the exact expiry-bearing intent was not precommitted, and no economic or Pancake effect is claimed.",
+      "blockers": [],
       "artifacts": [
         {
-          "kind": "preparation",
-          "path": "evidence/altana/preparations/125493138-bsc-testnet-readiness.json",
-          "sha256": "959e1b6fc66da8e65d1ff7c610c2e6b147ad99852bb1948a1c4ca61707fc1c98"
+          "kind": "grant_receipt",
+          "path": "evidence/submission/final/altana-lifecycle.json",
+          "sha256": "e001d4f9eb8e87d95408206e72c937c1ff8cd68d9885898a4d02aabdfe661b19"
+        },
+        {
+          "kind": "execute_receipt",
+          "path": "evidence/submission/final/altana-lifecycle.json",
+          "sha256": "e001d4f9eb8e87d95408206e72c937c1ff8cd68d9885898a4d02aabdfe661b19"
+        },
+        {
+          "kind": "revoke_receipt",
+          "path": "evidence/submission/final/altana-lifecycle.json",
+          "sha256": "e001d4f9eb8e87d95408206e72c937c1ff8cd68d9885898a4d02aabdfe661b19"
+        },
+        {
+          "kind": "negative_authority_probe",
+          "path": "evidence/submission/final/altana-lifecycle.json",
+          "sha256": "e001d4f9eb8e87d95408206e72c937c1ff8cd68d9885898a4d02aabdfe661b19"
         }
       ]
     },

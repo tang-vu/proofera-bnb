@@ -156,15 +156,17 @@ test("bounded v2 policy derives the exact public grant intent", async () => {
 });
 
 test("retained v2 lifecycle binds real receipts and explicit evidence limits", async () => {
-  const [lifecycleBytes, finalBytes] = await Promise.all([
+  const [lifecycleBytes, finalBytes, prettierIgnore] = await Promise.all([
     readFile(
       new URL(
         "../evidence/altana/lifecycles/126543819-72e7cf94-altana-lifecycle.json",
         import.meta.url
       )
     ),
-    readFile(new URL("../evidence/submission/final/altana-lifecycle.json", import.meta.url))
+    readFile(new URL("../evidence/submission/final/altana-lifecycle.json", import.meta.url)),
+    readFile(new URL("../.prettierignore", import.meta.url), "utf8")
   ]);
+  assert.match(prettierIgnore, /^evidence\/submission\/final\/\*\.json$/mu);
   assert.deepEqual(finalBytes, lifecycleBytes);
   assert.equal(
     createHash("sha256").update(lifecycleBytes).digest("hex"),

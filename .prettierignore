@@ -20,6 +20,8 @@ evidence/erc8004/preparations/*.json
 evidence/erc8004/registrations/*.json
 # Byte-exact JSON.stringify outputs from the fixed Altana lifecycle collector.
 evidence/altana/lifecycles/*.json
+# Byte-exact copies promoted into the fail-closed final-evidence ledger.
+evidence/submission/final/*.json
 # Byte-exact manifests from the public demo rehearsal collector.
 evidence/submission/rehearsals/*/manifest.json
 # Byte-exact manifests from the final/rehearsal demo video collector.

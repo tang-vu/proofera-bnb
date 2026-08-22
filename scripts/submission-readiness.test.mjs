@@ -28,7 +28,7 @@ test("submission readiness records all seven objective gates without claiming co
     [
       ["production-release", "deployed_unfrozen"],
       ["agent-registration", "verified"],
-      ["altana-lifecycle", "prepared_only"],
+      ["altana-lifecycle", "verified"],
       ["pancake-benefit", "read_only_only"],
       ["termix-pairs", "preregistered_only"],
       ["demo", "not_recorded"],
@@ -36,7 +36,10 @@ test("submission readiness records all seven objective gates without claiming co
     ]
   );
   assert.equal(readiness.gates[1].blockers.length, 0);
-  assert.ok(readiness.gates.every(({ blockers }, index) => index === 1 || blockers.length > 0));
+  assert.equal(readiness.gates[2].blockers.length, 0);
+  assert.ok(
+    readiness.gates.every(({ blockers }, index) => [1, 2].includes(index) || blockers.length > 0)
+  );
   await verifySubmissionArtifacts(readiness, repositoryRoot);
 });
 
