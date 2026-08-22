@@ -8,13 +8,14 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const CHAIN_ID = 97;
 const WORKER_SCHEMA_VERSION = 1;
-const WORKER_DIRECTORY_NAME = "altana-test-action-v1";
+const NATIVE_SPEND_LIMIT_WEI = 500_000_000_000_000n;
+const WORKER_DIRECTORY_NAME = "altana-test-action-v2";
 const CONFIG_PATH = resolve(
   dirname(fileURLToPath(import.meta.url)),
   "..",
   "deploy",
   "windows",
-  "altana-test-action.v1.json"
+  "altana-test-action.v2.json"
 );
 const POLL_INTERVAL_MS = 5_000;
 const RPC_TIMEOUT_MS = 20_000;
@@ -103,7 +104,7 @@ $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Security
 $raw = [Console]::In.ReadToEnd().Trim()
 $clear = [Convert]::FromBase64String($raw)
-$entropy = [Text.Encoding]::UTF8.GetBytes('ProofEra Altana test action signer v1')
+$entropy = [Text.Encoding]::UTF8.GetBytes('ProofEra Altana test action signer v2')
 try {
   $protected = [System.Security.Cryptography.ProtectedData]::Protect(
     $clear,
@@ -121,7 +122,7 @@ $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Security
 $raw = [Console]::In.ReadToEnd().Trim()
 $protected = [Convert]::FromBase64String($raw)
-$entropy = [Text.Encoding]::UTF8.GetBytes('ProofEra Altana test action signer v1')
+$entropy = [Text.Encoding]::UTF8.GetBytes('ProofEra Altana test action signer v2')
 try {
   $clear = [System.Security.Cryptography.ProtectedData]::Unprotect(
     $protected,
@@ -291,7 +292,11 @@ export function validateAltanaTestActionConfig(input) {
     ["limit", "period", "token"],
     "ALTANA_TEST_ACTION_PERMISSIONS_INVALID"
   );
-  if (spend.token !== null || spend.period !== "day" || decimal(spend.limit) !== 1n) {
+  if (
+    spend.token !== null ||
+    spend.period !== "day" ||
+    decimal(spend.limit) !== NATIVE_SPEND_LIMIT_WEI
+  ) {
     fail("ALTANA_TEST_ACTION_PERMISSIONS_INVALID");
   }
   if (

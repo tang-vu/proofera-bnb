@@ -18,7 +18,7 @@ import {
   type StoredPasskeyWallet
 } from "./altana-passkey-ceremony";
 
-const OPERATION_STORAGE_KEY = "proofera.altana.test-action.v1";
+const OPERATION_STORAGE_KEY = "proofera.altana.test-action.v2";
 const OPERATION_EVENT = "proofera-altana-test-action-change";
 const RELAY_ORIGIN = "https://testnet-relay.altana.network";
 
@@ -555,7 +555,10 @@ export function AltanaSessionCeremony({
         <span>Quyền chính xác</span>
         <code>chain 97 · PTA approve(address,uint256) · amount 0 · value 0</code>
         <code>target {config.action.target}</code>
-        <code>session {config.sessionKey.address} · expiry 1 giờ · native cap 1 wei/ngày</code>
+        <code>
+          session {config.sessionKey.address} · expiry 1 giờ · native fee cap{" "}
+          {config.permissions.spend[0].limit} wei/ngày (0.0005 tBNB)
+        </code>
       </div>
 
       <p aria-live="polite" role="status">

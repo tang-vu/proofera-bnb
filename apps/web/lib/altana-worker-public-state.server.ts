@@ -25,7 +25,7 @@ export async function readAltanaWorkerPublicState(
     return { availability: "unavailable", reason: "runtime_not_configured" };
   }
   const base = resolve(localAppData);
-  const directory = resolve(base, "ProofEra", "altana-test-action-v1");
+  const directory = resolve(base, "ProofEra", "altana-test-action-v2");
   if (!directory.startsWith(`${base}${sep}`)) {
     return { availability: "unavailable", reason: "runtime_not_configured" };
   }

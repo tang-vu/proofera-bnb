@@ -13,7 +13,7 @@ const state = {
   chainId: 97,
   configHash: `0x${"11".repeat(32)}`,
   walletAddress: "0x91Aa0E6627bFF6C911B38CEd5F7885E063b7C27a",
-  sessionKeyAddress: "0xb5F0658E3bc0c3495729b87DE32f568Bdc995a11",
+  sessionKeyAddress: "0x1b1B210b4C71481831963C3c03Ad0888c5Ec15e2",
   status: "waiting_authority",
   authorityPresent: false,
   balanceWei: "0",
@@ -24,7 +24,7 @@ const state = {
 
 async function fixture() {
   const root = await mkdtemp(join(tmpdir(), "proofera-altana-public-"));
-  const directory = join(root, "ProofEra", "altana-test-action-v1");
+  const directory = join(root, "ProofEra", "altana-test-action-v2");
   await mkdir(directory, { recursive: true });
   return { root, directory, path: join(directory, "public-state.json") };
 }

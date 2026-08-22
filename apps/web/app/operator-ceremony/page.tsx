@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { altanaTestActionConfigSchema } from "@proofera/integrations";
 
-import altanaTestActionConfig from "../../../../deploy/windows/altana-test-action.v1.json";
+import altanaTestActionConfig from "../../../../deploy/windows/altana-test-action.v2.json";
 
 import { readPasskeyRuntimeConfig } from "../../lib/runtime-config";
 import { CeremonyConsole } from "./ceremony-console";

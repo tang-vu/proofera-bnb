@@ -111,12 +111,12 @@ This is a real host-local staging deployment, not production activation evidence
 
 The operator ceremony has one local-only chain-97 worker for lifecycle evidence. It is deliberately narrower than the production LP activation composition:
 
-- tracked public configuration: `deploy/windows/altana-test-action.v1.json`;
+- tracked public configuration: `deploy/windows/altana-test-action.v2.json`;
 - pinned admin wallet: `0x91Aa0E6627bFF6C911B38CEd5F7885E063b7C27a`;
-- pinned worker address: `0xb5F0658E3bc0c3495729b87DE32f568Bdc995a11`;
+- pinned worker address: `0x1b1B210b4C71481831963C3c03Ad0888c5Ec15e2`;
 - target/call: non-economic PTA `0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc`, `approve(address,uint256)`, spender equal to the worker, amount `0`, native value `0`;
-- grant: chain `97`, one-hour lifetime, one-wei native daily spend cap, KeyStore registration enabled;
-- custody/state directory: `%LOCALAPPDATA%\ProofEra\altana-test-action-v1`, protected current-user ACL, DPAPI CurrentUser signer blob, create-only claim/submission/receipt files, and a strict secret-free `public-state.json` projection.
+- grant: chain `97`, one-hour lifetime, `500000000000000 wei` (`0.0005 tBNB`) daily native relay-fee/spend cap, KeyStore registration enabled;
+- custody/state directory: `%LOCALAPPDATA%\ProofEra\altana-test-action-v2`, protected current-user ACL, DPAPI CurrentUser signer blob, create-only claim/submission/receipt files, and a strict secret-free `public-state.json` projection.
 
 Provision once with `pnpm provision:altana:test-action`. The command never prints the private key; on an existing complete boundary it returns only the retained public descriptor and refuses a partial secret/descriptor pair. The tracked config must be updated and reviewed to match that descriptor before starting the worker. The current host is already provisioned for the tracked descriptor; do not provision a replacement while its config or journals are active.
 
@@ -124,7 +124,9 @@ The PM2 topology starts `proofera-altana-test-action-worker` with `--run`. It op
 
 The Next.js route `/api/operator-ceremony/altana-state` exposes only the strict public projection. The browser keeps the admin passkey device-bound, creates its grant-submitting fence before SDK invocation, and requires a separate Windows Hello ceremony for revoke. Browser local storage is not a production durable replay ledger; this operator path does not replace the canonical PostgreSQL grant-claim/activation composition.
 
-The first live attempt funded the wallet and produced successful finalized grant transaction `0xcdd3f4b4da56af34ca636e067fb0e26aae8bf6ce209b0691dde8d5e7b331071e`; a 2026-08-22 recovery read saw the same block, successful receipt and finality on both fixed RPCs. This operational recovery observation is not the complete lifecycle artifact described in the lifecycle runbook. The worker then retained the one-shot execute calls ID `0x0ea636cf51453205913e4b941cd4c01972754e2f0ffef4ef3ff88c6110331975`. Relay status `300` has no transaction hash or receipt and is classified as terminal failure by viem's EIP-5792 status categories; the prior worker incorrectly polled it as pending because SDK 0.7.0 handles only explicit `500`/`FAILED`. The immutable claim is not retried. The one-hour key expired and the current dual-RPC public projection reports no active authority. No execute/revoke receipt or completed lifecycle exists. Never delete these local journals merely to start again; a fresh reviewed attempt needs a new versioned signer/custody namespace and a resolved relay failure cause.
+The first live attempt funded the wallet and produced successful finalized grant transaction `0xcdd3f4b4da56af34ca636e067fb0e26aae8bf6ce209b0691dde8d5e7b331071e`; a 2026-08-22 recovery read saw the same block, successful receipt and finality on both fixed RPCs. This operational recovery observation is not the complete lifecycle artifact described in the lifecycle runbook. The v1 worker then retained the one-shot execute calls ID `0x0ea636cf51453205913e4b941cd4c01972754e2f0ffef4ef3ff88c6110331975`. Relay status `300` has no transaction hash or receipt and is classified as terminal failure by viem's EIP-5792 status categories; the prior worker incorrectly polled it as pending because SDK 0.7.0 handles only explicit `500`/`FAILED`. The immutable v1 claim is not retried. The one-hour key expired and the dual-RPC public projection reported no active authority. No v1 execute/revoke receipt or completed lifecycle exists.
+
+The v1 policy also exposed a concrete incompatibility: Porto 0.2.37 adds the relay orchestrator payment path to a session-signed bundle, while v1 authorized only `1 wei` of native spend. Relay status `300` did not return a reason, so this is not claimed as a proven historical root cause. Version 2 removes the known incompatibility with a fresh DPAPI signer/custody namespace and a `500000000000000 wei` daily cap; the action call remains value/amount zero and one-shot. The cap is above the v1 grant history's observed `182461240000000 wei` payment maximum, but that observation does not predict or prove v2 execution. Preserve `%LOCALAPPDATA%\ProofEra\altana-test-action-v1` and its journals unchanged.
 
 After a completed revoke, the KeyStore revocation is monotonic and this signer/config is consumed. Preserve the public files for evidence collection and provision a new versioned signer/config for any later run; never delete journals to manufacture a retry.
 

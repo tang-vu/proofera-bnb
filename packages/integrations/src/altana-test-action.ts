@@ -14,6 +14,7 @@ export const ALTANA_TEST_ACTION_TARGET =
 export const ALTANA_TEST_ACTION_SIGNATURE = "approve(address,uint256)" as const;
 export const ALTANA_TEST_ACTION_AMOUNT = 0n;
 export const ALTANA_TEST_ACTION_VALUE = 0n;
+export const ALTANA_TEST_ACTION_NATIVE_SPEND_LIMIT = 500_000_000_000_000n;
 
 const addressSchema = z
   .string()
@@ -59,7 +60,7 @@ export const altanaTestActionConfigSchema = z
       spend: z.tuple([
         z.strictObject({
           token: z.null(),
-          limit: z.literal("1"),
+          limit: z.literal(ALTANA_TEST_ACTION_NATIVE_SPEND_LIMIT.toString()),
           period: z.literal("day")
         })
       ])
@@ -183,7 +184,7 @@ export function createAltanaTestActionGrantIntent(
     sessionKey: createSessionPublicGrantDescriptor(config.sessionKey.publicKey),
     permissions: {
       calls: config.permissions.calls,
-      spend: [{ token: null, limit: 1n, period: "day" }]
+      spend: [{ token: null, limit: ALTANA_TEST_ACTION_NATIVE_SPEND_LIMIT, period: "day" }]
     },
     expiry: nowSeconds + config.sessionLifetimeSeconds,
     registerInKeystore: true

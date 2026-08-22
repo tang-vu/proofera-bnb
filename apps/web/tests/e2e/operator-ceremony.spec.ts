@@ -51,7 +51,7 @@ test("enables the bounded grant only for the pinned funded passkey wallet", asyn
           chainId: 97,
           configHash: `0x${"11".repeat(32)}`,
           walletAddress: "0x91Aa0E6627bFF6C911B38CEd5F7885E063b7C27a",
-          sessionKeyAddress: "0xb5F0658E3bc0c3495729b87DE32f568Bdc995a11",
+          sessionKeyAddress: "0x1b1B210b4C71481831963C3c03Ad0888c5Ec15e2",
           status: "waiting_authority",
           authorityPresent: false,
           balanceWei: "5000000000000000",
@@ -97,7 +97,7 @@ test("offers immediate revoke while an authorized execute is still pending", asy
           chainId: 97,
           configHash: `0x${"11".repeat(32)}`,
           walletAddress: "0x91Aa0E6627bFF6C911B38CEd5F7885E063b7C27a",
-          sessionKeyAddress: "0xb5F0658E3bc0c3495729b87DE32f568Bdc995a11",
+          sessionKeyAddress: "0x1b1B210b4C71481831963C3c03Ad0888c5Ec15e2",
           status: "execute_pending",
           authorityPresent: true,
           balanceWei: "98390568466905952",
@@ -111,7 +111,7 @@ test("offers immediate revoke while an authorized execute is still pending", asy
   await page.addInitScript(() => {
     const walletAddress = "0x91Aa0E6627bFF6C911B38CEd5F7885E063b7C27a";
     const sessionPublicKey =
-      "0x0481b28f8d35bf3c63575e01886128f5d7f6c0ef323af114d3d759ccdafd88e18527cffed5aa7d44edd7580d71f0ae1b0681e5469522fdc1ce9191b5e94a8fd67d";
+      "0x046c75b2bbc6232caaa2f532c06f7ae753e4422fb9bb3163bb6a4b66e1c1f2fdf7ba1889cf23600b453edc39ea4d195afc196fb47b565c3aad515c55b399429756";
     window.localStorage.setItem(
       "proofera.altana.passkey-wallet.v1",
       JSON.stringify({
@@ -127,7 +127,7 @@ test("offers immediate revoke while an authorized execute is still pending", asy
       })
     );
     window.localStorage.setItem(
-      "proofera.altana.test-action.v1",
+      "proofera.altana.test-action.v2",
       JSON.stringify({
         schemaVersion: 1,
         walletAddress,
@@ -160,7 +160,7 @@ test("shows terminal relay failure and never offers a consumed signer grant agai
           chainId: 97,
           configHash: `0x${"11".repeat(32)}`,
           walletAddress: "0x91Aa0E6627bFF6C911B38CEd5F7885E063b7C27a",
-          sessionKeyAddress: "0xb5F0658E3bc0c3495729b87DE32f568Bdc995a11",
+          sessionKeyAddress: "0x1b1B210b4C71481831963C3c03Ad0888c5Ec15e2",
           status: "execute_failed",
           authorityPresent: false,
           balanceWei: "98390568466905952",

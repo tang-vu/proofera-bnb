@@ -8,7 +8,7 @@ import {
   validateAltanaTestActionConfig
 } from "./altana-test-action-worker.mjs";
 
-const CONFIG_URL = new URL("../deploy/windows/altana-test-action.v1.json", import.meta.url);
+const CONFIG_URL = new URL("../deploy/windows/altana-test-action.v2.json", import.meta.url);
 const SOURCE_URL = new URL("./altana-test-action-worker.mjs", import.meta.url);
 
 test("tracked Altana test-action config is one bounded chain-97 zero approval", async () => {
@@ -21,7 +21,9 @@ test("tracked Altana test-action config is one bounded chain-97 zero approval", 
   assert.equal(config.action.spender, config.sessionKey.address);
   assert.equal(config.action.amount, "0");
   assert.equal(config.action.valueWei, "0");
-  assert.deepEqual(config.permissions.spend, [{ token: null, limit: "1", period: "day" }]);
+  assert.deepEqual(config.permissions.spend, [
+    { token: null, limit: "500000000000000", period: "day" }
+  ]);
   assert.equal(config.sessionLifetimeSeconds, 3_600);
 });
 
@@ -62,6 +64,14 @@ test("relay status follows viem EIP-5792 categories instead of polling terminal 
 test("config rejects expanded calldata and mismatched signer bindings", async () => {
   const config = JSON.parse(await readFile(CONFIG_URL, "utf8"));
 
+  assert.throws(
+    () =>
+      validateAltanaTestActionConfig({
+        ...config,
+        permissions: { ...config.permissions, spend: [{ token: null, limit: "1", period: "day" }] }
+      }),
+    /ALTANA_TEST_ACTION_PERMISSIONS_INVALID/u
+  );
   assert.throws(
     () => validateAltanaTestActionConfig({ ...config, action: { ...config.action, amount: "1" } }),
     /ALTANA_TEST_ACTION_CALL_INVALID/u

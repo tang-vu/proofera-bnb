@@ -14,7 +14,7 @@ import {
 const config = altanaTestActionConfigSchema.parse(
   JSON.parse(
     readFileSync(
-      new URL("../../../deploy/windows/altana-test-action.v1.json", import.meta.url),
+      new URL("../../../deploy/windows/altana-test-action.v2.json", import.meta.url),
       "utf8"
     )
   )
@@ -44,7 +44,7 @@ describe("Altana bounded test action", () => {
     expect(decoded.args).toEqual([config.sessionKey.address, 0n]);
   });
 
-  it("creates a one-hour exact grant with a one-wei native spend cap", () => {
+  it("creates a one-hour exact grant with a bounded native relay-fee cap", () => {
     const intent = createAltanaTestActionGrantIntent(config, config.walletAddress, 1_800_000_000);
 
     expect(intent).toEqual({
@@ -60,7 +60,7 @@ describe("Altana bounded test action", () => {
       },
       permissions: {
         calls: [{ to: ALTANA_TEST_ACTION_TARGET, signature: "approve(address,uint256)" }],
-        spend: [{ token: null, limit: "1", period: "day" }]
+        spend: [{ token: null, limit: "500000000000000", period: "day" }]
       },
       expiry: 1_800_003_600,
       registerInKeystore: true
@@ -75,6 +75,15 @@ describe("Altana bounded test action", () => {
         1_800_000_000
       )
     ).toThrow("ALTANA_TEST_ACTION_WALLET_MISMATCH");
+    expect(
+      altanaTestActionConfigSchema.safeParse({
+        ...config,
+        permissions: {
+          ...config.permissions,
+          spend: [{ token: null, limit: "1", period: "day" }]
+        }
+      }).success
+    ).toBe(false);
     expect(
       altanaTestActionConfigSchema.safeParse({
         ...config,
