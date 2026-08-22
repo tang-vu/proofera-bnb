@@ -267,7 +267,7 @@ function captureDatabaseReceipt(): Record<string, unknown> {
     GRANT_DATABASE,
     "-At",
     "-c",
-    "SELECT json_build_object('migrationVersion', migration_version::text, 'domainSchemaVersion', domain_schema_version::text, 'postgresMajor', postgres_major::text, 'semanticContractSha256', semantic_contract_sha256, 'deploymentId', deployment_id::text, 'appliedAtUtc', to_char(applied_at AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS.US\"Z\"'))::text FROM proofera_altana_grant_claim.schema_receipt"
+    "SELECT json_build_object('migrationVersion', migration_version::text, 'domainSchemaVersion', domain_schema_version::text, 'postgresMajor', postgres_major::text, 'semanticContractSha256', semantic_contract_sha256, 'deploymentId', deployment_id::text, 'appliedAtUtc', applied_at::text)::text FROM proofera_altana_grant_claim.schema_receipt"
   ]);
   let receiptValue: unknown;
   try {
@@ -306,6 +306,7 @@ function captureDatabaseReceipt(): Record<string, unknown> {
     "SELECT count(*)::text FROM proofera_altana_grant_claim.submission_claims"
   ]);
   if (claimCount !== "0") fail("TERMIX_PERMISSION_FREEZE_DATABASE_CLAIM_JOIN_UNKNOWN");
+  const appliedAtUtc = new Date(receipt.appliedAtUtc).toISOString();
   return {
     connectionBoundary: "container-local Unix socket read-only catalog queries",
     container: {
@@ -316,7 +317,7 @@ function captureDatabaseReceipt(): Record<string, unknown> {
       state
     },
     database: GRANT_DATABASE,
-    receipt,
+    receipt: { ...receipt, appliedAtUtc },
     submissionClaimCount: claimCount
   };
 }
