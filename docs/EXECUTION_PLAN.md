@@ -160,14 +160,17 @@ and verified hire are outer pre-network gates, the complete RPC plan runs before
 the one fixed A2A skill, declaration endpoint/component/input drift fails
 closed, and the response must bind the exact bundle with no execution. A valid
 synthetic bundle produced matching canonical digests through the local and
-public endpoint on 2026-08-17. This is an availability/parity smoke only, not a
-TermiX invocation, registered identity, hire receipt, final-bundle audit or
-performance result. Both create-only Task 02 CLIs are now implemented. The
+public endpoint on 2026-08-17. The active v1.1 release was re-probed on
+2026-08-22 with the real frozen bundle and returned byte-equivalent local/public
+canonical output. These are availability/parity smokes only, not TermiX
+invocations or performance results. Both create-only Task 02 CLIs are now implemented. The
 agent entry rejects missing exact invocation before Git, network or output
 access. The manual entry consumes bounded LF-only UTF-8 NDJSON so active work
 is timestamped as the operator emits each artifact/RPC/output event; it has no
-agent or network call. The final frozen bundle, real manual transcript, sourced
-cost and second-review artifacts remain required.
+agent or network call. The real lifecycle-backed bundle and declaration are now
+published on source release `38046f87b87c27fc3a44b3855cc7e54a10e21d8a`,
+with future randomness block `126555555`; run order, invocations, both raw
+captures, sourced cost, adjudication and second-review artifacts remain required.
 
 The Windows-host owner can start `Start ProofEra Ceremony.cmd` once to open a
 loopback-only guided worksheet. A root request on the loopback-only listener

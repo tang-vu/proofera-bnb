@@ -1,13 +1,13 @@
 # TermiX evidence boundary
 
-Status: **PARTIAL RAW CAPTURE / NON-PUBLISHABLE**. Task 01 and Task 03 each retain an agent and manual raw capture. Task 02 remains unbound and unrun. Nothing in this directory is yet a final paired result or a publishable agent-advantage claim.
+Status: **PARTIAL RAW CAPTURE / NON-PUBLISHABLE**. Task 01 and Task 03 each retain an agent and manual raw capture. Task 02 has a frozen published declaration and remains unrun while its public randomness is unresolved. Nothing in this directory is yet a final paired result or a publishable agent-advantage claim.
 
 `preregistrations/` contains exactly three schema-validated ProofEra-versus-manual protocols:
 
 | File                            | Task                             | Definition SHA-256                                                 | State                               |
 | ------------------------------- | -------------------------------- | ------------------------------------------------------------------ | ----------------------------------- |
 | `task-01-lp-range-v2.json`      | PancakeSwap V3 LP range decision | `9ac77645f2dd0ade20203b911cba18ce52b7b016fae8d9e73aa2919440b572ab` | raw lanes captured; not adjudicated |
-| `task-02-permission-audit.json` | Altana/Pancake permission audit  | `1191c85c4f36881be0736ced51fc6c23e24286101543bf0838346b0e2ed95645` | agent `NOT RUN`; manual `NOT RUN`   |
+| `task-02-permission-audit.json` | Altana/Pancake permission audit  | `1191c85c4f36881be0736ced51fc6c23e24286101543bf0838346b0e2ed95645` | frozen; randomness unresolved       |
 | `task-03-venus-health.json`     | Venus health-factor replay       | `c15ed1089fdeb75eab7db3134f08c011fd71bfe02ec2c3dbf3052592973c8c55` | raw lanes captured; not adjudicated |
 
 Task 01 v1 required a ProofEra-controlled PTA/WBNB testnet position that never
@@ -18,9 +18,9 @@ decision support, with source chain 56 separated from ERC-8004/hire chain 97.
 
 The digest covers the exact task, required input-binding rules, fixed constraints, environment-binding rules, rubric, hard-fail rules, parity controls, measurements, artifacts, receipts and reproduction plan. It is local tamper evidence, not an external timestamp or proof that a run occurred. Changing a definition requires a new version and digest; it must not overwrite the protocol used by a started run.
 
-The LP and Venus declarations, registered identities, hire receipts, run-order seeds, exact inputs and timed invocations were bound before their retained raw captures. LP uses `pancake-lp-agent-20260818-v4` and `pancake-lp-manual-20260818-v1`; Venus uses `venus-health-agent-20260818-v2` and `venus-health-manual-20260818-v2`. These files preserve timing, exact outputs, receipts and limitations but do not self-prove the no-agent boundary or assign rubric scores. Independent adjudication and schema-valid paired artifacts are still required before either comparison is publishable. Task 02 remains deliberately `UNBOUND` because its final bundle requires real lifecycle receipts that do not exist yet.
+The LP and Venus declarations, registered identities, hire receipts, run-order seeds, exact inputs and timed invocations were bound before their retained raw captures. LP uses `pancake-lp-agent-20260818-v4` and `pancake-lp-manual-20260818-v1`; Venus uses `venus-health-agent-20260818-v2` and `venus-health-manual-20260818-v2`. These files preserve timing, exact outputs, receipts and limitations but do not self-prove the no-agent boundary or assign rubric scores. Independent adjudication and schema-valid paired artifacts are still required before either comparison is publishable. Task 02 now binds the retained Altana lifecycle, code observation, staging database receipt, public proof-worker state, blind corpus, Agent `1825`, verified hire and reviewer-held answer-key digest in [`38046f87b87c-126555555.json`](./declarations/permission-audit/38046f87b87c-126555555.json). Its run order and both runs remain absent.
 
-Task 02's deterministic `audit_altana_permission_bundle` skill is live on the public LP A2A endpoint and its Agent Card advertises that exact ID. A valid synthetic local/public smoke on 2026-08-17 returned matching bundle digests and `executionPerformed: false`. This is capability availability/parity only: it is not a frozen Task 02 input, registered identity, verified hire, timed run, raw benchmark transcript, receipt, scored finding or advantage claim. Both create-only Task 02 CLIs exist; all final bindings remain absent.
+Task 02's deterministic `audit_altana_permission_bundle` v1.1 skill is live on the public LP A2A endpoint and its Agent Card advertises that exact ID. A secret-free local/public smoke on 2026-08-22 returned byte-equivalent canonical output for the frozen bundle, exact bundle digest and `executionPerformed: false`. This is capability availability/parity only: it is not a timed run, raw benchmark transcript, adjudication, scored finding or advantage claim. Both create-only Task 02 CLIs and the run-order collector exist; invocations remain absent until randomness resolves.
 
 Validate the preregistrations and paired-run harness:
 
@@ -73,7 +73,7 @@ The create-only Task 02 agent runner is available as:
 pnpm run:termix:permission-audit-agent -- --execute-exact-permission-audit-agent-run --input-bundle evidence/termix/frozen/permission-audit/<bound-bundle>.canonical-json
 ```
 
-It accepts only a tracked, byte-exact canonical bundle and a bounded standard-input invocation. It requires a clean published commit, chain-97 registration and verified hire receipt before the fixed read-only RPC plan or public A2A request can occur. It writes one new immutable capture beneath `runs/permission-audit/agent/`. No final bundle, invocation or Task 02 run exists.
+It accepts only a tracked, byte-exact canonical bundle and a bounded standard-input invocation. It requires a clean published commit, chain-97 registration and verified hire receipt before the fixed read-only RPC plan or public A2A request can occur. It writes one new immutable capture beneath `runs/permission-audit/agent/`. The active final bundle exists; no invocation or Task 02 run exists yet.
 
 The matching create-only manual runner is available as:
 
