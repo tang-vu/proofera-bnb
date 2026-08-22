@@ -36,6 +36,8 @@ const PREPARATION_DIRECTORY = "evidence/termix/preparations/permission-audit";
 const BUNDLE_DIRECTORY = "evidence/termix/frozen/permission-audit";
 const DECLARATION_DIRECTORY = "evidence/termix/declarations/permission-audit";
 const ANSWER_KEY_DIRECTORY = "ProofEra/termix-permission-audit-reviewer";
+const WSL_EXECUTABLE = "C:\\Windows\\System32\\wsl.exe";
+const DOCKER_WSL_DISTRIBUTION = "Ubuntu";
 const GRANT_CONTAINER = "proofera-postgres-grant";
 const GRANT_DATABASE = "proofera_altana_grant_claim";
 const REGISTRY = "0x8004A818BFB912233c491871b3d84c89A494BD9e";
@@ -235,7 +237,9 @@ function commandText(command: string, args: readonly string[], input?: string): 
 }
 
 function databaseCommand(code: string, args: readonly string[], input?: string): string {
-  return runStage(code, () => commandText("docker", args, input));
+  return runStage(code, () =>
+    commandText(WSL_EXECUTABLE, ["-d", DOCKER_WSL_DISTRIBUTION, "--", "docker", ...args], input)
+  );
 }
 
 function captureDatabaseReceipt(): Record<string, unknown> {
@@ -331,6 +335,11 @@ function captureDatabaseReceipt(): Record<string, unknown> {
   const appliedAtUtc = new Date(receipt.appliedAtUtc).toISOString();
   return {
     connectionBoundary: "container-local Unix socket read-only catalog queries",
+    dockerTransport: {
+      distribution: DOCKER_WSL_DISTRIBUTION,
+      executable: WSL_EXECUTABLE,
+      mode: "fixed WSL distribution invoking Docker CLI without an ambient command wrapper"
+    },
     container: {
       configuredImage,
       imageId,

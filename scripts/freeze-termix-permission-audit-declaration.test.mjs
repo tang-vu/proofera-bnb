@@ -17,6 +17,8 @@ test("permission audit freezer binds lifecycle, staging receipt, public state an
   assert.match(source, /126543819-72e7cf94-altana-lifecycle\.json/u);
   assert.match(source, /altana-test-action\.v2\.json/u);
   assert.match(source, /proofera-postgres-grant/u);
+  assert.match(source, /C:\\\\Windows\\\\System32\\\\wsl\.exe/u);
+  assert.match(source, /\["-d", DOCKER_WSL_DISTRIBUTION, "--", "docker", \.\.\.args\]/u);
   assert.match(source, /47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641/u);
   assert.match(
     source,
