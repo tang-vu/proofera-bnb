@@ -1,0 +1,36 @@
+{
+  "answerKeySha256": "61494b199b7b41b30eee370fe6736d864671439c65b2acfbee107c5ea9efdbeb",
+  "checks": {
+    "answerKeyDigestMatched": true,
+    "artifactDigestsVerified": true,
+    "exactOutputParity": true,
+    "manualBeforeAgentOrderVerified": true,
+    "noWriteBoundaryVerified": true,
+    "rubricRecomputed": true,
+    "secondReviewerIndependent": false
+  },
+  "limitations": [
+    "Both timed outputs exactly match the committed reviewer-held answer key, but the post-run reviewer operated this repository workflow and is not independent.",
+    "The pair remains unverified and non-publishable until a distinct second reviewer reobserves receipts, checks the manual no-agent log and signs the digest-bound adjudication.",
+    "Cost lines record explicit zero incremental tBNB fees inside each timed lane; they do not price human labor or allocate the earlier paid marketplace hire.",
+    "Equal rubric scores establish deterministic parity on this frozen corpus only, not general security performance or agent advantage."
+  ],
+  "pairId": "permission-audit-pair-20260822-v1",
+  "pairSha256": "68fcb8e6aefe85db8e6b239f1471fc65baee4dd0dd8ab2cd70516bdd1def8153",
+  "quality": { "agentPoints": 100, "manualPoints": 100, "maximumPoints": 100 },
+  "reviewState": "self_reviewed_unverified",
+  "reviewedAtUtc": "2026-08-22T12:50:39.527Z",
+  "reviewer": {
+    "independenceBasis": "Not independent: the reviewer also operated the repository workflow, so this record cannot satisfy the second-reviewer gate.",
+    "name": "OpenAI Codex repository operator",
+    "role": "Implementation-adjacent evidence reviewer"
+  },
+  "schemaVersion": "proofera-termix-permission-audit-self-review-v1.0.0",
+  "sources": {
+    "agentCapturePath": "evidence/termix/runs/permission-audit/agent/permission-audit-agent-20260822-v1.json",
+    "agentInvocationPath": "evidence/termix/invocations/permission-audit-agent-20260822-v1.canonical-json",
+    "manualCapturePath": "evidence/termix/runs/permission-audit/manual/permission-audit-manual-20260822-v1.json",
+    "manualInvocationPath": "evidence/termix/invocations/permission-audit-manual-20260822-v1.canonical-json"
+  },
+  "taskId": "autonomous-session-permission-audit"
+}

@@ -82,9 +82,9 @@
     {
       "gateId": "termix-pairs",
       "state": "preregistered_only",
-      "claim": "Exactly three paired protocols are preregistered. The LP and Venus agent/manual raw captures exist, but neither pair has independent adjudication or a final paired report; Task 02 remains unbound and unrun. No advantage is publishable.",
+      "claim": "Exactly three paired protocols are preregistered and all six raw lanes are retained. Task 02 has a digest-bound schema-valid pair plus an implementation-adjacent self-review, but both run states remain unverified because no independent second reviewer signed the pair. No advantage is publishable.",
       "blockers": [
-        "Complete the receipt-bound Task 02 pair, independently adjudicate all three pairs, and compile the final paired report."
+        "Obtain independent adjudication for all three pairs, compile the final verified three-pair report, and preserve the current non-claim boundary until that compiler succeeds."
       ],
       "artifacts": [
         {
@@ -121,6 +121,26 @@
           "kind": "venus_manual_raw_capture",
           "path": "evidence/termix/runs/venus-health/manual/venus-health-manual-20260818-v2.json",
           "sha256": "67978cfa3557fedfbc38d660f0980340b1665fc8cf11d012d914d755c5b25cc6"
+        },
+        {
+          "kind": "permission_audit_agent_raw_capture",
+          "path": "evidence/termix/runs/permission-audit/agent/permission-audit-agent-20260822-v1.json",
+          "sha256": "cabc0a22030ec0e473cf4df76ee5dd2deeedff33af04c194e6f68a999f411674"
+        },
+        {
+          "kind": "permission_audit_manual_raw_capture",
+          "path": "evidence/termix/runs/permission-audit/manual/permission-audit-manual-20260822-v1.json",
+          "sha256": "13aa348640b0ee8c7d0945083251c94e9fafcbe07a18cd0fada8deb5167176c0"
+        },
+        {
+          "kind": "permission_audit_unverified_pair",
+          "path": "evidence/termix/pairs/permission-audit/permission-audit-pair-20260822-v1.json",
+          "sha256": "c48479e909dd7addb83c3d9298ec731dd0fa334f11721e773ea1397488fe8580"
+        },
+        {
+          "kind": "permission_audit_non_independent_review",
+          "path": "evidence/termix/reviews/permission-audit/permission-audit-pair-20260822-v1-self-review.json",
+          "sha256": "f39ffa47450d2b9ef114b31a10929626eea4499dceba1f51b6d8c1a6951349d3"
         }
       ]
     },

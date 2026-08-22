@@ -1,0 +1,978 @@
+{
+  "agentRun": {
+    "artifacts": [
+      {
+        "artifactId": "agent-output",
+        "description": "Unedited canonical timed-lane output retained inside the immutable capture.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/runs/permission-audit/agent/permission-audit-agent-20260822-v1.json"
+        },
+        "mediaType": "application/json",
+        "role": "output",
+        "sha256": "955f222fabbdb0c454bd9a8853e861b3ea5fdcda8201407fa45226cb8f0497c2"
+      },
+      {
+        "artifactId": "agent-api-0",
+        "description": "Raw PublicNode BSC Testnet JSON-RPC request/response envelope retained inside the immutable capture.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/runs/permission-audit/agent/permission-audit-agent-20260822-v1.json"
+        },
+        "mediaType": "application/json",
+        "role": "raw-receipt",
+        "sha256": "d6265006914c145844bfe5c5aa1347c7dff63b20419a1d172c47738aa9ee40c2"
+      },
+      {
+        "artifactId": "agent-api-1",
+        "description": "Raw PublicNode BSC Testnet JSON-RPC request/response envelope retained inside the immutable capture.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/runs/permission-audit/agent/permission-audit-agent-20260822-v1.json"
+        },
+        "mediaType": "application/json",
+        "role": "raw-receipt",
+        "sha256": "3e94d2839aeebfe63dde0093b49c5cf5f0d71cc101edd37bc786eb6fb1fa4664"
+      },
+      {
+        "artifactId": "agent-api-2",
+        "description": "Raw PublicNode BSC Testnet JSON-RPC request/response envelope retained inside the immutable capture.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/runs/permission-audit/agent/permission-audit-agent-20260822-v1.json"
+        },
+        "mediaType": "application/json",
+        "role": "raw-receipt",
+        "sha256": "4dfe58b3524ee9d15c1d73e64f449fa458e16a3175a4c11108170e7ac4f3e5af"
+      },
+      {
+        "artifactId": "agent-api-3",
+        "description": "Raw PublicNode BSC Testnet JSON-RPC request/response envelope retained inside the immutable capture.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/runs/permission-audit/agent/permission-audit-agent-20260822-v1.json"
+        },
+        "mediaType": "application/json",
+        "role": "raw-receipt",
+        "sha256": "50ad7318c1aae9725e7470071b894cf1aaf2f3b3dc9dbc91b2763c2d57470005"
+      },
+      {
+        "artifactId": "agent-api-4",
+        "description": "Raw ProofEra Permission Auditor A2A request/response envelope retained inside the immutable capture.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/runs/permission-audit/agent/permission-audit-agent-20260822-v1.json"
+        },
+        "mediaType": "application/json",
+        "role": "raw-receipt",
+        "sha256": "ff390a5f2e4298242e235125989682c201b55cab942701b11e50a7cb78de5371"
+      },
+      {
+        "artifactId": "agent-hire-raw",
+        "description": "Verified pre-run ProofEra hire receipt retained for provenance; excluded from timed receipt and cost deltas.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/runs/permission-audit/agent/permission-audit-agent-20260822-v1.json"
+        },
+        "mediaType": "application/json",
+        "role": "raw-receipt",
+        "sha256": "caef380d77093cb7434f844c55e0357427fd9f9be890c8929347d5bfb97adadf"
+      }
+    ],
+    "costs": {
+      "lineItems": [
+        {
+          "amountMinorUnits": "0",
+          "category": "other",
+          "costId": "agent-incremental-testnet-fee",
+          "denomination": {
+            "chainId": 97,
+            "contractAddress": null,
+            "kind": "asset",
+            "minorUnitDecimals": 18,
+            "symbol": "tBNB"
+          },
+          "description": "Explicit zero incremental tBNB fee during the timed read-only lane; human labor and the earlier prepaid hire are not monetized or allocated.",
+          "incurredAtUtc": "2026-08-22T12:19:58.155Z",
+          "sources": [{ "kind": "receipt", "receiptId": "agent-api-receipt-0" }]
+        }
+      ],
+      "reason": null,
+      "state": "complete"
+    },
+    "declaration": {
+      "benchmarkId": "altana-permission-audit-v1",
+      "constraints": [
+        {
+          "constraintId": "audit-window",
+          "description": "Finish within 1200 seconds; overruns remain recorded.",
+          "enforcement": "scored",
+          "expected": { "encoding": "decimal_integer", "value": "1200" }
+        },
+        {
+          "constraintId": "bsc-testnet-only",
+          "description": "All authority, receipt and code observations are BSC testnet chain 97.",
+          "enforcement": "hard",
+          "expected": { "encoding": "decimal_integer", "value": "97" }
+        },
+        {
+          "constraintId": "required-enforcement-layers",
+          "description": "Corrections must identify the actual enforcement layer.",
+          "enforcement": "hard",
+          "expected": {
+            "encoding": "canonical_json",
+            "value": "[\"altana-or-onchain\",\"explicit-wallet-confirmation\",\"proofera-runtime\"]"
+          }
+        },
+        {
+          "constraintId": "secret-free-bundle",
+          "description": "No credential, signer, passkey or opaque secret handle may enter either lane.",
+          "enforcement": "hard",
+          "expected": { "encoding": "canonical_json", "value": "true" }
+        },
+        {
+          "constraintId": "timed-audit-read-only",
+          "description": "Neither lane may sign, grant, revoke, submit, broadcast or mutate a database.",
+          "enforcement": "hard",
+          "expected": { "encoding": "canonical_json", "value": "true" }
+        }
+      ],
+      "environment": {
+        "chainId": 97,
+        "components": [
+          {
+            "configurationSha256": "eb5f109f3b1da853c16afc4fb2f8aa98866c902a9142734d70cc173018053797",
+            "name": "altana-sdk",
+            "version": "0.7.0"
+          },
+          {
+            "configurationSha256": "5a94e234526fc2ffa2407bf49b20f4887f89b8d419009e76b529df35c80a0057",
+            "name": "manual-procedure",
+            "version": "proofera-termix-permission-audit-manual-v1.0.0"
+          },
+          { "configurationSha256": null, "name": "node", "version": "v24.14.1" },
+          {
+            "configurationSha256": "80c918eeeefe50ffdda36b25a4c891719602eff2661e67017cafdfd71e0bebd6",
+            "name": "postgresql",
+            "version": "17.9-host-local-staging"
+          },
+          {
+            "configurationSha256": "bce9dc29acc7d67c3e54f6f43eb36ed60e9f8560de0f9151aa80da3b3ad0941a",
+            "name": "proofera-security-auditor",
+            "version": "proofera-termix-permission-audit-engine-v1.1.0"
+          },
+          {
+            "configurationSha256": "80c918eeeefe50ffdda36b25a4c891719602eff2661e67017cafdfd71e0bebd6",
+            "name": "rpc-and-explorer",
+            "version": "126543819"
+          }
+        ],
+        "kind": "testnet",
+        "networkName": "BNB Smart Chain Testnet lifecycle replay",
+        "parameters": [
+          {
+            "key": "agent-registry-chain-id",
+            "value": { "encoding": "decimal_integer", "value": "97" }
+          },
+          {
+            "key": "authority-source-block",
+            "value": { "encoding": "decimal_integer", "value": "126543819" }
+          },
+          {
+            "key": "corpus-answer-key-digest",
+            "value": {
+              "encoding": "string",
+              "value": "61494b199b7b41b30eee370fe6736d864671439c65b2acfbee107c5ea9efdbeb"
+            }
+          },
+          {
+            "key": "erc8004-registry",
+            "value": {
+              "encoding": "evm_address",
+              "value": "0x8004A818BFB912233c491871b3d84c89A494BD9e"
+            }
+          },
+          {
+            "key": "permission-audit-agent-endpoint",
+            "value": { "encoding": "string", "value": "https://proofera-lp.tangvu.dev/" }
+          },
+          {
+            "key": "permission-audit-agent-id",
+            "value": { "encoding": "decimal_integer", "value": "1825" }
+          },
+          {
+            "key": "permission-audit-rpc-endpoint",
+            "value": { "encoding": "string", "value": "https://bsc-testnet-rpc.publicnode.com" }
+          },
+          {
+            "key": "run-order-randomness-commitment",
+            "value": {
+              "encoding": "canonical_json",
+              "value": "{\"blockNumber\":\"126555555\",\"chainId\":97,\"finalityConfirmations\":\"12\",\"mapping\":\"least-significant bit of finalized block hash: 0=agent-first, 1=manual-first\",\"providers\":[\"https://data-seed-prebsc-2-s2.binance.org:8545\",\"https://bsc-testnet-rpc.publicnode.com\"]}"
+            }
+          }
+        ],
+        "softwareCommitSha": "38046f87b87c27fc3a44b3855cc7e54a10e21d8a"
+      },
+      "inputs": [
+        {
+          "description": "Exact policy/config evidence reference for the audited activation.",
+          "inputId": "activation-proposal",
+          "unit": null,
+          "value": {
+            "encoding": "canonical_json",
+            "value": "{\"artifactId\":\"activation-proposal\",\"locator\":\"deploy/windows/altana-test-action.v2.json\",\"sha256\":\"53d21a388519dd2a88153392851944d51bd24b3cae1aadee647a6ec6a61f0583\"}"
+          }
+        },
+        {
+          "description": "Source-bound deterministic blind mutation corpus reference.",
+          "inputId": "adversarial-corpus",
+          "unit": null,
+          "value": {
+            "encoding": "canonical_json",
+            "value": "{\"artifactId\":\"adversarial-corpus\",\"locator\":\"scripts/freeze-termix-permission-audit-declaration.ts\",\"sha256\":\"708a30c9630ffb7fc7d01542b673fe7841e5f7453d0aadadd6a9b2036c768f7b\"}"
+          }
+        },
+        {
+          "description": "Retained grant, execute and revoke lifecycle evidence reference.",
+          "inputId": "authority-lifecycle-receipts",
+          "unit": null,
+          "value": {
+            "encoding": "canonical_json",
+            "value": "{\"artifactId\":\"authority-lifecycle\",\"locator\":\"evidence/altana/lifecycles/126543819-72e7cf94-altana-lifecycle.json\",\"sha256\":\"e001d4f9eb8e87d95408206e72c937c1ff8cd68d9885898a4d02aabdfe661b19\"}"
+          }
+        },
+        {
+          "description": "Exact-block PTA runtime attestation reference.",
+          "inputId": "code-authority-attestation",
+          "unit": null,
+          "value": {
+            "encoding": "canonical_json",
+            "value": "{\"artifactId\":\"code-attestation\",\"locator\":\"evidence/termix/preparations/permission-audit/38046f87b87c-126543819.json\",\"sha256\":\"80c918eeeefe50ffdda36b25a4c891719602eff2661e67017cafdfd71e0bebd6\"}"
+          }
+        },
+        {
+          "description": "Pinned Altana SDK 0.7.0 behavior evidence reference.",
+          "inputId": "sdk-behavior-evidence",
+          "unit": null,
+          "value": {
+            "encoding": "canonical_json",
+            "value": "{\"artifactId\":\"sdk-behavior\",\"locator\":\"evidence/altana/preparations/125493138-bsc-testnet-readiness.json\",\"sha256\":\"959e1b6fc66da8e65d1ff7c610c2e6b147ad99852bb1948a1c4ca61707fc1c98\"}"
+          }
+        }
+      ],
+      "qualityRubric": {
+        "criteria": [
+          {
+            "criterionId": "evidence-reproducibility",
+            "description": "Preserve hashes, receipts, timing, costs and limitations.",
+            "evidenceRequired": "Raw/canonical output, receipt joins and verification log.",
+            "maximumPoints": 15,
+            "measurement": "Second-review the complete source joins and deterministic output."
+          },
+          {
+            "criterionId": "false-positive-discipline",
+            "description": "Avoid claims unsupported by code, receipts, SDK evidence or policy.",
+            "evidenceRequired": "Finding-to-source join table and adjudication.",
+            "maximumPoints": 15,
+            "measurement": "Review every finding against exact evidence."
+          },
+          {
+            "criterionId": "impact-reproduction",
+            "description": "Explain impact and safe read-only reproduction.",
+            "evidenceRequired": "Reproduction log and source hashes.",
+            "maximumPoints": 15,
+            "measurement": "Replay each approved read-only reproduction."
+          },
+          {
+            "criterionId": "least-authority-correction",
+            "description": "Return a complete corrected three-layer policy.",
+            "evidenceRequired": "Corrected table and reviewer checklist.",
+            "maximumPoints": 20,
+            "measurement": "Validate target, selector, amount, expiry, claim, retry and revoke controls."
+          },
+          {
+            "criterionId": "true-positive-coverage",
+            "description": "Find seeded and naturally present authority, durability and retry defects.",
+            "evidenceRequired": "Raw report, normalized findings, corpus digest and answer-key trace.",
+            "maximumPoints": 35,
+            "measurement": "Compare normalized finding IDs and severities with the frozen answer key."
+          }
+        ],
+        "declaredAtUtc": "2026-08-11T18:22:25.921Z",
+        "rubricId": "termix-permission-audit-rubric-v1",
+        "totalMaximumPoints": 100,
+        "version": "1.0.0"
+      },
+      "requiredReceiptKinds": ["api", "transaction"],
+      "task": {
+        "domain": "security",
+        "exactDefinition": "Audit one immutable secret-free BSC testnet Altana activation bundle, identify authority and durability defects, and return evidence-linked findings plus a corrected three-layer enforcement table. The timed audit is read-only.",
+        "successCondition": "Both methods inspect byte-identical inputs, report reproducible findings without secrets or writes, and preserve the distinction between Altana/onchain, ProofEra runtime and explicit wallet enforcement.",
+        "taskId": "autonomous-session-permission-audit",
+        "title": "Altana/Pancake autonomous-session least-authority audit"
+      }
+    },
+    "evidenceState": {
+      "reason": "A distinct independent second reviewer has not reobserved the receipts, reviewed the manual no-agent log and signed the exact pair digest.",
+      "state": "unverified"
+    },
+    "limitations": [
+      "The fixed RPC observations verify chain, retained successful receipt joins and target runtime bytes only; they do not independently authenticate every frozen artifact.",
+      "The A2A response proves the captured public service output, not that its findings are complete or that the corrected policy is deployed.",
+      "The timed lane is read-only and cannot grant, sign, submit, broadcast, revoke or mutate durable state.",
+      "The normalized score is an implementation-adjacent deterministic self-review, not an independent adjudication.",
+      "The exact invocation is retained at evidence/termix/invocations/permission-audit-agent-20260822-v1.canonical-json.",
+      "Active operator segments remain available only in the raw timed capture; the generic pair schema compares full monotonic wall duration."
+    ],
+    "method": {
+      "agentReference": {
+        "agentId": "1825",
+        "chainId": 97,
+        "registryAddress": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+        "registrySourceUrl": "https://testnet.bscscan.com/address/0x8004A818BFB912233c491871b3d84c89A494BD9e",
+        "standard": "ERC-8004",
+        "state": "registered"
+      },
+      "configurationSha256": "bce9dc29acc7d67c3e54f6f43eb36ed60e9f8560de0f9151aa80da3b3ad0941a",
+      "kind": "agent",
+      "label": "Registered ProofEra Security Auditor",
+      "marketplace": "ProofEra",
+      "runtime": "self-hosted TypeScript A2A analyzer"
+    },
+    "qualityAssessment": {
+      "assessedAtUtc": "2026-08-22T12:50:39.527Z",
+      "assessor": "ProofEra deterministic post-run self-review v1",
+      "scores": [
+        {
+          "criterionId": "evidence-reproducibility",
+          "evidence": [
+            { "artifactId": "agent-output", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "agent-api-receipt-0" }
+          ],
+          "points": 15,
+          "rationale": "The raw capture retains exact output/API bytes, digests, timing, explicit-zero incremental cost, limitations and fixed invocations."
+        },
+        {
+          "criterionId": "false-positive-discipline",
+          "evidence": [
+            { "artifactId": "agent-output", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "agent-api-receipt-0" }
+          ],
+          "points": 15,
+          "rationale": "The canonical output contains no unsupported or duplicate finding beyond the exact answer key."
+        },
+        {
+          "criterionId": "impact-reproduction",
+          "evidence": [
+            { "artifactId": "agent-output", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "agent-api-receipt-0" }
+          ],
+          "points": 15,
+          "rationale": "Every finding retains a non-secret impact statement, read-only reproduction and evidence-artifact join."
+        },
+        {
+          "criterionId": "least-authority-correction",
+          "evidence": [
+            { "artifactId": "agent-output", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "agent-api-receipt-0" }
+          ],
+          "points": 20,
+          "rationale": "The corrected table exactly covers wallet confirmation, runtime validation, direct authority, unknown outcome, revoke and signer custody."
+        },
+        {
+          "criterionId": "true-positive-coverage",
+          "evidence": [
+            { "artifactId": "agent-output", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "agent-api-receipt-0" }
+          ],
+          "points": 35,
+          "rationale": "Normalized finding IDs, severities and source joins exactly match the reviewer-held answer key."
+        }
+      ]
+    },
+    "receipts": [
+      {
+        "endpointUrl": "https://bsc-testnet-rpc.publicnode.com",
+        "kind": "api",
+        "observedAtUtc": "2026-08-22T12:19:58.155Z",
+        "provider": "PublicNode BSC Testnet JSON-RPC",
+        "receiptId": "agent-api-receipt-0",
+        "requestId": "audit-ab1c587985424629-chain",
+        "responseArtifactId": "agent-api-0",
+        "responseSha256": "d6265006914c145844bfe5c5aa1347c7dff63b20419a1d172c47738aa9ee40c2",
+        "verification": {
+          "method": "Recomputed retained response bytes and revalidated the frozen RPC/A2A response contract.",
+          "state": "verified",
+          "verifiedAtUtc": "2026-08-22T12:50:39.527Z",
+          "verifier": "ProofEra deterministic post-run self-review v1"
+        }
+      },
+      {
+        "endpointUrl": "https://bsc-testnet-rpc.publicnode.com",
+        "kind": "api",
+        "observedAtUtc": "2026-08-22T12:19:58.276Z",
+        "provider": "PublicNode BSC Testnet JSON-RPC",
+        "receiptId": "agent-api-receipt-1",
+        "requestId": "audit-ab1c587985424629-grant",
+        "responseArtifactId": "agent-api-1",
+        "responseSha256": "3e94d2839aeebfe63dde0093b49c5cf5f0d71cc101edd37bc786eb6fb1fa4664",
+        "verification": {
+          "method": "Recomputed retained response bytes and revalidated the frozen RPC/A2A response contract.",
+          "state": "verified",
+          "verifiedAtUtc": "2026-08-22T12:50:39.527Z",
+          "verifier": "ProofEra deterministic post-run self-review v1"
+        }
+      },
+      {
+        "endpointUrl": "https://bsc-testnet-rpc.publicnode.com",
+        "kind": "api",
+        "observedAtUtc": "2026-08-22T12:19:58.387Z",
+        "provider": "PublicNode BSC Testnet JSON-RPC",
+        "receiptId": "agent-api-receipt-2",
+        "requestId": "audit-ab1c587985424629-revoke",
+        "responseArtifactId": "agent-api-2",
+        "responseSha256": "4dfe58b3524ee9d15c1d73e64f449fa458e16a3175a4c11108170e7ac4f3e5af",
+        "verification": {
+          "method": "Recomputed retained response bytes and revalidated the frozen RPC/A2A response contract.",
+          "state": "verified",
+          "verifiedAtUtc": "2026-08-22T12:50:39.527Z",
+          "verifier": "ProofEra deterministic post-run self-review v1"
+        }
+      },
+      {
+        "endpointUrl": "https://bsc-testnet-rpc.publicnode.com",
+        "kind": "api",
+        "observedAtUtc": "2026-08-22T12:19:58.500Z",
+        "provider": "PublicNode BSC Testnet JSON-RPC",
+        "receiptId": "agent-api-receipt-3",
+        "requestId": "audit-ab1c587985424629-code-0",
+        "responseArtifactId": "agent-api-3",
+        "responseSha256": "50ad7318c1aae9725e7470071b894cf1aaf2f3b3dc9dbc91b2763c2d57470005",
+        "verification": {
+          "method": "Recomputed retained response bytes and revalidated the frozen RPC/A2A response contract.",
+          "state": "verified",
+          "verifiedAtUtc": "2026-08-22T12:50:39.527Z",
+          "verifier": "ProofEra deterministic post-run self-review v1"
+        }
+      },
+      {
+        "endpointUrl": "https://proofera-lp.tangvu.dev/",
+        "kind": "api",
+        "observedAtUtc": "2026-08-22T12:20:00.197Z",
+        "provider": "ProofEra Permission Auditor A2A",
+        "receiptId": "agent-api-receipt-4",
+        "requestId": "audit-ab1c587985424629-a2a",
+        "responseArtifactId": "agent-api-4",
+        "responseSha256": "ff390a5f2e4298242e235125989682c201b55cab942701b11e50a7cb78de5371",
+        "verification": {
+          "method": "Recomputed retained response bytes and revalidated the frozen RPC/A2A response contract.",
+          "state": "verified",
+          "verifiedAtUtc": "2026-08-22T12:50:39.527Z",
+          "verifier": "ProofEra deterministic post-run self-review v1"
+        }
+      },
+      {
+        "chainId": 97,
+        "explorerUrl": "https://testnet.bscscan.com/tx/0xbfa1e3216d38efa0fc013efa504e808e16360b113f9a35bced6e1689345180c7",
+        "kind": "transaction",
+        "observedAtUtc": "2026-08-22T12:19:58.276Z",
+        "rawReceiptArtifactId": "agent-api-1",
+        "receiptId": "agent-authority-grant-transaction",
+        "transactionHash": "0xbfa1e3216d38efa0fc013efa504e808e16360b113f9a35bced6e1689345180c7",
+        "verification": {
+          "method": "Parsed the exact retained eth_getTransactionReceipt response and matched successful chain-97 grant lifecycle evidence.",
+          "state": "verified",
+          "verifiedAtUtc": "2026-08-22T12:50:39.527Z",
+          "verifier": "ProofEra deterministic post-run self-review v1"
+        }
+      }
+    ],
+    "reproductionCommands": [
+      {
+        "command": "pnpm --filter @proofera/benchmarks test",
+        "expectedArtifactIds": ["agent-output"],
+        "step": 1,
+        "workingDirectory": "."
+      }
+    ],
+    "runId": "permission-audit-agent-20260822-v1",
+    "timing": {
+      "endedAtUtc": "2026-08-22T12:20:00.197Z",
+      "monotonicClock": "Node.js process.hrtime.bigint",
+      "monotonicDurationNanoseconds": "2318655500",
+      "startedAtUtc": "2026-08-22T12:19:57.877Z"
+    }
+  },
+  "limitations": [
+    "Both timed outputs exactly match the committed reviewer-held answer key, but the post-run reviewer operated this repository workflow and is not independent.",
+    "The pair remains unverified and non-publishable until a distinct second reviewer reobserves receipts, checks the manual no-agent log and signs the digest-bound adjudication.",
+    "Cost lines record explicit zero incremental tBNB fees inside each timed lane; they do not price human labor or allocate the earlier paid marketplace hire.",
+    "Equal rubric scores establish deterministic parity on this frozen corpus only, not general security performance or agent advantage."
+  ],
+  "manualRun": {
+    "artifacts": [
+      {
+        "artifactId": "manual-output",
+        "description": "Unedited canonical timed-lane output retained inside the immutable capture.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/runs/permission-audit/manual/permission-audit-manual-20260822-v1.json"
+        },
+        "mediaType": "application/json",
+        "role": "output",
+        "sha256": "bf80ce3d9852f14a75d17bf616302599b3d274a3cf38071ee4c1e051bd32fe63"
+      },
+      {
+        "artifactId": "manual-api-0",
+        "description": "Raw PublicNode BSC Testnet JSON-RPC request/response envelope retained inside the immutable capture.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/runs/permission-audit/manual/permission-audit-manual-20260822-v1.json"
+        },
+        "mediaType": "application/json",
+        "role": "raw-receipt",
+        "sha256": "efa128d578cb2b17c513397636375e2cdc280882371a49092501089e404d8f96"
+      },
+      {
+        "artifactId": "manual-api-1",
+        "description": "Raw PublicNode BSC Testnet JSON-RPC request/response envelope retained inside the immutable capture.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/runs/permission-audit/manual/permission-audit-manual-20260822-v1.json"
+        },
+        "mediaType": "application/json",
+        "role": "raw-receipt",
+        "sha256": "e838442125aed5817b9419e9d636621f179ba894a18ae2007be480bf0b3d3638"
+      },
+      {
+        "artifactId": "manual-api-2",
+        "description": "Raw PublicNode BSC Testnet JSON-RPC request/response envelope retained inside the immutable capture.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/runs/permission-audit/manual/permission-audit-manual-20260822-v1.json"
+        },
+        "mediaType": "application/json",
+        "role": "raw-receipt",
+        "sha256": "9ee303a0a176d0a829c226b9b23631b1fcb5c427b8b660b32ed17e4f2c903bad"
+      },
+      {
+        "artifactId": "manual-api-3",
+        "description": "Raw PublicNode BSC Testnet JSON-RPC request/response envelope retained inside the immutable capture.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/runs/permission-audit/manual/permission-audit-manual-20260822-v1.json"
+        },
+        "mediaType": "application/json",
+        "role": "raw-receipt",
+        "sha256": "d48c83f88c678c96235ebfbc7530b062ea3ea2eb8a5de70cebbb45d27823ef14"
+      }
+    ],
+    "costs": {
+      "lineItems": [
+        {
+          "amountMinorUnits": "0",
+          "category": "other",
+          "costId": "manual-incremental-testnet-fee",
+          "denomination": {
+            "chainId": 97,
+            "contractAddress": null,
+            "kind": "asset",
+            "minorUnitDecimals": 18,
+            "symbol": "tBNB"
+          },
+          "description": "Explicit zero incremental tBNB fee during the timed read-only lane; human labor and the earlier prepaid hire are not monetized or allocated.",
+          "incurredAtUtc": "2026-08-22T12:17:28.796Z",
+          "sources": [{ "kind": "receipt", "receiptId": "manual-api-receipt-0" }]
+        }
+      ],
+      "reason": null,
+      "state": "complete"
+    },
+    "declaration": {
+      "benchmarkId": "altana-permission-audit-v1",
+      "constraints": [
+        {
+          "constraintId": "audit-window",
+          "description": "Finish within 1200 seconds; overruns remain recorded.",
+          "enforcement": "scored",
+          "expected": { "encoding": "decimal_integer", "value": "1200" }
+        },
+        {
+          "constraintId": "bsc-testnet-only",
+          "description": "All authority, receipt and code observations are BSC testnet chain 97.",
+          "enforcement": "hard",
+          "expected": { "encoding": "decimal_integer", "value": "97" }
+        },
+        {
+          "constraintId": "required-enforcement-layers",
+          "description": "Corrections must identify the actual enforcement layer.",
+          "enforcement": "hard",
+          "expected": {
+            "encoding": "canonical_json",
+            "value": "[\"altana-or-onchain\",\"explicit-wallet-confirmation\",\"proofera-runtime\"]"
+          }
+        },
+        {
+          "constraintId": "secret-free-bundle",
+          "description": "No credential, signer, passkey or opaque secret handle may enter either lane.",
+          "enforcement": "hard",
+          "expected": { "encoding": "canonical_json", "value": "true" }
+        },
+        {
+          "constraintId": "timed-audit-read-only",
+          "description": "Neither lane may sign, grant, revoke, submit, broadcast or mutate a database.",
+          "enforcement": "hard",
+          "expected": { "encoding": "canonical_json", "value": "true" }
+        }
+      ],
+      "environment": {
+        "chainId": 97,
+        "components": [
+          {
+            "configurationSha256": "eb5f109f3b1da853c16afc4fb2f8aa98866c902a9142734d70cc173018053797",
+            "name": "altana-sdk",
+            "version": "0.7.0"
+          },
+          {
+            "configurationSha256": "5a94e234526fc2ffa2407bf49b20f4887f89b8d419009e76b529df35c80a0057",
+            "name": "manual-procedure",
+            "version": "proofera-termix-permission-audit-manual-v1.0.0"
+          },
+          { "configurationSha256": null, "name": "node", "version": "v24.14.1" },
+          {
+            "configurationSha256": "80c918eeeefe50ffdda36b25a4c891719602eff2661e67017cafdfd71e0bebd6",
+            "name": "postgresql",
+            "version": "17.9-host-local-staging"
+          },
+          {
+            "configurationSha256": "bce9dc29acc7d67c3e54f6f43eb36ed60e9f8560de0f9151aa80da3b3ad0941a",
+            "name": "proofera-security-auditor",
+            "version": "proofera-termix-permission-audit-engine-v1.1.0"
+          },
+          {
+            "configurationSha256": "80c918eeeefe50ffdda36b25a4c891719602eff2661e67017cafdfd71e0bebd6",
+            "name": "rpc-and-explorer",
+            "version": "126543819"
+          }
+        ],
+        "kind": "testnet",
+        "networkName": "BNB Smart Chain Testnet lifecycle replay",
+        "parameters": [
+          {
+            "key": "agent-registry-chain-id",
+            "value": { "encoding": "decimal_integer", "value": "97" }
+          },
+          {
+            "key": "authority-source-block",
+            "value": { "encoding": "decimal_integer", "value": "126543819" }
+          },
+          {
+            "key": "corpus-answer-key-digest",
+            "value": {
+              "encoding": "string",
+              "value": "61494b199b7b41b30eee370fe6736d864671439c65b2acfbee107c5ea9efdbeb"
+            }
+          },
+          {
+            "key": "erc8004-registry",
+            "value": {
+              "encoding": "evm_address",
+              "value": "0x8004A818BFB912233c491871b3d84c89A494BD9e"
+            }
+          },
+          {
+            "key": "permission-audit-agent-endpoint",
+            "value": { "encoding": "string", "value": "https://proofera-lp.tangvu.dev/" }
+          },
+          {
+            "key": "permission-audit-agent-id",
+            "value": { "encoding": "decimal_integer", "value": "1825" }
+          },
+          {
+            "key": "permission-audit-rpc-endpoint",
+            "value": { "encoding": "string", "value": "https://bsc-testnet-rpc.publicnode.com" }
+          },
+          {
+            "key": "run-order-randomness-commitment",
+            "value": {
+              "encoding": "canonical_json",
+              "value": "{\"blockNumber\":\"126555555\",\"chainId\":97,\"finalityConfirmations\":\"12\",\"mapping\":\"least-significant bit of finalized block hash: 0=agent-first, 1=manual-first\",\"providers\":[\"https://data-seed-prebsc-2-s2.binance.org:8545\",\"https://bsc-testnet-rpc.publicnode.com\"]}"
+            }
+          }
+        ],
+        "softwareCommitSha": "38046f87b87c27fc3a44b3855cc7e54a10e21d8a"
+      },
+      "inputs": [
+        {
+          "description": "Exact policy/config evidence reference for the audited activation.",
+          "inputId": "activation-proposal",
+          "unit": null,
+          "value": {
+            "encoding": "canonical_json",
+            "value": "{\"artifactId\":\"activation-proposal\",\"locator\":\"deploy/windows/altana-test-action.v2.json\",\"sha256\":\"53d21a388519dd2a88153392851944d51bd24b3cae1aadee647a6ec6a61f0583\"}"
+          }
+        },
+        {
+          "description": "Source-bound deterministic blind mutation corpus reference.",
+          "inputId": "adversarial-corpus",
+          "unit": null,
+          "value": {
+            "encoding": "canonical_json",
+            "value": "{\"artifactId\":\"adversarial-corpus\",\"locator\":\"scripts/freeze-termix-permission-audit-declaration.ts\",\"sha256\":\"708a30c9630ffb7fc7d01542b673fe7841e5f7453d0aadadd6a9b2036c768f7b\"}"
+          }
+        },
+        {
+          "description": "Retained grant, execute and revoke lifecycle evidence reference.",
+          "inputId": "authority-lifecycle-receipts",
+          "unit": null,
+          "value": {
+            "encoding": "canonical_json",
+            "value": "{\"artifactId\":\"authority-lifecycle\",\"locator\":\"evidence/altana/lifecycles/126543819-72e7cf94-altana-lifecycle.json\",\"sha256\":\"e001d4f9eb8e87d95408206e72c937c1ff8cd68d9885898a4d02aabdfe661b19\"}"
+          }
+        },
+        {
+          "description": "Exact-block PTA runtime attestation reference.",
+          "inputId": "code-authority-attestation",
+          "unit": null,
+          "value": {
+            "encoding": "canonical_json",
+            "value": "{\"artifactId\":\"code-attestation\",\"locator\":\"evidence/termix/preparations/permission-audit/38046f87b87c-126543819.json\",\"sha256\":\"80c918eeeefe50ffdda36b25a4c891719602eff2661e67017cafdfd71e0bebd6\"}"
+          }
+        },
+        {
+          "description": "Pinned Altana SDK 0.7.0 behavior evidence reference.",
+          "inputId": "sdk-behavior-evidence",
+          "unit": null,
+          "value": {
+            "encoding": "canonical_json",
+            "value": "{\"artifactId\":\"sdk-behavior\",\"locator\":\"evidence/altana/preparations/125493138-bsc-testnet-readiness.json\",\"sha256\":\"959e1b6fc66da8e65d1ff7c610c2e6b147ad99852bb1948a1c4ca61707fc1c98\"}"
+          }
+        }
+      ],
+      "qualityRubric": {
+        "criteria": [
+          {
+            "criterionId": "evidence-reproducibility",
+            "description": "Preserve hashes, receipts, timing, costs and limitations.",
+            "evidenceRequired": "Raw/canonical output, receipt joins and verification log.",
+            "maximumPoints": 15,
+            "measurement": "Second-review the complete source joins and deterministic output."
+          },
+          {
+            "criterionId": "false-positive-discipline",
+            "description": "Avoid claims unsupported by code, receipts, SDK evidence or policy.",
+            "evidenceRequired": "Finding-to-source join table and adjudication.",
+            "maximumPoints": 15,
+            "measurement": "Review every finding against exact evidence."
+          },
+          {
+            "criterionId": "impact-reproduction",
+            "description": "Explain impact and safe read-only reproduction.",
+            "evidenceRequired": "Reproduction log and source hashes.",
+            "maximumPoints": 15,
+            "measurement": "Replay each approved read-only reproduction."
+          },
+          {
+            "criterionId": "least-authority-correction",
+            "description": "Return a complete corrected three-layer policy.",
+            "evidenceRequired": "Corrected table and reviewer checklist.",
+            "maximumPoints": 20,
+            "measurement": "Validate target, selector, amount, expiry, claim, retry and revoke controls."
+          },
+          {
+            "criterionId": "true-positive-coverage",
+            "description": "Find seeded and naturally present authority, durability and retry defects.",
+            "evidenceRequired": "Raw report, normalized findings, corpus digest and answer-key trace.",
+            "maximumPoints": 35,
+            "measurement": "Compare normalized finding IDs and severities with the frozen answer key."
+          }
+        ],
+        "declaredAtUtc": "2026-08-11T18:22:25.921Z",
+        "rubricId": "termix-permission-audit-rubric-v1",
+        "totalMaximumPoints": 100,
+        "version": "1.0.0"
+      },
+      "requiredReceiptKinds": ["api", "transaction"],
+      "task": {
+        "domain": "security",
+        "exactDefinition": "Audit one immutable secret-free BSC testnet Altana activation bundle, identify authority and durability defects, and return evidence-linked findings plus a corrected three-layer enforcement table. The timed audit is read-only.",
+        "successCondition": "Both methods inspect byte-identical inputs, report reproducible findings without secrets or writes, and preserve the distinction between Altana/onchain, ProofEra runtime and explicit wallet enforcement.",
+        "taskId": "autonomous-session-permission-audit",
+        "title": "Altana/Pancake autonomous-session least-authority audit"
+      }
+    },
+    "evidenceState": {
+      "reason": "A distinct independent second reviewer has not reobserved the receipts, reviewed the manual no-agent log and signed the exact pair digest.",
+      "state": "unverified"
+    },
+    "limitations": [
+      "The runner timestamps operator-declared active work but cannot cryptographically prove operator identity or absence of unreported tools.",
+      "Artifact-read events prove digest agreement only; they do not authenticate the underlying source or prove that the reviewer understood it.",
+      "The manual report is retained unedited and is not presumed correct merely because its schema and evidence joins validate.",
+      "The normalized score is an implementation-adjacent deterministic self-review, not an independent adjudication.",
+      "The exact invocation is retained at evidence/termix/invocations/permission-audit-manual-20260822-v1.canonical-json.",
+      "Active operator segments remain available only in the raw timed capture; the generic pair schema compares full monotonic wall duration."
+    ],
+    "method": {
+      "kind": "manual",
+      "label": "Independent bounded permission-audit worksheet",
+      "operatorRole": "Repository owner using the bounded no-agent security worksheet",
+      "procedureVersion": "proofera-termix-permission-audit-manual-v1.0.0",
+      "tools": [
+        { "name": "human-reviewed-canonical-json-worksheet", "version": "1.0.0" },
+        { "name": "node-sha256", "version": "node-crypto" },
+        { "name": "publicnode-bsc-testnet-json-rpc", "version": "eth-json-rpc" }
+      ]
+    },
+    "qualityAssessment": {
+      "assessedAtUtc": "2026-08-22T12:50:39.527Z",
+      "assessor": "ProofEra deterministic post-run self-review v1",
+      "scores": [
+        {
+          "criterionId": "evidence-reproducibility",
+          "evidence": [
+            { "artifactId": "manual-output", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "manual-api-receipt-0" }
+          ],
+          "points": 15,
+          "rationale": "The raw capture retains exact output/API bytes, digests, timing, explicit-zero incremental cost, limitations and fixed invocations."
+        },
+        {
+          "criterionId": "false-positive-discipline",
+          "evidence": [
+            { "artifactId": "manual-output", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "manual-api-receipt-0" }
+          ],
+          "points": 15,
+          "rationale": "The canonical output contains no unsupported or duplicate finding beyond the exact answer key."
+        },
+        {
+          "criterionId": "impact-reproduction",
+          "evidence": [
+            { "artifactId": "manual-output", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "manual-api-receipt-0" }
+          ],
+          "points": 15,
+          "rationale": "Every finding retains a non-secret impact statement, read-only reproduction and evidence-artifact join."
+        },
+        {
+          "criterionId": "least-authority-correction",
+          "evidence": [
+            { "artifactId": "manual-output", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "manual-api-receipt-0" }
+          ],
+          "points": 20,
+          "rationale": "The corrected table exactly covers wallet confirmation, runtime validation, direct authority, unknown outcome, revoke and signer custody."
+        },
+        {
+          "criterionId": "true-positive-coverage",
+          "evidence": [
+            { "artifactId": "manual-output", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "manual-api-receipt-0" }
+          ],
+          "points": 35,
+          "rationale": "Normalized finding IDs, severities and source joins exactly match the reviewer-held answer key."
+        }
+      ]
+    },
+    "receipts": [
+      {
+        "endpointUrl": "https://bsc-testnet-rpc.publicnode.com",
+        "kind": "api",
+        "observedAtUtc": "2026-08-22T12:17:28.796Z",
+        "provider": "PublicNode BSC Testnet JSON-RPC",
+        "receiptId": "manual-api-receipt-0",
+        "requestId": "audit-e6eca6d045c36c63-chain",
+        "responseArtifactId": "manual-api-0",
+        "responseSha256": "efa128d578cb2b17c513397636375e2cdc280882371a49092501089e404d8f96",
+        "verification": {
+          "method": "Recomputed retained response bytes and revalidated the frozen RPC/A2A response contract.",
+          "state": "verified",
+          "verifiedAtUtc": "2026-08-22T12:50:39.527Z",
+          "verifier": "ProofEra deterministic post-run self-review v1"
+        }
+      },
+      {
+        "endpointUrl": "https://bsc-testnet-rpc.publicnode.com",
+        "kind": "api",
+        "observedAtUtc": "2026-08-22T12:17:28.797Z",
+        "provider": "PublicNode BSC Testnet JSON-RPC",
+        "receiptId": "manual-api-receipt-1",
+        "requestId": "audit-e6eca6d045c36c63-grant",
+        "responseArtifactId": "manual-api-1",
+        "responseSha256": "e838442125aed5817b9419e9d636621f179ba894a18ae2007be480bf0b3d3638",
+        "verification": {
+          "method": "Recomputed retained response bytes and revalidated the frozen RPC/A2A response contract.",
+          "state": "verified",
+          "verifiedAtUtc": "2026-08-22T12:50:39.527Z",
+          "verifier": "ProofEra deterministic post-run self-review v1"
+        }
+      },
+      {
+        "endpointUrl": "https://bsc-testnet-rpc.publicnode.com",
+        "kind": "api",
+        "observedAtUtc": "2026-08-22T12:17:28.799Z",
+        "provider": "PublicNode BSC Testnet JSON-RPC",
+        "receiptId": "manual-api-receipt-2",
+        "requestId": "audit-e6eca6d045c36c63-revoke",
+        "responseArtifactId": "manual-api-2",
+        "responseSha256": "9ee303a0a176d0a829c226b9b23631b1fcb5c427b8b660b32ed17e4f2c903bad",
+        "verification": {
+          "method": "Recomputed retained response bytes and revalidated the frozen RPC/A2A response contract.",
+          "state": "verified",
+          "verifiedAtUtc": "2026-08-22T12:50:39.527Z",
+          "verifier": "ProofEra deterministic post-run self-review v1"
+        }
+      },
+      {
+        "endpointUrl": "https://bsc-testnet-rpc.publicnode.com",
+        "kind": "api",
+        "observedAtUtc": "2026-08-22T12:17:28.800Z",
+        "provider": "PublicNode BSC Testnet JSON-RPC",
+        "receiptId": "manual-api-receipt-3",
+        "requestId": "audit-e6eca6d045c36c63-code-0",
+        "responseArtifactId": "manual-api-3",
+        "responseSha256": "d48c83f88c678c96235ebfbc7530b062ea3ea2eb8a5de70cebbb45d27823ef14",
+        "verification": {
+          "method": "Recomputed retained response bytes and revalidated the frozen RPC/A2A response contract.",
+          "state": "verified",
+          "verifiedAtUtc": "2026-08-22T12:50:39.527Z",
+          "verifier": "ProofEra deterministic post-run self-review v1"
+        }
+      },
+      {
+        "chainId": 97,
+        "explorerUrl": "https://testnet.bscscan.com/tx/0xbfa1e3216d38efa0fc013efa504e808e16360b113f9a35bced6e1689345180c7",
+        "kind": "transaction",
+        "observedAtUtc": "2026-08-22T12:17:28.797Z",
+        "rawReceiptArtifactId": "manual-api-1",
+        "receiptId": "manual-authority-grant-transaction",
+        "transactionHash": "0xbfa1e3216d38efa0fc013efa504e808e16360b113f9a35bced6e1689345180c7",
+        "verification": {
+          "method": "Parsed the exact retained eth_getTransactionReceipt response and matched successful chain-97 grant lifecycle evidence.",
+          "state": "verified",
+          "verifiedAtUtc": "2026-08-22T12:50:39.527Z",
+          "verifier": "ProofEra deterministic post-run self-review v1"
+        }
+      }
+    ],
+    "reproductionCommands": [
+      {
+        "command": "pnpm --filter @proofera/benchmarks test",
+        "expectedArtifactIds": ["manual-output"],
+        "step": 1,
+        "workingDirectory": "."
+      }
+    ],
+    "runId": "permission-audit-manual-20260822-v1",
+    "timing": {
+      "endedAtUtc": "2026-08-22T12:17:28.803Z",
+      "monotonicClock": "Node.js process.hrtime.bigint",
+      "monotonicDurationNanoseconds": "12756400",
+      "startedAtUtc": "2026-08-22T12:17:28.789Z"
+    }
+  },
+  "pairId": "permission-audit-pair-20260822-v1",
+  "schemaVersion": "proofera-termix-pair-v1.0.0"
+}

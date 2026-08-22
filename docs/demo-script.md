@@ -12,7 +12,7 @@ Ready to show now:
 - the retained LP and Venus agent/manual raw captures;
 - the local operator ceremony explaining why manual judgment, passkey presence, execution, and revoke are separate transitions.
 
-Do not record the final cut yet. The following must exist first: real Altana grant/execute/revoke receipts and a negative-authority probe; controlled Pancake before/after evidence; Task 02 raw lanes; independent adjudication and final compilation of all three TermiX pairs; final production freeze. Until then, use rehearsal mode only.
+Do not record the final cut yet. The following must exist first: controlled Pancake before/after evidence; independent adjudication and final compilation of all three TermiX pairs; final production freeze. The Altana lifecycle and all six raw TermiX lanes are retained, but neither closes those remaining gates. Until then, use rehearsal mode only.
 
 ## One-session operator checklist
 

@@ -4,7 +4,12 @@ import { describe, expect, it } from "vitest";
 
 import { canonicalJson, sha256Bytes, sha256Canonical } from "./canonical.js";
 import { PERMISSION_AUDIT_ENGINE_VERSION, auditPermissionBundle } from "./permissionAudit.js";
-import { buildPermissionAuditPair } from "./permissionAuditPair.js";
+import { summarizePairedBenchmark } from "./pair.js";
+import {
+  PermissionAuditSelfReviewSchema,
+  buildPermissionAuditPair
+} from "./permissionAuditPair.js";
+import { PairedBenchmarkSchema } from "./schemas.js";
 
 const paths = {
   agentCapturePath:
@@ -44,6 +49,24 @@ function fixture() {
 }
 
 describe("permission-audit paired normalization", () => {
+  it("retains the compiled pair and its explicitly non-independent digest join", () => {
+    const pair = PairedBenchmarkSchema.parse(
+      readRepositoryJson(
+        "evidence/termix/pairs/permission-audit/permission-audit-pair-20260822-v1.json"
+      )
+    );
+    const review = PermissionAuditSelfReviewSchema.parse(
+      readRepositoryJson(
+        "evidence/termix/reviews/permission-audit/permission-audit-pair-20260822-v1-self-review.json"
+      )
+    );
+    const summary = summarizePairedBenchmark(pair);
+
+    expect(review.pairSha256).toBe(summary.pairSha256);
+    expect(summary).toMatchObject({ claimState: "unverified", publishableClaim: false });
+    expect(review.checks.secondReviewerIndependent).toBe(false);
+  });
+
   it("retains exact parity and blocks publication without an independent reviewer", () => {
     const result = buildPermissionAuditPair(fixture());
 

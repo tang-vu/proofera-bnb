@@ -1,8 +1,8 @@
 # ProofEra agent advantage report
 
-Updated: 2026-08-22. Overall status: **PARTIAL RAW CAPTURE — NON-PUBLISHABLE**.
+Updated: 2026-08-22. Overall status: **ALL SIX RAW LANES CAPTURED — NON-PUBLISHABLE**.
 
-This is ProofEra's TermiX paired-experiment ledger. Exactly three ProofEra-versus-manual tasks are preregistered. The hire contract deployment and three paid BSC-testnet hires are independently finalized in [`125715654-7fa5ad3e.json`](../evidence/termix/hire-receipts/125715654-7fa5ad3e.json); they establish commerce prerequisites only. Task 01 and Task 03 each retain an agent and manual raw capture. Task 02 now has a published frozen bundle/declaration built from the real bounded Altana lifecycle, but its run order and both timed lanes remain absent. No pair has independent adjudication or a compiler-accepted final report, so no performance or advantage is claimed.
+This is ProofEra's TermiX paired-experiment ledger. Exactly three ProofEra-versus-manual tasks are preregistered. The hire contract deployment and three paid BSC-testnet hires are independently finalized in [`125715654-7fa5ad3e.json`](../evidence/termix/hire-receipts/125715654-7fa5ad3e.json); they establish commerce prerequisites only. All six raw timed lanes are retained. Task 02 additionally has a schema-valid unverified pair and an implementation-adjacent self-review, while no task has independent adjudication and no compiler-accepted final three-pair report exists. No performance or advantage is claimed.
 
 ## Harness audit and preregistration boundary
 
@@ -43,7 +43,7 @@ Costs remain grouped by denomination; no hidden exchange-rate conversion or aggr
 | Preregistered task                       | ProofEra-hired agent | Without agent    | Publishable |
 | ---------------------------------------- | -------------------- | ---------------- | ----------- |
 | 01 — PancakeSwap LP range decision       | **RAW CAPTURED**     | **RAW CAPTURED** | No          |
-| 02 — autonomous-session permission audit | **NOT RUN**          | **NOT RUN**      | No          |
+| 02 — autonomous-session permission audit | **RAW CAPTURED**     | **RAW CAPTURED** | No          |
 | 03 — Venus health-factor replay          | **RAW CAPTURED**     | **RAW CAPTURED** | No          |
 
 ## Task 01 — PancakeSwap public-position LP range decision
@@ -104,7 +104,9 @@ Available implementation boundary: `@proofera/benchmarks` now includes a strict 
 
 Rubric (100): true-positive coverage 35; false-positive discipline 15; impact/reproduction 15; least-authority correction 20; evidence/reproducibility 15. Missing a seeded generic dispatcher, session-signer leak, wrong target/recipient/token/chain, unbounded spend, unsafe unknown-outcome retry or revoke failure is a hard fail. A secret exposure or timed write is also a hard fail.
 
-Still required: finalized two-provider run order; exact agent/manual invocations; both raw timed captures; timing/cost/tool log; post-run answer-key adjudication; second review; and compiler-accepted paired evidence. None of those run/result artifacts exists yet.
+Finalized two-provider randomness forced manual-first. Both exact invocations and both timed captures are retained. The manual lane recorded four fixed RPC observations without an agent call; the agent lane recorded the same four RPC observations plus one public A2A receipt. Both outputs contain the exact same 18 findings and corrected table, bind bundle SHA-256 `c50a2defc62a996cab8a8bf51be2b8b2bbe44cc007ea01e6d1512d7257a8f0cb`, and state `executionPerformed: false`.
+
+The create-only post-run compiler retained [`permission-audit-pair-20260822-v1.json`](../evidence/termix/pairs/permission-audit/permission-audit-pair-20260822-v1.json), logical pair SHA-256 `68fcb8e6aefe85db8e6b239f1471fc65baee4dd0dd8ab2cd70516bdd1def8153`. It records monotonic wall duration `12,756,400 ns` manual versus `2,318,655,500 ns` agent, explicit zero incremental tBNB fees in both timed lanes, and exact answer-key rubric parity at `100/100`. The implementation-adjacent [`self-review`](../evidence/termix/reviews/permission-audit/permission-audit-pair-20260822-v1-self-review.json) explicitly sets `secondReviewerIndependent: false`; both run evidence states therefore remain `unverified` and the pair summary is non-publishable. A distinct second reviewer must reobserve receipts, review the manual tool log and sign the exact pair digest before this pair can become verified.
 
 Available prerequisite commands—not paired audit execution:
 
@@ -113,7 +115,7 @@ pnpm --filter @proofera/integrations exec vitest run src/altana-lp-activation-co
 pnpm --filter @proofera/benchmarks test
 ```
 
-The create-only agent entrypoint is `pnpm run:termix:permission-audit-agent -- --execute-exact-permission-audit-agent-run --input-bundle evidence/termix/frozen/permission-audit/38046f87b87c-126543819.canonical-json`. It requires the byte-exact invocation on standard input, a clean published release, registered identity and verified hire before its fixed RPC/A2A lane can start. The create-only manual entrypoint uses that same bundle; its first bounded NDJSON line binds the request and subsequent lines are timestamped operator events consumed by the no-agent/no-network lane. Both final invocations remain absent until block `126555555` is finalized and the two fixed RPCs resolve the committed order. Agent result: **NOT RUN**. Manual result: **NOT RUN**.
+The create-only agent entrypoint is `pnpm run:termix:permission-audit-agent -- --execute-exact-permission-audit-agent-run --input-bundle evidence/termix/frozen/permission-audit/38046f87b87c-126543819.canonical-json`. It requires the byte-exact invocation on standard input, a clean published release, registered identity and verified hire before its fixed RPC/A2A lane can start. The create-only manual entrypoint uses that same bundle; its first bounded NDJSON line binds the request and subsequent lines are timestamped operator events consumed by the no-agent/no-network lane. Agent result: **RAW CAPTURED**. Manual result: **RAW CAPTURED**. Pair result: **SELF-REVIEWED / UNVERIFIED / NON-PUBLISHABLE**.
 
 ## Task 03 — Venus health-factor replay and intervention decision
 

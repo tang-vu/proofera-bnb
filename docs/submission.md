@@ -1,6 +1,6 @@
 # ProofEra submission draft
 
-Updated: 2026-08-22. Status: copy in progress; the marketplace and four read-only analyzer endpoints are public, all four ERC-8004 registrations are receipt-verified on BSC testnet, and the bounded Altana v2 grant/execute/revoke lifecycle is retained with explicit archive/provenance limits. The LP and Venus comparisons each have an agent raw capture and a manual raw capture. Task 02, Pancake benefit execution, independent adjudication, the final demo video, and final release evidence remain incomplete.
+Updated: 2026-08-22. Status: copy in progress; the marketplace and four read-only analyzer endpoints are public, all four ERC-8004 registrations are receipt-verified on BSC testnet, and the bounded Altana v2 grant/execute/revoke lifecycle is retained with explicit archive/provenance limits. All six TermiX raw lanes are retained. Task 02 has a schema-valid unverified pair and a deliberately non-independent self-review; Pancake benefit execution, independent adjudication, the final demo video, and final release evidence remain incomplete.
 
 ## Core copy
 
@@ -28,7 +28,7 @@ Users begin with a financial job—protect a Venus loan, manage Pancake concentr
 
 **Altana:** the bounded v2 chain-97 ceremony is complete. The retained [lifecycle artifact](../evidence/altana/lifecycles/126543819-72e7cf94-altana-lifecycle.json), SHA-256 `e001d4f9eb8e87d95408206e72c937c1ff8cd68d9885898a4d02aabdfe661b19`, joins successful grant transaction `0xbfa1e3216d38efa0fc013efa504e808e16360b113f9a35bced6e1689345180c7`, execute transaction `0xad65e59018c177ce1379b7e7de4e2449e03083f1569e7fcf0b2068e76cb0268e` with calls ID `0xc09bfb47b1dd426703bf11c1c7673c516f46e0afef5939108073ca0b9aa0dfcb`, and revoke transaction `0x72e7cf94527ec6bed65856ce6ccc96ef94c7d8af8e5183ffa4667854637bceb7` with calls ID `0x71f259a4f0a58f07776b72447afa4062f305692ad1b195298009c896c3c6a1db`. It also binds the exact PTA `Approval(wallet, session, 0)` event, PublicNode authority presence with expiry `1787392650` at grant/execute, absence at revoke, and BNB Chain plus PublicNode absence at finalized block `126543819`. The fixed BNB Chain node had pruned historical state, so two-provider historical authority is explicitly false; the exact expiry-bearing intent was reconstructed from the unchanged ceremony policy and onchain expiry rather than precommitted. The artifact does not directly decode the session signature, and zero approval proves no nonzero state transition, economic benefit, PancakeSwap/LP action or performance. The failed v1 calls ID remains retained and was never retried. This bounded proof worker is not the production LP worker/ledger/KMS path.
 
-**TermiX:** the strict harness and exactly three active digest-bound protocols exist for LP trading, permission security and Venus health. All four marketplace identities and three paid hires are receipt-verified on BSC testnet; those receipts do not establish task completion or performance. LP and Venus declarations plus finalized randomness forced agent-first, and all four corresponding raw captures are retained. The real Altana lifecycle input needed by Task 02 now exists, but its final immutable audit bundle, agent/manual runs, independent adjudication and final three-pair compilation remain incomplete. No advantage is claimed.
+**TermiX:** the strict harness and exactly three active digest-bound protocols exist for LP trading, permission security and Venus health. All four marketplace identities and three paid hires are receipt-verified on BSC testnet; those receipts do not establish task completion or performance. All six raw agent/manual captures are retained. Task 02 finalized manual-first order and produced a schema-valid pair with equal answer-key quality scores, explicit-zero incremental costs and exact timing. Its self-review is implementation-adjacent and explicitly not independent, so both evidence states remain unverified; independent adjudication of all three tasks and final three-pair compilation remain incomplete. No advantage is claimed.
 
 ## Submission evidence — incomplete
 
@@ -47,8 +47,8 @@ The judge-facing claim/evidence/missing-evidence map is maintained in [`judge-sc
 | Altana account/key links      | BOUNDED V2 CHAIN-97 LIFECYCLE RETAINED                       |
 | Grant/execute/revoke receipts | VERIFIED WITH EXPLICIT SINGLE-ARCHIVE HISTORICAL LIMIT       |
 | Pancake benefit run           | READ-ONLY PUBLIC POSITION CAPTURED; EXECUTION NOT RUN        |
-| TermiX hire receipts          | THREE FINALIZED PAID TESTNET HIRES; TWO RAW PAIRS CAPTURED   |
-| TermiX three-task report      | LP/VENUS RAW LANES CAPTURED; TASK 02 INPUT READY, RUNS OPEN  |
+| TermiX hire receipts          | THREE FINALIZED PAID TESTNET HIRES; ALL SIX LANES CAPTURED   |
+| TermiX three-task report      | TASK 02 PAIR UNVERIFIED; INDEPENDENT ADJUDICATION STILL OPEN |
 | Demo video                    | SIX-SCENE PUBLIC REHEARSAL RETAINED; VIDEO NOT RECORDED      |
 | CI/public smoke evidence      | LOCAL GATES AND PUBLIC SMOKE PASS; HOSTED CI BILLING-BLOCKED |
 | PTA fixture deployment        | FINALIZED CHAIN 97; NOT POOL/LP EVIDENCE                     |
