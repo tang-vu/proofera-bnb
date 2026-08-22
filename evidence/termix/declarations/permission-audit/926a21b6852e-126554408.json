@@ -1,0 +1,257 @@
+{
+  "schemaVersion": "proofera-termix-frozen-declaration-v1.0.0",
+  "answerKey": {
+    "access": "reviewer-held local file; not supplied to either timed lane",
+    "sha256": "f5050c5e7f01609c6bf85079794d9d3725a5f836ff734d98adf5681dccd98672"
+  },
+  "claims": {
+    "agentRun": false,
+    "hired": true,
+    "manualRun": false,
+    "result": false,
+    "runOrderResolved": false
+  },
+  "declaration": {
+    "benchmarkId": "altana-permission-audit-v1",
+    "task": {
+      "taskId": "autonomous-session-permission-audit",
+      "title": "Altana/Pancake autonomous-session least-authority audit",
+      "domain": "security",
+      "exactDefinition": "Audit one immutable secret-free BSC testnet Altana activation bundle, identify authority and durability defects, and return evidence-linked findings plus a corrected three-layer enforcement table. The timed audit is read-only.",
+      "successCondition": "Both methods inspect byte-identical inputs, report reproducible findings without secrets or writes, and preserve the distinction between Altana/onchain, ProofEra runtime and explicit wallet enforcement."
+    },
+    "inputs": [
+      {
+        "inputId": "activation-proposal",
+        "description": "Exact policy/config evidence reference for the audited activation.",
+        "value": {
+          "encoding": "canonical_json",
+          "value": "{\"artifactId\":\"activation-proposal\",\"locator\":\"deploy/windows/altana-test-action.v2.json\",\"sha256\":\"53d21a388519dd2a88153392851944d51bd24b3cae1aadee647a6ec6a61f0583\"}"
+        },
+        "unit": null
+      },
+      {
+        "inputId": "adversarial-corpus",
+        "description": "Source-bound deterministic blind mutation corpus reference.",
+        "value": {
+          "encoding": "canonical_json",
+          "value": "{\"artifactId\":\"adversarial-corpus\",\"locator\":\"scripts/freeze-termix-permission-audit-declaration.ts\",\"sha256\":\"708a30c9630ffb7fc7d01542b673fe7841e5f7453d0aadadd6a9b2036c768f7b\"}"
+        },
+        "unit": null
+      },
+      {
+        "inputId": "authority-lifecycle-receipts",
+        "description": "Retained grant, execute and revoke lifecycle evidence reference.",
+        "value": {
+          "encoding": "canonical_json",
+          "value": "{\"artifactId\":\"authority-lifecycle\",\"locator\":\"evidence/altana/lifecycles/126543819-72e7cf94-altana-lifecycle.json\",\"sha256\":\"e001d4f9eb8e87d95408206e72c937c1ff8cd68d9885898a4d02aabdfe661b19\"}"
+        },
+        "unit": null
+      },
+      {
+        "inputId": "code-authority-attestation",
+        "description": "Exact-block PTA runtime attestation reference.",
+        "value": {
+          "encoding": "canonical_json",
+          "value": "{\"artifactId\":\"code-attestation\",\"locator\":\"evidence/termix/preparations/permission-audit/926a21b6852e-126543819.json\",\"sha256\":\"5a3f25403685e04c5eccdeae7d1125d5c4dc227d6df6742a9230bd3a04aab234\"}"
+        },
+        "unit": null
+      },
+      {
+        "inputId": "sdk-behavior-evidence",
+        "description": "Pinned Altana SDK 0.7.0 behavior evidence reference.",
+        "value": {
+          "encoding": "canonical_json",
+          "value": "{\"artifactId\":\"sdk-behavior\",\"locator\":\"evidence/altana/preparations/125493138-bsc-testnet-readiness.json\",\"sha256\":\"959e1b6fc66da8e65d1ff7c610c2e6b147ad99852bb1948a1c4ca61707fc1c98\"}"
+        },
+        "unit": null
+      }
+    ],
+    "constraints": [
+      {
+        "constraintId": "audit-window",
+        "description": "Finish within 1200 seconds; overruns remain recorded.",
+        "enforcement": "scored",
+        "expected": { "encoding": "decimal_integer", "value": "1200" }
+      },
+      {
+        "constraintId": "bsc-testnet-only",
+        "description": "All authority, receipt and code observations are BSC testnet chain 97.",
+        "enforcement": "hard",
+        "expected": { "encoding": "decimal_integer", "value": "97" }
+      },
+      {
+        "constraintId": "required-enforcement-layers",
+        "description": "Corrections must identify the actual enforcement layer.",
+        "enforcement": "hard",
+        "expected": {
+          "encoding": "canonical_json",
+          "value": "[\"altana-or-onchain\",\"explicit-wallet-confirmation\",\"proofera-runtime\"]"
+        }
+      },
+      {
+        "constraintId": "secret-free-bundle",
+        "description": "No credential, signer, passkey or opaque secret handle may enter either lane.",
+        "enforcement": "hard",
+        "expected": { "encoding": "canonical_json", "value": "true" }
+      },
+      {
+        "constraintId": "timed-audit-read-only",
+        "description": "Neither lane may sign, grant, revoke, submit, broadcast or mutate a database.",
+        "enforcement": "hard",
+        "expected": { "encoding": "canonical_json", "value": "true" }
+      }
+    ],
+    "environment": {
+      "kind": "testnet",
+      "chainId": 97,
+      "networkName": "BNB Smart Chain Testnet lifecycle replay",
+      "softwareCommitSha": "926a21b6852e0008db474dd7e3ceb04d6e4ee23e",
+      "components": [
+        {
+          "name": "altana-sdk",
+          "version": "0.7.0",
+          "configurationSha256": "eb5f109f3b1da853c16afc4fb2f8aa98866c902a9142734d70cc173018053797"
+        },
+        {
+          "name": "manual-procedure",
+          "version": "proofera-termix-permission-audit-manual-v1.0.0",
+          "configurationSha256": "5a94e234526fc2ffa2407bf49b20f4887f89b8d419009e76b529df35c80a0057"
+        },
+        { "name": "node", "version": "v24.14.1", "configurationSha256": null },
+        {
+          "name": "postgresql",
+          "version": "17.9-host-local-staging",
+          "configurationSha256": "5a3f25403685e04c5eccdeae7d1125d5c4dc227d6df6742a9230bd3a04aab234"
+        },
+        {
+          "name": "proofera-security-auditor",
+          "version": "proofera-termix-permission-audit-engine-v1.1.0",
+          "configurationSha256": "bce9dc29acc7d67c3e54f6f43eb36ed60e9f8560de0f9151aa80da3b3ad0941a"
+        },
+        {
+          "name": "rpc-and-explorer",
+          "version": "126543819",
+          "configurationSha256": "5a3f25403685e04c5eccdeae7d1125d5c4dc227d6df6742a9230bd3a04aab234"
+        }
+      ],
+      "parameters": [
+        {
+          "key": "agent-registry-chain-id",
+          "value": { "encoding": "decimal_integer", "value": "97" }
+        },
+        {
+          "key": "authority-source-block",
+          "value": { "encoding": "decimal_integer", "value": "126543819" }
+        },
+        {
+          "key": "corpus-answer-key-digest",
+          "value": {
+            "encoding": "string",
+            "value": "f5050c5e7f01609c6bf85079794d9d3725a5f836ff734d98adf5681dccd98672"
+          }
+        },
+        {
+          "key": "erc8004-registry",
+          "value": {
+            "encoding": "evm_address",
+            "value": "0x8004A818BFB912233c491871b3d84c89A494BD9e"
+          }
+        },
+        {
+          "key": "permission-audit-agent-endpoint",
+          "value": { "encoding": "string", "value": "https://proofera-lp.tangvu.dev/" }
+        },
+        {
+          "key": "permission-audit-agent-id",
+          "value": { "encoding": "decimal_integer", "value": "1825" }
+        },
+        {
+          "key": "permission-audit-rpc-endpoint",
+          "value": { "encoding": "string", "value": "https://bsc-testnet-rpc.publicnode.com" }
+        },
+        {
+          "key": "run-order-randomness-commitment",
+          "value": {
+            "encoding": "canonical_json",
+            "value": "{\"blockNumber\":\"126554408\",\"chainId\":97,\"finalityConfirmations\":\"12\",\"mapping\":\"least-significant bit of finalized block hash: 0=agent-first, 1=manual-first\",\"providers\":[\"https://data-seed-prebsc-2-s2.binance.org:8545\",\"https://bsc-testnet-rpc.publicnode.com\"]}"
+          }
+        }
+      ]
+    },
+    "qualityRubric": {
+      "rubricId": "termix-permission-audit-rubric-v1",
+      "version": "1.0.0",
+      "declaredAtUtc": "2026-08-11T18:22:25.921Z",
+      "criteria": [
+        {
+          "criterionId": "evidence-reproducibility",
+          "description": "Preserve hashes, receipts, timing, costs and limitations.",
+          "measurement": "Second-review the complete source joins and deterministic output.",
+          "evidenceRequired": "Raw/canonical output, receipt joins and verification log.",
+          "maximumPoints": 15
+        },
+        {
+          "criterionId": "false-positive-discipline",
+          "description": "Avoid claims unsupported by code, receipts, SDK evidence or policy.",
+          "measurement": "Review every finding against exact evidence.",
+          "evidenceRequired": "Finding-to-source join table and adjudication.",
+          "maximumPoints": 15
+        },
+        {
+          "criterionId": "impact-reproduction",
+          "description": "Explain impact and safe read-only reproduction.",
+          "measurement": "Replay each approved read-only reproduction.",
+          "evidenceRequired": "Reproduction log and source hashes.",
+          "maximumPoints": 15
+        },
+        {
+          "criterionId": "least-authority-correction",
+          "description": "Return a complete corrected three-layer policy.",
+          "measurement": "Validate target, selector, amount, expiry, claim, retry and revoke controls.",
+          "evidenceRequired": "Corrected table and reviewer checklist.",
+          "maximumPoints": 20
+        },
+        {
+          "criterionId": "true-positive-coverage",
+          "description": "Find seeded and naturally present authority, durability and retry defects.",
+          "measurement": "Compare normalized finding IDs and severities with the frozen answer key.",
+          "evidenceRequired": "Raw report, normalized findings, corpus digest and answer-key trace.",
+          "maximumPoints": 35
+        }
+      ],
+      "totalMaximumPoints": 100
+    },
+    "requiredReceiptKinds": ["api", "transaction"]
+  },
+  "declarationSha256": "a0e49a569c86cdcead663a6eb77198202bddacc27a178c53c2c1b1f292a9b1ee",
+  "hireEvidence": {
+    "path": "evidence/termix/hire-receipts/125715654-7fa5ad3e.json",
+    "sha256": "8a79415f0ab07ebab13d1174ca033536a53b55497fd167202b844e30a59072a8"
+  },
+  "input": {
+    "path": "evidence/termix/frozen/permission-audit/926a21b6852e-126543819.canonical-json",
+    "sha256": "0c5b129c6f1015b0b04dbd259da897899ae41067bd35bd8f4d2980ba1c069c06"
+  },
+  "preparation": {
+    "path": "evidence/termix/preparations/permission-audit/926a21b6852e-126543819.json",
+    "sha256": "5a3f25403685e04c5eccdeae7d1125d5c4dc227d6df6742a9230bd3a04aab234"
+  },
+  "randomnessCommitment": {
+    "blockNumber": "126554408",
+    "chainId": 97,
+    "finalityConfirmations": "12",
+    "mapping": "least-significant bit of finalized block hash: 0=agent-first, 1=manual-first",
+    "providers": [
+      "https://data-seed-prebsc-2-s2.binance.org:8545",
+      "https://bsc-testnet-rpc.publicnode.com"
+    ]
+  },
+  "registeredAgent": {
+    "agentId": "1825",
+    "chainId": 97,
+    "registryAddress": "0x8004A818BFB912233c491871b3d84c89A494BD9e"
+  },
+  "sourceCommitSha": "926a21b6852e0008db474dd7e3ceb04d6e4ee23e",
+  "state": "frozen-awaiting-randomness-and-runs"
+}
