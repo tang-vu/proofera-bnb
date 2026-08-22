@@ -33,6 +33,8 @@ test("permission audit freezer binds lifecycle, staging receipt, public state an
   assert.match(source, /TERMIX_PERMISSION_FREEZE_BUNDLE_SCHEMA_INVALID/u);
   assert.match(source, /TERMIX_PERMISSION_FREEZE_DECLARATION_SCHEMA_INVALID/u);
   assert.match(source, /TERMIX_PERMISSION_FREEZE_OUTPUT_WRITE_FAILED/u);
+  assert.match(source, /TERMIX_PERMISSION_FREEZE_DATABASE_RECEIPT_QUERY_FAILED/u);
+  assert.match(source, /TERMIX_PERMISSION_FREEZE_DATABASE_CLAIM_QUERY_FAILED/u);
   assert.match(source, /open\(path, "wx", 0o600\)/u);
   assert.doesNotMatch(
     source,

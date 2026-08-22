@@ -234,19 +234,30 @@ function commandText(command: string, args: readonly string[], input?: string): 
   }).trim();
 }
 
+function databaseCommand(code: string, args: readonly string[], input?: string): string {
+  return runStage(code, () => commandText("docker", args, input));
+}
+
 function captureDatabaseReceipt(): Record<string, unknown> {
-  const state = commandText("docker", ["inspect", "--format={{.State.Status}}", GRANT_CONTAINER]);
-  const configuredImage = commandText("docker", [
+  const state = databaseCommand("TERMIX_PERMISSION_FREEZE_DATABASE_STATUS_READ_FAILED", [
+    "inspect",
+    "--format={{.State.Status}}",
+    GRANT_CONTAINER
+  ]);
+  const configuredImage = databaseCommand("TERMIX_PERMISSION_FREEZE_DATABASE_IMAGE_READ_FAILED", [
     "inspect",
     "--format={{.Config.Image}}",
     GRANT_CONTAINER
   ]);
-  const imageId = commandText("docker", ["inspect", "--format={{.Image}}", GRANT_CONTAINER]);
-  const restartPolicy = commandText("docker", [
+  const imageId = databaseCommand("TERMIX_PERMISSION_FREEZE_DATABASE_IMAGE_ID_READ_FAILED", [
     "inspect",
-    "--format={{.HostConfig.RestartPolicy.Name}}",
+    "--format={{.Image}}",
     GRANT_CONTAINER
   ]);
+  const restartPolicy = databaseCommand(
+    "TERMIX_PERMISSION_FREEZE_DATABASE_RESTART_POLICY_READ_FAILED",
+    ["inspect", "--format={{.HostConfig.RestartPolicy.Name}}", GRANT_CONTAINER]
+  );
   if (
     state !== "running" ||
     configuredImage !== EXPECTED_POSTGRES_CONFIGURED_IMAGE ||
@@ -255,8 +266,8 @@ function captureDatabaseReceipt(): Record<string, unknown> {
   ) {
     fail("TERMIX_PERMISSION_FREEZE_DATABASE_CONTAINER_INVALID");
   }
-  const receiptText = commandText(
-    "docker",
+  const receiptText = databaseCommand(
+    "TERMIX_PERMISSION_FREEZE_DATABASE_RECEIPT_QUERY_FAILED",
     [
       "exec",
       "-i",
@@ -296,8 +307,8 @@ function captureDatabaseReceipt(): Record<string, unknown> {
   ) {
     fail("TERMIX_PERMISSION_FREEZE_DATABASE_RECEIPT_INVALID");
   }
-  const claimCount = commandText(
-    "docker",
+  const claimCount = databaseCommand(
+    "TERMIX_PERMISSION_FREEZE_DATABASE_CLAIM_QUERY_FAILED",
     [
       "exec",
       "-i",
