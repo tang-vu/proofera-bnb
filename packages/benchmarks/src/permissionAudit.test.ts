@@ -25,7 +25,7 @@ function safeCandidate() {
     chainId: 97,
     dispatcher: "direct-only" as const,
     expiresAtUtc: "2026-08-17T13:00:00.000Z",
-    quoteObservedAtUtc: "2026-08-17T11:59:30.000Z",
+    quoteObservedAtUtc: "2026-08-17T11:29:30.000Z",
     revokePath: "present" as const,
     sessionSignerExposure: "none" as const,
     spendCaps: [{ limitBaseUnits: "1000", periodSeconds: "300", token: address("3") }],
@@ -70,6 +70,9 @@ function bundle(): PermissionAuditBundle {
     ],
     authorityLifecycle: {
       chainId: 97,
+      executeBlockHash: `0x${"5".repeat(64)}`,
+      executeObservedAtUtc: "2026-08-17T11:30:00.000Z",
+      executeTransactionHash: `0x${"6".repeat(64)}`,
       finalAuthorityState: "revoked",
       grantBlockHash: `0x${"1".repeat(64)}`,
       grantObservedAtUtc: "2026-08-17T11:20:00.000Z",
@@ -85,7 +88,10 @@ function bundle(): PermissionAuditBundle {
       chainId: 97
     },
     durableClaimState: {
+      claimEvidenceLevel: "direct-record",
+      claimEnforcementLayer: "postgresql-grant-claim",
       claimState: "claimed",
+      databaseClaimRecordObserved: true,
       databaseDeploymentReceiptArtifactId: "database-receipt",
       reservationId: "reservation-001",
       unknownOutcomeRetryAllowed: false
@@ -119,10 +125,13 @@ function bundle(): PermissionAuditBundle {
       chainId: 97,
       expiresAtUtc: candidate.expiresAtUtc,
       maximumQuoteAgeSeconds: 60,
+      requiredClaimEnforcementLayer: "postgresql-grant-claim",
+      requiresDirectClaimEvidence: true,
+      requiresDatabaseClaimRecord: true,
       spendCaps: candidate.spendCaps
     },
     frozenAtUtc: "2026-08-17T12:00:00.000Z",
-    schemaVersion: "proofera-termix-permission-audit-bundle-v1.0.0",
+    schemaVersion: "proofera-termix-permission-audit-bundle-v1.1.0",
     sdkBehavior: {
       callsIdRetainedAfterGrantException: "no",
       evidenceArtifactId: "sdk-evidence",
@@ -150,6 +159,39 @@ describe("permission audit engine", () => {
       }
     ];
     expect(auditPermissionBundle(input).findings).toEqual([]);
+  });
+
+  it("distinguishes a local proof-worker claim from the required PostgreSQL claim", () => {
+    const input = bundle();
+    input.adversarialCorpus = [
+      {
+        candidate: safeCandidate(),
+        caseId: "safe-control",
+        evidenceArtifactIds: ["corpus-evidence"]
+      }
+    ];
+    input.durableClaimState.claimEvidenceLevel = "inferred-from-pinned-ordering";
+    input.durableClaimState.claimEnforcementLayer = "local-create-only-file";
+    input.durableClaimState.databaseClaimRecordObserved = false;
+    expect(auditPermissionBundle(input).findings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          caseId: "activation-proposal",
+          findingId: "claim-enforcement-layer-mismatch",
+          severity: "high"
+        }),
+        expect.objectContaining({
+          caseId: "activation-proposal",
+          findingId: "database-claim-record-missing",
+          severity: "high"
+        }),
+        expect.objectContaining({
+          caseId: "activation-proposal",
+          findingId: "direct-claim-evidence-missing",
+          severity: "high"
+        })
+      ])
+    );
   });
 
   it("finds every preregistered seeded hard-fail class", () => {
@@ -187,7 +229,7 @@ describe("permission audit engine", () => {
     expect(() => auditPermissionBundle(input)).toThrow("TERMIX_PERMISSION_AUDIT_EVIDENCE_UNBOUND");
   });
 
-  it("rejects duplicate case identifiers and an already-expired expected policy", () => {
+  it("rejects duplicate cases and policy expiry at or before execution", () => {
     const duplicate = bundle();
     const firstCase = duplicate.adversarialCorpus[0];
     if (firstCase === undefined) throw new Error("Expected adversarial fixture");
@@ -197,10 +239,14 @@ describe("permission audit engine", () => {
     );
 
     const expired = bundle();
-    expired.expectedPolicy.expiresAtUtc = expired.frozenAtUtc;
+    expired.expectedPolicy.expiresAtUtc = expired.authorityLifecycle.executeObservedAtUtc;
     expect(() => auditPermissionBundle(expired)).toThrow(
-      "TERMIX_PERMISSION_AUDIT_EXPECTED_POLICY_EXPIRED"
+      "TERMIX_PERMISSION_AUDIT_LIFECYCLE_ORDER_INVALID"
     );
+
+    const historical = bundle();
+    historical.frozenAtUtc = "2026-08-18T12:00:00.000Z";
+    expect(() => auditPermissionBundle(historical)).not.toThrow();
   });
 
   it("requires source-role joins, lifecycle ordering and exact code-authority parity", () => {

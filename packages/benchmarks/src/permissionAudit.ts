@@ -4,7 +4,7 @@ import { canonicalJson, sha256Canonical } from "./canonical.js";
 import { BenchmarkIdSchema, Sha256Schema, UtcDateTimeSchema } from "./schemas.js";
 
 export const PERMISSION_AUDIT_ENGINE_VERSION =
-  "proofera-termix-permission-audit-engine-v1.0.0" as const;
+  "proofera-termix-permission-audit-engine-v1.1.0" as const;
 
 const AddressSchema = z.string().regex(/^0x[0-9a-fA-F]{40}$/u);
 const SelectorSchema = z.string().regex(/^0x[0-9a-fA-F]{8}$/u);
@@ -49,6 +49,9 @@ const ExpectedPolicySchema = z.strictObject({
   chainId: z.literal(97),
   expiresAtUtc: UtcDateTimeSchema,
   maximumQuoteAgeSeconds: z.number().int().positive().max(86_400),
+  requiredClaimEnforcementLayer: z.literal("postgresql-grant-claim"),
+  requiresDirectClaimEvidence: z.literal(true),
+  requiresDatabaseClaimRecord: z.literal(true),
   spendCaps: z.array(SpendCapSchema).min(1).max(20)
 });
 
@@ -63,6 +66,9 @@ export const PermissionAuditBundleSchema = z.strictObject({
   adversarialCorpus: z.array(AuditCaseSchema).min(1).max(100),
   authorityLifecycle: z.strictObject({
     chainId: z.literal(97),
+    executeBlockHash: BlockHashSchema,
+    executeObservedAtUtc: UtcDateTimeSchema,
+    executeTransactionHash: TransactionHashSchema,
     finalAuthorityState: z.literal("revoked"),
     grantBlockHash: BlockHashSchema,
     grantObservedAtUtc: UtcDateTimeSchema,
@@ -78,7 +84,10 @@ export const PermissionAuditBundleSchema = z.strictObject({
     chainId: z.literal(97)
   }),
   durableClaimState: z.strictObject({
+    claimEvidenceLevel: z.enum(["direct-record", "inferred-from-pinned-ordering"]),
+    claimEnforcementLayer: z.enum(["local-create-only-file", "postgresql-grant-claim"]),
     claimState: z.literal("claimed"),
+    databaseClaimRecordObserved: z.boolean(),
     databaseDeploymentReceiptArtifactId: BenchmarkIdSchema,
     reservationId: BenchmarkIdSchema,
     unknownOutcomeRetryAllowed: z.literal(false)
@@ -86,7 +95,7 @@ export const PermissionAuditBundleSchema = z.strictObject({
   evidence: z.array(EvidenceReferenceSchema).min(1).max(200),
   expectedPolicy: ExpectedPolicySchema,
   frozenAtUtc: UtcDateTimeSchema,
-  schemaVersion: z.literal("proofera-termix-permission-audit-bundle-v1.0.0"),
+  schemaVersion: z.literal("proofera-termix-permission-audit-bundle-v1.1.0"),
   sdkBehavior: z.strictObject({
     callsIdRetainedAfterGrantException: z.enum(["yes", "no", "unknown"]),
     evidenceArtifactId: BenchmarkIdSchema,
@@ -126,7 +135,10 @@ export function expectedPermissionAuditDeclarationInputs(
 }
 
 const severityByFindingId = {
+  "claim-enforcement-layer-mismatch": "high",
   "code-substitution": "critical",
+  "database-claim-record-missing": "high",
+  "direct-claim-evidence-missing": "high",
   "generic-dispatcher": "critical",
   "missing-revoke-path": "critical",
   "recipient-mismatch": "critical",
@@ -171,7 +183,7 @@ export const PermissionAuditOutputSchema = z.strictObject({
   executionPerformed: z.literal(false),
   findings: z.array(PermissionAuditFindingSchema),
   limitations: z.array(z.string().trim().min(1).max(1_000)).min(1).max(20),
-  schemaVersion: z.literal("proofera-termix-permission-audit-output-v1.0.0")
+  schemaVersion: z.literal("proofera-termix-permission-audit-output-v1.1.0")
 });
 
 export type PermissionAuditOutput = z.output<typeof PermissionAuditOutputSchema>;
@@ -199,7 +211,7 @@ export function auditPermissionBundle(input: unknown): PermissionAuditOutput {
       "Evidence references are digest-bound locators, not independent proof that their source contents are authentic or complete.",
       "The read-only audit does not grant, sign, submit, broadcast, revoke or mutate durable state."
     ],
-    schemaVersion: "proofera-termix-permission-audit-output-v1.0.0"
+    schemaVersion: "proofera-termix-permission-audit-output-v1.1.0"
   });
 }
 
@@ -220,9 +232,6 @@ function validateBundleEvidence(bundle: PermissionAuditBundle): void {
         throw new Error("TERMIX_PERMISSION_AUDIT_EVIDENCE_UNBOUND");
       }
     }
-  }
-  if (new Date(bundle.expectedPolicy.expiresAtUtc) <= new Date(bundle.frozenAtUtc)) {
-    throw new Error("TERMIX_PERMISSION_AUDIT_EXPECTED_POLICY_EXPIRED");
   }
   const requiredSourceIds = [
     ...Object.values(bundle.sourceBindings),
@@ -248,16 +257,25 @@ function validateBundleEvidence(bundle: PermissionAuditBundle): void {
     throw new Error("TERMIX_PERMISSION_AUDIT_CODE_AUTHORITY_MISMATCH");
   }
   if (
-    bundle.authorityLifecycle.grantTransactionHash.toLowerCase() ===
-    bundle.authorityLifecycle.revokeTransactionHash.toLowerCase()
-  ) {
-    throw new Error("TERMIX_PERMISSION_AUDIT_LIFECYCLE_TRANSACTION_DUPLICATE");
-  }
-  if (
+    new Date(bundle.authorityLifecycle.executeObservedAtUtc) <=
+      new Date(bundle.authorityLifecycle.grantObservedAtUtc) ||
     new Date(bundle.authorityLifecycle.revokeObservedAtUtc) <=
-    new Date(bundle.authorityLifecycle.grantObservedAtUtc)
+      new Date(bundle.authorityLifecycle.executeObservedAtUtc) ||
+    new Date(bundle.expectedPolicy.expiresAtUtc) <=
+      new Date(bundle.authorityLifecycle.executeObservedAtUtc)
   ) {
     throw new Error("TERMIX_PERMISSION_AUDIT_LIFECYCLE_ORDER_INVALID");
+  }
+  if (
+    new Set(
+      [
+        bundle.authorityLifecycle.grantTransactionHash,
+        bundle.authorityLifecycle.executeTransactionHash,
+        bundle.authorityLifecycle.revokeTransactionHash
+      ].map((value) => value.toLowerCase())
+    ).size !== 3
+  ) {
+    throw new Error("TERMIX_PERMISSION_AUDIT_LIFECYCLE_TRANSACTION_DUPLICATE");
   }
 }
 
@@ -277,6 +295,40 @@ function auditCaseAgainstExpected(
       severity: severityByFindingId[findingId]
     });
   };
+
+  if (
+    auditCase === bundle.activationProposal &&
+    bundle.durableClaimState.claimEnforcementLayer !==
+      bundle.expectedPolicy.requiredClaimEnforcementLayer
+  ) {
+    add(
+      "claim-enforcement-layer-mismatch",
+      "The observed one-shot claim is enforced by a different durability boundary than the production policy requires.",
+      "Compare durableClaimState.claimEnforcementLayer with expectedPolicy.requiredClaimEnforcementLayer."
+    );
+  }
+  if (
+    auditCase === bundle.activationProposal &&
+    bundle.expectedPolicy.requiresDirectClaimEvidence &&
+    bundle.durableClaimState.claimEvidenceLevel !== "direct-record"
+  ) {
+    add(
+      "direct-claim-evidence-missing",
+      "The one-shot claim is inferred from pinned worker ordering rather than retained as a directly reviewed claim record.",
+      "Require a secret-free append-only claim receipt that binds the exact activation before relying on the inferred state."
+    );
+  }
+  if (
+    auditCase === bundle.activationProposal &&
+    bundle.expectedPolicy.requiresDatabaseClaimRecord &&
+    !bundle.durableClaimState.databaseClaimRecordObserved
+  ) {
+    add(
+      "database-claim-record-missing",
+      "The deployed PostgreSQL ledger has no claim record binding this activation lifecycle.",
+      "Verify the deployment receipt separately, then require an exact append-only database claim joined to the activation before production execution."
+    );
+  }
 
   if (candidate.chainId !== bundle.expectedPolicy.chainId) {
     add(
@@ -321,14 +373,15 @@ function auditCaseAgainstExpected(
     );
   }
   const quoteAgeSeconds = Math.floor(
-    (new Date(bundle.frozenAtUtc).getTime() - new Date(candidate.quoteObservedAtUtc).getTime()) /
+    (new Date(bundle.authorityLifecycle.executeObservedAtUtc).getTime() -
+      new Date(candidate.quoteObservedAtUtc).getTime()) /
       1_000
   );
   if (quoteAgeSeconds < 0 || quoteAgeSeconds > bundle.expectedPolicy.maximumQuoteAgeSeconds) {
     add(
       "stale-quote",
       "The action may execute against price assumptions outside the confirmed freshness window.",
-      "Subtract quoteObservedAtUtc from frozenAtUtc and compare with maximumQuoteAgeSeconds."
+      "Subtract quoteObservedAtUtc from authorityLifecycle.executeObservedAtUtc and compare with maximumQuoteAgeSeconds."
     );
   }
 
@@ -395,11 +448,11 @@ function auditSpendCaps(
 ): void {
   for (const required of expected) {
     const cap = observed.find(({ token }) => token.toLowerCase() === required.token.toLowerCase());
-    if (cap === undefined || cap.limitBaseUnits === "0" || cap.periodSeconds === "0") {
+    if (cap === undefined || cap.periodSeconds === "0") {
       add(
         "unbounded-spend",
         "The reviewed token lacks a positive amount-and-period authority bound.",
-        `Locate the cap for token ${required.token} and verify positive integer base units and period.`
+        `Locate the cap for token ${required.token} and verify a declared integer base-unit ceiling plus a positive period.`
       );
       continue;
     }
@@ -431,7 +484,7 @@ function correctedEnforcementTable(bundle: PermissionAuditBundle) {
     {
       control: "runtime-validation",
       enforcementLayer: "proofera-runtime" as const,
-      requirement: `Revalidate quote age <= ${bundle.expectedPolicy.maximumQuoteAgeSeconds}s, reservation/claim state and exact decoded calls before execution.`
+      requirement: `Revalidate quote age <= ${bundle.expectedPolicy.maximumQuoteAgeSeconds}s, exact decoded calls, and one append-only ${bundle.expectedPolicy.requiredClaimEnforcementLayer} record before execution.`
     },
     {
       control: "unknown-grant-outcome",

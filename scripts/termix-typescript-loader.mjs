@@ -8,6 +8,7 @@ const LOADER_PATH = fileURLToPath(import.meta.url);
 const REPOSITORY_ROOT = resolvePath(dirname(LOADER_PATH), "..");
 const EXACT_ENTRYPOINTS = new Set([
   resolvePath(REPOSITORY_ROOT, "scripts/freeze-termix-pancake-lp-declaration.ts"),
+  resolvePath(REPOSITORY_ROOT, "scripts/freeze-termix-permission-audit-declaration.ts"),
   resolvePath(REPOSITORY_ROOT, "scripts/freeze-termix-venus-health-declaration.ts"),
   resolvePath(REPOSITORY_ROOT, "scripts/compile-termix-final-evidence.ts"),
   resolvePath(REPOSITORY_ROOT, "scripts/run-termix-venus-health-agent.ts"),

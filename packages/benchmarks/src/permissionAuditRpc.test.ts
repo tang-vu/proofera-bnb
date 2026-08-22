@@ -29,7 +29,7 @@ function bundle(): PermissionAuditBundle {
     chainId: 97,
     dispatcher: "direct-only" as const,
     expiresAtUtc: "2026-08-17T13:00:00.000Z",
-    quoteObservedAtUtc: "2026-08-17T11:59:30.000Z",
+    quoteObservedAtUtc: "2026-08-17T11:29:30.000Z",
     revokePath: "present" as const,
     sessionSignerExposure: "none" as const,
     spendCaps: [{ limitBaseUnits: "1000", periodSeconds: "300", token }],
@@ -47,6 +47,9 @@ function bundle(): PermissionAuditBundle {
     adversarialCorpus: [{ candidate, caseId: "control", evidenceArtifactIds: ["corpus"] }],
     authorityLifecycle: {
       chainId: 97,
+      executeBlockHash: `0x${"8".repeat(64)}`,
+      executeObservedAtUtc: "2026-08-17T11:30:00.000Z",
+      executeTransactionHash: `0x${"9".repeat(64)}`,
       finalAuthorityState: "revoked",
       grantBlockHash,
       grantObservedAtUtc: "2026-08-17T11:20:00.000Z",
@@ -62,7 +65,10 @@ function bundle(): PermissionAuditBundle {
       chainId: 97
     },
     durableClaimState: {
+      claimEvidenceLevel: "direct-record",
+      claimEnforcementLayer: "postgresql-grant-claim",
       claimState: "claimed",
+      databaseClaimRecordObserved: true,
       databaseDeploymentReceiptArtifactId: "database",
       reservationId: "reservation-001",
       unknownOutcomeRetryAllowed: false
@@ -73,10 +79,13 @@ function bundle(): PermissionAuditBundle {
       chainId: 97,
       expiresAtUtc: candidate.expiresAtUtc,
       maximumQuoteAgeSeconds: 60,
+      requiredClaimEnforcementLayer: "postgresql-grant-claim",
+      requiresDirectClaimEvidence: true,
+      requiresDatabaseClaimRecord: true,
       spendCaps: candidate.spendCaps
     },
     frozenAtUtc: "2026-08-17T12:00:00.000Z",
-    schemaVersion: "proofera-termix-permission-audit-bundle-v1.0.0",
+    schemaVersion: "proofera-termix-permission-audit-bundle-v1.1.0",
     sdkBehavior: {
       callsIdRetainedAfterGrantException: "no",
       evidenceArtifactId: "sdk",

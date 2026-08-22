@@ -4,7 +4,7 @@ import { z } from "zod";
 
 export const PERMISSION_AUDIT_SKILL = "audit_altana_permission_bundle" as const;
 export const PERMISSION_AUDIT_ENGINE_VERSION =
-  "proofera-termix-permission-audit-engine-v1.0.0" as const;
+  "proofera-termix-permission-audit-engine-v1.1.0" as const;
 
 const idSchema = z
   .string()
@@ -69,6 +69,9 @@ const expectedPolicySchema = z
     chainId: z.literal(97),
     expiresAtUtc: utcSchema,
     maximumQuoteAgeSeconds: z.number().int().positive().max(86_400),
+    requiredClaimEnforcementLayer: z.literal("postgresql-grant-claim"),
+    requiresDirectClaimEvidence: z.literal(true),
+    requiresDatabaseClaimRecord: z.literal(true),
     spendCaps: z.array(spendCapSchema).min(1).max(20)
   })
   .strict();
@@ -88,6 +91,9 @@ export const permissionAuditBundleSchema = z
     authorityLifecycle: z
       .object({
         chainId: z.literal(97),
+        executeBlockHash: blockHashSchema,
+        executeObservedAtUtc: utcSchema,
+        executeTransactionHash: transactionHashSchema,
         finalAuthorityState: z.literal("revoked"),
         grantBlockHash: blockHashSchema,
         grantObservedAtUtc: utcSchema,
@@ -107,7 +113,10 @@ export const permissionAuditBundleSchema = z
       .strict(),
     durableClaimState: z
       .object({
+        claimEvidenceLevel: z.enum(["direct-record", "inferred-from-pinned-ordering"]),
+        claimEnforcementLayer: z.enum(["local-create-only-file", "postgresql-grant-claim"]),
         claimState: z.literal("claimed"),
+        databaseClaimRecordObserved: z.boolean(),
         databaseDeploymentReceiptArtifactId: idSchema,
         reservationId: idSchema,
         unknownOutcomeRetryAllowed: z.literal(false)
@@ -116,7 +125,7 @@ export const permissionAuditBundleSchema = z
     evidence: z.array(evidenceReferenceSchema).min(1).max(200),
     expectedPolicy: expectedPolicySchema,
     frozenAtUtc: utcSchema,
-    schemaVersion: z.literal("proofera-termix-permission-audit-bundle-v1.0.0"),
+    schemaVersion: z.literal("proofera-termix-permission-audit-bundle-v1.1.0"),
     sdkBehavior: z
       .object({
         callsIdRetainedAfterGrantException: z.enum(["yes", "no", "unknown"]),
@@ -140,7 +149,10 @@ export const permissionAuditBundleSchema = z
 export type PermissionAuditBundle = z.infer<typeof permissionAuditBundleSchema>;
 
 const severityByFindingId = {
+  "claim-enforcement-layer-mismatch": "high",
   "code-substitution": "critical",
+  "database-claim-record-missing": "high",
+  "direct-claim-evidence-missing": "high",
   "generic-dispatcher": "critical",
   "missing-revoke-path": "critical",
   "recipient-mismatch": "critical",
@@ -178,7 +190,7 @@ export interface PermissionAuditResult {
   readonly executionPerformed: false;
   readonly findings: readonly PermissionAuditFinding[];
   readonly limitations: readonly string[];
-  readonly schemaVersion: "proofera-termix-permission-audit-output-v1.0.0";
+  readonly schemaVersion: "proofera-termix-permission-audit-output-v1.1.0";
 }
 
 export function auditPermissionBundle(input: unknown): PermissionAuditResult {
@@ -199,7 +211,7 @@ export function auditPermissionBundle(input: unknown): PermissionAuditResult {
       "Evidence references are digest-bound locators, not independent proof that their source contents are authentic or complete.",
       "The read-only audit does not grant, sign, submit, broadcast, revoke or mutate durable state."
     ],
-    schemaVersion: "proofera-termix-permission-audit-output-v1.0.0"
+    schemaVersion: "proofera-termix-permission-audit-output-v1.1.0"
   };
 }
 
@@ -255,9 +267,6 @@ function validateEvidence(bundle: PermissionAuditBundle): void {
       throw new Error("case evidence is unbound");
     }
   }
-  if (new Date(bundle.expectedPolicy.expiresAtUtc) <= new Date(bundle.frozenAtUtc)) {
-    throw new Error("expected policy is already expired");
-  }
   const requiredSourceIds = [
     ...Object.values(bundle.sourceBindings),
     bundle.durableClaimState.databaseDeploymentReceiptArtifactId
@@ -280,16 +289,25 @@ function validateEvidence(bundle: PermissionAuditBundle): void {
     throw new Error("code authority mismatches expected calls");
   }
   if (
-    bundle.authorityLifecycle.grantTransactionHash.toLowerCase() ===
-    bundle.authorityLifecycle.revokeTransactionHash.toLowerCase()
-  ) {
-    throw new Error("lifecycle transaction identifiers duplicate");
-  }
-  if (
+    new Date(bundle.authorityLifecycle.executeObservedAtUtc) <=
+      new Date(bundle.authorityLifecycle.grantObservedAtUtc) ||
     new Date(bundle.authorityLifecycle.revokeObservedAtUtc) <=
-    new Date(bundle.authorityLifecycle.grantObservedAtUtc)
+      new Date(bundle.authorityLifecycle.executeObservedAtUtc) ||
+    new Date(bundle.expectedPolicy.expiresAtUtc) <=
+      new Date(bundle.authorityLifecycle.executeObservedAtUtc)
   ) {
     throw new Error("lifecycle observation order is invalid");
+  }
+  if (
+    new Set(
+      [
+        bundle.authorityLifecycle.grantTransactionHash,
+        bundle.authorityLifecycle.executeTransactionHash,
+        bundle.authorityLifecycle.revokeTransactionHash
+      ].map((value) => value.toLowerCase())
+    ).size !== 3
+  ) {
+    throw new Error("lifecycle transaction identifiers duplicate");
   }
 }
 
@@ -309,6 +327,39 @@ function auditCaseAgainstExpected(
       severity: severityByFindingId[findingId]
     });
   };
+  if (
+    auditCase === bundle.activationProposal &&
+    bundle.durableClaimState.claimEnforcementLayer !==
+      bundle.expectedPolicy.requiredClaimEnforcementLayer
+  ) {
+    add(
+      "claim-enforcement-layer-mismatch",
+      "The observed one-shot claim is enforced by a different durability boundary than the production policy requires.",
+      "Compare durableClaimState.claimEnforcementLayer with expectedPolicy.requiredClaimEnforcementLayer."
+    );
+  }
+  if (
+    auditCase === bundle.activationProposal &&
+    bundle.expectedPolicy.requiresDirectClaimEvidence &&
+    bundle.durableClaimState.claimEvidenceLevel !== "direct-record"
+  ) {
+    add(
+      "direct-claim-evidence-missing",
+      "The one-shot claim is inferred from pinned worker ordering rather than retained as a directly reviewed claim record.",
+      "Require a secret-free append-only claim receipt that binds the exact activation before relying on the inferred state."
+    );
+  }
+  if (
+    auditCase === bundle.activationProposal &&
+    bundle.expectedPolicy.requiresDatabaseClaimRecord &&
+    !bundle.durableClaimState.databaseClaimRecordObserved
+  ) {
+    add(
+      "database-claim-record-missing",
+      "The deployed PostgreSQL ledger has no claim record binding this activation lifecycle.",
+      "Verify the deployment receipt separately, then require an exact append-only database claim joined to the activation before production execution."
+    );
+  }
   if (candidate.chainId !== bundle.expectedPolicy.chainId) {
     add(
       "wrong-chain",
@@ -352,14 +403,15 @@ function auditCaseAgainstExpected(
     );
   }
   const quoteAgeSeconds = Math.floor(
-    (new Date(bundle.frozenAtUtc).getTime() - new Date(candidate.quoteObservedAtUtc).getTime()) /
+    (new Date(bundle.authorityLifecycle.executeObservedAtUtc).getTime() -
+      new Date(candidate.quoteObservedAtUtc).getTime()) /
       1_000
   );
   if (quoteAgeSeconds < 0 || quoteAgeSeconds > bundle.expectedPolicy.maximumQuoteAgeSeconds) {
     add(
       "stale-quote",
       "The action may execute against price assumptions outside the confirmed freshness window.",
-      "Subtract quoteObservedAtUtc from frozenAtUtc and compare with maximumQuoteAgeSeconds."
+      "Subtract quoteObservedAtUtc from authorityLifecycle.executeObservedAtUtc and compare with maximumQuoteAgeSeconds."
     );
   }
   auditCalls(candidate.calls, bundle.expectedPolicy.allowedCalls, add);
@@ -425,11 +477,11 @@ function auditSpendCaps(
 ): void {
   for (const required of expected) {
     const cap = observed.find(({ token }) => token.toLowerCase() === required.token.toLowerCase());
-    if (cap === undefined || cap.limitBaseUnits === "0" || cap.periodSeconds === "0") {
+    if (cap === undefined || cap.periodSeconds === "0") {
       add(
         "unbounded-spend",
         "The reviewed token lacks a positive amount-and-period authority bound.",
-        `Locate the cap for token ${required.token} and verify positive integer base units and period.`
+        `Locate the cap for token ${required.token} and verify a declared integer base-unit ceiling plus a positive period.`
       );
       continue;
     }
@@ -463,7 +515,7 @@ function correctedEnforcementTable(
     {
       control: "runtime-validation",
       enforcementLayer: "proofera-runtime",
-      requirement: `Revalidate quote age <= ${String(bundle.expectedPolicy.maximumQuoteAgeSeconds)}s, reservation/claim state and exact decoded calls before execution.`
+      requirement: `Revalidate quote age <= ${String(bundle.expectedPolicy.maximumQuoteAgeSeconds)}s, exact decoded calls, and one append-only ${bundle.expectedPolicy.requiredClaimEnforcementLayer} record before execution.`
     },
     {
       control: "unknown-grant-outcome",

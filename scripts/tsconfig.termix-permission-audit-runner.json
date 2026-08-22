@@ -4,6 +4,7 @@
     "types": ["node"]
   },
   "include": [
+    "freeze-termix-permission-audit-declaration.ts",
     "run-termix-permission-audit-agent.ts",
     "run-termix-permission-audit-manual.ts",
     "../packages/benchmarks/src/**/*.ts"
