@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
+  normalizeRelayStatus,
   normalizeAccountExpiry,
   validateAltanaTestActionConfig
 } from "./altana-test-action-worker.mjs";
@@ -43,6 +44,19 @@ test("authority expiry accepts viem uint40 number and bigint representations", (
   assert.equal(normalizeAccountExpiry(1_787_330_074n), 1_787_330_074);
   assert.throws(() => normalizeAccountExpiry(Number.NaN), /ALTANA_TEST_ACTION_AUTHORITY_INVALID/u);
   assert.throws(() => normalizeAccountExpiry(2 ** 40), /ALTANA_TEST_ACTION_AUTHORITY_INVALID/u);
+});
+
+test("relay status follows viem EIP-5792 categories instead of polling terminal failures", () => {
+  assert.equal(normalizeRelayStatus(100), "pending");
+  assert.equal(normalizeRelayStatus(199), "pending");
+  assert.equal(normalizeRelayStatus(200), "confirmed");
+  assert.equal(normalizeRelayStatus(299), "confirmed");
+  assert.equal(normalizeRelayStatus(300), "failed");
+  assert.equal(normalizeRelayStatus(699), "failed");
+  assert.equal(normalizeRelayStatus("PENDING"), "pending");
+  assert.equal(normalizeRelayStatus("CONFIRMED"), "confirmed");
+  assert.equal(normalizeRelayStatus("FAILED"), "failed");
+  assert.equal(normalizeRelayStatus(700), "unknown");
 });
 
 test("config rejects expanded calldata and mismatched signer bindings", async () => {

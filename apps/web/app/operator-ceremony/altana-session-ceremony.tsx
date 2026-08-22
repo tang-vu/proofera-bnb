@@ -395,9 +395,16 @@ export function AltanaSessionCeremony({
   const authorityPresent = workerState?.authorityPresent === true;
   const executeConfirmed =
     workerState?.status === "execute_confirmed" || workerState?.status === "lifecycle_complete";
+  const executeFailed = workerState?.status === "execute_failed";
   const lifecycleComplete = workerState?.status === "lifecycle_complete";
   const sessionExpired = workerState === null ? false : sessionExpiredAtObservation(workerState);
-  const canGrant = walletMatches && funded && operation === null && !authorityPresent && !busy;
+  const canGrant =
+    walletMatches &&
+    funded &&
+    workerState?.status === "waiting_authority" &&
+    operation === null &&
+    !authorityPresent &&
+    !busy;
   const canRevoke =
     walletMatches && authorityPresent && operation !== null && operation.revoke === null && !busy;
 
@@ -559,15 +566,17 @@ export function AltanaSessionCeremony({
               ? `Luồng này chỉ nhận passkey wallet ${config.walletAddress}.`
               : !funded
                 ? `Ví đang có ${workerState?.balanceWei ?? "chưa rõ"} wei; cần ít nhất ${config.minimumNativeBalanceWei} wei tBNB để đăng ký hai key và trả gas.`
-                : sessionExpired && !authorityPresent
-                  ? "Session đã hết hạn và hai RPC không còn thấy authority. Không cần gửi revoke; execute vẫn chưa có receipt nên lifecycle chưa hoàn tất."
-                  : authorityPresent
-                    ? executeConfirmed
-                      ? "Test action đã có receipt; cần một lần Windows Hello riêng để revoke."
-                      : "Authority đang hoạt động nhưng execute chưa có receipt; bạn có thể revoke ngay. Lifecycle vẫn chưa hoàn tất nếu execute không xác nhận."
-                    : operation !== null
-                      ? "Grant đã được gửi hoặc đang reconciliation; retry bị khóa cho tới khi authority rõ ràng."
-                      : "Worker và funding đã sẵn sàng; grant cần một lần xác nhận Windows Hello.")}
+                : executeFailed
+                  ? `Relay đã kết thúc test action ở trạng thái failure ${workerState.execute?.relayStatusCode ?? "không rõ"}; không có receipt nên không có claim thực thi thành công.`
+                  : sessionExpired && !authorityPresent
+                    ? "Session đã hết hạn và hai RPC không còn thấy authority. Không cần gửi revoke; execute vẫn chưa có receipt nên lifecycle chưa hoàn tất."
+                    : authorityPresent
+                      ? executeConfirmed
+                        ? "Test action đã có receipt; cần một lần Windows Hello riêng để revoke."
+                        : "Authority đang hoạt động nhưng execute chưa có receipt; bạn có thể revoke ngay. Lifecycle vẫn chưa hoàn tất nếu execute không xác nhận."
+                      : operation !== null
+                        ? "Grant đã được gửi hoặc đang reconciliation; retry bị khóa cho tới khi authority rõ ràng."
+                        : "Worker và funding đã sẵn sàng; grant cần một lần xác nhận Windows Hello.")}
       </p>
 
       <div className="ceremony-passkey-actions">
@@ -625,6 +634,10 @@ export function AltanaSessionCeremony({
         <div>
           <dt>Execution</dt>
           <dd>{workerState?.status ?? "unavailable"}</dd>
+        </div>
+        <div>
+          <dt>Relay status</dt>
+          <dd>{workerState?.execute?.relayStatusCode ?? "unavailable"}</dd>
         </div>
       </dl>
 

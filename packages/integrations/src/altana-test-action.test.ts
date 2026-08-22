@@ -98,4 +98,32 @@ describe("Altana bounded test action", () => {
       }).success
     ).toBe(false);
   });
+
+  it("retains a bounded relay failure code in the public worker projection", () => {
+    const failed = {
+      schemaVersion: 1,
+      chainId: 97,
+      configHash: `0x${"11".repeat(32)}`,
+      walletAddress: config.walletAddress,
+      sessionKeyAddress: config.sessionKey.address,
+      status: "execute_failed",
+      authorityPresent: false,
+      balanceWei: "98390568466905952",
+      sessionExpiry: 1_787_330_074,
+      execute: {
+        callsId: `0x${"22".repeat(32)}`,
+        relayStatusCode: 300,
+        transactionHash: null
+      },
+      observedAt: "2026-08-22T00:00:00.000Z"
+    } as const;
+
+    expect(altanaTestActionPublicStateSchema.parse(failed)).toEqual(failed);
+    expect(
+      altanaTestActionPublicStateSchema.safeParse({
+        ...failed,
+        execute: { ...failed.execute, relayStatusCode: 700 }
+      }).success
+    ).toBe(false);
+  });
 });

@@ -146,3 +146,56 @@ test("offers immediate revoke while an authorized execute is still pending", asy
   await expect(page.getByRole("button", { name: "Revoke session" })).toBeEnabled();
   await expect(page.getByText(/execute chưa có receipt; bạn có thể revoke ngay/i)).toBeVisible();
 });
+
+test("shows terminal relay failure and never offers a consumed signer grant again", async ({
+  page
+}) => {
+  await page.route("**/api/operator-ceremony/altana-state", async (route) => {
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        availability: "available",
+        state: {
+          schemaVersion: 1,
+          chainId: 97,
+          configHash: `0x${"11".repeat(32)}`,
+          walletAddress: "0x91Aa0E6627bFF6C911B38CEd5F7885E063b7C27a",
+          sessionKeyAddress: "0xb5F0658E3bc0c3495729b87DE32f568Bdc995a11",
+          status: "execute_failed",
+          authorityPresent: false,
+          balanceWei: "98390568466905952",
+          sessionExpiry: 1_787_330_074,
+          execute: {
+            callsId: `0x${"22".repeat(32)}`,
+            relayStatusCode: 300,
+            transactionHash: null
+          },
+          observedAt: "2026-08-22T00:00:00.000Z"
+        }
+      })
+    });
+  });
+  await page.addInitScript(() => {
+    window.localStorage.setItem(
+      "proofera.altana.passkey-wallet.v1",
+      JSON.stringify({
+        schemaVersion: 1,
+        chainId: 97,
+        address: "0x91Aa0E6627bFF6C911B38CEd5F7885E063b7C27a",
+        credential: {
+          kind: "webauthn",
+          id: "test-credential",
+          publicKey: `0x${"11".repeat(64)}`,
+          rpId: "localhost"
+        }
+      })
+    );
+  });
+
+  await page.goto("/operator-ceremony");
+
+  await expect(page.getByText(/trạng thái failure 300/i)).toBeVisible();
+  await expect(page.getByText("300", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Grant quyền testnet" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Authority đã hết hạn" })).toBeDisabled();
+});

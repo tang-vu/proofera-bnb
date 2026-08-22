@@ -699,22 +699,39 @@ async function submitExecute(paths, config, expiry) {
   return identifiers;
 }
 
+export function normalizeRelayStatus(rawStatus) {
+  if (
+    rawStatus === "CONFIRMED" ||
+    (Number.isInteger(rawStatus) && rawStatus >= 200 && rawStatus < 300)
+  ) {
+    return "confirmed";
+  }
+  if (
+    rawStatus === "FAILED" ||
+    (Number.isInteger(rawStatus) && rawStatus >= 300 && rawStatus < 700)
+  ) {
+    return "failed";
+  }
+  if (
+    rawStatus === "PENDING" ||
+    (Number.isInteger(rawStatus) && rawStatus >= 100 && rawStatus < 200)
+  ) {
+    return "pending";
+  }
+  return "unknown";
+}
+
 async function relayStatus(callsId) {
   const result = await rpc(RELAY_URL, "wallet_getCallsStatus", [callsId]);
   if (!isRecord(result)) fail("ALTANA_TEST_ACTION_RELAY_STATUS_INVALID");
   const rawStatus = result.status;
-  const status =
-    rawStatus === 200 || rawStatus === "CONFIRMED"
-      ? "confirmed"
-      : rawStatus === 500 || rawStatus === "FAILED"
-        ? "failed"
-        : "pending";
+  const status = normalizeRelayStatus(rawStatus);
   const receipt = Array.isArray(result.receipts) ? result.receipts[0] : undefined;
   const transactionHash =
     isRecord(receipt) && typeof receipt.transactionHash === "string"
       ? exactHex(receipt.transactionHash, 32, "ALTANA_TEST_ACTION_TRANSACTION_HASH_INVALID")
       : null;
-  return Object.freeze({ status, transactionHash });
+  return Object.freeze({ rawStatus, status, transactionHash });
 }
 
 async function confirmedReceipt(transactionHash) {
@@ -785,7 +802,11 @@ async function runWorker() {
             authorityPresent: authority.present,
             balanceWei: authority.balanceWei.toString(10),
             sessionExpiry: claim?.sessionExpiry ?? authority.expiry,
-            execute: { callsId: identifiers.callsId, transactionHash: relay.transactionHash }
+            execute: {
+              callsId: identifiers.callsId,
+              relayStatusCode: relay.rawStatus,
+              transactionHash: relay.transactionHash
+            }
           });
         } else if (relay.status === "confirmed" && relay.transactionHash !== null) {
           const confirmed = await confirmedReceipt(relay.transactionHash);
@@ -793,6 +814,7 @@ async function runWorker() {
             const record = Object.freeze({
               schemaVersion: 1,
               callsId: identifiers.callsId,
+              relayStatusCode: relay.rawStatus,
               ...confirmed,
               confirmedAt: new Date().toISOString()
             });
@@ -805,13 +827,29 @@ async function runWorker() {
               execute: record
             });
           }
-        } else {
+        } else if (relay.status === "pending") {
           await writePublicState(paths, config, {
             status: "execute_pending",
             authorityPresent: authority.present,
             balanceWei: authority.balanceWei.toString(10),
             sessionExpiry: claim?.sessionExpiry ?? authority.expiry,
-            execute: { callsId: identifiers.callsId, transactionHash: relay.transactionHash }
+            execute: {
+              callsId: identifiers.callsId,
+              relayStatusCode: relay.rawStatus,
+              transactionHash: relay.transactionHash
+            }
+          });
+        } else {
+          await writePublicState(paths, config, {
+            status: "execute_outcome_unknown",
+            authorityPresent: authority.present,
+            balanceWei: authority.balanceWei.toString(10),
+            sessionExpiry: claim?.sessionExpiry ?? authority.expiry,
+            execute: {
+              callsId: identifiers.callsId,
+              relayStatusCode: relay.rawStatus,
+              transactionHash: relay.transactionHash
+            }
           });
         }
       } else if (claim !== null) {

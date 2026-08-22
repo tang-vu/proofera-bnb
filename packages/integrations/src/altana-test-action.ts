@@ -89,6 +89,9 @@ const executeSummarySchema = z
       .regex(/^0x(?:[0-9a-fA-F]{2})+$/)
       .max(514),
     transactionHash: hashSchema.nullable().optional(),
+    relayStatusCode: z
+      .union([z.number().int().min(100).max(699), z.enum(["PENDING", "CONFIRMED", "FAILED"])])
+      .optional(),
     schemaVersion: z.literal(1).optional(),
     blockHash: hashSchema.optional(),
     blockNumber: decimalSchema.optional(),
