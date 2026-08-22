@@ -364,9 +364,6 @@ function phase(name, operation, observation) {
     blockNumber: operation.blockNumber.toString(),
     blockHash: operation.blockHash,
     blockTimestamp: (1_900_000_000 + Number(operation.blockNumber) - 100).toString(),
-    providers: [
-      { provider: "bnb-chain", observation },
-      { provider: "publicnode", observation: structuredClone(observation) }
-    ]
+    providers: [{ provider: "publicnode", observation }]
   };
 }

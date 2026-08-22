@@ -11,6 +11,13 @@ accepts the source commit that contained the unchanged static ceremony policy, t
 observed onchain, and the finalized grant, execute and revoke transaction identifiers. It never accepts
 or reads a private key, passkey, KMS credential, signer or wallet password.
 
+Both RPCs must agree on transactions, receipts, canonical blocks, the application event and the later
+final authority absence. The fixed BNB Chain public full node can prune historical state within the
+capture window; it returned `missing trie node` for this ceremony's historical calls. Therefore only
+the fixed PublicNode archive-capable endpoint supplies authority reads at the grant, execute and revoke
+blocks. The artifact explicitly marks two-provider historical authority as false instead of treating
+the pruned response as agreement.
+
 For this bounded worker, expiry is generated when the owner starts the browser ceremony. The exact
 expiry-bearing grant intent therefore was not separately committed before the live v2 run. The
 collector does not invent that provenance: it reconstructs the public intent from the unchanged
@@ -25,9 +32,10 @@ After the three transactions, the collector:
 2. joins the execute and revoke Altana `wallet_getCallsStatus` results to their BSC-testnet receipts;
 3. requires both providers to find the exact PTA `Approval(wallet, session, 0)` event in the execute
    receipt;
-4. uses EIP-1898 canonical block-hash calls to require the session in both KeyStore and the Altana
-   account, with the exact reconstructed expiry, at the grant and execute blocks;
-5. requires it absent at the revoke block and again at a common checkpoint at least 12 blocks later;
+4. uses PublicNode EIP-1898 canonical block-hash calls to require the session in both KeyStore and the
+   Altana account, with the exact reconstructed expiry, at the grant and execute blocks;
+5. requires PublicNode to observe it absent at the revoke block and both RPCs to observe absence at a
+   common checkpoint at least 12 blocks later;
 6. rejects wrong order, duplicate hashes, expiry before execution, provider disagreement, missing
    finality, policy drift or any altered public key/permission binding; and
 7. writes one new artifact with `wx`; it never overwrites evidence.
@@ -59,5 +67,6 @@ Approval event. It does not directly decode which session key signed the relayed
 approval can leave allowance unchanged, so the event is not a nonzero state transition, economic
 benefit, PancakeSwap/LP action or performance result. The ceremony source commit timestamp is Git
 provenance, not an external trusted timestamp or deployment attestation. The artifact explicitly marks
-the exact grant intent as not precommitted. Missing or ambiguous material remains missing; it is never
-inferred from a relay status or successful receipt.
+the exact grant intent as not precommitted and the historical authority timeline as single-provider.
+Missing or ambiguous material remains missing; it is never inferred from a relay status or successful
+receipt.

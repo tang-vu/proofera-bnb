@@ -36,12 +36,15 @@ test("Altana lifecycle capture fixes authority and honest non-claim joins", () =
   assert.match(source, /isValidKey/u);
   assert.match(source, /getPublicKey/u);
   assert.match(source, /getKeys/u);
+  assert.match(source, /HISTORICAL_AUTHORITY_PROVIDERS/u);
   assert.match(source, /validatePtaApprovalReceipt/u);
   assert.match(source, /accountKeyExpiry/u);
   assert.match(source, /applicationCallSemanticsVerified: true/u);
   assert.match(source, /applicationEffectVerified: true/u);
   assert.match(source, /applicationStateChangeVerified: false/u);
   assert.match(source, /exactGrantIntentPrecommitted: false/u);
+  assert.match(source, /twoProviderHistoricalAuthorityVerified: false/u);
+  assert.match(source, /twoProviderFinalAuthorityAbsenceVerified: true/u);
   assert.match(source, /sessionSignatureDirectlyDecoded: false/u);
   assert.match(source, /privateSignerRead: false/u);
 });

@@ -35,6 +35,9 @@ const PROVIDERS = Object.freeze([
   { name: "bnb-chain", url: "https://data-seed-prebsc-2-s2.binance.org:8545" },
   { name: "publicnode", url: "https://bsc-testnet-rpc.publicnode.com" }
 ]);
+const HISTORICAL_AUTHORITY_PROVIDERS = Object.freeze(
+  PROVIDERS.filter(({ name }) => name === "publicnode")
+);
 
 const KEYSTORE_ABI = Object.freeze([
   {
@@ -440,7 +443,7 @@ async function phaseSnapshot(phase, operationValue, intent, ids, present) {
     fail("ALTANA_LIFECYCLE_OPERATION_BLOCK_MISMATCH");
   }
   const observations = await Promise.all(
-    PROVIDERS.map((provider) =>
+    HISTORICAL_AUTHORITY_PROVIDERS.map((provider) =>
       authoritySnapshot(provider, intent, ids, operationValue.blockHash, present)
     )
   );
@@ -449,7 +452,7 @@ async function phaseSnapshot(phase, operationValue, intent, ids, present) {
     blockNumber: operationValue.blockNumber.toString(),
     blockTimestamp: blocks[0].blockTimestamp.toString(),
     phase,
-    providers: PROVIDERS.map((provider, index) => ({
+    providers: HISTORICAL_AUTHORITY_PROVIDERS.map((provider, index) => ({
       observation: observations[index],
       provider: provider.name
     }))
@@ -579,7 +582,7 @@ async function capture(args) {
   });
 
   return Object.freeze({
-    schemaVersion: "proofera-altana-lifecycle-evidence-v1.1.0",
+    schemaVersion: "proofera-altana-lifecycle-evidence-v1.2.0",
     classification: {
       applicationCallSemanticsVerified: true,
       applicationEffectVerified: true,
@@ -591,11 +594,14 @@ async function capture(args) {
       executeReceiptVerified: true,
       executeRelayReceiptJoined: true,
       grantReceiptVerified: true,
+      historicalAuthorityProviderCount: HISTORICAL_AUTHORITY_PROVIDERS.length,
       privateSignerRead: false,
       ptaZeroApprovalEventVerified: true,
       revokeReceiptVerified: true,
       revokeRelayReceiptJoined: true,
-      sessionSignatureDirectlyDecoded: false
+      sessionSignatureDirectlyDecoded: false,
+      twoProviderFinalAuthorityAbsenceVerified: true,
+      twoProviderHistoricalAuthorityVerified: false
     },
     ceremonySourceCommit: args.ceremonySourceCommit,
     sourceBaseCommit: args.sourceBaseCommit,
@@ -624,6 +630,7 @@ async function capture(args) {
       finalityDepth: FINALITY_DEPTH.toString(),
       keyStore: KEYSTORE,
       keyStoreController: KEYSTORE_CONTROLLER,
+      historicalAuthorityProviders: HISTORICAL_AUTHORITY_PROVIDERS,
       providers: PROVIDERS,
       relayUrl: RELAY_URL
     },
@@ -643,6 +650,7 @@ async function capture(args) {
       "Successful receipts, relay calls-ID joins and exact authority state prove the observed lifecycle but do not directly decode which key signed the relayed execute intent.",
       "The exact expiry-bearing grant intent was not separately committed before the ceremony. It is reconstructed after the ceremony from the unchanged policy in the ceremony source commit plus the expiry independently observed in account authority at the canonical grant and execute blocks.",
       "A Git commit timestamp is repository provenance, not an external trusted timestamp or proof of which build was deployed.",
+      "The two RPCs independently join transaction, receipt and block data, and both prove authority absence at the later finalized checkpoint. PublicNode alone supplies canonical historical authority reads because the fixed BNB Chain public full node pruned those state tries; two-provider historical authority is explicitly false.",
       "The PTA receipt proves the exact Approval(owner, session, 0) event. Because the amount is zero, it does not prove a nonzero allowance transition, economic benefit, PancakeSwap/LP activity or performance.",
       "The static policy and derived intent contain no session private key; this collector never reads a signer, wallet secret or browser credential."
     ],

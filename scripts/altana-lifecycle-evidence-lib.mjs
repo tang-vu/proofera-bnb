@@ -503,21 +503,25 @@ function before(left, right) {
   );
 }
 
-function validateProviders(providers, expected) {
+function validateProviders(providers, expected, providerNames) {
   if (
     !Array.isArray(providers) ||
-    providers.length !== 2 ||
+    providers.length !== providerNames.length ||
     providers
       .map(({ provider }) => provider)
       .sort()
-      .join(",") !== "bnb-chain,publicnode"
+      .join(",") !== [...providerNames].sort().join(",")
   ) {
     fail("ALTANA_LIFECYCLE_PROVIDER_SET_INVALID");
   }
   const observations = providers.map((provider) =>
     validateAuthoritySnapshot(provider.observation, expected)
   );
-  if (JSON.stringify(observations[0]) !== JSON.stringify(observations[1])) {
+  if (
+    observations
+      .slice(1)
+      .some((observation) => JSON.stringify(observation) !== JSON.stringify(observations[0]))
+  ) {
     fail("ALTANA_LIFECYCLE_PROVIDER_STATE_MISMATCH");
   }
 }
@@ -574,12 +578,16 @@ export function validateLifecycleSequence({
     ) {
       fail("ALTANA_LIFECYCLE_AUTHORITY_EXPIRED_AT_EXECUTION");
     }
-    validateProviders(entry.providers, {
-      accountKeyHash: ids.accountKeyHash,
-      expiry: normalizedIntent.expiry,
-      present,
-      publicKey: normalizedIntent.sessionKey.publicKey
-    });
+    validateProviders(
+      entry.providers,
+      {
+        accountKeyHash: ids.accountKeyHash,
+        expiry: normalizedIntent.expiry,
+        present,
+        publicKey: normalizedIntent.sessionKey.publicKey
+      },
+      ["publicnode"]
+    );
     return Object.freeze({
       blockHash: entry.blockHash,
       blockNumber: entry.blockNumber,
@@ -602,12 +610,16 @@ export function validateLifecycleSequence({
   ) {
     fail("ALTANA_LIFECYCLE_FINAL_SNAPSHOT_INVALID");
   }
-  validateProviders(final.providers, {
-    accountKeyHash: ids.accountKeyHash,
-    expiry: normalizedIntent.expiry,
-    present: false,
-    publicKey: normalizedIntent.sessionKey.publicKey
-  });
+  validateProviders(
+    final.providers,
+    {
+      accountKeyHash: ids.accountKeyHash,
+      expiry: normalizedIntent.expiry,
+      present: false,
+      publicKey: normalizedIntent.sessionKey.publicKey
+    },
+    ["bnb-chain", "publicnode"]
+  );
   return Object.freeze({
     authorityAbsentAfterRevoke: true,
     authorityPresentForExecution: true,
