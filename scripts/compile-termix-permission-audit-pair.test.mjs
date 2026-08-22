@@ -6,6 +6,7 @@ const source = await readFile(
   new URL("./compile-termix-permission-audit-pair.ts", import.meta.url),
   "utf8"
 );
+const loader = await readFile(new URL("./termix-typescript-loader.mjs", import.meta.url), "utf8");
 
 test("permission-audit pair compiler is create-only and keeps independent review open", () => {
   assert.match(source, /--compile-exact-permission-audit-pair/u);
@@ -15,4 +16,5 @@ test("permission-audit pair compiler is create-only and keeps independent review
   assert.match(source, /buildPermissionAuditPair/u);
   assert.doesNotMatch(source, /secondReviewerIndependent:\s*true/u);
   assert.doesNotMatch(source, /publishableClaim:\s*true/u);
+  assert.match(loader, /scripts\/compile-termix-permission-audit-pair\.ts/u);
 });
