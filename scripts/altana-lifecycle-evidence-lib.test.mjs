@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
@@ -151,6 +152,88 @@ test("bounded v2 policy derives the exact public grant intent", async () => {
   assert.throws(
     () => deriveGrantIntentFromTestActionPolicy(wrongAction, 1_787_392_650),
     /ALTANA_LIFECYCLE_POLICY_INVALID/u
+  );
+});
+
+test("retained v2 lifecycle binds real receipts and explicit evidence limits", async () => {
+  const [lifecycleBytes, finalBytes] = await Promise.all([
+    readFile(
+      new URL(
+        "../evidence/altana/lifecycles/126543819-72e7cf94-altana-lifecycle.json",
+        import.meta.url
+      )
+    ),
+    readFile(new URL("../evidence/submission/final/altana-lifecycle.json", import.meta.url))
+  ]);
+  assert.deepEqual(finalBytes, lifecycleBytes);
+  assert.equal(
+    createHash("sha256").update(lifecycleBytes).digest("hex"),
+    "e001d4f9eb8e87d95408206e72c937c1ff8cd68d9885898a4d02aabdfe661b19"
+  );
+  const evidence = JSON.parse(lifecycleBytes.toString("utf8"));
+  assert.equal(evidence.schemaVersion, "proofera-altana-lifecycle-evidence-v1.2.0");
+  assert.equal(evidence.sourceBaseCommit, "823f04a03dd4ac97fd37cd6245004263179e8a7d");
+  assert.equal(evidence.ceremonySourceCommit, "9a483c95586736f45c35cdad5d07f642fef8ff63");
+  assert.equal(evidence.classification.authorityPresentForExecution, true);
+  assert.equal(evidence.classification.authorityAbsentAfterRevoke, true);
+  assert.equal(evidence.classification.ptaZeroApprovalEventVerified, true);
+  assert.equal(evidence.classification.applicationStateChangeVerified, false);
+  assert.equal(evidence.classification.exactGrantIntentPrecommitted, false);
+  assert.equal(evidence.classification.historicalAuthorityProviderCount, 1);
+  assert.equal(evidence.classification.twoProviderHistoricalAuthorityVerified, false);
+  assert.equal(evidence.classification.twoProviderFinalAuthorityAbsenceVerified, true);
+  assert.equal(
+    evidence.operations.grant.transactionHash,
+    "0xbfa1e3216d38efa0fc013efa504e808e16360b113f9a35bced6e1689345180c7"
+  );
+  assert.equal(
+    evidence.operations.execute.transactionHash,
+    "0xad65e59018c177ce1379b7e7de4e2449e03083f1569e7fcf0b2068e76cb0268e"
+  );
+  assert.equal(
+    evidence.operations.revoke.transactionHash,
+    "0x72e7cf94527ec6bed65856ce6ccc96ef94c7d8af8e5183ffa4667854637bceb7"
+  );
+  assert.deepEqual(
+    evidence.authorityTimeline.phases.map(({ phase, providers }) => [
+      phase,
+      providers.map(({ provider }) => provider)
+    ]),
+    [
+      ["grant", ["publicnode"]],
+      ["execute", ["publicnode"]],
+      ["revoke", ["publicnode"]]
+    ]
+  );
+  assert.deepEqual(
+    evidence.authorityTimeline.finalized.providers.map(({ provider, observation }) => [
+      provider,
+      observation.keyStoreValid
+    ]),
+    [
+      ["bnb-chain", false],
+      ["publicnode", false]
+    ]
+  );
+  assert.equal(evidence.applicationEvidence.eventSignature, "Approval(address,address,uint256)");
+  assert.equal(evidence.applicationEvidence.amount, "0");
+  assert.ok(
+    evidence.transcript.every(({ request }) =>
+      [
+        "eth_blockNumber",
+        "eth_call",
+        "eth_chainId",
+        "eth_getBlockByHash",
+        "eth_getBlockByNumber",
+        "eth_getTransactionByHash",
+        "eth_getTransactionReceipt",
+        "wallet_getCallsStatus"
+      ].includes(request.method)
+    )
+  );
+  assert.doesNotMatch(
+    lifecycleBytes.toString("utf8"),
+    /privateKey|walletPassword|passkeySecret|encryptedSigner/u
   );
 });
 
