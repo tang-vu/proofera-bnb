@@ -309,7 +309,6 @@ function auditCaseAgainstExpected(
   }
   if (
     auditCase === bundle.activationProposal &&
-    bundle.expectedPolicy.requiresDirectClaimEvidence &&
     bundle.durableClaimState.claimEvidenceLevel !== "direct-record"
   ) {
     add(
@@ -320,7 +319,6 @@ function auditCaseAgainstExpected(
   }
   if (
     auditCase === bundle.activationProposal &&
-    bundle.expectedPolicy.requiresDatabaseClaimRecord &&
     !bundle.durableClaimState.databaseClaimRecordObserved
   ) {
     add(
