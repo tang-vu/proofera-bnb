@@ -1,6 +1,6 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-22T09:34:27.032Z",
+  "updatedAtUtc": "2026-08-22T13:45:00.000Z",
   "readyForSubmission": false,
   "gates": [
     {
@@ -82,9 +82,9 @@
     {
       "gateId": "termix-pairs",
       "state": "preregistered_only",
-      "claim": "Exactly three paired protocols are preregistered and all six raw lanes are retained. Task 02 has a digest-bound schema-valid pair plus an implementation-adjacent self-review, but both run states remain unverified because no independent second reviewer signed the pair. No advantage is publishable.",
+      "claim": "Exactly three paired protocols, all six raw lanes, and three digest-bound schema-valid observational pairs are retained. Every pair has an implementation-adjacent self-review, both run states remain unverified, and the reviewer packet is awaiting a distinct independent reviewer. No advantage is publishable.",
       "blockers": [
-        "Obtain independent adjudication for all three pairs, compile the final verified three-pair report, and preserve the current non-claim boundary until that compiler succeeds."
+        "Have a distinct independent reviewer reobserve all three tasks, emit new verified pairs plus bound adjudications, then compile the final verified three-pair report while preserving the current non-claim boundary until that compiler succeeds."
       ],
       "artifacts": [
         {
@@ -141,6 +141,36 @@
           "kind": "permission_audit_non_independent_review",
           "path": "evidence/termix/reviews/permission-audit/permission-audit-pair-20260822-v1-self-review.json",
           "sha256": "f39ffa47450d2b9ef114b31a10929626eea4499dceba1f51b6d8c1a6951349d3"
+        },
+        {
+          "kind": "lp_unverified_pair",
+          "path": "evidence/termix/pairs/pancake-lp/pancake-lp-pair-20260822-v1.json",
+          "sha256": "01fab2ed8f9cfd87175eae7244b07701c6f9ce357e6da8269afa7537edab38a2"
+        },
+        {
+          "kind": "lp_non_independent_review",
+          "path": "evidence/termix/reviews/pancake-lp/pancake-lp-pair-20260822-v1-self-review.json",
+          "sha256": "f3e15a2e4350190c7df69e41534fd457af9dea91ff1319bc81f8ce0906934bea"
+        },
+        {
+          "kind": "venus_unverified_pair",
+          "path": "evidence/termix/pairs/venus-health/venus-health-pair-20260822-v1.json",
+          "sha256": "7bb7ce5a2fe8aa480a4bf20c308e7f72db121c765d09caacc6ab44ebfd99f328"
+        },
+        {
+          "kind": "venus_non_independent_review",
+          "path": "evidence/termix/reviews/venus-health/venus-health-pair-20260822-v1-self-review.json",
+          "sha256": "5d4e704f8ce0b54d8c68b93c45ee7bf0d4014fa565cf65992ddfc84d16d055ca"
+        },
+        {
+          "kind": "independent_reviewer_packet",
+          "path": "evidence/termix/reviewer-packets/20260822-v1/manifest.json",
+          "sha256": "1ba0c169cb24a343ebba253281fb196e7270f9a7e9b3b7bab0f36f8beeb8276e"
+        },
+        {
+          "kind": "permission_audit_post_run_answer_key",
+          "path": "evidence/termix/reviewer-packets/20260822-v1/permission-audit-answer-key.canonical-json",
+          "sha256": "595a4907946b7c8649d9341587e91d5918d43ce8dfd5bed4d631483c20d66677"
         }
       ]
     },

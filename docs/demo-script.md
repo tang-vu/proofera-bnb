@@ -1,6 +1,6 @@
 # ProofEra judge demo script
 
-Updated: 2026-08-19. This is the production script and shot list, not evidence that the final video has been recorded. Keep the final cut between 4:00 and 5:30. Never show a secret, wallet export, environment file, passkey credential payload, or session signer.
+Updated: 2026-08-22. This is the production script and shot list, not evidence that the final video has been recorded. Keep the final cut between 4:00 and 5:30. Never show a secret, wallet export, environment file, passkey credential payload, or session signer.
 
 ## Current recording boundary
 
@@ -9,10 +9,10 @@ Ready to show now:
 - the public marketplace and four read-only analyzers;
 - four receipt-verified ERC-8004 identities and three finalized testnet hires;
 - the Proof Room with exact build, artifact paths, hashes, and honest blockers;
-- the retained LP and Venus agent/manual raw captures;
+- all six retained TermiX raw captures, all three unverified observational pairs, and the independent-review packet;
 - the local operator ceremony explaining why manual judgment, passkey presence, execution, and revoke are separate transitions.
 
-Do not record the final cut yet. The following must exist first: controlled Pancake before/after evidence; independent adjudication and final compilation of all three TermiX pairs; final production freeze. The Altana lifecycle and all six raw TermiX lanes are retained, but neither closes those remaining gates. Until then, use rehearsal mode only.
+Do not record the final cut yet. The following must exist first: controlled Pancake before/after evidence; independent adjudication and final compilation of all three TermiX pairs; final production freeze. The Altana lifecycle, all six raw TermiX lanes, three unverified pairs and reviewer handoff are retained, but none closes those remaining gates. Until then, use rehearsal mode only.
 
 ## One-session operator checklist
 

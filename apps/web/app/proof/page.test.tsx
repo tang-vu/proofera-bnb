@@ -29,9 +29,14 @@ describe("Proof room", () => {
     }
     expect(html).toContain("No — gates remain open");
     expect(html).toContain("BSC-testnet registration verified");
-    expect(html).toContain("all six raw lanes are retained");
+    expect(html).toContain("all six raw lanes");
+    expect(html).toContain("lp unverified pair");
     expect(html).toContain("permission audit unverified pair");
+    expect(html).toContain("venus unverified pair");
+    expect(html).toContain("independent reviewer packet");
+    expect(html).toContain("lp non independent review");
     expect(html).toContain("permission audit non independent review");
+    expect(html).toContain("venus non independent review");
     for (const agentId of ["1825", "1826", "1827", "1828"]) {
       expect(html).toContain(`Agent ID ${agentId}`);
     }

@@ -1,0 +1,39 @@
+{
+  "checks": {
+    "artifactDigestsVerified": true,
+    "declarationBindingsVerified": true,
+    "deterministicCoreRecomputed": true,
+    "noWriteBoundaryVerified": true,
+    "publicRunOrderVerified": true,
+    "rubricRecomputed": true,
+    "secondReviewerIndependent": false
+  },
+  "limitations": [
+    "The agent and worksheet use different output envelopes; this self-review compares the frozen observation, calculation, threshold and decision core.",
+    "The manual no-agent statement and source provenance still require a genuinely independent second reviewer.",
+    "Equal implementation-adjacent scores on one public testnet replay do not prove avoided liquidation, agent advantage or production protection.",
+    "Both runs and this pair remain unverified until a distinct reviewer signs a digest-bound adjudication.",
+    "Zero incremental onchain cost excludes human labor and the earlier marketplace hire; no currency conversion is performed."
+  ],
+  "pairId": "venus-health-pair-20260822-v1",
+  "pairSha256": "2f3ac750834b93802b42f3317d35cfd82cb4381aec2497fb9b88232d6adca600",
+  "quality": { "agentPoints": 100, "manualPoints": 100, "maximumPoints": 100 },
+  "reviewState": "self_reviewed_unverified",
+  "reviewedAtUtc": "2026-08-22T13:29:59.383Z",
+  "reviewer": {
+    "independenceBasis": "Not independent: the reviewer also operated the repository workflow, so this record cannot satisfy the second-reviewer gate.",
+    "name": "OpenAI Codex repository operator",
+    "role": "Implementation-adjacent evidence reviewer"
+  },
+  "schemaVersion": "proofera-termix-observational-self-review-v1.0.0",
+  "sources": {
+    "agentCapturePath": "evidence/termix/runs/venus-health/venus-health-agent-20260818-v2.json",
+    "agentInvocationPath": "evidence/termix/invocations/venus-health-agent-20260818-v2.canonical-json",
+    "declarationPath": "evidence/termix/declarations/venus-health/402edbeae429-125808800.json",
+    "inputPath": "evidence/termix/frozen/venus-health/402edbeae429-125563831-125564152.canonical-json",
+    "manualCapturePath": "evidence/termix/runs/venus-health/manual/venus-health-manual-20260818-v2.json",
+    "operatorProcedurePath": "scripts/operator-ceremony-server.mjs",
+    "runOrderPath": "evidence/termix/declarations/venus-health/402edbeae429-125808800.run-order.json"
+  },
+  "taskId": "venus-health-factor-decision"
+}

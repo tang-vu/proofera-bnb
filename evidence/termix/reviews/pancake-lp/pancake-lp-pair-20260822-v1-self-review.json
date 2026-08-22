@@ -1,0 +1,39 @@
+{
+  "checks": {
+    "artifactDigestsVerified": true,
+    "declarationBindingsVerified": true,
+    "deterministicCoreRecomputed": true,
+    "noWriteBoundaryVerified": true,
+    "publicRunOrderVerified": true,
+    "rubricRecomputed": true,
+    "secondReviewerIndependent": false
+  },
+  "limitations": [
+    "The two retained formats are not byte-identical; this self-review compares only predeclared, independently recomputable decision fields.",
+    "The manual no-agent statement is runner-bounded but still requires a genuinely independent tool-log reviewer.",
+    "Equal implementation-adjacent scores on one frozen public position do not establish agent advantage or general LP performance.",
+    "Both runs and this pair remain unverified until a distinct reviewer signs a digest-bound adjudication.",
+    "Zero incremental onchain cost excludes human labor and the earlier marketplace hire; no currency conversion is performed."
+  ],
+  "pairId": "pancake-lp-pair-20260822-v1",
+  "pairSha256": "41f0df2b0ad2886573cf9e1035b247f971a2fed493b083af87b3153fa6adc103",
+  "quality": { "agentPoints": 100, "manualPoints": 100, "maximumPoints": 100 },
+  "reviewState": "self_reviewed_unverified",
+  "reviewedAtUtc": "2026-08-22T13:29:59.383Z",
+  "reviewer": {
+    "independenceBasis": "Not independent: the reviewer also operated the repository workflow, so this record cannot satisfy the second-reviewer gate.",
+    "name": "OpenAI Codex repository operator",
+    "role": "Implementation-adjacent evidence reviewer"
+  },
+  "schemaVersion": "proofera-termix-observational-self-review-v1.0.0",
+  "sources": {
+    "agentCapturePath": "evidence/termix/runs/pancake-lp/pancake-lp-agent-20260818-v4.json",
+    "agentInvocationPath": "evidence/termix/invocations/pancake-lp-agent-20260818-v4.canonical-json",
+    "declarationPath": "evidence/termix/declarations/pancake-lp/f8b57f2b1842-125735511.json",
+    "inputPath": "evidence/termix/frozen/pancake-lp/116342186-7152618.canonical-json",
+    "manualCapturePath": "evidence/termix/runs/pancake-lp/manual/pancake-lp-manual-20260818-v1.json",
+    "operatorProcedurePath": "scripts/operator-ceremony-server.mjs",
+    "runOrderPath": "evidence/termix/declarations/pancake-lp/f8b57f2b1842-125735511.run-order.json"
+  },
+  "taskId": "pancake-lp-range-decision"
+}

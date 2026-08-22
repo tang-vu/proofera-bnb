@@ -1,6 +1,8 @@
 # Pancake LP manual captures
 
-The create-only manual CLI writes one canonical capture per frozen run ID here. No run exists yet.
+The create-only manual CLI writes one canonical capture per frozen run ID here. The retained valid
+capture is `pancake-lp-manual-20260818-v1.json`; its observational pair and implementation-adjacent
+self-review remain `unverified` and non-publishable pending independent review.
 The NDJSON event stream records positive operator-active segments, exactly one matching read-only
 `slot0` RPC exchange, and the unedited canonical worksheet output. It cannot prove operator identity
 or the absence of unreported tools; independent tool-log review remains required.

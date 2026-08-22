@@ -1,14 +1,14 @@
 # TermiX evidence boundary
 
-Status: **ALL SIX RAW LANES CAPTURED / NON-PUBLISHABLE**. Each of the three tasks retains an agent and manual raw capture. Task 02 additionally has a schema-valid pair plus an implementation-adjacent self-review, but both run states remain `unverified` because no independent second reviewer has signed the pair digest. Nothing in this directory is yet a final three-pair report or a publishable agent-advantage claim.
+Status: **THREE OBSERVATIONAL PAIRS RETAINED / NON-PUBLISHABLE**. Each of the three tasks retains an agent lane, a manual lane, a schema-valid observational pair, and an implementation-adjacent self-review. Every run evidence state remains `unverified` because no distinct independent reviewer has reobserved and signed the evidence. Nothing in this directory is a final verified three-pair report or a publishable agent-advantage claim.
 
 `preregistrations/` contains exactly three schema-validated ProofEra-versus-manual protocols:
 
-| File                            | Task                             | Definition SHA-256                                                 | State                                |
-| ------------------------------- | -------------------------------- | ------------------------------------------------------------------ | ------------------------------------ |
-| `task-01-lp-range-v2.json`      | PancakeSwap V3 LP range decision | `9ac77645f2dd0ade20203b911cba18ce52b7b016fae8d9e73aa2919440b572ab` | raw lanes captured; not adjudicated  |
-| `task-02-permission-audit.json` | Altana/Pancake permission audit  | `1191c85c4f36881be0736ced51fc6c23e24286101543bf0838346b0e2ed95645` | raw lanes + unverified pair retained |
-| `task-03-venus-health.json`     | Venus health-factor replay       | `c15ed1089fdeb75eab7db3134f08c011fd71bfe02ec2c3dbf3052592973c8c55` | raw lanes captured; not adjudicated  |
+| File                            | Task                             | Definition SHA-256                                                 | State                    |
+| ------------------------------- | -------------------------------- | ------------------------------------------------------------------ | ------------------------ |
+| `task-01-lp-range-v2.json`      | PancakeSwap V3 LP range decision | `9ac77645f2dd0ade20203b911cba18ce52b7b016fae8d9e73aa2919440b572ab` | unverified pair retained |
+| `task-02-permission-audit.json` | Altana/Pancake permission audit  | `1191c85c4f36881be0736ced51fc6c23e24286101543bf0838346b0e2ed95645` | unverified pair retained |
+| `task-03-venus-health.json`     | Venus health-factor replay       | `c15ed1089fdeb75eab7db3134f08c011fd71bfe02ec2c3dbf3052592973c8c55` | unverified pair retained |
 
 Task 01 v1 required a ProofEra-controlled PTA/WBNB testnet position that never
 existed. It was never run and remains byte-for-byte preserved under
@@ -18,9 +18,13 @@ decision support, with source chain 56 separated from ERC-8004/hire chain 97.
 
 The digest covers the exact task, required input-binding rules, fixed constraints, environment-binding rules, rubric, hard-fail rules, parity controls, measurements, artifacts, receipts and reproduction plan. It is local tamper evidence, not an external timestamp or proof that a run occurred. Changing a definition requires a new version and digest; it must not overwrite the protocol used by a started run.
 
-All three declarations, registered identities, hire receipts, run-order seeds, exact inputs and timed invocations were bound before their retained raw captures. LP uses `pancake-lp-agent-20260818-v4` and `pancake-lp-manual-20260818-v1`; Task 02 uses `permission-audit-agent-20260822-v1` and `permission-audit-manual-20260822-v1`; Venus uses `venus-health-agent-20260818-v2` and `venus-health-manual-20260818-v2`. These files preserve timing, exact outputs, receipts and limitations but do not self-prove the no-agent boundary. Independent adjudication and schema-valid paired artifacts are still required for Task 01 and Task 03. Task 02 binds the retained Altana lifecycle, code observation, staging database receipt, public proof-worker state, blind corpus, Agent `1825`, verified hire and reviewer-held answer-key digest in [`38046f87b87c-126555555.json`](./declarations/permission-audit/38046f87b87c-126555555.json). Finalized block `126555555` forced manual-first; both exact invocations and both raw captures are retained.
+All three declarations, registered identities, hire receipts, run-order seeds, exact inputs and timed invocations were bound before their retained raw captures. LP uses `pancake-lp-agent-20260818-v4` and `pancake-lp-manual-20260818-v1`; Task 02 uses `permission-audit-agent-20260822-v1` and `permission-audit-manual-20260822-v1`; Venus uses `venus-health-agent-20260818-v2` and `venus-health-manual-20260818-v2`. These files preserve timing, exact outputs, receipts and limitations but do not self-prove the no-agent boundary. The three observational pairs and their self-reviews therefore remain unverified. Task 02 binds the retained Altana lifecycle, code observation, staging database receipt, public proof-worker state, blind corpus, Agent `1825`, verified hire and reviewer-held answer-key digest in [`38046f87b87c-126555555.json`](./declarations/permission-audit/38046f87b87c-126555555.json). Finalized block `126555555` forced manual-first; both exact invocations and both raw captures are retained.
 
 Task 02's deterministic `audit_altana_permission_bundle` v1.1 skill is live on the public LP A2A endpoint and its Agent Card advertises that exact ID. The timed manual and agent lanes both returned the same 18 evidence-linked findings, corrected enforcement table, exact bundle digest and `executionPerformed: false`. The retained pair [`permission-audit-pair-20260822-v1.json`](./pairs/permission-audit/permission-audit-pair-20260822-v1.json) records exact monotonic durations (`12,756,400 ns` manual and `2,318,655,500 ns` agent), explicit zero incremental tBNB fees and rubric parity at `100/100`. Its companion self-review explicitly records `secondReviewerIndependent: false`; therefore both evidence states are `unverified`, `publishableClaim` is false, and no winner or advantage is claimed.
+
+Task 01's retained pair [`pancake-lp-pair-20260822-v1.json`](./pairs/pancake-lp/pancake-lp-pair-20260822-v1.json), logical pair SHA-256 `41f0df2b0ad2886573cf9e1035b247f971a2fed493b083af87b3153fa6adc103`, recomputes the exact-hash tick/range worksheet and preserves unavailable economics. It records `1,073,806,100 ns` agent versus `620,556,240,100 ns` manual, zero incremental native fees and rubric parity at `100/100`. Task 03's retained pair [`venus-health-pair-20260822-v1.json`](./pairs/venus-health/venus-health-pair-20260822-v1.json), logical pair SHA-256 `2f3ac750834b93802b42f3317d35cfd82cb4381aec2497fb9b88232d6adca600`, recomputes all three integer 18-decimal health factors, their 144-second window and the bounded `hold` decision. It records `856,509,100 ns` agent versus `10,048,900 ns` manual, zero incremental native fees and rubric parity at `100/100`. These are exact retained measurements, not publishable comparisons: both self-reviews explicitly set `secondReviewerIndependent: false`.
+
+The independent-review handoff is retained under [`reviewer-packets/20260822-v1/`](./reviewer-packets/20260822-v1/). It digest-binds all inputs, the three current unverified pairs, the self-reviews, expected output paths and the post-run Task 02 answer key. That answer key became visible only after both blind lanes ended. The packet does not make its consumer independent and does not authorize changing the current pairs in place; a distinct reviewer must emit new verified pairs and pair-bound adjudications.
 
 Validate the preregistrations and paired-run harness:
 
@@ -29,7 +33,7 @@ pnpm --filter @proofera/benchmarks typecheck
 pnpm --filter @proofera/benchmarks test
 ```
 
-The tests perform no network request, wallet operation, transaction, real timing measurement or result generation. Subprocess tests prove the production CLIs fail before network/output access when exact invocation material is absent. Task-specific prerequisite commands are recorded inside each JSON file. Their final timed invocations remain `null` until the release, identity, hire and run-order bindings exist.
+The tests perform no network request, wallet operation, transaction or new timing measurement. They validate the retained result generation and prove production CLIs fail before network/output access when exact invocation material is absent. Task-specific prerequisite and retained invocation material is recorded inside the evidence files.
 
 Future raw run material belongs in a new run-ID directory, never inside `preregistrations/`. It must include the frozen declaration, raw inputs and outputs, UTC and monotonic timing, active-time segments, sourced integer costs, API/transaction receipts when required, rubric-complete second review, hashes, reproduction logs and limitations. Secrets and signer material are forbidden.
 
@@ -41,9 +45,9 @@ pnpm run:termix:venus-agent -- --execute-exact-venus-health-agent-run --request-
 
 It reads the public timed invocation from standard input. It requires a clean,
 published source commit and byte-exact committed request, then writes one new
-capture beneath `runs/venus-health/`. The command is not currently runnable as
-a benchmark because no final request, registered agent identity or verified
-hire receipt exists.
+capture beneath `runs/venus-health/`. The valid retained agent capture is
+`venus-health-agent-20260818-v2.json`; running the create-only command again
+would require a new preregistered run ID rather than overwriting that evidence.
 
 The create-only LP agent runner is available as:
 

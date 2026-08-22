@@ -14,7 +14,7 @@ export const TERMIX_FINAL_BUNDLE_SCHEMA_VERSION = "proofera-termix-final-bundle-
 export const TERMIX_FINAL_TASK_IDS = [
   "pancake-lp-range-decision",
   "autonomous-session-permission-audit",
-  "venus-health-factor-replay"
+  "venus-health-factor-decision"
 ] as const;
 
 const TermixFinalTaskIdSchema = z.enum(TERMIX_FINAL_TASK_IDS);

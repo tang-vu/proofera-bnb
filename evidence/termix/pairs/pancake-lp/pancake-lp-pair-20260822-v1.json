@@ -1,0 +1,747 @@
+{
+  "agentRun": {
+    "artifacts": [
+      {
+        "artifactId": "agent-output",
+        "description": "Unedited canonical timed-lane output retained inside the immutable capture.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/runs/pancake-lp/pancake-lp-agent-20260818-v4.json"
+        },
+        "mediaType": "application/json",
+        "role": "output",
+        "sha256": "e7564a74e1319f3274406d667cf4949cabc31343d7717b7082018d1b41771501"
+      },
+      {
+        "artifactId": "agent-shared-input",
+        "description": "Shared canonical frozen input payload used by both timed lanes.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/frozen/pancake-lp/116342186-7152618.canonical-json"
+        },
+        "mediaType": "application/json",
+        "role": "configuration",
+        "sha256": "3459eb2566621c4d74acef68c84849e59b74214c7a21d7d20b8bbc6352dda945"
+      },
+      {
+        "artifactId": "agent-api-0",
+        "description": "Raw OnFinality BSC mainnet archive JSON-RPC response envelope retained inside the immutable capture.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/runs/pancake-lp/pancake-lp-agent-20260818-v4.json"
+        },
+        "mediaType": "application/json",
+        "role": "raw-receipt",
+        "sha256": "fd3de3f95756496c66da0841d24e08e6c0107d2323a50cf1a7ea761b716a15c5"
+      },
+      {
+        "artifactId": "agent-api-1",
+        "description": "Raw ProofEra LP Range Agent A2A response envelope retained inside the immutable capture.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/runs/pancake-lp/pancake-lp-agent-20260818-v4.json"
+        },
+        "mediaType": "application/json",
+        "role": "raw-receipt",
+        "sha256": "eed9c3a5c049ff815a6310af1d8413701159444452bef30304ae1a200b0bc499"
+      },
+      {
+        "artifactId": "agent-hire-raw",
+        "description": "Verified pre-run ProofEra hire receipt retained for provenance and excluded from timed cost deltas.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/runs/pancake-lp/pancake-lp-agent-20260818-v4.json"
+        },
+        "mediaType": "application/json",
+        "role": "raw-receipt",
+        "sha256": "d4908ec938daefdb6aff31f661948576a483bdf1a622d4f54dc47906b2f7e3a9"
+      }
+    ],
+    "costs": {
+      "lineItems": [
+        {
+          "amountMinorUnits": "0",
+          "category": "gas",
+          "costId": "agent-incremental-onchain-fee",
+          "denomination": {
+            "chainId": 56,
+            "contractAddress": null,
+            "kind": "asset",
+            "minorUnitDecimals": 18,
+            "symbol": "BNB"
+          },
+          "description": "Explicit zero incremental native-asset fee inside the timed read-only lane; human labor and the earlier marketplace hire are excluded.",
+          "incurredAtUtc": "2026-08-18T04:36:02.538Z",
+          "sources": [{ "kind": "receipt", "receiptId": "agent-api-receipt-0" }]
+        }
+      ],
+      "reason": null,
+      "state": "complete"
+    },
+    "declaration": {
+      "benchmarkId": "pancake-lp-public-position-v2",
+      "constraints": [
+        {
+          "constraintId": "bsc-mainnet-source-only",
+          "description": "The analyzed source state is BNB Smart Chain mainnet chain ID 56.",
+          "enforcement": "hard",
+          "expected": { "encoding": "decimal_integer", "value": "56" }
+        },
+        {
+          "constraintId": "bsc-testnet-agent-commerce",
+          "description": "ERC-8004 identity and hire commerce are isolated to BSC testnet chain ID 97.",
+          "enforcement": "hard",
+          "expected": { "encoding": "decimal_integer", "value": "97" }
+        },
+        {
+          "constraintId": "decision-window",
+          "description": "Finish within 900 seconds; overruns remain recorded and lose timing credit.",
+          "enforcement": "scored",
+          "expected": { "encoding": "decimal_integer", "value": "900" }
+        },
+        {
+          "constraintId": "no-hidden-source",
+          "description": "Only the bundle and fixed exact-hash slot0 RPC access are allowed.",
+          "enforcement": "hard",
+          "expected": { "encoding": "canonical_json", "value": "true" }
+        },
+        {
+          "constraintId": "public-position-non-authority",
+          "description": "The third-party position is never ProofEra-owned, authorized or executable.",
+          "enforcement": "hard",
+          "expected": { "encoding": "canonical_json", "value": "true" }
+        },
+        {
+          "constraintId": "timed-run-no-write",
+          "description": "Neither method may sign, approve, submit, broadcast or access a wallet.",
+          "enforcement": "hard",
+          "expected": { "encoding": "canonical_json", "value": "true" }
+        }
+      ],
+      "environment": {
+        "chainId": 56,
+        "components": [
+          {
+            "configurationSha256": "7921f9492890a0f2a485dcd57dc78876ed00f8bce2213f61733b04298f4af09b",
+            "name": "manual-procedure",
+            "version": "proofera-termix-pancake-lp-manual-v1.1.0"
+          },
+          { "configurationSha256": null, "name": "node", "version": "v24.14.1" },
+          {
+            "configurationSha256": "6395774d0e37db2710ef0fa86ad7990463d8b6d79632b3116e0f389ba9c3dd5b",
+            "name": "proofera-lp-range-agent-lane",
+            "version": "1.0.0"
+          },
+          {
+            "configurationSha256": "37947165be883e0a2dc4582fbdbf57ffd38f1a2cc5fa7295fdd9451d08087786",
+            "name": "retained-pancakeswap-position",
+            "version": "116342186"
+          }
+        ],
+        "kind": "mainnet",
+        "networkName": "BNB Smart Chain Mainnet public-state replay",
+        "parameters": [
+          {
+            "key": "agent-registry-chain-id",
+            "value": { "encoding": "decimal_integer", "value": "97" }
+          },
+          {
+            "key": "erc8004-registry",
+            "value": {
+              "encoding": "evm_address",
+              "value": "0x8004A818BFB912233c491871b3d84c89A494BD9e"
+            }
+          },
+          {
+            "key": "lp-agent-endpoint",
+            "value": { "encoding": "string", "value": "https://proofera-lp.tangvu.dev/" }
+          },
+          { "key": "lp-agent-id", "value": { "encoding": "decimal_integer", "value": "1825" } },
+          {
+            "key": "lp-source-rpc-endpoint",
+            "value": { "encoding": "string", "value": "https://bnb.api.onfinality.io/public" }
+          },
+          {
+            "key": "run-order-randomness-commitment",
+            "value": {
+              "encoding": "canonical_json",
+              "value": "{\"blockNumber\":\"125735511\",\"chainId\":97,\"finalityConfirmations\":\"12\",\"mapping\":\"least-significant bit of the finalized block hash: 0=agent-first, 1=manual-first\",\"providers\":[\"https://data-seed-prebsc-2-s2.binance.org:8545\",\"https://bsc-testnet-rpc.publicnode.com\"]}"
+            }
+          },
+          {
+            "key": "source-block",
+            "value": { "encoding": "decimal_integer", "value": "116342186" }
+          },
+          {
+            "key": "source-block-hash",
+            "value": {
+              "encoding": "string",
+              "value": "0xe0dae09e27c2b8dfcb8d603794289a7b3b221b078e41169cc61b5233aee385bb"
+            }
+          }
+        ],
+        "softwareCommitSha": "f8b57f2b184266d8620d6590d663cd91d41db1ea"
+      },
+      "inputs": [
+        {
+          "description": "SHA-256 of the shared canonical LP input bundle.",
+          "inputId": "lp-range-input-bundle-sha256",
+          "unit": null,
+          "value": {
+            "encoding": "string",
+            "value": "3459eb2566621c4d74acef68c84849e59b74214c7a21d7d20b8bbc6352dda945"
+          }
+        },
+        {
+          "description": "SHA-256 of the retained public-position source evidence.",
+          "inputId": "source-evidence-sha256",
+          "unit": null,
+          "value": {
+            "encoding": "string",
+            "value": "37947165be883e0a2dc4582fbdbf57ffd38f1a2cc5fa7295fdd9451d08087786"
+          }
+        }
+      ],
+      "qualityRubric": {
+        "criteria": [
+          {
+            "criterionId": "economics-decision-integrity",
+            "description": "Keep absent economics unavailable and make only a supported bounded decision.",
+            "evidenceRequired": "Known/unknown fields, violations, decision and trace.",
+            "maximumPoints": 25,
+            "measurement": "Reject unsupported economics, substitutions and action recommendations."
+          },
+          {
+            "criterionId": "explanation-uncertainty",
+            "description": "Explain risk, decision, non-authority and limitations.",
+            "evidenceRequired": "Raw output and reviewer checklist.",
+            "maximumPoints": 10,
+            "measurement": "Apply the fixed checklist to unedited output."
+          },
+          {
+            "criterionId": "range-risk-accuracy",
+            "description": "Calculate exact range state, tick buffers and policy violations.",
+            "evidenceRequired": "Raw output, canonical result and reviewer worksheet.",
+            "maximumPoints": 25,
+            "measurement": "Independently recompute every integer field."
+          },
+          {
+            "criterionId": "reproducibility",
+            "description": "Produce deterministic output, timing, cost and receipt evidence.",
+            "evidenceRequired": "Run captures, hashes, timings, costs and reproduction log.",
+            "maximumPoints": 15,
+            "measurement": "Verify declaration parity, hashes, receipts and tool logs."
+          },
+          {
+            "criterionId": "verified-inputs",
+            "description": "Preserve and validate exact source identity and slot0 state.",
+            "evidenceRequired": "Frozen bundle, raw evidence, API receipt and trace.",
+            "maximumPoints": 25,
+            "measurement": "Recompute the source join and exact-hash slot0 receipt."
+          }
+        ],
+        "declaredAtUtc": "2026-08-16T21:32:00.000Z",
+        "rubricId": "termix-lp-range-rubric-v2",
+        "totalMaximumPoints": 100,
+        "version": "2.0.0"
+      },
+      "requiredReceiptKinds": ["api"],
+      "task": {
+        "domain": "trading",
+        "exactDefinition": "Given the immutable BNB Smart Chain mainnet public-position bundle, validate its retained identity and exact-hash slot0 replay; determine range and boundary state; then return canonical JSON with exact tick buffers, policy violations, only supplied economics, a bounded hold/review/insufficient-evidence decision, rationale and limitations. The position is unrelated to ProofEra and neither method may write onchain.",
+        "successCondition": "Both methods use identical declaration and input bytes, produce source-bound recomputable output, preserve missing economics, and make no ownership, authority, performance or execution claim from the public position.",
+        "taskId": "pancake-lp-range-decision",
+        "title": "PancakeSwap V3 public-position range decision"
+      }
+    },
+    "evidenceState": {
+      "reason": "A distinct independent reviewer has not reobserved receipts, reviewed the manual no-agent boundary and signed the exact pair digest.",
+      "state": "unverified"
+    },
+    "limitations": [
+      "The source API receipt rechecks only exact-block slot0; the committed input evidence remains necessary for position, owner, token, fee and liquidity fields.",
+      "The public third-party position establishes no ProofEra ownership, approval, authority, performance or execution receipt.",
+      "The analyzer is read-only and cannot sign, approve, rebalance or submit a transaction.",
+      "The normalized score is an implementation-adjacent deterministic self-review, not an independent adjudication.",
+      "The capture is retained at evidence/termix/runs/pancake-lp/pancake-lp-agent-20260818-v4.json.",
+      "The operator procedure is retained at scripts/operator-ceremony-server.mjs.",
+      "Active segments remain in the raw capture; the pair schema compares full monotonic wall duration."
+    ],
+    "method": {
+      "agentReference": {
+        "agentId": "1825",
+        "chainId": 97,
+        "registryAddress": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+        "registrySourceUrl": "https://testnet.bscscan.com/address/0x8004A818BFB912233c491871b3d84c89A494BD9e",
+        "standard": "ERC-8004",
+        "state": "registered"
+      },
+      "configurationSha256": "6395774d0e37db2710ef0fa86ad7990463d8b6d79632b3116e0f389ba9c3dd5b",
+      "kind": "agent",
+      "label": "Registered ProofEra LP Range agent",
+      "marketplace": "ProofEra",
+      "runtime": "self-hosted TypeScript A2A analyzer"
+    },
+    "qualityAssessment": {
+      "assessedAtUtc": "2026-08-22T13:29:59.383Z",
+      "assessor": "ProofEra deterministic observational-pair self-review v1",
+      "scores": [
+        {
+          "criterionId": "economics-decision-integrity",
+          "evidence": [
+            { "artifactId": "agent-output", "kind": "artifact" },
+            { "artifactId": "agent-shared-input", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "agent-api-receipt-0" }
+          ],
+          "points": 25,
+          "rationale": "Both outputs keep unavailable fee, gas and slippage economics unknown and select insufficient_evidence without proposing execution."
+        },
+        {
+          "criterionId": "explanation-uncertainty",
+          "evidence": [
+            { "artifactId": "agent-output", "kind": "artifact" },
+            { "artifactId": "agent-shared-input", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "agent-api-receipt-0" }
+          ],
+          "points": 10,
+          "rationale": "Both retained outputs explain missing economics, public-position non-authority and the read-only boundary."
+        },
+        {
+          "criterionId": "range-risk-accuracy",
+          "evidence": [
+            { "artifactId": "agent-output", "kind": "artifact" },
+            { "artifactId": "agent-shared-input", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "agent-api-receipt-0" }
+          ],
+          "points": 25,
+          "rationale": "Current tick, half-open range membership, width and both tick buffers recompute exactly from the frozen bundle and retained slot0 receipts."
+        },
+        {
+          "criterionId": "reproducibility",
+          "evidence": [
+            { "artifactId": "agent-output", "kind": "artifact" },
+            { "artifactId": "agent-shared-input", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "agent-api-receipt-0" }
+          ],
+          "points": 15,
+          "rationale": "Declaration, input digest, public run order, raw response bytes, output bytes and capture timings all pass deterministic joins."
+        },
+        {
+          "criterionId": "verified-inputs",
+          "evidence": [
+            { "artifactId": "agent-output", "kind": "artifact" },
+            { "artifactId": "agent-shared-input", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "agent-api-receipt-0" }
+          ],
+          "points": 25,
+          "rationale": "Both lanes bind the same chain, pool, Position Manager, position, block hash and exact-hash slot0 result."
+        }
+      ]
+    },
+    "receipts": [
+      {
+        "endpointUrl": "https://bnb.api.onfinality.io/public",
+        "kind": "api",
+        "observedAtUtc": "2026-08-18T04:36:02.538Z",
+        "provider": "OnFinality BSC mainnet archive JSON-RPC",
+        "receiptId": "agent-api-receipt-0",
+        "requestId": "pancake-lp-agent-20260818-v4-lp-slot0",
+        "responseArtifactId": "agent-api-0",
+        "responseSha256": "fd3de3f95756496c66da0841d24e08e6c0107d2323a50cf1a7ea761b716a15c5",
+        "verification": {
+          "method": "Recomputed retained bytes and revalidated the task-specific frozen RPC or A2A response contract.",
+          "state": "verified",
+          "verifiedAtUtc": "2026-08-22T13:29:59.383Z",
+          "verifier": "ProofEra deterministic observational-pair self-review v1"
+        }
+      },
+      {
+        "endpointUrl": "https://proofera-lp.tangvu.dev/",
+        "kind": "api",
+        "observedAtUtc": "2026-08-18T04:36:03.149Z",
+        "provider": "ProofEra LP Range Agent A2A",
+        "receiptId": "agent-api-receipt-1",
+        "requestId": "pancake-lp-agent-20260818-v4-lp-a2a",
+        "responseArtifactId": "agent-api-1",
+        "responseSha256": "eed9c3a5c049ff815a6310af1d8413701159444452bef30304ae1a200b0bc499",
+        "verification": {
+          "method": "Recomputed retained bytes and revalidated the task-specific frozen RPC or A2A response contract.",
+          "state": "verified",
+          "verifiedAtUtc": "2026-08-22T13:29:59.383Z",
+          "verifier": "ProofEra deterministic observational-pair self-review v1"
+        }
+      }
+    ],
+    "reproductionCommands": [
+      {
+        "command": "pnpm --filter @proofera/benchmarks test",
+        "expectedArtifactIds": ["agent-output", "agent-shared-input"],
+        "step": 1,
+        "workingDirectory": "."
+      }
+    ],
+    "runId": "pancake-lp-agent-20260818-v4",
+    "timing": {
+      "endedAtUtc": "2026-08-18T04:36:03.152Z",
+      "monotonicClock": "Node.js process.hrtime.bigint",
+      "monotonicDurationNanoseconds": "1073806100",
+      "startedAtUtc": "2026-08-18T04:36:02.078Z"
+    }
+  },
+  "limitations": [
+    "The two retained formats are not byte-identical; this self-review compares only predeclared, independently recomputable decision fields.",
+    "The manual no-agent statement is runner-bounded but still requires a genuinely independent tool-log reviewer.",
+    "Equal implementation-adjacent scores on one frozen public position do not establish agent advantage or general LP performance.",
+    "Both runs and this pair remain unverified until a distinct reviewer signs a digest-bound adjudication.",
+    "Zero incremental onchain cost excludes human labor and the earlier marketplace hire; no currency conversion is performed."
+  ],
+  "manualRun": {
+    "artifacts": [
+      {
+        "artifactId": "manual-output",
+        "description": "Unedited canonical timed-lane output retained inside the immutable capture.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/runs/pancake-lp/manual/pancake-lp-manual-20260818-v1.json"
+        },
+        "mediaType": "application/json",
+        "role": "output",
+        "sha256": "007dca2de9a05849541316dd8553209e4bcddd05114c1e5e1cf3804f62445536"
+      },
+      {
+        "artifactId": "manual-shared-input",
+        "description": "Shared canonical frozen input payload used by both timed lanes.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/frozen/pancake-lp/116342186-7152618.canonical-json"
+        },
+        "mediaType": "application/json",
+        "role": "configuration",
+        "sha256": "3459eb2566621c4d74acef68c84849e59b74214c7a21d7d20b8bbc6352dda945"
+      },
+      {
+        "artifactId": "manual-api-0",
+        "description": "Raw OnFinality BSC mainnet archive JSON-RPC response envelope retained inside the immutable capture.",
+        "locator": {
+          "kind": "repository",
+          "path": "evidence/termix/runs/pancake-lp/manual/pancake-lp-manual-20260818-v1.json"
+        },
+        "mediaType": "application/json",
+        "role": "raw-receipt",
+        "sha256": "e534964ade588effc79e17c6cd2252e495c6dce66618a825fa0d4638fb923b54"
+      }
+    ],
+    "costs": {
+      "lineItems": [
+        {
+          "amountMinorUnits": "0",
+          "category": "gas",
+          "costId": "manual-incremental-onchain-fee",
+          "denomination": {
+            "chainId": 56,
+            "contractAddress": null,
+            "kind": "asset",
+            "minorUnitDecimals": 18,
+            "symbol": "BNB"
+          },
+          "description": "Explicit zero incremental native-asset fee inside the timed read-only lane; human labor and the earlier marketplace hire are excluded.",
+          "incurredAtUtc": "2026-08-18T13:11:52.120Z",
+          "sources": [{ "kind": "receipt", "receiptId": "manual-api-receipt-0" }]
+        }
+      ],
+      "reason": null,
+      "state": "complete"
+    },
+    "declaration": {
+      "benchmarkId": "pancake-lp-public-position-v2",
+      "constraints": [
+        {
+          "constraintId": "bsc-mainnet-source-only",
+          "description": "The analyzed source state is BNB Smart Chain mainnet chain ID 56.",
+          "enforcement": "hard",
+          "expected": { "encoding": "decimal_integer", "value": "56" }
+        },
+        {
+          "constraintId": "bsc-testnet-agent-commerce",
+          "description": "ERC-8004 identity and hire commerce are isolated to BSC testnet chain ID 97.",
+          "enforcement": "hard",
+          "expected": { "encoding": "decimal_integer", "value": "97" }
+        },
+        {
+          "constraintId": "decision-window",
+          "description": "Finish within 900 seconds; overruns remain recorded and lose timing credit.",
+          "enforcement": "scored",
+          "expected": { "encoding": "decimal_integer", "value": "900" }
+        },
+        {
+          "constraintId": "no-hidden-source",
+          "description": "Only the bundle and fixed exact-hash slot0 RPC access are allowed.",
+          "enforcement": "hard",
+          "expected": { "encoding": "canonical_json", "value": "true" }
+        },
+        {
+          "constraintId": "public-position-non-authority",
+          "description": "The third-party position is never ProofEra-owned, authorized or executable.",
+          "enforcement": "hard",
+          "expected": { "encoding": "canonical_json", "value": "true" }
+        },
+        {
+          "constraintId": "timed-run-no-write",
+          "description": "Neither method may sign, approve, submit, broadcast or access a wallet.",
+          "enforcement": "hard",
+          "expected": { "encoding": "canonical_json", "value": "true" }
+        }
+      ],
+      "environment": {
+        "chainId": 56,
+        "components": [
+          {
+            "configurationSha256": "7921f9492890a0f2a485dcd57dc78876ed00f8bce2213f61733b04298f4af09b",
+            "name": "manual-procedure",
+            "version": "proofera-termix-pancake-lp-manual-v1.1.0"
+          },
+          { "configurationSha256": null, "name": "node", "version": "v24.14.1" },
+          {
+            "configurationSha256": "6395774d0e37db2710ef0fa86ad7990463d8b6d79632b3116e0f389ba9c3dd5b",
+            "name": "proofera-lp-range-agent-lane",
+            "version": "1.0.0"
+          },
+          {
+            "configurationSha256": "37947165be883e0a2dc4582fbdbf57ffd38f1a2cc5fa7295fdd9451d08087786",
+            "name": "retained-pancakeswap-position",
+            "version": "116342186"
+          }
+        ],
+        "kind": "mainnet",
+        "networkName": "BNB Smart Chain Mainnet public-state replay",
+        "parameters": [
+          {
+            "key": "agent-registry-chain-id",
+            "value": { "encoding": "decimal_integer", "value": "97" }
+          },
+          {
+            "key": "erc8004-registry",
+            "value": {
+              "encoding": "evm_address",
+              "value": "0x8004A818BFB912233c491871b3d84c89A494BD9e"
+            }
+          },
+          {
+            "key": "lp-agent-endpoint",
+            "value": { "encoding": "string", "value": "https://proofera-lp.tangvu.dev/" }
+          },
+          { "key": "lp-agent-id", "value": { "encoding": "decimal_integer", "value": "1825" } },
+          {
+            "key": "lp-source-rpc-endpoint",
+            "value": { "encoding": "string", "value": "https://bnb.api.onfinality.io/public" }
+          },
+          {
+            "key": "run-order-randomness-commitment",
+            "value": {
+              "encoding": "canonical_json",
+              "value": "{\"blockNumber\":\"125735511\",\"chainId\":97,\"finalityConfirmations\":\"12\",\"mapping\":\"least-significant bit of the finalized block hash: 0=agent-first, 1=manual-first\",\"providers\":[\"https://data-seed-prebsc-2-s2.binance.org:8545\",\"https://bsc-testnet-rpc.publicnode.com\"]}"
+            }
+          },
+          {
+            "key": "source-block",
+            "value": { "encoding": "decimal_integer", "value": "116342186" }
+          },
+          {
+            "key": "source-block-hash",
+            "value": {
+              "encoding": "string",
+              "value": "0xe0dae09e27c2b8dfcb8d603794289a7b3b221b078e41169cc61b5233aee385bb"
+            }
+          }
+        ],
+        "softwareCommitSha": "f8b57f2b184266d8620d6590d663cd91d41db1ea"
+      },
+      "inputs": [
+        {
+          "description": "SHA-256 of the shared canonical LP input bundle.",
+          "inputId": "lp-range-input-bundle-sha256",
+          "unit": null,
+          "value": {
+            "encoding": "string",
+            "value": "3459eb2566621c4d74acef68c84849e59b74214c7a21d7d20b8bbc6352dda945"
+          }
+        },
+        {
+          "description": "SHA-256 of the retained public-position source evidence.",
+          "inputId": "source-evidence-sha256",
+          "unit": null,
+          "value": {
+            "encoding": "string",
+            "value": "37947165be883e0a2dc4582fbdbf57ffd38f1a2cc5fa7295fdd9451d08087786"
+          }
+        }
+      ],
+      "qualityRubric": {
+        "criteria": [
+          {
+            "criterionId": "economics-decision-integrity",
+            "description": "Keep absent economics unavailable and make only a supported bounded decision.",
+            "evidenceRequired": "Known/unknown fields, violations, decision and trace.",
+            "maximumPoints": 25,
+            "measurement": "Reject unsupported economics, substitutions and action recommendations."
+          },
+          {
+            "criterionId": "explanation-uncertainty",
+            "description": "Explain risk, decision, non-authority and limitations.",
+            "evidenceRequired": "Raw output and reviewer checklist.",
+            "maximumPoints": 10,
+            "measurement": "Apply the fixed checklist to unedited output."
+          },
+          {
+            "criterionId": "range-risk-accuracy",
+            "description": "Calculate exact range state, tick buffers and policy violations.",
+            "evidenceRequired": "Raw output, canonical result and reviewer worksheet.",
+            "maximumPoints": 25,
+            "measurement": "Independently recompute every integer field."
+          },
+          {
+            "criterionId": "reproducibility",
+            "description": "Produce deterministic output, timing, cost and receipt evidence.",
+            "evidenceRequired": "Run captures, hashes, timings, costs and reproduction log.",
+            "maximumPoints": 15,
+            "measurement": "Verify declaration parity, hashes, receipts and tool logs."
+          },
+          {
+            "criterionId": "verified-inputs",
+            "description": "Preserve and validate exact source identity and slot0 state.",
+            "evidenceRequired": "Frozen bundle, raw evidence, API receipt and trace.",
+            "maximumPoints": 25,
+            "measurement": "Recompute the source join and exact-hash slot0 receipt."
+          }
+        ],
+        "declaredAtUtc": "2026-08-16T21:32:00.000Z",
+        "rubricId": "termix-lp-range-rubric-v2",
+        "totalMaximumPoints": 100,
+        "version": "2.0.0"
+      },
+      "requiredReceiptKinds": ["api"],
+      "task": {
+        "domain": "trading",
+        "exactDefinition": "Given the immutable BNB Smart Chain mainnet public-position bundle, validate its retained identity and exact-hash slot0 replay; determine range and boundary state; then return canonical JSON with exact tick buffers, policy violations, only supplied economics, a bounded hold/review/insufficient-evidence decision, rationale and limitations. The position is unrelated to ProofEra and neither method may write onchain.",
+        "successCondition": "Both methods use identical declaration and input bytes, produce source-bound recomputable output, preserve missing economics, and make no ownership, authority, performance or execution claim from the public position.",
+        "taskId": "pancake-lp-range-decision",
+        "title": "PancakeSwap V3 public-position range decision"
+      }
+    },
+    "evidenceState": {
+      "reason": "A distinct independent reviewer has not reobserved receipts, reviewed the manual no-agent boundary and signed the exact pair digest.",
+      "state": "unverified"
+    },
+    "limitations": [
+      "The runner timestamps operator-supplied work and exact RPC bytes but cannot cryptographically prove operator identity.",
+      "The no-agent declaration requires independent tool-log review and is not self-authenticating.",
+      "The public third-party position establishes no ownership, authority, performance or execution receipt.",
+      "The manual output is retained unedited for scoring and is not presumed correct.",
+      "The normalized score is an implementation-adjacent deterministic self-review, not an independent adjudication.",
+      "The capture is retained at evidence/termix/runs/pancake-lp/manual/pancake-lp-manual-20260818-v1.json.",
+      "The operator procedure is retained at scripts/operator-ceremony-server.mjs.",
+      "Active segments remain in the raw capture; the pair schema compares full monotonic wall duration."
+    ],
+    "method": {
+      "kind": "manual",
+      "label": "Operator-confirmed LP worksheet without agent",
+      "operatorRole": "Repository owner using the bounded non-agent worksheet",
+      "procedureVersion": "proofera-termix-pancake-lp-manual-v1.1.0",
+      "tools": [
+        { "name": "human-reviewed-canonical-json-worksheet", "version": "1.0.0" },
+        { "name": "onfinality-bsc-mainnet-archive-json-rpc", "version": "eth-json-rpc" }
+      ]
+    },
+    "qualityAssessment": {
+      "assessedAtUtc": "2026-08-22T13:29:59.383Z",
+      "assessor": "ProofEra deterministic observational-pair self-review v1",
+      "scores": [
+        {
+          "criterionId": "economics-decision-integrity",
+          "evidence": [
+            { "artifactId": "manual-output", "kind": "artifact" },
+            { "artifactId": "manual-shared-input", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "manual-api-receipt-0" }
+          ],
+          "points": 25,
+          "rationale": "Both outputs keep unavailable fee, gas and slippage economics unknown and select insufficient_evidence without proposing execution."
+        },
+        {
+          "criterionId": "explanation-uncertainty",
+          "evidence": [
+            { "artifactId": "manual-output", "kind": "artifact" },
+            { "artifactId": "manual-shared-input", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "manual-api-receipt-0" }
+          ],
+          "points": 10,
+          "rationale": "Both retained outputs explain missing economics, public-position non-authority and the read-only boundary."
+        },
+        {
+          "criterionId": "range-risk-accuracy",
+          "evidence": [
+            { "artifactId": "manual-output", "kind": "artifact" },
+            { "artifactId": "manual-shared-input", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "manual-api-receipt-0" }
+          ],
+          "points": 25,
+          "rationale": "Current tick, half-open range membership, width and both tick buffers recompute exactly from the frozen bundle and retained slot0 receipts."
+        },
+        {
+          "criterionId": "reproducibility",
+          "evidence": [
+            { "artifactId": "manual-output", "kind": "artifact" },
+            { "artifactId": "manual-shared-input", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "manual-api-receipt-0" }
+          ],
+          "points": 15,
+          "rationale": "Declaration, input digest, public run order, raw response bytes, output bytes and capture timings all pass deterministic joins."
+        },
+        {
+          "criterionId": "verified-inputs",
+          "evidence": [
+            { "artifactId": "manual-output", "kind": "artifact" },
+            { "artifactId": "manual-shared-input", "kind": "artifact" },
+            { "kind": "receipt", "receiptId": "manual-api-receipt-0" }
+          ],
+          "points": 25,
+          "rationale": "Both lanes bind the same chain, pool, Position Manager, position, block hash and exact-hash slot0 result."
+        }
+      ]
+    },
+    "receipts": [
+      {
+        "endpointUrl": "https://bnb.api.onfinality.io/public",
+        "kind": "api",
+        "observedAtUtc": "2026-08-18T13:11:52.120Z",
+        "provider": "OnFinality BSC mainnet archive JSON-RPC",
+        "receiptId": "manual-api-receipt-0",
+        "requestId": "pancake-lp-manual-20260818-v1-lp-slot0",
+        "responseArtifactId": "manual-api-0",
+        "responseSha256": "e534964ade588effc79e17c6cd2252e495c6dce66618a825fa0d4638fb923b54",
+        "verification": {
+          "method": "Recomputed retained bytes and revalidated the task-specific frozen RPC or A2A response contract.",
+          "state": "verified",
+          "verifiedAtUtc": "2026-08-22T13:29:59.383Z",
+          "verifier": "ProofEra deterministic observational-pair self-review v1"
+        }
+      }
+    ],
+    "reproductionCommands": [
+      {
+        "command": "pnpm --filter @proofera/benchmarks test",
+        "expectedArtifactIds": ["manual-output", "manual-shared-input"],
+        "step": 1,
+        "workingDirectory": "."
+      }
+    ],
+    "runId": "pancake-lp-manual-20260818-v1",
+    "timing": {
+      "endedAtUtc": "2026-08-18T13:22:12.671Z",
+      "monotonicClock": "Node.js process.hrtime.bigint",
+      "monotonicDurationNanoseconds": "620556240100",
+      "startedAtUtc": "2026-08-18T13:11:52.114Z"
+    }
+  },
+  "pairId": "pancake-lp-pair-20260822-v1",
+  "schemaVersion": "proofera-termix-pair-v1.0.0"
+}

@@ -1,0 +1,204 @@
+{
+  "schemaVersion": "proofera-termix-reviewer-packet-v1.0.0",
+  "packetId": "termix-independent-review-20260822-v1",
+  "preparedAtUtc": "2026-08-22T13:35:00.000Z",
+  "pairCompilerReleaseCommit": "4fdc5398ecc6daa050d1945a71fd5c5c61c602eb",
+  "state": "awaiting_independent_reviewer",
+  "independentReviewComplete": false,
+  "publishable": false,
+  "claimBoundary": "This packet contains three unverified input pairs and implementation-adjacent self-reviews. It is not an adjudication and makes no agent-advantage claim.",
+  "reviewContract": {
+    "adjudicationSchemaPath": "packages/benchmarks/src/finalReport.ts",
+    "adjudicationSchemaSha256": "bcb7128498de1b97481fb3f48f6a6775b9f35fc0f766576c089ed92c277309ba",
+    "finalCompilerPath": "scripts/compile-termix-final-evidence.ts",
+    "finalCompilerSha256": "c2aa0632291f8c6d0aee3e1483406fd2cda9164326f4401c5a154f27471ef0d8",
+    "requiredChecks": [
+      "pairSchemaValidated",
+      "artifactDigestsVerified",
+      "receiptsReobserved",
+      "rubricRecomputed",
+      "rawOutputsReviewed",
+      "manualNoAgentToolLogReviewed"
+    ],
+    "verifiedPairRule": "The reviewer must create a new verified pair without changing raw output, timing, cost or source bytes; replace self-review scoring and verification metadata with the reviewer's own work, then compute the new logical pair digest.",
+    "adjudicationRule": "The adjudication must bind the new verified pairId, logical pair SHA-256 and declaration SHA-256. Do not sign the unverified input-pair digest as the final digest.",
+    "failureRule": "Any failed check remains an explicit reviewer finding. Do not create a verified pair or a passing adjudication from incomplete evidence."
+  },
+  "tasks": [
+    {
+      "taskId": "pancake-lp-range-decision",
+      "pairId": "pancake-lp-pair-20260822-v1",
+      "inputPairState": "unverified",
+      "inputPairPath": "evidence/termix/pairs/pancake-lp/pancake-lp-pair-20260822-v1.json",
+      "inputPairBytesSha256": "01fab2ed8f9cfd87175eae7244b07701c6f9ce357e6da8269afa7537edab38a2",
+      "inputPairLogicalSha256": "41f0df2b0ad2886573cf9e1035b247f971a2fed493b083af87b3153fa6adc103",
+      "declarationSha256": "776c41fd1043d0541f2c67d2cb6a7306bf7738def026bb78b36b868b6ca9edd3",
+      "selfReviewPath": "evidence/termix/reviews/pancake-lp/pancake-lp-pair-20260822-v1-self-review.json",
+      "selfReviewBytesSha256": "f3e15a2e4350190c7df69e41534fd457af9dea91ff1319bc81f8ce0906934bea",
+      "selfReviewIndependent": false,
+      "reviewerMustProduce": {
+        "verifiedPairPath": "evidence/termix/pairs/pancake-lp/pancake-lp-pair-20260822-v1-independent.json",
+        "adjudicationPath": "evidence/termix/adjudications/pancake-lp/pancake-lp-pair-20260822-v1-adjudication.json"
+      },
+      "evidence": [
+        {
+          "path": "evidence/termix/runs/pancake-lp/pancake-lp-agent-20260818-v4.json",
+          "sha256": "633b5f874516c1ad4bd7819ee6a180524b7bcc07a9c37e4d116e3cc83d094d19",
+          "purpose": "Unedited agent capture with exact-hash slot0, A2A, timing and hire evidence."
+        },
+        {
+          "path": "evidence/termix/runs/pancake-lp/manual/pancake-lp-manual-20260818-v1.json",
+          "sha256": "5ee72fc3008dde7e94115ea1243eaf8c940be56c1c64753e33707722215cb3b6",
+          "purpose": "Unedited no-agent worksheet capture with exact-hash slot0 and timing."
+        },
+        {
+          "path": "evidence/termix/frozen/pancake-lp/116342186-7152618.canonical-json",
+          "sha256": "755fd83702d72fd691f40bf24d225e0a1063cafbe982a50d63c9aecba77dffb5",
+          "purpose": "Shared frozen public-position input bytes."
+        },
+        {
+          "path": "evidence/termix/declarations/pancake-lp/f8b57f2b1842-125735511.json",
+          "sha256": "9754a0ffcc64d3c9fcbe90ee7d39c7d57cd8ed58039e9a7dbcbad9c6ec3f71b4",
+          "purpose": "Final shared declaration, rubric and input bindings."
+        },
+        {
+          "path": "evidence/termix/declarations/pancake-lp/f8b57f2b1842-125735511.run-order.json",
+          "sha256": "e07558ddbff7bb6ad5356ab975bfb963e8848c4afc07261bd9cc24df0c3d4936",
+          "purpose": "Two-provider finalized public-randomness order resolution."
+        },
+        {
+          "path": "evidence/termix/invocations/pancake-lp-agent-20260818-v4.canonical-json",
+          "sha256": "76dc1d4326b69bfaec25282fc501f1fdc3ef2759a7b1167dc953b5f70fcd070a",
+          "purpose": "Exact agent invocation and verified paid-hire binding."
+        },
+        {
+          "path": "scripts/operator-ceremony-server.mjs",
+          "sha256": "5992b214ba38ab973a93bda77e32c26ddab58e1100a5695b951721792fa8abcb",
+          "purpose": "Bounded manual invocation, worksheet and no-agent runner orchestration for tool-log review."
+        }
+      ]
+    },
+    {
+      "taskId": "autonomous-session-permission-audit",
+      "pairId": "permission-audit-pair-20260822-v1",
+      "inputPairState": "unverified",
+      "inputPairPath": "evidence/termix/pairs/permission-audit/permission-audit-pair-20260822-v1.json",
+      "inputPairBytesSha256": "c48479e909dd7addb83c3d9298ec731dd0fa334f11721e773ea1397488fe8580",
+      "inputPairLogicalSha256": "68fcb8e6aefe85db8e6b239f1471fc65baee4dd0dd8ab2cd70516bdd1def8153",
+      "declarationSha256": "6f568c25eb405b23ec5ba68f72c61bfca68d63b4f7cd63dea93ff2f9a0ebc370",
+      "selfReviewPath": "evidence/termix/reviews/permission-audit/permission-audit-pair-20260822-v1-self-review.json",
+      "selfReviewBytesSha256": "f39ffa47450d2b9ef114b31a10929626eea4499dceba1f51b6d8c1a6951349d3",
+      "selfReviewIndependent": false,
+      "reviewerMustProduce": {
+        "verifiedPairPath": "evidence/termix/pairs/permission-audit/permission-audit-pair-20260822-v1-independent.json",
+        "adjudicationPath": "evidence/termix/adjudications/permission-audit/permission-audit-pair-20260822-v1-adjudication.json"
+      },
+      "evidence": [
+        {
+          "path": "evidence/termix/runs/permission-audit/agent/permission-audit-agent-20260822-v1.json",
+          "sha256": "cabc0a22030ec0e473cf4df76ee5dd2deeedff33af04c194e6f68a999f411674",
+          "purpose": "Unedited agent capture with four RPC observations, one A2A receipt and timing."
+        },
+        {
+          "path": "evidence/termix/runs/permission-audit/manual/permission-audit-manual-20260822-v1.json",
+          "sha256": "13aa348640b0ee8c7d0945083251c94e9fafcbe07a18cd0fada8deb5167176c0",
+          "purpose": "Unedited no-agent capture with the same four read-only RPC observations."
+        },
+        {
+          "path": "evidence/termix/frozen/permission-audit/38046f87b87c-126543819.canonical-json",
+          "sha256": "f06e1261d86f8e4f9a8caf50c507e47eb401854bd847e1ef249423f0757ffb0f",
+          "purpose": "Shared secret-free frozen permission-audit bundle bytes."
+        },
+        {
+          "path": "evidence/termix/declarations/permission-audit/38046f87b87c-126555555.json",
+          "sha256": "afc06db20bd44273e250cd86a6b5104e8bf7a1014cb17d52abf84dd0ec7efd12",
+          "purpose": "Final shared declaration, rubric and answer-key digest binding."
+        },
+        {
+          "path": "evidence/termix/declarations/permission-audit/38046f87b87c-126555555.run-order.json",
+          "sha256": "1dab3ba0718587f30e02fe438ac4be2fb8612a83beea02fd739410a963e76e68",
+          "purpose": "Two-provider finalized public-randomness order resolution."
+        },
+        {
+          "path": "evidence/termix/invocations/permission-audit-agent-20260822-v1.canonical-json",
+          "sha256": "ed8aca82d6f2451f30d57ada283810c2483e1dc3f4a6945f34246074a03e2cfb",
+          "purpose": "Exact agent invocation and verified paid-hire binding."
+        },
+        {
+          "path": "evidence/termix/invocations/permission-audit-manual-20260822-v1.canonical-json",
+          "sha256": "67e2e7f0a7ed86c9868507bb1d52fc8c60dc566ecfd95bc12f464976489f668b",
+          "purpose": "Exact manual no-agent invocation."
+        },
+        {
+          "path": "evidence/termix/reviewer-packets/20260822-v1/permission-audit-answer-key.canonical-json",
+          "sha256": "595a4907946b7c8649d9341587e91d5918d43ce8dfd5bed4d631483c20d66677",
+          "payloadSha256": "61494b199b7b41b30eee370fe6736d864671439c65b2acfbee107c5ea9efdbeb",
+          "purpose": "Post-run publication of the preregistered blind answer key; payload digest excludes the single final LF."
+        },
+        {
+          "path": "evidence/altana/lifecycles/126543819-72e7cf94-altana-lifecycle.json",
+          "sha256": "e001d4f9eb8e87d95408206e72c937c1ff8cd68d9885898a4d02aabdfe661b19",
+          "purpose": "Grant, execute, revoke and final-absence lifecycle source evidence."
+        },
+        {
+          "path": "evidence/termix/preparations/permission-audit/38046f87b87c-126543819.json",
+          "sha256": "80c918eeeefe50ffdda36b25a4c891719602eff2661e67017cafdfd71e0bebd6",
+          "purpose": "Exact-block code and authority preparation evidence."
+        }
+      ]
+    },
+    {
+      "taskId": "venus-health-factor-decision",
+      "pairId": "venus-health-pair-20260822-v1",
+      "inputPairState": "unverified",
+      "inputPairPath": "evidence/termix/pairs/venus-health/venus-health-pair-20260822-v1.json",
+      "inputPairBytesSha256": "7bb7ce5a2fe8aa480a4bf20c308e7f72db121c765d09caacc6ab44ebfd99f328",
+      "inputPairLogicalSha256": "2f3ac750834b93802b42f3317d35cfd82cb4381aec2497fb9b88232d6adca600",
+      "declarationSha256": "23e41675965eed45dbd876ab4fdb221c1d403f538b5088bc52dd5c722ab33924",
+      "selfReviewPath": "evidence/termix/reviews/venus-health/venus-health-pair-20260822-v1-self-review.json",
+      "selfReviewBytesSha256": "5d4e704f8ce0b54d8c68b93c45ee7bf0d4014fa565cf65992ddfc84d16d055ca",
+      "selfReviewIndependent": false,
+      "reviewerMustProduce": {
+        "verifiedPairPath": "evidence/termix/pairs/venus-health/venus-health-pair-20260822-v1-independent.json",
+        "adjudicationPath": "evidence/termix/adjudications/venus-health/venus-health-pair-20260822-v1-adjudication.json"
+      },
+      "evidence": [
+        {
+          "path": "evidence/termix/runs/venus-health/venus-health-agent-20260818-v2.json",
+          "sha256": "8b5506f8ee76f9d7146da88017881a9accebd3a7891a6f50fb7c209eb82f1881",
+          "purpose": "Unedited agent capture with A2A, timing and verified paid-hire evidence."
+        },
+        {
+          "path": "evidence/termix/runs/venus-health/manual/venus-health-manual-20260818-v2.json",
+          "sha256": "67978cfa3557fedfbc38d660f0980340b1665fc8cf11d012d914d755c5b25cc6",
+          "purpose": "Unedited no-agent worksheet capture with chain and three block receipts."
+        },
+        {
+          "path": "evidence/termix/frozen/venus-health/402edbeae429-125563831-125564152.canonical-json",
+          "sha256": "24332c45c880115166dff8c269e3a40b592a3decaea7a0981b32c45989abd2bf",
+          "purpose": "Shared frozen three-observation Venus request bytes."
+        },
+        {
+          "path": "evidence/termix/declarations/venus-health/402edbeae429-125808800.json",
+          "sha256": "387a5bf99a64973a557b6eba252b83ec1816b933967ddadd9885209be01a44a0",
+          "purpose": "Final shared declaration, rubric and public-window bindings."
+        },
+        {
+          "path": "evidence/termix/declarations/venus-health/402edbeae429-125808800.run-order.json",
+          "sha256": "988073df2b644429bba2b525a8258d4ebfcd14e810a11ddeadf80cf5626343a8",
+          "purpose": "Two-provider finalized public-randomness order resolution."
+        },
+        {
+          "path": "evidence/termix/invocations/venus-health-agent-20260818-v2.canonical-json",
+          "sha256": "2648812aa7ad6fdbd55d9e3db04d387ec5a00b2ac5fce87476d13ff80b2081a1",
+          "purpose": "Exact agent invocation and verified paid-hire binding."
+        },
+        {
+          "path": "scripts/operator-ceremony-server.mjs",
+          "sha256": "5992b214ba38ab973a93bda77e32c26ddab58e1100a5695b951721792fa8abcb",
+          "purpose": "Bounded manual invocation, integer worksheet and no-agent runner orchestration for tool-log review."
+        }
+      ]
+    }
+  ]
+}

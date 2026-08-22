@@ -141,8 +141,9 @@ receipt. The matching manual CLIs consume bounded LF-only UTF-8 NDJSON, perform
 no network or agent request themselves, timestamp positive operator work and
 write only new immutable captures. LP v2 also separates its mainnet source-data chain from testnet
 identity/hire receipts and preserves the never-run v1 definition. All six
-final timed lanes now have retained raw captures, but only Task 02 has a
-schema-valid pair and that pair remains unverified. Task 02 has a strict deterministic,
+final timed lanes and three schema-valid observational pairs are retained. Every pair has an
+implementation-adjacent self-review, both run states remain `unverified`, and none is publishable.
+Task 02 has a strict deterministic,
 read-only permission-audit engine that rejects unbound evidence, reports each
 seeded authority defect independently, emits all three required enforcement
 layers, requires distinct role-bound proposal/corpus/lifecycle/code/SDK and
@@ -173,9 +174,14 @@ published on source release `38046f87b87c27fc3a44b3855cc7e54a10e21d8a`.
 Finalized randomness block `126555555` forced manual-first; both exact invocations
 and raw captures are retained. The post-run compiler reproduced 18 findings,
 explicit-zero incremental costs and rubric parity at `100/100`, while keeping both
-evidence states `unverified`. The implementation-adjacent self-review explicitly
-sets `secondReviewerIndependent: false`; a distinct second reviewer and final
-three-pair compilation remain required.
+evidence states `unverified`. The Task 02 implementation-adjacent self-review explicitly sets
+`secondReviewerIndependent: false`. The LP and Venus pair compiler also recomputed their fixed
+worksheets from retained bytes, recorded exact timing, explicit-zero incremental native fees and
+rubric parity at `100/100`, and emitted only unverified pairs plus non-independent self-reviews.
+The digest-bound `evidence/termix/reviewer-packets/20260822-v1/` handoff now exposes all required
+inputs and expected outputs without pretending its consumer is independent. A distinct second
+reviewer must emit new verified pairs and pair-bound adjudications before final three-pair
+compilation can run.
 
 The Windows-host owner can start `Start ProofEra Ceremony.cmd` once to open a
 loopback-only guided worksheet. A root request on the loopback-only listener
