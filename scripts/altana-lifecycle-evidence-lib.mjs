@@ -14,6 +14,9 @@ const UINT40_MAX = 2 ** 40 - 1;
 const UINT256_MAX = (1n << 256n) - 1n;
 const SECP256K1_FIELD_PRIME = 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fn;
 const PERIODS = new Set(["minute", "hour", "day", "week", "month", "year"]);
+const PTA_TARGET = "0x4ed64525d6fb06b7da926c683cbd809632c9b4cc";
+const PTA_APPROVAL_TOPIC = "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925";
+const ZERO_WORD = `0x${"0".repeat(64)}`;
 
 function fail(code) {
   throw new Error(code);
@@ -185,6 +188,99 @@ export function validateGrantIntent(input) {
   });
 }
 
+export function deriveGrantIntentFromTestActionPolicy(input, expiry) {
+  const policy = strictRecord(
+    input,
+    [
+      "action",
+      "chainId",
+      "minimumNativeBalanceWei",
+      "permissions",
+      "schemaVersion",
+      "sessionKey",
+      "sessionLifetimeSeconds",
+      "walletAddress"
+    ],
+    "ALTANA_LIFECYCLE_POLICY_INVALID"
+  );
+  const key = strictRecord(
+    policy.sessionKey,
+    ["address", "curve", "custody", "publicKey", "schemaVersion"],
+    "ALTANA_LIFECYCLE_POLICY_SESSION_KEY_INVALID"
+  );
+  const action = strictRecord(
+    policy.action,
+    ["amount", "functionSignature", "spender", "target", "valueWei"],
+    "ALTANA_LIFECYCLE_POLICY_ACTION_INVALID"
+  );
+  const permissions = strictRecord(
+    policy.permissions,
+    ["calls", "spend"],
+    "ALTANA_LIFECYCLE_POLICY_PERMISSIONS_INVALID"
+  );
+  if (
+    policy.schemaVersion !== 1 ||
+    policy.chainId !== CHAIN_ID ||
+    policy.sessionLifetimeSeconds !== 3_600 ||
+    policy.minimumNativeBalanceWei !== "5000000000000000" ||
+    key.schemaVersion !== 1 ||
+    key.custody !== "worker-dpapi-current-user" ||
+    key.curve !== "secp256k1" ||
+    !Number.isInteger(expiry) ||
+    expiry <= 0 ||
+    expiry > UINT40_MAX ||
+    action.functionSignature !== "approve(address,uint256)" ||
+    action.amount !== "0" ||
+    action.valueWei !== "0" ||
+    exactAddress(action.target, "ALTANA_LIFECYCLE_POLICY_ACTION_INVALID") !== PTA_TARGET ||
+    exactAddress(action.spender, "ALTANA_LIFECYCLE_POLICY_ACTION_INVALID") !==
+      exactAddress(key.address, "ALTANA_LIFECYCLE_POLICY_SESSION_KEY_INVALID") ||
+    !Array.isArray(permissions.calls) ||
+    permissions.calls.length !== 1 ||
+    !Array.isArray(permissions.spend) ||
+    permissions.spend.length !== 1
+  ) {
+    fail("ALTANA_LIFECYCLE_POLICY_INVALID");
+  }
+  const call = strictRecord(
+    permissions.calls[0],
+    ["signature", "to"],
+    "ALTANA_LIFECYCLE_POLICY_CALL_INVALID"
+  );
+  const spend = strictRecord(
+    permissions.spend[0],
+    ["limit", "period", "token"],
+    "ALTANA_LIFECYCLE_POLICY_SPEND_INVALID"
+  );
+  if (
+    call.signature !== action.functionSignature ||
+    exactAddress(call.to, "ALTANA_LIFECYCLE_POLICY_CALL_INVALID") !== PTA_TARGET ||
+    spend.token !== null ||
+    spend.limit !== "500000000000000" ||
+    spend.period !== "day"
+  ) {
+    fail("ALTANA_LIFECYCLE_POLICY_PERMISSION_MISMATCH");
+  }
+  return validateGrantIntent({
+    chainId: CHAIN_ID,
+    expiry,
+    permissions: {
+      calls: [{ signature: call.signature, to: call.to }],
+      spend: [{ limit: spend.limit, period: spend.period, token: null }]
+    },
+    registerInKeystore: true,
+    schemaVersion: 1,
+    sessionKey: {
+      address: key.address,
+      curve: key.curve,
+      custody: "worker-kms",
+      publicKey: key.publicKey,
+      schemaVersion: 1
+    },
+    walletAddress: policy.walletAddress
+  });
+}
+
 export function deriveAuthorityIds(validatedIntent) {
   const intent = validateGrantIntent(validatedIntent);
   const keyStoreKeyId = keccak256(intent.sessionKey.publicKey);
@@ -292,10 +388,74 @@ export function validateRelayCallsStatus(input, expected) {
   return Object.freeze({ callsId: status.id.toLowerCase(), status: "CONFIRMED" });
 }
 
+export function validatePtaApprovalReceipt(receipt, expected) {
+  if (receipt === null || typeof receipt !== "object" || !Array.isArray(receipt.logs)) {
+    fail("ALTANA_LIFECYCLE_PTA_RECEIPT_INVALID");
+  }
+  const transactionHash = exactHex(
+    expected.transactionHash,
+    32,
+    "ALTANA_LIFECYCLE_PTA_TRANSACTION_HASH_INVALID"
+  );
+  const blockHash = exactHex(expected.blockHash, 32, "ALTANA_LIFECYCLE_PTA_BLOCK_HASH_INVALID");
+  const blockNumber = BigInt(expected.blockNumber);
+  if (
+    exactHex(receipt.transactionHash, 32, "ALTANA_LIFECYCLE_PTA_TRANSACTION_HASH_INVALID") !==
+      transactionHash ||
+    exactHex(receipt.blockHash, 32, "ALTANA_LIFECYCLE_PTA_BLOCK_HASH_INVALID") !== blockHash ||
+    parseQuantity(receipt.blockNumber, "ALTANA_LIFECYCLE_PTA_BLOCK_NUMBER_INVALID") !== blockNumber
+  ) {
+    fail("ALTANA_LIFECYCLE_PTA_RECEIPT_MISMATCH");
+  }
+  const matchingLogs = receipt.logs.filter(
+    (log) =>
+      typeof log?.address === "string" &&
+      log.address.toLowerCase() === PTA_TARGET &&
+      Array.isArray(log.topics) &&
+      typeof log.topics[0] === "string" &&
+      log.topics[0].toLowerCase() === PTA_APPROVAL_TOPIC
+  );
+  if (matchingLogs.length !== 1) fail("ALTANA_LIFECYCLE_PTA_APPROVAL_EVENT_MISSING");
+  const log = matchingLogs[0];
+  const owner = exactAddress(expected.owner, "ALTANA_LIFECYCLE_PTA_OWNER_INVALID");
+  const spender = exactAddress(expected.spender, "ALTANA_LIFECYCLE_PTA_SPENDER_INVALID");
+  const ownerTopic = padHex(owner, { size: 32 }).toLowerCase();
+  const spenderTopic = padHex(spender, { size: 32 }).toLowerCase();
+  if (
+    log.topics.length !== 3 ||
+    exactHex(log.topics[1], 32, "ALTANA_LIFECYCLE_PTA_OWNER_TOPIC_INVALID") !== ownerTopic ||
+    exactHex(log.topics[2], 32, "ALTANA_LIFECYCLE_PTA_SPENDER_TOPIC_INVALID") !== spenderTopic ||
+    exactHex(log.data, 32, "ALTANA_LIFECYCLE_PTA_AMOUNT_INVALID") !== ZERO_WORD ||
+    exactHex(log.transactionHash, 32, "ALTANA_LIFECYCLE_PTA_LOG_HASH_INVALID") !==
+      transactionHash ||
+    exactHex(log.blockHash, 32, "ALTANA_LIFECYCLE_PTA_LOG_BLOCK_HASH_INVALID") !== blockHash ||
+    parseQuantity(log.blockNumber, "ALTANA_LIFECYCLE_PTA_LOG_BLOCK_NUMBER_INVALID") !== blockNumber
+  ) {
+    fail("ALTANA_LIFECYCLE_PTA_APPROVAL_EVENT_MISMATCH");
+  }
+  return Object.freeze({
+    amount: "0",
+    blockHash,
+    blockNumber,
+    contractAddress: PTA_TARGET,
+    eventSignature: "Approval(address,address,uint256)",
+    logIndex: parseQuantity(log.logIndex, "ALTANA_LIFECYCLE_PTA_LOG_INDEX_INVALID"),
+    owner,
+    spender,
+    transactionHash
+  });
+}
+
 export function validateAuthoritySnapshot(input, expected) {
   const snapshot = strictRecord(
     input,
-    ["accountKeyHashes", "keyStorePublicKey", "keyStorePublicKeyRead", "keyStoreValid"],
+    [
+      "accountKeyExpiry",
+      "accountKeyHashes",
+      "keyStorePublicKey",
+      "keyStorePublicKeyRead",
+      "keyStoreValid"
+    ],
     "ALTANA_LIFECYCLE_AUTHORITY_SNAPSHOT_INVALID"
   );
   if (
@@ -316,6 +476,9 @@ export function validateAuthoritySnapshot(input, expected) {
     snapshot.keyStoreValid !== expected.present ||
     accountPresent !== expected.present ||
     (expected.present
+      ? snapshot.accountKeyExpiry !== String(expected.expiry)
+      : snapshot.accountKeyExpiry !== null) ||
+    (expected.present
       ? snapshot.keyStorePublicKeyRead !== true ||
         exactHex(snapshot.keyStorePublicKey, 65, "ALTANA_LIFECYCLE_KEYSTORE_PUBLIC_KEY_INVALID") !==
           expected.publicKey
@@ -324,6 +487,7 @@ export function validateAuthoritySnapshot(input, expected) {
     fail("ALTANA_LIFECYCLE_AUTHORITY_STATE_MISMATCH");
   }
   return Object.freeze({
+    accountKeyExpiry: snapshot.accountKeyExpiry,
     accountKeyPresent: accountPresent,
     accountKeyHashes: Object.freeze(hashes),
     keyStorePublicKey: snapshot.keyStorePublicKey,
@@ -412,6 +576,7 @@ export function validateLifecycleSequence({
     }
     validateProviders(entry.providers, {
       accountKeyHash: ids.accountKeyHash,
+      expiry: normalizedIntent.expiry,
       present,
       publicKey: normalizedIntent.sessionKey.publicKey
     });
@@ -439,6 +604,7 @@ export function validateLifecycleSequence({
   }
   validateProviders(final.providers, {
     accountKeyHash: ids.accountKeyHash,
+    expiry: normalizedIntent.expiry,
     present: false,
     publicKey: normalizedIntent.sessionKey.publicKey
   });

@@ -1,13 +1,16 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
   CHAIN_ID,
   deriveAuthorityIds,
+  deriveGrantIntentFromTestActionPolicy,
   validateAuthoritySnapshot,
   validateGrantIntent,
   validateLifecycleSequence,
   validateOperationObservation,
+  validatePtaApprovalReceipt,
   validateRelayCallsStatus
 } from "./altana-lifecycle-evidence-lib.mjs";
 
@@ -19,6 +22,9 @@ const TARGET = "0x2222222222222222222222222222222222222222";
 const TOKEN = "0x3333333333333333333333333333333333333333";
 const RELAY_FROM = "0x4444444444444444444444444444444444444444";
 const RELAY_TO = "0x5555555555555555555555555555555555555555";
+const PTA_TARGET = "0x4ed64525d6fb06b7da926c683cbd809632c9b4cc";
+const APPROVAL_TOPIC = "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925";
+const ZERO_WORD = `0x${"0".repeat(64)}`;
 
 const intent = {
   schemaVersion: 1,
@@ -74,11 +80,16 @@ function operationFixture(transactionHash, blockNumber, transactionIndex) {
 
 function snapshot(present, ids) {
   return {
+    accountKeyExpiry: present ? intent.expiry.toString() : null,
     keyStoreValid: present,
     keyStorePublicKey: present ? PUBLIC_KEY : null,
     keyStorePublicKeyRead: present,
     accountKeyHashes: present ? [ids.accountKeyHash] : []
   };
+}
+
+function addressTopic(address) {
+  return `0x${"0".repeat(24)}${address.slice(2).toLowerCase()}`;
 }
 
 test("grant intent derives both public authority identifiers", () => {
@@ -114,6 +125,32 @@ test("grant intent rejects key, permissions and scope drift", () => {
         }
       }),
     /ALTANA_LIFECYCLE_PERMISSION_DUPLICATE/u
+  );
+});
+
+test("bounded v2 policy derives the exact public grant intent", async () => {
+  const policy = JSON.parse(
+    await readFile(new URL("../deploy/windows/altana-test-action.v2.json", import.meta.url), "utf8")
+  );
+  const derived = deriveGrantIntentFromTestActionPolicy(policy, 1_787_392_650);
+  assert.equal(derived.expiry, 1_787_392_650);
+  assert.equal(derived.sessionKey.custody, "worker-kms");
+  assert.equal(derived.permissions.calls[0].to, PTA_TARGET);
+  assert.deepEqual(derived.permissions.spend, [
+    { token: null, limit: "500000000000000", period: "day" }
+  ]);
+
+  const wrongCap = structuredClone(policy);
+  wrongCap.permissions.spend[0].limit = "1";
+  assert.throws(
+    () => deriveGrantIntentFromTestActionPolicy(wrongCap, 1_787_392_650),
+    /ALTANA_LIFECYCLE_POLICY_PERMISSION_MISMATCH/u
+  );
+  const wrongAction = structuredClone(policy);
+  wrongAction.action.amount = "1";
+  assert.throws(
+    () => deriveGrantIntentFromTestActionPolicy(wrongAction, 1_787_392_650),
+    /ALTANA_LIFECYCLE_POLICY_INVALID/u
   );
 });
 
@@ -159,11 +196,56 @@ test("relay status joins the confirmed calls id and receipt", () => {
   );
 });
 
+test("PTA receipt proves only the exact zero Approval event", () => {
+  const fixture = operationFixture(hash("b"), 101, 1);
+  fixture.receipt.logs = [
+    {
+      address: PTA_TARGET,
+      blockHash: fixture.receipt.blockHash,
+      blockNumber: fixture.receipt.blockNumber,
+      data: ZERO_WORD,
+      logIndex: "0xa",
+      topics: [APPROVAL_TOPIC, addressTopic(WALLET), addressTopic(SESSION_ADDRESS)],
+      transactionHash: fixture.receipt.transactionHash
+    }
+  ];
+  const operation = validateOperationObservation(fixture, { hash: hash("b") });
+  assert.deepEqual(
+    validatePtaApprovalReceipt(fixture.receipt, {
+      ...operation,
+      owner: WALLET,
+      spender: SESSION_ADDRESS
+    }),
+    {
+      amount: "0",
+      blockHash: operation.blockHash,
+      blockNumber: 101n,
+      contractAddress: PTA_TARGET,
+      eventSignature: "Approval(address,address,uint256)",
+      logIndex: 10n,
+      owner: WALLET,
+      spender: SESSION_ADDRESS,
+      transactionHash: hash("b")
+    }
+  );
+  fixture.receipt.logs[0].data = `0x${"0".repeat(63)}1`;
+  assert.throws(
+    () =>
+      validatePtaApprovalReceipt(fixture.receipt, {
+        ...operation,
+        owner: WALLET,
+        spender: SESSION_ADDRESS
+      }),
+    /ALTANA_LIFECYCLE_PTA_APPROVAL_EVENT_MISMATCH/u
+  );
+});
+
 test("authority snapshot requires KeyStore and account agreement", () => {
   const ids = deriveAuthorityIds(intent);
   assert.equal(
     validateAuthoritySnapshot(snapshot(true, ids), {
       accountKeyHash: ids.accountKeyHash,
+      expiry: intent.expiry,
       present: true,
       publicKey: PUBLIC_KEY
     }).accountKeyPresent,
@@ -173,7 +255,25 @@ test("authority snapshot requires KeyStore and account agreement", () => {
     () =>
       validateAuthoritySnapshot(
         { ...snapshot(true, ids), accountKeyHashes: [] },
-        { accountKeyHash: ids.accountKeyHash, present: true, publicKey: PUBLIC_KEY }
+        {
+          accountKeyHash: ids.accountKeyHash,
+          expiry: intent.expiry,
+          present: true,
+          publicKey: PUBLIC_KEY
+        }
+      ),
+    /ALTANA_LIFECYCLE_AUTHORITY_STATE_MISMATCH/u
+  );
+  assert.throws(
+    () =>
+      validateAuthoritySnapshot(
+        { ...snapshot(true, ids), accountKeyExpiry: "1999999999" },
+        {
+          accountKeyHash: ids.accountKeyHash,
+          expiry: intent.expiry,
+          present: true,
+          publicKey: PUBLIC_KEY
+        }
       ),
     /ALTANA_LIFECYCLE_AUTHORITY_STATE_MISMATCH/u
   );

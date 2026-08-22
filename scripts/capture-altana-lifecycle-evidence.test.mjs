@@ -11,6 +11,10 @@ const source = await readFile(
 test("Altana lifecycle capture is exact-release gated, read-only and create-only", () => {
   assert.match(source, /--capture-exact-altana-lifecycle/u);
   assert.match(source, /--source-base-commit/u);
+  assert.match(source, /--ceremony-source-commit/u);
+  assert.match(source, /--policy-config/u);
+  assert.match(source, /--session-expiry/u);
+  assert.doesNotMatch(source, /--grant-intent/u);
   assert.match(source, /wallet_getCallsStatus/u);
   assert.match(source, /eth_getTransactionByHash/u);
   assert.match(source, /eth_getTransactionReceipt/u);
@@ -32,8 +36,12 @@ test("Altana lifecycle capture fixes authority and honest non-claim joins", () =
   assert.match(source, /isValidKey/u);
   assert.match(source, /getPublicKey/u);
   assert.match(source, /getKeys/u);
-  assert.match(source, /applicationCallSemanticsVerified: false/u);
-  assert.match(source, /applicationEffectVerified: false/u);
+  assert.match(source, /validatePtaApprovalReceipt/u);
+  assert.match(source, /accountKeyExpiry/u);
+  assert.match(source, /applicationCallSemanticsVerified: true/u);
+  assert.match(source, /applicationEffectVerified: true/u);
+  assert.match(source, /applicationStateChangeVerified: false/u);
+  assert.match(source, /exactGrantIntentPrecommitted: false/u);
   assert.match(source, /sessionSignatureDirectlyDecoded: false/u);
   assert.match(source, /privateSignerRead: false/u);
 });

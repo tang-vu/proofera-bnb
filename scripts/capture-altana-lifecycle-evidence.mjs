@@ -10,11 +10,12 @@ import {
   KEYSTORE,
   KEYSTORE_CONTROLLER,
   deriveAuthorityIds,
+  deriveGrantIntentFromTestActionPolicy,
   exactHex,
   parseQuantity,
-  validateGrantIntent,
   validateLifecycleSequence,
   validateOperationObservation,
+  validatePtaApprovalReceipt,
   validateRelayCallsStatus
 } from "./altana-lifecycle-evidence-lib.mjs";
 
@@ -105,9 +106,13 @@ function parseArguments(argv) {
     EXECUTE_FLAG,
     "--source-base-commit",
     null,
+    "--ceremony-source-commit",
+    null,
     "--preparation",
     null,
-    "--grant-intent",
+    "--policy-config",
+    null,
+    "--session-expiry",
     null,
     "--grant-tx",
     null,
@@ -130,6 +135,13 @@ function parseArguments(argv) {
   if (!/^[0-9a-f]{40}$/u.test(sourceBaseCommit)) {
     fail("ALTANA_LIFECYCLE_SOURCE_BASE_COMMIT_INVALID");
   }
+  const ceremonySourceCommit = argv[4];
+  if (!/^[0-9a-f]{40}$/u.test(ceremonySourceCommit)) {
+    fail("ALTANA_LIFECYCLE_CEREMONY_SOURCE_COMMIT_INVALID");
+  }
+  if (!/^[1-9][0-9]*$/u.test(argv[10])) fail("ALTANA_LIFECYCLE_SESSION_EXPIRY_INVALID");
+  const sessionExpiry = Number(argv[10]);
+  if (!Number.isSafeInteger(sessionExpiry)) fail("ALTANA_LIFECYCLE_SESSION_EXPIRY_INVALID");
   const callsId = (value) => {
     if (!/^0x(?:[0-9a-fA-F]{2}){1,256}$/u.test(value)) {
       fail("ALTANA_LIFECYCLE_CALLS_ID_INVALID");
@@ -137,21 +149,23 @@ function parseArguments(argv) {
     return value.toLowerCase();
   };
   return Object.freeze({
-    executeCallsId: callsId(argv[10]),
-    executeTransactionHash: exactHex(argv[12], 32, "ALTANA_LIFECYCLE_TRANSACTION_HASH_INVALID"),
-    grantIntentPath: validatePath(
-      argv[6],
-      "evidence/altana/intents/",
-      "ALTANA_LIFECYCLE_INTENT_PATH_INVALID"
+    ceremonySourceCommit,
+    executeCallsId: callsId(argv[14]),
+    executeTransactionHash: exactHex(argv[16], 32, "ALTANA_LIFECYCLE_TRANSACTION_HASH_INVALID"),
+    grantTransactionHash: exactHex(argv[12], 32, "ALTANA_LIFECYCLE_TRANSACTION_HASH_INVALID"),
+    policyConfigPath: validatePath(
+      argv[8],
+      "deploy/windows/",
+      "ALTANA_LIFECYCLE_POLICY_PATH_INVALID"
     ),
-    grantTransactionHash: exactHex(argv[8], 32, "ALTANA_LIFECYCLE_TRANSACTION_HASH_INVALID"),
     preparationPath: validatePath(
-      argv[4],
+      argv[6],
       "evidence/altana/preparations/",
       "ALTANA_LIFECYCLE_PREPARATION_PATH_INVALID"
     ),
-    revokeCallsId: callsId(argv[14]),
-    revokeTransactionHash: exactHex(argv[16], 32, "ALTANA_LIFECYCLE_TRANSACTION_HASH_INVALID"),
+    revokeCallsId: callsId(argv[18]),
+    revokeTransactionHash: exactHex(argv[20], 32, "ALTANA_LIFECYCLE_TRANSACTION_HASH_INVALID"),
+    sessionExpiry,
     sourceBaseCommit
   });
 }
@@ -189,7 +203,7 @@ function gitBytes(args) {
   });
 }
 
-function verifyRelease(sourceBaseCommit) {
+function verifyRelease(sourceBaseCommit, ceremonySourceCommit) {
   if (gitText(["status", "--porcelain=v1", "--untracked-files=all"]) !== "") {
     fail("ALTANA_LIFECYCLE_REPOSITORY_DIRTY");
   }
@@ -198,6 +212,14 @@ function verifyRelease(sourceBaseCommit) {
   if (gitText(["rev-parse", "origin/main"]) !== head) {
     fail("ALTANA_LIFECYCLE_SOURCE_NOT_PUBLISHED");
   }
+  if (gitText(["merge-base", ceremonySourceCommit, head]) !== ceremonySourceCommit) {
+    fail("ALTANA_LIFECYCLE_CEREMONY_SOURCE_NOT_ANCESTOR");
+  }
+  const ceremonyCommitTimestamp = gitText(["show", "-s", "--format=%ct", ceremonySourceCommit]);
+  if (!/^[1-9][0-9]*$/u.test(ceremonyCommitTimestamp)) {
+    fail("ALTANA_LIFECYCLE_CEREMONY_SOURCE_TIMESTAMP_INVALID");
+  }
+  return Object.freeze({ ceremonyCommitTimestamp, head });
 }
 
 async function assertCanonicalPath(repositoryPath) {
@@ -238,6 +260,14 @@ async function committedJson(repositoryPath) {
     fail("ALTANA_LIFECYCLE_INPUT_JSON_INVALID");
   }
   return Object.freeze({ bytes, path: repositoryPath, sha256: sha256(bytes), value });
+}
+
+async function committedJsonAt(repositoryPath, commit) {
+  const source = await committedJson(repositoryPath);
+  if (!source.bytes.equals(gitBytes(["show", `${commit}:${repositoryPath}`]))) {
+    fail("ALTANA_LIFECYCLE_POLICY_CHANGED_AFTER_CEREMONY_SOURCE");
+  }
+  return Object.freeze({ ...source, commit });
 }
 
 function validatePreparation(preparation) {
@@ -366,6 +396,24 @@ async function authoritySnapshot(provider, intent, ids, blockHash, present) {
   if (!Array.isArray(accountKeys) || accountKeys.length !== 2 || !Array.isArray(accountKeys[1])) {
     fail("ALTANA_LIFECYCLE_ACCOUNT_KEYS_DECODE_INVALID");
   }
+  if (!Array.isArray(accountKeys[0]) || accountKeys[0].length !== accountKeys[1].length) {
+    fail("ALTANA_LIFECYCLE_ACCOUNT_KEYS_DECODE_INVALID");
+  }
+  const accountKeyHashes = accountKeys[1].map((value) => value.toLowerCase());
+  const accountKeyIndex = accountKeyHashes.indexOf(ids.accountKeyHash);
+  let accountKeyExpiry = null;
+  if (accountKeyIndex !== -1) {
+    const key = accountKeys[0][accountKeyIndex];
+    const rawExpiry = Array.isArray(key) ? key[0] : key?.expiry;
+    if (!(
+      typeof rawExpiry === "bigint" ||
+      (typeof rawExpiry === "number" && Number.isInteger(rawExpiry)) ||
+      (typeof rawExpiry === "string" && /^[0-9]+$/u.test(rawExpiry))
+    )) {
+      fail("ALTANA_LIFECYCLE_ACCOUNT_KEY_EXPIRY_INVALID");
+    }
+    accountKeyExpiry = BigInt(rawExpiry).toString();
+  }
   const publicKey = present
     ? decode(
         KEYSTORE_ABI,
@@ -375,7 +423,8 @@ async function authoritySnapshot(provider, intent, ids, blockHash, present) {
       )
     : null;
   return Object.freeze({
-    accountKeyHashes: accountKeys[1].map((value) => value.toLowerCase()),
+    accountKeyExpiry,
+    accountKeyHashes,
     keyStorePublicKey: typeof publicKey === "string" ? publicKey.toLowerCase() : null,
     keyStorePublicKeyRead: present,
     keyStoreValid: valid
@@ -451,13 +500,13 @@ async function finalSnapshot(intent, ids, revokeBlockNumber) {
 }
 
 async function capture(args) {
-  verifyRelease(args.sourceBaseCommit);
-  const [preparationSource, intentSource] = await Promise.all([
+  const release = verifyRelease(args.sourceBaseCommit, args.ceremonySourceCommit);
+  const [preparationSource, policySource] = await Promise.all([
     committedJson(args.preparationPath),
-    committedJson(args.grantIntentPath)
+    committedJsonAt(args.policyConfigPath, args.ceremonySourceCommit)
   ]);
   validatePreparation(preparationSource.value);
-  const intent = validateGrantIntent(intentSource.value);
+  const intent = deriveGrantIntentFromTestActionPolicy(policySource.value, args.sessionExpiry);
   const ids = deriveAuthorityIds(intent);
 
   const chainIds = await Promise.all(
@@ -487,6 +536,19 @@ async function capture(args) {
     return validated[0];
   });
   const [grant, execute, revoke] = operations;
+  const applicationObservations = rawOperations[1].map((value) =>
+    validatePtaApprovalReceipt(value.receipt, {
+      ...execute,
+      owner: intent.walletAddress,
+      spender: intent.sessionKey.address
+    })
+  );
+  same(
+    applicationObservations[0],
+    applicationObservations[1],
+    "ALTANA_LIFECYCLE_PROVIDER_APPLICATION_EVENT_MISMATCH"
+  );
+  const applicationEvidence = applicationObservations[0];
 
   const [executeRelayRaw, revokeRelayRaw] = await Promise.all([
     jsonRpc(RELAY_URL, "altana-testnet-relay", "wallet_getCallsStatus", [args.executeCallsId]),
@@ -517,31 +579,45 @@ async function capture(args) {
   });
 
   return Object.freeze({
-    schemaVersion: "proofera-altana-lifecycle-evidence-v1.0.0",
+    schemaVersion: "proofera-altana-lifecycle-evidence-v1.1.0",
     classification: {
-      artifact: "two_provider_read_side_altana_authority_lifecycle",
-      applicationCallSemanticsVerified: false,
-      applicationEffectVerified: false,
+      applicationCallSemanticsVerified: true,
+      applicationEffectVerified: true,
+      applicationStateChangeVerified: false,
+      artifact: "two_provider_read_side_altana_authority_lifecycle_with_pta_zero_approval",
       authorityAbsentAfterRevoke: lifecycle.authorityAbsentAfterRevoke,
       authorityPresentForExecution: lifecycle.authorityPresentForExecution,
+      exactGrantIntentPrecommitted: false,
       executeReceiptVerified: true,
       executeRelayReceiptJoined: true,
       grantReceiptVerified: true,
       privateSignerRead: false,
+      ptaZeroApprovalEventVerified: true,
       revokeReceiptVerified: true,
       revokeRelayReceiptJoined: true,
       sessionSignatureDirectlyDecoded: false
     },
+    ceremonySourceCommit: args.ceremonySourceCommit,
     sourceBaseCommit: args.sourceBaseCommit,
     sources: {
-      grantIntent: {
-        path: intentSource.path,
-        sha256: intentSource.sha256
+      policyConfig: {
+        commit: policySource.commit,
+        path: policySource.path,
+        sha256: policySource.sha256
       },
       preparation: {
         path: preparationSource.path,
         sha256: preparationSource.sha256
       }
+    },
+    intentProvenance: {
+      ceremonySourceCommit: args.ceremonySourceCommit,
+      ceremonySourceCommitTimestamp: release.ceremonyCommitTimestamp,
+      collectorSourceCommit: release.head,
+      derivation: "precommitted-static-policy-plus-onchain-authority-expiry",
+      exactIntentPrecommitted: false,
+      grantBlockTimestamp: phaseSnapshots[0].blockTimestamp,
+      sessionExpirySource: "account-getKeys-at-grant-and-execute-canonical-blocks"
     },
     network: {
       chainId: CHAIN_ID,
@@ -558,14 +634,17 @@ async function capture(args) {
       grant,
       revoke: { ...revoke, callsId: revokeRelay.callsId }
     },
+    applicationEvidence,
     authorityTimeline: {
       finalized: final,
       phases: phaseSnapshots
     },
     limitations: [
-      "Successful receipts, relay calls-ID joins and exact authority state prove the observed lifecycle but do not directly decode which key signed the execute intent.",
-      "This artifact does not decode the relayed application call or prove a PancakeSwap state effect; a separately joined application-specific receipt and before/after artifact remain required.",
-      "A public grant intent contains no session private key and this collector never reads a signer, wallet secret or browser credential."
+      "Successful receipts, relay calls-ID joins and exact authority state prove the observed lifecycle but do not directly decode which key signed the relayed execute intent.",
+      "The exact expiry-bearing grant intent was not separately committed before the ceremony. It is reconstructed after the ceremony from the unchanged policy in the ceremony source commit plus the expiry independently observed in account authority at the canonical grant and execute blocks.",
+      "A Git commit timestamp is repository provenance, not an external trusted timestamp or proof of which build was deployed.",
+      "The PTA receipt proves the exact Approval(owner, session, 0) event. Because the amount is zero, it does not prove a nonzero allowance transition, economic benefit, PancakeSwap/LP activity or performance.",
+      "The static policy and derived intent contain no session private key; this collector never reads a signer, wallet secret or browser credential."
     ],
     transcript
   });
