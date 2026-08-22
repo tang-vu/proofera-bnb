@@ -17,6 +17,7 @@ test("permission audit freezer binds lifecycle, staging receipt, public state an
   assert.match(source, /126543819-72e7cf94-altana-lifecycle\.json/u);
   assert.match(source, /altana-test-action\.v2\.json/u);
   assert.match(source, /proofera-postgres-grant/u);
+  assert.match(source, /47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641/u);
   assert.match(
     source,
     /SELECT count\(\*\)::text FROM proofera_altana_grant_claim\.submission_claims/u
@@ -26,6 +27,9 @@ test("permission audit freezer binds lifecycle, staging receipt, public state an
   assert.match(source, /databaseClaimRecordObserved: false/u);
   assert.match(source, /EIP-1898 blockHash requireCanonical/u);
   assert.match(source, /answer-key-sha256/u);
+  assert.match(source, /TERMIX_PERMISSION_FREEZE_BUNDLE_SCHEMA_INVALID/u);
+  assert.match(source, /TERMIX_PERMISSION_FREEZE_DECLARATION_SCHEMA_INVALID/u);
+  assert.match(source, /TERMIX_PERMISSION_FREEZE_OUTPUT_WRITE_FAILED/u);
   assert.match(source, /open\(path, "wx", 0o600\)/u);
   assert.doesNotMatch(
     source,

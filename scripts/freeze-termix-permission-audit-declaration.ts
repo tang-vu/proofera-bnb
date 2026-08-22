@@ -47,6 +47,9 @@ const EXPECTED_MIGRATION_SHA256 =
 const EXPECTED_SEMANTIC_SHA256 = "fc81399172bf962fe4d0b017d58846a3651ca5ccd850004e20d280ebdad9639a";
 const EXPECTED_PTA_RUNTIME_SHA256 =
   "e018f428a384212f11817a24f4828c1a479403d86491e256a7f79d3142395527";
+const EXPECTED_POSTGRES_IMAGE_ID =
+  "sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641";
+const EXPECTED_POSTGRES_CONFIGURED_IMAGE = `postgres:17.9-bookworm@${EXPECTED_POSTGRES_IMAGE_ID}`;
 const MAXIMUM_GIT_OUTPUT_BYTES = 8_000_000;
 const MAXIMUM_COMMAND_OUTPUT_BYTES = 2_000_000;
 const MINIMUM_RANDOMNESS_MARGIN_BLOCKS = 1_200n;
@@ -75,6 +78,28 @@ interface CommittedJson {
 
 function fail(code: string): never {
   throw new Error(code);
+}
+
+function hasSafeErrorCode(error: unknown): error is Error {
+  return error instanceof Error && /^[A-Z0-9_]+$/u.test(error.message);
+}
+
+function runStage<T>(code: string, action: () => T): T {
+  try {
+    return action();
+  } catch (error) {
+    if (hasSafeErrorCode(error)) throw error;
+    fail(code);
+  }
+}
+
+async function runAsyncStage<T>(code: string, action: () => Promise<T>): Promise<T> {
+  try {
+    return await action();
+  } catch (error) {
+    if (hasSafeErrorCode(error)) throw error;
+    fail(code);
+  }
 }
 
 function parseArguments(args: readonly string[]): Options {
@@ -223,8 +248,8 @@ function captureDatabaseReceipt(): Record<string, unknown> {
   ]);
   if (
     state !== "running" ||
-    configuredImage !== "postgres:17.9-bookworm" ||
-    !/^sha256:[0-9a-f]{64}$/u.test(imageId) ||
+    configuredImage !== EXPECTED_POSTGRES_CONFIGURED_IMAGE ||
+    imageId !== EXPECTED_POSTGRES_IMAGE_ID ||
     restartPolicy !== "unless-stopped"
   ) {
     fail("TERMIX_PERMISSION_FREEZE_DATABASE_CONTAINER_INVALID");
@@ -639,13 +664,16 @@ async function main(): Promise<void> {
     "TERMIX_PERMISSION_FREEZE_LIFECYCLE_INVALID"
   );
   const finalBlockHash = hash(finalized.blockHash, "TERMIX_PERMISSION_FREEZE_LIFECYCLE_INVALID");
-  const codeAttestation = await captureCodeAttestation(
-    finalBlockNumber,
-    finalBlockHash,
-    options.randomnessBlock
+  const codeAttestation = await runAsyncStage(
+    "TERMIX_PERMISSION_FREEZE_CODE_ATTESTATION_FAILED",
+    () => captureCodeAttestation(finalBlockNumber, finalBlockHash, options.randomnessBlock)
   );
-  const database = captureDatabaseReceipt();
-  const publicState = validatePublicState(lifecycle, policyInput.value);
+  const database = runStage("TERMIX_PERMISSION_FREEZE_DATABASE_READ_FAILED", () =>
+    captureDatabaseReceipt()
+  );
+  const publicState = runStage("TERMIX_PERMISSION_FREEZE_PUBLIC_STATE_READ_FAILED", () =>
+    validatePublicState(lifecycle, policyInput.value)
+  );
   const ptaContract = record(ptaInput.value.contract, "TERMIX_PERMISSION_FREEZE_PTA_INVALID");
   if (
     ptaInput.value.chainId !== 97 ||
@@ -764,7 +792,7 @@ async function main(): Promise<void> {
     { artifactId: "sdk-behavior", locator: SDK_PATH, sha256: sdkInput.sha256 },
     { artifactId: "worker-public-state", locator: preparationPath, sha256: preparationSha256 }
   ];
-  const bundle = PermissionAuditBundleSchema.parse({
+  const bundleResult = PermissionAuditBundleSchema.safeParse({
     activationProposal: {
       candidate: { ...safeCorpusCandidate, spendCaps: [] },
       caseId: "activation-proposal",
@@ -841,9 +869,13 @@ async function main(): Promise<void> {
       sdkBehaviorEvidenceArtifactId: "sdk-behavior"
     }
   });
+  if (!bundleResult.success) fail("TERMIX_PERMISSION_FREEZE_BUNDLE_SCHEMA_INVALID");
+  const bundle = bundleResult.data;
   const bundleCanonicalJson = canonicalJson(bundle);
   const bundleSha256 = sha256Bytes(bundleCanonicalJson);
-  const auditOutput = auditPermissionBundle(bundle);
+  const auditOutput = runStage("TERMIX_PERMISSION_FREEZE_ENGINE_OUTPUT_INVALID", () =>
+    auditPermissionBundle(bundle)
+  );
   const answerKeyCanonicalJson = canonicalJson({
     bundleSha256,
     engineVersion: PERMISSION_AUDIT_ENGINE_VERSION,
@@ -866,7 +898,7 @@ async function main(): Promise<void> {
     "code-authority-attestation": "Exact-block PTA runtime attestation reference.",
     "sdk-behavior-evidence": "Pinned Altana SDK 0.7.0 behavior evidence reference."
   };
-  const declaration = BenchmarkDeclarationSchema.parse({
+  const declarationResult = BenchmarkDeclarationSchema.safeParse({
     benchmarkId: "altana-permission-audit-v1",
     task: {
       domain: "security",
@@ -1037,6 +1069,8 @@ async function main(): Promise<void> {
     },
     requiredReceiptKinds: ["api", "transaction"]
   });
+  if (!declarationResult.success) fail("TERMIX_PERMISSION_FREEZE_DECLARATION_SCHEMA_INVALID");
+  const declaration = declarationResult.data;
   const normalizedDeclaration = normalizeBenchmarkDeclaration(declaration);
   const declarationSha256 = sha256Bytes(canonicalJson(normalizedDeclaration));
   const declarationArtifact = {
@@ -1080,13 +1114,15 @@ async function main(): Promise<void> {
     ensureAbsent(absoluteDeclarationPath),
     ensureAbsent(answerKeyPath)
   ]);
-  await writeExclusive(absolutePreparationPath, preparationBody);
-  await writeExclusive(absoluteBundlePath, `${bundleCanonicalJson}\n`);
-  await writeExclusive(
-    absoluteDeclarationPath,
-    await format(JSON.stringify(declarationArtifact), JSON_FORMAT_OPTIONS)
-  );
-  await writeExclusive(answerKeyPath, `${answerKeyCanonicalJson}\n`);
+  await runAsyncStage("TERMIX_PERMISSION_FREEZE_OUTPUT_WRITE_FAILED", async () => {
+    await writeExclusive(absolutePreparationPath, preparationBody);
+    await writeExclusive(absoluteBundlePath, `${bundleCanonicalJson}\n`);
+    await writeExclusive(
+      absoluteDeclarationPath,
+      await format(JSON.stringify(declarationArtifact), JSON_FORMAT_OPTIONS)
+    );
+    await writeExclusive(answerKeyPath, `${answerKeyCanonicalJson}\n`);
+  });
   process.stdout.write(
     `${preparationPath}\n${bundlePath}\n${declarationPath}\nanswer-key-sha256:${answerKeySha256}\n`
   );
