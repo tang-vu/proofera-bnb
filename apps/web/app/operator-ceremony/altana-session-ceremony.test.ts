@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   isPublicRelayEvidenceMethod,
   publicRelayResult,
+  sessionExpiredAtObservation,
   type RelayCapture
 } from "./altana-session-ceremony";
 
@@ -35,5 +36,26 @@ describe("Altana relay public evidence capture", () => {
         { callsId: "0x1234", transactionHash: null }
       )
     ).toEqual({ callsId: "0x1234", transactionHash });
+  });
+
+  it("derives expiry only from the worker observation timestamp", () => {
+    expect(
+      sessionExpiredAtObservation({
+        sessionExpiry: 1_787_330_074,
+        observedAt: "2026-08-21T16:34:34.000Z"
+      })
+    ).toBe(true);
+    expect(
+      sessionExpiredAtObservation({
+        sessionExpiry: 1_787_330_074,
+        observedAt: "2026-08-21T16:34:33.999Z"
+      })
+    ).toBe(false);
+    expect(
+      sessionExpiredAtObservation({
+        sessionExpiry: null,
+        observedAt: "2026-08-22T00:00:00.000Z"
+      })
+    ).toBe(false);
   });
 });

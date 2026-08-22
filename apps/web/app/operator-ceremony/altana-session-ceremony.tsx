@@ -224,6 +224,16 @@ export function publicRelayResult(
   return { ...capture, transactionHash };
 }
 
+export function sessionExpiredAtObservation(
+  state: Pick<AltanaTestActionPublicState, "observedAt" | "sessionExpiry">
+): boolean {
+  if (state.sessionExpiry === null) return false;
+  const observedAtMilliseconds = Date.parse(state.observedAt);
+  return (
+    Number.isFinite(observedAtMilliseconds) && state.sessionExpiry * 1_000 <= observedAtMilliseconds
+  );
+}
+
 async function withRelayCapture<T>(operation: () => Promise<T>): Promise<{
   readonly result: T;
   readonly capture: RelayCapture;
@@ -386,8 +396,10 @@ export function AltanaSessionCeremony({
   const executeConfirmed =
     workerState?.status === "execute_confirmed" || workerState?.status === "lifecycle_complete";
   const lifecycleComplete = workerState?.status === "lifecycle_complete";
+  const sessionExpired = workerState === null ? false : sessionExpiredAtObservation(workerState);
   const canGrant = walletMatches && funded && operation === null && !authorityPresent && !busy;
-  const canRevoke = walletMatches && executeConfirmed && authorityPresent && !busy;
+  const canRevoke =
+    walletMatches && authorityPresent && operation !== null && operation.revoke === null && !busy;
 
   async function grant(event: MouseEvent<HTMLButtonElement>) {
     if (!canGrant || wallet === null) return;
@@ -547,11 +559,15 @@ export function AltanaSessionCeremony({
               ? `Luồng này chỉ nhận passkey wallet ${config.walletAddress}.`
               : !funded
                 ? `Ví đang có ${workerState?.balanceWei ?? "chưa rõ"} wei; cần ít nhất ${config.minimumNativeBalanceWei} wei tBNB để đăng ký hai key và trả gas.`
-                : executeConfirmed
-                  ? "Test action đã có receipt; cần một lần Windows Hello riêng để revoke."
-                  : operation !== null
-                    ? "Grant đã được gửi hoặc đang reconciliation; retry bị khóa cho tới khi authority rõ ràng."
-                    : "Worker và funding đã sẵn sàng; grant cần một lần xác nhận Windows Hello.")}
+                : sessionExpired && !authorityPresent
+                  ? "Session đã hết hạn và hai RPC không còn thấy authority. Không cần gửi revoke; execute vẫn chưa có receipt nên lifecycle chưa hoàn tất."
+                  : authorityPresent
+                    ? executeConfirmed
+                      ? "Test action đã có receipt; cần một lần Windows Hello riêng để revoke."
+                      : "Authority đang hoạt động nhưng execute chưa có receipt; bạn có thể revoke ngay. Lifecycle vẫn chưa hoàn tất nếu execute không xác nhận."
+                    : operation !== null
+                      ? "Grant đã được gửi hoặc đang reconciliation; retry bị khóa cho tới khi authority rõ ràng."
+                      : "Worker và funding đã sẵn sàng; grant cần một lần xác nhận Windows Hello.")}
       </p>
 
       <div className="ceremony-passkey-actions">
@@ -569,7 +585,11 @@ export function AltanaSessionCeremony({
           onClick={revoke}
           type="button"
         >
-          {lifecycleComplete ? "Đã revoke" : "Revoke session"}
+          {lifecycleComplete
+            ? "Đã revoke"
+            : sessionExpired && !authorityPresent
+              ? "Authority đã hết hạn"
+              : "Revoke session"}
         </button>
       </div>
 

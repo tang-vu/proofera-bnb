@@ -85,3 +85,64 @@ test("enables the bounded grant only for the pinned funded passkey wallet", asyn
   await expect(page.getByText(/worker và funding đã sẵn sàng/i)).toBeVisible();
   await expect(page.getByRole("button", { name: "Revoke session" })).toBeDisabled();
 });
+
+test("offers immediate revoke while an authorized execute is still pending", async ({ page }) => {
+  await page.route("**/api/operator-ceremony/altana-state", async (route) => {
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        availability: "available",
+        state: {
+          schemaVersion: 1,
+          chainId: 97,
+          configHash: `0x${"11".repeat(32)}`,
+          walletAddress: "0x91Aa0E6627bFF6C911B38CEd5F7885E063b7C27a",
+          sessionKeyAddress: "0xb5F0658E3bc0c3495729b87DE32f568Bdc995a11",
+          status: "execute_pending",
+          authorityPresent: true,
+          balanceWei: "98390568466905952",
+          sessionExpiry: 1_787_330_074,
+          execute: { callsId: `0x${"22".repeat(32)}`, transactionHash: null },
+          observedAt: "2026-08-21T00:00:00.000Z"
+        }
+      })
+    });
+  });
+  await page.addInitScript(() => {
+    const walletAddress = "0x91Aa0E6627bFF6C911B38CEd5F7885E063b7C27a";
+    const sessionPublicKey =
+      "0x0481b28f8d35bf3c63575e01886128f5d7f6c0ef323af114d3d759ccdafd88e18527cffed5aa7d44edd7580d71f0ae1b0681e5469522fdc1ce9191b5e94a8fd67d";
+    window.localStorage.setItem(
+      "proofera.altana.passkey-wallet.v1",
+      JSON.stringify({
+        schemaVersion: 1,
+        chainId: 97,
+        address: walletAddress,
+        credential: {
+          kind: "webauthn",
+          id: "test-credential",
+          publicKey: `0x${"11".repeat(64)}`,
+          rpId: "localhost"
+        }
+      })
+    );
+    window.localStorage.setItem(
+      "proofera.altana.test-action.v1",
+      JSON.stringify({
+        schemaVersion: 1,
+        walletAddress,
+        sessionPublicKey,
+        status: "grant_confirmed_probe_required",
+        intent: { walletAddress, sessionKey: { publicKey: sessionPublicKey } },
+        grant: { callsId: `0x${"33".repeat(32)}`, transactionHash: null },
+        revoke: null,
+        updatedAt: "2026-08-21T00:00:00.000Z"
+      })
+    );
+  });
+
+  await page.goto("/operator-ceremony");
+
+  await expect(page.getByRole("button", { name: "Revoke session" })).toBeEnabled();
+  await expect(page.getByText(/execute chưa có receipt; bạn có thể revoke ngay/i)).toBeVisible();
+});
