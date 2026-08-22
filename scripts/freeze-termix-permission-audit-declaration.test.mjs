@@ -24,6 +24,7 @@ test("permission audit freezer binds lifecycle, staging receipt, public state an
   );
   assert.match(source, /'appliedAtUtc', applied_at::text/u);
   assert.doesNotMatch(source, /to_char\(applied_at/u);
+  assert.match(source, /"-i"[\s\S]*"-f",\s*"-"/u);
   assert.match(source, /claimEnforcementLayer: "local-create-only-file"/u);
   assert.match(source, /claimEvidenceLevel: "inferred-from-pinned-ordering"/u);
   assert.match(source, /databaseClaimRecordObserved: false/u);

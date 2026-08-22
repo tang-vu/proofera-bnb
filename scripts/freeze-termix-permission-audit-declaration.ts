@@ -224,10 +224,11 @@ function unixTimestampToUtc(value: unknown, code: string): string {
   return result.toISOString();
 }
 
-function commandText(command: string, args: readonly string[]): string {
+function commandText(command: string, args: readonly string[], input?: string): string {
   return execFileSync(command, args, {
     cwd: ROOT,
     encoding: "utf8",
+    input,
     maxBuffer: MAXIMUM_COMMAND_OUTPUT_BYTES,
     windowsHide: true
   }).trim();
@@ -254,21 +255,26 @@ function captureDatabaseReceipt(): Record<string, unknown> {
   ) {
     fail("TERMIX_PERMISSION_FREEZE_DATABASE_CONTAINER_INVALID");
   }
-  const receiptText = commandText("docker", [
-    "exec",
-    "-u",
-    "postgres",
-    GRANT_CONTAINER,
-    "psql",
-    "-X",
-    "-v",
-    "ON_ERROR_STOP=1",
-    "-d",
-    GRANT_DATABASE,
-    "-At",
-    "-c",
-    "SELECT json_build_object('migrationVersion', migration_version::text, 'domainSchemaVersion', domain_schema_version::text, 'postgresMajor', postgres_major::text, 'semanticContractSha256', semantic_contract_sha256, 'deploymentId', deployment_id::text, 'appliedAtUtc', applied_at::text)::text FROM proofera_altana_grant_claim.schema_receipt"
-  ]);
+  const receiptText = commandText(
+    "docker",
+    [
+      "exec",
+      "-i",
+      "-u",
+      "postgres",
+      GRANT_CONTAINER,
+      "psql",
+      "-X",
+      "-v",
+      "ON_ERROR_STOP=1",
+      "-d",
+      GRANT_DATABASE,
+      "-At",
+      "-f",
+      "-"
+    ],
+    "SELECT json_build_object('migrationVersion', migration_version::text, 'domainSchemaVersion', domain_schema_version::text, 'postgresMajor', postgres_major::text, 'semanticContractSha256', semantic_contract_sha256, 'deploymentId', deployment_id::text, 'appliedAtUtc', applied_at::text)::text FROM proofera_altana_grant_claim.schema_receipt;\n"
+  );
   let receiptValue: unknown;
   try {
     receiptValue = JSON.parse(receiptText) as unknown;
@@ -290,21 +296,26 @@ function captureDatabaseReceipt(): Record<string, unknown> {
   ) {
     fail("TERMIX_PERMISSION_FREEZE_DATABASE_RECEIPT_INVALID");
   }
-  const claimCount = commandText("docker", [
-    "exec",
-    "-u",
-    "postgres",
-    GRANT_CONTAINER,
-    "psql",
-    "-X",
-    "-v",
-    "ON_ERROR_STOP=1",
-    "-d",
-    GRANT_DATABASE,
-    "-At",
-    "-c",
-    "SELECT count(*)::text FROM proofera_altana_grant_claim.submission_claims"
-  ]);
+  const claimCount = commandText(
+    "docker",
+    [
+      "exec",
+      "-i",
+      "-u",
+      "postgres",
+      GRANT_CONTAINER,
+      "psql",
+      "-X",
+      "-v",
+      "ON_ERROR_STOP=1",
+      "-d",
+      GRANT_DATABASE,
+      "-At",
+      "-f",
+      "-"
+    ],
+    "SELECT count(*)::text FROM proofera_altana_grant_claim.submission_claims;\n"
+  );
   if (claimCount !== "0") fail("TERMIX_PERMISSION_FREEZE_DATABASE_CLAIM_JOIN_UNKNOWN");
   const appliedAtUtc = new Date(receipt.appliedAtUtc).toISOString();
   return {
