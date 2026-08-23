@@ -138,7 +138,7 @@ function policyBody(release = releaseIdentity()): PolicyBody {
     transaction: Object.freeze({
       chainId: "97" as const,
       from: BSC_TESTNET_PTA_WBNB_POOL_SENDER,
-      nonce: "1" as const,
+      nonce: "9" as const,
       to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
       selector: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_SELECTOR,
       data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
@@ -366,7 +366,7 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
       transaction: {
         chainId: "97",
         from: BSC_TESTNET_PTA_WBNB_POOL_SENDER,
-        nonce: "1",
+        nonce: "9",
         to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
         selector: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_SELECTOR,
         dataKeccak256: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_KECCAK256,

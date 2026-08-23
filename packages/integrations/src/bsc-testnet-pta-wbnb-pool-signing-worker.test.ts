@@ -87,7 +87,7 @@ const RECOVERY = Object.freeze({
   attemptId: `0x${"24".repeat(32)}` as Hex
 });
 const RFC6979_KAT_TRANSACTION_HASH =
-  "0x5fb4c8d0538d62767b9108d2344b400f666fb67e4c38c8b0eeace73fcd61f363";
+  "0x0ff5681303ab45b67f848a7cc07b874ed0b7c4ff09b2030469d186f1e5ac7c44";
 
 function exactTransaction(
   overrides: Partial<BscTestnetPtaWbnbPoolExactSigningTransaction> = {}
@@ -96,7 +96,7 @@ function exactTransaction(
     data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
     gasLimit: 5_983_857n,
     gasPriceWei: 100_000_000n,
-    nonce: 1n,
+    nonce: 9n,
     signingNotAfterMilliseconds: Date.now() + 60_000,
     ...overrides
   });
@@ -250,7 +250,7 @@ async function signSyntheticExact(
     data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
     gas: 5_983_857n,
     gasPrice: 100_000_000n,
-    nonce: 1,
+    nonce: 9,
     to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
     type: "legacy",
     value: 0n,
@@ -337,7 +337,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
       data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
       gas: transaction.gasLimit,
       gasPrice: transaction.gasPriceWei,
-      nonce: 1,
+      nonce: 9,
       to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
       type: "legacy",
       value: 0n
@@ -354,7 +354,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
       data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
       gas: transaction.gasLimit,
       gasPrice: transaction.gasPriceWei,
-      nonce: 1,
+      nonce: 9,
       type: "legacy"
     });
     expect(getAddress(parsed.to ?? "0x0000000000000000000000000000000000000000")).toBe(
@@ -891,7 +891,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
           data: transaction.data,
           gas: transaction.gasLimit,
           gasPrice: transaction.gasPriceWei,
-          nonce: 1,
+          nonce: 9,
           to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
           type: "legacy",
           value: 0n
@@ -1263,7 +1263,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
   });
 
   it("accepts canonical short signature scalars and rejects all exact transaction drifts", async () => {
-    const shortScalarKey = `0x${(18).toString(16).padStart(64, "0")}` as Hex;
+    const shortScalarKey = `0x${(129).toString(16).padStart(64, "0")}` as Hex;
     const shortAccount = privateKeyToAccount(shortScalarKey);
     const shortRaw = await signSyntheticExact(shortScalarKey);
     const shortParsed = parseTransaction(shortRaw);
@@ -1327,7 +1327,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
         data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
         gas: 5_983_857n,
         gasPrice: 100_000_000n,
-        nonce: 1,
+        nonce: 9,
         to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
         type: "legacy",
         value: 0n

@@ -166,10 +166,10 @@ function fakeClient(changes: FakeChanges = {}) {
             return request.params[1] === "pending"
               ? "pendingNonce" in changes
                 ? changes.pendingNonce
-                : "0x1"
+                : "0x9"
               : "latestNonce" in changes
                 ? changes.latestNonce
-                : "0x1";
+                : "0x9";
           }
           return request.params[1] === "pending" && "pendingCandidateNonce" in changes
             ? changes.pendingCandidateNonce
@@ -255,7 +255,7 @@ describe("BSC testnet PTA/WBNB pool coordinator", () => {
     expect(COORDINATOR_SOURCE).toContain(`"${EIP1967_BEACON_SLOT}" as const`);
   });
 
-  it("constructs only the exact zero-value, nonce-one, non-authorizing envelope", async () => {
+  it("constructs only the exact zero-value, pinned-nonce, non-authorizing envelope", async () => {
     const execution = run({}, { finalizedHeight: COMMON_BLOCK_NUMBER + 3n });
     const result = await execution.result;
 
@@ -269,7 +269,7 @@ describe("BSC testnet PTA/WBNB pool coordinator", () => {
         transaction: {
           from: ADDRESSES.sender,
           to: ADDRESSES.manager,
-          nonce: "1",
+          nonce: "9",
           data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
           dataBytes: 132,
           dataKeccak256: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_KECCAK256,
@@ -289,8 +289,8 @@ describe("BSC testnet PTA/WBNB pool coordinator", () => {
         observation: {
           finalizedBlockNumber: COMMON_BLOCK_NUMBER.toString(),
           finalizedBlockHash: COMMON_BLOCK_HASH,
-          latestNonce: "1",
-          pendingNonce: "1",
+          latestNonce: "9",
+          pendingNonce: "9",
           pendingPool: ADDRESSES.zero,
           candidateCode: "0x",
           candidateNonce: "0",

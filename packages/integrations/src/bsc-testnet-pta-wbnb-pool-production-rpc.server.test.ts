@@ -74,8 +74,8 @@ function fixedFetch(pendingNonceDriftOrigin: string | null = null) {
         result =
           address === BSC_TESTNET_PTA_WBNB_POOL_SENDER
             ? origin === pendingNonceDriftOrigin && tag === "pending"
-              ? "0x2"
-              : "0x1"
+              ? "0xa"
+              : "0x9"
             : "0x0";
         break;
       }
@@ -214,7 +214,7 @@ function reconciliationFetch(options: ReconciliationFetchOptions = {}) {
           chainId: "0x61",
           from: BSC_TESTNET_PTA_WBNB_POOL_SENDER,
           to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
-          nonce: "0x1",
+          nonce: "0x9",
           value: "0x0",
           gas: "0x5b8d80",
           gasPrice: "0x5f5e100",
@@ -290,8 +290,8 @@ describe("PTA/WBNB fixed production RPC pre-send reread", () => {
     expect(result).toMatchObject({
       primaryOrigin: BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN,
       corroboratorOrigin: BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN,
-      latestNonce: "1",
-      pendingNonce: "1",
+      latestNonce: "9",
+      pendingNonce: "9",
       transactionByHash: null,
       receiptByHash: null,
       factoryPoolForward: ZERO_ADDRESS,

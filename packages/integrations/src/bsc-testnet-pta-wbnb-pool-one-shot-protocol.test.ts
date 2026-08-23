@@ -132,8 +132,8 @@ function freshCapability(): BscTestnetPtaWbnbPoolFreshRecheckCapability {
       finalizedBlockHash: `0x${"66".repeat(32)}`,
       finalizedBlockTimestamp: timestamp,
       finalizedBlockGasLimit: "140000000",
-      latestNonce: "1",
-      pendingNonce: "1",
+      latestNonce: "9",
+      pendingNonce: "9",
       factoryPool: "0x0000000000000000000000000000000000000000",
       candidateCode: "0x",
       senderCode: "0x",
@@ -165,7 +165,7 @@ function responseWithScalars(request: BscTestnetPtaWbnbPoolSigningWorkerRequest,
     {
       type: "legacy",
       chainId: 97,
-      nonce: 1,
+      nonce: 9,
       gasPrice: BigInt(request.transaction.gasPriceWei),
       gas: BigInt(request.transaction.gasLimit),
       to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
@@ -219,7 +219,7 @@ describe("PTA/WBNB pool exact one-shot protocol", () => {
     );
     expect(exact).toMatchObject({
       type: "legacy",
-      nonce: "1",
+      nonce: "9",
       valueWei: "0",
       gasLimit: "5983857",
       gasPriceWei: "100000000",

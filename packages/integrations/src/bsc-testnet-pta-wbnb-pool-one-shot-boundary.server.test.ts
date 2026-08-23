@@ -89,7 +89,7 @@ function client(): BscTestnetPtaWbnbPoolRpcClient {
         case "eth_getStorageAt":
           return ZERO_WORD;
         case "eth_getTransactionCount":
-          return request.params[0].toLowerCase() === ADDRESSES.sender.toLowerCase() ? "0x1" : "0x0";
+          return request.params[0].toLowerCase() === ADDRESSES.sender.toLowerCase() ? "0x9" : "0x0";
         case "eth_getBalance":
           return "0x16312e1b2439d00";
         case "eth_gasPrice":
@@ -186,7 +186,7 @@ describe("PTA/WBNB durable one-shot boundary specification", () => {
       exactBinding: {
         chainId: 97,
         from: ADDRESSES.sender,
-        nonce: 1n,
+        nonce: 9n,
         to: ADDRESSES.manager,
         selector: "0x13ead562",
         data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,

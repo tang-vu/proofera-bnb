@@ -9,6 +9,7 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE,
   BSC_TESTNET_PTA_WBNB_POOL_CHAIN_ID,
   BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS,
+  BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_KECCAK256,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_SELECTOR,
@@ -515,7 +516,7 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
       descriptor.transactionSubmitted !== false ||
       exactBinding.chainId !== BSC_TESTNET_PTA_WBNB_POOL_CHAIN_ID ||
       exactBinding.from !== BSC_TESTNET_PTA_WBNB_POOL_SENDER ||
-      exactBinding.nonce !== 1n ||
+      exactBinding.nonce !== BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE ||
       exactBinding.to !== BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER ||
       exactBinding.selector !== BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_SELECTOR ||
       exactBinding.data !== BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA ||
@@ -531,7 +532,7 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
       return blocked(
         "DESCRIPTOR_INVALID",
         "descriptor",
-        "Descriptor does not bind the exact nonce-one chain-97 initializer and safety requirements."
+        "Descriptor does not bind the exact pinned-nonce chain-97 initializer and safety requirements."
       );
     }
     const transaction = buildBscTestnetPtaWbnbPoolExactSigningTransaction({

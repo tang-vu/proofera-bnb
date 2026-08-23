@@ -126,8 +126,8 @@ function freshCapability(
         (Date.parse(authenticatedAt) - 30_000) / 1_000
       ).toString(),
       finalizedBlockGasLimit: "140000000",
-      latestNonce: "1",
-      pendingNonce: "1",
+      latestNonce: "9",
+      pendingNonce: "9",
       factoryPool: "0x0000000000000000000000000000000000000000",
       candidateCode: "0x",
       senderCode: "0x",
@@ -145,7 +145,7 @@ function signedResponse(request: BscTestnetPtaWbnbPoolSigningWorkerRequest) {
     {
       type: "legacy",
       chainId: 97,
-      nonce: 1,
+      nonce: 9,
       gasPrice: BigInt(request.transaction.gasPriceWei),
       gas: BigInt(request.transaction.gasLimit),
       to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
@@ -602,7 +602,7 @@ describe("PTA/WBNB pool one-shot signer core", () => {
           {
             type: "legacy",
             chainId: 97,
-            nonce: 1,
+            nonce: 9,
             gasPrice: 100_000_000n,
             gas: 5_983_857n,
             to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,

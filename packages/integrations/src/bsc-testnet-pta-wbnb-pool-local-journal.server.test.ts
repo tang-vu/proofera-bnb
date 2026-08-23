@@ -242,7 +242,7 @@ function workerExchange(request: BscTestnetPtaWbnbPoolLegacyClaimRequestForTests
     {
       type: "legacy",
       chainId: 97,
-      nonce: 1,
+      nonce: 9,
       gasPrice: BigInt(workerRequest.transaction.gasPriceWei),
       gas: BigInt(workerRequest.transaction.gasLimit),
       to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,

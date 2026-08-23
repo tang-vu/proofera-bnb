@@ -20,6 +20,7 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN,
   BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE,
+  BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_KECCAK256,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_SELECTOR,
@@ -36,7 +37,7 @@ import {
 export const BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY =
   "0xe6c943aa33e600bfc1770ee654ee6b00bf6dbcc7cc1702c58bd1caa64dadb9cc" as const satisfies Hex;
 export const BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID =
-  "proofera:bsc-testnet:97:pta-wbnb:pancake-v3-fee-500:sender-nonce-1:v5" as const;
+  "proofera:bsc-testnet:97:pta-wbnb:pancake-v3-fee-500:sender-nonce-9:v5" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2 = 2 as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3 = 3 as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION = 4 as const;
@@ -104,7 +105,7 @@ export interface BscTestnetPtaWbnbPoolExactSigningTransaction {
   readonly eip155ReplayProtection: true;
   readonly from: typeof BSC_TESTNET_PTA_WBNB_POOL_SENDER;
   readonly to: typeof BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER;
-  readonly nonce: "1";
+  readonly nonce: typeof BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL;
   readonly valueWei: "0";
   readonly gasLimit: string;
   readonly gasPriceWei: string;
@@ -200,8 +201,8 @@ export interface BscTestnetPtaWbnbPoolFreshRecheckCapability extends BscTestnetP
     finalizedBlockHash: Hex;
     finalizedBlockTimestamp: string;
     finalizedBlockGasLimit: string;
-    latestNonce: "1";
-    pendingNonce: "1";
+    latestNonce: typeof BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL;
+    pendingNonce: typeof BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL;
     factoryPool: typeof ZERO_ADDRESS;
     candidateCode: "0x";
     senderCode: "0x";
@@ -713,7 +714,7 @@ export function buildBscTestnetPtaWbnbPoolExactSigningTransaction(
     eip155ReplayProtection: true as const,
     from: BSC_TESTNET_PTA_WBNB_POOL_SENDER,
     to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
-    nonce: "1" as const,
+    nonce: BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
     valueWei: "0" as const,
     gasLimit: gasLimit.toString(),
     gasPriceWei: gasPriceWei.toString(),
@@ -750,7 +751,7 @@ function inspectExactTransaction(
     transaction.eip155ReplayProtection !== true ||
     transaction.from !== BSC_TESTNET_PTA_WBNB_POOL_SENDER ||
     transaction.to !== BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER ||
-    transaction.nonce !== "1" ||
+    transaction.nonce !== BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL ||
     transaction.valueWei !== "0" ||
     transaction.data !== BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA ||
     gasLimit === null ||
@@ -910,8 +911,8 @@ function inspectFreshCapability(
     transactionGasLimit > finalizedBlockGasLimit ||
     rpcGasPriceWei !== transactionGasPriceWei ||
     senderBalanceWei < transactionMaximumCostWei ||
-    rpc.latestNonce !== "1" ||
-    rpc.pendingNonce !== "1" ||
+    rpc.latestNonce !== BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL ||
+    rpc.pendingNonce !== BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL ||
     rpc.factoryPool !== ZERO_ADDRESS ||
     rpc.candidateCode !== "0x" ||
     rpc.senderCode !== "0x" ||
@@ -946,8 +947,8 @@ function inspectFreshCapability(
       finalizedBlockHash: rpc.finalizedBlockHash as Hex,
       finalizedBlockTimestamp: finalizedBlockTimestamp.toString(),
       finalizedBlockGasLimit: finalizedBlockGasLimit.toString(),
-      latestNonce: "1",
-      pendingNonce: "1",
+      latestNonce: BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
+      pendingNonce: BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
       factoryPool: ZERO_ADDRESS,
       candidateCode: "0x",
       senderCode: "0x",

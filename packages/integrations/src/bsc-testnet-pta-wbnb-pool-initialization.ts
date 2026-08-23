@@ -8,7 +8,11 @@ export const BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN =
 
 export const BSC_TESTNET_PTA_WBNB_POOL_SENDER =
   "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49" as const satisfies Address;
-export const BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE = 1n;
+// Generation 5 has never signed or submitted. Its exact transaction is rebased to the sender state
+// observed by both fixed RPCs after unrelated retained chain-97 work advanced the shared test EOA.
+// Historical generation-1..4 journal evidence remains bound to nonce 1 and is parsed separately.
+export const BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE = 9n;
+export const BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL = "9" as const;
 export const BSC_TESTNET_PTA_ADDRESS =
   "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc" as const satisfies Address;
 export const BSC_TESTNET_WBNB_ADDRESS =
@@ -90,7 +94,7 @@ export interface BscTestnetPtaWbnbPoolInitializationEnvelopeBody {
   readonly transaction: Readonly<{
     from: typeof BSC_TESTNET_PTA_WBNB_POOL_SENDER;
     to: typeof BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER;
-    nonce: "1";
+    nonce: typeof BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL;
     data: typeof BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA;
     dataBytes: typeof BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_BYTES;
     dataKeccak256: typeof BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_KECCAK256;
@@ -112,8 +116,8 @@ export interface BscTestnetPtaWbnbPoolInitializationEnvelopeBody {
     finalizedBlockNumber: string;
     finalizedBlockHash: Hex;
     finalizedBlockTimestamp: string;
-    latestNonce: "1";
-    pendingNonce: "1";
+    latestNonce: typeof BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL;
+    pendingNonce: typeof BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL;
     pendingPool: "0x0000000000000000000000000000000000000000";
     candidateCode: "0x";
     candidateNonce: "0";

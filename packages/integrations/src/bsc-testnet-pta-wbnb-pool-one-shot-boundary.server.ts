@@ -12,6 +12,7 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_ENVELOPE_LIFETIME_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_ENVELOPE_HASH_DOMAIN,
   BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE,
+  BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_BYTES,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_KECCAK256,
@@ -341,7 +342,7 @@ function inspectedEnvelope(value: unknown): BscTestnetPtaWbnbPoolInitializationE
     envelope.chainId !== "97" ||
     envelope.transaction.from !== BSC_TESTNET_PTA_WBNB_POOL_SENDER ||
     envelope.transaction.to !== BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER ||
-    envelope.transaction.nonce !== "1" ||
+    envelope.transaction.nonce !== BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL ||
     envelope.transaction.selector !== BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_SELECTOR ||
     envelope.transaction.data !== BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA ||
     envelope.transaction.dataBytes !== BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_BYTES ||
@@ -365,8 +366,8 @@ function inspectedEnvelope(value: unknown): BscTestnetPtaWbnbPoolInitializationE
     !/^0x[0-9a-f]{64}$/u.test(envelope.observation.finalizedBlockHash) ||
     !/^[1-9][0-9]*$/u.test(envelope.observation.finalizedBlockNumber) ||
     !/^[1-9][0-9]*$/u.test(envelope.observation.finalizedBlockTimestamp) ||
-    envelope.observation.latestNonce !== "1" ||
-    envelope.observation.pendingNonce !== "1" ||
+    envelope.observation.latestNonce !== BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL ||
+    envelope.observation.pendingNonce !== BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL ||
     envelope.observation.pendingPool !== "0x0000000000000000000000000000000000000000" ||
     envelope.observation.candidateCode !== "0x" ||
     envelope.observation.candidateNonce !== "0" ||

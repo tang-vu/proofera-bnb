@@ -12,6 +12,7 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_CHAIN_ID,
   BSC_TESTNET_PTA_WBNB_POOL_ENVELOPE_LIFETIME_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_EXECUTION_AUTHORITY_LIFETIME_SECONDS,
+  BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_KECCAK256,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_SELECTOR,
@@ -611,7 +612,7 @@ function parseDescriptor(input: unknown): BscTestnetPtaWbnbPoolOneShotPreparedDe
     descriptor.transactionSubmitted !== false ||
     binding.chainId !== BSC_TESTNET_PTA_WBNB_POOL_CHAIN_ID ||
     binding.from !== BSC_TESTNET_PTA_WBNB_POOL_SENDER ||
-    binding.nonce !== 1n ||
+    binding.nonce !== BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE ||
     binding.to !== BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER ||
     binding.selector !== BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_SELECTOR ||
     binding.data !== BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA ||
@@ -930,7 +931,7 @@ function ownerAuthorizationText(
     `executionFlag=${BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_EXECUTION_FLAG}`,
     `chainId=${BSC_TESTNET_PTA_WBNB_POOL_CHAIN_ID}`,
     `from=${BSC_TESTNET_PTA_WBNB_POOL_SENDER}`,
-    "nonce=1",
+    `nonce=${BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE}`,
     `to=${BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER}`,
     "functionSignature=createAndInitializePoolIfNecessary(address,address,uint24,uint160)",
     `selector=${BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_SELECTOR}`,

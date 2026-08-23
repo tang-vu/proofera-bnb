@@ -24,6 +24,7 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_CHAIN_ID,
   BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN,
   BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE,
+  BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
   BSC_TESTNET_PTA_WBNB_POOL_FEE,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_ESTIMATE,
@@ -169,8 +170,8 @@ export interface BscTestnetPtaWbnbPoolSubmissionCapability {
     finalizedBlockHash: Hex;
     finalizedBlockTimestamp: string;
     finalizedBlockGasLimit: string;
-    latestNonce: "1";
-    pendingNonce: "1";
+    latestNonce: typeof BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL;
+    pendingNonce: typeof BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL;
     transactionByHash: null;
     receiptByHash: null;
     factoryPoolForward: typeof ZERO_ADDRESS;
@@ -188,7 +189,7 @@ export interface BscTestnetPtaWbnbPoolSubmissionCapability {
     chainId: "97";
     from: typeof BSC_TESTNET_PTA_WBNB_POOL_SENDER;
     to: typeof BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER;
-    nonce: "1";
+    nonce: typeof BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL;
     valueWei: "0";
     gasLimit: string;
     gasPriceWei: string;
@@ -283,7 +284,7 @@ export interface BscTestnetPtaWbnbPoolNormalizedTransaction {
   readonly chainId: "97";
   readonly from: typeof BSC_TESTNET_PTA_WBNB_POOL_SENDER;
   readonly to: typeof BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER;
-  readonly nonce: "1";
+  readonly nonce: typeof BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL;
   readonly valueWei: "0";
   readonly gasLimit: string;
   readonly gasPriceWei: string;
@@ -887,8 +888,8 @@ async function validateSubmissionCapability(
     finalizedBlockTimestamp * 1_000n > BigInt(preSubmissionObservedAt) ||
     BigInt(preSubmissionObservedAt) - finalizedBlockTimestamp * 1_000n > 120_000n ||
     finalizedBlockGasLimit === null ||
-    preSubmission.latestNonce !== "1" ||
-    preSubmission.pendingNonce !== "1" ||
+    preSubmission.latestNonce !== BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL ||
+    preSubmission.pendingNonce !== BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL ||
     preSubmission.transactionByHash !== null ||
     preSubmission.receiptByHash !== null ||
     preSubmission.factoryPoolForward !== ZERO_ADDRESS ||
@@ -1098,8 +1099,8 @@ async function validateSubmissionCapability(
         finalizedBlockHash: preSubmission.finalizedBlockHash as Hex,
         finalizedBlockTimestamp: preSubmission.finalizedBlockTimestamp as string,
         finalizedBlockGasLimit: preSubmission.finalizedBlockGasLimit as string,
-        latestNonce: "1",
-        pendingNonce: "1",
+        latestNonce: BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
+        pendingNonce: BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
         transactionByHash: null,
         receiptByHash: null,
         factoryPoolForward: ZERO_ADDRESS,
@@ -1117,7 +1118,7 @@ async function validateSubmissionCapability(
         chainId: "97",
         from: BSC_TESTNET_PTA_WBNB_POOL_SENDER,
         to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
-        nonce: "1",
+        nonce: BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
         valueWei: "0",
         gasLimit: transaction.gasLimit as string,
         gasPriceWei: transaction.gasPriceWei as string,
@@ -1354,7 +1355,7 @@ function parseNormalizedTransaction(
     transaction.chainId !== "97" ||
     from !== BSC_TESTNET_PTA_WBNB_POOL_SENDER ||
     to !== BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER ||
-    transaction.nonce !== "1" ||
+    transaction.nonce !== BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL ||
     transaction.valueWei !== "0" ||
     transaction.gasLimit !== capability.transaction.gasLimit ||
     transaction.gasPriceWei !== capability.transaction.gasPriceWei ||
@@ -1369,7 +1370,7 @@ function parseNormalizedTransaction(
     chainId: "97",
     from: BSC_TESTNET_PTA_WBNB_POOL_SENDER,
     to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
-    nonce: "1",
+    nonce: BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
     valueWei: "0",
     gasLimit: capability.transaction.gasLimit,
     gasPriceWei: capability.transaction.gasPriceWei,

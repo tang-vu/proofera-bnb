@@ -12,6 +12,7 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_CHAIN_ID,
   BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN,
   BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE,
+  BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_ESTIMATE,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_LIMIT,
@@ -971,7 +972,7 @@ function createBscTestnetPtaWbnbPoolPostClaimRechecker(
         return blocked(
           "NONCE_MISMATCH",
           "pending_state",
-          "The exact sender latest and pending nonce must both remain one.",
+          "The exact sender latest and pending nonce must both remain at the pinned value.",
           true
         );
       }
@@ -1172,8 +1173,8 @@ function createBscTestnetPtaWbnbPoolPostClaimRechecker(
           finalizedBlockHash: primaryBlock.hash,
           finalizedBlockTimestamp: primaryBlock.timestamp.toString(),
           finalizedBlockGasLimit: primaryBlock.gasLimit.toString(),
-          latestNonce: "1",
-          pendingNonce: "1",
+          latestNonce: BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
+          pendingNonce: BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
           factoryPool: ZERO_ADDRESS,
           candidateCode: "0x",
           senderCode: "0x",

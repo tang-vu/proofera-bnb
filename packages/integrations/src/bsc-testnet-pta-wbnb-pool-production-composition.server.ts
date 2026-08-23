@@ -7,6 +7,7 @@ import { keccak256, type Hex } from "viem";
 
 import { describeBscTestnetPtaWbnbPoolOneShotBoundary } from "./bsc-testnet-pta-wbnb-pool-one-shot-boundary.server";
 import {
+  BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
   BSC_TESTNET_PTA_WBNB_POOL_SENDER,
   BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER
@@ -381,7 +382,7 @@ function signingCapabilityFromState(
       chainId: "97",
       from: BSC_TESTNET_PTA_WBNB_POOL_SENDER,
       to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
-      nonce: "1",
+      nonce: BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
       valueWei: "0",
       gasLimit: state.gasLimit,
       gasPriceWei: state.gasPriceWei,

@@ -482,7 +482,7 @@ export function reconstructExactBscTestnetPtaWbnbPoolRfc6979TransactionForIntern
       data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
       gas: transaction.gasLimit,
       gasPrice: transaction.gasPriceWei,
-      nonce: 1 as const,
+      nonce: Number(BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE),
       to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
       type: "legacy" as const,
       value: 0n
@@ -1496,7 +1496,7 @@ function parseWorkerInput(
     data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
     gas: gasLimit,
     gasPrice: gasPriceWei,
-    nonce: 1,
+    nonce: Number(BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE),
     to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
     type: "legacy",
     value: 0n
@@ -1588,7 +1588,7 @@ export async function inspectExactBscTestnetPtaWbnbPoolSignedTransactionForInter
         data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
         gas: transaction.gasLimit,
         gasPrice: transaction.gasPriceWei,
-        nonce: 1,
+        nonce: Number(BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE),
         to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
         type: "legacy",
         value: 0n
@@ -1627,7 +1627,7 @@ async function attestSignedTransaction(
       data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
       gas: validated.transaction.gasLimit,
       gasPrice: validated.transaction.gasPriceWei,
-      nonce: 1,
+      nonce: Number(BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE),
       to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
       type: "legacy",
       value: 0n

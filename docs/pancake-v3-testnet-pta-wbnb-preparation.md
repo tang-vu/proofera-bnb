@@ -396,6 +396,11 @@ Recovery generation 5 directly binds that exact terminal and separately requires
 submission-v3. It uses no Invocation A, new no-effect proof, or reusable fence snapshot. A fresh,
 distinct envelope observed after the terminal is required. Policy/runtime-instantiation is v5, TTY is
 v6, owner command/text/confirmation is v8, and signing/intent/broadcast are v5.
+The only permitted transaction is now pinned to sender nonce `9`. Unrelated retained chain-97 work
+advanced the shared development EOA after generation 4; because generation 5 had never signed or
+submitted, its unused namespace was rebased without rewriting nonce-`1` predecessor evidence. A
+non-retained 2026-08-23 two-RPC observation motivated the rebase but supplies no freshness or authority;
+every in-ceremony nonce check must still agree exactly on `9` or stop before signing.
 The active signing journal uses `bsc-testnet-pta-wbnb-pool-v5` and carries
 `{ generation, predecessorState, predecessorTerminalRawSha256, attemptId }` through claim, worker,
 signed readback, submission, and reconciliation. Signing v1-v4 and submission-v2/v3 remain immutable;
@@ -495,8 +500,9 @@ The two write decisions stay separate:
 
 - Generation 5 must reread all eight namespaces, bind the exact generation-4 terminal and exact-empty
   submission-v3, then independently refresh all five runtime identities, manager/factory/deployer
-  relationships, fee configuration, factory owner, LM controls, pair lookup, nonce, fee, gas, and
-  balance in a fresh distinct envelope after that terminal. No Invocation A or no-effect fence applies.
+  relationships, fee configuration, factory owner, LM controls, pair lookup, exact sender nonce `9`,
+  fee, gas, and balance in a fresh distinct envelope after that terminal. Any nonce drift blocks; no
+  Invocation A or no-effect fence applies.
 - Preserve the owner-designated internal decision only for exact commit `bc7000e`. Obtain a final
   distinct-agent technical decision bound to the exact changed release, including the ceremony/bridge/
   journal/recovery/ancestry delta. Local implementation review does not replace that release-bound

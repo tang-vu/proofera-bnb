@@ -113,7 +113,7 @@ function descriptor(
     exactBinding: {
       chainId: 97,
       from: BSC_TESTNET_PTA_WBNB_POOL_SENDER,
-      nonce: 1n,
+      nonce: 9n,
       to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
       selector: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_SELECTOR,
       data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,

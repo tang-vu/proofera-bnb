@@ -154,8 +154,8 @@ function makeClient(
     }
     if (rpcRequest.method === "eth_getTransactionCount") {
       return rpcRequest.params[1] === "latest"
-        ? (overrides.latestNonce ?? "0x1")
-        : (overrides.pendingNonce ?? "0x1");
+        ? (overrides.latestNonce ?? "0x9")
+        : (overrides.pendingNonce ?? "0x9");
     }
     if (rpcRequest.method === "eth_getCode") {
       const [address, selector] = rpcRequest.params;
@@ -276,8 +276,8 @@ describe("PTA/WBNB post-claim dual-RPC recheck", () => {
         finalizedBlockNumber: COMMON_HEIGHT.toString(),
         finalizedBlockHash: BLOCK_HASH,
         finalizedBlockGasLimit: "140000000",
-        latestNonce: "1",
-        pendingNonce: "1",
+        latestNonce: "9",
+        pendingNonce: "9",
         factoryPool: ZERO_ADDRESS,
         candidateCode: "0x",
         senderCode: "0x",

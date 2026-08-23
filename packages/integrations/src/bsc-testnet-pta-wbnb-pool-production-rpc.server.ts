@@ -19,6 +19,8 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE,
   BSC_TESTNET_PTA_WBNB_POOL_CHAIN_ID,
   BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN,
+  BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE,
+  BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
   BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN,
   BSC_TESTNET_PTA_WBNB_POOL_SENDER,
@@ -347,7 +349,7 @@ function normalizeTransaction(input: unknown): BscTestnetPtaWbnbPoolNormalizedTr
     transaction.type !== "0x0" ||
     hash === null ||
     chainId !== BigInt(BSC_TESTNET_PTA_WBNB_POOL_CHAIN_ID) ||
-    nonce !== 1n ||
+    nonce !== BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE ||
     value !== 0n ||
     gas === null ||
     gasPrice === null ||
@@ -364,7 +366,7 @@ function normalizeTransaction(input: unknown): BscTestnetPtaWbnbPoolNormalizedTr
     chainId: "97" as const,
     from: BSC_TESTNET_PTA_WBNB_POOL_SENDER,
     to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
-    nonce: "1" as const,
+    nonce: BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
     valueWei: "0" as const,
     gasLimit: gas.toString(),
     gasPriceWei: gasPrice.toString(),
@@ -855,8 +857,8 @@ export async function acquireBscTestnetPtaWbnbPoolProductionPreSubmissionForInte
   if (
     primary.transaction !== null ||
     primary.receipt !== null ||
-    primary.latestNonce !== 1n ||
-    primary.pendingNonce !== 1n ||
+    primary.latestNonce !== BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE ||
+    primary.pendingNonce !== BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE ||
     primary.forwardLatest !== ZERO_ADDRESS ||
     primary.forwardPending !== ZERO_ADDRESS ||
     primary.reverseLatest !== ZERO_ADDRESS ||
@@ -888,8 +890,8 @@ export async function acquireBscTestnetPtaWbnbPoolProductionPreSubmissionForInte
       if (gasLimit === null) throw new Error("RPC_FINALIZED_INVALID");
       return gasLimit.toString();
     })(),
-    latestNonce: "1",
-    pendingNonce: "1",
+    latestNonce: BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
+    pendingNonce: BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL,
     transactionByHash: null,
     receiptByHash: null,
     factoryPoolForward: ZERO_ADDRESS,
