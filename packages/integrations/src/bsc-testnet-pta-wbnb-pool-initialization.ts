@@ -8,6 +8,10 @@ export const BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN =
 
 export const BSC_TESTNET_PTA_WBNB_POOL_SENDER =
   "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49" as const satisfies Address;
+// The durable operation identity is stable across recovery envelopes and sender-nonce rebases. The
+// exact transaction nonce remains a separate release-, envelope-, policy-, and signer-bound field.
+export const BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY =
+  "0xe6c943aa33e600bfc1770ee654ee6b00bf6dbcc7cc1702c58bd1caa64dadb9cc" as const satisfies Hex;
 // Generation 5 has never signed or submitted. Its exact transaction is rebased to the sender state
 // observed by both fixed RPCs after unrelated retained chain-97 work advanced the shared test EOA.
 // Historical generation-1..4 journal evidence remains bound to nonce 1 and is parsed separately.

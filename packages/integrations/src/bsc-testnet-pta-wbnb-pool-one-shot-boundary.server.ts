@@ -2,7 +2,7 @@ import "server-only";
 
 import { isProxy } from "node:util/types";
 
-import { keccak256, stringToHex, type Hex } from "viem";
+import type { Hex } from "viem";
 
 import {
   BSC_TESTNET_PTA_ADDRESS,
@@ -21,6 +21,7 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_ESTIMATE,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_PRICE_WEI,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_TOTAL_COST_WEI,
+  BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   BSC_TESTNET_PTA_WBNB_POOL_SENDER,
   BSC_TESTNET_PTA_WBNB_POOL_SQRT_PRICE_X96,
   BSC_TESTNET_WBNB_ADDRESS,
@@ -29,9 +30,6 @@ import {
   type BscTestnetPtaWbnbPoolInitializationEnvelope,
   type BscTestnetPtaWbnbPoolInitializationEnvelopeBody
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
-
-export const BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_OPERATION_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-one-shot-operation:v1" as const;
 
 export type BscTestnetPtaWbnbPoolOneShotJournalState =
   "claimed" | "signed" | "submitted" | "confirmed" | "failed_before_submission" | "unknown_outcome";
@@ -490,21 +488,10 @@ export function describeBscTestnetPtaWbnbPoolOneShotBoundary(
       transactionSubmitted: false as const
     });
   }
-  // The one-shot key binds the irreversible operation, not a refreshable observation envelope.
-  // A fresh envelope remains separately bound by the durable claim request.
-  const operationKey = keccak256(
-    stringToHex(
-      [
-        BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_OPERATION_DOMAIN,
-        BSC_TESTNET_PTA_WBNB_POOL_CHAIN_ID.toString(),
-        BSC_TESTNET_PTA_WBNB_POOL_SENDER.toLowerCase(),
-        BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE.toString(),
-        BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER.toLowerCase(),
-        BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
-        "0"
-      ].join("\u0000")
-    )
-  );
+  // The one-shot key binds the irreversible pool-creation operation and its immutable predecessor
+  // lineage, not a refreshable observation envelope or a sender nonce that can advance before an
+  // unused recovery generation signs. The exact nonce remains separately bound below.
+  const operationKey = BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
   const exactBinding: BscTestnetPtaWbnbPoolOneShotExactBinding = Object.freeze({
     chainId: BSC_TESTNET_PTA_WBNB_POOL_CHAIN_ID,
     from: BSC_TESTNET_PTA_WBNB_POOL_SENDER,

@@ -12,6 +12,7 @@ import {
 import {
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
   BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_KECCAK256,
+  BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   deriveBscTestnetPtaWbnbPoolInitializationEnvelopeHash,
   type BscTestnetPtaWbnbPoolInitializationEnvelope,
   type BscTestnetPtaWbnbPoolInitializationEnvelopeBody
@@ -181,7 +182,7 @@ describe("PTA/WBNB durable one-shot boundary specification", () => {
     );
     expect(prepared).toMatchObject({
       status: "prepared_non_authorizing",
-      operationKey: expect.stringMatching(/^0x[0-9a-f]{64}$/u),
+      operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       envelopeObservedAt: NOW,
       exactBinding: {
         chainId: 97,

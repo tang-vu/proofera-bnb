@@ -29,13 +29,13 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_PRICE_WEI,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_OBSERVATION_AGE_SECONDS,
   BSC_TESTNET_PTA_WBNB_POOL_MAX_TOTAL_COST_WEI,
+  BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN,
   BSC_TESTNET_PTA_WBNB_POOL_SENDER,
   calculateBscTestnetPtaWbnbPoolGasLimit
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 
-export const BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY =
-  "0xe6c943aa33e600bfc1770ee654ee6b00bf6dbcc7cc1702c58bd1caa64dadb9cc" as const satisfies Hex;
+export { BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY } from "./bsc-testnet-pta-wbnb-pool-initialization";
 export const BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID =
   "proofera:bsc-testnet:97:pta-wbnb:pancake-v3-fee-500:sender-nonce-9:v5" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2 = 2 as const;

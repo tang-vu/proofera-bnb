@@ -228,7 +228,7 @@ const MESSAGES: Readonly<Record<BscTestnetPtaWbnbPoolCoordinatorReason, string>>
   proxy_slot_nonzero: "A pinned contract had a non-zero EIP-1967 proxy slot.",
   protocol_binding_mismatch: "A pinned Pancake V3 relationship or mutable owner binding changed.",
   fee_tier_mismatch: "The fee-500 factory configuration changed.",
-  nonce_mismatch: "The exact sender latest or pending nonce was not one.",
+  nonce_mismatch: `The exact sender latest or pending nonce was not ${BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE_DECIMAL}.`,
   sender_not_eoa: "The exact sender had contract bytecode.",
   pool_already_exists_or_raced:
     "The exact pool was already present in finalized, latest, or pending state.",
