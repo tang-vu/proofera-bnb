@@ -16,11 +16,11 @@ import {
   BSC_TESTNET_WBNB_ADDRESS
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ATTEMPT_ID,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ENVELOPE_HASH,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_ATTEMPT_ID,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_ENVELOPE_HASH,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
@@ -95,16 +95,16 @@ type PolicyBody = Omit<BscTestnetPtaWbnbPoolReleaseReviewPolicy, "policyDigest">
 function predecessorTerminal() {
   return Object.freeze({
     status: "failed_before_worker" as const,
-    generation: 5 as const,
+    generation: 6 as const,
     predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
-    predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
-    predecessorEnvelopeHash: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ENVELOPE_HASH,
+    predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
+    predecessorEnvelopeHash: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_ENVELOPE_HASH,
     inheritedPredecessorTerminalRawSha256:
-      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
-    predecessorAttemptId: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ATTEMPT_ID,
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
+    predecessorAttemptId: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_ATTEMPT_ID,
     phase: "post_claim_recheck" as const,
     issueCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" as const,
-    outcomeDigest: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+    outcomeDigest: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
     workerAuthorizationOutcome: "not_attempted" as const,
     workerStartOutcome: "not_attempted" as const,
     signatureOutcome: "not_attempted" as const,
@@ -131,9 +131,9 @@ function policyBody(release = releaseIdentity()): PolicyBody {
     deriveBscTestnetPtaWbnbPoolReleaseReviewSubjectSha256ForInternalUse(release);
   if (reviewedSubjectSha256 === null) throw new Error("synthetic release must be valid");
   return Object.freeze({
-    schemaVersion: 6 as const,
-    kind: "owner_designated_internal_multi_agent_release_review_policy_generation_6_v6" as const,
-    decision: "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_6_POLICY" as const,
+    schemaVersion: 7 as const,
+    kind: "owner_designated_internal_multi_agent_release_review_policy_generation_7_v7" as const,
+    decision: "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_7_POLICY" as const,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     release,
     transaction: Object.freeze({
@@ -166,13 +166,13 @@ function policyBody(release = releaseIdentity()): PolicyBody {
       maximumPostConfirmationPreclaimSeconds: "60" as const,
       postRecheckExecutionReserveSeconds: "20" as const,
       maximumPostClaimRecheckAgeSeconds: "30" as const,
-      recoveryGeneration: "6" as const,
+      recoveryGeneration: "7" as const,
       predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
-      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
+      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
       predecessorFailedBeforeWorkerOutcomeDigest:
-        BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+        BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
       inheritedPredecessorTerminalRawSha256:
-        BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256
+        BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256
     }),
     scope: Object.freeze({
       exactFreshEnvelopeRequired: true as const,
@@ -189,7 +189,7 @@ function policyBody(release = releaseIdentity()): PolicyBody {
       priceIsMarketPriceOraclePegOrValuation: false as const,
       predecessorTerminalRecordRequired: true as const,
       predecessorFailedBeforeWorkerEvidenceRequired: true as const,
-      predecessorSubmissionV4JournalStateRequired: "exact_empty" as const,
+      predecessorSubmissionV5JournalStateRequired: "exact_empty" as const,
       predecessorStateRequired: "failed_before_worker" as const,
       predecessorIssueCodeRequired: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" as const,
       predecessorPhaseRequired: "post_claim_recheck" as const,
@@ -361,8 +361,8 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
     if (admission === null) throw new Error("expected realm");
 
     expect(admission.policy).toMatchObject({
-      schemaVersion: 6,
-      decision: "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_6_POLICY",
+      schemaVersion: 7,
+      decision: "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_7_POLICY",
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       release: expectedRelease,
       transaction: {
@@ -388,13 +388,13 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
         maximumPostConfirmationPreclaimSeconds: "60",
         postRecheckExecutionReserveSeconds: "20",
         maximumPostClaimRecheckAgeSeconds: "30",
-        recoveryGeneration: "6",
+        recoveryGeneration: "7",
         predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
-        predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
+        predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
         predecessorFailedBeforeWorkerOutcomeDigest:
-          BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+          BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
         inheritedPredecessorTerminalRawSha256:
-          BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256
+          BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256
       },
       scope: {
         maximumSignatureCount: "1",
@@ -407,7 +407,7 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
         priceIsMarketPriceOraclePegOrValuation: false,
         predecessorTerminalRecordRequired: true,
         predecessorFailedBeforeWorkerEvidenceRequired: true,
-        predecessorSubmissionV4JournalStateRequired: "exact_empty",
+        predecessorSubmissionV5JournalStateRequired: "exact_empty",
         predecessorStateRequired: "failed_before_worker",
         predecessorIssueCodeRequired: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
         predecessorPhaseRequired: "post_claim_recheck",
@@ -442,7 +442,7 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
       executionEnvelopeObservedAt: EXECUTION_ENVELOPE_OBSERVED_AT,
       expiresAt: ENVELOPE_EXPIRES_AT,
       recovery: {
-        generation: 6,
+        generation: 7,
         predecessorTerminal: predecessorTerminal()
       },
       automatedPolicyApplication: true,
@@ -580,7 +580,7 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
     } = predecessorTerminal();
     void _omittedSubmissionJournalState;
     const cases = [
-      instantiationInput(BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ENVELOPE_HASH),
+      instantiationInput(BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_ENVELOPE_HASH),
       Object.freeze({
         ...instantiationInput(),
         executionEnvelopeObservedAt: PREDECESSOR_RECORDED_AT
@@ -971,7 +971,7 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
     ).toBeNull();
   });
 
-  it("rejects malformed metadata, indices, hashes, payloads and retired v1/v6 frames", () => {
+  it("rejects malformed metadata, indices, hashes, payloads and retired v1/v7 frames", () => {
     const policyBytes = Buffer.alloc(9_000, 0x71);
     const lines = ttyTransportLines(policyBytes);
     const wrongHash = `0x${"cd".repeat(32)}`;
@@ -1007,7 +1007,7 @@ describe("BSC testnet PTA/WBNB release-review policy", () => {
     const retiredV6 = lines.map((line) =>
       line.replace(
         BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_FRAME_DOMAIN,
-        "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-frame:v6"
+        "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-frame:v7"
       )
     );
     expect(decodeTtyTransport(Buffer.from(`${retiredV6.join("\n")}\n`, "ascii"))).toBeNull();

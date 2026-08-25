@@ -98,7 +98,7 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-release-review-policy.server";
 import {
   openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse,
-  probeWindowsBscTestnetPtaWbnbPoolGeneration4SubmissionJournalForInternalUse
+  probeWindowsBscTestnetPtaWbnbPoolGeneration5SubmissionJournalForInternalUse
 } from "./bsc-testnet-pta-wbnb-pool-submission-journal.server";
 
 const MAXIMUM_STDIN_BYTES = 32_768;
@@ -2072,7 +2072,7 @@ export function matchesBscTestnetPtaWbnbPoolExactBroadcastToSuccessfulSigningFor
     !Object.isFrozen(record.recovery) ||
     !hasExactKeys(record, EXACT_BROADCAST_REQUEST_KEYS) ||
     !hasExactKeys(recovery, EXACT_BROADCAST_RECOVERY_KEYS) ||
-    record.schemaVersion !== 6 ||
+    record.schemaVersion !== 7 ||
     record.operation !== EXACT_BROADCAST_OPERATION ||
     record.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
     record.claimId !== request.claimId ||
@@ -2214,7 +2214,7 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
     const [predecessorRecovery, predecessorSubmission, activeRecovery, submissionRecovery] =
       await Promise.all([
         openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse(),
-        probeWindowsBscTestnetPtaWbnbPoolGeneration4SubmissionJournalForInternalUse(),
+        probeWindowsBscTestnetPtaWbnbPoolGeneration5SubmissionJournalForInternalUse(),
         openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse(),
         openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse()
       ]);
@@ -2412,7 +2412,7 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
           BSC_TESTNET_PTA_WBNB_POOL_POST_RECHECK_EXECUTION_RESERVE_SECONDS
       });
       preparationDigest = `0x${createHash("sha256")
-        .update("proofera.bsc-testnet.pta-wbnb-pool.owner-preparation.v3\u0000", "utf8")
+        .update("proofera.bsc-testnet.pta-wbnb-pool.owner-preparation.v4\u0000", "utf8")
         .update(preparationBody, "utf8")
         .digest("hex")}` as Hex;
     } catch {
@@ -2484,7 +2484,7 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
         return nativeActivationBlocked(
           "NATIVE_RECOVERY_STATE_INVALID",
           "recovery",
-          "The exact generation-5 terminal or empty generation-6 signing/submission prerequisites changed after owner confirmation."
+          "The exact generation-6 terminal or empty generation-7 signing/submission prerequisites changed after owner confirmation."
         );
       }
       const preparedState = await signingJournal.readState();

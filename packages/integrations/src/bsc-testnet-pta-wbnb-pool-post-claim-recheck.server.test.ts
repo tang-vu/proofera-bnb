@@ -15,7 +15,7 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_SENDER
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   buildBscTestnetPtaWbnbPoolExactSigningTransaction,
   validateBscTestnetPtaWbnbPoolFreshRecheckCapability,
@@ -31,7 +31,7 @@ const ENVELOPE_HASH = `0x${"11".repeat(32)}` as Hex;
 const REVIEWER_DIGEST = `0x${"22".repeat(32)}` as Hex;
 const OWNER_DIGEST = `0x${"33".repeat(32)}` as Hex;
 const PREDECESSOR_TERMINAL_RAW_SHA256 =
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256;
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256;
 const ATTEMPT_ID = `0x${"35".repeat(32)}` as Hex;
 const CLAIM_TOKEN = `0x${"44".repeat(32)}` as Hex;
 const MANIFEST = `0x${"55".repeat(32)}` as Hex;
@@ -63,8 +63,8 @@ function transaction() {
 
 function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
   return Object.freeze({
-    schemaVersion: 6,
-    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_6",
+    schemaVersion: 7,
+    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_7",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
     reviewerApprovalDigest: REVIEWER_DIGEST,
@@ -74,7 +74,7 @@ function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
     authenticatedAt: "2026-08-13T04:29:55.000Z",
     expiresAt: "2026-08-13T04:31:55.000Z",
     recovery: Object.freeze({
-      generation: 6,
+      generation: 7,
       predecessorState: "failed_before_worker",
       predecessorTerminalRawSha256: PREDECESSOR_TERMINAL_RAW_SHA256,
       attemptId: ATTEMPT_ID
@@ -248,7 +248,7 @@ describe("PTA/WBNB post-claim dual-RPC recheck", () => {
       status: "verified",
       issue: null,
       boundary: {
-        scope: "exact_pta_wbnb_pool_recovery_generation_6_after_atomic_claim_dual_rpc_recheck",
+        scope: "exact_pta_wbnb_pool_recovery_generation_7_after_atomic_claim_dual_rpc_recheck",
         chainId: "97",
         fixedOfficialRpcOriginsOnly: true,
         eip1898RequireCanonical: true,
@@ -267,7 +267,7 @@ describe("PTA/WBNB post-claim dual-RPC recheck", () => {
       authenticatedAt: COMPLETE,
       expiresAt: "2026-08-13T04:31:55.000Z",
       recovery: {
-        generation: 6,
+        generation: 7,
         predecessorState: "failed_before_worker",
         predecessorTerminalRawSha256: PREDECESSOR_TERMINAL_RAW_SHA256,
         attemptId: ATTEMPT_ID

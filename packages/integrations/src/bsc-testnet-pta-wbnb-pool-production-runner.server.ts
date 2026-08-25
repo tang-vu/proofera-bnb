@@ -9,6 +9,7 @@ import {
   openExistingWindowsBscTestnetPtaWbnbPoolGeneration2LocalJournalForRecoveryForInternalUse,
   openExistingWindowsBscTestnetPtaWbnbPoolGeneration3LocalJournalForRecoveryForInternalUse,
   openExistingWindowsBscTestnetPtaWbnbPoolGeneration4LocalJournalForRecoveryForInternalUse,
+  openExistingWindowsBscTestnetPtaWbnbPoolGeneration5LocalJournalForRecoveryForInternalUse,
   openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse,
   type BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult,
   type BscTestnetPtaWbnbPoolExistingLocalJournalResult,
@@ -21,7 +22,8 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 import { createBscTestnetPtaWbnbPoolPrivateBroadcasterForInternalUse } from "./bsc-testnet-pta-wbnb-pool-private-broadcaster.server";
 import {
@@ -40,9 +42,11 @@ import {
   openExistingWindowsBscTestnetPtaWbnbPoolSubmissionJournalForTerminalReconciliationForInternalUse,
   probeWindowsBscTestnetPtaWbnbPoolGeneration3SubmissionJournalForInternalUse,
   probeWindowsBscTestnetPtaWbnbPoolGeneration4SubmissionJournalForInternalUse,
+  probeWindowsBscTestnetPtaWbnbPoolGeneration5SubmissionJournalForInternalUse,
   probeWindowsBscTestnetPtaWbnbPoolPredecessorSubmissionJournalForInternalUse,
   type BscTestnetPtaWbnbPoolGeneration3SubmissionJournalProbeResult,
   type BscTestnetPtaWbnbPoolGeneration4SubmissionJournalProbeResult,
+  type BscTestnetPtaWbnbPoolGeneration5SubmissionJournalProbeResult,
   type BscTestnetPtaWbnbPoolPredecessorSubmissionJournalProbeResult,
   type BscTestnetPtaWbnbPoolExistingSubmissionJournalResult
 } from "./bsc-testnet-pta-wbnb-pool-submission-journal.server";
@@ -99,11 +103,13 @@ type DurableRecoverySnapshot = Readonly<{
   generation2: BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult;
   generation3: BscTestnetPtaWbnbPoolExistingLegacyLocalJournalResult;
   generation4: BscTestnetPtaWbnbPoolExistingLocalJournalResult;
+  generation5: BscTestnetPtaWbnbPoolExistingLocalJournalResult;
   predecessor: BscTestnetPtaWbnbPoolExistingPredecessorLocalJournalResult;
   active: BscTestnetPtaWbnbPoolExistingLocalJournalResult;
   generation2Submission: BscTestnetPtaWbnbPoolPredecessorSubmissionJournalProbeResult;
   generation3Submission: BscTestnetPtaWbnbPoolGeneration3SubmissionJournalProbeResult;
-  predecessorSubmission: BscTestnetPtaWbnbPoolGeneration4SubmissionJournalProbeResult;
+  generation4Submission: BscTestnetPtaWbnbPoolGeneration4SubmissionJournalProbeResult;
+  predecessorSubmission: BscTestnetPtaWbnbPoolGeneration5SubmissionJournalProbeResult;
   submission: BscTestnetPtaWbnbPoolExistingSubmissionJournalResult;
 }>;
 
@@ -113,10 +119,12 @@ async function probeAllDurableRecoveryState(): Promise<DurableRecoverySnapshot> 
     generation2,
     generation3,
     generation4,
+    generation5,
     predecessor,
     active,
     generation2Submission,
     generation3Submission,
+    generation4Submission,
     predecessorSubmission,
     submission
   ] = await Promise.all([
@@ -124,11 +132,13 @@ async function probeAllDurableRecoveryState(): Promise<DurableRecoverySnapshot> 
     openExistingWindowsBscTestnetPtaWbnbPoolGeneration2LocalJournalForRecoveryForInternalUse(),
     openExistingWindowsBscTestnetPtaWbnbPoolGeneration3LocalJournalForRecoveryForInternalUse(),
     openExistingWindowsBscTestnetPtaWbnbPoolGeneration4LocalJournalForRecoveryForInternalUse(),
+    openExistingWindowsBscTestnetPtaWbnbPoolGeneration5LocalJournalForRecoveryForInternalUse(),
     openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse(),
     openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse(),
     probeWindowsBscTestnetPtaWbnbPoolPredecessorSubmissionJournalForInternalUse(),
     probeWindowsBscTestnetPtaWbnbPoolGeneration3SubmissionJournalForInternalUse(),
     probeWindowsBscTestnetPtaWbnbPoolGeneration4SubmissionJournalForInternalUse(),
+    probeWindowsBscTestnetPtaWbnbPoolGeneration5SubmissionJournalForInternalUse(),
     openExistingWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForRecoveryForInternalUse()
   ]);
   return Object.freeze({
@@ -136,10 +146,12 @@ async function probeAllDurableRecoveryState(): Promise<DurableRecoverySnapshot> 
     generation2,
     generation3,
     generation4,
+    generation5,
     predecessor,
     active,
     generation2Submission,
     generation3Submission,
+    generation4Submission,
     predecessorSubmission,
     submission
   });
@@ -193,10 +205,12 @@ function durableSnapshotBlocked(snapshot: DurableRecoverySnapshot): boolean {
     snapshot.generation2.status === "blocked" ||
     snapshot.generation3.status === "blocked" ||
     snapshot.generation4.status === "blocked" ||
+    snapshot.generation5.status === "blocked" ||
     snapshot.predecessor.status === "blocked" ||
     snapshot.active.status === "blocked" ||
     snapshot.generation2Submission.status === "blocked" ||
     snapshot.generation3Submission.status === "blocked" ||
+    snapshot.generation4Submission.status === "blocked" ||
     snapshot.predecessorSubmission.status === "blocked" ||
     snapshot.submission.status === "blocked"
   );
@@ -211,6 +225,9 @@ function exactEmptyActiveAndSubmission(snapshot: DurableRecoverySnapshot): boole
     snapshot.generation3Submission.status === "ready" &&
     snapshot.generation3Submission.presence === "empty" &&
     snapshot.generation3Submission.files.length === 0 &&
+    snapshot.generation4Submission.status === "ready" &&
+    snapshot.generation4Submission.presence !== "present" &&
+    snapshot.generation4Submission.files.length === 0 &&
     snapshot.predecessorSubmission.status === "ready" &&
     snapshot.predecessorSubmission.presence !== "present" &&
     snapshot.predecessorSubmission.files.length === 0 &&
@@ -269,6 +286,14 @@ async function exactCombinedPredecessorTerminal(
     snapshot.generation4.state.generation !== 4 ||
     snapshot.generation4.state.predecessorFenceSha256 !==
       BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256 ||
+    snapshot.generation5.status !== "opened" ||
+    snapshot.generation5.state.status !== "failed_before_worker" ||
+    snapshot.generation5.state.generation !== 5 ||
+    snapshot.generation5.state.predecessorTerminalRawSha256 !==
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256 ||
+    snapshot.generation4Submission.status !== "ready" ||
+    snapshot.generation4Submission.presence === "present" ||
+    snapshot.generation4Submission.files.length !== 0 ||
     snapshot.predecessor.status !== "opened" ||
     snapshot.predecessorSubmission.status !== "ready" ||
     snapshot.predecessorSubmission.presence === "present" ||
@@ -285,9 +310,9 @@ async function exactCombinedPredecessorTerminal(
   const terminal = await snapshot.predecessor.journal.readExactTerminalRecoveryBinding();
   return terminal !== null &&
     terminal.inheritedPredecessorTerminalRawSha256 ===
-      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256 &&
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256 &&
     terminal.predecessorTerminalRawSha256 ===
-      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256
     ? Object.freeze({
         ...terminal,
         submissionOutcome: "not_attempted" as const,
@@ -321,10 +346,10 @@ function samePredecessorTerminal(
 }
 
 /**
- * Fixed production root. All ten fixed LocalAppData namespaces are opened read-only before
- * release review, TTY input, custody, signing, or broadcasting. The exact immutable generation-5
+ * Fixed production root. All twelve fixed LocalAppData namespaces are opened read-only before
+ * release review, TTY input, custody, signing, or broadcasting. The exact immutable generation-6
  * failed-before-worker terminal and exact-empty predecessor submission namespace are required
- * before any fresh generation-6 owner authority can exist.
+ * before any fresh generation-7 owner authority can exist.
  */
 export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise<BscTestnetPtaWbnbPoolProductionRunResult> {
   let startup: DurableRecoverySnapshot;
@@ -347,7 +372,7 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
     if (startupPredecessor === null) {
       return blocked(
         "PREDECESSOR_TERMINAL_INVALID",
-        "Generation-6 durable state exists without the exact immutable generation-1 through generation-5 terminal lineage."
+        "Generation-7 durable state exists without the exact immutable generation-1 through generation-6 terminal lineage."
       );
     }
     try {
@@ -387,7 +412,7 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
   if (startupPredecessor === null || startup.predecessor.status !== "opened") {
     return blocked(
       "PREDECESSOR_TERMINAL_MISSING",
-      "The exact generation-1 through generation-3 fence chain, generation-4 and generation-5 failed-before-worker terminals, and exact-empty predecessor submission namespaces are required before recovery generation 6 can create fresh authority."
+      "The exact generation-1 through generation-3 fence chain, generation-4 through generation-6 failed-before-worker terminals, and exact-empty predecessor submission namespaces are required before recovery generation 7 can create fresh authority."
     );
   }
   const fixedPredecessorTerminal = startupPredecessor;
@@ -443,7 +468,7 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
   ) {
     return blocked(
       "EXECUTION_ENVELOPE_NOT_AFTER_TERMINAL",
-      "The fresh execution snapshot is not distinct from and strictly later than the retained generation-5 terminal."
+      "The fresh execution snapshot is not distinct from and strictly later than the retained generation-6 terminal."
     );
   }
   let descriptor: ReturnType<typeof describeBscTestnetPtaWbnbPoolOneShotBoundary>;
@@ -499,7 +524,7 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
   } catch {
     return blocked(
       "POST_OWNER_DURABLE_REREAD_FAILED",
-      "The ten durable namespaces could not be reread after owner confirmation."
+      "The twelve durable namespaces could not be reread after owner confirmation."
     );
   }
   const afterOwnerTerminal = await exactCombinedPredecessorTerminal(afterOwnerTty);
@@ -548,7 +573,7 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
     ) {
       return blocked(
         "PRE_COMPOSITION_DURABLE_STATE_CHANGED",
-        "The predecessor terminal or empty active/submission state changed before the generation-6 claim."
+        "The predecessor terminal or empty active/submission state changed before the generation-7 claim."
       );
     }
     return createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
@@ -560,7 +585,7 @@ export async function runBscTestnetPtaWbnbPoolProductionOnceFromStdin(): Promise
         predecessorSigningJournal,
         predecessorTerminal: fixedPredecessorTerminal,
         probePredecessorSubmission:
-          probeWindowsBscTestnetPtaWbnbPoolGeneration4SubmissionJournalForInternalUse,
+          probeWindowsBscTestnetPtaWbnbPoolGeneration5SubmissionJournalForInternalUse,
         signingJournal: activation.bridge.signingJournal,
         submissionJournal: broadcastBundle.submissionJournal,
         issueWorker: activation.bridge.issueWorker,

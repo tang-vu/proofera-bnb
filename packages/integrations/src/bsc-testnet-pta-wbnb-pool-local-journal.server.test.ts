@@ -25,6 +25,8 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
   createBscTestnetPtaWbnbPoolLocalJournalCore,
@@ -66,6 +68,10 @@ const GENERATION_5_CLAIM_RECORD =
   '{"schemaVersion":"bsc_testnet_pta_wbnb_pool_local_journal_v5","kind":"claim","claimId":"pta-wbnb-pool-v5-291bb85f036ecc3971344c4390649d61","operationKey":"0xe6c943aa33e600bfc1770ee654ee6b00bf6dbcc7cc1702c58bd1caa64dadb9cc","envelopeHash":"0xff96825f7e22467ef692548d22ef3ed3aa392eeaec7f1396b4ccdeba1e36d43c","authorizationReceiptSha256":"0x838c1700667578398a2a8cb31e508c677fdecb1243002a96a82caf3c5e521a0c","signingHash":"0xb3af96cfee896dbeadb5fb144b44cd0237007a0f5365f6c929238e06292aa3e1","serializedUnsignedSha256":"0x561ce21b43f81088edc3a267b3fd982b2291c773b26ced908a564a25dd44d6ec","reviewerApprovalDigest":"0x0c38c7752719a55c40624989dfb7b2adae65c3ba2403f61e9948435e773c4841","ownerAuthorizationDigest":"0x16ffb042e7bae818be1aba9ca7b5e3e795ddf084dd80d6d4d3e6231c4967f3dc","releaseCommit":"e8f3f5b56a5a423094a77a679462f71baa7d6069","runtimeManifestSha256":"0xfa2fffc0e211904c830aa963eaddda20543c66ecbeb750680fa790a409e05418","generation":5,"predecessorState":"failed_before_worker","predecessorTerminalRawSha256":"0x2e0570423b1217f1dab6fa8cdb91a0a75b2d78023bacc611a6c81017d0033bab","attemptId":"0x81edb062fff3165780e4e04bcfc4da63c152f08c34ce0937127c04d07b7a32a0","recordedAt":"2026-08-25T02:42:47.382Z","gasLimit":"5983857","gasPriceWei":"100000000","maxCostWei":"598385700000000","authorizedAt":"2026-08-25T02:42:30.185Z","expiresAt":"2026-08-25T02:44:30.185Z"}\n';
 const GENERATION_5_TERMINAL_RECORD =
   '{"schemaVersion":"bsc_testnet_pta_wbnb_pool_local_journal_v5","kind":"failed_before_worker","claimId":"pta-wbnb-pool-v5-291bb85f036ecc3971344c4390649d61","operationKey":"0xe6c943aa33e600bfc1770ee654ee6b00bf6dbcc7cc1702c58bd1caa64dadb9cc","envelopeHash":"0xff96825f7e22467ef692548d22ef3ed3aa392eeaec7f1396b4ccdeba1e36d43c","authorizationReceiptSha256":"0x838c1700667578398a2a8cb31e508c677fdecb1243002a96a82caf3c5e521a0c","signingHash":"0xb3af96cfee896dbeadb5fb144b44cd0237007a0f5365f6c929238e06292aa3e1","serializedUnsignedSha256":"0x561ce21b43f81088edc3a267b3fd982b2291c773b26ced908a564a25dd44d6ec","reviewerApprovalDigest":"0x0c38c7752719a55c40624989dfb7b2adae65c3ba2403f61e9948435e773c4841","ownerAuthorizationDigest":"0x16ffb042e7bae818be1aba9ca7b5e3e795ddf084dd80d6d4d3e6231c4967f3dc","releaseCommit":"e8f3f5b56a5a423094a77a679462f71baa7d6069","runtimeManifestSha256":"0xfa2fffc0e211904c830aa963eaddda20543c66ecbeb750680fa790a409e05418","generation":5,"predecessorState":"failed_before_worker","predecessorTerminalRawSha256":"0x2e0570423b1217f1dab6fa8cdb91a0a75b2d78023bacc611a6c81017d0033bab","attemptId":"0x81edb062fff3165780e4e04bcfc4da63c152f08c34ce0937127c04d07b7a32a0","recordedAt":"2026-08-25T02:42:57.981Z","phase":"post_claim_recheck","issueCode":"POST_CLAIM_RECHECK_OUTCOME_UNKNOWN","outcomeDigest":"0x7db76f9069e2d46d674eaccb2c7453489e8b80ca1940288b49ac7da46196a93a"}\n';
+const GENERATION_6_CLAIM_RECORD =
+  '{"schemaVersion":"bsc_testnet_pta_wbnb_pool_local_journal_v6","kind":"claim","claimId":"pta-wbnb-pool-v6-fddfa6da6d9e1f48220a551386ac9789","operationKey":"0xe6c943aa33e600bfc1770ee654ee6b00bf6dbcc7cc1702c58bd1caa64dadb9cc","envelopeHash":"0x747733735d59f9975f4b9fb5e2fdc9b60a3a004939b5c22c9bab0e53578c484a","authorizationReceiptSha256":"0xfe30898509b19790497b27890bdd2a3c5918f66c39f6a4c1a07b8f39f244feb0","signingHash":"0xb3af96cfee896dbeadb5fb144b44cd0237007a0f5365f6c929238e06292aa3e1","serializedUnsignedSha256":"0x561ce21b43f81088edc3a267b3fd982b2291c773b26ced908a564a25dd44d6ec","reviewerApprovalDigest":"0x8c06dfcfba7136ed8b3d14915a1f40af38b85eab593330b986f00f516d89328a","ownerAuthorizationDigest":"0xa944f0eabf121ab5093ee9634756ac68c54d66a47517e28ebcb3596a8ef7a287","releaseCommit":"1655d39db63a636e7c66a007046c06eab65c55f1","runtimeManifestSha256":"0xc34022bb89478052075a70d43017dfaaee44092cf72b3505bbbac1a56ea3256a","generation":6,"predecessorState":"failed_before_worker","predecessorTerminalRawSha256":"0x39a6295f3f816cb5bba6c8c3be11982bcafa45847608e1150de950738217c8c9","attemptId":"0x29017850ccf109d2082edcdf62cacf96a41a71820ffebe0365eb896b388fb26d","recordedAt":"2026-08-25T13:09:48.685Z","gasLimit":"5983857","gasPriceWei":"100000000","maxCostWei":"598385700000000","authorizedAt":"2026-08-25T13:09:32.576Z","expiresAt":"2026-08-25T13:11:32.576Z"}\n';
+const GENERATION_6_TERMINAL_RECORD =
+  '{"schemaVersion":"bsc_testnet_pta_wbnb_pool_local_journal_v6","kind":"failed_before_worker","claimId":"pta-wbnb-pool-v6-fddfa6da6d9e1f48220a551386ac9789","operationKey":"0xe6c943aa33e600bfc1770ee654ee6b00bf6dbcc7cc1702c58bd1caa64dadb9cc","envelopeHash":"0x747733735d59f9975f4b9fb5e2fdc9b60a3a004939b5c22c9bab0e53578c484a","authorizationReceiptSha256":"0xfe30898509b19790497b27890bdd2a3c5918f66c39f6a4c1a07b8f39f244feb0","signingHash":"0xb3af96cfee896dbeadb5fb144b44cd0237007a0f5365f6c929238e06292aa3e1","serializedUnsignedSha256":"0x561ce21b43f81088edc3a267b3fd982b2291c773b26ced908a564a25dd44d6ec","reviewerApprovalDigest":"0x8c06dfcfba7136ed8b3d14915a1f40af38b85eab593330b986f00f516d89328a","ownerAuthorizationDigest":"0xa944f0eabf121ab5093ee9634756ac68c54d66a47517e28ebcb3596a8ef7a287","releaseCommit":"1655d39db63a636e7c66a007046c06eab65c55f1","runtimeManifestSha256":"0xc34022bb89478052075a70d43017dfaaee44092cf72b3505bbbac1a56ea3256a","generation":6,"predecessorState":"failed_before_worker","predecessorTerminalRawSha256":"0x39a6295f3f816cb5bba6c8c3be11982bcafa45847608e1150de950738217c8c9","attemptId":"0x29017850ccf109d2082edcdf62cacf96a41a71820ffebe0365eb896b388fb26d","recordedAt":"2026-08-25T13:09:55.563Z","phase":"post_claim_recheck","issueCode":"POST_CLAIM_RECHECK_OUTCOME_UNKNOWN","outcomeDigest":"0xfbece16f72e4ed39317a2ff6ad56933448150e8f8f9f3a86df8f77f793219f73"}\n';
 const SOURCE = readFileSync(
   new URL("./bsc-testnet-pta-wbnb-pool-local-journal.server.ts", import.meta.url),
   "utf8"
@@ -192,7 +198,7 @@ function unsignedSha256(transaction: ReturnType<typeof exactTransaction>): Hex {
 function claim(
   overrides: Partial<
     BscTestnetPtaWbnbPoolLegacyClaimRequestForTests & {
-      generation: 6;
+      generation: 7;
       predecessorState: "failed_before_worker";
       predecessorTerminalRawSha256: Hex;
       attemptId: Hex;
@@ -226,7 +232,7 @@ function workerExchange(request: BscTestnetPtaWbnbPoolLegacyClaimRequestForTests
   const recovery = Object.freeze({
     generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
     predecessorState: "failed_before_worker" as const,
-    predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
+    predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
     attemptId: hex32("a")
   });
   const intent = Object.freeze({
@@ -260,7 +266,7 @@ function workerExchange(request: BscTestnetPtaWbnbPoolLegacyClaimRequestForTests
   return Object.freeze({
     workerRequest,
     workerResponse: Object.freeze({
-      schemaVersion: 6 as const,
+      schemaVersion: 7 as const,
       operation: BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_OPERATION,
       status: "signed" as const,
       oneShotIntentId: BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
@@ -451,7 +457,7 @@ describe("PTA/WBNB pool local append-only journal", () => {
     }
   });
 
-  it("opens only the exact generation-5 failed-before-worker predecessor terminal bytes", async () => {
+  it("retains only the exact generation-5 failed-before-worker historical bytes", async () => {
     expect(Buffer.byteLength(GENERATION_5_CLAIM_RECORD, "utf8")).toBe(1_364);
     expect(Buffer.byteLength(GENERATION_5_TERMINAL_RECORD, "utf8")).toBe(1_383);
     expect(`0x${createHash("sha256").update(GENERATION_5_CLAIM_RECORD).digest("hex")}`).toBe(
@@ -473,23 +479,7 @@ describe("PTA/WBNB pool local append-only journal", () => {
       predecessorState: "failed_before_worker",
       predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256
     });
-    await expect(exact.readExactTerminalRecoveryBinding()).resolves.toEqual({
-      status: "failed_before_worker",
-      generation: 5,
-      predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_CLAIM_RAW_SHA256,
-      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
-      predecessorEnvelopeHash: "0xff96825f7e22467ef692548d22ef3ed3aa392eeaec7f1396b4ccdeba1e36d43c",
-      inheritedPredecessorTerminalRawSha256:
-        BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
-      predecessorAttemptId: "0x81edb062fff3165780e4e04bcfc4da63c152f08c34ce0937127c04d07b7a32a0",
-      phase: "post_claim_recheck",
-      issueCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
-      outcomeDigest: "0x7db76f9069e2d46d674eaccb2c7453489e8b80ca1940288b49ac7da46196a93a",
-      workerAuthorizationOutcome: "not_attempted",
-      workerStartOutcome: "not_attempted",
-      signatureOutcome: "not_attempted",
-      recordedAt: "2026-08-25T02:42:57.981Z"
-    });
+    await expect(exact.readExactTerminalRecoveryBinding()).resolves.toBeNull();
     for (const [name, changed] of [
       ["01-claim.v5.json", GENERATION_5_CLAIM_RECORD.replace("e8f3f5b", "f8f3f5b")],
       ["02-transition.v5.json", GENERATION_5_TERMINAL_RECORD.replace("7db76f90", "8db76f90")]
@@ -501,6 +491,62 @@ describe("PTA/WBNB pool local append-only journal", () => {
             name === "02-transition.v5.json" ? changed : GENERATION_5_TERMINAL_RECORD
         }).ports,
         5
+      );
+      await expect(contaminated.readStrictRecoveryState()).resolves.toBeNull();
+      await expect(contaminated.readExactTerminalRecoveryBinding()).resolves.toBeNull();
+    }
+  });
+
+  it("opens only the exact generation-6 failed-before-worker predecessor terminal bytes", async () => {
+    expect(Buffer.byteLength(GENERATION_6_CLAIM_RECORD, "utf8")).toBe(1_364);
+    expect(Buffer.byteLength(GENERATION_6_TERMINAL_RECORD, "utf8")).toBe(1_383);
+    expect(`0x${createHash("sha256").update(GENERATION_6_CLAIM_RECORD).digest("hex")}`).toBe(
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_CLAIM_RAW_SHA256
+    );
+    expect(`0x${createHash("sha256").update(GENERATION_6_TERMINAL_RECORD).digest("hex")}`).toBe(
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256
+    );
+    const exact = createBscTestnetPtaWbnbPoolLocalJournalCore(
+      memoryPorts({
+        "01-claim.v6.json": GENERATION_6_CLAIM_RECORD,
+        "02-transition.v6.json": GENERATION_6_TERMINAL_RECORD
+      }).ports,
+      6
+    );
+    await expect(exact.readStrictRecoveryState()).resolves.toMatchObject({
+      status: "failed_before_worker",
+      generation: 6,
+      predecessorState: "failed_before_worker",
+      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256
+    });
+    await expect(exact.readExactTerminalRecoveryBinding()).resolves.toEqual({
+      status: "failed_before_worker",
+      generation: 6,
+      predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_CLAIM_RAW_SHA256,
+      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
+      predecessorEnvelopeHash: "0x747733735d59f9975f4b9fb5e2fdc9b60a3a004939b5c22c9bab0e53578c484a",
+      inheritedPredecessorTerminalRawSha256:
+        BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
+      predecessorAttemptId: "0x29017850ccf109d2082edcdf62cacf96a41a71820ffebe0365eb896b388fb26d",
+      phase: "post_claim_recheck",
+      issueCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
+      outcomeDigest: "0xfbece16f72e4ed39317a2ff6ad56933448150e8f8f9f3a86df8f77f793219f73",
+      workerAuthorizationOutcome: "not_attempted",
+      workerStartOutcome: "not_attempted",
+      signatureOutcome: "not_attempted",
+      recordedAt: "2026-08-25T13:09:55.563Z"
+    });
+    for (const [name, changed] of [
+      ["01-claim.v6.json", GENERATION_6_CLAIM_RECORD.replace("1655d39", "2655d39")],
+      ["02-transition.v6.json", GENERATION_6_TERMINAL_RECORD.replace("fbece16f", "abece16f")]
+    ] as const) {
+      const contaminated = createBscTestnetPtaWbnbPoolLocalJournalCore(
+        memoryPorts({
+          "01-claim.v6.json": name === "01-claim.v6.json" ? changed : GENERATION_6_CLAIM_RECORD,
+          "02-transition.v6.json":
+            name === "02-transition.v6.json" ? changed : GENERATION_6_TERMINAL_RECORD
+        }).ports,
+        6
       );
       await expect(contaminated.readStrictRecoveryState()).resolves.toBeNull();
       await expect(contaminated.readExactTerminalRecoveryBinding()).resolves.toBeNull();
@@ -616,7 +662,7 @@ describe("PTA/WBNB pool local append-only journal", () => {
       `0x${createHash("sha256").update(GENERATION_3_CLAIM_RECORD, "utf8").digest("hex")}`
     ).toBe(BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_CLAIM_RAW_SHA256);
     expect(BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256).toBe(
-      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_CLAIM_RAW_SHA256
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_CLAIM_RAW_SHA256
     );
     const memory = memoryPorts(
       { "01-claim.v3.json": GENERATION_3_CLAIM_RECORD },
@@ -843,33 +889,33 @@ describe("PTA/WBNB pool local append-only journal", () => {
     }
   });
 
-  it("uses a distinct active generation-6 schema, receipt domain, recovery binding, and claim id", async () => {
+  it("uses a distinct active generation-7 schema, receipt domain, recovery binding, and claim id", async () => {
     const recovery = Object.freeze({
-      generation: 6 as const,
+      generation: 7 as const,
       predecessorState: "failed_before_worker" as const,
-      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
+      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
       attemptId: hex32("a")
     });
     const request = claim(recovery);
     const memory = memoryPorts();
-    const journal = createBscTestnetPtaWbnbPoolLocalJournalCore(memory.ports, 6);
+    const journal = createBscTestnetPtaWbnbPoolLocalJournalCore(memory.ports, 7);
     const result = await journal.claimExactInitialization(request);
     expect(result).toMatchObject({ status: "claimed" });
-    expect(result.claimId).toMatch(/^pta-wbnb-pool-v6-[0-9a-f]{32}$/u);
+    expect(result.claimId).toMatch(/^pta-wbnb-pool-v7-[0-9a-f]{32}$/u);
     expect(result.claimId).not.toBe(binding(claim()).claimId);
     expect(request.authorizationReceiptSha256).not.toBe(claim().authorizationReceiptSha256);
-    expect(memory.files.get("01-claim.v6.json")).toContain(
-      '"schemaVersion":"bsc_testnet_pta_wbnb_pool_local_journal_v6"'
+    expect(memory.files.get("01-claim.v7.json")).toContain(
+      '"schemaVersion":"bsc_testnet_pta_wbnb_pool_local_journal_v7"'
     );
     await expect(journal.readState()).resolves.toMatchObject({
       status: "claimed",
-      generation: 6,
+      generation: 7,
       predecessorState: recovery.predecessorState,
       predecessorTerminalRawSha256: recovery.predecessorTerminalRawSha256,
       attemptId: recovery.attemptId
     });
     await expect(
-      createBscTestnetPtaWbnbPoolLocalJournalCore(memoryPorts().ports, 6).claimExactInitialization(
+      createBscTestnetPtaWbnbPoolLocalJournalCore(memoryPorts().ports, 7).claimExactInitialization(
         claim()
       )
     ).rejects.toThrow("INPUT_INVALID");
@@ -881,11 +927,11 @@ describe("PTA/WBNB pool local append-only journal", () => {
 
     const changedAttempt = await createBscTestnetPtaWbnbPoolLocalJournalCore(
       memoryPorts().ports,
-      6
+      7
     ).claimExactInitialization(claim({ ...recovery, attemptId: hex32("b") }));
     expect(changedAttempt.claimId).not.toBe(result.claimId);
     await expect(
-      createBscTestnetPtaWbnbPoolLocalJournalCore(memoryPorts().ports, 6).claimExactInitialization(
+      createBscTestnetPtaWbnbPoolLocalJournalCore(memoryPorts().ports, 7).claimExactInitialization(
         claim({ ...recovery, predecessorTerminalRawSha256: hex32("c") })
       )
     ).rejects.toThrow("INPUT_INVALID");
@@ -893,14 +939,14 @@ describe("PTA/WBNB pool local append-only journal", () => {
 
   it("durably terminalizes a known post-claim failure in active slot 2 before worker authorization", async () => {
     const recovery = Object.freeze({
-      generation: 6 as const,
+      generation: 7 as const,
       predecessorState: "failed_before_worker" as const,
-      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
+      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
       attemptId: hex32("a")
     });
     const request = claim(recovery);
     const memory = memoryPorts();
-    const journal = createBscTestnetPtaWbnbPoolLocalJournalCore(memory.ports, 6);
+    const journal = createBscTestnetPtaWbnbPoolLocalJournalCore(memory.ports, 7);
     const claimed = await journal.claimExactInitialization(request);
     const outcomeDigest = deriveBscTestnetPtaWbnbPoolFailedBeforeWorkerOutcomeDigest(
       Object.freeze({
@@ -925,11 +971,11 @@ describe("PTA/WBNB pool local append-only journal", () => {
         })
       )
     ).resolves.toEqual({ status: "failed_before_worker" });
-    expect(memory.calls).toEqual(["01-claim.v6.json", "02-transition.v6.json"]);
-    expect(memory.files.get("02-transition.v6.json")).toContain('"kind":"failed_before_worker"');
+    expect(memory.calls).toEqual(["01-claim.v7.json", "02-transition.v7.json"]);
+    expect(memory.files.get("02-transition.v7.json")).toContain('"kind":"failed_before_worker"');
     await expect(journal.readStrictRecoveryState()).resolves.toMatchObject({
       status: "failed_before_worker",
-      generation: 6,
+      generation: 7,
       serializedTransaction: null,
       transactionHash: null
     });
@@ -941,7 +987,7 @@ describe("PTA/WBNB pool local append-only journal", () => {
       })
     ).rejects.toThrow("STATE_MISMATCH");
     await expect(
-      createBscTestnetPtaWbnbPoolLocalJournalCore(memory.ports, 6).readStrictRecoveryState()
+      createBscTestnetPtaWbnbPoolLocalJournalCore(memory.ports, 7).readStrictRecoveryState()
     ).resolves.toMatchObject({ status: "failed_before_worker" });
   });
 
@@ -1316,13 +1362,13 @@ describe("PTA/WBNB pool local append-only journal", () => {
     expect(provisioningStart).toBeGreaterThan(readOnlyStart);
     expect(protectRecordStart).toBeGreaterThan(provisioningStart);
     expect(readOnlyScript).not.toMatch(/New-Item|SetAccessControl|Remove-Item/u);
-    expect(provisioningScript).toContain("01-claim.v6.json");
+    expect(provisioningScript).toContain("01-claim.v7.json");
     expect(provisioningScript).not.toContain("01-claim.v1.json");
   });
 });
 
 describe.runIf(process.platform === "win32")("read-only Windows signing recovery probe", () => {
-  it("exposes narrow generation-specific restart facades and accepts active v6 slots", async () => {
+  it("exposes narrow generation-specific restart facades and accepts active v7 slots", async () => {
     const legacyDirectory = await createSyntheticDirectory();
     const activeDirectory = await createSyntheticDirectory();
     try {
@@ -1347,19 +1393,19 @@ describe.runIf(process.platform === "win32")("read-only Windows signing recovery
       expect("claimExactInitialization" in legacy.journal).toBe(false);
 
       const recovery = Object.freeze({
-        generation: 6 as const,
+        generation: 7 as const,
         predecessorState: "failed_before_worker" as const,
-        predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
+        predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
         attemptId: hex32("a")
       });
       const activeMemory = memoryPorts();
       await createBscTestnetPtaWbnbPoolLocalJournalCore(
         activeMemory.ports,
-        6
+        7
       ).claimExactInitialization(claim(recovery));
-      const activeContent = activeMemory.files.get("01-claim.v6.json");
-      if (activeContent === undefined) throw new TypeError("active v6 fixture was not created");
-      const activePath = win32.join(activeDirectory, "01-claim.v6.json");
+      const activeContent = activeMemory.files.get("01-claim.v7.json");
+      if (activeContent === undefined) throw new TypeError("active v7 fixture was not created");
+      const activePath = win32.join(activeDirectory, "01-claim.v7.json");
       await writeFile(activePath, activeContent, { encoding: "utf8", flag: "wx" });
       await protectSynthetic(activePath);
       const active =
@@ -1368,7 +1414,7 @@ describe.runIf(process.platform === "win32")("read-only Windows signing recovery
         );
       expect(active.status).toBe("opened");
       if (active.status !== "opened") throw new TypeError("active fixture did not open");
-      expect(active.state).toMatchObject({ status: "claimed", generation: 6 });
+      expect(active.state).toMatchObject({ status: "claimed", generation: 7 });
       expect(Object.keys(active.journal).sort()).toEqual(
         ["readState", "readStrictRecoveryState"].sort()
       );

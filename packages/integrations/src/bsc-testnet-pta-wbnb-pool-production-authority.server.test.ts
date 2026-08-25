@@ -53,11 +53,11 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import type { BscTestnetPtaWbnbPoolOneShotPreparedDescriptor } from "./bsc-testnet-pta-wbnb-pool-one-shot-boundary.server";
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ATTEMPT_ID,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ENVELOPE_HASH,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_ATTEMPT_ID,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_ENVELOPE_HASH,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   buildBscTestnetPtaWbnbPoolSigningWorkerRequest
@@ -164,19 +164,19 @@ function runtimeRecoveryForEnvelopeObservedAt(
 ): BscTestnetPtaWbnbPoolRuntimeReviewInstantiation["recovery"] {
   const observed = Date.parse(envelopeObservedAt);
   return deeplyFreeze({
-    generation: 6,
+    generation: 7,
     predecessorTerminal: {
       status: "failed_before_worker",
-      generation: 5,
+      generation: 6,
       predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
-      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
-      predecessorEnvelopeHash: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ENVELOPE_HASH,
+      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
+      predecessorEnvelopeHash: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_ENVELOPE_HASH,
       inheritedPredecessorTerminalRawSha256:
-        BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
-      predecessorAttemptId: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ATTEMPT_ID,
+        BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
+      predecessorAttemptId: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_ATTEMPT_ID,
       phase: "post_claim_recheck",
       issueCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
-      outcomeDigest: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+      outcomeDigest: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
       workerAuthorizationOutcome: "not_attempted",
       workerStartOutcome: "not_attempted",
       signatureOutcome: "not_attempted",
@@ -192,8 +192,8 @@ function runtimeReview(
   branded = true
 ): BscTestnetPtaWbnbPoolRuntimeReviewInstantiation {
   const value = deeplyFreeze({
-    schemaVersion: 6,
-    kind: "automated_release_policy_recovery_envelope_instantiation_v6",
+    schemaVersion: 7,
+    kind: "automated_release_policy_recovery_envelope_instantiation_v7",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     policyDigest: POLICY_DIGEST,
     releaseCommit: RELEASE,
@@ -256,8 +256,8 @@ function commandFor(
   );
   if (challenge === null) throw new Error("Challenge fixture failed.");
   return deeplyFreeze({
-    schemaVersion: 9,
-    kind: "execute_exact_bsc_testnet_pta_wbnb_pool_recovery_generation_6_once_v9",
+    schemaVersion: 10,
+    kind: "execute_exact_bsc_testnet_pta_wbnb_pool_recovery_generation_7_once_v10",
     executionFlag: BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_EXECUTION_FLAG,
     runtimeReviewInstantiation: instantiation,
     challengeIssuedAt: AUTHORIZED_AT,
@@ -339,7 +339,7 @@ function broadcastRequest(
   const signedTransaction = "0x01" as Hex;
   const transactionHash = keccak256(signedTransaction);
   return deeplyFreeze({
-    schemaVersion: 6,
+    schemaVersion: 7,
     operation:
       "consume_exact_bsc_testnet_pta_wbnb_pool_broadcast_authorization_after_durable_start",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -397,20 +397,20 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
       `runtimeReviewInstantiationDigest=${INSTANTIATION_DIGEST}`
     );
     expect(challenge.ownerAuthorizationText).toContain(
-      `predecessorTerminalRawSha256=${BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256}`
+      `predecessorTerminalRawSha256=${BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256}`
     );
     expect(challenge.ownerAuthorizationText).toContain(
       `predecessorClaimRawSha256=${BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256}`
     );
     expect(challenge.ownerAuthorizationText).toContain(
-      "decision=AUTHORIZE_FRESH_RECOVERY_GENERATION_6_POOL_INITIALIZATION_SIGNATURE_AND_SUBMISSION_AFTER_APPEND_ONLY_PREDECESSOR_TERMINAL"
+      "decision=AUTHORIZE_FRESH_RECOVERY_GENERATION_7_POOL_INITIALIZATION_SIGNATURE_AND_SUBMISSION_AFTER_APPEND_ONLY_PREDECESSOR_TERMINAL"
     );
     expect(challenge.ownerAuthorizationText).toContain(
-      `inheritedPredecessorTerminalRawSha256=${BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256}`
+      `inheritedPredecessorTerminalRawSha256=${BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256}`
     );
-    expect(challenge.ownerAuthorizationText).toContain("separate_exact_empty_submission_v4");
-    expect(challenge.ownerAuthorizationText).not.toContain("GENERATION_5_POOL_INITIALIZATION");
-    expect(challenge.ownerAuthorizationText).not.toContain("submission_v3");
+    expect(challenge.ownerAuthorizationText).toContain("separate_exact_empty_submission_v5");
+    expect(challenge.ownerAuthorizationText).not.toContain("GENERATION_6_POOL_INITIALIZATION");
+    expect(challenge.ownerAuthorizationText).not.toContain("submission_v4");
     expect(challenge.ownerAuthorizationText).not.toContain("inheritedPredecessorFenceSha256");
     expect(challenge.ownerAuthorizationText).toContain(
       "predecessorWorkerAuthorizationOutcome=not_attempted"
@@ -444,9 +444,9 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
       `0x${createHash("sha256").update(challenge.ownerAuthorizationText).digest("hex")}`
     );
     expect(challenge.ownerConfirmationText).toContain(
-      "decision=CONFIRM_FRESH_GENERATION_6_AUTHORIZATION_AFTER_APPEND_ONLY_PREDECESSOR_TERMINAL_ONE_SIGNATURE_AND_ONE_SUBMISSION_NO_RETRY_NO_REPLACEMENT"
+      "decision=CONFIRM_FRESH_GENERATION_7_AUTHORIZATION_AFTER_APPEND_ONLY_PREDECESSOR_TERMINAL_ONE_SIGNATURE_AND_ONE_SUBMISSION_NO_RETRY_NO_REPLACEMENT"
     );
-    expect(challenge.ownerConfirmationText).not.toContain("GENERATION_5_AUTHORIZATION");
+    expect(challenge.ownerConfirmationText).not.toContain("GENERATION_6_AUTHORIZATION");
     expect(
       authority.authorize(exactDescriptor, commandFor(instantiation, releaseTrust), localCapability)
     ).toMatchObject({ status: "blocked", issue: { code: "OWNER_CEREMONY_REQUIRED" } });
@@ -528,7 +528,7 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
     expect(traps).toBe(0);
   });
 
-  it("rejects pre-v9 owner replay and every fixed predecessor recovery mutation", async () => {
+  it("rejects pre-v10 owner replay and every fixed predecessor recovery mutation", async () => {
     const setup = harness();
     const exactDescriptor = descriptor();
     const branded = runtimeReview();
@@ -919,16 +919,16 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
     expect(result.command.ceremonyNonce).toMatch(/^0x[0-9a-f]{64}$/u);
     expect(result.command.ceremonyNonce).not.toBe(`0x${"00".repeat(32)}`);
     expect(result.command.runtimeReviewInstantiation).toBe(instantiation);
-    expect(result.command.schemaVersion).toBe(9);
+    expect(result.command.schemaVersion).toBe(10);
     expect(result.command.kind).toBe(
-      "execute_exact_bsc_testnet_pta_wbnb_pool_recovery_generation_6_once_v9"
+      "execute_exact_bsc_testnet_pta_wbnb_pool_recovery_generation_7_once_v10"
     );
     expect(result.command.challengeIssuedAt).toBe(AUTHORIZED_AT);
     expect(result.command).not.toHaveProperty("confirmedAt");
     expect(result.command).not.toHaveProperty("executionExpiresAt");
     expect(result.command.recovery).toMatchObject({
-      generation: 6,
-      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256
+      generation: 7,
+      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256
     });
     expect(result.command.ownerAuthorizationText).toContain(
       `ceremonyNonce=${result.command.ceremonyNonce}`
