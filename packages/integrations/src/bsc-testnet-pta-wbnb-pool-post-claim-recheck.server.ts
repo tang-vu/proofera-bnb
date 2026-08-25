@@ -150,6 +150,31 @@ export type BscTestnetPtaWbnbPoolPostClaimRecheckIssueCode =
   | "INSUFFICIENT_BALANCE"
   | "CAPABILITY_ISSUANCE_FAILED";
 
+export const BSC_TESTNET_PTA_WBNB_POOL_POST_CLAIM_RECHECK_ISSUE_CODES = Object.freeze([
+  "CONFIGURATION_INVALID",
+  "PRODUCTION_AUTHORIZATION_UNAVAILABLE",
+  "INPUT_INVALID",
+  "AUTHORIZATION_AUTHENTICATION_FAILED",
+  "CLOCK_INVALID",
+  "AUTHORIZATION_EXPIRED",
+  "AUTHORIZATION_RESERVE_INSUFFICIENT",
+  "RPC_REQUEST_FAILED",
+  "MALFORMED_RPC_RESPONSE",
+  "CHAIN_MISMATCH",
+  "PROVIDER_DISAGREEMENT",
+  "FINALIZED_BLOCK_IN_FUTURE",
+  "FINALIZED_BLOCK_STALE",
+  "RECHECK_WINDOW_EXCEEDED",
+  "RECHECK_EXECUTION_RESERVE_EXHAUSTED",
+  "NONCE_MISMATCH",
+  "POOL_ALREADY_EXISTS_OR_RACED",
+  "SENDER_NOT_EOA",
+  "SIMULATION_MISMATCH",
+  "GAS_POLICY_VIOLATION",
+  "INSUFFICIENT_BALANCE",
+  "CAPABILITY_ISSUANCE_FAILED"
+] as const) satisfies readonly BscTestnetPtaWbnbPoolPostClaimRecheckIssueCode[];
+
 export type BscTestnetPtaWbnbPoolPostClaimRecheckStage =
   | "configuration"
   | "input"
@@ -161,14 +186,73 @@ export type BscTestnetPtaWbnbPoolPostClaimRecheckStage =
   | "simulation"
   | "capability";
 
+const POST_CLAIM_RECHECK_STAGES = Object.freeze([
+  "configuration",
+  "input",
+  "clock",
+  "chain",
+  "block",
+  "canonical_state",
+  "pending_state",
+  "simulation",
+  "capability"
+] as const) satisfies readonly BscTestnetPtaWbnbPoolPostClaimRecheckStage[];
+
 export interface BscTestnetPtaWbnbPoolPostClaimRecheckIssue {
   readonly code: BscTestnetPtaWbnbPoolPostClaimRecheckIssueCode;
   readonly stage: BscTestnetPtaWbnbPoolPostClaimRecheckStage;
   readonly message: string;
 }
 
+const POST_CLAIM_RECHECK_REJECTION_BRAND = Symbol.for(
+  "proofera.bsc-testnet.pta-wbnb-pool.post-claim-recheck-rejected.v1"
+);
+
+/** Carries an already validated, fail-closed recheck result across the signer port boundary. */
+export class BscTestnetPtaWbnbPoolPostClaimRecheckRejected extends Error {
+  readonly issue: BscTestnetPtaWbnbPoolPostClaimRecheckIssue;
+
+  constructor(issue: BscTestnetPtaWbnbPoolPostClaimRecheckIssue) {
+    super(issue.message);
+    this.name = "BscTestnetPtaWbnbPoolPostClaimRecheckRejected";
+    this.issue = issue;
+    Object.defineProperty(this, POST_CLAIM_RECHECK_REJECTION_BRAND, {
+      value: true,
+      writable: false,
+      enumerable: false,
+      configurable: false
+    });
+  }
+}
+
+export function inspectBscTestnetPtaWbnbPoolPostClaimRecheckRejectionForInternalUse(
+  input: unknown
+): BscTestnetPtaWbnbPoolPostClaimRecheckIssue | null {
+  if (input === null || typeof input !== "object") return null;
+  const branded = Object.getOwnPropertyDescriptor(input, POST_CLAIM_RECHECK_REJECTION_BRAND);
+  const issue = Object.getOwnPropertyDescriptor(input, "issue")?.value as unknown;
+  if (
+    branded?.value !== true ||
+    issue === null ||
+    typeof issue !== "object" ||
+    isProxy(issue) ||
+    !Object.isFrozen(issue)
+  ) {
+    return null;
+  }
+  const record = issue as Readonly<Record<string, unknown>>;
+  return Reflect.ownKeys(record).length === 3 &&
+    BSC_TESTNET_PTA_WBNB_POOL_POST_CLAIM_RECHECK_ISSUE_CODES.some((code) => code === record.code) &&
+    POST_CLAIM_RECHECK_STAGES.some((stage) => stage === record.stage) &&
+    typeof record.message === "string" &&
+    record.message.length >= 1 &&
+    record.message.length <= 512
+    ? (issue as BscTestnetPtaWbnbPoolPostClaimRecheckIssue)
+    : null;
+}
+
 const STATIC_BOUNDARY = Object.freeze({
-  scope: "exact_pta_wbnb_pool_recovery_generation_7_after_atomic_claim_dual_rpc_recheck" as const,
+  scope: "exact_pta_wbnb_pool_recovery_generation_8_after_atomic_claim_dual_rpc_recheck" as const,
   environment: "bsc-testnet" as const,
   chainId: "97" as const,
   primaryOrigin: BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN,
@@ -583,6 +667,26 @@ async function requestPair(
   return Promise.all([requestOne(primary, request), requestOne(corroborator, request)]);
 }
 
+/**
+ * Keep one request per endpoint in flight. The public BSC testnet origins can throttle a burst of
+ * unrelated state calls even while every individual call remains healthy. Ordered pairs preserve
+ * the same dual-provider equality checks without retries or a larger authority window.
+ */
+async function requestPairsInOrder(
+  primary: BscTestnetPtaWbnbPoolPostClaimRpcClient,
+  corroborator: BscTestnetPtaWbnbPoolPostClaimRpcClient,
+  requests: readonly BscTestnetPtaWbnbPoolPostClaimRpcRequest[]
+): Promise<readonly [readonly unknown[], readonly unknown[]]> {
+  const primaryValues: unknown[] = [];
+  const corroboratorValues: unknown[] = [];
+  for (const request of requests) {
+    const [primaryValue, corroboratorValue] = await requestPair(primary, corroborator, request);
+    primaryValues.push(primaryValue);
+    corroboratorValues.push(corroboratorValue);
+  }
+  return Object.freeze([Object.freeze(primaryValues), Object.freeze(corroboratorValues)]);
+}
+
 interface CurrentObservation {
   readonly balance: bigint;
   readonly latestNonce: bigint;
@@ -838,14 +942,11 @@ function createBscTestnetPtaWbnbPoolPostClaimRechecker(
         getCodeRequest(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, canonicalSelector),
         getCodeRequest(BSC_TESTNET_PTA_WBNB_POOL_SENDER, canonicalSelector)
       ]);
-      const [primaryCanonicalRaw, corroboratorCanonicalRaw] = await Promise.all([
-        Promise.all(
-          canonicalRequests.map((request) => requestOne(dependencies.primaryClient, request))
-        ),
-        Promise.all(
-          canonicalRequests.map((request) => requestOne(dependencies.corroboratorClient, request))
-        )
-      ]);
+      const [primaryCanonicalRaw, corroboratorCanonicalRaw] = await requestPairsInOrder(
+        dependencies.primaryClient,
+        dependencies.corroboratorClient,
+        canonicalRequests
+      );
       const primaryCanonical = Object.freeze({
         pool: parseAddressWord(primaryCanonicalRaw[0]),
         candidateCode: parseBytes(primaryCanonicalRaw[1]),
@@ -939,14 +1040,11 @@ function createBscTestnetPtaWbnbPoolPostClaimRechecker(
           params: freezeParams([initializationCall])
         })
       ]);
-      const [primaryCurrentRaw, corroboratorCurrentRaw] = await Promise.all([
-        Promise.all(
-          currentRequests.map((request) => requestOne(dependencies.primaryClient, request))
-        ),
-        Promise.all(
-          currentRequests.map((request) => requestOne(dependencies.corroboratorClient, request))
-        )
-      ]);
+      const [primaryCurrentRaw, corroboratorCurrentRaw] = await requestPairsInOrder(
+        dependencies.primaryClient,
+        dependencies.corroboratorClient,
+        currentRequests
+      );
       const primaryCurrent = parseCurrent(primaryCurrentRaw);
       const corroboratorCurrent = parseCurrent(corroboratorCurrentRaw);
       if (primaryCurrent === null || corroboratorCurrent === null) {

@@ -19,8 +19,12 @@ import {
   type BscTestnetPtaWbnbPoolRecoveryAttemptBinding,
   type BscTestnetPtaWbnbPoolSigningWorkerRequest
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
+import {
+  inspectBscTestnetPtaWbnbPoolPostClaimRecheckRejectionForInternalUse,
+  type BscTestnetPtaWbnbPoolPostClaimRecheckIssue
+} from "./bsc-testnet-pta-wbnb-pool-post-claim-recheck.server";
 
-export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_CLAIM_SCHEMA_VERSION = 7 as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_CLAIM_SCHEMA_VERSION = 8 as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_CLAIM_OPERATION =
   "claim_exact_bsc_testnet_pta_wbnb_pool_initialization_once" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_SIGNED_READBACK_OPERATION =
@@ -127,6 +131,7 @@ export type BscTestnetPtaWbnbPoolOneShotSignerIssueCode =
   | "INTENT_ALREADY_CLAIMED"
   | "CLAIM_IDENTIFIER_INVALID"
   | "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN"
+  | "POST_CLAIM_RECHECK_REJECTED"
   | "POST_CLAIM_RECHECK_INVALID"
   | "POST_CLAIM_RECHECK_AUTHENTICATION_FAILED"
   | "POST_CLAIM_RECHECK_RESERVE_EXHAUSTED"
@@ -141,6 +146,7 @@ export interface BscTestnetPtaWbnbPoolOneShotSignerIssue {
   readonly phase: "configuration" | "authorization" | "claim" | "recheck" | "worker" | "commit";
   readonly message: string;
   readonly protocolIssue: BscTestnetPtaWbnbPoolProtocolIssue | null;
+  readonly postClaimRecheckIssue: BscTestnetPtaWbnbPoolPostClaimRecheckIssue | null;
 }
 
 export type BscTestnetPtaWbnbPoolOneShotSignerResult =
@@ -303,9 +309,10 @@ function signerIssue(
   code: BscTestnetPtaWbnbPoolOneShotSignerIssueCode,
   phase: BscTestnetPtaWbnbPoolOneShotSignerIssue["phase"],
   message: string,
-  protocolIssue: BscTestnetPtaWbnbPoolProtocolIssue | null = null
+  protocolIssue: BscTestnetPtaWbnbPoolProtocolIssue | null = null,
+  postClaimRecheckIssue: BscTestnetPtaWbnbPoolPostClaimRecheckIssue | null = null
 ): BscTestnetPtaWbnbPoolOneShotSignerIssue {
-  return Object.freeze({ code, phase, message, protocolIssue });
+  return Object.freeze({ code, phase, message, protocolIssue, postClaimRecheckIssue });
 }
 
 function blockedBeforeClaim(
@@ -625,7 +632,25 @@ function createBscTestnetPtaWbnbPoolOneShotSignerCore(
       rawRecheck = await Reflect.apply(dependencies.acquireFreshPostClaimRecheck, undefined, [
         recheckRequest
       ]);
-    } catch {
+    } catch (error) {
+      const knownRecheckFailure =
+        inspectBscTestnetPtaWbnbPoolPostClaimRecheckRejectionForInternalUse(error);
+      if (knownRecheckFailure !== null) {
+        return setTerminal(
+          doNotRetry(
+            signerIssue(
+              "POST_CLAIM_RECHECK_REJECTED",
+              "recheck",
+              knownRecheckFailure.message,
+              null,
+              knownRecheckFailure
+            ),
+            "claimed",
+            "not_attempted"
+          ),
+          "terminal_do_not_retry"
+        );
+      }
       return setTerminal(
         doNotRetry(
           signerIssue(

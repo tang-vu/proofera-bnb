@@ -15,7 +15,7 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_SENDER
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   buildBscTestnetPtaWbnbPoolExactSigningTransaction,
   validateBscTestnetPtaWbnbPoolFreshRecheckCapability,
@@ -31,7 +31,7 @@ const ENVELOPE_HASH = `0x${"11".repeat(32)}` as Hex;
 const REVIEWER_DIGEST = `0x${"22".repeat(32)}` as Hex;
 const OWNER_DIGEST = `0x${"33".repeat(32)}` as Hex;
 const PREDECESSOR_TERMINAL_RAW_SHA256 =
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256;
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256;
 const ATTEMPT_ID = `0x${"35".repeat(32)}` as Hex;
 const CLAIM_TOKEN = `0x${"44".repeat(32)}` as Hex;
 const MANIFEST = `0x${"55".repeat(32)}` as Hex;
@@ -63,8 +63,8 @@ function transaction() {
 
 function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
   return Object.freeze({
-    schemaVersion: 7,
-    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_7",
+    schemaVersion: 8,
+    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_8",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
     reviewerApprovalDigest: REVIEWER_DIGEST,
@@ -74,7 +74,7 @@ function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
     authenticatedAt: "2026-08-13T04:29:55.000Z",
     expiresAt: "2026-08-13T04:31:55.000Z",
     recovery: Object.freeze({
-      generation: 7,
+      generation: 8,
       predecessorState: "failed_before_worker",
       predecessorTerminalRawSha256: PREDECESSOR_TERMINAL_RAW_SHA256,
       attemptId: ATTEMPT_ID
@@ -248,7 +248,7 @@ describe("PTA/WBNB post-claim dual-RPC recheck", () => {
       status: "verified",
       issue: null,
       boundary: {
-        scope: "exact_pta_wbnb_pool_recovery_generation_7_after_atomic_claim_dual_rpc_recheck",
+        scope: "exact_pta_wbnb_pool_recovery_generation_8_after_atomic_claim_dual_rpc_recheck",
         chainId: "97",
         fixedOfficialRpcOriginsOnly: true,
         eip1898RequireCanonical: true,
@@ -267,7 +267,7 @@ describe("PTA/WBNB post-claim dual-RPC recheck", () => {
       authenticatedAt: COMPLETE,
       expiresAt: "2026-08-13T04:31:55.000Z",
       recovery: {
-        generation: 7,
+        generation: 8,
         predecessorState: "failed_before_worker",
         predecessorTerminalRawSha256: PREDECESSOR_TERMINAL_RAW_SHA256,
         attemptId: ATTEMPT_ID
@@ -351,6 +351,51 @@ describe("PTA/WBNB post-claim dual-RPC recheck", () => {
         ]
       });
     }
+  });
+
+  it("keeps at most one ordered request in flight per fixed RPC endpoint", async () => {
+    const request = input();
+    const primary = makeClient(BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN);
+    const corroborator = makeClient(BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN);
+    let primaryInFlight = 0;
+    let corroboratorInFlight = 0;
+    let maximumPrimaryInFlight = 0;
+    let maximumCorroboratorInFlight = 0;
+    const wrap = (
+      client: typeof primary.client,
+      update: (delta: 1 | -1) => void
+    ): typeof primary.client => ({
+      origin: client.origin,
+      request: async (rpcRequest) => {
+        update(1);
+        await Promise.resolve();
+        try {
+          return await client.request(rpcRequest);
+        } finally {
+          update(-1);
+        }
+      }
+    });
+    const rechecker = createBscTestnetPtaWbnbPoolPostClaimRecheckerForTests({
+      primaryClient: wrap(primary.client, (delta) => {
+        primaryInFlight += delta;
+        maximumPrimaryInFlight = Math.max(maximumPrimaryInFlight, primaryInFlight);
+      }),
+      corroboratorClient: wrap(corroborator.client, (delta) => {
+        corroboratorInFlight += delta;
+        maximumCorroboratorInFlight = Math.max(maximumCorroboratorInFlight, corroboratorInFlight);
+      }),
+      now: clocks([START, COMPLETE]),
+      authenticateAuthorizedIntent: (candidate: unknown) => candidate === request.authorizedIntent,
+      issueJournalClaimToken: () => CLAIM_TOKEN
+    });
+
+    await expect(rechecker.recheck(request)).resolves.toMatchObject({ status: "verified" });
+    expect(maximumPrimaryInFlight).toBe(1);
+    expect(maximumCorroboratorInFlight).toBe(1);
+    expect(primary.calls.map(({ method }) => method)).toEqual(
+      corroborator.calls.map(({ method }) => method)
+    );
   });
 
   it("requires the authorization gate's private intent brand before clock, RPC, or token issuance", async () => {

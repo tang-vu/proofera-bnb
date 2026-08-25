@@ -33,9 +33,9 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -46,21 +46,21 @@ import {
 export const BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_RUNTIME_MANIFEST_DOMAIN =
   "ProofEra:bsc-testnet-pta-wbnb-pool-production-runtime-manifest:v2" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_SUBJECT_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-subject:v7" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-subject:v8" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_POLICY_DIGEST_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-policy:v7" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-policy:v8" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RUNTIME_REVIEW_INSTANTIATION_DIGEST_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-runtime-review-instantiation:v7" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-runtime-review-instantiation:v8" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_CHALLENGE_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-challenge:v8" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-challenge:v9" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_RELEASE_REVIEW_TTY_FRAME_DOMAIN =
-  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-frame:v8" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-pool-release-review-tty-frame:v9" as const;
 
 const POLICY_KIND =
-  "owner_designated_internal_multi_agent_release_review_policy_generation_7_v7" as const;
-const POLICY_DECISION = "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_7_POLICY" as const;
+  "owner_designated_internal_multi_agent_release_review_policy_generation_8_v8" as const;
+const POLICY_DECISION = "GO_EXACT_CHAIN_97_RECOVERY_GENERATION_8_POLICY" as const;
 const REVIEWER_DECISION = "GO_WITH_ZERO_P0_AND_ZERO_P1" as const;
-const INSTANTIATION_KIND = "automated_release_policy_recovery_envelope_instantiation_v7" as const;
+const INSTANTIATION_KIND = "automated_release_policy_recovery_envelope_instantiation_v8" as const;
 const BYTES32 = /^0x[0-9a-f]{64}$/u;
 const GIT_OBJECT = /^[0-9a-f]{40}$/u;
 const UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u;
@@ -139,7 +139,7 @@ const SCOPE_KEYS = [
   "predecessorFailedBeforeWorkerEvidenceRequired",
   "predecessorSignatureOutcomeRequired",
   "predecessorStateRequired",
-  "predecessorSubmissionV5JournalStateRequired",
+  "predecessorSubmissionV6JournalStateRequired",
   "predecessorSubmissionOutcomeRequired",
   "predecessorIssueCodeRequired",
   "predecessorPhaseRequired",
@@ -242,7 +242,7 @@ export interface BscTestnetPtaWbnbPoolExactReleaseIdentity {
 }
 
 export interface BscTestnetPtaWbnbPoolReleaseReviewPolicy {
-  readonly schemaVersion: 7;
+  readonly schemaVersion: 8;
   readonly kind: typeof POLICY_KIND;
   readonly decision: typeof POLICY_DECISION;
   readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
@@ -277,11 +277,11 @@ export interface BscTestnetPtaWbnbPoolReleaseReviewPolicy {
     maximumPostConfirmationPreclaimSeconds: "60";
     postRecheckExecutionReserveSeconds: "20";
     maximumPostClaimRecheckAgeSeconds: "30";
-    recoveryGeneration: "7";
+    recoveryGeneration: "8";
     predecessorClaimRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256;
-    predecessorTerminalRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256;
-    predecessorFailedBeforeWorkerOutcomeDigest: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_FAILED_BEFORE_WORKER_OUTCOME_DIGEST;
-    inheritedPredecessorTerminalRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256;
+    predecessorTerminalRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256;
+    predecessorFailedBeforeWorkerOutcomeDigest: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_FAILED_BEFORE_WORKER_OUTCOME_DIGEST;
+    inheritedPredecessorTerminalRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256;
   }>;
   readonly scope: Readonly<{
     exactFreshEnvelopeRequired: true;
@@ -304,7 +304,7 @@ export interface BscTestnetPtaWbnbPoolReleaseReviewPolicy {
     predecessorWorkerAuthorizationOutcomeRequired: "not_attempted";
     predecessorWorkerStartOutcomeRequired: "not_attempted";
     predecessorSignatureOutcomeRequired: "not_attempted";
-    predecessorSubmissionV5JournalStateRequired: "exact_empty";
+    predecessorSubmissionV6JournalStateRequired: "exact_empty";
     predecessorSubmissionOutcomeRequired: "not_attempted";
     freshEnvelopeAfterTerminalRequired: true;
   }>;
@@ -337,13 +337,13 @@ export interface BscTestnetPtaWbnbPoolPredecessorTerminalBinding {
   readonly status: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE;
   readonly generation: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION;
   readonly predecessorClaimRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256;
-  readonly predecessorTerminalRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256;
+  readonly predecessorTerminalRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256;
   readonly predecessorEnvelopeHash: Hex;
-  readonly inheritedPredecessorTerminalRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256;
+  readonly inheritedPredecessorTerminalRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256;
   readonly predecessorAttemptId: Hex;
   readonly phase: "post_claim_recheck";
   readonly issueCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN";
-  readonly outcomeDigest: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_FAILED_BEFORE_WORKER_OUTCOME_DIGEST;
+  readonly outcomeDigest: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_FAILED_BEFORE_WORKER_OUTCOME_DIGEST;
   readonly workerAuthorizationOutcome: "not_attempted";
   readonly workerStartOutcome: "not_attempted";
   readonly signatureOutcome: "not_attempted";
@@ -358,7 +358,7 @@ export interface BscTestnetPtaWbnbPoolRuntimeReviewRecoveryBinding {
 }
 
 export interface BscTestnetPtaWbnbPoolRuntimeReviewInstantiation {
-  readonly schemaVersion: 7;
+  readonly schemaVersion: 8;
   readonly kind: typeof INSTANTIATION_KIND;
   readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
   readonly policyDigest: Hex;
@@ -527,15 +527,15 @@ function parsePredecessorTerminal(
     terminal.generation !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION ||
     terminal.predecessorClaimRawSha256 !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256 ||
     terminal.predecessorTerminalRawSha256 !==
-      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256 ||
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256 ||
     !exactBytes32(terminal.predecessorEnvelopeHash) ||
     terminal.inheritedPredecessorTerminalRawSha256 !==
-      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256 ||
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256 ||
     !exactBytes32(terminal.predecessorAttemptId) ||
     terminal.phase !== "post_claim_recheck" ||
     terminal.issueCode !== "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" ||
     terminal.outcomeDigest !==
-      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_FAILED_BEFORE_WORKER_OUTCOME_DIGEST ||
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_FAILED_BEFORE_WORKER_OUTCOME_DIGEST ||
     terminal.workerAuthorizationOutcome !== "not_attempted" ||
     terminal.workerStartOutcome !== "not_attempted" ||
     terminal.signatureOutcome !== "not_attempted" ||
@@ -549,14 +549,14 @@ function parsePredecessorTerminal(
     status: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
     generation: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION,
     predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
-    predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
+    predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256,
     predecessorEnvelopeHash: terminal.predecessorEnvelopeHash,
     inheritedPredecessorTerminalRawSha256:
-      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
     predecessorAttemptId: terminal.predecessorAttemptId,
     phase: "post_claim_recheck",
     issueCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
-    outcomeDigest: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+    outcomeDigest: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
     workerAuthorizationOutcome: "not_attempted",
     workerStartOutcome: "not_attempted",
     signatureOutcome: "not_attempted",
@@ -861,13 +861,13 @@ function exactCaps(): BscTestnetPtaWbnbPoolReleaseReviewPolicy["caps"] {
       BSC_TESTNET_PTA_WBNB_POOL_POST_RECHECK_EXECUTION_RESERVE_SECONDS.toString() as "20",
     maximumPostClaimRecheckAgeSeconds:
       BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_MAX_AGE_SECONDS.toString() as "30",
-    recoveryGeneration: "7",
+    recoveryGeneration: "8",
     predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
-    predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
+    predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256,
     predecessorFailedBeforeWorkerOutcomeDigest:
-      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
     inheritedPredecessorTerminalRawSha256:
-      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256
   });
 }
 
@@ -893,7 +893,7 @@ function exactScope(): BscTestnetPtaWbnbPoolReleaseReviewPolicy["scope"] {
     predecessorWorkerAuthorizationOutcomeRequired: "not_attempted",
     predecessorWorkerStartOutcomeRequired: "not_attempted",
     predecessorSignatureOutcomeRequired: "not_attempted",
-    predecessorSubmissionV5JournalStateRequired: "exact_empty",
+    predecessorSubmissionV6JournalStateRequired: "exact_empty",
     predecessorSubmissionOutcomeRequired: "not_attempted",
     freshEnvelopeAfterTerminalRequired: true
   });
@@ -982,7 +982,7 @@ function parsePolicyBody(
     reviewedAt === null ||
     expiresAt === null ||
     expectedSubjectDigest === null ||
-    policy.schemaVersion !== 7 ||
+    policy.schemaVersion !== 8 ||
     policy.kind !== POLICY_KIND ||
     policy.decision !== POLICY_DECISION ||
     policy.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
@@ -1042,7 +1042,7 @@ function parsePolicyBody(
     }
   }
   return Object.freeze({
-    schemaVersion: 7,
+    schemaVersion: 8,
     kind: POLICY_KIND,
     decision: POLICY_DECISION,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -1147,7 +1147,7 @@ function buildInstantiation(
     return null;
   }
   const body = Object.freeze({
-    schemaVersion: 7 as const,
+    schemaVersion: 8 as const,
     kind: INSTANTIATION_KIND,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     policyDigest: policy.policyDigest,
@@ -1874,7 +1874,7 @@ export async function readBscTestnetPtaWbnbPoolReleaseReviewPolicyFromControllin
 }
 
 /**
- * Exercises only the untrusted bounded transport decoder (introduced in v2, current domain v8) in
+ * Exercises only the untrusted bounded transport decoder (introduced in v2, current domain v9) in
  * adversarial tests. It cannot parse or admit a policy, access the production WeakMap, or create an
  * authority-bearing realm.
  */

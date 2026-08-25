@@ -9,12 +9,14 @@ const harness = vi.hoisted(() => ({
   openGeneration3: vi.fn(),
   openGeneration4: vi.fn(),
   openGeneration5: vi.fn(),
+  openGeneration6: vi.fn(),
   openPredecessor: vi.fn(),
   openLocal: vi.fn(),
   probeGeneration2Submission: vi.fn(),
   probeGeneration3Submission: vi.fn(),
   probeGeneration4Submission: vi.fn(),
   probeGeneration5Submission: vi.fn(),
+  probeGeneration6Submission: vi.fn(),
   openSubmission: vi.fn(),
   openTerminalSubmission: vi.fn(),
   createBridge: vi.fn(),
@@ -42,6 +44,8 @@ vi.mock("./bsc-testnet-pta-wbnb-pool-local-journal.server", () => ({
     harness.openGeneration4,
   openExistingWindowsBscTestnetPtaWbnbPoolGeneration5LocalJournalForRecoveryForInternalUse:
     harness.openGeneration5,
+  openExistingWindowsBscTestnetPtaWbnbPoolGeneration6LocalJournalForRecoveryForInternalUse:
+    harness.openGeneration6,
   openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse:
     harness.openPredecessor,
   openExistingWindowsBscTestnetPtaWbnbPoolLocalJournalForRecoveryForInternalUse: harness.openLocal
@@ -58,7 +62,9 @@ vi.mock("./bsc-testnet-pta-wbnb-pool-submission-journal.server", () => ({
   probeWindowsBscTestnetPtaWbnbPoolGeneration4SubmissionJournalForInternalUse:
     harness.probeGeneration4Submission,
   probeWindowsBscTestnetPtaWbnbPoolGeneration5SubmissionJournalForInternalUse:
-    harness.probeGeneration5Submission
+    harness.probeGeneration5Submission,
+  probeWindowsBscTestnetPtaWbnbPoolGeneration6SubmissionJournalForInternalUse:
+    harness.probeGeneration6Submission
 }));
 vi.mock("./bsc-testnet-pta-wbnb-pool-signing-worker", () => ({
   createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeForInternalUse: harness.createBridge
@@ -94,11 +100,12 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_ATTEMPT_ID,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_CLAIM_RAW_SHA256,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_ENVELOPE_HASH,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_ATTEMPT_ID,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_ENVELOPE_HASH,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 
@@ -232,18 +239,28 @@ const GENERATION_5_OPENED = Object.freeze({
   }),
   issue: null
 });
+const GENERATION_6_OPENED = Object.freeze({
+  status: "opened" as const,
+  journal: Object.freeze({}),
+  state: Object.freeze({
+    status: "failed_before_worker" as const,
+    generation: 6 as const,
+    predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256
+  }),
+  issue: null
+});
 const PREDECESSOR_TERMINAL = Object.freeze({
   status: "failed_before_worker" as const,
   generation: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION,
-  predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_CLAIM_RAW_SHA256,
-  predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
-  predecessorEnvelopeHash: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_ENVELOPE_HASH,
+  predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_CLAIM_RAW_SHA256,
+  predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256,
+  predecessorEnvelopeHash: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_ENVELOPE_HASH,
   inheritedPredecessorTerminalRawSha256:
-    BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
-  predecessorAttemptId: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_ATTEMPT_ID,
+    BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
+  predecessorAttemptId: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_ATTEMPT_ID,
   phase: "post_claim_recheck" as const,
   issueCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" as const,
-  outcomeDigest: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+  outcomeDigest: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
   workerAuthorizationOutcome: "not_attempted" as const,
   workerStartOutcome: "not_attempted" as const,
   signatureOutcome: "not_attempted" as const,
@@ -334,12 +351,14 @@ const DURABLE_PROBE_ORDER = Object.freeze([
   "generation3-open",
   "generation4-open",
   "generation5-open",
+  "generation6-open",
   "predecessor-open",
   "local-open",
   "generation2-submission-probe",
   "generation3-submission-probe",
   "generation4-submission-probe",
   "generation5-submission-probe",
+  "generation6-submission-probe",
   "submission-open"
 ]);
 
@@ -375,6 +394,10 @@ function readyFreshPath(): void {
     harness.order.push("generation5-open");
     return GENERATION_5_OPENED;
   });
+  harness.openGeneration6.mockImplementation(async () => {
+    harness.order.push("generation6-open");
+    return GENERATION_6_OPENED;
+  });
   PREDECESSOR_JOURNAL.readExactTerminalRecoveryBinding.mockImplementation(
     async () => PREDECESSOR_TERMINAL
   );
@@ -404,6 +427,10 @@ function readyFreshPath(): void {
   });
   harness.probeGeneration5Submission.mockImplementation(async () => {
     harness.order.push("generation5-submission-probe");
+    return EMPTY_GENERATION_2_SUBMISSION;
+  });
+  harness.probeGeneration6Submission.mockImplementation(async () => {
+    harness.order.push("generation6-submission-probe");
     return EMPTY_GENERATION_2_SUBMISSION;
   });
   harness.createBridge.mockImplementation(async () => {
@@ -465,7 +492,7 @@ beforeEach(() => {
 });
 
 describe("PTA/WBNB recovery-first production runner", () => {
-  it("rereads all twelve durable namespaces across startup, owner, activation, and claim boundaries", async () => {
+  it("rereads all fourteen durable namespaces across startup, owner, activation, and claim boundaries", async () => {
     await expect(runBscTestnetPtaWbnbPoolProductionOnceFromStdin()).resolves.toEqual(FRESH_RESULT);
 
     expect(harness.order).toEqual([
@@ -502,7 +529,7 @@ describe("PTA/WBNB recovery-first production runner", () => {
         executionCapability: EXECUTION_CAPABILITY,
         predecessorSigningJournal: PREDECESSOR_JOURNAL,
         predecessorTerminal: PREDECESSOR_TERMINAL_BINDING,
-        probePredecessorSubmission: harness.probeGeneration5Submission,
+        probePredecessorSubmission: harness.probeGeneration6Submission,
         signingJournal: SIGNING_JOURNAL,
         submissionJournal: SUBMISSION_JOURNAL,
         broadcaster: BROADCASTER
@@ -511,30 +538,34 @@ describe("PTA/WBNB recovery-first production runner", () => {
     expect(PREDECESSOR_JOURNAL.readExactTerminalRecoveryBinding).toHaveBeenCalledTimes(4);
   });
 
-  it("waits for all twelve startup probes and does not preload policy while any is pending", async () => {
+  it("waits for all fourteen startup probes and does not preload policy while any is pending", async () => {
     const ancestor = deferred<typeof ANCESTOR_FENCED>();
     const generation2 = deferred<typeof GENERATION_2_FENCED>();
     const generation3 = deferred<typeof GENERATION_3_FENCED>();
     const generation4 = deferred<typeof GENERATION_4_OPENED>();
     const generation5 = deferred<typeof GENERATION_5_OPENED>();
+    const generation6 = deferred<typeof GENERATION_6_OPENED>();
     const predecessor = deferred<typeof PREDECESSOR_OPENED>();
     const local = deferred<typeof EMPTY_LOCAL>();
     const generation2Submission = deferred<typeof EMPTY_GENERATION_2_SUBMISSION>();
     const generation3Submission = deferred<typeof EMPTY_GENERATION_3_SUBMISSION>();
     const generation4Submission = deferred<typeof EMPTY_GENERATION_2_SUBMISSION>();
     const generation5Submission = deferred<typeof EMPTY_GENERATION_2_SUBMISSION>();
+    const generation6Submission = deferred<typeof EMPTY_GENERATION_2_SUBMISSION>();
     const submission = deferred<typeof EMPTY_SUBMISSION>();
     harness.openAncestor.mockImplementation(() => ancestor.promise);
     harness.openGeneration2.mockImplementation(() => generation2.promise);
     harness.openGeneration3.mockImplementation(() => generation3.promise);
     harness.openGeneration4.mockImplementation(() => generation4.promise);
     harness.openGeneration5.mockImplementation(() => generation5.promise);
+    harness.openGeneration6.mockImplementation(() => generation6.promise);
     harness.openPredecessor.mockImplementation(() => predecessor.promise);
     harness.openLocal.mockImplementation(() => local.promise);
     harness.probeGeneration2Submission.mockImplementation(() => generation2Submission.promise);
     harness.probeGeneration3Submission.mockImplementation(() => generation3Submission.promise);
     harness.probeGeneration4Submission.mockImplementation(() => generation4Submission.promise);
     harness.probeGeneration5Submission.mockImplementation(() => generation5Submission.promise);
+    harness.probeGeneration6Submission.mockImplementation(() => generation6Submission.promise);
     harness.openSubmission.mockImplementation(() => submission.promise);
 
     const running = runBscTestnetPtaWbnbPoolProductionOnceFromStdin();
@@ -544,12 +575,14 @@ describe("PTA/WBNB recovery-first production runner", () => {
     expect(harness.openGeneration3).toHaveBeenCalledTimes(1);
     expect(harness.openGeneration4).toHaveBeenCalledTimes(1);
     expect(harness.openGeneration5).toHaveBeenCalledTimes(1);
+    expect(harness.openGeneration6).toHaveBeenCalledTimes(1);
     expect(harness.openPredecessor).toHaveBeenCalledTimes(1);
     expect(harness.openLocal).toHaveBeenCalledTimes(1);
     expect(harness.probeGeneration2Submission).toHaveBeenCalledTimes(1);
     expect(harness.probeGeneration3Submission).toHaveBeenCalledTimes(1);
     expect(harness.probeGeneration4Submission).toHaveBeenCalledTimes(1);
     expect(harness.probeGeneration5Submission).toHaveBeenCalledTimes(1);
+    expect(harness.probeGeneration6Submission).toHaveBeenCalledTimes(1);
     expect(harness.openSubmission).toHaveBeenCalledTimes(1);
     expect(harness.readPolicy).not.toHaveBeenCalled();
     ancestor.resolve(ANCESTOR_FENCED);
@@ -565,6 +598,9 @@ describe("PTA/WBNB recovery-first production runner", () => {
     await Promise.resolve();
     expect(harness.readPolicy).not.toHaveBeenCalled();
     generation5.resolve(GENERATION_5_OPENED);
+    await Promise.resolve();
+    expect(harness.readPolicy).not.toHaveBeenCalled();
+    generation6.resolve(GENERATION_6_OPENED);
     await Promise.resolve();
     expect(harness.readPolicy).not.toHaveBeenCalled();
     predecessor.resolve(PREDECESSOR_OPENED);
@@ -585,6 +621,9 @@ describe("PTA/WBNB recovery-first production runner", () => {
     generation5Submission.resolve(EMPTY_GENERATION_2_SUBMISSION);
     await Promise.resolve();
     expect(harness.readPolicy).not.toHaveBeenCalled();
+    generation6Submission.resolve(EMPTY_GENERATION_2_SUBMISSION);
+    await Promise.resolve();
+    expect(harness.readPolicy).not.toHaveBeenCalled();
     submission.resolve(EMPTY_SUBMISSION);
     await running;
     expect(harness.readPolicy).toHaveBeenCalledTimes(1);
@@ -596,13 +635,15 @@ describe("PTA/WBNB recovery-first production runner", () => {
     ["generation-3 signing", harness.openGeneration3],
     ["generation-4 signing", harness.openGeneration4],
     ["generation-5 signing", harness.openGeneration5],
-    ["generation-6 signing", harness.openPredecessor],
-    ["generation-7 signing", harness.openLocal],
+    ["generation-6 signing", harness.openGeneration6],
+    ["generation-7 signing", harness.openPredecessor],
+    ["generation-8 signing", harness.openLocal],
     ["submission-v2", harness.probeGeneration2Submission],
     ["submission-v3", harness.probeGeneration3Submission],
     ["submission-v4", harness.probeGeneration4Submission],
     ["submission-v5", harness.probeGeneration5Submission],
-    ["submission-v6", harness.openSubmission]
+    ["submission-v6", harness.probeGeneration6Submission],
+    ["submission-v7", harness.openSubmission]
   ])("fails closed when the %s startup probe is blocked", async (_label, probe) => {
     probe.mockResolvedValueOnce(Object.freeze({ status: "blocked" }));
 
@@ -668,13 +709,13 @@ describe("PTA/WBNB recovery-first production runner", () => {
 
   it.each([
     [
-      "reuses the generation-6 envelope hash",
+      "reuses the generation-7 envelope hash",
       Object.freeze({
         ...ENVELOPE,
         envelopeHash: PREDECESSOR_TERMINAL.predecessorEnvelopeHash
       })
     ],
-    ["is not later than the generation-6 terminal", envelope("22", PREDECESSOR_TERMINAL.recordedAt)]
+    ["is not later than the generation-7 terminal", envelope("22", PREDECESSOR_TERMINAL.recordedAt)]
   ])("blocks a fresh envelope that %s", async (_label, candidate) => {
     harness.prepare.mockResolvedValueOnce(
       Object.freeze({ status: "observed" as const, envelope: candidate })
@@ -729,12 +770,19 @@ describe("PTA/WBNB recovery-first production runner", () => {
     [
       "generation-6 signing",
       () =>
+        harness.openGeneration6
+          .mockResolvedValueOnce(GENERATION_6_OPENED)
+          .mockResolvedValueOnce(EMPTY_LOCAL)
+    ],
+    [
+      "generation-7 signing",
+      () =>
         harness.openPredecessor
           .mockResolvedValueOnce(PREDECESSOR_OPENED)
           .mockResolvedValueOnce(EMPTY_LOCAL)
     ],
     [
-      "generation-7 signing",
+      "generation-8 signing",
       () =>
         harness.openLocal.mockResolvedValueOnce(EMPTY_LOCAL).mockResolvedValueOnce(
           Object.freeze({
@@ -803,6 +851,20 @@ describe("PTA/WBNB recovery-first production runner", () => {
     ],
     [
       "submission-v6",
+      () =>
+        harness.probeGeneration6Submission
+          .mockResolvedValueOnce(EMPTY_GENERATION_2_SUBMISSION)
+          .mockResolvedValueOnce(
+            Object.freeze({
+              status: "ready",
+              presence: "present",
+              files: Object.freeze(["01-signed-commit.v8.json"]),
+              issue: null
+            })
+          )
+    ],
+    [
+      "submission-v7",
       () =>
         harness.openSubmission.mockResolvedValueOnce(EMPTY_SUBMISSION).mockResolvedValueOnce(
           Object.freeze({

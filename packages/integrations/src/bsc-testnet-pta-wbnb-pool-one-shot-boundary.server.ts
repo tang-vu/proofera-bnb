@@ -49,7 +49,7 @@ export interface BscTestnetPtaWbnbPoolOneShotExactBinding {
 
 /**
  * Legacy preparation-only receipt shape. It is non-authorizing: the executable generation-6 path
- * obtains a separately branded owner-v10 intent outside this module, and copied JSON/digests here
+ * obtains a separately branded owner-v11 intent outside this module, and copied JSON/digests here
  * cannot substitute for that authority.
  */
 export interface BscTestnetPtaWbnbPoolExternalAuthorizationReceipt {

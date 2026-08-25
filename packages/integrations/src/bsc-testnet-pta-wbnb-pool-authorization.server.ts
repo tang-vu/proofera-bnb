@@ -30,7 +30,7 @@ import {
 export const BSC_TESTNET_PTA_WBNB_POOL_REVIEWER_APPROVAL_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.external-reviewer-approval.v1" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_OWNER_AUTHORIZATION_DIGEST_DOMAIN =
-  "proofera.bsc-testnet.pta-wbnb-pool.owner-envelope-authorization.v7" as const;
+  "proofera.bsc-testnet.pta-wbnb-pool.owner-envelope-authorization.v8" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_OWNER_DESIGNATED_REVIEW_APPROVAL_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.owner-designated-internal-multi-agent-review.v1" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_REVIEW_ARTIFACT_SHA256 =
@@ -122,9 +122,9 @@ export interface BscTestnetPtaWbnbPoolOwnerSignatureAndBroadcastAuthorizationBod
   BscTestnetPtaWbnbPoolOwnerEnvelopeAuthorizationBody,
   "schemaVersion" | "kind" | "decision"
 > {
-  readonly schemaVersion: 8;
-  readonly kind: "exact_owner_recovery_generation_7_signature_and_single_broadcast_authorization_v8";
-  readonly decision: "authorize_fresh_chain_97_pool_recovery_generation_7_signature_and_single_broadcast";
+  readonly schemaVersion: 9;
+  readonly kind: "exact_owner_recovery_generation_8_signature_and_single_broadcast_authorization_v9";
+  readonly decision: "authorize_fresh_chain_97_pool_recovery_generation_8_signature_and_single_broadcast";
   readonly broadcastPolicy: "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity";
   readonly liquidityActionAuthorized: false;
   readonly ceremonyNonce: Hex;
@@ -634,7 +634,7 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
         : null;
     const ownerV4 =
       ownerKind ===
-      "exact_owner_recovery_generation_7_signature_and_single_broadcast_authorization_v8";
+      "exact_owner_recovery_generation_8_signature_and_single_broadcast_authorization_v9";
     const ownerBodyKeys = OWNER_V3_BODY_KEYS;
     const owner = ownerV4 ? inspectRecord(ownerValue, OWNER_V3_KEYS) : null;
     if (owner === null) {
@@ -669,11 +669,11 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
       ownerIdentity === null ||
       authorizedAt === null ||
       ownerExpiry === null ||
-      owner.schemaVersion !== 8 ||
+      owner.schemaVersion !== 9 ||
       owner.kind !==
-        "exact_owner_recovery_generation_7_signature_and_single_broadcast_authorization_v8" ||
+        "exact_owner_recovery_generation_8_signature_and_single_broadcast_authorization_v9" ||
       owner.decision !==
-        "authorize_fresh_chain_97_pool_recovery_generation_7_signature_and_single_broadcast" ||
+        "authorize_fresh_chain_97_pool_recovery_generation_8_signature_and_single_broadcast" ||
       owner.broadcastPolicy !== "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity" ||
       ceremonyNonce === null ||
       owner.liquidityActionAuthorized !== false ||
@@ -730,9 +730,9 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
       return blocked("AUTHORIZATION_EXPIRED", "expiresAt", "Authorization envelope expired.");
     }
     const intent = Object.freeze({
-      schemaVersion: 7 as const,
+      schemaVersion: 8 as const,
       scope:
-        "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_7" as const,
+        "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_8" as const,
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       envelopeHash,
       reviewerApprovalDigest,

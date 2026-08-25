@@ -31,7 +31,7 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-signer-core";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_SCOPE,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
@@ -49,6 +49,10 @@ import {
   type BscTestnetPtaWbnbPoolLocalJournalPorts
 } from "./bsc-testnet-pta-wbnb-pool-local-journal.server";
 import { createBscTestnetPtaWbnbPoolSigningWorkerForInternalUse } from "./bsc-testnet-pta-wbnb-pool-signing-worker";
+import {
+  BscTestnetPtaWbnbPoolPostClaimRecheckRejected,
+  inspectBscTestnetPtaWbnbPoolPostClaimRecheckRejectionForInternalUse
+} from "./bsc-testnet-pta-wbnb-pool-post-claim-recheck.server";
 
 const ENVELOPE_HASH = `0x${"11".repeat(32)}` as Hex;
 const REVIEWER_DIGEST = `0x${"22".repeat(32)}` as Hex;
@@ -56,7 +60,7 @@ const OWNER_DIGEST = `0x${"33".repeat(32)}` as Hex;
 const CLAIM_TOKEN = `0x${"44".repeat(32)}` as Hex;
 const MANIFEST = `0x${"55".repeat(32)}` as Hex;
 const PREDECESSOR_TERMINAL_RAW_SHA256 =
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256;
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256;
 const ATTEMPT_ID = `0x${"99".repeat(32)}` as Hex;
 const RELEASE = "a".repeat(40);
 const NOW = "2026-08-13T04:30:01.000Z";
@@ -80,8 +84,8 @@ function exactTransaction() {
 
 function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
   return Object.freeze({
-    schemaVersion: 7,
-    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_7",
+    schemaVersion: 8,
+    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_8",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
     reviewerApprovalDigest: REVIEWER_DIGEST,
@@ -99,7 +103,7 @@ function freshCapability(
   authenticatedAt = "2026-08-13T04:30:00.000Z"
 ): BscTestnetPtaWbnbPoolFreshRecheckCapability {
   return {
-    schemaVersion: 7,
+    schemaVersion: 8,
     scope: BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_SCOPE,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
@@ -303,7 +307,7 @@ describe("PTA/WBNB pool one-shot signer core", () => {
       "signed_commit_readback"
     ]);
     expect(calls.claim.mock.calls[0]?.[0]).toMatchObject({
-      schemaVersion: 7,
+      schemaVersion: 8,
       operation: BSC_TESTNET_PTA_WBNB_POOL_DURABLE_CLAIM_OPERATION,
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       envelopeHash: ENVELOPE_HASH,
@@ -321,7 +325,7 @@ describe("PTA/WBNB pool one-shot signer core", () => {
       recovery: RECOVERY
     });
     expect(calls.readback.mock.calls[0]?.[0]).toMatchObject({
-      schemaVersion: 7,
+      schemaVersion: 8,
       operation: BSC_TESTNET_PTA_WBNB_POOL_DURABLE_SIGNED_READBACK_OPERATION,
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       envelopeHash: ENVELOPE_HASH,
@@ -446,6 +450,33 @@ describe("PTA/WBNB pool one-shot signer core", () => {
         expect(calls.worker).not.toHaveBeenCalled();
       }
     }
+  });
+
+  it("retains an exact known post-claim recheck code and stage without invoking the worker", async () => {
+    const exactIssue = Object.freeze({
+      code: "RPC_REQUEST_FAILED" as const,
+      stage: "chain" as const,
+      message: "The exact dual-RPC chain check failed."
+    });
+    const rejection = new BscTestnetPtaWbnbPoolPostClaimRecheckRejected(exactIssue);
+    expect(inspectBscTestnetPtaWbnbPoolPostClaimRecheckRejectionForInternalUse(rejection)).toBe(
+      exactIssue
+    );
+    const { core, calls } = harness({
+      recheck: async () => Promise.reject(rejection)
+    });
+
+    await expect(core.signOnce()).resolves.toMatchObject({
+      status: "do_not_retry",
+      retryAllowed: false,
+      durableClaimOutcome: "claimed",
+      issue: {
+        code: "POST_CLAIM_RECHECK_REJECTED",
+        postClaimRecheckIssue: exactIssue
+      }
+    });
+    expect(calls.authorizeWorker).not.toHaveBeenCalled();
+    expect(calls.worker).not.toHaveBeenCalled();
   });
 
   it("withholds raw bytes unless exact durable signed-commit readback succeeds", async () => {
@@ -647,7 +678,7 @@ describe("PTA/WBNB pool one-shot signer core", () => {
     await expect(journal.readState()).resolves.toMatchObject({ status: "signed_committed" });
     expect(integratedResult.issue).toBeNull();
     expect(integratedResult).toMatchObject({ status: "signed_committed" });
-    expect(files.has("04-transition.v7.json")).toBe(true);
+    expect(files.has("04-transition.v8.json")).toBe(true);
     expect(files.size).toBe(4);
   });
 });

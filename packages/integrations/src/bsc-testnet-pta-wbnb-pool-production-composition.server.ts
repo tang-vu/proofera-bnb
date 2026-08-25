@@ -30,7 +30,10 @@ import {
   type BscTestnetPtaWbnbPoolRecoveryAttemptBinding,
   type BscTestnetPtaWbnbPoolSigningWorkerRequest
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
-import { createBscTestnetPtaWbnbPoolPostClaimRecheckerForInternalUse } from "./bsc-testnet-pta-wbnb-pool-post-claim-recheck.server";
+import {
+  BscTestnetPtaWbnbPoolPostClaimRecheckRejected,
+  createBscTestnetPtaWbnbPoolPostClaimRecheckerForInternalUse
+} from "./bsc-testnet-pta-wbnb-pool-post-claim-recheck.server";
 import {
   acquireBscTestnetPtaWbnbPoolProductionPreSubmissionForInternalUse,
   createFixedOfficialBscTestnetPtaWbnbPoolPostClaimRpcClientsForInternalUse,
@@ -40,7 +43,7 @@ import {
 import {
   deriveBscTestnetPtaWbnbPoolAuthorizationReceiptSha256,
   deriveBscTestnetPtaWbnbPoolFailedBeforeWorkerOutcomeDigest,
-  type BscTestnetPtaWbnbPoolGeneration7ClaimRequest,
+  type BscTestnetPtaWbnbPoolGeneration8ClaimRequest,
   type BscTestnetPtaWbnbPoolFailedBeforeWorkerIssueCode,
   type BscTestnetPtaWbnbPoolPredecessorLocalJournalRecoveryReader,
   type BscTestnetPtaWbnbPoolPredecessorTerminalState,
@@ -63,9 +66,9 @@ import {
   type BscTestnetPtaWbnbPoolTerminalReconciliationJournal
 } from "./bsc-testnet-pta-wbnb-pool-submission-reconciler.server";
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V8_POLICY,
+  BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V9_POLICY,
   type BscTestnetPtaWbnbPoolDurableSubmissionJournal,
-  type BscTestnetPtaWbnbPoolGeneration5SubmissionJournalProbeResult,
+  type BscTestnetPtaWbnbPoolGeneration6SubmissionJournalProbeResult,
   type BscTestnetPtaWbnbPoolSubmissionJournalRecoveryReader,
   type BscTestnetPtaWbnbPoolSubmissionRecoveryState
 } from "./bsc-testnet-pta-wbnb-pool-submission-journal.server";
@@ -106,7 +109,7 @@ export interface BscTestnetPtaWbnbPoolFixedProductionPorts {
   readonly authenticateAuthorizedIntent: (intent: unknown) => boolean;
   readonly predecessorSigningJournal: BscTestnetPtaWbnbPoolPredecessorLocalJournalRecoveryReader;
   readonly predecessorTerminal: BscTestnetPtaWbnbPoolPredecessorTerminalBinding;
-  readonly probePredecessorSubmission: () => Promise<BscTestnetPtaWbnbPoolGeneration5SubmissionJournalProbeResult>;
+  readonly probePredecessorSubmission: () => Promise<BscTestnetPtaWbnbPoolGeneration6SubmissionJournalProbeResult>;
   readonly signingJournal: BscTestnetPtaWbnbPoolLocalJournal;
   readonly submissionJournal: BscTestnetPtaWbnbPoolDurableSubmissionJournal;
   readonly issueWorker: (executionCapability: unknown) => BscTestnetPtaWbnbPoolSigningWorker;
@@ -219,7 +222,7 @@ function stateBinding(state: BscTestnetPtaWbnbPoolLocalJournalState): Readonly<{
 
 function exactClaimRequestFromIntent(
   intent: BscTestnetPtaWbnbPoolAuthorizedSigningIntent
-): BscTestnetPtaWbnbPoolGeneration7ClaimRequest {
+): BscTestnetPtaWbnbPoolGeneration8ClaimRequest {
   const body = Object.freeze({
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: intent.envelopeHash,
@@ -272,7 +275,7 @@ function localTerminalMatchesCombinedEvidence(
 }
 
 function predecessorSubmissionIsExactEmpty(
-  probe: BscTestnetPtaWbnbPoolGeneration5SubmissionJournalProbeResult
+  probe: BscTestnetPtaWbnbPoolGeneration6SubmissionJournalProbeResult
 ): boolean {
   return (
     probe.status === "ready" &&
@@ -307,7 +310,7 @@ function predecessorTerminalMatchesRecoveryAttempt(
 function claimedStateMatchesRequest(
   state: BscTestnetPtaWbnbPoolLocalJournalState,
   claimId: string,
-  request: BscTestnetPtaWbnbPoolGeneration7ClaimRequest
+  request: BscTestnetPtaWbnbPoolGeneration8ClaimRequest
 ): boolean {
   return (
     state.status === "claimed" &&
@@ -563,9 +566,9 @@ export async function reconcileExistingBscTestnetPtaWbnbPoolRecoveryForInternalU
 
 /**
  * Narrow fresh-only composition. It accepts only the already activated private native capabilities
- * minted after the release policy and exact owner ceremony. It re-reads the immutable generation-6
+ * minted after the release policy and exact owner ceremony. It re-reads the immutable generation-7
  * failed-before-worker terminal, the exact-empty predecessor submission namespace, and both active
- * durable journals, and refuses any changed state before the generation-7 claim.
+ * durable journals, and refuses any changed state before the generation-8 claim.
  */
 export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
   ports: BscTestnetPtaWbnbPoolFixedProductionPorts
@@ -580,7 +583,7 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
     const now = exactDate(ports.now);
     if (now === null) return blocked("CLOCK_INVALID", "Production clock is invalid.");
     let predecessorTerminalState: BscTestnetPtaWbnbPoolPredecessorTerminalState | null;
-    let predecessorSubmissionState: BscTestnetPtaWbnbPoolGeneration5SubmissionJournalProbeResult;
+    let predecessorSubmissionState: BscTestnetPtaWbnbPoolGeneration6SubmissionJournalProbeResult;
     let signingState: BscTestnetPtaWbnbPoolLocalJournalState;
     let recoveryState: BscTestnetPtaWbnbPoolSubmissionRecoveryState;
     try {
@@ -609,7 +612,7 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
     ) {
       return blocked(
         "PREDECESSOR_TERMINAL_CHANGED_AFTER_OWNER_CONFIRMATION",
-        "The exact generation-6 terminal or exact-empty submission-v5 namespace changed after the owner ceremony; generation-7 authority cannot be used."
+        "The exact generation-7 terminal or exact-empty submission-v6 namespace changed after the owner ceremony; generation-8 authority cannot be used."
       );
     }
     const descriptor = describeBscTestnetPtaWbnbPoolOneShotBoundary(envelope, ports.now);
@@ -726,7 +729,7 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
           }
           const retainedClaim = await ports.signingJournal.readState();
           if (!claimedStateMatchesRequest(retainedClaim, result.claimId, claimRequest)) {
-            throw new Error("GENERATION_7_CLAIM_READBACK_MISMATCH");
+            throw new Error("GENERATION_8_CLAIM_READBACK_MISMATCH");
           }
           return Object.freeze({ status: "claimed" as const, claimId: result.claimId });
         },
@@ -754,7 +757,9 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
           return rechecker
             .recheck(Object.freeze({ authorizedIntent: intent, claimId: request.claimId }))
             .then((result) => {
-              if (result.status !== "verified") throw new Error(result.issue.code);
+              if (result.status !== "verified") {
+                throw new BscTestnetPtaWbnbPoolPostClaimRecheckRejected(result.issue);
+              }
               return result.capability;
             });
         },
@@ -821,15 +826,17 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
         const retainedClaim = await ports.signingJournal.readState();
         const binding = stateBinding(retainedClaim);
         const issueCode: BscTestnetPtaWbnbPoolFailedBeforeWorkerIssueCode =
-          signed.issue.code === "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN"
+          signed.issue.postClaimRecheckIssue?.code ??
+          (signed.issue.code === "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN"
             ? "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN"
-            : "POST_CLAIM_RECHECK_REJECTED";
+            : "POST_CLAIM_RECHECK_REJECTED");
         const evidenceDigest = `0x${createHash("sha256")
           .update(
             JSON.stringify({
               phase: signed.issue.phase,
               code: signed.issue.code,
-              protocolIssue: signed.issue.protocolIssue
+              protocolIssue: signed.issue.protocolIssue,
+              postClaimRecheckIssue: signed.issue.postClaimRecheckIssue
             }),
             "utf8"
           )
@@ -873,7 +880,11 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
           );
         }
       }
-      return blocked(signed.issue.code, signed.issue.message, signed.transactionHash);
+      return blocked(
+        signed.issue.postClaimRecheckIssue?.code ?? signed.issue.code,
+        signed.issue.postClaimRecheckIssue?.message ?? signed.issue.message,
+        signed.transactionHash
+      );
     }
     durableSignedTransactionHash = signed.transactionHash;
     const signedState = await ports.signingJournal.readState();
@@ -903,9 +914,9 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
     }
     await ports.submissionJournal.initializeSignedCommit(
       Object.freeze({
-        schemaVersion: 7 as const,
-        kind: "authenticated_owner_recovery_generation_7_signed_submission_commit_v7" as const,
-        ownerAuthorizationPolicy: BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V8_POLICY,
+        schemaVersion: 8 as const,
+        kind: "authenticated_owner_recovery_generation_8_signed_submission_commit_v8" as const,
+        ownerAuthorizationPolicy: BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V9_POLICY,
         capability
       })
     );
