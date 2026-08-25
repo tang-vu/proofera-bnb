@@ -929,7 +929,7 @@ function ownerAuthorizationText(
   const confirmationNotAfter = new Date(confirmationNotAfterMilliseconds).toISOString();
   return [
     BSC_TESTNET_PTA_WBNB_POOL_OWNER_AUTHORIZATION_TEXT_DOMAIN,
-    "decision=AUTHORIZE_FRESH_RECOVERY_GENERATION_5_POOL_INITIALIZATION_SIGNATURE_AND_SUBMISSION_AFTER_APPEND_ONLY_PREDECESSOR_TERMINAL",
+    "decision=AUTHORIZE_FRESH_RECOVERY_GENERATION_6_POOL_INITIALIZATION_SIGNATURE_AND_SUBMISSION_AFTER_APPEND_ONLY_PREDECESSOR_TERMINAL",
     `executionFlag=${BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_EXECUTION_FLAG}`,
     `chainId=${BSC_TESTNET_PTA_WBNB_POOL_CHAIN_ID}`,
     `from=${BSC_TESTNET_PTA_WBNB_POOL_SENDER}`,
@@ -959,7 +959,7 @@ function ownerAuthorizationText(
     `predecessorGeneration=${terminal.generation}`,
     `predecessorTerminalRawSha256=${terminal.predecessorTerminalRawSha256}`,
     `predecessorEnvelopeHash=${terminal.predecessorEnvelopeHash}`,
-    `inheritedPredecessorFenceSha256=${terminal.inheritedPredecessorTerminalRawSha256}`,
+    `inheritedPredecessorTerminalRawSha256=${terminal.inheritedPredecessorTerminalRawSha256}`,
     `predecessorAttemptId=${terminal.predecessorAttemptId}`,
     `predecessorPhase=${terminal.phase}`,
     `predecessorIssueCode=${terminal.issueCode}`,
@@ -971,7 +971,7 @@ function ownerAuthorizationText(
     `predecessorSubmissionJournalState=${terminal.submissionJournalState}`,
     `predecessorClaimRawSha256=${terminal.predecessorClaimRawSha256}`,
     `predecessorRecordedAt=${terminal.recordedAt}`,
-    "recoveryRule=append_only_failed_before_worker_terminal_proves_no_worker_authorization_no_worker_start_no_signature;separate_exact_empty_submission_v3_plus_code_ordering_proves_no_submission;fresh_distinct_later_envelope_requires_new_owner_authorization",
+    "recoveryRule=append_only_failed_before_worker_terminal_proves_no_worker_authorization_no_worker_start_no_signature;separate_exact_empty_submission_v4_plus_code_ordering_proves_no_submission;fresh_distinct_later_envelope_requires_new_owner_authorization",
     `signingHash=${transaction.signingHash}`,
     `gasLimit=${transaction.gasLimit}`,
     `gasPriceWei=${transaction.gasPriceWei}`,
@@ -1074,7 +1074,7 @@ export function buildBscTestnetPtaWbnbPoolOwnerAuthorizationChallengeForInternal
     `predecessorTerminalRawSha256=${recovery.predecessorTerminalRawSha256}`,
     `attemptId=${recovery.attemptId}`,
     `ceremonyNonce=${ceremonyNonce}`,
-    "decision=CONFIRM_FRESH_GENERATION_5_AUTHORIZATION_AFTER_APPEND_ONLY_PREDECESSOR_TERMINAL_ONE_SIGNATURE_AND_ONE_SUBMISSION_NO_RETRY_NO_REPLACEMENT"
+    "decision=CONFIRM_FRESH_GENERATION_6_AUTHORIZATION_AFTER_APPEND_ONLY_PREDECESSOR_TERMINAL_ONE_SIGNATURE_AND_ONE_SUBMISSION_NO_RETRY_NO_REPLACEMENT"
   ].join("|");
   if (Buffer.byteLength(confirmation, "utf8") > MAXIMUM_OWNER_CONFIRMATION_BYTES) return null;
   return Object.freeze({

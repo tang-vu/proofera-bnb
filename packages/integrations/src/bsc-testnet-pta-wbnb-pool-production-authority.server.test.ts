@@ -403,6 +403,16 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
       `predecessorClaimRawSha256=${BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256}`
     );
     expect(challenge.ownerAuthorizationText).toContain(
+      "decision=AUTHORIZE_FRESH_RECOVERY_GENERATION_6_POOL_INITIALIZATION_SIGNATURE_AND_SUBMISSION_AFTER_APPEND_ONLY_PREDECESSOR_TERMINAL"
+    );
+    expect(challenge.ownerAuthorizationText).toContain(
+      `inheritedPredecessorTerminalRawSha256=${BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256}`
+    );
+    expect(challenge.ownerAuthorizationText).toContain("separate_exact_empty_submission_v4");
+    expect(challenge.ownerAuthorizationText).not.toContain("GENERATION_5_POOL_INITIALIZATION");
+    expect(challenge.ownerAuthorizationText).not.toContain("submission_v3");
+    expect(challenge.ownerAuthorizationText).not.toContain("inheritedPredecessorFenceSha256");
+    expect(challenge.ownerAuthorizationText).toContain(
       "predecessorWorkerAuthorizationOutcome=not_attempted"
     );
     expect(challenge.ownerAuthorizationText).toContain(
@@ -434,9 +444,9 @@ describe("PTA/WBNB runtime-policy and exact owner authority", () => {
       `0x${createHash("sha256").update(challenge.ownerAuthorizationText).digest("hex")}`
     );
     expect(challenge.ownerConfirmationText).toContain(
-      "decision=CONFIRM_FRESH_GENERATION_5_AUTHORIZATION_AFTER_APPEND_ONLY_PREDECESSOR_TERMINAL_ONE_SIGNATURE_AND_ONE_SUBMISSION_NO_RETRY_NO_REPLACEMENT"
+      "decision=CONFIRM_FRESH_GENERATION_6_AUTHORIZATION_AFTER_APPEND_ONLY_PREDECESSOR_TERMINAL_ONE_SIGNATURE_AND_ONE_SUBMISSION_NO_RETRY_NO_REPLACEMENT"
     );
-    expect(challenge.ownerConfirmationText).not.toContain("GENERATION_2_AUTHORIZATION");
+    expect(challenge.ownerConfirmationText).not.toContain("GENERATION_5_AUTHORIZATION");
     expect(
       authority.authorize(exactDescriptor, commandFor(instantiation, releaseTrust), localCapability)
     ).toMatchObject({ status: "blocked", issue: { code: "OWNER_CEREMONY_REQUIRED" } });
