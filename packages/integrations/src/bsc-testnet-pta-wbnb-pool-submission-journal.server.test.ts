@@ -655,7 +655,7 @@ describe.runIf(process.platform === "win32")(
       }
     }, 30_000);
 
-    it("strictly exposes generation-4 submission-v4 state without mutation", async () => {
+    it("strictly exposes generation-5 submission-v4 state without mutation", async () => {
       const directory = await createSyntheticWindowsDirectory();
       try {
         const emptyBefore = await snapshotSyntheticTree(directory);
@@ -686,7 +686,7 @@ describe.runIf(process.platform === "win32")(
       }
     }, 30_000);
 
-    it("strictly exposes generation-5 submission-v5 state without mutation", async () => {
+    it("strictly exposes generation-6 submission-v5 state without mutation", async () => {
       const directory = await createSyntheticWindowsDirectory();
       try {
         const emptyBefore = await snapshotSyntheticTree(directory);

@@ -1740,7 +1740,7 @@ function generation4ProbeBlocked(): BscTestnetPtaWbnbPoolGeneration4SubmissionJo
     files: null,
     issue: Object.freeze({
       code: "GENERATION_4_SUBMISSION_JOURNAL_INVALID" as const,
-      message: "The generation-5 submission-v5 namespace could not be inspected without mutation."
+      message: "The generation-5 submission-v4 namespace could not be inspected without mutation."
     })
   });
 }
@@ -2184,7 +2184,7 @@ export async function probeWindowsBscTestnetPtaWbnbPoolGeneration3SubmissionJour
   }
 }
 
-/** Strict read-only probe for the generation-5 submission-v5 namespace. */
+/** Strict read-only probe for the generation-5 submission-v4 namespace. */
 export async function probeWindowsBscTestnetPtaWbnbPoolGeneration4SubmissionJournalForInternalUse(): Promise<BscTestnetPtaWbnbPoolGeneration4SubmissionJournalProbeResult> {
   if (process.platform !== "win32") return generation4ProbeBlocked();
   try {
@@ -2321,7 +2321,7 @@ export async function probeWindowsBscTestnetPtaWbnbPoolGeneration3SubmissionJour
   return probeGeneration3AtDirectory(directory);
 }
 
-/** Test-only no-write generation-5 submission-v5 namespace probe. */
+/** Test-only no-write generation-5 submission-v4 namespace probe. */
 export async function probeWindowsBscTestnetPtaWbnbPoolGeneration4SubmissionJournalAtSyntheticDirectoryForTests(
   untrustedDirectory: unknown
 ): Promise<BscTestnetPtaWbnbPoolGeneration4SubmissionJournalProbeResult> {

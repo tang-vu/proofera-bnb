@@ -321,7 +321,7 @@ there was no fresh RPC, custody-artifact access, DPAPI operation, custody unlock
 transaction hash, send, receipt, pool, or liquidity. The source then changed, so this exact triplet and
 policy are historical v1 evidence only and cannot authorize v2.
 
-The current v7 challenge/frame domains retain the strict nonce-bound ASCII `BEGIN`/`CHUNK`/`END` state
+The current v8 challenge/frame domains retain the strict nonce-bound ASCII `BEGIN`/`CHUNK`/`END` state
 machine introduced in v2 under one absolute five-minute deadline. Every line binds its exact line index, chunk count, policy byte
 length, and lowercase raw policy-byte SHA-256; each `CHUNK` also binds its exact zero-based chunk
 index. Lines must be exact-order LF or CRLF with no blank/control/trailing data. The hard content-line
@@ -333,7 +333,7 @@ chunks/eight total bounded lines without becoming authority. A one-off local Win
 motivated these conservative constants, but its harness and result are not retained and it is not
 reproducible repository evidence. Repository unit tests establish only the transport arithmetic and
 parser behavior. The reader reconstructs the policy once, verifies exact
-count/order, declared length/hash, and canonical base64url, and rejects retired v1/v2/v3/v4/v5/v6 domains, truncation,
+count/order, declared length/hash, and canonical base64url, and rejects retired v1/v2/v3/v4/v5/v6/v7 domains, truncation,
 missing/duplicate/reordered chunks, malformed terminators, and buffered trailing input before policy
 admission, fresh RPC, custody access, or owner authority. This invariant does not
 prove that the OS queue had no earlier input and does not protect against malicious same-user preload.
@@ -497,11 +497,11 @@ position authority is approved by this document.
 The two write decisions stay separate:
 
 1. Pool initialization requires its own fresh simulation, exact sender/nonce/gas/cost envelope, short
-   broadcast window, durable one-shot claim/submission journal, the exact generation-5 terminal, a new
-   owner-designated distinct-agent technical decision and canonical policy for the exact generation-6
-   release, exact owner-v9 authorization through the bounded TTY ceremony, receipt, exact logs, and
+   broadcast window, durable one-shot claim/submission journal, the exact generation-6 terminal, a new
+   owner-designated distinct-agent technical decision and canonical policy for the exact generation-7
+   release, exact owner-v10 authorization through the bounded TTY ceremony, receipt, exact logs, and
    post-state reconciliation. Historical confirmations cannot cross the terminal binding; this
-   preparation record supplies none of those generation-6 authority or transaction outputs.
+   preparation record supplies none of those generation-7 authority or transaction outputs.
 2. Only after the pool is independently re-reviewed may an LP mint be prepared. It requires separate
    bounded token approvals, explicit ticks/amounts/minima/deadline/slippage, owner/revoke authority,
    simulation, user confirmation, and receipt evidence.
