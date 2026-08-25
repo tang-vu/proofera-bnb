@@ -21,11 +21,11 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_SCOPE,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_CLAIM_RAW_SHA256,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ATTEMPT_ID,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_CLAIM_RAW_SHA256,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ATTEMPT_ID,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
@@ -50,7 +50,7 @@ const OWNER_DIGEST = `0x${"33".repeat(32)}` as Hex;
 const CLAIM_TOKEN = `0x${"44".repeat(32)}` as Hex;
 const MANIFEST = `0x${"55".repeat(32)}` as Hex;
 const PREDECESSOR_TERMINAL_RAW_SHA256 =
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256;
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256;
 const RUNTIME_INSTANTIATION_DIGEST = `0x${"88".repeat(32)}` as Hex;
 const RELEASE = "a".repeat(40);
 const RELEASE_TREE = "b".repeat(40);
@@ -89,8 +89,8 @@ function transaction() {
 
 function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
   return Object.freeze({
-    schemaVersion: 5,
-    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_5",
+    schemaVersion: 6,
+    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_6",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
     reviewerApprovalDigest: REVIEWER_DIGEST,
@@ -107,7 +107,7 @@ function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
 function freshCapability(): BscTestnetPtaWbnbPoolFreshRecheckCapability {
   const timestamp = Math.floor(Date.parse("2026-08-13T04:29:30.000Z") / 1_000).toString();
   return {
-    schemaVersion: 5,
+    schemaVersion: 6,
     scope: BSC_TESTNET_PTA_WBNB_POOL_FRESH_RECHECK_SCOPE,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
@@ -175,7 +175,7 @@ function responseWithScalars(request: BscTestnetPtaWbnbPoolSigningWorkerRequest,
     { r, s, v: 229n }
   );
   return {
-    schemaVersion: 5,
+    schemaVersion: 6,
     operation: BSC_TESTNET_PTA_WBNB_POOL_SIGNING_WORKER_OPERATION,
     status: "signed",
     oneShotIntentId: BSC_TESTNET_PTA_WBNB_POOL_ONE_SHOT_INTENT_ID,
@@ -192,24 +192,24 @@ function responseWithScalars(request: BscTestnetPtaWbnbPoolSigningWorkerRequest,
 }
 
 describe("PTA/WBNB pool exact one-shot protocol", () => {
-  it("pins immutable predecessor lineage through the exact generation-4 terminal", () => {
+  it("pins immutable predecessor lineage through the exact generation-5 terminal", () => {
     expect(BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2_CLAIM_RAW_SHA256).toBe(
       "0x613df995936c3ccfff56e5da5588906f1bd28340ae8297eb08524274b9b8e1c3"
     );
     expect(BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_CLAIM_RAW_SHA256).toBe(
       "0x7ff780a8f0ac1a1f8ff7bced5d858259f918cdb1891c684aa208b6bca31c9585"
     );
-    expect(BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256).toBe(
-      "0x9fa84a9cf79373dd1ccfd5217bb0159cb6e97f6821489d9a1afbc0c5df258f2e"
-    );
-    expect(BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_CLAIM_RAW_SHA256).toBe(
-      "0xd5fc6da9f853c621f4f407c9d8a729f898c0297720bc50817e633fa538967f36"
-    );
     expect(BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256).toBe(
       "0x2e0570423b1217f1dab6fa8cdb91a0a75b2d78023bacc611a6c81017d0033bab"
     );
-    expect(BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST).toBe(
-      "0x23468d2bf83c3b855334c077890c866c59955a44c42c83f2e32af4a5ef73ad06"
+    expect(BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_CLAIM_RAW_SHA256).toBe(
+      "0x0d76c35b7d6cdec488b8b79dafcefacc597c79f057fe722a2202d284515017f1"
+    );
+    expect(BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256).toBe(
+      "0x39a6295f3f816cb5bba6c8c3be11982bcafa45847608e1150de950738217c8c9"
+    );
+    expect(BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_FAILED_BEFORE_WORKER_OUTCOME_DIGEST).toBe(
+      "0x7db76f9069e2d46d674eaccb2c7453489e8b80ca1940288b49ac7da46196a93a"
     );
   });
   it("pins the reviewed operation key and exact legacy EIP-155 unsigned transaction", () => {
@@ -229,10 +229,10 @@ describe("PTA/WBNB pool exact one-shot protocol", () => {
     expect(keccak256(exact.serializedUnsignedTransaction)).toBe(exact.signingHash);
   });
 
-  it("derives generation-5 attempt IDs from canonical full release identity and rejects drift", () => {
+  it("derives generation-6 attempt IDs from canonical full release identity and rejects drift", () => {
     const exact = recovery().attemptId;
     expect(exact).toMatch(/^0x[0-9a-f]{64}$/u);
-    expect(exact).not.toBe(BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ATTEMPT_ID);
+    expect(exact).not.toBe(BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ATTEMPT_ID);
     expect(
       deriveBscTestnetPtaWbnbPoolRecoveryAttemptId({
         generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
@@ -342,7 +342,7 @@ describe("PTA/WBNB pool exact one-shot protocol", () => {
       { ...exact.recovery, generation: 1 },
       { ...exact.recovery, predecessorState: "claimed" },
       { ...exact.recovery, predecessorTerminalRawSha256: `0x${"12".repeat(32)}` },
-      { ...exact.recovery, attemptId: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ATTEMPT_ID }
+      { ...exact.recovery, attemptId: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ATTEMPT_ID }
     ]) {
       expect(
         parseBscTestnetPtaWbnbPoolAuthorizedSigningIntentForInternalUse(

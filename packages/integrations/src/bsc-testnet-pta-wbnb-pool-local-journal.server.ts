@@ -26,6 +26,7 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ATTEMPT_ID,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ENVELOPE_HASH,
@@ -33,6 +34,13 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_RELEASE_COMMIT,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_RUNTIME_MANIFEST_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ATTEMPT_ID,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ENVELOPE_HASH,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_RELEASE_COMMIT,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_RUNTIME_MANIFEST_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION,
@@ -69,21 +77,27 @@ const GENERATION_3_JOURNAL_SUBDIRECTORY = [
   "operations",
   "bsc-testnet-pta-wbnb-pool-v3"
 ] as const;
-const PREDECESSOR_JOURNAL_SUBDIRECTORY = [
+const GENERATION_4_JOURNAL_SUBDIRECTORY = [
   "ProofEra",
   "operations",
   "bsc-testnet-pta-wbnb-pool-v4"
 ] as const;
-const ACTIVE_JOURNAL_SUBDIRECTORY = [
+const PREDECESSOR_JOURNAL_SUBDIRECTORY = [
   "ProofEra",
   "operations",
   "bsc-testnet-pta-wbnb-pool-v5"
 ] as const;
+const ACTIVE_JOURNAL_SUBDIRECTORY = [
+  "ProofEra",
+  "operations",
+  "bsc-testnet-pta-wbnb-pool-v6"
+] as const;
 const LEGACY_SCHEMA_VERSION = "bsc_testnet_pta_wbnb_pool_local_journal_v1" as const;
 const GENERATION_2_SCHEMA_VERSION = "bsc_testnet_pta_wbnb_pool_local_journal_v2" as const;
 const GENERATION_3_SCHEMA_VERSION = "bsc_testnet_pta_wbnb_pool_local_journal_v3" as const;
-const PREDECESSOR_SCHEMA_VERSION = "bsc_testnet_pta_wbnb_pool_local_journal_v4" as const;
-const ACTIVE_SCHEMA_VERSION = "bsc_testnet_pta_wbnb_pool_local_journal_v5" as const;
+const GENERATION_4_SCHEMA_VERSION = "bsc_testnet_pta_wbnb_pool_local_journal_v4" as const;
+const PREDECESSOR_SCHEMA_VERSION = "bsc_testnet_pta_wbnb_pool_local_journal_v5" as const;
+const ACTIVE_SCHEMA_VERSION = "bsc_testnet_pta_wbnb_pool_local_journal_v6" as const;
 const SUPERSESSION_FENCE_SCHEMA_VERSION =
   "bsc_testnet_pta_wbnb_pool_pre_worker_supersession_fence_v3" as const;
 const GENERATION_2_SUPERSESSION_FENCE_SCHEMA_VERSION =
@@ -93,8 +107,10 @@ const LEGACY_SUPERSESSION_FENCE_SCHEMA_VERSION =
 const LEGACY_AUTHORIZATION_KIND =
   "exact_pta_wbnb_pool_initialization_user_authorization_v1" as const;
 const ACTIVE_AUTHORIZATION_KIND =
-  "exact_pta_wbnb_pool_recovery_generation_5_user_authorization_v5" as const;
+  "exact_pta_wbnb_pool_recovery_generation_6_user_authorization_v6" as const;
 const PREDECESSOR_AUTHORIZATION_KIND =
+  "exact_pta_wbnb_pool_recovery_generation_5_user_authorization_v5" as const;
+const GENERATION_4_AUTHORIZATION_KIND =
   "exact_pta_wbnb_pool_recovery_generation_4_user_authorization_v4" as const;
 const GENERATION_3_AUTHORIZATION_KIND =
   "exact_pta_wbnb_pool_recovery_generation_3_user_authorization_v3" as const;
@@ -108,14 +124,18 @@ const GENERATION_3_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.authorization-receipt.v3" as const;
 const GENERATION_3_CLAIM_ID_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.claim-id.v3" as const;
-const PREDECESSOR_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN =
+const GENERATION_4_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.authorization-receipt.v4" as const;
-const PREDECESSOR_CLAIM_ID_DIGEST_DOMAIN =
+const GENERATION_4_CLAIM_ID_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.claim-id.v4" as const;
-export const BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN =
+const PREDECESSOR_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.authorization-receipt.v5" as const;
-export const BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_CLAIM_ID_DIGEST_DOMAIN =
+const PREDECESSOR_CLAIM_ID_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.claim-id.v5" as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN =
+  "proofera.bsc-testnet.pta-wbnb-pool.authorization-receipt.v6" as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_CLAIM_ID_DIGEST_DOMAIN =
+  "proofera.bsc-testnet.pta-wbnb-pool.claim-id.v6" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_SUPERSESSION_FENCE_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.pre-worker-supersession-fence.v3" as const;
 const GENERATION_2_SUPERSESSION_FENCE_DIGEST_DOMAIN =
@@ -125,9 +145,9 @@ const LEGACY_SUPERSESSION_FENCE_DIGEST_DOMAIN =
 export const BSC_TESTNET_PTA_WBNB_POOL_NO_EFFECT_PROOF_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.pre-worker-no-effect-proof.v2" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_FAILED_BEFORE_WORKER_DIGEST_DOMAIN =
-  "proofera.bsc-testnet.pta-wbnb-pool.failed-before-worker.v5" as const;
+  "proofera.bsc-testnet.pta-wbnb-pool.failed-before-worker.v6" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_FAILED_BEFORE_WORKER_DIGEST_DOMAIN =
-  "proofera.bsc-testnet.pta-wbnb-pool.failed-before-worker.v4" as const;
+  "proofera.bsc-testnet.pta-wbnb-pool.failed-before-worker.v5" as const;
 const HISTORICAL_PREDECESSOR_STATE = "superseded_before_worker" as const;
 export {
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_1_CLAIM_RAW_SHA256,
@@ -136,6 +156,8 @@ export {
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_CLAIM_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256
 };
 const MAXIMUM_RECORD_BYTES = 32_768;
@@ -157,11 +179,11 @@ const LEGACY_SLOT_FILES = Object.freeze([
   "05-transition.v1.json"
 ]);
 const ACTIVE_SLOT_FILES = Object.freeze([
-  "01-claim.v5.json",
-  "02-transition.v5.json",
-  "03-transition.v5.json",
-  "04-transition.v5.json",
-  "05-transition.v5.json"
+  "01-claim.v6.json",
+  "02-transition.v6.json",
+  "03-transition.v6.json",
+  "04-transition.v6.json",
+  "05-transition.v6.json"
 ]);
 const GENERATION_2_SLOT_FILES = Object.freeze([
   "01-claim.v2.json",
@@ -171,6 +193,13 @@ const GENERATION_2_SLOT_FILES = Object.freeze([
   "05-transition.v2.json"
 ]);
 const PREDECESSOR_SLOT_FILES = Object.freeze([
+  "01-claim.v5.json",
+  "02-transition.v5.json",
+  "03-transition.v5.json",
+  "04-transition.v5.json",
+  "05-transition.v5.json"
+]);
+const GENERATION_4_SLOT_FILES = Object.freeze([
   "01-claim.v4.json",
   "02-transition.v4.json",
   "03-transition.v4.json",
@@ -191,6 +220,7 @@ type JournalGeneration =
   | 1
   | typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2
   | typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3
+  | typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4
   | typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
   | typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
 
@@ -206,6 +236,8 @@ function slotFilesFor(generation: JournalGeneration): readonly string[] {
       return GENERATION_2_SLOT_FILES;
     case BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3:
       return GENERATION_3_SLOT_FILES;
+    case BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4:
+      return GENERATION_4_SLOT_FILES;
     case BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION:
       return PREDECESSOR_SLOT_FILES;
     case BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION:
@@ -254,6 +286,7 @@ interface BscTestnetPtaWbnbPoolRecoveryClaimRequest extends BscTestnetPtaWbnbPoo
   readonly generation:
     | typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2
     | typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3
+    | typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4
     | typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
     | typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
   readonly predecessorState:
@@ -263,15 +296,22 @@ interface BscTestnetPtaWbnbPoolRecoveryClaimRequest extends BscTestnetPtaWbnbPoo
   readonly attemptId: Hex;
 }
 
-export interface BscTestnetPtaWbnbPoolGeneration5ClaimRequest extends BscTestnetPtaWbnbPoolRecoveryClaimRequest {
+export interface BscTestnetPtaWbnbPoolGeneration6ClaimRequest extends BscTestnetPtaWbnbPoolRecoveryClaimRequest {
   readonly generation: typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
   readonly predecessorState: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE;
   readonly predecessorFenceSha256?: never;
   readonly predecessorTerminalRawSha256: Hex;
 }
 
-export interface BscTestnetPtaWbnbPoolGeneration4ClaimRequest extends BscTestnetPtaWbnbPoolRecoveryClaimRequest {
+export interface BscTestnetPtaWbnbPoolGeneration5ClaimRequest extends BscTestnetPtaWbnbPoolRecoveryClaimRequest {
   readonly generation: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION;
+  readonly predecessorState: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE;
+  readonly predecessorFenceSha256?: never;
+  readonly predecessorTerminalRawSha256: Hex;
+}
+
+export interface BscTestnetPtaWbnbPoolGeneration4ClaimRequest extends BscTestnetPtaWbnbPoolRecoveryClaimRequest {
+  readonly generation: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4;
   readonly predecessorState: typeof HISTORICAL_PREDECESSOR_STATE;
   readonly predecessorFenceSha256: Hex;
   readonly predecessorTerminalRawSha256?: never;
@@ -303,15 +343,48 @@ function isRecoveryClaim(
     "generation" in request &&
     (request.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2 ||
       request.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3 ||
+      request.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4 ||
       request.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION ||
       request.generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION)
   );
 }
 
 function predecessorStateFor(generation: Exclude<JournalGeneration, 1>) {
-  return generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+  return generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION ||
+    generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
     ? BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE
     : HISTORICAL_PREDECESSOR_STATE;
+}
+
+function usesTerminalPredecessor(
+  generation: Exclude<JournalGeneration, 1>
+): generation is
+  | typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
+  | typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION {
+  return (
+    generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION ||
+    generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+  );
+}
+
+function expectedPredecessorTerminalRawSha256(
+  generation:
+    | typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
+    | typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+): Hex {
+  return generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
+    ? BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256
+    : BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256;
+}
+
+function predecessorAttemptId(
+  generation:
+    | typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
+    | typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+): Hex {
+  return generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
+    ? BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ATTEMPT_ID
+    : BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ATTEMPT_ID;
 }
 
 interface JournalBinding {
@@ -328,6 +401,7 @@ interface JournalBinding {
   readonly generation?:
     | typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2
     | typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3
+    | typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4
     | typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
     | typeof BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION;
   readonly predecessorState?:
@@ -425,14 +499,14 @@ export interface BscTestnetPtaWbnbPoolSupersessionFenceState {
 export interface BscTestnetPtaWbnbPoolPredecessorTerminalState {
   readonly status: "failed_before_worker";
   readonly generation: typeof BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION;
-  readonly predecessorClaimRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_CLAIM_RAW_SHA256;
-  readonly predecessorTerminalRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256;
-  readonly predecessorEnvelopeHash: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ENVELOPE_HASH;
-  readonly inheritedFenceSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256;
-  readonly predecessorAttemptId: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ATTEMPT_ID;
+  readonly predecessorClaimRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_CLAIM_RAW_SHA256;
+  readonly predecessorTerminalRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256;
+  readonly predecessorEnvelopeHash: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ENVELOPE_HASH;
+  readonly inheritedPredecessorTerminalRawSha256: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256;
+  readonly predecessorAttemptId: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ATTEMPT_ID;
   readonly phase: "post_claim_recheck";
   readonly issueCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN";
-  readonly outcomeDigest: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST;
+  readonly outcomeDigest: typeof BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_FAILED_BEFORE_WORKER_OUTCOME_DIGEST;
   readonly workerAuthorizationOutcome: "not_attempted";
   readonly workerStartOutcome: "not_attempted";
   readonly signatureOutcome: "not_attempted";
@@ -485,7 +559,7 @@ export interface BscTestnetPtaWbnbPoolLocalJournalState {
 
 export interface BscTestnetPtaWbnbPoolLocalJournal {
   readonly claimExactInitialization: (
-    request: BscTestnetPtaWbnbPoolGeneration5ClaimRequest
+    request: BscTestnetPtaWbnbPoolGeneration6ClaimRequest
   ) => Promise<
     | Readonly<{ status: "claimed"; claimId: string }>
     | Readonly<{
@@ -655,6 +729,7 @@ interface ParsedRecord extends JournalBinding {
     | typeof LEGACY_SCHEMA_VERSION
     | typeof GENERATION_2_SCHEMA_VERSION
     | typeof GENERATION_3_SCHEMA_VERSION
+    | typeof GENERATION_4_SCHEMA_VERSION
     | typeof PREDECESSOR_SCHEMA_VERSION
     | typeof ACTIVE_SCHEMA_VERSION;
   readonly kind: RecordKind;
@@ -973,13 +1048,15 @@ function receiptBody(request: AnyClaimBody) {
             ? GENERATION_2_AUTHORIZATION_KIND
             : request.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3
               ? GENERATION_3_AUTHORIZATION_KIND
-              : request.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
-                ? PREDECESSOR_AUTHORIZATION_KIND
-                : ACTIVE_AUTHORIZATION_KIND,
+              : request.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4
+                ? GENERATION_4_AUTHORIZATION_KIND
+                : request.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
+                  ? PREDECESSOR_AUTHORIZATION_KIND
+                  : ACTIVE_AUTHORIZATION_KIND,
         ...common,
         generation: request.generation,
         predecessorState: request.predecessorState,
-        ...(request.generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+        ...(usesTerminalPredecessor(request.generation)
           ? { predecessorTerminalRawSha256: request.predecessorTerminalRawSha256 }
           : { predecessorFenceSha256: request.predecessorFenceSha256 }),
         attemptId: request.attemptId
@@ -997,9 +1074,11 @@ export function deriveBscTestnetPtaWbnbPoolAuthorizationReceiptSha256(request: A
             ? GENERATION_2_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN
             : request.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3
               ? GENERATION_3_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN
-              : request.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
-                ? PREDECESSOR_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN
-                : BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN
+              : request.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4
+                ? GENERATION_4_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN
+                : request.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
+                  ? PREDECESSOR_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN
+                  : BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_AUTHORIZATION_RECEIPT_DIGEST_DOMAIN
         }\u0000${JSON.stringify(body)}`
       )
     : sha256Hex(JSON.stringify(body));
@@ -1058,14 +1137,14 @@ function inspectClaimRequest(
     (generation !== 1 &&
       (record.generation !== generation ||
         record.predecessorState !== predecessorStateFor(generation) ||
-        !(generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+        !(usesTerminalPredecessor(generation)
           ? exactBytes32(record.predecessorTerminalRawSha256)
           : exactBytes32(record.predecessorFenceSha256)) ||
         !exactBytes32(record.attemptId) ||
-        (generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION &&
+        (usesTerminalPredecessor(generation) &&
           (record.predecessorTerminalRawSha256 !==
-            BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256 ||
-            record.attemptId === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ATTEMPT_ID)))) ||
+            expectedPredecessorTerminalRawSha256(generation) ||
+            record.attemptId === predecessorAttemptId(generation))))) ||
     gasLimit === null ||
     gasPrice === null ||
     maxCost === null ||
@@ -1098,7 +1177,7 @@ function inspectClaimRequest(
       ? {
           generation,
           predecessorState: predecessorStateFor(generation),
-          ...(generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+          ...(usesTerminalPredecessor(generation)
             ? { predecessorTerminalRawSha256: record.predecessorTerminalRawSha256 as Hex }
             : { predecessorFenceSha256: record.predecessorFenceSha256 as Hex }),
           attemptId: record.attemptId as Hex
@@ -1123,12 +1202,14 @@ function claimIdFor(request: AnyClaimRequest, generation: JournalGeneration): st
           ? GENERATION_2_CLAIM_ID_DIGEST_DOMAIN
           : generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3
             ? GENERATION_3_CLAIM_ID_DIGEST_DOMAIN
-            : BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_CLAIM_ID_DIGEST_DOMAIN
+            : generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4
+              ? GENERATION_4_CLAIM_ID_DIGEST_DOMAIN
+              : BSC_TESTNET_PTA_WBNB_POOL_ACTIVE_CLAIM_ID_DIGEST_DOMAIN
     }\u0000${JSON.stringify({
       operationKey: request.operationKey,
       generation,
       predecessorState: request.predecessorState,
-      ...(generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+      ...(usesTerminalPredecessor(generation)
         ? { predecessorTerminalRawSha256: request.predecessorTerminalRawSha256 }
         : { predecessorFenceSha256: request.predecessorFenceSha256 }),
       attemptId: request.attemptId
@@ -1152,8 +1233,8 @@ function bindingFromClaim(request: AnyClaimRequest, generation: JournalGeneratio
   } as const;
   if (generation === 1 || !isRecoveryClaim(request)) return Object.freeze(base);
   if (
-    generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION &&
-    request.generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION &&
+    usesTerminalPredecessor(generation) &&
+    request.generation === generation &&
     request.predecessorTerminalRawSha256 !== undefined
   ) {
     return Object.freeze({
@@ -1165,7 +1246,7 @@ function bindingFromClaim(request: AnyClaimRequest, generation: JournalGeneratio
     });
   }
   if (
-    generation !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION &&
+    !usesTerminalPredecessor(generation) &&
     request.generation === generation &&
     request.predecessorFenceSha256 !== undefined
   ) {
@@ -1181,7 +1262,7 @@ function bindingFromClaim(request: AnyClaimRequest, generation: JournalGeneratio
 }
 
 function recoveryBindingKeysFor(generation: Exclude<JournalGeneration, 1>): readonly string[] {
-  return generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+  return usesTerminalPredecessor(generation)
     ? ["generation", "predecessorState", "predecessorTerminalRawSha256", "attemptId"]
     : ["generation", "predecessorState", "predecessorFenceSha256", "attemptId"];
 }
@@ -1228,14 +1309,14 @@ function inspectBinding(
     (generation !== 1 &&
       (record.generation !== generation ||
         record.predecessorState !== predecessorStateFor(generation) ||
-        !(generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+        !(usesTerminalPredecessor(generation)
           ? exactBytes32(record.predecessorTerminalRawSha256)
           : exactBytes32(record.predecessorFenceSha256)) ||
         !exactBytes32(record.attemptId) ||
-        (generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION &&
+        (usesTerminalPredecessor(generation) &&
           (record.predecessorTerminalRawSha256 !==
-            BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256 ||
-            record.attemptId === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ATTEMPT_ID))))
+            expectedPredecessorTerminalRawSha256(generation) ||
+            record.attemptId === predecessorAttemptId(generation)))))
   ) {
     return null;
   }
@@ -1276,12 +1357,13 @@ function bindingOf(record: DataRecord | JournalBinding): JournalBinding {
     runtimeManifestSha256: record.runtimeManifestSha256 as Hex,
     ...(record.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2 ||
     record.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3 ||
+    record.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4 ||
     record.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION ||
     record.generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
       ? {
           generation: record.generation,
           predecessorState: predecessorStateFor(record.generation),
-          ...(record.generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+          ...(usesTerminalPredecessor(record.generation)
             ? { predecessorTerminalRawSha256: record.predecessorTerminalRawSha256 as Hex }
             : { predecessorFenceSha256: record.predecessorFenceSha256 as Hex }),
           attemptId: record.attemptId as Hex
@@ -1333,6 +1415,8 @@ function schemaVersionFor(generation: JournalGeneration) {
       return GENERATION_2_SCHEMA_VERSION;
     case BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3:
       return GENERATION_3_SCHEMA_VERSION;
+    case BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4:
+      return GENERATION_4_SCHEMA_VERSION;
     case BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION:
       return PREDECESSOR_SCHEMA_VERSION;
     case BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION:
@@ -1551,7 +1635,7 @@ function parseStored(
         ? {
             generation: record.generation,
             predecessorState: record.predecessorState,
-            ...(generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+            ...(usesTerminalPredecessor(generation)
               ? { predecessorTerminalRawSha256: record.predecessorTerminalRawSha256 }
               : { predecessorFenceSha256: record.predecessorFenceSha256 }),
             attemptId: record.attemptId
@@ -1642,16 +1726,20 @@ function parseStored(
     );
     const issueCode = inspectFailedBeforeWorkerIssueCode(record.issueCode);
     if (
-      (generation !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION &&
+      (generation !== BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4 &&
+        generation !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION &&
         generation !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION) ||
       binding === null ||
       record.phase !== "post_claim_recheck" ||
       issueCode === null ||
       !exactBytes32(record.outcomeDigest) ||
-      (generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION &&
+      ((generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4 ||
+        generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION) &&
         (issueCode !== "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" ||
           record.outcomeDigest !==
-            BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST))
+            (generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4
+              ? BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST
+              : BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_FAILED_BEFORE_WORKER_OUTCOME_DIGEST)))
     ) {
       return null;
     }
@@ -1750,11 +1838,13 @@ function stateFrom(
           ? BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2
           : claim.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3
             ? BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3
-            : claim.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
-              ? BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
-              : claim.generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
-                ? BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
-                : 1,
+            : claim.generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4
+              ? BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4
+              : claim.generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
+                ? BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION
+                : claim.generation === BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+                  ? BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION
+                  : 1,
     predecessorState: claim?.predecessorState ?? null,
     predecessorFenceSha256: claim?.predecessorFenceSha256 ?? null,
     predecessorTerminalRawSha256: claim?.predecessorTerminalRawSha256 ?? null,
@@ -1874,6 +1964,7 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
     (untrustedGeneration !== 1 &&
       untrustedGeneration !== BSC_TESTNET_PTA_WBNB_POOL_GENERATION_2 &&
       untrustedGeneration !== BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3 &&
+      untrustedGeneration !== BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4 &&
       untrustedGeneration !== BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION &&
       untrustedGeneration !== BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION)
   ) {
@@ -1985,7 +2076,7 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
       return unknownSnapshot(claim);
     }
     if (
-      generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION &&
+      generation === BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4 &&
       (records.length !== 2 ||
         last.kind !== "failed_before_worker" ||
         last.phase !== "post_claim_recheck" ||
@@ -2004,6 +2095,30 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
           BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_CLAIM_RAW_SHA256 ||
         sha256Hex(rawRecords[1] as string) !==
           BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256)
+    ) {
+      return unknownSnapshot(claim);
+    }
+    if (
+      generation === BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION &&
+      (records.length !== 2 ||
+        last.kind !== "failed_before_worker" ||
+        last.phase !== "post_claim_recheck" ||
+        last.issueCode !== "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" ||
+        last.outcomeDigest !==
+          BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_FAILED_BEFORE_WORKER_OUTCOME_DIGEST ||
+        claim.envelopeHash !== BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ENVELOPE_HASH ||
+        claim.attemptId !== BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ATTEMPT_ID ||
+        claim.releaseCommit !== BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_RELEASE_COMMIT ||
+        claim.runtimeManifestSha256 !==
+          BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_RUNTIME_MANIFEST_SHA256 ||
+        claim.predecessorTerminalRawSha256 !==
+          BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256 ||
+        Buffer.byteLength(rawRecords[0] as string, "utf8") !== 1_364 ||
+        Buffer.byteLength(rawRecords[1] as string, "utf8") !== 1_383 ||
+        sha256Hex(rawRecords[0] as string) !==
+          BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_CLAIM_RAW_SHA256 ||
+        sha256Hex(rawRecords[1] as string) !==
+          BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256)
     ) {
       return unknownSnapshot(claim);
     }
@@ -2055,8 +2170,9 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
           terminal.phase !== "post_claim_recheck" ||
           terminal.issueCode !== "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" ||
           terminal.outcomeDigest !==
-            BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST ||
-          claim.predecessorFenceSha256 !== BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256 ||
+            BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_FAILED_BEFORE_WORKER_OUTCOME_DIGEST ||
+          claim.predecessorTerminalRawSha256 !==
+            BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256 ||
           claim.attemptId === undefined
         ) {
           return null;
@@ -2064,15 +2180,16 @@ export function createBscTestnetPtaWbnbPoolLocalJournalCore(
         return Object.freeze({
           status: "failed_before_worker" as const,
           generation: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION,
-          predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_CLAIM_RAW_SHA256,
+          predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_CLAIM_RAW_SHA256,
           predecessorTerminalRawSha256:
+            BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
+          predecessorEnvelopeHash: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ENVELOPE_HASH,
+          inheritedPredecessorTerminalRawSha256:
             BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
-          predecessorEnvelopeHash: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ENVELOPE_HASH,
-          inheritedFenceSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_3_FENCE_SHA256,
-          predecessorAttemptId: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_ATTEMPT_ID,
+          predecessorAttemptId: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_ATTEMPT_ID,
           phase: "post_claim_recheck" as const,
           issueCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN" as const,
-          outcomeDigest: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+          outcomeDigest: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
           workerAuthorizationOutcome: "not_attempted" as const,
           workerStartOutcome: "not_attempted" as const,
           signatureOutcome: "not_attempted" as const,
@@ -2702,7 +2819,7 @@ try {
   if ([IO.Path]::GetFullPath($baseItem.FullName) -ne [IO.Path]::GetFullPath($base)) { throw 'base-path' }
 
   $cursor = $baseItem.FullName
-  foreach ($segment in @('ProofEra', 'operations', 'bsc-testnet-pta-wbnb-pool-v5')) {
+  foreach ($segment in @('ProofEra', 'operations', 'bsc-testnet-pta-wbnb-pool-v6')) {
     $candidate = [IO.Path]::GetFullPath([IO.Path]::Combine($cursor, $segment))
     if ([IO.Path]::GetDirectoryName($candidate) -ne [IO.Path]::GetFullPath($cursor)) { throw 'escape' }
     if (Test-Path -LiteralPath $candidate) {
@@ -2720,8 +2837,8 @@ try {
 
   # All ancestors have been validated before the first ACL mutation.
   $allowed = @(
-     '01-claim.v5.json', '02-transition.v5.json', '03-transition.v5.json',
-     '04-transition.v5.json', '05-transition.v5.json'
+     '01-claim.v6.json', '02-transition.v6.json', '03-transition.v6.json',
+     '04-transition.v6.json', '05-transition.v6.json'
   )
   $retainedFiles = @()
   foreach ($child in @(Get-ChildItem -LiteralPath $cursor -Force)) {
@@ -2834,6 +2951,7 @@ function expectedJournalDirectoryFromLocalAppData(
     subdirectory !== LEGACY_JOURNAL_SUBDIRECTORY &&
     subdirectory !== GENERATION_2_JOURNAL_SUBDIRECTORY &&
     subdirectory !== GENERATION_3_JOURNAL_SUBDIRECTORY &&
+    subdirectory !== GENERATION_4_JOURNAL_SUBDIRECTORY &&
     subdirectory !== PREDECESSOR_JOURNAL_SUBDIRECTORY &&
     subdirectory !== ACTIVE_JOURNAL_SUBDIRECTORY
   ) {
@@ -3399,9 +3517,36 @@ export async function openExistingWindowsBscTestnetPtaWbnbPoolGeneration3LocalJo
 }
 
 /**
- * Opens the immutable exact generation-4 failed-before-worker predecessor read-only. Its durable
+ * Opens immutable generation 4 for historical terminal-lineage verification only.
+ */
+export async function openExistingWindowsBscTestnetPtaWbnbPoolGeneration4LocalJournalForRecoveryForInternalUse(): Promise<BscTestnetPtaWbnbPoolExistingLocalJournalResult> {
+  if (process.platform !== "win32") return recoveryBlocked();
+  try {
+    const directory = await readOnlyFixedJournalDirectory(GENERATION_4_JOURNAL_SUBDIRECTORY);
+    if (directory === null) {
+      return Object.freeze({
+        status: "absent" as const,
+        journal: null,
+        state: emptyLocalJournalState(),
+        issue: null
+      });
+    }
+    const opened = await openExistingLocalAtDirectory(
+      directory,
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4
+    );
+    return opened.status === "opened"
+      ? Object.freeze({ ...opened, journal: activeRecoveryFacade(opened.journal) })
+      : opened;
+  } catch {
+    return recoveryBlocked();
+  }
+}
+
+/**
+ * Opens the immutable exact generation-5 failed-before-worker predecessor read-only. Its durable
  * two-slot terminal ordering proves no worker authorization/start/signature occurred. Submission
- * absence is established separately from the exact-empty submission-v3 namespace plus code
+ * absence is established separately from the exact-empty submission-v4 namespace plus code
  * ordering; this facade deliberately exposes no fence or mutation method.
  */
 export async function openExistingWindowsBscTestnetPtaWbnbPoolPredecessorLocalJournalForRecoveryForInternalUse(): Promise<BscTestnetPtaWbnbPoolExistingPredecessorLocalJournalResult> {

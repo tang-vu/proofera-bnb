@@ -19,7 +19,7 @@ import {
   createBscTestnetPtaWbnbPoolProductionAuthorizationGate
 } from "./bsc-testnet-pta-wbnb-pool-authorization.server";
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   buildBscTestnetPtaWbnbPoolExactSigningTransaction
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
@@ -125,9 +125,9 @@ function ownerAuthorization(
   });
   if (exact === null) throw new Error("Transaction fixture failed.");
   const body = {
-    schemaVersion: 6,
-    kind: "exact_owner_recovery_generation_5_signature_and_single_broadcast_authorization_v6",
-    decision: "authorize_fresh_chain_97_pool_recovery_generation_5_signature_and_single_broadcast",
+    schemaVersion: 7,
+    kind: "exact_owner_recovery_generation_6_signature_and_single_broadcast_authorization_v7",
+    decision: "authorize_fresh_chain_97_pool_recovery_generation_6_signature_and_single_broadcast",
     broadcastPolicy: "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity",
     liquidityActionAuthorized: false,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -140,9 +140,9 @@ function ownerAuthorization(
     authorizationTextSha256: TEXT_DIGEST,
     ceremonyNonce,
     recovery: deeplyFreeze({
-      generation: 5,
+      generation: 6,
       predecessorState: "failed_before_worker",
-      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_4_TRANSITION_RAW_SHA256,
+      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_5_TRANSITION_RAW_SHA256,
       attemptId: ATTEMPT_ID
     }),
     signingHash: exact.signingHash,
