@@ -262,6 +262,10 @@ test("opens the judge proof room without promoting incomplete gates", async ({ p
     "data-gate-state",
     "verified"
   );
+  await expect(page.locator('[data-gate-id="pancake-benefit"]')).toHaveAttribute(
+    "data-gate-state",
+    "initializer_only"
+  );
   await expect(page.getByText(/BSC testnet ERC-8004 Agent ID/u)).toHaveCount(4);
   await expect(page.getByText(/Execution disabled/u)).toHaveCount(4);
 });

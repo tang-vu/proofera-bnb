@@ -41,12 +41,12 @@ The five bounded lifecycle rows now have linked evidence. This closes only the t
 
 Eligibility story: prove a real, measurable benefit to an LP or trader; a logo or read-only integration is insufficient.
 
-| Required evidence               | Current state                                                                             | Closure artifact                                       |
-| ------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| Authentic Pancake product state | Exact-block public USDT/WBNB position capture and deterministic LP analysis retained      | Frozen controlled pool/position context                |
-| Real bounded operation          | Direct V3 selector/calldata and at-most-once boundaries implemented; no operation receipt | Successful controlled testnet transaction receipt      |
-| Before/after value              | Current capture identifies one-tick boundary risk but makes no performance claim          | Before/after range, fees, gas, slippage, and IL inputs |
-| Fair alternative                | LP TermiX manual baseline and protected adjudication are retained                         | Controlled benefit run compared against that baseline  |
+| Required evidence               | Current state                                                                                                                               | Closure artifact                                       |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| Authentic Pancake product state | Exact-block public USDT/WBNB position capture and deterministic LP analysis retained                                                        | Frozen controlled pool/position context                |
+| Real bounded operation          | Exact initializer receipt/logs observed on both fixed RPCs; strict durable confirmation unavailable and no liquidity/benefit receipt exists | Successful controlled liquidity transaction receipt    |
+| Before/after value              | Current capture identifies one-tick boundary risk but makes no performance claim                                                            | Before/after range, fees, gas, slippage, and IL inputs |
+| Fair alternative                | LP TermiX manual baseline and protected adjudication are retained                                                                           | Controlled benefit run compared against that baseline  |
 
 ### TermiX
 

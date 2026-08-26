@@ -29,7 +29,7 @@ test("submission readiness records all seven objective gates without claiming co
       ["production-release", "deployed_unfrozen"],
       ["agent-registration", "verified"],
       ["altana-lifecycle", "verified"],
-      ["pancake-benefit", "read_only_only"],
+      ["pancake-benefit", "initializer_only"],
       ["termix-pairs", "verified"],
       ["demo", "not_recorded"],
       ["submission", "draft"]

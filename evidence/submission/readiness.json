@@ -1,6 +1,6 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-26T09:53:16.614Z",
+  "updatedAtUtc": "2026-08-26T10:25:14.306Z",
   "readyForSubmission": false,
   "gates": [
     {
@@ -66,8 +66,8 @@
     },
     {
       "gateId": "pancake-benefit",
-      "state": "read_only_only",
-      "claim": "A third-party public-position analysis is retained; it proves no ownership, execution, receipt or realized benefit.",
+      "state": "initializer_only",
+      "claim": "Both fixed chain-97 RPCs observed a matching status-1 initializer receipt and expected PoolCreated/Initialize logs, but historical EIP-1898 state was unavailable so strict durable confirmation remains withheld. No liquidity, LP position, controlled before/after result or realized benefit is evidenced.",
       "blockers": [
         "Retain a controlled Pancake transaction receipt and before/after result against the frozen manual baseline net of known costs."
       ],
@@ -76,6 +76,11 @@
           "kind": "read_only_capture",
           "path": "evidence/pancake/runs/public-position/116342186-7152618.json",
           "sha256": "37947165be883e0a2dc4582fbdbf57ffd38f1a2cc5fa7295fdd9451d08087786"
+        },
+        {
+          "kind": "initializer_observation",
+          "path": "evidence/development/bsc-testnet-pta-wbnb-pool-reconciliation-observation-2026-08-26.json",
+          "sha256": "b19e9857aaff1572197da7dbf9c2c6f19ff6589ec1899dff8efd53fd47490c0b"
         }
       ]
     },
