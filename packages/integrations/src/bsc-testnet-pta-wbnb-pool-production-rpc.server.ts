@@ -26,6 +26,7 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_SENDER,
   BSC_TESTNET_WBNB_ADDRESS
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
+import { BSC_TESTNET_PTA_WBNB_POOL_GENERATION_10_TRANSACTION_HASH } from "./bsc-testnet-pta-wbnb-pool-generation-10-recovery";
 import { BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 import {
   BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_FINALITY_ANCESTRY_BLOCKS,
@@ -915,6 +916,74 @@ export async function sendExactBscTestnetPtaWbnbPoolRawTransactionOnceForInterna
 ): Promise<unknown> {
   void signedTransaction;
   throw new Error("PRODUCTION_AUTHORIZATION_UNAVAILABLE");
+}
+
+export interface BscTestnetPtaWbnbPoolGeneration10ExistingSignatureSender {
+  readonly sendExactRawTransactionOnce: (signedTransaction: Hex) => Promise<unknown>;
+}
+
+/**
+ * Generation-10's only send port. The exact predecessor bytes are fixed when this one-use closure
+ * is created. Both the fresh owner authority and the in-memory token minted by this process's
+ * successful O_EXCL submission_started append must be consumed before the sole RPC call begins.
+ */
+export function createBscTestnetPtaWbnbPoolGeneration10ExistingSignatureSenderForInternalUse(input: {
+  readonly capability: BscTestnetPtaWbnbPoolSubmissionCapability;
+  readonly consumeOwnerAuthority: (capability: unknown, signedTransaction: Hex) => boolean;
+  readonly consumeDurableStartToken: (transactionHash: Hex) => boolean;
+}): BscTestnetPtaWbnbPoolGeneration10ExistingSignatureSender {
+  const dependencies = inspectRecord(input);
+  const capability = inspectRecord(dependencies?.capability);
+  const consumeOwnerAuthority = dependencies?.consumeOwnerAuthority;
+  const consumeDurableStartToken = dependencies?.consumeDurableStartToken;
+  if (
+    dependencies === null ||
+    Reflect.ownKeys(dependencies).length !== 3 ||
+    capability === null ||
+    typeof consumeOwnerAuthority !== "function" ||
+    isProxy(consumeOwnerAuthority) ||
+    typeof consumeDurableStartToken !== "function" ||
+    isProxy(consumeDurableStartToken) ||
+    capability.transaction === null ||
+    typeof capability.transaction !== "object" ||
+    capability.transactionHash !== undefined ||
+    (capability.transaction as Readonly<Record<string, unknown>>).transactionHash !==
+      BSC_TESTNET_PTA_WBNB_POOL_GENERATION_10_TRANSACTION_HASH ||
+    (capability.transaction as Readonly<Record<string, unknown>>).signedTransaction === undefined
+  ) {
+    throw new Error("GENERATION_10_SENDER_CONFIGURATION_INVALID");
+  }
+  const expectedCapability = input.capability;
+  const expectedRaw = expectedCapability.transaction.signedTransaction;
+  if (keccak256(expectedRaw) !== BSC_TESTNET_PTA_WBNB_POOL_GENERATION_10_TRANSACTION_HASH) {
+    throw new Error("GENERATION_10_SENDER_CONFIGURATION_INVALID");
+  }
+  let attempted = false;
+  return Object.freeze({
+    sendExactRawTransactionOnce: async (signedTransaction: Hex): Promise<unknown> => {
+      if (attempted) throw new Error("GENERATION_10_SEND_ALREADY_ATTEMPTED");
+      attempted = true;
+      if (
+        signedTransaction !== expectedRaw ||
+        keccak256(signedTransaction) !== BSC_TESTNET_PTA_WBNB_POOL_GENERATION_10_TRANSACTION_HASH ||
+        !Reflect.apply(consumeOwnerAuthority, undefined, [expectedCapability, signedTransaction]) ||
+        !Reflect.apply(consumeDurableStartToken, undefined, [
+          BSC_TESTNET_PTA_WBNB_POOL_GENERATION_10_TRANSACTION_HASH
+        ])
+      ) {
+        throw new Error("GENERATION_10_SEND_AUTHORITY_UNAVAILABLE");
+      }
+      const result = await rpc(
+        BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN,
+        "eth_sendRawTransaction",
+        [signedTransaction]
+      );
+      if (result !== BSC_TESTNET_PTA_WBNB_POOL_GENERATION_10_TRANSACTION_HASH) {
+        throw new Error("GENERATION_10_SEND_OUTCOME_AMBIGUOUS");
+      }
+      return BSC_TESTNET_PTA_WBNB_POOL_GENERATION_10_TRANSACTION_HASH;
+    }
+  });
 }
 
 async function providerObservation(

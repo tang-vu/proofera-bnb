@@ -16,7 +16,7 @@ const PINNED_NODE_VERSION = "v24.14.1";
 const PINNED_NODE_EXECUTABLE_SHA256 =
   "58e74bf02fc5bbacc41dcb8bef089961cd5bddd37830b87784e4fc624d145d1f";
 const PINNED_TYPESCRIPT_LOADER_SHA256 =
-  "91c74ade17c12cca55e030935d59fed0838cd3ededd721417c147a097f968107";
+  "3dbab65f2df090ced9590b6d121de640bb94547367556dbad38f3f2209cc7441";
 const CLI_PATH = fileURLToPath(import.meta.url);
 const REPOSITORY_ROOT = resolve(dirname(CLI_PATH), "..");
 const LOADER_PATH = resolve(REPOSITORY_ROOT, "scripts/typescript-extension-loader.mjs");
@@ -183,9 +183,16 @@ async function main(): Promise<void> {
   }
   // Do not evaluate the executable stack until the active Node binary, arguments, condition,
   // sole loader, entrypoint, working tree root, and absence of NODE_OPTIONS have been checked.
-  const { runBscTestnetPtaWbnbPoolProductionOnceFromStdin } =
-    await import("../packages/integrations/src/bsc-testnet-pta-wbnb-pool-production-runner.server");
-  const result = await runBscTestnetPtaWbnbPoolProductionOnceFromStdin();
+  const { runBscTestnetPtaWbnbPoolGeneration10IfApplicableForInternalUse } =
+    await import("../packages/integrations/src/bsc-testnet-pta-wbnb-pool-generation-10-runner.server");
+  const generation10 = await runBscTestnetPtaWbnbPoolGeneration10IfApplicableForInternalUse();
+  const result =
+    generation10.status === "handled"
+      ? generation10.result
+      : await import("../packages/integrations/src/bsc-testnet-pta-wbnb-pool-production-runner.server").then(
+          ({ runBscTestnetPtaWbnbPoolProductionOnceFromStdin }) =>
+            runBscTestnetPtaWbnbPoolProductionOnceFromStdin()
+        );
   await writeResult(result);
   if (result.status !== "confirmed") process.exitCode = 1;
 }

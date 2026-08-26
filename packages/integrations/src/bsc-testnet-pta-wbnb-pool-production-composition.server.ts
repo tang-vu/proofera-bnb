@@ -62,7 +62,10 @@ import {
   createBscTestnetPtaWbnbPoolReconciliationRecoveryCoreForInternalUse,
   deriveBscTestnetPtaWbnbPoolSubmissionJournalStateForInternalUse,
   type BscTestnetPtaWbnbPoolSubmissionCapability,
+  type BscTestnetPtaWbnbPoolSubmissionJournal,
+  type BscTestnetPtaWbnbPoolSubmissionStartedRequest,
   type BscTestnetPtaWbnbPoolSubmissionResult,
+  type BscTestnetPtaWbnbPoolTerminalReconciliationRequest,
   type BscTestnetPtaWbnbPoolTerminalReconciliationJournal
 } from "./bsc-testnet-pta-wbnb-pool-submission-reconciler.server";
 import {
@@ -100,6 +103,22 @@ const BOUNDARY = Object.freeze({
 });
 
 export const BSC_TESTNET_PTA_WBNB_POOL_PRODUCTION_COMPOSITION_BOUNDARY = BOUNDARY;
+
+/**
+ * Narrows the richer durable journal to the exact plain-data dependency boundary accepted by the
+ * submission core. The durable initializer/recovery methods must never cross this seam.
+ */
+export function narrowBscTestnetPtaWbnbPoolSubmissionJournalForInternalUse(
+  journal: BscTestnetPtaWbnbPoolDurableSubmissionJournal
+): BscTestnetPtaWbnbPoolSubmissionJournal {
+  return Object.freeze({
+    readState: () => journal.readState(),
+    commitSubmissionStarted: (request: BscTestnetPtaWbnbPoolSubmissionStartedRequest) =>
+      journal.commitSubmissionStarted(request),
+    commitTerminalReconciliation: (request: BscTestnetPtaWbnbPoolTerminalReconciliationRequest) =>
+      journal.commitTerminalReconciliation(request)
+  });
+}
 
 export interface BscTestnetPtaWbnbPoolFixedProductionPorts {
   readonly now: () => Date;
@@ -928,7 +947,9 @@ export function createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse(
         acquireSubmissionCapability: async () => capability,
         authenticateSubmissionCapability: (value: unknown) =>
           typeof value === "object" && value !== null && !isProxy(value) && branded.has(value),
-        journal: ports.submissionJournal,
+        journal: narrowBscTestnetPtaWbnbPoolSubmissionJournalForInternalUse(
+          ports.submissionJournal
+        ),
         acquireTerminalPreSendRecheck: (input: BscTestnetPtaWbnbPoolProductionPreSubmissionInput) =>
           ports.broadcaster.acquireTerminalPreSendRecheck(ports.executionCapability, input),
         sendExactRawTransactionOnce: (signedTransaction: Hex) =>

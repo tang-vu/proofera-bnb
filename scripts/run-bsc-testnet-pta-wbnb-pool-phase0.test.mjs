@@ -29,6 +29,10 @@ const SIGNING_WORKER_SOURCE = resolve(
   ROOT,
   "packages/integrations/src/bsc-testnet-pta-wbnb-pool-signing-worker.ts"
 );
+const GENERATION_10_RELEASE_SOURCE = resolve(
+  ROOT,
+  "packages/integrations/src/bsc-testnet-pta-wbnb-pool-generation-10-release.server.ts"
+);
 const GENERIC_SIGNING_WORKER_SOURCE = resolve(
   ROOT,
   "packages/integrations/src/bsc-testnet-pta-signing-worker.ts"
@@ -124,8 +128,13 @@ function exactPowerShellFunction(source, name) {
   return source.slice(start, end + 2);
 }
 
-function literalReleasePaths(source, endMarker, additions) {
-  const start = source.indexOf("const RELEASE_SOURCE_PATHS");
+function literalReleasePaths(
+  source,
+  endMarker,
+  additions,
+  startMarker = "const RELEASE_SOURCE_PATHS"
+) {
+  const start = source.indexOf(startMarker);
   const end = source.indexOf(endMarker, start);
   assert.ok(start >= 0 && end > start);
   const block = source.slice(start, end);
@@ -298,6 +307,13 @@ test("phase zero and phase one bind the same complete release-source set", () =>
     ]
   );
   assert.deepEqual(phaseZero, phaseOne);
+  const generation10 = literalReleasePaths(
+    readFileSync(GENERATION_10_RELEASE_SOURCE, "utf8"),
+    "const FIXED_GIT_ENVIRONMENT",
+    [],
+    "export const BSC_TESTNET_PTA_WBNB_POOL_GENERATION_10_RELEASE_SOURCE_PATHS"
+  );
+  assert.deepEqual(phaseZero, generation10);
 });
 
 test("every nested noble resolver junction stays bound to the hashed canonical tree", () => {
@@ -395,8 +411,8 @@ test("the production loader admits only committed source and the ten hashed runt
 test("both pool release inspectors pin the exact final loader bytes", () => {
   const loaderBytes = readFileSync(resolve(ROOT, "scripts/typescript-extension-loader.mjs"));
   const digest = createHash("sha256").update(loaderBytes).digest("hex");
-  assert.equal(loaderBytes.byteLength, 6_684);
-  assert.equal(digest, "91c74ade17c12cca55e030935d59fed0838cd3ededd721417c147a097f968107");
+  assert.equal(loaderBytes.byteLength, 7_224);
+  assert.equal(digest, "3dbab65f2df090ced9590b6d121de640bb94547367556dbad38f3f2209cc7441");
   assert.ok(readFileSync(POOL_CLI_SOURCE, "utf8").includes(digest));
   assert.ok(readFileSync(GENERIC_SIGNING_WORKER_SOURCE, "utf8").includes(digest));
 });

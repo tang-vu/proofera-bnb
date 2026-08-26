@@ -2,12 +2,12 @@
 
 Updated: 2026-08-26. Decision: **exact offline provenance, a non-authorizing read-only
 preflight, an old-scope unsent request, an owner-designated internal multi-agent technical decision
-for `bc7000e`, and the historical generation-4 through generation-8 operational outcomes are recorded.
-Generation 8 accepted owner-v11 confirmation and durably ended `failed_before_worker` / `GAS_POLICY_VIOLATION`
-with only an exact claim/terminal pair. It created no worker start, custody-secret access, signature,
-send, receipt, pool, or liquidity and cannot authorize changed code. Current generation 9 requires a
-new release policy, fresh envelope, and owner-v12 approval. This record supplies none and records no pool or
-Pancake write**.
+for `bc7000e`, and the historical generation-4 through generation-9 operational outcomes are recorded.
+Generation 9 accepted owner-v12 and retained one exact nonce-`9` signature, then failed
+`CONFIGURATION_INVALID` before durable submission start or send. Current generation 10 can use only
+that exact existing signature, authorizes zero additional signatures and at most one send, and requires
+a new release policy, two exact owner-designated internal reviews, and owner-v13 approval. This record
+supplies none of that authority and records no receipt, pool, liquidity, or Pancake write**.
 
 Machine record:
 [`evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json`](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json)
@@ -423,17 +423,23 @@ Generation 8 is historical. Its local-only owner-v11 run for release
 There is no worker authorization/start, custody access or unlock, signature, submission, transaction
 hash, receipt, pool, or liquidity.
 
-Recovery generation 9 directly binds that exact generation-8 terminal and its inherited generation-7
-terminal, and separately requires submission-v7 to contain no retained transaction state. A fresh,
-distinct envelope observed after the terminal is required. Policy/runtime-instantiation is v9, TTY is
-v10, owner command/text/confirmation is v12, and signing/intent/broadcast are v9. The only permitted
-transaction remains pinned to sender nonce `9`; every in-ceremony nonce check must agree exactly or stop
-before signing. The active signing journal uses `bsc-testnet-pta-wbnb-pool-v9`. Signing v1-v8 and
-submission-v2 through v7 remain immutable; active submission uses
-`bsc-testnet-pta-wbnb-pool-submission-v8` with v10 durable records and owner policy v10. The fixed signed
-gas limit is `6,600,000` whenever the fresh estimate is at most `5,500,000` and still satisfies the exact
-20% margin; estimate drift within that bound no longer changes the signed transaction. Persisted bytes
-never recreate owner authority.
+Historical recovery generation 9 directly bound that exact generation-8 terminal and its inherited
+generation-7 terminal, required submission-v7 to contain no retained transaction state, and used a
+fresh distinct envelope. Its policy/runtime-instantiation was v9, TTY was v10, owner confirmation was
+v12, and signing/intent/broadcast were v9. The resulting exact nonce-`9` signature is now an immutable
+host-local predecessor. Its transaction hash is
+`0xa24d1dfa3440de3fcb644d9b52847bcc8d54f43a2e29b425f50bbce4bd684022`.
+The five-method durable journal then violated the submission core's exact three-method plain-data
+dependency boundary, producing `CONFIGURATION_INVALID` before `submission_started` or RPC send.
+Persisted bytes never recreate owner authority.
+
+Generation 10 independently validates the exact generation-9 journals and signed transaction. The
+applicable entrypoint does not load the production signing worker or call custody unlock/signing;
+predecessor journal readers still reuse the reviewed Windows process/ACL helper. Policy/runtime-
+instantiation is v10, TTY is v11, and owner confirmation is v13. It permits zero additional signatures and at most one send. Fresh
+dual-RPC state checks bracket exclusive creation of the submission-v9 v11 start record; only that
+same-process creator receives a one-use send token. Once start exists, all restarts are
+reconciliation-only with no resend or replacement.
 
 A separate local post-claim recheck core requires the authorization gate's authenticated private
 intent before making any read. It compares only the two fixed official RPC origins, finds a common
@@ -500,11 +506,11 @@ independence, or protection from two colluding/identically faulty Byzantine prov
 child wires these controls to a closure-private sender; the public worker and generic raw sender remain
 unavailable. Every release containing this path must have a committed and pushed identity, then its exact
 commit/tree/full runtime manifest must receive new owner-designated audits and a matching policy before
-the owner enters the separate exact generation-9 owner-v12 TTY confirmation. This document
+the owner enters the separate exact generation-10 owner-v13 TTY confirmation. This document
 records the historical admitted `36f6e5e7` policy and the later expired owner-v4 incident at
-`336af296` and `655187f2`, plus the non-retained generation-4 terminal observation, but supplies no
-matching policy or owner-v12 confirmation for generation 9; no generation-9 signature, send, transaction
-receipt, pool, or LP position exists. These changed files are
+`336af296` and `655187f2`, plus the non-retained generation-4 terminal observation. It records the
+bounded host-local generation-9 signature outcome but supplies no matching policy or owner-v13
+confirmation for generation 10; no send, transaction receipt, pool, or LP position exists. These changed files are
 not covered by the old external-review request, retained `bc7000e` decision, or any historical policy.
 
 ## Separate proposed liquidity envelope
@@ -517,23 +523,21 @@ position authority is approved by this document.
 
 The two write decisions stay separate:
 
-1. Pool initialization requires its own fresh simulation, exact sender/nonce/gas/cost envelope, short
-   broadcast window, durable one-shot claim/submission journal, the exact generation-8 terminal, a new
-   owner-designated distinct-agent technical decision and canonical policy for the exact generation-9
-   release, exact owner-v12 authorization through the bounded TTY ceremony, receipt, exact logs, and
-   post-state reconciliation. Historical confirmations cannot cross the terminal binding; this
-   preparation record supplies none of those generation-9 authority or transaction outputs.
+1. Pool initialization requires fresh dual-RPC state around durable submission start, the exact existing
+   generation-9 signature, a new owner-designated distinct-agent technical decision and canonical policy
+   for the exact generation-10 release, exact owner-v13 authorization through the bounded TTY ceremony,
+   at most one send, receipt, exact logs, and post-state reconciliation. Historical confirmations cannot
+   authorize generation 10; this preparation record supplies none of those authority or receipt outputs.
 2. Only after the pool is independently re-reviewed may an LP mint be prepared. It requires separate
    bounded token approvals, explicit ticks/amounts/minima/deadline/slippage, owner/revoke authority,
    simulation, user confirmation, and receipt evidence.
 
 ## Remaining blockers
 
-- Generation 9 must reread all sixteen namespaces, bind the exact generation-8 terminal and empty/absent
-  submission-v7, then independently refresh all five runtime identities, manager/factory/deployer
-  relationships, fee configuration, factory owner, LM controls, pair lookup, exact sender nonce `9`,
-  fee, gas, and balance in a fresh distinct envelope after that terminal. Any nonce drift blocks; no
-  Invocation A or no-effect fence applies.
+- Generation 10 must validate the exact generation-9 signed predecessor and confirm that its submission-v8
+  state is `signed_committed` with no `submission_started`. It must refresh dual-RPC state before and after
+  exclusively creating submission-v9 start. Any transaction, nonce, pool, candidate-code, gas, balance,
+  expiry, or predecessor drift blocks. It must not unlock custody or produce another signature.
 - Preserve the owner-designated internal decision only for exact commit `bc7000e`. Obtain a final
   distinct-agent technical decision bound to the exact changed release, including the ceremony/bridge/
   journal/recovery/ancestry delta. Local implementation review does not replace that release-bound
@@ -541,8 +545,9 @@ The two write decisions stay separate:
   old eight-file unsent request, public Gist and byte-exact re-fetch provide no review for later code.
   Its generator, test, and artifact remain pinned to the historical 45-second envelope and are not
   timing evidence for the revised `300`/`240`/`60`/`30` contract.
-- Obtain a fresh exact generation-9 owner-v12 authorization. Expired owner-v4/v5/v6/v7/v8/v9/v10/v11 confirmations,
-  requests, terminal records, or reviewer decisions cannot substitute for it.
+- Obtain a fresh exact generation-10 owner-v13 authorization for the fixed existing signature. Expired
+  owner-v4 through owner-v12 confirmations, requests, terminal records, or reviewer decisions cannot
+  substitute for it.
 - Generate the canonical generation-9 runtime policy only after the final commit is pushed and two
   designated read-only agents approve its exact commit/tree/full manifest. Use that exact triplet only with the
   absolute PowerShell phase-minus-one command; never substitute direct Node, the blocked pnpm wrapper,
@@ -563,14 +568,14 @@ The two write decisions stay separate:
 
 Until those gates close and explorer-verifiable receipts exist, the truthful state remains: PTA and
 WBNB identities are evidenced, the retained pool construction path is reproduced exactly offline,
-and a read-only non-authorizing preflight plus a phase-minus-one/phase-zero, exact-policy/owner-gated
-incident-only generation-9 recovery/signing/submission/reconciliation path is implemented. The
-owner-designated internal technical-review gate is complete only for the exact `bc7000e` nonexecuting
-subject, not this changed release until its final commit is pushed and receives new exact audits. **No
-authenticated external/third-party review is claimed. The `36f6e5e7` policy and the `336af296`
-policy/expired owner-v4 incident are historical, non-authorizing operational observations; this preparation
-record contains no matching generation-9 policy, owner-v12 transaction approval, signature, send,
-receipt, PTA/WBNB pool, liquidity, oracle, position, Pancake write, or autonomous-execution evidence**.
+generation 9 has one exact host-local signed transaction but no durable submission start or send, and an
+exact-policy/owner-gated generation-10 existing-signature submission/reconciliation path is implemented.
+The owner-designated internal technical-review gate is complete only for the exact `bc7000e`
+nonexecuting subject, not this changed release until its final commit is pushed and receives two new
+exact audits. **No authenticated external/third-party review is claimed. Historical policies and
+owner-v4 through owner-v12 confirmations are non-authorizing for generation 10; this preparation record
+contains no matching generation-10 policy, owner-v13 transaction approval, send, receipt, PTA/WBNB pool,
+liquidity, oracle, position, Pancake write, or autonomous-execution evidence**.
 
 The machine record is linked to the retained
 [bounded public-result RPC transcript](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json)

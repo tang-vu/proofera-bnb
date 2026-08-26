@@ -799,6 +799,18 @@ export type BscTestnetPtaWbnbPoolLocalJournalRecoveryProbeResult =
       issue: Readonly<{ code: "RECOVERY_JOURNAL_INVALID"; message: string }>;
     }>;
 
+export type BscTestnetPtaWbnbPoolGeneration9RecordHashProbeResult =
+  | Readonly<{
+      status: "ready";
+      records: readonly Readonly<{ name: string; byteLength: number; sha256: Hex }>[];
+      issue: null;
+    }>
+  | Readonly<{
+      status: "blocked";
+      records: null;
+      issue: Readonly<{ code: "GENERATION_9_RECORD_HASHES_INVALID"; message: string }>;
+    }>;
+
 export type BscTestnetPtaWbnbPoolExistingLocalJournalResult =
   | Readonly<{
       status: "absent";
@@ -3962,6 +3974,53 @@ export async function probeWindowsBscTestnetPtaWbnbPoolLocalJournalRecoveryForIn
         state: opened.state,
         issue: null
       });
+}
+
+/**
+ * Read-only generation-9 raw-record fingerprint probe for the append-only signed-commit recovery.
+ * It returns names, lengths and SHA-256 values only; retained transaction bytes never cross this
+ * boundary. Exactly four occupied slots are required because generation 9 stopped at signed_commit.
+ */
+export async function probeWindowsBscTestnetPtaWbnbPoolGeneration9RecordHashesForInternalUse(): Promise<BscTestnetPtaWbnbPoolGeneration9RecordHashProbeResult> {
+  const blocked = (): BscTestnetPtaWbnbPoolGeneration9RecordHashProbeResult =>
+    Object.freeze({
+      status: "blocked" as const,
+      records: null,
+      issue: Object.freeze({
+        code: "GENERATION_9_RECORD_HASHES_INVALID" as const,
+        message: "The exact generation-9 signing record fingerprints could not be verified."
+      })
+    });
+  if (process.platform !== "win32") return blocked();
+  try {
+    const directory = await readOnlyFixedJournalDirectory(ACTIVE_JOURNAL_SUBDIRECTORY);
+    if (directory === null) return blocked();
+    const names = (await readdir(directory)).sort();
+    const expected = ACTIVE_SLOT_FILES.slice(0, 4);
+    if (names.length !== expected.length || names.some((name, index) => name !== expected[index])) {
+      return blocked();
+    }
+    await verifyPaths(directory, names, ACTIVE_SLOT_FILES);
+    const records: Readonly<{ name: string; byteLength: number; sha256: Hex }>[] = [];
+    for (const name of names) {
+      const text = await readBoundedFile(win32.join(directory, name));
+      if (text === null) return blocked();
+      records.push(
+        Object.freeze({
+          name,
+          byteLength: Buffer.byteLength(text, "utf8"),
+          sha256: `0x${createHash("sha256").update(text, "utf8").digest("hex")}` as Hex
+        })
+      );
+    }
+    return Object.freeze({
+      status: "ready" as const,
+      records: Object.freeze(records),
+      issue: null
+    });
+  } catch {
+    return blocked();
+  }
 }
 
 /** Test-only no-write recovery seam over a caller-created synthetic directory. */

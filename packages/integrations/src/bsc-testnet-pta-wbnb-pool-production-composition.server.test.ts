@@ -51,6 +51,7 @@ import { BSC_TESTNET_PTA_WBNB_POOL_SENDER } from "./bsc-testnet-pta-wbnb-pool-in
 import type { BscTestnetPtaWbnbPoolAuthorizedSigningIntent } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
 import {
   createBscTestnetPtaWbnbPoolProductionCompositionForInternalUse,
+  narrowBscTestnetPtaWbnbPoolSubmissionJournalForInternalUse,
   reconcileExistingBscTestnetPtaWbnbPoolRecoveryForInternalUse,
   type BscTestnetPtaWbnbPoolFixedProductionPorts
 } from "./bsc-testnet-pta-wbnb-pool-production-composition.server";
@@ -289,6 +290,24 @@ function retainedTerminalPair(
 }
 
 describe("PTA/WBNB fresh production composition", () => {
+  it("passes only the exact three-method journal facade into the submission core", async () => {
+    const harness = inertPorts({ state: "empty" });
+    const durable = harness.ports.submissionJournal;
+    const narrowed = narrowBscTestnetPtaWbnbPoolSubmissionJournalForInternalUse(durable);
+
+    expect(Object.isFrozen(narrowed)).toBe(true);
+    expect(Reflect.ownKeys(narrowed).sort()).toEqual([
+      "commitSubmissionStarted",
+      "commitTerminalReconciliation",
+      "readState"
+    ]);
+    expect("initializeSignedCommit" in narrowed).toBe(false);
+    expect("readRecoveryState" in narrowed).toBe(false);
+
+    await narrowed.readState();
+    expect(durable.readState).toHaveBeenCalledTimes(1);
+  });
+
   it("re-reads the predecessor fence and both active journals before touching activated authority", async () => {
     const harness = inertPorts(
       { state: "empty" },

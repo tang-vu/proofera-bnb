@@ -2501,7 +2501,7 @@ function terminalAckValid(
 
 /**
  * Internal one-shot composition core. The caller cannot provide transaction bytes to the returned
- * method. Production supplies the append-only fsync/O_EXCL v3 journal through the fixed private
+ * method. Production supplies an exact append-only fsync/O_EXCL journal through a fixed private
  * bridge; tests inject deterministic non-network ports.
  */
 function createBscTestnetPtaWbnbPoolSubmissionCore(
