@@ -248,7 +248,9 @@ export async function inspectBscTestnetPtaWbnbPoolGeneration10PredecessorForInte
       parsed.type !== "legacy" ||
       parsed.chainId !== 97 ||
       parsed.nonce !== 9 ||
-      parsed.to !== BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER ||
+      parsed.to === null ||
+      parsed.to === undefined ||
+      getAddress(parsed.to) !== BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER ||
       parsed.data !== BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA ||
       parsed.gas !== 6_600_000n ||
       parsed.gasPrice !== 100_000_000n ||

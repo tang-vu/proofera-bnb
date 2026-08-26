@@ -17,7 +17,8 @@ vi.mock("viem", async (importOriginal) => {
             type: "legacy",
             chainId: 97,
             nonce: 9,
-            to: "0x427bF5b37357632377eCbEC9de3626C71A5396c1",
+            // parseTransaction returns the serialized address spelling, not a checksummed string.
+            to: "0x427bf5b37357632377ecbec9de3626c71a5396c1",
             data: "0x13ead5620000000000000000000000004ed64525d6fb06b7da926c683cbd809632c9b4cc000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd00000000000000000000000000000000000000000000000000000000000001f40000000000000000000000000000000000000000004189374bc6a7ef9db22d0e",
             gas: 6_600_000n,
             gasPrice: 100_000_000n,
