@@ -141,6 +141,11 @@
   gap: 13px;
 }
 
+.identityGrid dd {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .unknownValue {
   display: flex;
   align-items: flex-start;

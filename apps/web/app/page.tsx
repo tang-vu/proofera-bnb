@@ -36,6 +36,9 @@ export default function HomePage() {
         <div className="nav-links">
           <Link href="/marketplace">Marketplace</Link>
           <Link href="/proof">Proof room</Link>
+          <Link className="nav-optional" href="/session-control">
+            Session control
+          </Link>
           <Link className="nav-optional" href="/mission-control">
             Mission Control
           </Link>
@@ -64,6 +67,9 @@ export default function HomePage() {
           <Link className="button button-secondary" href="/mission-control">
             See active mandates
           </Link>
+          <Link className="button button-secondary" href="/session-control">
+            Grant a testnet session
+          </Link>
           <a className="button button-secondary" href="#method">
             How proof works
           </a>
@@ -75,7 +81,7 @@ export default function HomePage() {
           </div>
           <div>
             <dt>Permission rule</dt>
-            <dd>Scoped + expiring</dd>
+            <dd>Grant once + bounded</dd>
           </div>
           <div>
             <dt>Action rule</dt>
@@ -106,7 +112,9 @@ export default function HomePage() {
               <span className="category-number">0{index + 1}</span>
               <h3>{category.name}</h3>
               <p>{category.description}</p>
-              <span className="evidence-state">Public analyzer live · BSC identity pending</span>
+              <span className="evidence-state">
+                Public analyzer live · BSC testnet identity verified
+              </span>
               <span className="category-card-action" aria-hidden="true">
                 Explore agents →
               </span>
@@ -130,7 +138,8 @@ export default function HomePage() {
             <li>Unknown fields remain unknown and lower confidence.</li>
             <li>Stale sources are visibly stale, never silently refreshed with fixtures.</li>
             <li>Simulations and realized performance are separated.</li>
-            <li>Revocation is part of activation, not a support article.</li>
+            <li>One scoped grant covers valid actions; scope expansion requires the owner.</li>
+            <li>Pause and revocation are part of activation, not a support article.</li>
           </ul>
         </div>
       </section>

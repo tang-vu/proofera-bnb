@@ -10,6 +10,7 @@ import {
 } from "../../lib/marketplace-query";
 import { referenceAgentCoverage } from "../../lib/reference-agent-coverage";
 import { loadRegistryCandidates } from "../../lib/registry";
+import { verifiedReferenceEvidenceForCategory } from "../../lib/verified-submission-evidence";
 import { ComparisonSelectionForm } from "./comparison-selection";
 
 export const metadata = {
@@ -276,6 +277,9 @@ export default async function MarketplacePage({ searchParams }: MarketplacePageP
           <Link className="nav-optional" href="/mission-control">
             Mission Control
           </Link>
+          <Link className="nav-optional" href="/session-control">
+            Session control
+          </Link>
           <Link href="/venus-health">Venus liquidity</Link>
           <Link className="nav-optional" href="/yield-sources">
             Lista sources
@@ -402,31 +406,39 @@ export default async function MarketplacePage({ searchParams }: MarketplacePageP
           </p>
         </div>
         <div className="category-grid">
-          {referenceAgentCoverage.map((reference) => (
-            <article className="category-card" key={reference.category}>
-              <div className="agent-card-topline">
-                <span className="state-badge state-available">BSC testnet registered</span>
-                <span className="state-badge state-caution">Execution disabled</span>
-              </div>
-              <p className="mono-kicker">{reference.skill}</p>
-              <h3>{reference.name}</h3>
-              <p>{reference.boundary}</p>
-              <ul>
-                {reference.evidenceFocus.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-              <p className="registry-footnote">
-                <strong>Method:</strong> {reference.methodologyVersion}
-                <br />
-                <strong>Registration:</strong> finalized on BSC testnet ·{" "}
-                <strong>marketplace eligibility:</strong> false
-              </p>
-              <Link className="text-link" href={`/reference-analyzers/${reference.category}`}>
-                Open {reference.name} dossier
-              </Link>
-            </article>
-          ))}
+          {referenceAgentCoverage.map((reference) => {
+            const evidence = verifiedReferenceEvidenceForCategory(reference.category);
+            return (
+              <article className="category-card" key={reference.category}>
+                <div className="agent-card-topline">
+                  <span className="state-badge state-available">BSC testnet registered</span>
+                  <span className="state-badge state-caution">Execution disabled</span>
+                </div>
+                <p className="mono-kicker">{reference.skill}</p>
+                <h3>{reference.name}</h3>
+                <p>{reference.boundary}</p>
+                <ul>
+                  {reference.evidenceFocus.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+                <p className="registry-footnote">
+                  <strong>Method:</strong> {reference.methodologyVersion}
+                  <br />
+                  <strong>Registration:</strong> finalized on BSC testnet · Agent ID{" "}
+                  {evidence.agentId}
+                  <br />
+                  <strong>Paid hire receipts:</strong> {evidence.paidHireReceipts.length} finalized
+                  · task completion not inferred
+                  <br />
+                  <strong>Current marketplace eligibility:</strong> false
+                </p>
+                <Link className="text-link" href={`/reference-analyzers/${reference.category}`}>
+                  Open {reference.name} dossier
+                </Link>
+              </article>
+            );
+          })}
         </div>
       </section>
 

@@ -9,7 +9,8 @@ describe("operator ceremony page", () => {
 
     expect(html).toContain("Show local runner");
     expect(html).toContain("cannot accept the displayed facts");
-    expect(html).toContain("BOUNDED NON-AGENT BASELINES");
+    expect(html).toContain("INTERNAL EVIDENCE TOOL");
+    expect(html).toContain("Open Session Control");
     expect(html).toContain("submit a transaction");
     expect(html).toContain("Tạo Altana passkey");
     expect(html).toContain("Khôi phục ví đã có giao dịch");

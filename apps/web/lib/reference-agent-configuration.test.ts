@@ -69,17 +69,21 @@ describe("reference-agent mandate configuration", () => {
       expect(Object.isFrozen(state)).toBe(true);
     });
 
-    it(`${category} preserves exact financial strings and keeps every readiness gate false`, () => {
+    it(`${category} preserves exact financial strings and keeps identity separate from activation`, () => {
       const state = parseReferenceAgentConfiguration(category, validQueries[category]);
 
       expect(state.status).toBe("configured");
       if (state.status !== "configured") throw new TypeError("Expected configured state");
       expect(state.configuration.capitalRaw).toBe(maxUint256);
       expect(state.configuration).toMatchObject({ category, schemaVersion: 1 });
-      expect(Object.values(state.readiness.flags)).toEqual(Array(9).fill(false));
+      expect(state.readiness.flags.verifiedAgentIdentityReady).toBe(true);
+      expect(
+        Object.entries(state.readiness.flags)
+          .filter(([key]) => key !== "verifiedAgentIdentityReady")
+          .map(([, value]) => value)
+      ).toEqual(Array(8).fill(false));
       expect(state.readiness.blockers.map(({ code }) => code)).toEqual([
         "trusted_evidence_absent",
-        "verified_agent_identity_absent",
         "scoped_authority_absent",
         "transaction_receipt_absent"
       ]);

@@ -10,7 +10,7 @@ Ready to show now:
 - four receipt-verified ERC-8004 identities and three finalized testnet hires;
 - the Proof Room with exact build, artifact paths, hashes, and honest blockers;
 - all six retained TermiX raw captures, immutable source pairs, protected verified derivatives, adjudications, and the final three-artifact bundle;
-- the local operator ceremony explaining why manual judgment, passkey presence, execution, and revoke are separate transitions.
+- Session Control showing one owner grant, autonomous in-scope execution, explicit scope-expansion rules, and revoke; the internal operator ceremony is not part of the user journey.
 
 Do not record the final cut yet. The following must exist first: controlled Pancake before/after evidence and the final production freeze. The Altana lifecycle and TermiX gates are verified; the final TermiX review remains owner-designated internal and identity-limited. Until the remaining objective gates close, use rehearsal mode only.
 
@@ -47,15 +47,15 @@ Show the source block, exact-hash read, decision, limitations, and testnet/mainn
 
 ## 1:55-2:45 — bound authority
 
-Visual: LP activation configuration and permission preview.
+Visual: LP mandate configuration, then Session Control.
 
-Narration: “Before authority exists, ProofEra fixes the chain, direct target, selector, token and recipient, spend cap, deadline, expiry, quote age, and enforcement owner. Generic routers and undeclared multicalls are denied. The admin passkey remains in the browser; the scoped session signer belongs only in the encrypted worker boundary.”
+Narration: “Before authority exists, ProofEra fixes the chain, direct target, selector, token and recipient, spend cap, deadline, expiry, quote age, and enforcement owner. The owner grants that mandate once. Matching actions run without another wallet signature; stale evidence blocks automatically, and any wider call, token, cap, chain, or expired session returns to the owner.”
 
 After the real lifecycle exists, show the exact grant and execute explorer links. Never expose calldata containing secrets or signer material.
 
 ## 2:45-3:25 — execute, reconcile, revoke
 
-Visual: Mission Control lifecycle timeline, execute receipt, revoke receipt, and negative-authority probe.
+Visual: Mission Control’s retained grant, execute, and revoke receipts plus the negative-authority proof.
 
 Narration: “A button press is not a receipt. ProofEra treats pending and unknown outcomes explicitly and never blind-retries an uncertain grant. The bounded action is joined to its finalized receipt. Revoke is complete only after both the revoke receipt and a fresh onchain probe show that the scoped session no longer has authority.”
 

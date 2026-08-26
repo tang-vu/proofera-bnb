@@ -78,7 +78,9 @@ const journeys = [
 ] as const;
 
 async function hasNoHorizontalOverflow(page: Page): Promise<boolean> {
-  return page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+  return page.evaluate(
+    () => document.documentElement.scrollWidth <= document.documentElement.clientWidth
+  );
 }
 
 for (const journey of journeys) {
@@ -112,7 +114,9 @@ for (const journey of journeys) {
     await page.getByRole("button", { name: "Review mandate" }).click();
 
     await expect(
-      page.getByRole("heading", { name: "Mandate captured. Trust remains absent." })
+      page.getByRole("heading", {
+        name: "Mandate captured. Identity verified; trust incomplete."
+      })
     ).toBeVisible();
     await expect(
       page.getByRole("complementary", { name: "Normalized user-controlled mandate" })
@@ -125,15 +129,19 @@ for (const journey of journeys) {
     for (const selection of journey.expectedSelections) {
       await expect(page.getByText(selection, { exact: true }).last()).toBeVisible();
     }
-    await expect(page.getByText("False", { exact: true })).toHaveCount(9);
-    await expect(page.getByText("All false", { exact: true })).toBeVisible();
+    await expect(page.getByText("True", { exact: true })).toHaveCount(1);
+    await expect(page.getByText("False", { exact: true })).toHaveCount(8);
+    await expect(page.getByText("1 verified · 8 blocked", { exact: true })).toBeVisible();
     await expect(page.getByText("trusted evidence absent", { exact: true })).toBeVisible();
-    await expect(page.getByText("verified agent identity absent", { exact: true })).toBeVisible();
     await expect(page.getByText("scoped authority absent", { exact: true })).toBeVisible();
     await expect(page.getByText("transaction receipt absent", { exact: true })).toBeVisible();
     await expect(
       page.getByText(/This configuration handler performed no RPC read, HTTP fetch, wallet access/i)
     ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Inspect the bounded session-key model" })
+    ).toHaveAttribute("href", "/session-control");
+    await expect(page.getByText(/does not activate this configured strategy/i)).toBeVisible();
     await expect(page.getByRole("button", { name: /activate|hire|execute/i })).toHaveCount(0);
     await expect(page.getByText(/transaction hash/i)).toHaveCount(1);
     expect(offOriginRequests).toEqual([]);

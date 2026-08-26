@@ -12,9 +12,13 @@ test("starts one honest operator session and keeps it through a reload", async (
   await page.goto("/operator-ceremony");
 
   await expect(
-    page.getByRole("heading", { name: "Start once. Stay inside one ceremony." })
+    page.getByRole("heading", { name: "Reproduce bounded evidence checkpoints." })
   ).toBeVisible();
-  await expect(page.getByText(/starting the session creates no evidence by itself/i)).toBeVisible();
+  await expect(page.getByText(/creates no evidence, authority, receipt/i)).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open Session Control" })).toHaveAttribute(
+    "href",
+    "/session-control"
+  );
 
   await page.getByRole("button", { name: "Show local runner" }).click();
 

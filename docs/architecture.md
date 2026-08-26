@@ -1,6 +1,6 @@
 # ProofEra architecture
 
-Updated: 2026-08-12. This document describes the target architecture and the local boundaries already built to support the judged journey without turning registry metadata or simulated results into execution authority. The complete diagram is not a deployment-status claim.
+Updated: 2026-08-26. This document describes the target architecture and the local boundaries already built to support the judged journey without turning registry metadata or simulated results into execution authority. The complete diagram is not a deployment-status claim.
 
 ## System boundary
 
@@ -17,7 +17,29 @@ flowchart LR
   S[BNB Agent Studio runtime] --> K
 ```
 
-The browser owns the user's passkey ceremony and must display exactly what will be granted. The final-origin operator page exposes SDK 0.7.0 create/recover controls, validates the exact HTTPS origin and RP ID in the browser, and retains only the public credential descriptor locally on that device. Recovery is explicitly limited to wallets whose first Altana transaction has already registered an admin key in the chain-97 KeyStore; a newly prepared counterfactual wallet is not mislabeled as recoverable, and a recovery failure cannot replace an already-retained local descriptor. The marketplace server owns data ingestion, recommendation rules, and policy preparation, but never an admin key or autonomous session private key. One bounded local-only ceremony worker now owns a single DPAPI CurrentUser-protected scoped signer outside the repository and exposes only a strict public state projection. Version 2 is pinned to wallet `0x91Aa0E6627bFF6C911B38CEd5F7885E063b7C27a`, the non-economic PTA target, `approve(address,uint256)`, amount/value zero, one-hour expiry, and a `500000000000000 wei` daily native relay-fee cap. This worker is not the general LP activation/KMS path, has no listener, and creates no authority until the browser passkey grant has a real onchain result. BSC and partner explorers remain the source of truth for onchain state.
+The browser owns the user's grant and revoke passkey ceremonies and must display exactly what will be granted. The final-origin Session Control page exposes SDK 0.7.0 create/recover controls, validates the exact HTTPS origin and RP ID in the browser, and retains only the public credential descriptor locally on that device. Recovery is explicitly limited to wallets whose first Altana transaction has already registered an admin key in the chain-97 KeyStore; a newly prepared counterfactual wallet is not mislabeled as recoverable, and a recovery failure cannot replace an already-retained local descriptor. The marketplace server owns data ingestion, recommendation rules, and policy preparation, but never an admin key or autonomous session private key. One bounded local-only proof worker owns a single DPAPI CurrentUser-protected scoped signer outside the repository and exposes only a strict public state projection. Version 2 is pinned to wallet `0x91Aa0E6627bFF6C911B38CEd5F7885E063b7C27a`, the non-economic PTA target, `approve(address,uint256)`, amount/value zero, one-hour expiry, and a `500000000000000 wei` daily native relay-fee cap. The worker performs its pinned in-scope action without a second owner signature. It is not the general LP activation/KMS path, has no listener, and creates no authority until the browser passkey grant has a real onchain result. BSC and partner explorers remain the source of truth for onchain state.
+
+## User journey
+
+```mermaid
+flowchart LR
+  L[Land] --> C[Choose one of four jobs]
+  C --> D[Inspect identity, evidence, and unknowns]
+  D --> M[Define mandate]
+  M --> E{Trusted evidence complete?}
+  E -->|No| H[Show exact blockers]
+  E -->|Yes| P[Review one permission preview]
+  P --> G[Owner grants once]
+  G --> X[Agent acts inside scope]
+  X --> O[Mission Control: authority, receipts, pause, revoke]
+  O --> X
+  X -->|Scope/cap/chain changes or expiry| P
+  O -->|Revoke| R[Fresh probe proves authority absent]
+```
+
+The current bounded Altana proof covers create/recover, one grant, one automatic in-scope PTA
+amount-0 action, receipt reconciliation, owner revoke, and final authority absence. The production
+LP journey still stops at the trusted evidence/policy handoff and must not be narrated as complete.
 
 ## Repository boundaries
 
@@ -93,6 +115,25 @@ The permission-preview view-model is derived from the canonical policy and begin
 Grant, execute and revoke are explicit state machines. `requested`, `pending` and `outcome_unknown` never appear as confirmed. Execute/revoke retain their Altana `callsId` for reconciliation. A revoke remains active/pending until account authority is observed invalid; a UI click is not revocation evidence.
 
 The Proof Stream stores operation type, canonical policy hash, public wallet/session identifiers, environment, source/call IDs, transaction hash when present, timestamps and status transitions. It never stores signers.
+
+### One-grant mandate admission
+
+The owner authorizes a durable policy rather than signing each matching transaction. The pure
+mandate evaluator returns one of three decisions:
+
+- `authorized_without_new_signature`: chain, wallet, contract, selector, aggregate spend, expiry, execution count,
+  idempotency, quote window, deadline, calldata constraints, policy binding, and fresh simulation
+  all pass;
+- `blocked`: a runtime or evidence condition fails, so no submission occurs and the owner
+  is not prompted to widen permission;
+- `requires_new_grant`: the request changes chain/call/token/cap or the prior authority expired or was
+  revoked.
+
+The evaluator does not sign, broadcast, or prove authority. The production worker must still bind
+the same policy hash and wallet, observe current onchain authority, reserve idempotency durably, and
+revalidate immediately before submission. `/session-control` exposes the bounded testnet
+grant/revoke mechanics; `/mission-control` displays the retained public lifecycle. The internal
+`/operator-ceremony` route remains a non-indexed evidence tool, not the user journey.
 
 ## Deployment shape
 

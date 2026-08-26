@@ -215,7 +215,7 @@ function ConfigurationForm({
         and quote values are intentionally not entered here.
       </p>
       <button className="button button-primary" type="submit">
-        Review configuration
+        Review one-time mandate
       </button>
     </form>
   );
@@ -307,7 +307,10 @@ export default async function LpActivatePage({ searchParams }: LpActivatePagePro
           <Link className="nav-optional" href="/pancake-position">
             Position evidence
           </Link>
-          <span className="nav-current">LP configuration</span>
+          <span className="nav-current">LP mandate</span>
+          <Link className="nav-optional" href="/session-control">
+            Session control
+          </Link>
           <Link className="nav-optional" href="/mission-control">
             Mission Control
           </Link>
@@ -316,12 +319,12 @@ export default async function LpActivatePage({ searchParams }: LpActivatePagePro
       </nav>
 
       <header className="shell pancake-position-header">
-        <span className="eyebrow">LP RANGE AGENT / CONFIGURATION ONLY</span>
-        <h1>Set boundaries before authority.</h1>
+        <span className="eyebrow">LP RANGE AGENT / ONE-TIME MANDATE DESIGN</span>
+        <h1>Grant once. Keep every action bounded.</h1>
         <p className="lede">
-          Capture the user-controlled range, capital, and runtime limits first. Contract identity,
-          ownership, token metadata, live pool state, and quotes must come from separate trusted
-          server evidence.
+          Set range, capital, slippage, frequency, and expiry before authority exists. Once exact
+          server evidence produces a permission preview and the owner grants it, the agent may act
+          inside that mandate without asking for another transaction signature.
         </p>
       </header>
 
@@ -337,6 +340,60 @@ export default async function LpActivatePage({ searchParams }: LpActivatePagePro
         ) : (
           <ConfigurationRequest values={state.formValues} />
         )}
+      </section>
+
+      <section className="shell section" aria-labelledby="lp-authorization-model-heading">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">AUTHORIZATION MODEL</span>
+            <h2 id="lp-authorization-model-heading">One grant is the boundary.</h2>
+          </div>
+          <p>
+            Repeated owner prompts are reserved for permission changes, not routine actions that
+            already satisfy the granted policy.
+          </p>
+        </div>
+        <div className="passport-grid">
+          <article className="passport-panel">
+            <div className="passport-panel-heading">
+              <div>
+                <span className="step-number">A</span>
+                <h3>Within policy</h3>
+              </div>
+              <span className="state-badge state-available">No re-sign</span>
+            </div>
+            <p>
+              Exact chain, wallet, contract, selector, calldata constraints, spend cap, expiry,
+              quote freshness, deadline, idempotency, and simulation must all pass.
+            </p>
+          </article>
+          <article className="passport-panel">
+            <div className="passport-panel-heading">
+              <div>
+                <span className="step-number">B</span>
+                <h3>Runtime failure</h3>
+              </div>
+              <span className="state-badge state-caution">Block</span>
+            </div>
+            <p>
+              Stale data, policy mismatch, failed simulation, duplicate intent, or exhausted daily
+              limits stop the action. They do not trigger an automatic permission expansion.
+            </p>
+          </article>
+          <article className="passport-panel">
+            <div className="passport-panel-heading">
+              <div>
+                <span className="step-number">C</span>
+                <h3>Scope expansion</h3>
+              </div>
+              <span className="state-badge state-unknown">Fresh grant</span>
+            </div>
+            <p>
+              A different chain, call, token, higher cap, expired session, or revoked session
+              requires the owner to review and grant a new mandate.
+            </p>
+          </article>
+        </div>
       </section>
 
       {state.status !== "configured" ? null : (
@@ -443,12 +500,16 @@ export default async function LpActivatePage({ searchParams }: LpActivatePagePro
           </div>
 
           <div className="decision-hold pancake-identity-boundary">
-            <strong>Next gate: server evidence, not user input</strong>
+            <strong>Next gate: trusted evidence, then one owner grant</strong>
             <p>
               Only after exact contract code, factory/pool relations, position ownership, token
               decimals, a pinned block, and fresh minimum-output provenance are verified can a
-              permission policy be constructed for a separate wallet-confirmation flow.
+              hash-stable permission policy be constructed. After that single grant, matching
+              actions do not need another signature.
             </p>
+            <Link className="text-link" href="/session-control">
+              Inspect the verified session-key flow <span aria-hidden="true">→</span>
+            </Link>
           </div>
         </section>
       )}

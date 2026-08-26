@@ -35,7 +35,7 @@ test("starts with an honest, testnet-only configuration boundary", async ({ page
   await page.goto("/lp-activate");
 
   await expect(
-    page.getByRole("heading", { name: "Set boundaries before authority." })
+    page.getByRole("heading", { name: "Grant once. Keep every action bounded." })
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Set user boundaries first." })).toBeVisible();
   await expect(
@@ -43,6 +43,8 @@ test("starts with an honest, testnet-only configuration boundary", async ({ page
   ).toBeVisible();
   await expect(page.getByLabel("BSC network")).toHaveValue("97");
   await expect(page.getByLabel("Intended execution wallet (not connected)")).toHaveValue("");
+  await expect(page.getByRole("heading", { name: "One grant is the boundary." })).toBeVisible();
+  await expect(page.getByText("No re-sign", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: /activate|confirm|connect wallet/i })).toHaveCount(
     0
   );
@@ -60,6 +62,9 @@ test("renders exact normalized user bounds and blocks authority", async ({ page 
   await expect(page.getByText("Readiness blocked", { exact: true })).toBeVisible();
   await expect(page.getByText(WALLET, { exact: true }).first()).toBeVisible();
   await expect(page.getByText(MAX_UINT256, { exact: true }).first()).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Inspect the verified session-key flow/ })
+  ).toHaveAttribute("href", "/session-control");
 
   const readiness = page
     .getByRole("region", { name: "Configuration captured. Authority absent." })

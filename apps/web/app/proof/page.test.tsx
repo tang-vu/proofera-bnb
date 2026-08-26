@@ -34,12 +34,20 @@ describe("Proof room", () => {
     expect(html).toContain("strict durable confirmation remains withheld");
     expect(html).toContain("initializer observation");
     expect(html).toContain("Both lanes scored 100/100 on all three bounded tasks");
+    expect(html).toContain("Three paired tasks. Mixed timing. Quality parity.");
+    expect(html).toContain("Pancake LP boundary decision");
+    expect(html).toContain("Altana permission-security audit");
+    expect(html).toContain("Venus health-factor decision");
+    expect(html).toContain("Agent faster");
+    expect(html).toContain("Manual faster");
     expect(html).toContain("paired report");
     expect(html).toContain("raw runs");
     expect(html).toContain("adjudication");
     for (const agentId of ["1825", "1826", "1827", "1828"]) {
       expect(html).toContain(`Agent ID ${agentId}`);
     }
+    expect(html).toContain("Finalized paid hire receipts 2");
+    expect(html).toContain("Finalized paid hire receipts 1");
   });
 
   it("does not render successful receipt or submission claims from the incomplete ledger", () => {

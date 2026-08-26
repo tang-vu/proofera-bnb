@@ -166,10 +166,23 @@ test("opens LP configuration without implying a wallet connection", async ({ pag
 
   await expect(page).toHaveURL(/\/lp-activate$/);
   await expect(
-    page.getByRole("heading", { name: "Set boundaries before authority." })
+    page.getByRole("heading", { name: "Grant once. Keep every action bounded." })
   ).toBeVisible();
   await expect(page.getByText("Readiness remains blocked", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Intended execution wallet (not connected)")).toHaveValue("");
+});
+
+test("shows verified BSC identities and the one-grant session entry point", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(
+    page.getByText("Public analyzer live · BSC testnet identity verified", { exact: true })
+  ).toHaveCount(4);
+  await expect(page.getByRole("link", { name: "Grant a testnet session" })).toHaveAttribute(
+    "href",
+    "/session-control"
+  );
+  await expect(page.getByText("Grant once + bounded", { exact: true })).toBeVisible();
 });
 
 test("rejects invalid Pancake position input without an RPC read", async ({ page }) => {
@@ -268,4 +281,9 @@ test("opens the judge proof room without promoting incomplete gates", async ({ p
   );
   await expect(page.getByText(/BSC testnet ERC-8004 Agent ID/u)).toHaveCount(4);
   await expect(page.getByText(/Execution disabled/u)).toHaveCount(4);
+  await expect(
+    page.getByRole("heading", { name: "Three paired tasks. Mixed timing. Quality parity." })
+  ).toBeVisible();
+  await expect(page.getByText("Agent faster", { exact: true })).toHaveCount(1);
+  await expect(page.getByText("Manual faster", { exact: true })).toHaveCount(2);
 });

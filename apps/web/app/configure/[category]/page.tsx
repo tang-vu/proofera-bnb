@@ -451,9 +451,10 @@ function BlankState({ category }: Readonly<{ category: ReferenceConfigurationCat
         form creates only a normalized {presentation[category].label.toLowerCase()} request.
       </p>
       <div className="decision-hold">
-        <strong>Every readiness gate remains false</strong>
+        <strong>Identity verified; strategy readiness remains blocked</strong>
         <p>
-          Trusted evidence, identity, permissions, authority, receipts, and revoke state are absent.
+          The category agent has a finalized BSC-testnet identity. Trusted strategy evidence,
+          permissions, authority, receipts, and revoke state are absent.
         </p>
       </div>
     </aside>
@@ -570,7 +571,9 @@ function ConfigurationReadiness({
       <div className="pancake-result-heading">
         <div>
           <span className="state-badge state-caution">Readiness blocked</span>
-          <h2 id="mandate-readiness-heading">Mandate captured. Trust remains absent.</h2>
+          <h2 id="mandate-readiness-heading">
+            Mandate captured. Identity verified; trust incomplete.
+          </h2>
         </div>
         <span className="state-badge state-caution">
           {configuration.network === "bsc-mainnet"
@@ -644,14 +647,22 @@ function ConfigurationReadiness({
               <span className="step-number">03</span>
               <h2>Readiness flags</h2>
             </div>
-            <span className="state-badge state-caution">All false</span>
+            <span className="state-badge state-caution">1 verified · 8 blocked</span>
           </div>
           <dl className="pancake-facts">
             {(Object.keys(readinessLabels) as Array<keyof typeof readinessLabels>).map((key) => (
               <div key={key}>
                 <dt>{readinessLabels[key]}</dt>
                 <dd>
-                  <span className="state-badge state-caution">False</span>
+                  <span
+                    className={
+                      readiness.flags[key]
+                        ? "state-badge state-available"
+                        : "state-badge state-caution"
+                    }
+                  >
+                    {readiness.flags[key] ? "True" : "False"}
+                  </span>
                 </dd>
               </div>
             ))}
@@ -665,6 +676,13 @@ function ConfigurationReadiness({
           This configuration handler performed no RPC read, HTTP fetch, wallet access, application
           environment lookup, or write. A later evidence service must independently establish every
           trusted fact.
+        </p>
+        <Link className="text-link" href="/session-control">
+          Inspect the bounded session-key model <span aria-hidden="true">→</span>
+        </Link>
+        <p>
+          Session Control currently proves only the PTA amount-0 test action; it does not activate
+          this configured strategy.
         </p>
       </div>
     </section>

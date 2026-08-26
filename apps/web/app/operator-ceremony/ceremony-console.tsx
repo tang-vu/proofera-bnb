@@ -96,7 +96,11 @@ export function CeremonyConsole({
           </button>
         </section>
         <div className="shell ceremony-passkey-start">
-          <AltanaPasskeyCeremony canonicalOrigin={canonicalOrigin} rpId={rpId} />
+          <AltanaPasskeyCeremony
+            canonicalOrigin={canonicalOrigin}
+            canonicalPath="/operator-ceremony"
+            rpId={rpId}
+          />
           <AltanaSessionCeremony config={altanaTestAction} rpId={rpId} />
         </div>
       </>
@@ -159,7 +163,11 @@ export function CeremonyConsole({
         ))}
       </ol>
 
-      <AltanaPasskeyCeremony canonicalOrigin={canonicalOrigin} rpId={rpId} />
+      <AltanaPasskeyCeremony
+        canonicalOrigin={canonicalOrigin}
+        canonicalPath="/operator-ceremony"
+        rpId={rpId}
+      />
       <AltanaSessionCeremony config={altanaTestAction} rpId={rpId} />
 
       <aside className="unavailable-panel" role="status">

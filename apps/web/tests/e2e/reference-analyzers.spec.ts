@@ -50,9 +50,12 @@ for (const analyzer of analyzers) {
 
     expect(response?.status()).toBe(200);
     await expect(page.getByRole("heading", { level: 1, name: analyzer.name })).toBeVisible();
-    await expect(page.getByText("NOT AN AGENT PASSPORT", { exact: false })).toBeVisible();
-    await expect(page.getByText("Do not hire or activate", { exact: true })).toBeVisible();
-    await expect(page.getByText("False", { exact: true })).toHaveCount(6);
+    await expect(
+      page.getByText("REGISTERED REFERENCE AGENT DOSSIER", { exact: true })
+    ).toBeVisible();
+    await expect(page.getByText("Identity verified", { exact: true })).toBeVisible();
+    await expect(page.getByText("True", { exact: true })).toHaveCount(2);
+    await expect(page.getByText("False", { exact: true })).toHaveCount(4);
     await expect(page.getByText("Unknown · no observation", { exact: true })).toHaveCount(8);
     await expect(page.getByText("No receipt", { exact: true })).toHaveCount(8);
     await expect(page.getByText("Implemented; not run", { exact: true })).toHaveCount(
@@ -62,6 +65,10 @@ for (const analyzer of analyzers) {
       page.getByText("Definition documented; calculator absent", { exact: true })
     ).toHaveCount(8 - analyzer.implementedMetrics.length);
     await expect(page.getByRole("button", { name: "Execution unavailable" })).toBeDisabled();
+    await expect(page.getByRole("link", { name: "Inspect session controls" })).toHaveAttribute(
+      "href",
+      "/session-control"
+    );
     await expect(page.getByRole("link", { name: "Configure mandate" })).toHaveAttribute(
       "href",
       analyzer.configureHref
@@ -79,14 +86,14 @@ for (const analyzer of analyzers) {
       ).toBeVisible();
     }
 
-    await expect(
-      page.getByText(/no connected wallet, scoped authority, BSC deployment/i)
-    ).toBeVisible();
+    await expect(page.getByText(/no connected wallet, active scoped authority/i)).toBeVisible();
     await expect(page.getByText(/activation enabled/i)).toHaveCount(0);
     await expect(page.getByRole("link", { name: /^Hire/i })).toHaveCount(0);
     expect(offOriginRequests).toEqual([]);
     expect(
-      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= document.documentElement.clientWidth
+      )
     ).toBe(true);
   });
 }

@@ -46,7 +46,7 @@ const unparsedReferenceAgentCoverage = [
     activationEligible: false,
     executionEnabled: false,
     boundary:
-      "BSC-testnet identity 1825 is finalized. Analysis remains read-only with no authority, execution, hire, or performance receipt."
+      "BSC-testnet identity 1825 and two paid hire receipts are finalized. The receipts do not prove task completion, authority, execution, or performance."
   },
   {
     category: "grid-trading",
@@ -106,7 +106,7 @@ const unparsedReferenceAgentCoverage = [
     activationEligible: false,
     executionEnabled: false,
     boundary:
-      "BSC-testnet identity 1828 is finalized. Execution, hiring, marketplace eligibility, and authority remain unverified and false."
+      "BSC-testnet identity 1828 and one paid hire receipt are finalized. Current hireability, execution, marketplace eligibility, authority, and performance remain false or unverified."
   }
 ] as const;
 

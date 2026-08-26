@@ -8,6 +8,7 @@ import {
   type ReferenceAnalyzerCategory,
   type ReferenceAnalyzerPassport
 } from "../../../lib/reference-analyzer-passport";
+import { verifiedReferenceEvidenceForCategory } from "../../../lib/verified-submission-evidence";
 import styles from "./reference-analyzer.module.css";
 
 export const dynamic = "force-static";
@@ -57,7 +58,7 @@ export async function generateMetadata({ params }: ReferenceAnalyzerPageProps): 
         ? "The requested ProofEra reference analyzer category does not exist."
         : "Repository-backed " +
           categoryLabels[passport.category] +
-          " analyzer contract. Not a live, registered, hireable, or executable BSC agent."
+          " analyzer with a finalized BSC-testnet ERC-8004 identity. Execution and performance remain unverified."
   };
 }
 
@@ -73,16 +74,50 @@ function UnknownValue({ children }: Readonly<{ children: string }>) {
 export default async function ReferenceAnalyzerPage({ params }: ReferenceAnalyzerPageProps) {
   const passport = referenceAnalyzerPassportForCategory((await params).category);
   if (passport === null) notFound();
+  const verifiedEvidence = verifiedReferenceEvidenceForCategory(passport.category);
 
   const identityFacts = [
-    ["Network and chain ID", "Not assigned — no deployment is represented."],
-    ["ERC-8004 identity", "Absent — no token ID or registry transaction exists."],
-    ["Owner", "Absent — repository authorship is not an onchain owner address."],
-    ["Last activity", "Not observed — this page performs no endpoint or chain read."],
-    ["Execution count and success rate", "Not measured — no decoded execution set exists."],
-    ["Fees and uptime", "Not published — there is no live service observation window."],
-    ["Risk and reputation", "Not scored — local code is not sufficient market evidence."],
-    ["Latest transaction receipt", "None — no transaction is created or claimed here."]
+    {
+      label: "Network and chain ID",
+      value: "BSC testnet · chain 97",
+      state: "observed"
+    },
+    {
+      label: "ERC-8004 identity",
+      value: "Agent ID " + passport.identity.erc8004TokenId,
+      state: "observed"
+    },
+    {
+      label: "Registered owner",
+      value: passport.identity.ownerAddress,
+      state: "observed"
+    },
+    {
+      label: "Registration receipt",
+      value: passport.identity.registrationTransactionHash,
+      href: "https://testnet.bscscan.com/tx/" + passport.identity.registrationTransactionHash,
+      state: "observed"
+    },
+    {
+      label: "Last agent activity",
+      value: "Not observed — registration and hire receipts are not execution telemetry.",
+      state: "unknown"
+    },
+    {
+      label: "Execution count and success rate",
+      value: "Not measured — no decoded strategy-execution set exists.",
+      state: "unknown"
+    },
+    {
+      label: "Fees, uptime, risk, and reputation",
+      value: "Not scored — identity and paid hire events are insufficient.",
+      state: "unknown"
+    },
+    {
+      label: "Latest execution receipt",
+      value: "None — paid hire receipts do not prove task completion.",
+      state: "unknown"
+    }
   ] as const;
 
   return (
@@ -97,28 +132,30 @@ export default async function ReferenceAnalyzerPage({ params }: ReferenceAnalyze
         <div className="nav-links">
           <Link href="/marketplace">Marketplace</Link>
           <span className="nav-current">Reference dossier</span>
-          <span className="network-pill">Local code only</span>
+          <span className="network-pill">BSC testnet identity</span>
         </div>
       </nav>
 
       <header className={["shell", styles.hero].join(" ")}>
         <div>
-          <span className="eyebrow">REFERENCE ANALYZER DOSSIER · NOT AN AGENT PASSPORT</span>
+          <span className="eyebrow">REGISTERED REFERENCE AGENT DOSSIER</span>
           <p className="mono-kicker">{passport.coverage.skill}</p>
           <h1>{passport.coverage.name}</h1>
           <p className="lede">
-            This is a repository-backed, deterministic analysis contract for{" "}
-            {categoryLabels[passport.category].toLowerCase()}. It is not a live BSC agent, an
-            ERC-8004 identity, a recommendation, or a performance record.
+            This deterministic public analyzer covers{" "}
+            {categoryLabels[passport.category].toLowerCase()} and has finalized ERC-8004 Agent ID{" "}
+            {passport.identity.erc8004TokenId} on BSC testnet. Registration is not a recommendation,
+            execution receipt, or performance record.
           </p>
         </div>
         <aside className={styles.boundary} aria-labelledby="boundary-heading">
-          <span className="state-badge state-caution">Do not hire or activate</span>
-          <h2 id="boundary-heading">Code exists. Agent evidence does not.</h2>
+          <span className="state-badge state-available">Identity verified</span>
+          <h2 id="boundary-heading">Identity exists. Execution gates remain closed.</h2>
           <p>{passport.coverage.boundary}</p>
           <p>
-            This route makes no network, wallet, environment, or write call. A methodology version
-            describes local code; it does not prove an execution or outcome.
+            This route performs no wallet or write call. Finalized identity and paid hire receipts
+            stay separate from current hireability, execution authority, task completion, and
+            strategy outcome.
           </p>
         </aside>
       </header>
@@ -147,12 +184,12 @@ export default async function ReferenceAnalyzerPage({ params }: ReferenceAnalyze
         <div className={styles.sectionHeading}>
           <div>
             <span className="eyebrow">01 · ELIGIBILITY BOUNDARY</span>
-            <h2 id="eligibility-heading">Every execution gate is closed.</h2>
+            <h2 id="eligibility-heading">Identity verified. Execution gates closed.</h2>
           </div>
           <p>
-            Five execution flags come from the shared four-category reference coverage record.
-            Hireable is separately held false because this analyzer is neither marketplace-eligible
-            nor activation-eligible. None are inferred from source code or deterministic tests.
+            Identity and registration are true from finalized BSC-testnet evidence. Marketplace,
+            activation, execution, and current hireability remain false because those require
+            separate evidence and product controls.
           </p>
         </div>
         <dl className={styles.eligibilityGrid}>
@@ -160,7 +197,15 @@ export default async function ReferenceAnalyzerPage({ params }: ReferenceAnalyze
             <div key={key}>
               <dt>{eligibilityLabels[key]}</dt>
               <dd>
-                <span className="state-badge state-caution">False</span>
+                <span
+                  className={
+                    passport.eligibility[key]
+                      ? "state-badge state-available"
+                      : "state-badge state-caution"
+                  }
+                >
+                  {passport.eligibility[key] ? "True" : "False"}
+                </span>
               </dd>
             </div>
           ))}
@@ -171,23 +216,59 @@ export default async function ReferenceAnalyzerPage({ params }: ReferenceAnalyze
         <div className={styles.sectionHeading}>
           <div>
             <span className="eyebrow">02 · IDENTITY AND TRACK RECORD</span>
-            <h2 id="identity-heading">Absence stays visible.</h2>
+            <h2 id="identity-heading">Finalized identity, bounded claims.</h2>
           </div>
           <p>
-            No local fixture, filename, or test result is substituted for a registration, owner,
-            activity observation, reputation sample, or transaction receipt.
+            Registration and paid hire events are displayed from committed finalized evidence.
+            Unobserved execution, outcome, uptime, reputation, and performance remain unknown.
           </p>
         </div>
         <dl className={styles.identityGrid}>
-          {identityFacts.map(([label, explanation]) => (
-            <div key={label}>
-              <dt>{label}</dt>
+          {identityFacts.map((fact) => (
+            <div key={fact.label}>
+              <dt>{fact.label}</dt>
               <dd>
-                <UnknownValue>{explanation}</UnknownValue>
+                {fact.state === "observed" ? (
+                  <span>
+                    <span className="state-badge state-available">Verified</span>{" "}
+                    {"href" in fact ? (
+                      <a href={fact.href} rel="noopener noreferrer" target="_blank">
+                        {fact.value} <span aria-hidden="true">↗</span>
+                      </a>
+                    ) : (
+                      <span className="raw-value">{fact.value}</span>
+                    )}
+                  </span>
+                ) : (
+                  <UnknownValue>{fact.value}</UnknownValue>
+                )}
               </dd>
             </div>
           ))}
         </dl>
+        <div className={styles.methodBoundary}>
+          <div>
+            <span className="panel-overline">FINALIZED PAID HIRE RECEIPTS</span>
+            <strong>{verifiedEvidence.paidHireReceipts.length}</strong>
+          </div>
+          {verifiedEvidence.paidHireReceipts.length === 0 ? (
+            <p>No paid hire receipt is present for this identity in the current final artifact.</p>
+          ) : (
+            <ul>
+              {verifiedEvidence.paidHireReceipts.map((receipt) => (
+                <li key={receipt.transactionHash}>
+                  <a href={receipt.explorerUrl} rel="noopener noreferrer" target="_blank">
+                    {receipt.slug} <span aria-hidden="true">↗</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p>
+            A paid hire receipt proves a finalized testnet engagement event only. It does not prove
+            that the task completed or that the agent produced a beneficial outcome.
+          </p>
+        </div>
       </section>
 
       <section className={["shell", styles.section].join(" ")} aria-labelledby="metrics-heading">
@@ -257,11 +338,11 @@ export default async function ReferenceAnalyzerPage({ params }: ReferenceAnalyze
         <div className={styles.sectionHeading}>
           <div>
             <span className="eyebrow">04 · REPOSITORY PROVENANCE</span>
-            <h2 id="provenance-heading">Inspectable code paths, not live proof.</h2>
+            <h2 id="provenance-heading">Inspectable code and finalized identity evidence.</h2>
           </div>
           <p>
-            Paths below are plain repository references. They are deliberately not converted into
-            arbitrary external links and do not imply that a service is deployed.
+            Paths below bind the method contract and finalized registration evidence. They do not
+            turn missing execution or performance observations into current facts.
           </p>
         </div>
         <div className={styles.provenanceGrid}>
@@ -296,15 +377,19 @@ export default async function ReferenceAnalyzerPage({ params }: ReferenceAnalyze
       >
         <div>
           <span className="eyebrow">EXECUTION BOUNDARY</span>
-          <h2 id="execution-boundary-heading">Analysis contract only.</h2>
+          <h2 id="execution-boundary-heading">Registered analyzer, execution disabled.</h2>
           <p id="execution-disabled-reason">
-            There is no connected wallet, scoped authority, BSC deployment, verified identity,
-            execution receipt, or revoke target. ProofEra cannot hire or activate this analyzer.
+            There is no connected wallet, active scoped authority, verified strategy execution
+            receipt, or current user-facing hire control. ProofEra cannot activate this analyzer
+            from this dossier.
           </p>
         </div>
         <div className="hero-actions">
           <Link className="button button-secondary" href={configurationRoutes[passport.category]}>
             Configure mandate
+          </Link>
+          <Link className="button button-secondary" href="/session-control">
+            Inspect session controls
           </Link>
           <button
             aria-describedby="execution-disabled-reason"

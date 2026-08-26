@@ -4,6 +4,10 @@ import Link from "next/link";
 import registrationEvidence from "../../../../evidence/submission/final/agent-registration.json";
 import readiness from "../../../../evidence/submission/readiness.json";
 import { publicBuildIdentifier } from "../../lib/runtime-readiness";
+import {
+  verifiedReferenceEvidence,
+  verifiedTermixPairs
+} from "../../lib/verified-submission-evidence";
 
 import styles from "./proof.module.css";
 
@@ -48,6 +52,15 @@ function humanize(value: string): string {
 function sourceUrl(build: string, path: string): string | null {
   if (!/^[0-9a-f]{40}$/u.test(build)) return null;
   return `https://github.com/tang-vu/proofera-bnb/blob/${build}/${path}`;
+}
+
+function formatNanoseconds(value: string): string {
+  const nanoseconds = BigInt(value);
+  const seconds = nanoseconds / 1_000_000_000n;
+  const fraction = (nanoseconds % 1_000_000_000n).toString().padStart(9, "0").replace(/0+$/u, "");
+  return fraction.length === 0
+    ? seconds.toString() + " s"
+    : seconds.toString() + "." + fraction + " s";
 }
 
 export default function ProofRoomPage() {
@@ -116,6 +129,9 @@ export default function ProofRoomPage() {
             const registration = registrationEvidence.agents.find(
               (candidate) => candidate.key === agent.key
             );
+            const hireEvidence = verifiedReferenceEvidence.find(
+              (candidate) => candidate.agentId === registration?.agentId
+            );
             return (
               <article className={styles.agentCard} key={agent.category}>
                 <div className={styles.cardHeading}>
@@ -132,10 +148,72 @@ export default function ProofRoomPage() {
                   BSC testnet ERC-8004 Agent ID {registration?.agentId ?? "unknown"} · Execution
                   disabled
                 </p>
+                <p>
+                  Finalized paid hire receipts {hireEvidence?.paidHireReceipts.length ?? 0} · Task
+                  completion not inferred
+                </p>
               </article>
             );
           })}
         </div>
+      </section>
+
+      <section
+        className={`shell section ${styles.section}`}
+        aria-labelledby="termix-results-heading"
+      >
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">AGENT ADVANTAGE REPORT</span>
+            <h2 id="termix-results-heading">Three paired tasks. Mixed timing. Quality parity.</h2>
+          </div>
+          <p>
+            Both lanes scored 100/100 with zero incremental native cost in every bounded task.
+            Timing points in different directions, so ProofEra makes no universal speed, quality, or
+            financial-advantage claim.
+          </p>
+        </div>
+        <div className={styles.agentGrid}>
+          {verifiedTermixPairs.map((pair) => (
+            <article className={styles.agentCard} key={pair.taskId}>
+              <div className={styles.cardHeading}>
+                <h3>{pair.label}</h3>
+                <span className={styles.available}>
+                  {pair.timingWinner === "agent" ? "Agent faster" : "Manual faster"}
+                </span>
+              </div>
+              <dl className="pancake-facts">
+                <div>
+                  <dt>Agent time</dt>
+                  <dd>{formatNanoseconds(pair.agentNanoseconds)}</dd>
+                </div>
+                <div>
+                  <dt>Manual time</dt>
+                  <dd>{formatNanoseconds(pair.manualNanoseconds)}</dd>
+                </div>
+                <div>
+                  <dt>Quality</dt>
+                  <dd>
+                    {pair.agentQualityPoints}/{pair.maximumQualityPoints} agent ·{" "}
+                    {pair.manualQualityPoints}/{pair.maximumQualityPoints} manual
+                  </dd>
+                </div>
+                <div>
+                  <dt>Incremental native cost</dt>
+                  <dd>
+                    {pair.agentCostMinorUnits} {pair.costSymbol} agent · {pair.manualCostMinorUnits}{" "}
+                    {pair.costSymbol} manual
+                  </dd>
+                </div>
+              </dl>
+            </article>
+          ))}
+        </div>
+        <p className="registry-footnote">
+          The review is owner-designated internal, not external or cryptographically authenticated.
+          Raw outputs, paired report, and adjudication remain digest-bound in the closure ledger
+          below.
+        </p>
       </section>
 
       <section className={`shell section ${styles.section}`} aria-labelledby="closure-heading">

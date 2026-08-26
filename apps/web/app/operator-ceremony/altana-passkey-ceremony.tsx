@@ -21,6 +21,7 @@ export interface StoredPasskeyWallet {
 }
 
 interface AltanaPasskeyCeremonyProps {
+  readonly canonicalPath: "/operator-ceremony" | "/session-control";
   readonly canonicalOrigin: string;
   readonly rpId: string;
 }
@@ -98,10 +99,14 @@ function browserSnapshot(canonicalOrigin: string, rpId: string): string {
   return stored === null ? "idle" : `ready:${stored.address}`;
 }
 
-function defaultBoundaryMessage(snapshot: string, canonicalOrigin: string): string {
+function defaultBoundaryMessage(
+  snapshot: string,
+  canonicalOrigin: string,
+  canonicalPath: AltanaPasskeyCeremonyProps["canonicalPath"]
+): string {
   if (snapshot === "checking") return "Đang kiểm tra HTTPS origin và WebAuthn trên thiết bị này.";
   if (snapshot === "origin_mismatch") {
-    return `Mở đúng ${canonicalOrigin}/operator-ceremony để dùng passkey.`;
+    return "Mở đúng " + canonicalOrigin + canonicalPath + " để dùng passkey.";
   }
   if (snapshot === "unsupported") {
     return "Trình duyệt hoặc HTTPS context này không hỗ trợ WebAuthn passkey.";
@@ -112,7 +117,11 @@ function defaultBoundaryMessage(snapshot: string, canonicalOrigin: string): stri
   return "Chưa có passkey ProofEra trên thiết bị này.";
 }
 
-export function AltanaPasskeyCeremony({ canonicalOrigin, rpId }: AltanaPasskeyCeremonyProps) {
+export function AltanaPasskeyCeremony({
+  canonicalPath,
+  canonicalOrigin,
+  rpId
+}: AltanaPasskeyCeremonyProps) {
   const snapshot = useSyncExternalStore(
     (onStoreChange) => {
       window.addEventListener("storage", onStoreChange);
@@ -134,7 +143,8 @@ export function AltanaPasskeyCeremony({ canonicalOrigin, rpId }: AltanaPasskeyCe
   const available = snapshot === "idle" || snapshot.startsWith("ready:");
   const ready = walletAddress !== null;
   const canCreateOrRecover = snapshot === "idle" && !busy;
-  const message = operationMessage ?? defaultBoundaryMessage(snapshot, canonicalOrigin);
+  const message =
+    operationMessage ?? defaultBoundaryMessage(snapshot, canonicalOrigin, canonicalPath);
 
   async function retainWallet(result: unknown) {
     if (typeof result !== "object" || result === null) throw new Error("invalid_wallet");

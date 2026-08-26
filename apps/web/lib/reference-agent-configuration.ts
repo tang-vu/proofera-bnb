@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { referenceCoverageForCategory } from "./reference-agent-coverage";
+
 const configurableCategorySchema = z.enum([
   "grid-trading",
   "yield-optimisation",
@@ -179,7 +181,7 @@ export interface ReferenceConfigurationIssue {
 export interface ReferenceConfigurationReadiness {
   readonly flags: Readonly<{
     trustedEvidenceReady: false;
-    verifiedAgentIdentityReady: false;
+    verifiedAgentIdentityReady: true;
     marketplaceEligibilityReady: false;
     permissionPreviewReady: false;
     scopedAuthorityReady: false;
@@ -189,11 +191,7 @@ export interface ReferenceConfigurationReadiness {
     revokeReady: false;
   }>;
   readonly blockers: readonly Readonly<{
-    code:
-      | "trusted_evidence_absent"
-      | "verified_agent_identity_absent"
-      | "scoped_authority_absent"
-      | "transaction_receipt_absent";
+    code: "trusted_evidence_absent" | "scoped_authority_absent" | "transaction_receipt_absent";
     message: string;
   }>[];
   readonly boundary: Readonly<{
@@ -522,10 +520,14 @@ function structuralIssues(
 function createReadiness(
   category: ReferenceConfigurationCategory
 ): ReferenceConfigurationReadiness {
+  const coverage = referenceCoverageForCategory(category);
+  if (!coverage.erc8004Registered || !coverage.liveBscAgent) {
+    throw new TypeError("Configured reference category lacks its required verified identity.");
+  }
   return {
     flags: {
       trustedEvidenceReady: false,
-      verifiedAgentIdentityReady: false,
+      verifiedAgentIdentityReady: true,
       marketplaceEligibilityReady: false,
       permissionPreviewReady: false,
       scopedAuthorityReady: false,
@@ -536,11 +538,6 @@ function createReadiness(
     },
     blockers: [
       { code: "trusted_evidence_absent", message: trustedEvidenceMessages[category] },
-      {
-        code: "verified_agent_identity_absent",
-        message:
-          "No live BSC deployment, ERC-8004 identity, verified endpoint, marketplace eligibility, or execution history is attached."
-      },
       {
         code: "scoped_authority_absent",
         message:

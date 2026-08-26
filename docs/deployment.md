@@ -109,7 +109,10 @@ This is a real host-local staging deployment, not production activation evidence
 
 ## Bounded Altana test-action worker
 
-The operator ceremony has one local-only chain-97 worker for lifecycle evidence. It is deliberately narrower than the production LP activation composition:
+The bounded session proof has one local-only chain-97 worker for lifecycle evidence. The user-facing
+entry is `/session-control`; `/operator-ceremony` retains the benchmark/recovery ceremony and is
+non-indexed. Both reuse the same public-state API and are deliberately narrower than the production
+LP activation composition:
 
 - tracked public configuration: `deploy/windows/altana-test-action.v2.json`;
 - pinned admin wallet: `0x91Aa0E6627bFF6C911B38CEd5F7885E063b7C27a`;
@@ -122,7 +125,12 @@ Provision once with `pnpm provision:altana:test-action`. The command never print
 
 The PM2 topology starts `proofera-altana-test-action-worker` with `--run`. It opens no socket. It polls the two fixed BSC-testnet RPCs and remains `waiting_authority` until both KeyStore validity and the derived Altana account key hash are present with one matching expiry. It then simulates the exact PTA zero approval, durably creates the execution claim, unwraps the signer, submits once with SDK `noWait: true`, and reconciles the returned `callsId` plus a dual-RPC successful receipt. A retained claim without a retained calls ID becomes terminal unknown and must not be deleted or retried. `lifecycle_complete` requires both RPCs to agree that KeyStore validity is false and the account key hash is absent; expiry-only disagreement blocks.
 
-The Next.js route `/api/operator-ceremony/altana-state` exposes only the strict public projection. The browser keeps the admin passkey device-bound, creates its grant-submitting fence before SDK invocation, and requires a separate Windows Hello ceremony for revoke. Browser local storage is not a production durable replay ledger; this operator path does not replace the canonical PostgreSQL grant-claim/activation composition.
+The Next.js route `/api/operator-ceremony/altana-state` exposes only the strict public projection. The browser keeps the
+admin passkey device-bound, creates its grant-submitting fence before SDK invocation, and requires a
+separate Windows Hello ceremony for owner revoke. After one observed grant, the worker executes the
+pinned in-scope action without another owner signature. Browser local storage is not a production
+durable replay ledger; this bounded path does not replace the canonical PostgreSQL
+grant-claim/activation composition.
 
 The first live attempt funded the wallet and produced successful finalized grant transaction `0xcdd3f4b4da56af34ca636e067fb0e26aae8bf6ce209b0691dde8d5e7b331071e`; a 2026-08-22 recovery read saw the same block, successful receipt and finality on both fixed RPCs. This operational recovery observation is not the complete lifecycle artifact described in the lifecycle runbook. The v1 worker then retained the one-shot execute calls ID `0x0ea636cf51453205913e4b941cd4c01972754e2f0ffef4ef3ff88c6110331975`. Relay status `300` has no transaction hash or receipt and is classified as terminal failure by viem's EIP-5792 status categories; the prior worker incorrectly polled it as pending because SDK 0.7.0 handles only explicit `500`/`FAILED`. The immutable v1 claim is not retried. The one-hour key expired and the dual-RPC public projection reported no active authority. No v1 execute/revoke receipt or completed lifecycle exists.
 
@@ -155,7 +163,7 @@ bag deploy prepare
 
 Before deployment, inspect generated manifests, endpoint health behavior, IAM/quota, region, secret injection and whether `--skip-register` is required. ProofEra's browser-passkey Altana session is not assumed equivalent to Studio's native/local Altana provisioning. The worker must receive the ProofEra-scoped signer through the reviewed KMS seam and pass independent authority verification.
 
-All four analyzers have hardened public A2A/MCP runtimes and fail-independent CI matrix entries: LP Range 17 tests, Grid Trading 24, Yield Optimisation 33, and Health-Factor Guardian 42. Their durable endpoints and public health/Card probes pass. Dedicated registration wallets and current A2A identity metadata exist, but balances and ERC-8004 identities do not; see the [agent registration runbook](./agent-registration.md). Analyzer availability alone is not execution or outcome evidence.
+All four analyzers have hardened public A2A/MCP runtimes and fail-independent CI matrix entries: LP Range 17 tests, Grid Trading 24, Yield Optimisation 33, and Health-Factor Guardian 42. Their durable endpoints and public health/Card probes pass. Finalized BSC-testnet registration evidence binds Agent IDs 1825–1828, and separate evidence binds two paid hires to LP plus one to Health; see the [agent registration runbook](./agent-registration.md). Availability, registration, and paid hire events remain separate from execution, task completion, and outcome evidence.
 
 Prepare durable self-host/AWS hosting first. Start the 48-hour BNB-managed trial only when a testnet evidence capture window is scheduled. Agent ERC-8004 registration is a separate, custody-specific admin operation; do not assume Studio/Altana can sign it generically.
 
