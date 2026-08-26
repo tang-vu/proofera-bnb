@@ -22,6 +22,7 @@ evidence/erc8004/registrations/*.json
 evidence/altana/lifecycles/*.json
 # Byte-exact copies promoted into the fail-closed final-evidence ledger.
 evidence/submission/final/*.json
+evidence/submission/final/termix/**/*.json
 # Byte-exact manifests from the public demo rehearsal collector.
 evidence/submission/rehearsals/*/manifest.json
 # Byte-exact manifests from the final/rehearsal demo video collector.
