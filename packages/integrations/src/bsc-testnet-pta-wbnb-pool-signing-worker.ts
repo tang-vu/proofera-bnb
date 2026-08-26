@@ -2072,7 +2072,7 @@ export function matchesBscTestnetPtaWbnbPoolExactBroadcastToSuccessfulSigningFor
     !Object.isFrozen(record.recovery) ||
     !hasExactKeys(record, EXACT_BROADCAST_REQUEST_KEYS) ||
     !hasExactKeys(recovery, EXACT_BROADCAST_RECOVERY_KEYS) ||
-    record.schemaVersion !== 8 ||
+    record.schemaVersion !== 9 ||
     record.operation !== EXACT_BROADCAST_OPERATION ||
     record.operationKey !== BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY ||
     record.claimId !== request.claimId ||
@@ -2484,7 +2484,7 @@ export async function createWindowsBscTestnetPtaWbnbPoolNativeProductionBridgeFo
         return nativeActivationBlocked(
           "NATIVE_RECOVERY_STATE_INVALID",
           "recovery",
-          "The exact generation-7 terminal or empty generation-8 signing/submission prerequisites changed after owner confirmation."
+          "The exact generation-8 terminal or empty generation-9 signing/submission prerequisites changed after owner confirmation."
         );
       }
       const preparedState = await signingJournal.readState();

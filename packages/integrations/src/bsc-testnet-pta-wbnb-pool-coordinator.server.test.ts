@@ -275,7 +275,7 @@ describe("BSC testnet PTA/WBNB pool coordinator", () => {
           dataKeccak256: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_KECCAK256,
           selector: "0x13ead562",
           valueWei: "0",
-          gasLimit: "5983857",
+          gasLimit: "6600000",
           gasPriceWei: "100000000"
         },
         initializer: {
@@ -304,11 +304,11 @@ describe("BSC testnet PTA/WBNB pool coordinator", () => {
         },
         caps: {
           gasMarginBps: "2000",
-          maximumGasEstimate: "5000000",
-          maximumGasLimit: "6000000",
+          maximumGasEstimate: "5500000",
+          maximumGasLimit: "6600000",
           maximumGasPriceWei: "3000000000",
           maximumTotalCostWei: "18000000000000000",
-          boundedMaximumCostWei: "598385700000000"
+          boundedMaximumCostWei: "660000000000000"
         },
         authorization: {
           signingReady: false,
@@ -399,7 +399,7 @@ describe("BSC testnet PTA/WBNB pool coordinator", () => {
       { simulation: addressResult(ADDRESSES.zero) },
       "simulation_mismatch"
     ],
-    [{ gasEstimate: "0x4c4b41" }, { gasEstimate: "0x4c4b41" }, "gas_cap_exceeded"],
+    [{ gasEstimate: "0x53ec61" }, { gasEstimate: "0x53ec61" }, "gas_cap_exceeded"],
     [{ gasPrice: "0xb2d05e01" }, { gasPrice: "0xb2d05e01" }, "gas_cap_exceeded"],
     [{ balance: "0x1" }, { balance: "0x1" }, "insufficient_balance"]
   ] as const)("fails closed for a material mismatch", async (primary, corroborator, reason) => {

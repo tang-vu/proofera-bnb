@@ -48,8 +48,8 @@ export interface BscTestnetPtaWbnbPoolOneShotExactBinding {
 }
 
 /**
- * Legacy preparation-only receipt shape. It is non-authorizing: the executable generation-6 path
- * obtains a separately branded owner-v11 intent outside this module, and copied JSON/digests here
+ * Legacy preparation-only receipt shape. It is non-authorizing: the executable generation-9 path
+ * obtains a separately branded owner-v12 intent outside this module, and copied JSON/digests here
  * cannot substitute for that authority.
  */
 export interface BscTestnetPtaWbnbPoolExternalAuthorizationReceipt {
@@ -380,8 +380,8 @@ function inspectedEnvelope(value: unknown): BscTestnetPtaWbnbPoolInitializationE
     expiresMilliseconds - observedMilliseconds !==
       BSC_TESTNET_PTA_WBNB_POOL_ENVELOPE_LIFETIME_SECONDS * 1_000 ||
     envelope.caps.gasMarginBps !== "2000" ||
-    envelope.caps.maximumGasEstimate !== "5000000" ||
-    envelope.caps.maximumGasLimit !== "6000000" ||
+    envelope.caps.maximumGasEstimate !== "5500000" ||
+    envelope.caps.maximumGasLimit !== "6600000" ||
     envelope.caps.maximumGasPriceWei !== "3000000000" ||
     envelope.caps.maximumTotalCostWei !== "18000000000000000" ||
     envelope.raceBoundary.initializerHasNoDeadline !== true ||

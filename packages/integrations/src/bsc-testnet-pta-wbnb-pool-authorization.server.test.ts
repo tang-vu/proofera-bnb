@@ -19,7 +19,7 @@ import {
   createBscTestnetPtaWbnbPoolProductionAuthorizationGate
 } from "./bsc-testnet-pta-wbnb-pool-authorization.server";
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_8_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   buildBscTestnetPtaWbnbPoolExactSigningTransaction
 } from "./bsc-testnet-pta-wbnb-pool-one-shot-protocol";
@@ -65,7 +65,7 @@ function descriptor() {
       data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
       dataKeccak256: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_KECCAK256,
       valueWei: 0n,
-      gasLimit: 5_983_857n,
+      gasLimit: 6_600_000n,
       gasPriceWei: 100_000_000n
     },
     envelopeExpiresAt: ENVELOPE_EXPIRES_AT,
@@ -119,15 +119,15 @@ function ownerAuthorization(
   ceremonyNonce = `0x${"44".repeat(32)}` as Hex
 ) {
   const exact = buildBscTestnetPtaWbnbPoolExactSigningTransaction({
-    gasLimit: "5983857",
+    gasLimit: "6600000",
     gasPriceWei: "100000000",
     sourceEnvelopeHash: ENVELOPE_HASH
   });
   if (exact === null) throw new Error("Transaction fixture failed.");
   const body = {
-    schemaVersion: 9,
-    kind: "exact_owner_recovery_generation_8_signature_and_single_broadcast_authorization_v9",
-    decision: "authorize_fresh_chain_97_pool_recovery_generation_8_signature_and_single_broadcast",
+    schemaVersion: 10,
+    kind: "exact_owner_recovery_generation_9_signature_and_single_broadcast_authorization_v10",
+    decision: "authorize_fresh_chain_97_pool_recovery_generation_9_signature_and_single_broadcast",
     broadcastPolicy: "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity",
     liquidityActionAuthorized: false,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
@@ -140,9 +140,9 @@ function ownerAuthorization(
     authorizationTextSha256: TEXT_DIGEST,
     ceremonyNonce,
     recovery: deeplyFreeze({
-      generation: 8,
+      generation: 9,
       predecessorState: "failed_before_worker",
-      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256,
+      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_8_TRANSITION_RAW_SHA256,
       attemptId: ATTEMPT_ID
     }),
     signingHash: exact.signingHash,
@@ -248,7 +248,7 @@ describe("PTA/WBNB pool exact authorization composition", () => {
     }
   });
 
-  it("binds the CSPRNG ceremony nonce and recovery attempt into exact owner v11 receipt bytes", () => {
+  it("binds the CSPRNG ceremony nonce and recovery attempt into exact owner v10 receipt bytes", () => {
     const reviewer = reviewerApproval();
     const owner = ownerAuthorization(reviewer.approvalDigest);
     const ownerBrands = new WeakSet<object>([owner]);

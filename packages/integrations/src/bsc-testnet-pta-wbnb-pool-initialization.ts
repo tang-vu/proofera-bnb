@@ -12,7 +12,7 @@ export const BSC_TESTNET_PTA_WBNB_POOL_SENDER =
 // exact transaction nonce remains a separate release-, envelope-, policy-, and signer-bound field.
 export const BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY =
   "0xe6c943aa33e600bfc1770ee654ee6b00bf6dbcc7cc1702c58bd1caa64dadb9cc" as const satisfies Hex;
-// Generation 6 has never signed or submitted. Its exact transaction is rebased to the sender state
+// Recovery generations 5 through 8 never signed or submitted. The exact transaction remains rebased to the sender state
 // observed by both fixed RPCs after unrelated retained chain-97 work advanced the shared test EOA.
 // Historical generation-1..4 journal evidence remains bound to nonce 1 and is parsed separately.
 export const BSC_TESTNET_PTA_WBNB_POOL_EXPECTED_NONCE = 9n;
@@ -52,8 +52,8 @@ export const BSC_TESTNET_PTA_WBNB_POOL_MINIMUM_REMAINING_BEFORE_CLAIM_SECONDS = 
 export const BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_POST_CONFIRMATION_PRECLAIM_SECONDS = 60 as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_POST_RECHECK_EXECUTION_RESERVE_SECONDS = 20 as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_GAS_MARGIN_BPS = 2_000 as const;
-export const BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_ESTIMATE = 5_000_000n;
-export const BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_LIMIT = 6_000_000n;
+export const BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_ESTIMATE = 5_500_000n;
+export const BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_LIMIT = 6_600_000n;
 export const BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_PRICE_WEI = 3_000_000_000n;
 export const BSC_TESTNET_PTA_WBNB_POOL_MAX_TOTAL_COST_WEI = 18_000_000_000_000_000n;
 
@@ -135,8 +135,8 @@ export interface BscTestnetPtaWbnbPoolInitializationEnvelopeBody {
   }>;
   readonly caps: Readonly<{
     gasMarginBps: "2000";
-    maximumGasEstimate: "5000000";
-    maximumGasLimit: "6000000";
+    maximumGasEstimate: "5500000";
+    maximumGasLimit: "6600000";
     maximumGasPriceWei: "3000000000";
     maximumTotalCostWei: "18000000000000000";
     boundedMaximumCostWei: string;
@@ -177,7 +177,9 @@ export function deriveBscTestnetPtaWbnbPoolInitializationEnvelopeHash(
 
 export function calculateBscTestnetPtaWbnbPoolGasLimit(gasEstimate: bigint): bigint | null {
   if (gasEstimate <= 0n || gasEstimate > BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_ESTIMATE) return null;
-  const gasLimit =
+  const minimumGasLimit =
     (gasEstimate * (10_000n + BigInt(BSC_TESTNET_PTA_WBNB_POOL_GAS_MARGIN_BPS)) + 9_999n) / 10_000n;
-  return gasLimit <= BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_LIMIT ? gasLimit : null;
+  return minimumGasLimit <= BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_LIMIT
+    ? BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_LIMIT
+    : null;
 }

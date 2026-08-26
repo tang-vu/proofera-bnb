@@ -122,9 +122,9 @@ export interface BscTestnetPtaWbnbPoolOwnerSignatureAndBroadcastAuthorizationBod
   BscTestnetPtaWbnbPoolOwnerEnvelopeAuthorizationBody,
   "schemaVersion" | "kind" | "decision"
 > {
-  readonly schemaVersion: 9;
-  readonly kind: "exact_owner_recovery_generation_8_signature_and_single_broadcast_authorization_v9";
-  readonly decision: "authorize_fresh_chain_97_pool_recovery_generation_8_signature_and_single_broadcast";
+  readonly schemaVersion: 10;
+  readonly kind: "exact_owner_recovery_generation_9_signature_and_single_broadcast_authorization_v10";
+  readonly decision: "authorize_fresh_chain_97_pool_recovery_generation_9_signature_and_single_broadcast";
   readonly broadcastPolicy: "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity";
   readonly liquidityActionAuthorized: false;
   readonly ceremonyNonce: Hex;
@@ -632,11 +632,11 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
       ownerValue !== null && typeof ownerValue === "object" && !isProxy(ownerValue)
         ? Object.getOwnPropertyDescriptor(ownerValue, "kind")?.value
         : null;
-    const ownerV4 =
+    const activeOwner =
       ownerKind ===
-      "exact_owner_recovery_generation_8_signature_and_single_broadcast_authorization_v9";
+      "exact_owner_recovery_generation_9_signature_and_single_broadcast_authorization_v10";
     const ownerBodyKeys = OWNER_V3_BODY_KEYS;
-    const owner = ownerV4 ? inspectRecord(ownerValue, OWNER_V3_KEYS) : null;
+    const owner = activeOwner ? inspectRecord(ownerValue, OWNER_V3_KEYS) : null;
     if (owner === null) {
       return blocked(
         "OWNER_AUTHORIZATION_INVALID",
@@ -669,11 +669,11 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
       ownerIdentity === null ||
       authorizedAt === null ||
       ownerExpiry === null ||
-      owner.schemaVersion !== 9 ||
+      owner.schemaVersion !== 10 ||
       owner.kind !==
-        "exact_owner_recovery_generation_8_signature_and_single_broadcast_authorization_v9" ||
+        "exact_owner_recovery_generation_9_signature_and_single_broadcast_authorization_v10" ||
       owner.decision !==
-        "authorize_fresh_chain_97_pool_recovery_generation_8_signature_and_single_broadcast" ||
+        "authorize_fresh_chain_97_pool_recovery_generation_9_signature_and_single_broadcast" ||
       owner.broadcastPolicy !== "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity" ||
       ceremonyNonce === null ||
       owner.liquidityActionAuthorized !== false ||
@@ -730,9 +730,9 @@ function createBscTestnetPtaWbnbPoolAuthorizationGateCore(
       return blocked("AUTHORIZATION_EXPIRED", "expiresAt", "Authorization envelope expired.");
     }
     const intent = Object.freeze({
-      schemaVersion: 8 as const,
+      schemaVersion: 9 as const,
       scope:
-        "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_8" as const,
+        "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_9" as const,
       operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
       envelopeHash,
       reviewerApprovalDigest,

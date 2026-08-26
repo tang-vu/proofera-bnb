@@ -283,7 +283,7 @@ describe("PTA/WBNB fixed production RPC pre-send reread", () => {
 
     const result = await acquireBscTestnetPtaWbnbPoolProductionPreSubmissionForInternalUse({
       transactionHash: TRANSACTION_HASH,
-      gasLimit: "5983857",
+      gasLimit: "6600000",
       gasPriceWei: "100000000"
     });
 
@@ -334,7 +334,7 @@ describe("PTA/WBNB fixed production RPC pre-send reread", () => {
     await expect(
       acquireBscTestnetPtaWbnbPoolProductionPreSubmissionForInternalUse({
         transactionHash: TRANSACTION_HASH,
-        gasLimit: "5983857",
+        gasLimit: "6600000",
         gasPriceWei: "100000000"
       })
     ).rejects.toThrow("RPC_PROVIDER_DISAGREEMENT");

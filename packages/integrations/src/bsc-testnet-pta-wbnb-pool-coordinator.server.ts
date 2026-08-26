@@ -1106,8 +1106,8 @@ export async function coordinateBscTestnetPtaWbnbPoolInitializationForTests(
       }),
       caps: Object.freeze({
         gasMarginBps: BSC_TESTNET_PTA_WBNB_POOL_GAS_MARGIN_BPS.toString() as "2000",
-        maximumGasEstimate: BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_ESTIMATE.toString() as "5000000",
-        maximumGasLimit: BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_LIMIT.toString() as "6000000",
+        maximumGasEstimate: BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_ESTIMATE.toString() as "5500000",
+        maximumGasLimit: BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_LIMIT.toString() as "6600000",
         maximumGasPriceWei: BSC_TESTNET_PTA_WBNB_POOL_MAX_GAS_PRICE_WEI.toString() as "3000000000",
         maximumTotalCostWei:
           BSC_TESTNET_PTA_WBNB_POOL_MAX_TOTAL_COST_WEI.toString() as "18000000000000000",

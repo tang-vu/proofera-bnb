@@ -15,7 +15,7 @@ import {
   BSC_TESTNET_PTA_WBNB_POOL_SENDER
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_8_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   buildBscTestnetPtaWbnbPoolExactSigningTransaction,
   validateBscTestnetPtaWbnbPoolFreshRecheckCapability,
@@ -31,7 +31,7 @@ const ENVELOPE_HASH = `0x${"11".repeat(32)}` as Hex;
 const REVIEWER_DIGEST = `0x${"22".repeat(32)}` as Hex;
 const OWNER_DIGEST = `0x${"33".repeat(32)}` as Hex;
 const PREDECESSOR_TERMINAL_RAW_SHA256 =
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256;
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_8_TRANSITION_RAW_SHA256;
 const ATTEMPT_ID = `0x${"35".repeat(32)}` as Hex;
 const CLAIM_TOKEN = `0x${"44".repeat(32)}` as Hex;
 const MANIFEST = `0x${"55".repeat(32)}` as Hex;
@@ -53,7 +53,7 @@ function quantity(value: bigint): Hex {
 
 function transaction() {
   const value = buildBscTestnetPtaWbnbPoolExactSigningTransaction({
-    gasLimit: "5983857",
+    gasLimit: "6600000",
     gasPriceWei: "100000000",
     sourceEnvelopeHash: ENVELOPE_HASH
   });
@@ -63,8 +63,8 @@ function transaction() {
 
 function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
   return Object.freeze({
-    schemaVersion: 8,
-    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_8",
+    schemaVersion: 9,
+    scope: "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_9",
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     envelopeHash: ENVELOPE_HASH,
     reviewerApprovalDigest: REVIEWER_DIGEST,
@@ -74,7 +74,7 @@ function authorizedIntent(): BscTestnetPtaWbnbPoolAuthorizedSigningIntent {
     authenticatedAt: "2026-08-13T04:29:55.000Z",
     expiresAt: "2026-08-13T04:31:55.000Z",
     recovery: Object.freeze({
-      generation: 8,
+      generation: 9,
       predecessorState: "failed_before_worker",
       predecessorTerminalRawSha256: PREDECESSOR_TERMINAL_RAW_SHA256,
       attemptId: ATTEMPT_ID
@@ -248,7 +248,7 @@ describe("PTA/WBNB post-claim dual-RPC recheck", () => {
       status: "verified",
       issue: null,
       boundary: {
-        scope: "exact_pta_wbnb_pool_recovery_generation_8_after_atomic_claim_dual_rpc_recheck",
+        scope: "exact_pta_wbnb_pool_recovery_generation_9_after_atomic_claim_dual_rpc_recheck",
         chainId: "97",
         fixedOfficialRpcOriginsOnly: true,
         eip1898RequireCanonical: true,
@@ -267,7 +267,7 @@ describe("PTA/WBNB post-claim dual-RPC recheck", () => {
       authenticatedAt: COMPLETE,
       expiresAt: "2026-08-13T04:31:55.000Z",
       recovery: {
-        generation: 8,
+        generation: 9,
         predecessorState: "failed_before_worker",
         predecessorTerminalRawSha256: PREDECESSOR_TERMINAL_RAW_SHA256,
         attemptId: ATTEMPT_ID
@@ -345,7 +345,7 @@ describe("PTA/WBNB post-claim dual-RPC recheck", () => {
             to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
             data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
             value: "0x0",
-            gas: quantity(5_983_857n),
+            gas: quantity(6_600_000n),
             gasPrice: quantity(100_000_000n)
           }
         ]
@@ -432,7 +432,7 @@ describe("PTA/WBNB post-claim dual-RPC recheck", () => {
     [{ pendingSenderCode: "0x00" }, "SENDER_NOT_EOA"],
     [{ simulation: ZERO_ADDRESS }, "SIMULATION_MISMATCH"],
     [{ gasPrice: quantity(100_000_001n) }, "GAS_POLICY_VIOLATION"],
-    [{ gasEstimate: quantity(5_000_001n) }, "GAS_POLICY_VIOLATION"],
+    [{ gasEstimate: quantity(5_500_001n) }, "GAS_POLICY_VIOLATION"],
     [{ balance: "0x1" }, "INSUFFICIENT_BALANCE"],
     [{ blockGasLimit: 5_000_000n }, "GAS_POLICY_VIOLATION"]
   ] as const)("fails closed for a material exact-state change", async (overrides, code) => {

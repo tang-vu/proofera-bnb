@@ -38,7 +38,12 @@ function isOutsideRepository(candidate: string): boolean {
     (isAbsolute(relation) || relation === ".." || relation.startsWith(`..${sep}`))
   );
 }
-const SUBDIRECTORY = ["ProofEra", "operations", "bsc-testnet-pta-wbnb-pool-submission-v7"] as const;
+const SUBDIRECTORY = ["ProofEra", "operations", "bsc-testnet-pta-wbnb-pool-submission-v8"] as const;
+const GENERATION_7_SUBDIRECTORY = [
+  "ProofEra",
+  "operations",
+  "bsc-testnet-pta-wbnb-pool-submission-v7"
+] as const;
 const GENERATION_6_SUBDIRECTORY = [
   "ProofEra",
   "operations",
@@ -64,10 +69,10 @@ const PREDECESSOR_SUBDIRECTORY = [
   "operations",
   "bsc-testnet-pta-wbnb-pool-submission-v2"
 ] as const;
-const SCHEMA = "bsc_testnet_pta_wbnb_pool_submission_journal_v9" as const;
-const SIGNED_COMMIT_FILE = "01-signed-commit.v9.json" as const;
-const SUBMISSION_STARTED_FILE = "02-submission-started.v9.json" as const;
-const TERMINAL_RECONCILIATION_FILE = "03-terminal-reconciliation.v9.json" as const;
+const SCHEMA = "bsc_testnet_pta_wbnb_pool_submission_journal_v10" as const;
+const SIGNED_COMMIT_FILE = "01-signed-commit.v10.json" as const;
+const SUBMISSION_STARTED_FILE = "02-submission-started.v10.json" as const;
+const TERMINAL_RECONCILIATION_FILE = "03-terminal-reconciliation.v10.json" as const;
 const FILES = Object.freeze([
   SIGNED_COMMIT_FILE,
   SUBMISSION_STARTED_FILE,
@@ -98,6 +103,11 @@ const GENERATION_6_FILES = Object.freeze([
   "02-submission-started.v8.json",
   "03-terminal-reconciliation.v8.json"
 ] as const);
+const GENERATION_7_FILES = Object.freeze([
+  "01-signed-commit.v9.json",
+  "02-submission-started.v9.json",
+  "03-terminal-reconciliation.v9.json"
+] as const);
 
 function isJournalFileName(value: string): boolean {
   return FILES.some((name) => name === value);
@@ -122,16 +132,20 @@ function isGeneration5JournalFileName(value: string): boolean {
 function isGeneration6JournalFileName(value: string): boolean {
   return GENERATION_6_FILES.some((name) => name === value);
 }
+
+function isGeneration7JournalFileName(value: string): boolean {
+  return GENERATION_7_FILES.some((name) => name === value);
+}
 const MAXIMUM_RECORD_BYTES = 32_768;
 const BYTES32 = /^0x[0-9a-f]{64}$/u;
 const RELEASE_COMMIT = /^[0-9a-f]{40}$/u;
 const UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u;
 
-export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V9_POLICY = Object.freeze({
-  schemaVersion: 9 as const,
-  kind: "exact_owner_recovery_generation_8_signature_and_single_broadcast_authorization_v9" as const,
+export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V10_POLICY = Object.freeze({
+  schemaVersion: 10 as const,
+  kind: "exact_owner_recovery_generation_9_signature_and_single_broadcast_authorization_v10" as const,
   decision:
-    "authorize_fresh_chain_97_pool_recovery_generation_8_signature_and_single_broadcast" as const,
+    "authorize_fresh_chain_97_pool_recovery_generation_9_signature_and_single_broadcast" as const,
   broadcastPolicy: "one_send_only_no_retry_no_replacement_reconcile_after_ambiguity" as const,
   liquidityActionAuthorized: false as const,
   oneSignatureMaximum: true as const,
@@ -143,13 +157,13 @@ export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V9_POLICY = Object.freeze({
   journalAuthenticatesAuthority: false as const
 });
 
-export type BscTestnetPtaWbnbPoolDurableOwnerV9Policy =
-  typeof BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V9_POLICY;
+export type BscTestnetPtaWbnbPoolDurableOwnerV10Policy =
+  typeof BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V10_POLICY;
 
 export interface BscTestnetPtaWbnbPoolDurableSignedCommitRequest {
-  readonly schemaVersion: 8;
-  readonly kind: "authenticated_owner_recovery_generation_8_signed_submission_commit_v8";
-  readonly ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV9Policy;
+  readonly schemaVersion: 9;
+  readonly kind: "authenticated_owner_recovery_generation_9_signed_submission_commit_v9";
+  readonly ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV10Policy;
   /**
    * The caller has already authenticated this capability. The journal validates and retains its
    * exact bytes as recovery evidence; persisted bytes never recreate that object capability.
@@ -162,7 +176,7 @@ export type BscTestnetPtaWbnbPoolSubmissionRecoveryState =
   | Readonly<{
       state: "unknown_outcome";
       capability: BscTestnetPtaWbnbPoolSubmissionCapability | null;
-      ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV9Policy | null;
+      ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV10Policy | null;
       signedCommitSha256: Hex | null;
       submissionStartedRecordSha256: Hex | null;
       journalEvidenceOnly: true;
@@ -170,10 +184,10 @@ export type BscTestnetPtaWbnbPoolSubmissionRecoveryState =
       sendingAuthorizedByJournal: false;
     }>
   | Readonly<{
-      schemaVersion: 8;
+      schemaVersion: 9;
       journalSchema: typeof SCHEMA;
       state: "signed_committed" | "submission_started" | "confirmed" | "reverted";
-      ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV9Policy;
+      ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV10Policy;
       capability: BscTestnetPtaWbnbPoolSubmissionCapability;
       signedCommitSha256: Hex;
       submissionStartedRecordSha256: Hex | null;
@@ -185,7 +199,7 @@ export type BscTestnetPtaWbnbPoolSubmissionRecoveryState =
 
 export type BscTestnetPtaWbnbPoolSubmissionTerminalRecoveryState =
   | Extract<BscTestnetPtaWbnbPoolSubmissionRecoveryState, Readonly<{ state: "unknown_outcome" }>>
-  | (Extract<BscTestnetPtaWbnbPoolSubmissionRecoveryState, Readonly<{ schemaVersion: 8 }>> &
+  | (Extract<BscTestnetPtaWbnbPoolSubmissionRecoveryState, Readonly<{ schemaVersion: 9 }>> &
       Readonly<{ state: "submission_started" }>);
 
 const BINDING_KEYS = [
@@ -321,7 +335,7 @@ type SignedCommitRecord = Readonly<{
   schema: typeof SCHEMA;
   kind: "signed_commit";
   recordedAt: string;
-  ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV9Policy;
+  ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV10Policy;
   capability: BscTestnetPtaWbnbPoolSubmissionCapability;
   journalEvidenceOnly: true;
 }>;
@@ -457,6 +471,20 @@ export type BscTestnetPtaWbnbPoolGeneration6SubmissionJournalProbeResult =
       presence: "unknown";
       files: null;
       issue: Readonly<{ code: "GENERATION_6_SUBMISSION_JOURNAL_INVALID"; message: string }>;
+    }>;
+
+export type BscTestnetPtaWbnbPoolGeneration7SubmissionJournalProbeResult =
+  | Readonly<{
+      status: "ready";
+      presence: "absent" | "empty" | "present";
+      files: readonly (typeof GENERATION_7_FILES)[number][];
+      issue: null;
+    }>
+  | Readonly<{
+      status: "blocked";
+      presence: "unknown";
+      files: null;
+      issue: Readonly<{ code: "GENERATION_7_SUBMISSION_JOURNAL_INVALID"; message: string }>;
     }>;
 
 export type BscTestnetPtaWbnbPoolExistingSubmissionJournalResult =
@@ -643,13 +671,13 @@ function sha256Text(input: string): Hex {
   return `0x${createHash("sha256").update(input, "utf8").digest("hex")}`;
 }
 
-function exactOwnerV9Policy(input: unknown): BscTestnetPtaWbnbPoolDurableOwnerV9Policy | null {
+function exactOwnerV10Policy(input: unknown): BscTestnetPtaWbnbPoolDurableOwnerV10Policy | null {
   const record = inspectRecord(input, POLICY_KEYS);
   return record !== null &&
     POLICY_KEYS.every(
-      (key) => record[key] === BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V9_POLICY[key]
+      (key) => record[key] === BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V10_POLICY[key]
     )
-    ? BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V9_POLICY
+    ? BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V10_POLICY
     : null;
 }
 
@@ -689,7 +717,7 @@ function snapshotCapability(input: unknown): BscTestnetPtaWbnbPoolSubmissionCapa
 type ParsedSignedCommitRequest = Readonly<{
   capability: BscTestnetPtaWbnbPoolSubmissionCapability;
   binding: Binding;
-  ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV9Policy;
+  ownerAuthorizationPolicy: BscTestnetPtaWbnbPoolDurableOwnerV10Policy;
 }>;
 
 async function parseSignedCommitRequest(
@@ -697,14 +725,14 @@ async function parseSignedCommitRequest(
   asOf: Date
 ): Promise<ParsedSignedCommitRequest | null> {
   const record = inspectRecord(input, SIGNED_COMMIT_REQUEST_KEYS);
-  const policy = record === null ? null : exactOwnerV9Policy(record.ownerAuthorizationPolicy);
+  const policy = record === null ? null : exactOwnerV10Policy(record.ownerAuthorizationPolicy);
   const capability = record === null ? null : snapshotCapability(record.capability);
   if (
     record === null ||
     policy === null ||
     capability === null ||
-    record.schemaVersion !== 8 ||
-    record.kind !== "authenticated_owner_recovery_generation_8_signed_submission_commit_v8"
+    record.schemaVersion !== 9 ||
+    record.kind !== "authenticated_owner_recovery_generation_9_signed_submission_commit_v9"
   ) {
     return null;
   }
@@ -848,7 +876,7 @@ async function parseStoredSignedCommit(input: string | null): Promise<ParsedSign
     "schema"
   ]);
   const recordedAt = exact?.recordedAt;
-  const policy = exact === null ? null : exactOwnerV9Policy(exact.ownerAuthorizationPolicy);
+  const policy = exact === null ? null : exactOwnerV10Policy(exact.ownerAuthorizationPolicy);
   const capability = exact === null ? null : snapshotCapability(exact.capability);
   if (
     input === null ||
@@ -1176,7 +1204,7 @@ export function createBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUs
       });
     }
     return Object.freeze({
-      schemaVersion: 8 as const,
+      schemaVersion: 9 as const,
       journalSchema: SCHEMA,
       state: snapshot.state,
       ownerAuthorizationPolicy: snapshot.signedCommit.record.ownerAuthorizationPolicy,
@@ -1365,7 +1393,7 @@ try {
   $baseItem = Get-Item -LiteralPath $base -Force
   if (-not $baseItem.PSIsContainer -or (($baseItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)) { throw 'base' }
   $cursor = $baseItem.FullName
-  foreach ($segment in @('ProofEra', 'operations', 'bsc-testnet-pta-wbnb-pool-submission-v7')) {
+  foreach ($segment in @('ProofEra', 'operations', 'bsc-testnet-pta-wbnb-pool-submission-v8')) {
     $candidate = [IO.Path]::GetFullPath([IO.Path]::Combine($cursor, $segment))
     if ([IO.Path]::GetDirectoryName($candidate) -ne [IO.Path]::GetFullPath($cursor)) { throw 'escape' }
     if (-not (Test-Path -LiteralPath $candidate)) { [void](New-Item -ItemType Directory -Path $candidate) }
@@ -1373,7 +1401,7 @@ try {
     if (-not $item.PSIsContainer -or (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)) { throw 'path' }
     $cursor = $item.FullName
   }
-  $allowed = @('01-signed-commit.v9.json','02-submission-started.v9.json','03-terminal-reconciliation.v9.json')
+  $allowed = @('01-signed-commit.v10.json','02-submission-started.v10.json','03-terminal-reconciliation.v10.json')
   foreach ($child in @(Get-ChildItem -LiteralPath $cursor -Force)) {
     if ($child.PSIsContainer -or ($allowed -notcontains $child.Name) -or (($child.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) -or $child.LinkType) { throw 'child' }
   }
@@ -1797,6 +1825,18 @@ function generation6ProbeBlocked(): BscTestnetPtaWbnbPoolGeneration6SubmissionJo
   });
 }
 
+function generation7ProbeBlocked(): BscTestnetPtaWbnbPoolGeneration7SubmissionJournalProbeResult {
+  return Object.freeze({
+    status: "blocked" as const,
+    presence: "unknown" as const,
+    files: null,
+    issue: Object.freeze({
+      code: "GENERATION_7_SUBMISSION_JOURNAL_INVALID" as const,
+      message: "The generation-8 submission-v7 namespace could not be inspected without mutation."
+    })
+  });
+}
+
 async function predecessorNames(directory: string): Promise<readonly string[] | null> {
   const entries = await readdir(directory, { withFileTypes: true });
   const names: string[] = [];
@@ -1984,6 +2024,44 @@ async function probeGeneration6AtDirectory(
     });
   } catch {
     return generation6ProbeBlocked();
+  }
+}
+
+async function generation7Names(directory: string): Promise<readonly string[] | null> {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const names: string[] = [];
+  for (const entry of entries) {
+    if (!entry.isFile() || !isGeneration7JournalFileName(entry.name)) return null;
+    names.push(entry.name);
+  }
+  return Object.freeze(names.sort());
+}
+
+async function probeGeneration7AtDirectory(
+  directory: string
+): Promise<BscTestnetPtaWbnbPoolGeneration7SubmissionJournalProbeResult> {
+  try {
+    const first = await generation7Names(directory);
+    if (first === null || !(await verifyPaths(directory, first, isGeneration7JournalFileName))) {
+      return generation7ProbeBlocked();
+    }
+    const second = await generation7Names(directory);
+    if (
+      second === null ||
+      first.length !== second.length ||
+      first.some((name, index) => name !== second[index]) ||
+      !(await verifyPaths(directory, second, isGeneration7JournalFileName))
+    ) {
+      return generation7ProbeBlocked();
+    }
+    return Object.freeze({
+      status: "ready" as const,
+      presence: first.length === 0 ? ("empty" as const) : ("present" as const),
+      files: first as readonly (typeof GENERATION_7_FILES)[number][],
+      issue: null
+    });
+  } catch {
+    return generation7ProbeBlocked();
   }
 }
 
@@ -2316,6 +2394,24 @@ export async function probeWindowsBscTestnetPtaWbnbPoolGeneration6SubmissionJour
   }
 }
 
+/** Strict read-only probe for the generation-8 submission-v7 namespace. */
+export async function probeWindowsBscTestnetPtaWbnbPoolGeneration7SubmissionJournalForInternalUse(): Promise<BscTestnetPtaWbnbPoolGeneration7SubmissionJournalProbeResult> {
+  if (process.platform !== "win32") return generation7ProbeBlocked();
+  try {
+    const directory = await readOnlyFixedDirectory(GENERATION_7_SUBDIRECTORY);
+    return directory === null
+      ? Object.freeze({
+          status: "ready" as const,
+          presence: "absent" as const,
+          files: Object.freeze([]),
+          issue: null
+        })
+      : probeGeneration7AtDirectory(directory);
+  } catch {
+    return generation7ProbeBlocked();
+  }
+}
+
 /** Fixed current-user-only Windows composition. No caller path or mutable storage choice exists. */
 export async function createWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUse(): Promise<BscTestnetPtaWbnbPoolDurableSubmissionJournal> {
   if (process.platform !== "win32") {
@@ -2472,6 +2568,25 @@ export async function probeWindowsBscTestnetPtaWbnbPoolGeneration6SubmissionJour
   const directory = resolve(untrustedDirectory);
   if (!isOutsideRepository(directory)) return generation6ProbeBlocked();
   return probeGeneration6AtDirectory(directory);
+}
+
+/** Test-only no-write generation-8 submission-v7 namespace probe. */
+export async function probeWindowsBscTestnetPtaWbnbPoolGeneration7SubmissionJournalAtSyntheticDirectoryForTests(
+  untrustedDirectory: unknown
+): Promise<BscTestnetPtaWbnbPoolGeneration7SubmissionJournalProbeResult> {
+  if (process.platform !== "win32") return generation7ProbeBlocked();
+  if (
+    typeof untrustedDirectory !== "string" ||
+    untrustedDirectory.length > 500 ||
+    !/^[A-Za-z]:\\[^\0\r\n]*$/u.test(untrustedDirectory) ||
+    untrustedDirectory.includes("/") ||
+    win32.normalize(untrustedDirectory) !== untrustedDirectory
+  ) {
+    return generation7ProbeBlocked();
+  }
+  const directory = resolve(untrustedDirectory);
+  if (!isOutsideRepository(directory)) return generation7ProbeBlocked();
+  return probeGeneration7AtDirectory(directory);
 }
 
 /** Test-only terminal-evidence facade over a previously branded synthetic startup observation. */

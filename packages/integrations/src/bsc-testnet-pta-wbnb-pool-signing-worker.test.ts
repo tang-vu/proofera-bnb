@@ -22,11 +22,11 @@ import {
 } from "./bsc-testnet-pta-wbnb-pool-initialization";
 import type { BscTestnetPtaWbnbPoolPredecessorTerminalState } from "./bsc-testnet-pta-wbnb-pool-local-journal.server";
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_ATTEMPT_ID,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_ENVELOPE_HASH,
-  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
   BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_8_ATTEMPT_ID,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_8_ENVELOPE_HASH,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_8_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+  BSC_TESTNET_PTA_WBNB_POOL_GENERATION_8_TRANSITION_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
   BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION,
@@ -83,18 +83,18 @@ const RUNTIME_MANIFEST_SHA256 = `0x${"22".repeat(32)}` as const;
 const RECOVERY = Object.freeze({
   generation: BSC_TESTNET_PTA_WBNB_POOL_RECOVERY_GENERATION,
   predecessorState: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_STATE,
-  predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256,
+  predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_8_TRANSITION_RAW_SHA256,
   attemptId: `0x${"24".repeat(32)}` as Hex
 });
 const RFC6979_KAT_TRANSACTION_HASH =
-  "0x0ff5681303ab45b67f848a7cc07b874ed0b7c4ff09b2030469d186f1e5ac7c44";
+  "0x28725894e6d1dd8ddb85c353e30f3d885a2a7bf3308e6eaf302228af8baae4d1";
 
 function exactTransaction(
   overrides: Partial<BscTestnetPtaWbnbPoolExactSigningTransaction> = {}
 ): BscTestnetPtaWbnbPoolExactSigningTransaction {
   return Object.freeze({
     data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
-    gasLimit: 5_983_857n,
+    gasLimit: 6_600_000n,
     gasPriceWei: 100_000_000n,
     nonce: 9n,
     signingNotAfterMilliseconds: Date.now() + 60_000,
@@ -150,7 +150,7 @@ function syntheticEncryptedStore(
 
 function reviewedWorkerRequest() {
   const transaction = buildBscTestnetPtaWbnbPoolExactSigningTransaction({
-    gasLimit: "5983857",
+    gasLimit: "6600000",
     gasPriceWei: "100000000",
     sourceEnvelopeHash: `0x${"33".repeat(32)}`
   });
@@ -248,7 +248,7 @@ async function signSyntheticExact(
   return privateKeyToAccount(privateKey).signTransaction({
     chainId: 97,
     data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
-    gas: 5_983_857n,
+    gas: 6_600_000n,
     gasPrice: 100_000_000n,
     nonce: 9,
     to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,
@@ -370,7 +370,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
 
   it("fails closed on transaction drift and still clears the owned scalar", () => {
     const scalar = Buffer.from(SYNTHETIC_PRIVATE_KEY.slice(2), "hex");
-    const drifted = exactTransaction({ gasLimit: 6_000_001n });
+    const drifted = exactTransaction({ gasLimit: 6_600_001n });
     expect(() =>
       reconstructExactBscTestnetPtaWbnbPoolRfc6979TransactionForInternalUse(scalar, drifted)
     ).toThrow("failed closed");
@@ -529,19 +529,19 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     ).toBe(false);
   });
 
-  it("requires the exact generation-7 terminal, empty or absent submission-v6, and absent active generation-8 namespaces before custody metadata", () => {
+  it("requires the exact generation-8 terminal, empty or absent submission-v7, and absent active generation-9 namespaces before custody metadata", () => {
     const predecessorTerminal = Object.freeze({
       status: "failed_before_worker",
       generation: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_GENERATION,
       predecessorClaimRawSha256: BSC_TESTNET_PTA_WBNB_POOL_PREDECESSOR_CLAIM_RAW_SHA256,
-      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256,
-      predecessorEnvelopeHash: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_ENVELOPE_HASH,
+      predecessorTerminalRawSha256: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_8_TRANSITION_RAW_SHA256,
+      predecessorEnvelopeHash: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_8_ENVELOPE_HASH,
       inheritedPredecessorTerminalRawSha256:
-        BSC_TESTNET_PTA_WBNB_POOL_GENERATION_6_TRANSITION_RAW_SHA256,
-      predecessorAttemptId: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_ATTEMPT_ID,
+        BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_TRANSITION_RAW_SHA256,
+      predecessorAttemptId: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_8_ATTEMPT_ID,
       phase: "post_claim_recheck",
-      issueCode: "POST_CLAIM_RECHECK_OUTCOME_UNKNOWN",
-      outcomeDigest: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_7_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
+      issueCode: "GAS_POLICY_VIOLATION",
+      outcomeDigest: BSC_TESTNET_PTA_WBNB_POOL_GENERATION_8_FAILED_BEFORE_WORKER_OUTCOME_DIGEST,
       workerAuthorizationOutcome: "not_attempted",
       workerStartOutcome: "not_attempted",
       signatureOutcome: "not_attempted",
@@ -763,9 +763,9 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
   it("binds broadcast owner time separately from the later fresh signing timestamp", () => {
     const request = reviewedWorkerRequest();
     const intent = Object.freeze({
-      schemaVersion: 8 as const,
+      schemaVersion: 9 as const,
       scope:
-        "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_8" as const,
+        "owner_designated_internal_release_policy_and_exact_owner_pool_recovery_generation_9" as const,
       operationKey: request.operationKey,
       envelopeHash: request.transaction.sourceEnvelopeHash,
       reviewerApprovalDigest: request.reviewerApprovalDigest,
@@ -779,7 +779,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
     }) satisfies BscTestnetPtaWbnbPoolAuthorizedSigningIntent;
     const response = syntheticAttestedResponse(request);
     const broadcast = Object.freeze({
-      schemaVersion: 8,
+      schemaVersion: 9,
       operation:
         "consume_exact_bsc_testnet_pta_wbnb_pool_broadcast_authorization_after_durable_start",
       operationKey: request.operationKey,
@@ -1237,7 +1237,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
         ...Object.entries(request).filter(([key]) => key !== "requestHash")
       ])
     );
-    const duplicate = valid.replace('"schemaVersion":8,', '"schemaVersion":8,"schemaVersion":8,');
+    const duplicate = valid.replace('"schemaVersion":9,', '"schemaVersion":9,"schemaVersion":9,');
     const extra = JSON.stringify({ ...request, extra: true });
     const malformedInputs: Uint8Array[] = [
       Buffer.alloc(0),
@@ -1271,7 +1271,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
   });
 
   it("accepts canonical short signature scalars and rejects all exact transaction drifts", async () => {
-    const shortScalarKey = `0x${(129).toString(16).padStart(64, "0")}` as Hex;
+    const shortScalarKey = `0x${(87).toString(16).padStart(64, "0")}` as Hex;
     const shortAccount = privateKeyToAccount(shortScalarKey);
     const shortRaw = await signSyntheticExact(shortScalarKey);
     const shortParsed = parseTransaction(shortRaw);
@@ -1300,7 +1300,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
         to: "0x0000000000000000000000000000000000000001"
       }),
       signSyntheticExact(SYNTHETIC_PRIVATE_KEY, { data: "0x13ead563" }),
-      signSyntheticExact(SYNTHETIC_PRIVATE_KEY, { gas: 5_983_858n }),
+      signSyntheticExact(SYNTHETIC_PRIVATE_KEY, { gas: 6_600_001n }),
       signSyntheticExact(SYNTHETIC_PRIVATE_KEY, { gasPrice: 100_000_001n }),
       signSyntheticExact(SYNTHETIC_PRIVATE_KEY, { value: 1n }),
       signSyntheticExact(`0x${"22".repeat(32)}` as Hex)
@@ -1333,7 +1333,7 @@ describe("PTA/WBNB exact pool signing worker cryptography", () => {
       {
         chainId: 97,
         data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
-        gas: 5_983_857n,
+        gas: 6_600_000n,
         gasPrice: 100_000_000n,
         nonce: 9,
         to: BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER,

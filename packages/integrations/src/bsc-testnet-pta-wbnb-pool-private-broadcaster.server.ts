@@ -16,10 +16,10 @@ import {
   type BscTestnetPtaWbnbPoolSubmissionJournalState
 } from "./bsc-testnet-pta-wbnb-pool-submission-reconciler.server";
 import {
-  BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V9_POLICY,
+  BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V10_POLICY,
   createWindowsBscTestnetPtaWbnbPoolDurableSubmissionJournalForInternalUse,
   type BscTestnetPtaWbnbPoolDurableSubmissionJournal,
-  type BscTestnetPtaWbnbPoolDurableOwnerV9Policy,
+  type BscTestnetPtaWbnbPoolDurableOwnerV10Policy,
   type BscTestnetPtaWbnbPoolSubmissionRecoveryState
 } from "./bsc-testnet-pta-wbnb-pool-submission-journal.server";
 import {
@@ -80,7 +80,7 @@ const JOURNAL_STATE_KEYS = [
 ] as const;
 
 export interface BscTestnetPtaWbnbPoolExactBroadcastAuthorizationRequest {
-  readonly schemaVersion: 8;
+  readonly schemaVersion: 9;
   readonly operation: typeof BROADCAST_OPERATION;
   readonly operationKey: typeof BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY;
   readonly claimId: string;
@@ -283,8 +283,8 @@ function snapshotPreSubmission(
     BscTestnetPtaWbnbPoolSubmissionCapability["preSubmission"] | null;
 }
 
-function exactOwnerPolicy(value: unknown): value is BscTestnetPtaWbnbPoolDurableOwnerV9Policy {
-  return sameJson(value, BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V9_POLICY);
+function exactOwnerPolicy(value: unknown): value is BscTestnetPtaWbnbPoolDurableOwnerV10Policy {
+  return sameJson(value, BSC_TESTNET_PTA_WBNB_POOL_DURABLE_OWNER_V10_POLICY);
 }
 
 function startedState(
@@ -306,7 +306,7 @@ function authorizationRequest(
   terminalPreSubmission: BscTestnetPtaWbnbPoolSubmissionCapability["preSubmission"]
 ): BscTestnetPtaWbnbPoolExactBroadcastAuthorizationRequest {
   return Object.freeze({
-    schemaVersion: 8 as const,
+    schemaVersion: 9 as const,
     operation: BROADCAST_OPERATION,
     operationKey: BSC_TESTNET_PTA_WBNB_POOL_OPERATION_KEY,
     claimId: capability.claimId,

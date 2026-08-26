@@ -252,7 +252,7 @@ export function inspectBscTestnetPtaWbnbPoolPostClaimRecheckRejectionForInternal
 }
 
 const STATIC_BOUNDARY = Object.freeze({
-  scope: "exact_pta_wbnb_pool_recovery_generation_8_after_atomic_claim_dual_rpc_recheck" as const,
+  scope: "exact_pta_wbnb_pool_recovery_generation_9_after_atomic_claim_dual_rpc_recheck" as const,
   environment: "bsc-testnet" as const,
   chainId: "97" as const,
   primaryOrigin: BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN,

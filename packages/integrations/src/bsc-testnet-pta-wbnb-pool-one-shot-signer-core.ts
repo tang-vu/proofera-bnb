@@ -24,7 +24,7 @@ import {
   type BscTestnetPtaWbnbPoolPostClaimRecheckIssue
 } from "./bsc-testnet-pta-wbnb-pool-post-claim-recheck.server";
 
-export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_CLAIM_SCHEMA_VERSION = 8 as const;
+export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_CLAIM_SCHEMA_VERSION = 9 as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_CLAIM_OPERATION =
   "claim_exact_bsc_testnet_pta_wbnb_pool_initialization_once" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_DURABLE_SIGNED_READBACK_OPERATION =

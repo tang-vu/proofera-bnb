@@ -193,7 +193,7 @@ describe("PTA/WBNB durable one-shot boundary specification", () => {
         data: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA,
         dataKeccak256: BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_DATA_KECCAK256,
         valueWei: 0n,
-        gasLimit: 5_983_857n,
+        gasLimit: 6_600_000n,
         gasPriceWei: 100_000_000n
       },
       signingReady: false,
