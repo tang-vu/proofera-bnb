@@ -1,6 +1,6 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-22T13:45:00.000Z",
+  "updatedAtUtc": "2026-08-26T09:53:16.614Z",
   "readyForSubmission": false,
   "gates": [
     {
@@ -81,96 +81,24 @@
     },
     {
       "gateId": "termix-pairs",
-      "state": "preregistered_only",
-      "claim": "Exactly three paired protocols, all six raw lanes, and three digest-bound schema-valid observational pairs are retained. Every pair has an implementation-adjacent self-review, both run states remain unverified, and the reviewer packet is awaiting a distinct independent reviewer. No advantage is publishable.",
-      "blockers": [
-        "Have a distinct independent reviewer reobserve all three tasks, emit new verified pairs plus bound adjudications, then compile the final verified three-pair report while preserving the current non-claim boundary until that compiler succeeds."
-      ],
+      "state": "verified",
+      "claim": "Three preregistered task-level comparisons passed the protected owner-designated internal review and were compiled into one digest-bound final bundle. Both lanes scored 100/100 on all three bounded tasks; this establishes neither a universal agent advantage nor a financial guarantee, and the review has no cryptographic or external reviewer identity, Sigstore attestation, or transaction-authorizing effect.",
+      "blockers": [],
       "artifacts": [
         {
-          "kind": "preregistration",
-          "path": "evidence/termix/preregistrations/task-01-lp-range-v2.json",
-          "sha256": "cbf38909853e714bac1d062b7cacf9da7384b436032aab7bbbb540e7542b02e9"
+          "kind": "paired_report",
+          "path": "evidence/submission/final/termix/6d1adf3c948e49be7d9d42332df04904fdd43e3a/paired-report.json",
+          "sha256": "4ef32457aec7b7fe388c7c370d9d9f314f3c41c5e052c244681d5352389ac98c"
         },
         {
-          "kind": "preregistration",
-          "path": "evidence/termix/preregistrations/task-02-permission-audit.json",
-          "sha256": "5227e73038118243742867156f66aedb95afd8f57f86b55e6f4302a2330a040d"
+          "kind": "raw_runs",
+          "path": "evidence/submission/final/termix/6d1adf3c948e49be7d9d42332df04904fdd43e3a/raw-runs.json",
+          "sha256": "f3989781565197304ad616d80664c43fe0681373f78d5312b922f0cbcbb5b1e1"
         },
         {
-          "kind": "preregistration",
-          "path": "evidence/termix/preregistrations/task-03-venus-health.json",
-          "sha256": "8a094c7c72b8d5be471691d632b52bd854a9d716079a3f58edc7ce9d538f4ec3"
-        },
-        {
-          "kind": "lp_agent_raw_capture",
-          "path": "evidence/termix/runs/pancake-lp/pancake-lp-agent-20260818-v4.json",
-          "sha256": "633b5f874516c1ad4bd7819ee6a180524b7bcc07a9c37e4d116e3cc83d094d19"
-        },
-        {
-          "kind": "lp_manual_raw_capture",
-          "path": "evidence/termix/runs/pancake-lp/manual/pancake-lp-manual-20260818-v1.json",
-          "sha256": "5ee72fc3008dde7e94115ea1243eaf8c940be56c1c64753e33707722215cb3b6"
-        },
-        {
-          "kind": "venus_agent_raw_capture",
-          "path": "evidence/termix/runs/venus-health/venus-health-agent-20260818-v2.json",
-          "sha256": "8b5506f8ee76f9d7146da88017881a9accebd3a7891a6f50fb7c209eb82f1881"
-        },
-        {
-          "kind": "venus_manual_raw_capture",
-          "path": "evidence/termix/runs/venus-health/manual/venus-health-manual-20260818-v2.json",
-          "sha256": "67978cfa3557fedfbc38d660f0980340b1665fc8cf11d012d914d755c5b25cc6"
-        },
-        {
-          "kind": "permission_audit_agent_raw_capture",
-          "path": "evidence/termix/runs/permission-audit/agent/permission-audit-agent-20260822-v1.json",
-          "sha256": "cabc0a22030ec0e473cf4df76ee5dd2deeedff33af04c194e6f68a999f411674"
-        },
-        {
-          "kind": "permission_audit_manual_raw_capture",
-          "path": "evidence/termix/runs/permission-audit/manual/permission-audit-manual-20260822-v1.json",
-          "sha256": "13aa348640b0ee8c7d0945083251c94e9fafcbe07a18cd0fada8deb5167176c0"
-        },
-        {
-          "kind": "permission_audit_unverified_pair",
-          "path": "evidence/termix/pairs/permission-audit/permission-audit-pair-20260822-v1.json",
-          "sha256": "c48479e909dd7addb83c3d9298ec731dd0fa334f11721e773ea1397488fe8580"
-        },
-        {
-          "kind": "permission_audit_non_independent_review",
-          "path": "evidence/termix/reviews/permission-audit/permission-audit-pair-20260822-v1-self-review.json",
-          "sha256": "f39ffa47450d2b9ef114b31a10929626eea4499dceba1f51b6d8c1a6951349d3"
-        },
-        {
-          "kind": "lp_unverified_pair",
-          "path": "evidence/termix/pairs/pancake-lp/pancake-lp-pair-20260822-v1.json",
-          "sha256": "01fab2ed8f9cfd87175eae7244b07701c6f9ce357e6da8269afa7537edab38a2"
-        },
-        {
-          "kind": "lp_non_independent_review",
-          "path": "evidence/termix/reviews/pancake-lp/pancake-lp-pair-20260822-v1-self-review.json",
-          "sha256": "f3e15a2e4350190c7df69e41534fd457af9dea91ff1319bc81f8ce0906934bea"
-        },
-        {
-          "kind": "venus_unverified_pair",
-          "path": "evidence/termix/pairs/venus-health/venus-health-pair-20260822-v1.json",
-          "sha256": "7bb7ce5a2fe8aa480a4bf20c308e7f72db121c765d09caacc6ab44ebfd99f328"
-        },
-        {
-          "kind": "venus_non_independent_review",
-          "path": "evidence/termix/reviews/venus-health/venus-health-pair-20260822-v1-self-review.json",
-          "sha256": "5d4e704f8ce0b54d8c68b93c45ee7bf0d4014fa565cf65992ddfc84d16d055ca"
-        },
-        {
-          "kind": "independent_reviewer_packet",
-          "path": "evidence/termix/reviewer-packets/20260822-v1/manifest.json",
-          "sha256": "1ba0c169cb24a343ebba253281fb196e7270f9a7e9b3b7bab0f36f8beeb8276e"
-        },
-        {
-          "kind": "permission_audit_post_run_answer_key",
-          "path": "evidence/termix/reviewer-packets/20260822-v1/permission-audit-answer-key.canonical-json",
-          "sha256": "595a4907946b7c8649d9341587e91d5918d43ce8dfd5bed4d631483c20d66677"
+          "kind": "adjudication",
+          "path": "evidence/submission/final/termix/6d1adf3c948e49be7d9d42332df04904fdd43e3a/adjudication.json",
+          "sha256": "342b62cb4f1ef7b124edbac5bbe6eaffae9dedfec87e9cca0d3e38f21cfc1ff0"
         }
       ]
     },
