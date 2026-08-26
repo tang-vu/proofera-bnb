@@ -39,6 +39,15 @@ function jsonResponse(origin: string, id: number, result: unknown): Response {
   return response;
 }
 
+function jsonErrorResponse(origin: string, id: number, code: number, message: string): Response {
+  const response = new Response(JSON.stringify({ jsonrpc: "2.0", id, error: { code, message } }), {
+    status: 200,
+    headers: { "content-type": "application/json" }
+  });
+  Object.defineProperty(response, "url", { value: origin });
+  return response;
+}
+
 function fixedFetch(pendingNonceDriftOrigin: string | null = null) {
   const calls: Readonly<{ origin: string; method: string; params: readonly unknown[] }>[] = [];
   const fetchMock = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
@@ -117,6 +126,7 @@ function finalityBlockHash(number: bigint): Hex {
 interface ReconciliationFetchOptions {
   readonly checkpointRecheckForkOrigin?: string;
   readonly canonicalProbeFailureOrigin?: string;
+  readonly historicalStateUnavailableOrigins?: readonly string[];
   readonly recheckedFinalizedNumber?: bigint;
   readonly recheckedFinalizedHash?: Hex;
 }
@@ -126,6 +136,8 @@ function reconciliationFetch(options: ReconciliationFetchOptions = {}) {
   const ethCallCounts = new Map<string, number>();
   const finalizedCounts = new Map<string, number>();
   const checkpointCounts = new Map<string, number>();
+  const activeRequests = new Map<string, number>();
+  const maximumConcurrentRequests = new Map<string, number>();
   const uint24 = encodeAbiParameters([{ type: "uint24" }], [500]);
   const int24 = encodeAbiParameters([{ type: "int24" }], [10]);
   const uint128One = encodeAbiParameters([{ type: "uint128" }], [1n]);
@@ -168,6 +180,17 @@ function reconciliationFetch(options: ReconciliationFetchOptions = {}) {
       params: readonly unknown[];
     };
     calls.push({ origin, method: request.method, params: request.params });
+    const active = (activeRequests.get(origin) ?? 0) + 1;
+    activeRequests.set(origin, active);
+    maximumConcurrentRequests.set(
+      origin,
+      Math.max(maximumConcurrentRequests.get(origin) ?? 0, active)
+    );
+    await Promise.resolve();
+    const finish = <T>(value: T): T => {
+      activeRequests.set(origin, (activeRequests.get(origin) ?? 1) - 1);
+      return value;
+    };
     let result: unknown;
     switch (request.method) {
       case "eth_chainId":
@@ -243,6 +266,12 @@ function reconciliationFetch(options: ReconciliationFetchOptions = {}) {
         };
         break;
       case "eth_call": {
+        if (
+          options.historicalStateUnavailableOrigins?.includes(origin) === true &&
+          typeof request.params[1] === "object"
+        ) {
+          return finish(jsonErrorResponse(origin, request.id, -32_000, "missing trie node"));
+        }
         const index = ethCallCounts.get(origin) ?? 0;
         ethCallCounts.set(origin, index + 1);
         result = ethCallResults[index];
@@ -259,6 +288,12 @@ function reconciliationFetch(options: ReconciliationFetchOptions = {}) {
         result = ZERO_WORD;
         break;
       case "eth_getBalance":
+        if (
+          options.historicalStateUnavailableOrigins?.includes(origin) === true &&
+          typeof request.params[1] === "object"
+        ) {
+          return finish(jsonErrorResponse(origin, request.id, -32_000, "missing trie node"));
+        }
         if (options.canonicalProbeFailureOrigin === origin) {
           throw new Error("canonical checkpoint disappeared");
         }
@@ -267,10 +302,10 @@ function reconciliationFetch(options: ReconciliationFetchOptions = {}) {
       default:
         throw new Error(`Unexpected method ${request.method}`);
     }
-    return jsonResponse(origin, request.id, result);
+    return finish(jsonResponse(origin, request.id, result));
   });
   vi.stubGlobal("fetch", fetchMock);
-  return { calls, fetchMock };
+  return { calls, fetchMock, maximumConcurrentRequests };
 }
 
 afterEach(() => {
@@ -351,7 +386,7 @@ describe("PTA/WBNB fixed production RPC pre-send reread", () => {
 
 describe("PTA/WBNB fixed production RPC reconciliation evidence", () => {
   it("uses a stable receipt-plus-128 checkpoint and reads EIP-1898 post-state at the receipt block", async () => {
-    const { calls } = reconciliationFetch();
+    const { calls, maximumConcurrentRequests } = reconciliationFetch();
 
     const result =
       await observeExactBscTestnetPtaWbnbPoolTransactionForInternalUse(TRANSACTION_HASH);
@@ -389,6 +424,7 @@ describe("PTA/WBNB fixed production RPC reconciliation evidence", () => {
       BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN,
       BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN
     ]) {
+      expect(maximumConcurrentRequests.get(origin)).toBeLessThanOrEqual(2);
       const providerCalls = calls.filter((call) => call.origin === origin);
       const finalizedIndexes = providerCalls.flatMap((call, index) =>
         call.method === "eth_getBlockByNumber" && call.params[0] === "finalized" ? [index] : []
@@ -439,6 +475,27 @@ describe("PTA/WBNB fixed production RPC reconciliation evidence", () => {
     await expect(
       observeExactBscTestnetPtaWbnbPoolTransactionForInternalUse(TRANSACTION_HASH)
     ).rejects.toThrow("canonical checkpoint disappeared");
+    expect(calls.some((call) => call.method === "eth_sendRawTransaction")).toBe(false);
+  });
+
+  it("retains receipt and finality evidence when exact historical post-state is pruned", async () => {
+    const { calls } = reconciliationFetch({
+      historicalStateUnavailableOrigins: [
+        BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN,
+        BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN
+      ]
+    });
+
+    const result =
+      await observeExactBscTestnetPtaWbnbPoolTransactionForInternalUse(TRANSACTION_HASH);
+
+    for (const provider of [result.primary, result.corroborator]) {
+      expect(provider.transaction?.hash).toBe(TRANSACTION_HASH);
+      expect(provider.receipt?.status).toBe("1");
+      expect(provider.receiptToCommonFinalizedAncestry).toHaveLength(128);
+      expect(provider.checkpointCanonicalAttestation).toBeNull();
+      expect(provider.postState).toBeNull();
+    }
     expect(calls.some((call) => call.method === "eth_sendRawTransaction")).toBe(false);
   });
 

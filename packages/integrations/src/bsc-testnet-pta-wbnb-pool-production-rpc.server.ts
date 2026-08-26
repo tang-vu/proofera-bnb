@@ -241,6 +241,20 @@ async function rpc(
       throw new Error("RPC_REDIRECTED");
     }
     const envelope = inspectRecord(await readBoundedResponse(response));
+    const remoteError = inspectRecord(envelope?.error);
+    if (
+      envelope !== null &&
+      envelope.jsonrpc === "2.0" &&
+      envelope.id === id &&
+      Object.hasOwn(envelope, "error") &&
+      !Object.hasOwn(envelope, "result") &&
+      remoteError !== null &&
+      Reflect.ownKeys(remoteError).length === 2 &&
+      remoteError.code === -32_000 &&
+      remoteError.message === "missing trie node"
+    ) {
+      throw new Error("RPC_HISTORICAL_STATE_UNAVAILABLE");
+    }
     if (
       envelope === null ||
       envelope.jsonrpc !== "2.0" ||
@@ -525,65 +539,57 @@ function callObject(to: Address, data: Hex): Readonly<{ to: Address; data: Hex }
   return Object.freeze({ to, data });
 }
 
+async function runRpcCallsSequentially(
+  origin: RpcOrigin,
+  calls: readonly (readonly [method: string, params: readonly unknown[]])[]
+): Promise<readonly unknown[]> {
+  const results: unknown[] = [];
+  for (const [method, params] of calls) results.push(await rpc(origin, method, params));
+  return Object.freeze(results);
+}
+
 async function postState(
   origin: RpcOrigin,
   block: BscTestnetPtaWbnbPoolNormalizedBlock
 ): Promise<BscTestnetPtaWbnbPoolPostState> {
   const state = Object.freeze({ blockHash: block.hash, requireCanonical: true as const });
-  const calls = Object.freeze([
-    rpc(origin, "eth_call", [callObject(BSC_TESTNET_PANCAKE_V3_FACTORY, FORWARD_GET_POOL), state]),
-    rpc(origin, "eth_call", [callObject(BSC_TESTNET_PANCAKE_V3_FACTORY, REVERSE_GET_POOL), state]),
-    rpc(origin, "eth_getTransactionCount", [BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, state]),
-    rpc(origin, "eth_getCode", [BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, state]),
-    rpc(origin, "eth_getStorageAt", [
-      BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE,
-      IMPLEMENTATION_SLOT,
-      state
-    ]),
-    rpc(origin, "eth_getStorageAt", [BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, ADMIN_SLOT, state]),
-    rpc(origin, "eth_getStorageAt", [BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, BEACON_SLOT, state]),
-    rpc(origin, "eth_call", [
-      callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, selector("factory()")),
-      state
-    ]),
-    rpc(origin, "eth_call", [
-      callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, selector("token0()")),
-      state
-    ]),
-    rpc(origin, "eth_call", [
-      callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, selector("token1()")),
-      state
-    ]),
-    rpc(origin, "eth_call", [
-      callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, selector("fee()")),
-      state
-    ]),
-    rpc(origin, "eth_call", [
-      callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, selector("tickSpacing()")),
-      state
-    ]),
-    rpc(origin, "eth_call", [
-      callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, selector("maxLiquidityPerTick()")),
-      state
-    ]),
-    rpc(origin, "eth_call", [
-      callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, selector("liquidity()")),
-      state
-    ]),
-    rpc(origin, "eth_call", [
-      callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, selector("lmPool()")),
-      state
-    ]),
-    rpc(origin, "eth_call", [
-      callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, selector("slot0()")),
-      state
-    ]),
-    rpc(origin, "eth_call", [
-      callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, `${OBSERVATIONS}${word(0n)}` as Hex),
-      state
+  const raw = await runRpcCallsSequentially(
+    origin,
+    Object.freeze([
+      ["eth_call", [callObject(BSC_TESTNET_PANCAKE_V3_FACTORY, FORWARD_GET_POOL), state]],
+      ["eth_call", [callObject(BSC_TESTNET_PANCAKE_V3_FACTORY, REVERSE_GET_POOL), state]],
+      ["eth_getTransactionCount", [BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, state]],
+      ["eth_getCode", [BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, state]],
+      ["eth_getStorageAt", [BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, IMPLEMENTATION_SLOT, state]],
+      ["eth_getStorageAt", [BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, ADMIN_SLOT, state]],
+      ["eth_getStorageAt", [BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, BEACON_SLOT, state]],
+      ["eth_call", [callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, selector("factory()")), state]],
+      ["eth_call", [callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, selector("token0()")), state]],
+      ["eth_call", [callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, selector("token1()")), state]],
+      ["eth_call", [callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, selector("fee()")), state]],
+      [
+        "eth_call",
+        [callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, selector("tickSpacing()")), state]
+      ],
+      [
+        "eth_call",
+        [callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, selector("maxLiquidityPerTick()")), state]
+      ],
+      [
+        "eth_call",
+        [callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, selector("liquidity()")), state]
+      ],
+      ["eth_call", [callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, selector("lmPool()")), state]],
+      ["eth_call", [callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, selector("slot0()")), state]],
+      [
+        "eth_call",
+        [
+          callObject(BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE, `${OBSERVATIONS}${word(0n)}` as Hex),
+          state
+        ]
+      ]
     ])
-  ]);
-  const raw = await Promise.all(calls);
+  );
   const forward = decodeAddressWord(raw[0]);
   const reverse = decodeAddressWord(raw[1]);
   const nonce = quantity(raw[2]);
@@ -1030,12 +1036,13 @@ async function providerObservation(
       throw new Error("RPC_FINALITY_CHECKPOINT_INVALID");
     }
     if (BigInt(reportedHead.number) >= checkpointNumber) {
-      const rawAncestry = await Promise.all(
+      const rawAncestry = await runRpcCallsSequentially(
+        origin,
         Array.from(
           { length: BSC_TESTNET_PTA_WBNB_POOL_MAXIMUM_FINALITY_ANCESTRY_BLOCKS },
           (_unused, index) => {
             const number = receiptNumber + BigInt(index) + 1n;
-            return rpc(origin, "eth_getBlockByNumber", [`0x${number.toString(16)}`, false]);
+            return ["eth_getBlockByNumber", [`0x${number.toString(16)}`, false]] as const;
           }
         )
       );
@@ -1055,7 +1062,13 @@ async function providerObservation(
         normalizedAncestry as BscTestnetPtaWbnbPoolNormalizedAncestryHeader[]
       );
       if (receipt.status === "1") {
-        retainedPostState = await postState(origin, receiptBlock);
+        try {
+          retainedPostState = await postState(origin, receiptBlock);
+        } catch (error) {
+          if (!(error instanceof Error) || error.message !== "RPC_HISTORICAL_STATE_UNAVAILABLE") {
+            throw error;
+          }
+        }
       }
       checkpointBlockRecheck = normalizeBlock(
         await rpc(origin, "eth_getBlockByNumber", [`0x${checkpointNumber.toString(16)}`, false])
@@ -1083,18 +1096,24 @@ async function providerObservation(
       blockHash: commonFinalizedBlock.hash,
       requireCanonical: true as const
     });
-    const checkpointBalance = quantity(
-      await rpc(origin, "eth_getBalance", [ZERO_ADDRESS, checkpointState])
-    );
-    if (checkpointBalance === null) {
-      throw new Error("RPC_FINALITY_CANONICAL_ATTESTATION_INVALID");
+    try {
+      const checkpointBalance = quantity(
+        await rpc(origin, "eth_getBalance", [ZERO_ADDRESS, checkpointState])
+      );
+      if (checkpointBalance === null) {
+        throw new Error("RPC_FINALITY_CANONICAL_ATTESTATION_INVALID");
+      }
+      checkpointCanonicalAttestation = Object.freeze({
+        method: "eth_getBalance" as const,
+        address: ZERO_ADDRESS,
+        eip1898Block: checkpointState,
+        resultWei: checkpointBalance.toString()
+      });
+    } catch (error) {
+      if (!(error instanceof Error) || error.message !== "RPC_HISTORICAL_STATE_UNAVAILABLE") {
+        throw error;
+      }
     }
-    checkpointCanonicalAttestation = Object.freeze({
-      method: "eth_getBalance" as const,
-      address: ZERO_ADDRESS,
-      eip1898Block: checkpointState,
-      resultWei: checkpointBalance.toString()
-    });
   }
   return Object.freeze({
     origin,
