@@ -30,7 +30,7 @@ import {
 export const BSC_TESTNET_PTA_WBNB_POOL_REVIEWER_APPROVAL_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.external-reviewer-approval.v1" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_OWNER_AUTHORIZATION_DIGEST_DOMAIN =
-  "proofera.bsc-testnet.pta-wbnb-pool.owner-envelope-authorization.v8" as const;
+  "proofera.bsc-testnet.pta-wbnb-pool.owner-envelope-authorization.v9" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_OWNER_DESIGNATED_REVIEW_APPROVAL_DIGEST_DOMAIN =
   "proofera.bsc-testnet.pta-wbnb-pool.owner-designated-internal-multi-agent-review.v1" as const;
 export const BSC_TESTNET_PTA_WBNB_POOL_INITIALIZER_REVIEW_ARTIFACT_SHA256 =

@@ -1784,7 +1784,7 @@ function generation3ProbeBlocked(): BscTestnetPtaWbnbPoolGeneration3SubmissionJo
     files: null,
     issue: Object.freeze({
       code: "GENERATION_3_SUBMISSION_JOURNAL_INVALID" as const,
-      message: "The generation-3 submission-v3 namespace could not be inspected without mutation."
+      message: "The generation-4 submission-v3 namespace could not be inspected without mutation."
     })
   });
 }
@@ -2320,7 +2320,7 @@ export async function probeWindowsBscTestnetPtaWbnbPoolPredecessorSubmissionJour
 }
 
 /**
- * Strict read-only visibility probe for the generation-3 submission-v3 namespace. It never parses
+ * Strict read-only visibility probe for the generation-4 submission-v3 namespace. It never parses
  * historical bytes into current authority and never provisions, repairs, or writes that path.
  */
 export async function probeWindowsBscTestnetPtaWbnbPoolGeneration3SubmissionJournalForInternalUse(): Promise<BscTestnetPtaWbnbPoolGeneration3SubmissionJournalProbeResult> {
@@ -2492,7 +2492,7 @@ export async function probeWindowsBscTestnetPtaWbnbPoolPredecessorSubmissionJour
   return probePredecessorAtDirectory(directory);
 }
 
-/** Test-only no-write generation-3 namespace probe over a caller-created synthetic directory. */
+/** Test-only no-write generation-4 submission-v3 namespace probe over a caller-created synthetic directory. */
 export async function probeWindowsBscTestnetPtaWbnbPoolGeneration3SubmissionJournalAtSyntheticDirectoryForTests(
   untrustedDirectory: unknown
 ): Promise<BscTestnetPtaWbnbPoolGeneration3SubmissionJournalProbeResult> {

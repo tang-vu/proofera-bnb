@@ -179,6 +179,12 @@ function harness(options: { reviewer?: boolean; owner?: boolean } = {}) {
 }
 
 describe("PTA/WBNB pool exact authorization composition", () => {
+  it("separates the generation-9 owner authorization digest domain", () => {
+    expect(BSC_TESTNET_PTA_WBNB_POOL_OWNER_AUTHORIZATION_DIGEST_DOMAIN).toBe(
+      "proofera.bsc-testnet.pta-wbnb-pool.owner-envelope-authorization.v9"
+    );
+  });
+
   it("keeps the production gate permanently non-authorizing in this release", () => {
     const gate = createBscTestnetPtaWbnbPoolProductionAuthorizationGate();
     expect(
