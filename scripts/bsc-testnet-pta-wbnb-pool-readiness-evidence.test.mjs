@@ -11,6 +11,18 @@ const EVIDENCE_PATH = resolve(
   "development",
   "bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json"
 );
+const RECONCILIATION_EVIDENCE_PATH = resolve(
+  ROOT,
+  "evidence",
+  "development",
+  "bsc-testnet-pta-wbnb-pool-reconciliation-observation-2026-08-26.json"
+);
+const RECONCILIATION_REVIEW_PATH = resolve(
+  ROOT,
+  "evidence",
+  "development",
+  "bsc-testnet-pta-wbnb-pool-reconciliation-release-review-2026-08-26.json"
+);
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const ZERO_WORD = `0x${"0".repeat(64)}`;
 const EMPTY_CODE_KECCAK = "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470";
@@ -325,4 +337,139 @@ test("snapshot cannot be interpreted as authorization, receipt, pool, or activat
     assert.equal(text.includes(forbiddenKey), false);
   }
   assert.equal(/0x[0-9a-f]{1000,}/u.test(text), false);
+});
+
+test("bounded reconciliation observation retains the exact receipt without inventing terminal success", () => {
+  const text = readFileSync(RECONCILIATION_EVIDENCE_PATH, "utf8");
+  const evidence = JSON.parse(text);
+  const transactionHash = "0xa24d1dfa3440de3fcb644d9b52847bcc8d54f43a2e29b425f50bbce4bd684022";
+
+  assert.equal(evidence.schemaVersion, 1);
+  assert.equal(evidence.kind, "bsc_testnet_pta_wbnb_pool_bounded_reconciliation_observation_v1");
+  assert.equal(evidence.environment, "bsc-testnet");
+  assert.equal(evidence.chainId, "97");
+  assert.equal(evidence.capturedAt, "2026-08-26T06:55:03.951Z");
+  assert.deepEqual(evidence.observation.providers, [
+    "https://bsc-testnet-dataseed.bnbchain.org",
+    "https://bsc-testnet.bnbchain.org"
+  ]);
+  assert.equal(evidence.source.releaseCommit, "bc56a959dcc29898d9b207f92fb27459b6ccc8d8");
+  assert.equal(
+    evidence.source.runtimeManifestSha256,
+    "0xc011fd5d1cb6703d431a6d9429e2fbeea77b7c4ced4d9802ad2ebf367ab5a4c7"
+  );
+  assert.equal(evidence.source.selectedNormalizedFieldsOnly, true);
+  assert.equal(evidence.source.providerResponsesCryptographicallyAuthenticated, false);
+
+  assert.equal(evidence.authoritativeReconciliation.status, "do_not_retry");
+  assert.equal(evidence.authoritativeReconciliation.transactionHash, transactionHash);
+  assert.equal(evidence.authoritativeReconciliation.issue.code, "CANONICALITY_INVALID");
+  assert.equal(evidence.authoritativeReconciliation.retryBroadcastAllowed, false);
+  assert.equal(evidence.authoritativeReconciliation.reconciliationRetryAllowed, true);
+  assert.equal(evidence.authoritativeReconciliation.durableTerminalRecordCreated, false);
+  assert.equal(evidence.authoritativeReconciliation.newSignatureCreated, false);
+  assert.equal(evidence.authoritativeReconciliation.rawTransactionResent, false);
+  assert.equal(evidence.authoritativeReconciliation.replacementTransactionCreated, false);
+
+  assert.equal(evidence.observation.providerTransactionAgreement, true);
+  assert.equal(evidence.observation.providerReceiptAgreement, true);
+  assert.equal(evidence.observation.fixedCheckpointAgreement, true);
+  assert.equal(evidence.observation.ancestryAgreement, true);
+  assert.equal(evidence.observation.transaction.hash, transactionHash);
+  assert.equal(evidence.observation.transaction.chainId, "97");
+  assert.equal(evidence.observation.transaction.nonce, "9");
+  assert.equal(evidence.observation.transaction.to, MANAGER);
+  assert.equal(evidence.observation.transaction.valueWei, "0");
+  assert.equal(evidence.observation.receipt.transactionHash, transactionHash);
+  assert.equal(evidence.observation.receipt.status, "1");
+  assert.equal(evidence.observation.receipt.logs.length, 2);
+  assert.equal(evidence.observation.receipt.logs[0].address, FACTORY);
+  assert.equal(
+    evidence.observation.receipt.logs[0].topics[0],
+    "0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118"
+  );
+  assert.equal(
+    evidence.observation.receipt.logs[1].address,
+    "0x30b07e82d7181a53Ae2EA98Cd08b6733Ffd831aE"
+  );
+  assert.equal(
+    evidence.observation.receipt.logs[1].topics[0],
+    "0x98636036cb66a9c19a37435efc1e90142190214e8abeb821bdba3f2990dd4c95"
+  );
+  assert.equal(evidence.observation.receiptBlock.number, "127284872");
+  assert.equal(evidence.observation.fixedReceiptPlus128Checkpoint.number, "127285000");
+  assert.equal(evidence.observation.fixedReceiptPlus128Checkpoint.ancestryLength, 128);
+  assert.equal(evidence.observation.fixedReceiptPlus128Checkpoint.exactNumberRecheckMatched, true);
+  assert.equal(evidence.observation.checkpointCanonicalAttestation, null);
+  assert.equal(evidence.observation.receiptBlockPostState, null);
+  assert.equal(evidence.conclusion.strictReconciliationOutcome, "insufficient_evidence");
+  assert.equal(evidence.conclusion.durableConfirmedClaimAllowed, false);
+  assert.equal(evidence.conclusion.explorerVerifiableReceiptObserved, true);
+  assert.equal(evidence.conclusion.liquidityActionObserved, false);
+  assert.equal(evidence.conclusion.lpPositionObserved, false);
+
+  for (const forbiddenKey of [
+    '"privateKey":',
+    '"walletPassword":',
+    '"mnemonic":',
+    '"seedPhrase":',
+    '"signedTransaction":'
+  ]) {
+    assert.equal(text.includes(forbiddenKey), false);
+  }
+});
+
+test("two exact internal reviews remain identity-limited and non-authorizing", () => {
+  const evidence = JSON.parse(readFileSync(RECONCILIATION_REVIEW_PATH, "utf8"));
+
+  assert.equal(evidence.schemaVersion, 1);
+  assert.equal(
+    evidence.kind,
+    "owner_designated_internal_two_reviewer_reconciliation_release_review_v1"
+  );
+  assert.equal(evidence.decision, "GO_WITH_ZERO_P0_AND_ZERO_P1");
+  assert.equal(evidence.subject.releaseCommit, "bc56a959dcc29898d9b207f92fb27459b6ccc8d8");
+  assert.equal(evidence.subject.releaseTree, "de9ab09c6e89b81d45c90e255f9ed6fa18df2b4c");
+  assert.equal(evidence.subject.runtimeManifestEntryCount, 37);
+  assert.equal(
+    evidence.subject.reviewedSubjectSha256,
+    "0xab89f0bf084286dda5425df25bf79fb49786d2ca50a119f071743bc9ca8a7baf"
+  );
+  assert.deepEqual(
+    evidence.reviewers.map(({ taskLabel, decision, p0Findings, p1Findings }) => ({
+      taskLabel,
+      decision,
+      p0Findings,
+      p1Findings
+    })),
+    [
+      {
+        taskLabel: "release_review_a",
+        decision: "GO_WITH_ZERO_P0_AND_ZERO_P1",
+        p0Findings: 0,
+        p1Findings: 0
+      },
+      {
+        taskLabel: "release_review_b",
+        decision: "GO_WITH_ZERO_P0_AND_ZERO_P1",
+        p0Findings: 0,
+        p1Findings: 0
+      }
+    ]
+  );
+  assert.equal(evidence.reviewers[1].p2Findings, 1);
+  assert.equal(evidence.reviewedProperties.submissionStartedRestartIsReconciliationOnly, true);
+  assert.equal(evidence.reviewedProperties.newSignatureAuthorized, false);
+  assert.equal(evidence.reviewedProperties.maximumAdditionalSignatures, "0");
+  assert.equal(evidence.reviewedProperties.resendOrReplacementAvailable, false);
+  assert.deepEqual(evidence.limitations, {
+    ownerDesignatedInternalReview: true,
+    externalIndependentReview: false,
+    cryptographicallyIdentifiedReviewers: false,
+    sigstoreAttested: false,
+    transactionOrBroadcastAuthorization: false,
+    futureRuntimeEnvelopeReviewed: false,
+    networkOrRpcWritePerformedByReviewers: false,
+    custodyOrSecretInspectedByReviewers: false
+  });
 });

@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "kind": "bsc_testnet_pta_wbnb_pool_bounded_reconciliation_observation_v1",
+  "environment": "bsc-testnet",
+  "chainId": "97",
+  "capturedAt": "2026-08-26T06:55:03.951Z",
+  "source": {
+    "releaseCommit": "bc56a959dcc29898d9b207f92fb27459b6ccc8d8",
+    "releaseTree": "de9ab09c6e89b81d45c90e255f9ed6fa18df2b4c",
+    "runtimeManifestSha256": "0xc011fd5d1cb6703d431a6d9429e2fbeea77b7c4ced4d9802ad2ebf367ab5a4c7",
+    "function": "observeExactBscTestnetPtaWbnbPoolTransactionForInternalUse",
+    "selectedNormalizedFieldsOnly": true,
+    "providerResponsesCryptographicallyAuthenticated": false
+  },
+  "authoritativeReconciliation": {
+    "status": "do_not_retry",
+    "retryBroadcastAllowed": false,
+    "reconciliationRetryAllowed": true,
+    "transactionHash": "0xa24d1dfa3440de3fcb644d9b52847bcc8d54f43a2e29b425f50bbce4bd684022",
+    "explorerUrl": "https://testnet.bscscan.com/tx/0xa24d1dfa3440de3fcb644d9b52847bcc8d54f43a2e29b425f50bbce4bd684022",
+    "issue": {
+      "code": "CANONICALITY_INVALID",
+      "phase": "reconciliation",
+      "message": "Both fixed providers must attest the agreed checkpoint hash with an EIP-1898 canonical read."
+    },
+    "durableTerminalRecordCreated": false,
+    "newSignatureCreated": false,
+    "rawTransactionResent": false,
+    "replacementTransactionCreated": false
+  },
+  "observation": {
+    "rawNormalizedEvidenceSha256": "0x72383249796bb095918088dcc1b52fdc75cb1f85cbcdf35bad8023365ff90af5",
+    "providers": ["https://bsc-testnet-dataseed.bnbchain.org", "https://bsc-testnet.bnbchain.org"],
+    "providerTransactionAgreement": true,
+    "providerReceiptAgreement": true,
+    "fixedCheckpointAgreement": true,
+    "ancestryAgreement": true,
+    "transaction": {
+      "hash": "0xa24d1dfa3440de3fcb644d9b52847bcc8d54f43a2e29b425f50bbce4bd684022",
+      "type": "legacy",
+      "chainId": "97",
+      "from": "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49",
+      "to": "0x427bF5b37357632377eCbEC9de3626C71A5396c1",
+      "nonce": "9",
+      "valueWei": "0",
+      "gasLimit": "6600000",
+      "gasPriceWei": "100000000",
+      "input": "0x13ead5620000000000000000000000004ed64525d6fb06b7da926c683cbd809632c9b4cc000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd00000000000000000000000000000000000000000000000000000000000001f40000000000000000000000000000000000000000004189374bc6a7ef9db22d0e",
+      "blockHash": "0xd7b9b18b3a02e3b0b8bcc8f403507e2fb53ba575eb02b9ca0002d9a8bb9131d6",
+      "blockNumber": "127284872",
+      "transactionIndex": "3"
+    },
+    "receipt": {
+      "transactionHash": "0xa24d1dfa3440de3fcb644d9b52847bcc8d54f43a2e29b425f50bbce4bd684022",
+      "transactionIndex": "3",
+      "blockHash": "0xd7b9b18b3a02e3b0b8bcc8f403507e2fb53ba575eb02b9ca0002d9a8bb9131d6",
+      "blockNumber": "127284872",
+      "from": "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49",
+      "to": "0x427bF5b37357632377eCbEC9de3626C71A5396c1",
+      "gasUsed": "4808582",
+      "effectiveGasPriceWei": "100000000",
+      "status": "1",
+      "type": "legacy",
+      "logs": [
+        {
+          "address": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+          "topics": [
+            "0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118",
+            "0x0000000000000000000000004ed64525d6fb06b7da926c683cbd809632c9b4cc",
+            "0x000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd",
+            "0x00000000000000000000000000000000000000000000000000000000000001f4"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000030b07e82d7181a53ae2ea98cd08b6733ffd831ae",
+          "logIndex": "9",
+          "removed": false
+        },
+        {
+          "address": "0x30b07e82d7181a53Ae2EA98Cd08b6733Ffd831aE",
+          "topics": ["0x98636036cb66a9c19a37435efc1e90142190214e8abeb821bdba3f2990dd4c95"],
+          "data": "0x0000000000000000000000000000000000000000004189374bc6a7ef9db22d0efffffffffffffffffffffffffffffffffffffffffffffffffffffffffffde44d",
+          "logIndex": "10",
+          "removed": false
+        }
+      ]
+    },
+    "reportedFinalizedHead": {
+      "number": "127290756",
+      "hash": "0x90a8b0c570f62a7a5024295febda5eac6dde8fcbe89ad9419f5668de7dad5b52"
+    },
+    "recheckedFinalizedHead": {
+      "number": "127290790",
+      "hash": "0x1678e4a9b6a9d0932774678653bdf3b8b28221541825b71dce85891fe9458e3f"
+    },
+    "receiptBlock": {
+      "number": "127284872",
+      "hash": "0xd7b9b18b3a02e3b0b8bcc8f403507e2fb53ba575eb02b9ca0002d9a8bb9131d6",
+      "parentHash": "0x7ce0cab4e3179f93d71424fb67d091bdc553de981d5172a102e41d3a2f2d035e",
+      "timestamp": "1787724638",
+      "transactionCount": 5
+    },
+    "fixedReceiptPlus128Checkpoint": {
+      "number": "127285000",
+      "hash": "0xa9aab229c53add8401d4616d7376fc9acbb2754f2deb0413c422cd0798da3760",
+      "parentHash": "0x42ce5996e1b4c77e51ef6b99855af7c2f8d9920146e40edc1940ad2ee575764e",
+      "timestamp": "1787724695",
+      "transactionCount": 5,
+      "exactNumberRecheckMatched": true,
+      "ancestryLength": 128,
+      "ancestrySha256": "0x511c1ddad25107440ffec4924014b4b6bed8497f5a457f5a5d0db9cae295ec47"
+    },
+    "checkpointCanonicalAttestation": null,
+    "receiptBlockPostState": null
+  },
+  "conclusion": {
+    "strictReconciliationOutcome": "insufficient_evidence",
+    "durableConfirmedClaimAllowed": false,
+    "explorerVerifiableReceiptObserved": true,
+    "liquidityActionObserved": false,
+    "lpPositionObserved": false
+  },
+  "limitations": [
+    "This is a selected normalized read-only observation, not the raw JSON-RPC envelopes or an authenticated provider transcript.",
+    "Both fixed providers lacked the required EIP-1898 checkpoint attestation and receipt-block post-state, so transaction and receipt agreement is not promoted to ProofEra's strict durable confirmed state.",
+    "The artifact contains no private key, keystore, wallet password, raw signed transaction, signing authority, broadcast authority, liquidity approval, or mainnet authority.",
+    "A later reconciliation may read state again but may never resend or replace the exact transaction."
+  ]
+}

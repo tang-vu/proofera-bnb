@@ -1,16 +1,21 @@
 # PancakeSwap V3 BSC testnet PTA/WBNB pool readiness
 
-Updated: 2026-08-26. Decision: **exact offline provenance, a non-authorizing read-only
-preflight, an old-scope unsent request, an owner-designated internal multi-agent technical decision
-for `bc7000e`, and the historical generation-4 through generation-9 operational outcomes are recorded.
-Generation 9 accepted owner-v12 and retained one exact nonce-`9` signature, then failed
-`CONFIGURATION_INVALID` before durable submission start or send. Current generation 10 can use only
-that exact existing signature, authorizes zero additional signatures and at most one send, and requires
-a new release policy, two exact owner-designated internal reviews, and owner-v13 approval. This record
-supplies none of that authority and records no receipt, pool, liquidity, or Pancake write**.
+Updated: 2026-08-26. Decision: **generation 10 consumed its sole existing-signature send opportunity
+after exact policy/owner gates and durably remains `submission_started`. Both fixed RPCs observe the
+exact transaction, status-1 receipt, expected `PoolCreated`/`Initialize` payloads, receipt block and
+receipt-plus-128 ancestry. Both lack the required historical EIP-1898 canonical/state reads, so the
+strict result is `do_not_retry/CANONICALITY_INVALID`, not durable `confirmed`. Release `bc56a95` has
+two owner-designated internal reviews with zero P0/P1. No resend, replacement, liquidity, LP mint,
+position, oracle or mainnet action is claimed or authorized**.
 
 Machine record:
 [`evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json`](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json)
+
+Bounded reconciliation observation:
+[`evidence/development/bsc-testnet-pta-wbnb-pool-reconciliation-observation-2026-08-26.json`](../evidence/development/bsc-testnet-pta-wbnb-pool-reconciliation-observation-2026-08-26.json)
+
+Exact reconciliation-release reviews:
+[`evidence/development/bsc-testnet-pta-wbnb-pool-reconciliation-release-review-2026-08-26.json`](../evidence/development/bsc-testnet-pta-wbnb-pool-reconciliation-release-review-2026-08-26.json)
 
 Non-authorizing external-review request:
 [`evidence/development/pancake-v3-pta-wbnb-external-review-request-2026-08-13.json`](../evidence/development/pancake-v3-pta-wbnb-external-review-request-2026-08-13.json)
@@ -451,7 +456,7 @@ opaque in-memory capability is bound to the exact claim and intent; cloned or pr
 accepted. The two endpoint requests in each pair run together, but pairs are ordered so each endpoint
 has at most one request in flight; there is no transport retry. Known fail-closed results retain their
 exact code and stage in the signer diagnostic, while truly ambiguous transport exceptions remain unknown.
-accepted. Focused tests exercise that behavior and its failure boundaries.
+Focused tests exercise that behavior and its failure boundaries.
 
 The standalone public production recheck constructor remains fail-closed, while the root composition
 binds the same strict recheck to its fixed official-RPC clients and private authenticated intent. No
@@ -478,17 +483,13 @@ index is bound. Success additionally requires exactly the expected factory `Pool
 liquidity and initialized observation state. A reverted receipt is kept distinct and cannot retain
 success logs or pool post-state.
 
-The repository now locally implements those formerly pending controls. Its append-only submission
-journal schema v10 persists the exact generation-9 owner authorization, recovery quartet,
-one-signature/one-broadcast policy, and transaction binding. Submission-v2 through v7 are probed read-only while
-new writes use submission-v8, so predecessor state is not hidden by a directory rename. The production root reads
-signing generations 1 through 9 and submission v2 through v8 before any authorization or signing; composition
-then rereads the generation-8 terminal, empty/absent submission-v7, active signing-v9, and active submission-v8: terminal state stops; durable
-`submission_started`/`unknown_outcome` enters recovery-only reconciliation; a signed commit without a
-durable start cannot recreate owner authority; and mismatched restart state fails closed. A fresh
-attempt must win durable `submission_started`, after which a second fixed dual-RPC state snapshot is
-required immediately before the sole send opportunity. Expiry or drift after the acknowledgement
-forbids send, retry, and replacement.
+The repository implements these controls with the immutable generation-9 signing-v9/submission-v8
+predecessor and the generation-10 submission-v9 protocol plus v11 start/terminal journal files. The
+production root reads the predecessor and active generation-10 journal before any policy or owner path:
+terminal state stops; durable `submission_started`/`unknown_outcome` enters recovery-only
+reconciliation; a signed predecessor without a durable start cannot recreate owner authority; and
+mismatched state fails closed. The generation-10 start now exists. Consequently no later process can
+obtain its exclusive start token, owner send capability, signer, resend or replacement path.
 
 Terminal reconciliation requires both fixed providers to return the identical exact transaction,
 receipt and logs, plus identical EIP-1898 post-state at the receipt block. Per provider it samples the
@@ -504,14 +505,12 @@ timestamp-regressive evidence fails closed. The provider-attested sandwich order
 It is RPC consistency, not cryptographic proof that `C` is an ancestor of `F1`/`F2`, provider
 independence, or protection from two colluding/identically faulty Byzantine providers. The phase-one
 child wires these controls to a closure-private sender; the public worker and generic raw sender remain
-unavailable. Every release containing this path must have a committed and pushed identity, then its exact
-commit/tree/full runtime manifest must receive new owner-designated audits and a matching policy before
-the owner enters the separate exact generation-10 owner-v13 TTY confirmation. This document
-records the historical admitted `36f6e5e7` policy and the later expired owner-v4 incident at
-`336af296` and `655187f2`, plus the non-retained generation-4 terminal observation. It records the
-bounded host-local generation-9 signature outcome but supplies no matching policy or owner-v13
-confirmation for generation 10; no send, transaction receipt, pool, or LP position exists. These changed files are
-not covered by the old external-review request, retained `bc7000e` decision, or any historical policy.
+unavailable. The original send release passed its exact policy and separate owner-v13 gate. The later
+read-only reconciliation release `bc56a959dcc29898d9b207f92fb27459b6ccc8d8`, tree
+`de9ab09c6e89b81d45c90e255f9ed6fa18df2b4c`, and runtime manifest
+`0xc011fd5d1cb6703d431a6d9429e2fbeea77b7c4ced4d9802ad2ebf367ab5a4c7` received two exact
+owner-designated internal reviews with zero P0/P1. Those reviews are not external, cryptographically
+identified, Sigstore-attested, transaction authorization, or review of a future runtime envelope.
 
 ## Separate proposed liquidity envelope
 
@@ -523,59 +522,32 @@ position authority is approved by this document.
 
 The two write decisions stay separate:
 
-1. Pool initialization requires fresh dual-RPC state around durable submission start, the exact existing
-   generation-9 signature, a new owner-designated distinct-agent technical decision and canonical policy
-   for the exact generation-10 release, exact owner-v13 authorization through the bounded TTY ceremony,
-   at most one send, receipt, exact logs, and post-state reconciliation. Historical confirmations cannot
-   authorize generation 10; this preparation record supplies none of those authority or receipt outputs.
+1. Pool initialization consumed its single authorized existing-signature send. The matching receipt and
+   logs are observed, but strict durable confirmation remains unavailable because both fixed providers
+   lack the required historical EIP-1898 reads. No second initialization send is allowed.
 2. Only after the pool is independently re-reviewed may an LP mint be prepared. It requires separate
    bounded token approvals, explicit ticks/amounts/minima/deadline/slippage, owner/revoke authority,
    simulation, user confirmation, and receipt evidence.
 
 ## Remaining blockers
 
-- Generation 10 must validate the exact generation-9 signed predecessor and confirm that its submission-v8
-  state is `signed_committed` with no `submission_started`. It must refresh dual-RPC state before and after
-  exclusively creating submission-v9 start. Any transaction, nonce, pool, candidate-code, gas, balance,
-  expiry, or predecessor drift blocks. It must not unlock custody or produce another signature.
-- Preserve the owner-designated internal decision only for exact commit `bc7000e`. Obtain a final
-  distinct-agent technical decision bound to the exact changed release, including the ceremony/bridge/
-  journal/recovery/ancestry delta. Local implementation review does not replace that release-bound
-  decision. Do not describe this lane as external, Sigstore-authenticated or third-party review. The
-  old eight-file unsent request, public Gist and byte-exact re-fetch provide no review for later code.
-  Its generator, test, and artifact remain pinned to the historical 45-second envelope and are not
-  timing evidence for the revised `300`/`240`/`60`/`30` contract.
-- Obtain a fresh exact generation-10 owner-v13 authorization for the fixed existing signature. Expired
-  owner-v4 through owner-v12 confirmations, requests, terminal records, or reviewer decisions cannot
-  substitute for it.
-- Generate the canonical generation-9 runtime policy only after the final commit is pushed and two
-  designated read-only agents approve its exact commit/tree/full manifest. Use that exact triplet only with the
-  absolute PowerShell phase-minus-one command; never substitute direct Node, the blocked pnpm wrapper,
-  placeholder values, the historical v1 triplet/policy, the stale `36f6e5e7` triplet/policy, or the
-  incident `336af296` triplet/policy/owner-v4 bytes.
-  Admit the matching policy through the strict nonce-bound v10 `BEGIN`/ordered `CHUNK`/`END` TTY phase,
-  run the fixed coordinator for the fresh envelope, and instantiate the admitted policy on it. Then
-  require the owner's exact v12 second-phase confirmation; neither gate may be inferred from
-  repository contents, chat, digests, or journal state. The public worker and generic raw sender stay
-  hard-blocked even when the closure-private path is used.
-- Re-run the fixed two-provider coordinator immediately before any generation-9 claim,
-  then repeat the pending nonce, pool, candidate-code and simulation checks after the durable claim and
-  abort on any drift.
+- Keep generation 10 reconciliation-only. Its exact raw transaction must never be resent or replaced.
+  A later reconciliation may only re-read the retained transaction using a separately reviewed fixed-
+  provider policy; missing archive state must remain explicit rather than becoming success.
+- Preserve the exact `bc56a95` two-review decision only for that 37-file runtime subject. It is
+  owner-designated internal review, not external/Sigstore/cryptographic reviewer identity and not
+  transaction authority.
 - Establish post-initialization observation cardinality and elapsed oracle history before using the
   pool for analysis; a new pool has no decision-useful history merely because it exists.
 - Review actual liquidity depth, price-manipulation exposure, token funding, LP range, ownership,
   bounded approvals, Altana policy/authority, and revoke behavior before activation.
 
-Until those gates close and explorer-verifiable receipts exist, the truthful state remains: PTA and
-WBNB identities are evidenced, the retained pool construction path is reproduced exactly offline,
-generation 9 has one exact host-local signed transaction but no durable submission start or send, and an
-exact-policy/owner-gated generation-10 existing-signature submission/reconciliation path is implemented.
-The owner-designated internal technical-review gate is complete only for the exact `bc7000e`
-nonexecuting subject, not this changed release until its final commit is pushed and receives two new
-exact audits. **No authenticated external/third-party review is claimed. Historical policies and
-owner-v4 through owner-v12 confirmations are non-authorizing for generation 10; this preparation record
-contains no matching generation-10 policy, owner-v13 transaction approval, send, receipt, PTA/WBNB pool,
-liquidity, oracle, position, Pancake write, or autonomous-execution evidence**.
+The truthful state is: PTA/WBNB identities and construction provenance are evidenced; generation 10
+durably started and exercised its at-most-once exact transaction; both fixed providers return matching
+status-1 receipt/log and bounded ancestry observations. ProofEra has no strict durable `confirmed`
+record because both required EIP-1898 historical reads are unavailable. **No authenticated external/
+third-party review is claimed. No missing historical state is converted into a pool-state claim, and
+no resend, replacement, liquidity, oracle, LP position, mainnet write, or further authority exists**.
 
 The machine record is linked to the retained
 [bounded public-result RPC transcript](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json)

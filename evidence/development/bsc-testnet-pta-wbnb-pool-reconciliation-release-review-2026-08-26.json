@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "kind": "owner_designated_internal_two_reviewer_reconciliation_release_review_v1",
+  "decision": "GO_WITH_ZERO_P0_AND_ZERO_P1",
+  "subject": {
+    "releaseCommit": "bc56a959dcc29898d9b207f92fb27459b6ccc8d8",
+    "releaseTree": "de9ab09c6e89b81d45c90e255f9ed6fa18df2b4c",
+    "runtimeManifestEntryCount": 37,
+    "runtimeManifestSha256": "0xc011fd5d1cb6703d431a6d9429e2fbeea77b7c4ced4d9802ad2ebf367ab5a4c7",
+    "predecessorBundleDigest": "0xd4818274914334f39d3bcd87395ef507bc0095081ad1204e7eb792feac019b68",
+    "reviewedSubjectSha256": "0xab89f0bf084286dda5425df25bf79fb49786d2ca50a119f071743bc9ca8a7baf",
+    "transactionHash": "0xa24d1dfa3440de3fcb644d9b52847bcc8d54f43a2e29b425f50bbce4bd684022"
+  },
+  "reviewers": [
+    {
+      "taskLabel": "release_review_a",
+      "modelRole": "independent_internal_security_release_reviewer",
+      "reviewedAt": "2026-08-26T06:50:25.979Z",
+      "decision": "GO_WITH_ZERO_P0_AND_ZERO_P1",
+      "p0Findings": 0,
+      "p1Findings": 0,
+      "p2Findings": 0,
+      "p3Findings": 0
+    },
+    {
+      "taskLabel": "release_review_b",
+      "modelRole": "independent_internal_release_reviewer_b",
+      "reviewedAt": "2026-08-26T06:52:07.885Z",
+      "decision": "GO_WITH_ZERO_P0_AND_ZERO_P1",
+      "p0Findings": 0,
+      "p1Findings": 0,
+      "p2Findings": 1,
+      "p3Findings": 0,
+      "p2Finding": "The preparation and traceability prose still described the pre-send state and older submission schema; the follow-up documentation-only update corrects that status."
+    }
+  ],
+  "reviewedProperties": {
+    "headOriginMainAndTreeMatched": true,
+    "worktreeWasClean": true,
+    "manifestRecomputedIndependentlyByBothReviewers": true,
+    "predecessorAndSubjectRecomputedIndependentlyByBothReviewers": true,
+    "sequentialPerProviderAncestryAndPostStateReads": true,
+    "exactMissingTrieNodeClassificationOnly": true,
+    "missingHistoricalStateCannotBecomeConfirmed": true,
+    "submissionStartedRestartIsReconciliationOnly": true,
+    "newSignatureAuthorized": false,
+    "maximumAdditionalSignatures": "0",
+    "resendOrReplacementAvailable": false
+  },
+  "verification": [
+    "Reviewer A: 5 focused integration files / 41 tests passed; integrations typecheck and phase-zero 17-test suite passed.",
+    "Reviewer B: 4 focused integration files / 39 tests passed; integrations typecheck, changed-file Prettier, and release diff check passed.",
+    "Root: full pnpm verify passed for the reviewed runtime commit before review."
+  ],
+  "limitations": {
+    "ownerDesignatedInternalReview": true,
+    "externalIndependentReview": false,
+    "cryptographicallyIdentifiedReviewers": false,
+    "sigstoreAttested": false,
+    "transactionOrBroadcastAuthorization": false,
+    "futureRuntimeEnvelopeReviewed": false,
+    "networkOrRpcWritePerformedByReviewers": false,
+    "custodyOrSecretInspectedByReviewers": false
+  }
+}
