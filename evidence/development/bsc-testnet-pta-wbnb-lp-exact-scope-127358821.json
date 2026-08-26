@@ -1,0 +1,394 @@
+{
+  "schemaVersion": 1,
+  "kind": "bsc_testnet_pta_wbnb_first_lp_exact_scope",
+  "policyId": "ProofEra:bsc-testnet-pta-wbnb-first-lp-exact-scope:v1",
+  "status": "prepared_not_authorized",
+  "sourceCommit": "c1df68635f1f7b83acc49bc2dad9a32187c050bd",
+  "preparedAt": "2026-08-26T15:25:16.401Z",
+  "scopeExpiresAt": "2026-08-26T15:27:16.401Z",
+  "reusableAfterExpiry": false,
+  "chain": {
+    "environment": "bsc-testnet",
+    "chainId": 97,
+    "mainnetWritePossible": false,
+    "fixedOfficialDualRpc": true
+  },
+  "owner": "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49",
+  "observation": {
+    "commonBlockNumber": "127358821",
+    "commonBlockHash": "0xdd22c398ca874fac40c68ff0ff6884b7e238d882b0c4923a9abafab6d44d5cb3",
+    "commonBlockTimestampUnix": "1787757915",
+    "commonBlockTimestampUtc": "2026-08-26T15:25:15.000Z",
+    "blockAgeSeconds": "1",
+    "providerAgreementVerified": true,
+    "observations": [
+      {
+        "provider": "primary",
+        "rpcOrigin": "https://bsc-testnet-dataseed.bnbchain.org",
+        "chainId": 97,
+        "tipBlockNumber": "127358821",
+        "block": {
+          "number": "127358821",
+          "hash": "0xdd22c398ca874fac40c68ff0ff6884b7e238d882b0c4923a9abafab6d44d5cb3",
+          "timestampUnix": "1787757915",
+          "timestampUtc": "2026-08-26T15:25:15.000Z"
+        },
+        "sender": {
+          "nativeBalanceWei": "87356393180000000",
+          "ptaBalanceRaw": "1000000000000000000000000",
+          "wbnbBalanceRaw": "0",
+          "ptaAllowanceToManagerRaw": "0",
+          "wbnbAllowanceToManagerRaw": "0",
+          "commonBlockNonce": "10",
+          "pendingNonce": "10",
+          "managerNftBalance": "0"
+        },
+        "tokens": {
+          "ptaDecimals": 18,
+          "ptaSymbol": "PTA",
+          "ptaTotalSupplyRaw": "1000000000000000000000000",
+          "wbnbDecimals": 18,
+          "wbnbSymbol": "WBNB"
+        },
+        "pool": {
+          "sqrtPriceX96": "79228162514264337593543950",
+          "currentTick": -138163,
+          "observationIndex": 0,
+          "observationCardinality": 1,
+          "observationCardinalityNext": 1,
+          "feeProtocol": 222825800,
+          "unlocked": true,
+          "liquidityRaw": "0",
+          "token0": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc",
+          "token1": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+          "fee": 500,
+          "tickSpacing": 10,
+          "factory": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865"
+        },
+        "relations": {
+          "factoryPool": "0x30b07e82d7181a53Ae2EA98Cd08b6733Ffd831aE",
+          "factoryTickSpacing": 10,
+          "managerFactory": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+          "managerWeth9": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+          "managerDeployer": "0x41ff9AA7e16B8B1a8a8dc4f0eFacd93D02d071c9"
+        },
+        "gasPriceWei": "100000000",
+        "contracts": [
+          {
+            "address": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc",
+            "byteLength": 1826,
+            "runtimeKeccak256": "0x2f8caecd2e51f085ab11a67e5b8a89eeab7b667bd89ec708a481b66ed756e006",
+            "eip1967": {
+              "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          {
+            "address": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+            "byteLength": 3124,
+            "runtimeKeccak256": "0xb7d84205eaaf83ce7b3940c6beaad6d22790255e34a9a2b486aa8cdfff118fe6",
+            "eip1967": {
+              "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          {
+            "address": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+            "byteLength": 5151,
+            "runtimeKeccak256": "0x8191d3ab1d55d3da9822199f28865415c99566b6f1aee4a4b16713f57930678c",
+            "eip1967": {
+              "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          {
+            "address": "0x41ff9AA7e16B8B1a8a8dc4f0eFacd93D02d071c9",
+            "byteLength": 24556,
+            "runtimeKeccak256": "0xedd527f11646c1912dfc51b57ffa0ee27972f8798bcaf7bc68ae6ad054b6022b",
+            "eip1967": {
+              "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          {
+            "address": "0x427bF5b37357632377eCbEC9de3626C71A5396c1",
+            "byteLength": 24466,
+            "runtimeKeccak256": "0xd86730989544d7a3ea034c8a322733683137cf70b0f49231fd88405eac6098d7",
+            "eip1967": {
+              "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          {
+            "address": "0x30b07e82d7181a53Ae2EA98Cd08b6733Ffd831aE",
+            "byteLength": 22962,
+            "runtimeKeccak256": "0xc7187b6ca08de7a5856f7725d15e39a534b27a964fdc445abfd7663041b0e69d",
+            "eip1967": {
+              "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          }
+        ]
+      },
+      {
+        "provider": "corroborator",
+        "rpcOrigin": "https://bsc-testnet.bnbchain.org",
+        "chainId": 97,
+        "tipBlockNumber": "127358822",
+        "block": {
+          "number": "127358821",
+          "hash": "0xdd22c398ca874fac40c68ff0ff6884b7e238d882b0c4923a9abafab6d44d5cb3",
+          "timestampUnix": "1787757915",
+          "timestampUtc": "2026-08-26T15:25:15.000Z"
+        },
+        "sender": {
+          "nativeBalanceWei": "87356393180000000",
+          "ptaBalanceRaw": "1000000000000000000000000",
+          "wbnbBalanceRaw": "0",
+          "ptaAllowanceToManagerRaw": "0",
+          "wbnbAllowanceToManagerRaw": "0",
+          "commonBlockNonce": "10",
+          "pendingNonce": "10",
+          "managerNftBalance": "0"
+        },
+        "tokens": {
+          "ptaDecimals": 18,
+          "ptaSymbol": "PTA",
+          "ptaTotalSupplyRaw": "1000000000000000000000000",
+          "wbnbDecimals": 18,
+          "wbnbSymbol": "WBNB"
+        },
+        "pool": {
+          "sqrtPriceX96": "79228162514264337593543950",
+          "currentTick": -138163,
+          "observationIndex": 0,
+          "observationCardinality": 1,
+          "observationCardinalityNext": 1,
+          "feeProtocol": 222825800,
+          "unlocked": true,
+          "liquidityRaw": "0",
+          "token0": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc",
+          "token1": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+          "fee": 500,
+          "tickSpacing": 10,
+          "factory": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865"
+        },
+        "relations": {
+          "factoryPool": "0x30b07e82d7181a53Ae2EA98Cd08b6733Ffd831aE",
+          "factoryTickSpacing": 10,
+          "managerFactory": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+          "managerWeth9": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+          "managerDeployer": "0x41ff9AA7e16B8B1a8a8dc4f0eFacd93D02d071c9"
+        },
+        "gasPriceWei": "100000000",
+        "contracts": [
+          {
+            "address": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc",
+            "byteLength": 1826,
+            "runtimeKeccak256": "0x2f8caecd2e51f085ab11a67e5b8a89eeab7b667bd89ec708a481b66ed756e006",
+            "eip1967": {
+              "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          {
+            "address": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+            "byteLength": 3124,
+            "runtimeKeccak256": "0xb7d84205eaaf83ce7b3940c6beaad6d22790255e34a9a2b486aa8cdfff118fe6",
+            "eip1967": {
+              "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          {
+            "address": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+            "byteLength": 5151,
+            "runtimeKeccak256": "0x8191d3ab1d55d3da9822199f28865415c99566b6f1aee4a4b16713f57930678c",
+            "eip1967": {
+              "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          {
+            "address": "0x41ff9AA7e16B8B1a8a8dc4f0eFacd93D02d071c9",
+            "byteLength": 24556,
+            "runtimeKeccak256": "0xedd527f11646c1912dfc51b57ffa0ee27972f8798bcaf7bc68ae6ad054b6022b",
+            "eip1967": {
+              "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          {
+            "address": "0x427bF5b37357632377eCbEC9de3626C71A5396c1",
+            "byteLength": 24466,
+            "runtimeKeccak256": "0xd86730989544d7a3ea034c8a322733683137cf70b0f49231fd88405eac6098d7",
+            "eip1967": {
+              "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          {
+            "address": "0x30b07e82d7181a53Ae2EA98Cd08b6733Ffd831aE",
+            "byteLength": 22962,
+            "runtimeKeccak256": "0xc7187b6ca08de7a5856f7725d15e39a534b27a964fdc445abfd7663041b0e69d",
+            "eip1967": {
+              "implementation": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "admin": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "beacon": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "position": {
+    "pool": "0x30b07e82d7181a53Ae2EA98Cd08b6733Ffd831aE",
+    "manager": "0x427bF5b37357632377eCbEC9de3626C71A5396c1",
+    "recipient": "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49",
+    "token0": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc",
+    "token1": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+    "fee": "500",
+    "tickLower": -887270,
+    "tickUpper": 887270,
+    "range": "full_range_aligned_to_tick_spacing_10",
+    "amount0DesiredRaw": "1000000000000000000000",
+    "amount1DesiredRaw": "1000000000000000",
+    "amount0MinRaw": "1000000000000000000000",
+    "amount1MinRaw": "1000000000000000",
+    "maximumSlippageBps": 0,
+    "expectedLiquidityRaw": "1000000000000000000",
+    "deadlineUnix": "1787758816",
+    "deadlineUtc": "2026-08-26T15:40:16.000Z",
+    "priceMeaning": "fixed_non_economic_test_scenario_not_market_price_oracle_peg_or_valuation",
+    "nativeFundingMethod": "direct_payable_mint_wraps_only_the_exact_WBNB_amount_owed"
+  },
+  "exactTransactions": [
+    {
+      "order": 1,
+      "purpose": "exact_PTA_allowance_for_one_mint",
+      "chainId": 97,
+      "type": "legacy",
+      "from": "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49",
+      "nonce": "10",
+      "to": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc",
+      "selector": "0x095ea7b3",
+      "data": "0x095ea7b3000000000000000000000000427bf5b37357632377ecbec9de3626c71a5396c100000000000000000000000000000000000000000000003635c9adc5dea00000",
+      "dataKeccak256": "0xe9db868c2cfaa1f01d08eecb6b49442a1bbba1ac844a4c7415593feeb43f9c73",
+      "valueWei": "0",
+      "gasLimit": "56120",
+      "gasPriceWei": "100000000"
+    },
+    {
+      "order": 2,
+      "purpose": "direct_zero_slippage_full_range_Pancake_V3_mint",
+      "chainId": 97,
+      "type": "legacy",
+      "from": "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49",
+      "nonce": "11",
+      "to": "0x427bF5b37357632377eCbEC9de3626C71A5396c1",
+      "selector": "0x88316456",
+      "data": "0x883164560000000000000000000000004ed64525d6fb06b7da926c683cbd809632c9b4cc000000000000000000000000ae13d989dac2f0debff460ac112a837c89baa7cd00000000000000000000000000000000000000000000000000000000000001f4fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff2761a00000000000000000000000000000000000000000000000000000000000d89e600000000000000000000000000000000000000000000003635c9adc5dea0000000000000000000000000000000000000000000000000000000038d7ea4c6800000000000000000000000000000000000000000000000003635c9adc5dea0000000000000000000000000000000000000000000000000000000038d7ea4c68000000000000000000000000000997cd959798f7c925076eaeff5855c5c2c1e5a49000000000000000000000000000000000000000000000000000000006a8f08e0",
+      "dataKeccak256": "0x3eaf4d41e37d23b188644cb68ea83709692056364d9add00a5835dc884b43395",
+      "valueWei": "1000000000000000",
+      "gasLimit": "749842",
+      "gasPriceWei": "100000000"
+    }
+  ],
+  "caps": {
+    "ptaSpendRaw": "1000000000000000000000",
+    "nativeMintValueWei": "1000000000000000",
+    "gasPriceWei": "100000000",
+    "maximumGasPriceWei": "300000000",
+    "approvalGasEstimate": "46766",
+    "approvalGasLimit": "56120",
+    "mintGasEstimate": "624868",
+    "mintGasLimit": "749842",
+    "maximumGasCostWei": "80596200000000",
+    "maximumNativeOutflowWei": "1080596200000000"
+  },
+  "simulations": {
+    "stateOverridePurpose": "read_only simulation of mint after the exact preceding PTA approval; no persistent state change",
+    "providerAgreementVerified": true,
+    "tokenIdIsUnconstrainedReturnValue": true,
+    "simulations": [
+      {
+        "provider": "primary",
+        "approval": {
+          "returned": true,
+          "gasEstimate": "46766"
+        },
+        "mint": {
+          "simulatedTokenId": "37091",
+          "liquidityRaw": "1000000000000000000",
+          "amount0Raw": "1000000000000000000000",
+          "amount1Raw": "1000000000000000",
+          "gasEstimate": "624868",
+          "allowanceStateOverrideSlot": "0x5f9f6095e4023bbead9e4ac3756a56cbe57e18b8e07aba856b2c58188b647399"
+        }
+      },
+      {
+        "provider": "corroborator",
+        "approval": {
+          "returned": true,
+          "gasEstimate": "46766"
+        },
+        "mint": {
+          "simulatedTokenId": "37091",
+          "liquidityRaw": "1000000000000000000",
+          "amount0Raw": "1000000000000000000000",
+          "amount1Raw": "1000000000000000",
+          "gasEstimate": "624868",
+          "allowanceStateOverrideSlot": "0x5f9f6095e4023bbead9e4ac3756a56cbe57e18b8e07aba856b2c58188b647399"
+        }
+      }
+    ]
+  },
+  "failureCleanup": {
+    "target": "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc",
+    "selector": "0x095ea7b3",
+    "data": "0x095ea7b3000000000000000000000000427bf5b37357632377ecbec9de3626c71a5396c10000000000000000000000000000000000000000000000000000000000000000",
+    "dataKeccak256": "0x8d75199322b760b5813ec81f2e7fbbf29dd3dc74df1205a24f997e24e0a084c7",
+    "valueWei": "0",
+    "rule": "If approval confirms but mint does not confirm, stop all mint retries and prepare one fresh-nonce exact approve(manager,0) cleanup scope after reconciling the mint outcome.",
+    "preauthorized": false
+  },
+  "prohibited": {
+    "multicall": true,
+    "dispatcher": true,
+    "WBNBApproval": true,
+    "tokenTransfer": true,
+    "swap": true,
+    "additionalLiquidity": true,
+    "retryAfterAmbiguousSubmission": true,
+    "replacement": true,
+    "mainnet": true
+  },
+  "authorization": {
+    "preparationAuthorizedByOwner": true,
+    "signingAuthorized": false,
+    "custodyUnlockAuthorized": false,
+    "broadcastAuthorized": false,
+    "signatureCreated": false,
+    "transactionSubmitted": false,
+    "blockchainWritePerformed": false
+  },
+  "evidenceBoundary": {
+    "preparationIsNotReceipt": true,
+    "simulationIsNotExecution": true,
+    "tokenIdMayRaceBecauseItIsNotAFunctionInput": true,
+    "successfulReceiptAndPostStateRequiredBeforeLiquidityClaim": true,
+    "realizedBenefitRemainsUnknown": true
+  },
+  "exactScopeSha256": "0xf7af56fa4fa35b84ef2f9459f90f974df857436098db273391578b806e4ac639"
+}

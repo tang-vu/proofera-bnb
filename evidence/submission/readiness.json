@@ -1,20 +1,20 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-26T10:25:14.306Z",
+  "updatedAtUtc": "2026-08-26T15:20:17.492Z",
   "readyForSubmission": false,
   "gates": [
     {
       "gateId": "production-release",
       "state": "deployed_unfrozen",
-      "claim": "A two-resolver, five-host TLS and eleven-response rehearsal is retained for published build b68c6b6d1a2f7f1671f384b397cfd54386481934; the final judging release and final probe are not frozen.",
+      "claim": "A two-resolver, five-host TLS and eleven-response rehearsal is retained for publicly deployed commit c1df68635f1f7b83acc49bc2dad9a32187c050bd; the final judging release and final probe are not frozen.",
       "blockers": [
         "Freeze the final published commit and retain an independently reviewable public probe artifact."
       ],
       "artifacts": [
         {
           "kind": "release_rehearsal",
-          "path": "evidence/submission/release-probes/b68c6b6d1a2f7f1671f384b397cfd54386481934/rehearsal/manifest.json",
-          "sha256": "3bf2d5f9eb5263695bbfd6340568f1f052b03e523c1b4bafb123611bb30eaf71"
+          "path": "evidence/submission/release-probes/c1df68635f1f7b83acc49bc2dad9a32187c050bd/rehearsal/manifest.json",
+          "sha256": "2a896963a9479a44131c608371c07f08782cf505b440da1f7646cf4bd64e80fa"
         }
       ]
     },
@@ -67,8 +67,9 @@
     {
       "gateId": "pancake-benefit",
       "state": "initializer_only",
-      "claim": "Both fixed chain-97 RPCs observed a matching status-1 initializer receipt and expected PoolCreated/Initialize logs, but historical EIP-1898 state was unavailable so strict durable confirmation remains withheld. No liquidity, LP position, controlled before/after result or realized benefit is evidenced.",
+      "claim": "Both fixed chain-97 RPCs observed the initializer receipt; historical EIP-1898 state remains unavailable, so strict durable confirmation remains withheld. At common block 127358821 they also agreed on exact current code, pool liquidity zero, sender balances/allowances/nonces and read-only simulations for a two-transaction zero-slippage first-LP scope. That scope expired without custody access, signature or broadcast; no liquidity, LP position, controlled before/after result or realized benefit is evidenced.",
       "blockers": [
+        "Regenerate the exact two-minute scope from fresh dual-RPC state and obtain separate exact owner signing/broadcast authorization.",
         "Retain a controlled Pancake transaction receipt and before/after result against the frozen manual baseline net of known costs."
       ],
       "artifacts": [
@@ -81,6 +82,11 @@
           "kind": "initializer_observation",
           "path": "evidence/development/bsc-testnet-pta-wbnb-pool-reconciliation-observation-2026-08-26.json",
           "sha256": "b19e9857aaff1572197da7dbf9c2c6f19ff6589ec1899dff8efd53fd47490c0b"
+        },
+        {
+          "kind": "read_only_exact_scope_preparation",
+          "path": "evidence/development/bsc-testnet-pta-wbnb-lp-exact-scope-127358821.json",
+          "sha256": "410c538efcdb3bff6589a05a8062d16aaf56386aa9db851760f1a043d04ec3df"
         }
       ]
     },
