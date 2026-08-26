@@ -6,9 +6,10 @@ import { fileURLToPath } from "node:url";
 
 import {
   TermixIndependentReviewRecordSchema,
-  TermixReviewerPacketV3Schema,
+  TermixReviewerPacketV4Schema,
   TermixProtectedIndependentAdjudicationSchema,
   assertTermixAdjudicationBinding,
+  assertTermixReviewEvidenceBytes,
   canonicalJson,
   sha256Bytes,
   summarizePairedBenchmark
@@ -226,11 +227,16 @@ async function verifyPacketContract(packet: {
 }
 
 async function verifyReviewEvidence(
-  evidence: readonly { readonly path: string; readonly sha256: string }[]
+  evidence: readonly {
+    readonly path: string;
+    readonly sha256: string;
+    readonly payloadSha256?: string | undefined;
+    readonly purpose: string;
+  }[]
 ): Promise<void> {
   for (const item of evidence) {
     const bytes = await readExactTracked(validateEvidencePath(item.path));
-    if (sha256Bytes(bytes) !== item.sha256) fail("TERMIX_FINAL_INDEPENDENT_REVIEW_EVIDENCE_DRIFT");
+    assertTermixReviewEvidenceBytes(item, bytes);
   }
 }
 
@@ -284,7 +290,7 @@ async function buildSources(sources: readonly SourceInvocation[]) {
       if (sha256Bytes(packetBytes) !== adjudication.packetBytesSha256) {
         fail("TERMIX_FINAL_REVIEW_PACKET_BYTES_DRIFT");
       }
-      const packet = TermixReviewerPacketV3Schema.parse(
+      const packet = TermixReviewerPacketV4Schema.parse(
         parseJson(packetBytes, "TERMIX_FINAL_REVIEW_PACKET_JSON_INVALID")
       );
       await verifyPacketContract(packet);

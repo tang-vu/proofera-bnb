@@ -18,7 +18,8 @@ test("TermiX materializer is create-only and validates the protected derivative"
   assert.match(source, /sameComparison\(before, after\)/u);
   assert.match(source, /flag: "wx"/u);
   assert.match(source, /TERMIX_REVIEW_CONTRACT_DRIFT/u);
-  assert.match(source, /TERMIX_REVIEW_EVIDENCE_DRIFT/u);
+  assert.match(source, /assertTermixReviewEvidenceBytes\(/u);
+  assert.match(schema, /TERMIX_REVIEW_EVIDENCE_PAYLOAD_DIGEST_MISMATCH/u);
   assert.match(schema, /termixProtectedPairProjection/u);
   assert.match(schema, /TERMIX_VERIFIED_PAIR_PROTECTED_PROJECTION_DRIFT/u);
   assert.doesNotMatch(source, /\bfetch\s*\(/u);

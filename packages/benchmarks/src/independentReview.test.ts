@@ -5,13 +5,14 @@ import { describe, expect, it } from "vitest";
 import {
   TERMIX_REVIEW_TASK_IDS,
   TermixIndependentReviewRecordSchema,
+  assertTermixReviewEvidenceBytes,
   assertTermixVerifiedDerivative,
   materializeTermixVerifiedPair,
   termixProtectedPairProjection
 } from "./independentReview.js";
 import { benchmarkDeclarationSha256 } from "./pair.js";
 import { PairedBenchmarkSchema, type PairedBenchmark } from "./schemas.js";
-import { canonicalJson, sha256Canonical } from "./canonical.js";
+import { canonicalJson, sha256Bytes, sha256Canonical } from "./canonical.js";
 
 const REVIEWED_AT = "2026-08-26T09:00:00.000Z";
 const REVIEWER = {
@@ -183,5 +184,34 @@ describe("TermiX protected independent-review materialization", () => {
 
   it("keeps the exact fixed task set", () => {
     expect(TERMIX_REVIEW_TASK_IDS).toEqual(TASK_FIXTURES.map(({ taskId }) => taskId));
+  });
+
+  it("verifies both retained full-file and optional final-LF payload digests", () => {
+    const bytes = Buffer.from("exact-payload\n", "utf8");
+    const evidence = {
+      path: "evidence/termix/reviewer-packets/payload.canonical-json",
+      sha256: sha256Bytes(bytes),
+      payloadSha256: sha256Bytes(bytes.subarray(0, -1)),
+      purpose: "Exact payload fixture."
+    };
+    expect(() => assertTermixReviewEvidenceBytes(evidence, bytes)).not.toThrow();
+    expect(() =>
+      assertTermixReviewEvidenceBytes(
+        { ...evidence, sha256: sha256Bytes(Buffer.from("drift\n", "utf8")) },
+        bytes
+      )
+    ).toThrow("TERMIX_REVIEW_EVIDENCE_FULL_DIGEST_MISMATCH");
+    expect(() =>
+      assertTermixReviewEvidenceBytes(
+        {
+          ...evidence,
+          sha256: sha256Bytes(Buffer.from("exact-payload", "utf8"))
+        },
+        Buffer.from("exact-payload", "utf8")
+      )
+    ).toThrow("TERMIX_REVIEW_EVIDENCE_PAYLOAD_LINE_ENDING_INVALID");
+    expect(() =>
+      assertTermixReviewEvidenceBytes({ ...evidence, payloadSha256: "e".repeat(64) }, bytes)
+    ).toThrow("TERMIX_REVIEW_EVIDENCE_PAYLOAD_DIGEST_MISMATCH");
   });
 });

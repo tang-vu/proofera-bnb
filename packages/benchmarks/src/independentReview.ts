@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { canonicalJson, sha256Canonical } from "./canonical.js";
+import { canonicalJson, sha256Bytes, sha256Canonical } from "./canonical.js";
 import { benchmarkDeclarationSha256 } from "./pair.js";
 import {
   BenchmarkIdSchema,
@@ -16,8 +16,8 @@ import {
 export const TERMIX_INDEPENDENT_REVIEW_SCHEMA_VERSION =
   "proofera-termix-independent-review-v2.0.0" as const;
 export const TERMIX_REVIEWER_PACKET_SCHEMA_VERSION =
-  "proofera-termix-reviewer-packet-v3.0.0" as const;
-export const TERMIX_ADJUDICATION_SCHEMA_VERSION = "proofera-termix-adjudication-v3.0.0" as const;
+  "proofera-termix-reviewer-packet-v4.0.0" as const;
+export const TERMIX_ADJUDICATION_SCHEMA_VERSION = "proofera-termix-adjudication-v4.0.0" as const;
 
 export const TERMIX_REVIEW_TASK_IDS = [
   "pancake-lp-range-decision",
@@ -137,7 +137,7 @@ export const TermixIndependentReviewRecordSchema = z
     }
   });
 
-export const TermixReviewerPacketV3Schema = z
+export const TermixReviewerPacketV4Schema = z
   .strictObject({
     schemaVersion: z.literal(TERMIX_REVIEWER_PACKET_SCHEMA_VERSION),
     packetId: BenchmarkIdSchema,
@@ -257,6 +257,20 @@ export const TermixProtectedIndependentAdjudicationSchema = z.strictObject({
   evidence: z.array(TermixReviewEvidenceSchema).min(2).max(100),
   limitations: z.array(z.string().trim().min(1).max(1_000)).min(1).max(50)
 });
+
+export function assertTermixReviewEvidenceBytes(evidenceInput: unknown, bytes: Uint8Array): void {
+  const evidence = TermixReviewEvidenceSchema.parse(evidenceInput);
+  if (sha256Bytes(bytes) !== evidence.sha256) {
+    throw new Error("TERMIX_REVIEW_EVIDENCE_FULL_DIGEST_MISMATCH");
+  }
+  if (evidence.payloadSha256 === undefined) return;
+  if (bytes.length === 0 || bytes.at(-1) !== 0x0a) {
+    throw new Error("TERMIX_REVIEW_EVIDENCE_PAYLOAD_LINE_ENDING_INVALID");
+  }
+  if (sha256Bytes(bytes.subarray(0, -1)) !== evidence.payloadSha256) {
+    throw new Error("TERMIX_REVIEW_EVIDENCE_PAYLOAD_DIGEST_MISMATCH");
+  }
+}
 
 const STALE_PAIR_LIMITATION =
   /self-review|implementation-adjacent|remain unverified|remains unverified|requires (?:a )?(?:genuinely )?independent|not independent/iu;

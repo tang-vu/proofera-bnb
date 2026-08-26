@@ -14,7 +14,8 @@ test("TermiX final compiler fixes the three verified pair and adjudication bound
   assert.match(source, /summarizePairedBenchmark\(pair\)/u);
   assert.match(source, /TermixProtectedIndependentAdjudicationSchema\.parse/u);
   assert.match(source, /TermixIndependentReviewRecordSchema\.parse/u);
-  assert.match(source, /TermixReviewerPacketV3Schema\.parse/u);
+  assert.match(source, /TermixReviewerPacketV4Schema\.parse/u);
+  assert.match(source, /assertTermixReviewEvidenceBytes\(/u);
   assert.match(source, /assertTermixAdjudicationBinding\(/u);
   assert.match(source, /evidence\/termix\/final-pairs\//u);
   assert.match(source, /verifyAdjudicationEvidence\(adjudication\)/u);
