@@ -1,6 +1,6 @@
 # ProofEra judge demo script
 
-Updated: 2026-08-22. This is the production script and shot list, not evidence that the final video has been recorded. Keep the final cut between 4:00 and 5:30. Never show a secret, wallet export, environment file, passkey credential payload, or session signer.
+Updated: 2026-08-26. This is the production script and shot list, not evidence that the final video has been recorded. Keep the final cut between 4:00 and 5:30. Never show a secret, wallet export, environment file, passkey credential payload, or session signer.
 
 ## Current recording boundary
 
@@ -9,10 +9,10 @@ Ready to show now:
 - the public marketplace and four read-only analyzers;
 - four receipt-verified ERC-8004 identities and three finalized testnet hires;
 - the Proof Room with exact build, artifact paths, hashes, and honest blockers;
-- all six retained TermiX raw captures, all three unverified observational pairs, and the independent-review packet;
+- all six retained TermiX raw captures, immutable source pairs, protected verified derivatives, adjudications, and the final three-artifact bundle;
 - the local operator ceremony explaining why manual judgment, passkey presence, execution, and revoke are separate transitions.
 
-Do not record the final cut yet. The following must exist first: controlled Pancake before/after evidence; independent adjudication and final compilation of all three TermiX pairs; final production freeze. The Altana lifecycle, all six raw TermiX lanes, three unverified pairs and reviewer handoff are retained, but none closes those remaining gates. Until then, use rehearsal mode only.
+Do not record the final cut yet. The following must exist first: controlled Pancake before/after evidence and the final production freeze. The Altana lifecycle and TermiX gates are verified; the final TermiX review remains owner-designated internal and identity-limited. Until the remaining objective gates close, use rehearsal mode only.
 
 ## One-session operator checklist
 
@@ -65,9 +65,9 @@ If any receipt is pending or missing during rehearsal, show the honest blocked s
 
 Visual: final TermiX paired report, then raw LP and Venus captures.
 
-Narration template: “Three tasks were preregistered before execution: Pancake LP range analysis, an Altana permission audit, and Venus health-factor replay. The same frozen evidence and rubric are used for agent and manual lanes. [Insert only the final adjudicated time, cost, and quality values.] Raw outputs and reviewer limitations remain linked, so the comparison can be reproduced instead of trusted as marketing.”
+Narration template: “Three tasks were preregistered before execution: Pancake LP range analysis, an Altana permission audit, and Venus health-factor replay. The same frozen evidence and rubric were used for agent and manual lanes. Both lanes scored 100 out of 100 with zero incremental native fee in each bounded task. The retained timings point in different directions across tasks, so ProofEra claims no universal winner. Raw outputs and reviewer limitations remain linked, making the comparison reproducible rather than marketing.”
 
-Do not narrate a winner until the compiler accepts all three pairs and their independent adjudications.
+The compiler accepts all three protected pairs and adjudications, but narrate only the exact task-level measurements and the identity limitations of the owner-designated internal review.
 
 ## 4:20-5:00 — proof and close
 

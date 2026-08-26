@@ -218,14 +218,14 @@ pnpm audit --audit-level high
 
 It preserves documented APY units, subtracts only fully sourced known costs with exact bigint/rational arithmetic, and withholds net APY when scale, annualization, economics, liquidity, withdrawal, exposure, route history, or exact representability is missing. Supplied route references never become realized performance.
 
-The TermiX harness is also deliberately non-executing. It rejects mismatched paired declarations and enables a publishable comparison only after both runs carry complete, verified timing, cost, output, rubric, and receipt evidence. Exactly three local preregistrations bind the LP-trading, permission-security, and Venus-health protocols while leaving real inputs and runners `UNBOUND`; both methods remain `NOT RUN` and non-publishable:
+The TermiX harness is also deliberately non-executing. It rejects mismatched paired declarations and enables a task-level comparison only after both runs carry complete, verified timing, cost, output, rubric, and receipt evidence. Exactly three preregistrations bind the LP-trading, permission-security, and Venus-health protocols. All six timed lanes were retained under frozen declarations, then a protected owner-designated internal review materialized three verified derivatives and pair-bound adjudications without changing the source measurements:
 
 ```bash
 pnpm --filter @proofera/benchmarks typecheck
 pnpm --filter @proofera/benchmarks test
 ```
 
-The current benchmark/preregistration suite has 22 tests. Its local SHA-256 definition digests detect edits; they are not public timestamps, agent results, receipts, or advantage claims.
+The final digest-bound bundle is retained under [`evidence/submission/final/termix/`](./evidence/submission/final/termix/) and all three bounded tasks scored `100/100` in both lanes. This establishes neither a universal agent advantage nor a financial guarantee. The review has no cryptographically authenticated or external reviewer identity, no Sigstore attestation, and no transaction-authorizing effect. The benchmark package currently passes 112 deterministic tests.
 
 ## Data and environment labels
 

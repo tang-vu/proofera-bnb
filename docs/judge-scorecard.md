@@ -46,18 +46,18 @@ Eligibility story: prove a real, measurable benefit to an LP or trader; a logo o
 | Authentic Pancake product state | Exact-block public USDT/WBNB position capture and deterministic LP analysis retained      | Frozen controlled pool/position context                |
 | Real bounded operation          | Direct V3 selector/calldata and at-most-once boundaries implemented; no operation receipt | Successful controlled testnet transaction receipt      |
 | Before/after value              | Current capture identifies one-tick boundary risk but makes no performance claim          | Before/after range, fees, gas, slippage, and IL inputs |
-| Fair alternative                | LP TermiX protocol is preregistered but not run                                           | Frozen manual baseline and adjudicated pair            |
+| Fair alternative                | LP TermiX manual baseline and protected adjudication are retained                         | Controlled benefit run compared against that baseline  |
 
 ### TermiX
 
 Recorded rubric: service value 30%, measured agent advantage 30%, high-stakes category/track record 20%, and marketplace quality 20%. At least three real agent-versus-manual tasks must report time, cost, output quality, and raw outputs; at least one must be trading, equities, or security.
 
-| Weighted signal                  | ProofEra design                                                                      | Missing evidence                                                            |
-| -------------------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
-| Service value — 30%              | Marketplace discovery, four verified registrations, and fixed hire-gated agent lanes | Three verified hire receipts and the remaining permission-audit declaration |
-| Measured advantage — 30%         | Deterministic paired schema, fixed timing/cost/rubric, no inferred winner            | All six real method runs and independent adjudication                       |
-| High stakes / track record — 20% | Pancake LP, permission security, and Venus health protocols                          | Receipt-complete task inputs and observation limitations                    |
-| Marketplace quality — 20%        | Public four-category UI, proof room, evidence-first controls                         | Final zero-instruction hire journey and clean-room demo                     |
+| Weighted signal                  | ProofEra design                                                                                  | Missing evidence                                                      |
+| -------------------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| Service value — 30%              | Marketplace discovery, four verified registrations, three paid hires, and fixed hire-gated lanes | Final public-release availability remains open                        |
+| Measured advantage — 30%         | Six retained lanes, protected three-pair bundle, exact timing/cost/rubric, no inferred winner    | External/cryptographic reviewer identity is unavailable               |
+| High stakes / track record — 20% | Verified bounded Pancake LP analysis, permission security, and Venus health comparisons          | No live trading track record or realized financial outcome is claimed |
+| Marketplace quality — 20%        | Public four-category UI, proof room, evidence-first controls                                     | Final zero-instruction hire journey and clean-room demo               |
 
 The three frozen pairs are:
 
@@ -65,7 +65,7 @@ The three frozen pairs are:
 2. Altana/Pancake permission-security audit versus manual review.
 3. Venus health-factor decision versus manual analysis.
 
-Every method is still `NOT RUN`; no advantage may be narrated before the final paired report validates.
+All six methods and the protected final bundle are retained. Narration must remain task-specific: both lanes scored `100/100`, costs were explicit zero incremental native units, and timing directions differ. No universal advantage or financial guarantee may be claimed.
 
 ## Submission asset matrix
 

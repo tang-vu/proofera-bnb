@@ -105,9 +105,9 @@ Three preregistered pairs share fixed inputs and rubrics:
 
 Each pair reports wall time, operator-active time, sourced cost, output SHA-256, receipt joins, and predeclared quality scoring. Publication is rejected when either lane is incomplete or declarations differ.
 
-Pending chart: `[THREE PAIRED RESULTS — TIME / COST / QUALITY / LIMITATIONS]`.
+Retained chart values: LP `1.0738061 s` agent versus `620.5562401 s` manual; permission audit `2.3186555 s` agent versus `0.0127564 s` manual; Venus `0.8565091 s` agent versus `0.0100489 s` manual. Both lanes scored `100/100` with explicit-zero incremental native fees in all three bounded tasks.
 
-Current truth: harness and runners exist; every method remains `NOT RUN`.
+Current truth: all six lanes, three protected derivatives, three adjudications and the final bundle are retained. Timing directions differ, so no universal winner or financial guarantee is claimed. The review is owner-designated internal, not external, cryptographically identified or Sigstore-attested.
 
 ## Slide 9 — Defensibility and business model
 

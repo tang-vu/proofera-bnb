@@ -123,7 +123,7 @@ Acceptance criteria:
 - Proof Stream links raw source/transaction evidence; provider outage and stale cache behavior is observable.
 - Rate limiting, cache policy, retention, and optional PostgreSQL/indexer need are load-tested before infrastructure expansion.
 
-## Milestone 4 — partner-track proof (`PLANNED`)
+## Milestone 4 — partner-track proof (`IN PROGRESS`)
 
 Acceptance criteria:
 
@@ -141,9 +141,12 @@ without a registered ERC-8004 identity and independently verified hire
 receipt. The matching manual CLIs consume bounded LF-only UTF-8 NDJSON, perform
 no network or agent request themselves, timestamp positive operator work and
 write only new immutable captures. LP v2 also separates its mainnet source-data chain from testnet
-identity/hire receipts and preserves the never-run v1 definition. All six
-final timed lanes and three schema-valid observational pairs are retained. Every pair has an
-implementation-adjacent self-review, both run states remain `unverified`, and none is publishable.
+identity/hire receipts and preserves the never-run v1 definition. All six final timed lanes and
+three original schema-valid observational pairs are retained. Those source pairs remain unverified
+under their implementation-adjacent self-reviews. Protected packet v4 and the owner-designated
+internal review record separately bind three verified derivatives, three adjudications and the
+compiler-accepted final bundle without changing any source measurement. The TermiX readiness gate
+is verified for these bounded task-level comparisons only.
 Task 02 has a strict deterministic,
 read-only permission-audit engine that rejects unbound evidence, reports each
 seeded authority defect independently, emits all three required enforcement
@@ -172,17 +175,18 @@ access. The manual entry consumes bounded LF-only UTF-8 NDJSON so active work
 is timestamped as the operator emits each artifact/RPC/output event; it has no
 agent or network call. The real lifecycle-backed bundle and declaration are now
 published on source release `38046f87b87c27fc3a44b3855cc7e54a10e21d8a`.
-Finalized randomness block `126555555` forced manual-first; both exact invocations
-and raw captures are retained. The post-run compiler reproduced 18 findings,
-explicit-zero incremental costs and rubric parity at `100/100`, while keeping both
-evidence states `unverified`. The Task 02 implementation-adjacent self-review explicitly sets
-`secondReviewerIndependent: false`. The LP and Venus pair compiler also recomputed their fixed
-worksheets from retained bytes, recorded exact timing, explicit-zero incremental native fees and
-rubric parity at `100/100`, and emitted only unverified pairs plus non-independent self-reviews.
-The digest-bound `evidence/termix/reviewer-packets/20260822-v1/` handoff now exposes all required
-inputs and expected outputs without pretending its consumer is independent. A distinct second
-reviewer must emit new verified pairs and pair-bound adjudications before final three-pair
-compilation can run.
+Finalized randomness block `126555555` forced manual-first; both exact invocations and raw captures
+are retained. The post-run compiler reproduced 18 findings, explicit-zero incremental costs and
+rubric parity at `100/100`, while the original Task 02 pair correctly stayed unverified under its
+implementation-adjacent self-review. The LP and Venus source compilers likewise retained exact
+worksheets, timing, costs and non-independent self-reviews. Packet v4 later superseded the historical
+handoff, fixed all payload and runtime bindings, and was reviewed with zero P0/P1 findings by two
+owner-designated internal review roles. Review record
+`evidence/termix/reviews/independent/20260826-v4.json` materialized separate verified derivatives and
+pair-bound adjudications. The protected final compiler emitted the exact three-artifact bundle under
+`evidence/submission/final/termix/6d1adf3c948e49be7d9d42332df04904fdd43e3a/`. The reviewer
+identity is not cryptographically authenticated or external, no Sigstore attestation exists, and the
+result is neither transaction authorization nor a universal advantage claim.
 
 The Windows-host owner can start `Start ProofEra Ceremony.cmd` once to open a
 loopback-only guided worksheet. A root request on the loopback-only listener
@@ -265,27 +269,27 @@ separately approved final-recovery boundary with no deploy path, two immutable
 completed-hire prerequisites, only the Venus hire at nonce `8`, and a maximum
 total spend of `50000000000000 wei`.
 
-The create-only `capture:termix:hires` collector is also implemented and still
-non-invoked. Given the exact deployment and three hire hashes, it requires a
-clean published release, then joins normalized transactions, receipts and
-canonical blocks across the same two RPCs. At one common block at least 12 deep
-it verifies exact runtime bytes, ERC-8004 owners, decoded event fields, the
-contract's receipt-hash formula and each stored engagement receipt. Its output
+The create-only `capture:termix:hires` collector joined the exact deployment and
+three bounded hire transactions across both fixed RPCs. At common finalized
+block `125715654` it verified runtime bytes, ERC-8004 owners, decoded event
+fields, the contract receipt-hash formula and every stored engagement receipt.
+The retained manifest SHA-256 is
+`8a79415f0ab07ebab13d1174ca033536a53b55497fd167202b844e30a59072a8` and
 contains three byte-hashed `verifiedHireReceipt` objects accepted by the timed
-runner while keeping task completion, performance, execution authority and
-TermiX completion false. Four deterministic collector/validator tests pass;
-no receipt output exists before the approved transactions finalize.
+runners. This closes paid testnet commerce only; task completion and performance
+are established, where available, by the separate paired evidence rather than
+inferred from hire receipts.
 
-The Venus lane now has a real frozen public-replay input and fair order rather
-than placeholders. Source release `3ba85859ced39b457da819d27637d3fc02101c5d`
+The Venus lane uses a real frozen public-replay input and fair order rather than
+placeholders. Source release `3ba85859ced39b457da819d27637d3fc02101c5d`
 binds the retained two-provider window, non-authority account selection,
 read-only guardian policy, agent `1828`, endpoint/configuration and manual
 procedure. Declaration commit `e5c48b9` predates committed randomness block
 `125568071`; both RPCs agreed on the finalized block hash and LSB `0`, forcing
-agent-first. The retained declaration/order verifier passes. This closes only
-input and order preparation: hire, agent run, manual run, scoring, intervention
-and result claims remain false, and the forced manual run cannot legally start
-before the agent hire gate closes.
+agent-first. The valid replacement agent/manual lanes, scoring, protected
+derivative and adjudication are now retained. They prove only the frozen
+read-only replay and bounded `hold` decision, not intervention authority or a
+realized financial outcome.
 
 ## Milestone 5 — submission-grade product (`PLANNED`)
 

@@ -1,8 +1,8 @@
 # ProofEra agent advantage report
 
-Updated: 2026-08-22. Overall status: **THREE OBSERVATIONAL PAIRS RETAINED — NON-PUBLISHABLE**.
+Updated: 2026-08-26. Overall status: **THREE PROTECTED TASK-LEVEL PAIRS VERIFIED — BOUNDED CLAIM ONLY**.
 
-This is ProofEra's TermiX paired-experiment ledger. Exactly three ProofEra-versus-manual tasks are preregistered. The hire contract deployment and three paid BSC-testnet hires are independently finalized in [`125715654-7fa5ad3e.json`](../evidence/termix/hire-receipts/125715654-7fa5ad3e.json); they establish commerce prerequisites only. All six raw timed lanes and three schema-valid observational pairs are retained. Every pair has an implementation-adjacent self-review, while no task has independent adjudication and no compiler-accepted final verified three-pair report exists. No performance or advantage is claimed.
+This is ProofEra's TermiX paired-experiment ledger. Exactly three ProofEra-versus-manual tasks are preregistered. The hire contract deployment and three paid BSC-testnet hires are independently finalized in [`125715654-7fa5ad3e.json`](../evidence/termix/hire-receipts/125715654-7fa5ad3e.json); they establish commerce prerequisites only. All six raw timed lanes and the original unverified observational pairs remain immutable. Protected reviewer packet v4, one owner-designated internal independent-review record, three verified derivative pairs, three pair-bound adjudications and the compiler-accepted final bundle are now retained. All three tasks have rubric parity at `100/100`; there is no universal agent-advantage or financial-guarantee claim.
 
 ## Harness audit and preregistration boundary
 
@@ -40,11 +40,11 @@ Run order is chosen from recorded public randomness only after declaration freez
 
 Costs remain grouped by denomination; no hidden exchange-rate conversion or aggregate winner is inferred. A hard fail remains visible rather than being removed from the comparison.
 
-| Preregistered task                       | ProofEra-hired agent | Without agent    | Pair state              |
-| ---------------------------------------- | -------------------- | ---------------- | ----------------------- |
-| 01 — PancakeSwap LP range decision       | **RAW CAPTURED**     | **RAW CAPTURED** | unverified / not public |
-| 02 — autonomous-session permission audit | **RAW CAPTURED**     | **RAW CAPTURED** | unverified / not public |
-| 03 — Venus health-factor replay          | **RAW CAPTURED**     | **RAW CAPTURED** | unverified / not public |
+| Preregistered task                       | ProofEra-hired agent | Without agent    | Protected pair state       |
+| ---------------------------------------- | -------------------- | ---------------- | -------------------------- |
+| 01 — PancakeSwap LP range decision       | **RAW CAPTURED**     | **RAW CAPTURED** | verified / task-level only |
+| 02 — autonomous-session permission audit | **RAW CAPTURED**     | **RAW CAPTURED** | verified / task-level only |
+| 03 — Venus health-factor replay          | **RAW CAPTURED**     | **RAW CAPTURED** | verified / task-level only |
 
 ## Task 01 — PancakeSwap public-position LP range decision
 
@@ -52,13 +52,13 @@ Track alignment: trading, PancakeSwap, TermiX and the marketplace. Active prereg
 
 Exact task: from one immutable BSC-mainnet public USDT/WBNB Pancake V3 position bundle, validate the retained source and an exact-hash `slot0` replay; calculate in-range and boundary state; and return exact tick buffers, policy violations, supplied known economics, explicitly unavailable economics, a bounded decision, rationale and limitations. Position `7152618` belongs to an unrelated public address. Both methods are read-only and may never infer ProofEra ownership, authority, performance or execution.
 
-The shared candidate bundle is retained at [`116342186-7152618.canonical-json`](../evidence/termix/frozen/pancake-lp/116342186-7152618.canonical-json), logical SHA-256 `3459eb2566621c4d74acef68c84849e59b74214c7a21d7d20b8bbc6352dda945`. It binds the exact evidence-file digest, block/hash, pool, manager, position, expected tick and byte-equivalent agent request. The chain-97 registration, paid hire receipt, declaration, finalized agent-first order, both exact method invocations and both raw captures exist. The bundle remains an input, not a result; independent reobservation and adjudication remain absent.
+The shared candidate bundle is retained at [`116342186-7152618.canonical-json`](../evidence/termix/frozen/pancake-lp/116342186-7152618.canonical-json), logical SHA-256 `3459eb2566621c4d74acef68c84849e59b74214c7a21d7d20b8bbc6352dda945`. It binds the exact evidence-file digest, block/hash, pool, manager, position, expected tick and byte-equivalent agent request. The chain-97 registration, paid hire receipt, declaration, finalized agent-first order, both exact method invocations and both raw captures exist. The bundle remains an input rather than execution or ownership evidence; the later protected review reobserved its bounded public sources and preserved this non-authority boundary.
 
 Fixed constraints separate source-data chain 56 from ERC-8004/hire chain 97; require identical bundle and exact-hash `slot0` access; forbid all timed wallet/write activity and undeclared network access; and preserve the third-party non-authority label.
 
 Rubric (100): verified inputs 25; range/risk accuracy 25; economics/decision integrity 25; explanation/uncertainty 10; reproducibility 15. Wrong source/commerce chain, block/hash, contract, position, tick, evidence digest or RPC origin; any timed write/wallet use; any ownership/performance overclaim; fabricated value; undeclared access; or paired mismatch is a hard fail.
 
-Both fixed lanes used declaration SHA-256 `776c41fd1043d0541f2c67d2cb6a7306bf7738def026bb78b36b868b6ca9edd3`. The retained agent capture is `pancake-lp-agent-20260818-v4`; the retained manual capture is `pancake-lp-manual-20260818-v1`. Both returned `insufficient_evidence` from the same exact-hash source and preserve their unedited outputs, timing, receipts and limitations. The observational pair [`pancake-lp-pair-20260822-v1.json`](../evidence/termix/pairs/pancake-lp/pancake-lp-pair-20260822-v1.json), logical SHA-256 `41f0df2b0ad2886573cf9e1035b247f971a2fed493b083af87b3153fa6adc103`, recomputes the exact-hash tick/range worksheet, preserves unavailable economics, records `1,073,806,100 ns` agent versus `620,556,240,100 ns` manual, explicit zero incremental native fees, and rubric parity at `100/100`. Its implementation-adjacent self-review sets `secondReviewerIndependent: false`, so both evidence states remain `unverified`.
+Both fixed lanes used declaration SHA-256 `776c41fd1043d0541f2c67d2cb6a7306bf7738def026bb78b36b868b6ca9edd3`. The retained agent capture is `pancake-lp-agent-20260818-v4`; the retained manual capture is `pancake-lp-manual-20260818-v1`. Both returned `insufficient_evidence` from the same exact-hash source and preserve their unedited outputs, timing, receipts and limitations. The original observational pair [`pancake-lp-pair-20260822-v1.json`](../evidence/termix/pairs/pancake-lp/pancake-lp-pair-20260822-v1.json), logical SHA-256 `41f0df2b0ad2886573cf9e1035b247f971a2fed493b083af87b3153fa6adc103`, remains unverified under its implementation-adjacent self-review. The protected derivative [`pancake-lp-pair-20260822-v1-independent.json`](../evidence/termix/final-pairs/pancake-lp/pancake-lp-pair-20260822-v1-independent.json) preserves every measurement, records `1,073,806,100 ns` agent versus `620,556,240,100 ns` manual, explicit zero incremental native fees and rubric parity at `100/100`, and is bound to the retained independent-review record and adjudication.
 
 Available prerequisite commands—not experiment commands:
 
@@ -90,7 +90,7 @@ The manual CLI accepts only bounded LF-only UTF-8 NDJSON, makes no network or
 agent request itself, timestamps each operator event as consumed, and writes a
 new immutable capture beneath `evidence/termix/runs/pancake-lp/manual/`.
 
-Raw lanes and observational pair: **CAPTURED / UNVERIFIED**. Independent adjudication and publishable pair: **NOT RUN / NON-PUBLISHABLE**.
+Raw lanes and original observational pair: **CAPTURED / IMMUTABLE SOURCE**. Protected derivative and adjudication: **VERIFIED / TASK-LEVEL CLAIM ONLY**.
 
 ## Task 02 — Altana/Pancake autonomous-session permission audit
 
@@ -106,7 +106,7 @@ Rubric (100): true-positive coverage 35; false-positive discipline 15; impact/re
 
 Finalized two-provider randomness forced manual-first. Both exact invocations and both timed captures are retained. The manual lane recorded four fixed RPC observations without an agent call; the agent lane recorded the same four RPC observations plus one public A2A receipt. Both outputs contain the exact same 18 findings and corrected table, bind bundle SHA-256 `c50a2defc62a996cab8a8bf51be2b8b2bbe44cc007ea01e6d1512d7257a8f0cb`, and state `executionPerformed: false`.
 
-The create-only post-run compiler retained [`permission-audit-pair-20260822-v1.json`](../evidence/termix/pairs/permission-audit/permission-audit-pair-20260822-v1.json), logical pair SHA-256 `68fcb8e6aefe85db8e6b239f1471fc65baee4dd0dd8ab2cd70516bdd1def8153`. It records monotonic wall duration `12,756,400 ns` manual versus `2,318,655,500 ns` agent, explicit zero incremental tBNB fees in both timed lanes, and exact answer-key rubric parity at `100/100`. The implementation-adjacent [`self-review`](../evidence/termix/reviews/permission-audit/permission-audit-pair-20260822-v1-self-review.json) explicitly sets `secondReviewerIndependent: false`; both run evidence states therefore remain `unverified` and the pair summary is non-publishable. A distinct second reviewer must reobserve receipts, review the manual tool log and sign the exact pair digest before this pair can become verified.
+The create-only post-run compiler retained [`permission-audit-pair-20260822-v1.json`](../evidence/termix/pairs/permission-audit/permission-audit-pair-20260822-v1.json), logical pair SHA-256 `68fcb8e6aefe85db8e6b239f1471fc65baee4dd0dd8ab2cd70516bdd1def8153`. That source pair remains unverified under its implementation-adjacent [`self-review`](../evidence/termix/reviews/permission-audit/permission-audit-pair-20260822-v1-self-review.json). The protected derivative [`permission-audit-pair-20260822-v1-independent.json`](../evidence/termix/final-pairs/permission-audit/permission-audit-pair-20260822-v1-independent.json) preserves monotonic wall duration `12,756,400 ns` manual versus `2,318,655,500 ns` agent, explicit zero incremental tBNB fees and exact answer-key rubric parity at `100/100`; its evidence and adjudication are bound to the independent-review record.
 
 Available prerequisite commands—not paired audit execution:
 
@@ -115,7 +115,7 @@ pnpm --filter @proofera/integrations exec vitest run src/altana-lp-activation-co
 pnpm --filter @proofera/benchmarks test
 ```
 
-The create-only agent entrypoint is `pnpm run:termix:permission-audit-agent -- --execute-exact-permission-audit-agent-run --input-bundle evidence/termix/frozen/permission-audit/38046f87b87c-126543819.canonical-json`. It requires the byte-exact invocation on standard input, a clean published release, registered identity and verified hire before its fixed RPC/A2A lane can start. The create-only manual entrypoint uses that same bundle; its first bounded NDJSON line binds the request and subsequent lines are timestamped operator events consumed by the no-agent/no-network lane. Agent result: **RAW CAPTURED**. Manual result: **RAW CAPTURED**. Pair result: **SELF-REVIEWED / UNVERIFIED / NON-PUBLISHABLE**.
+The create-only agent entrypoint is `pnpm run:termix:permission-audit-agent -- --execute-exact-permission-audit-agent-run --input-bundle evidence/termix/frozen/permission-audit/38046f87b87c-126543819.canonical-json`. It requires the byte-exact invocation on standard input, a clean published release, registered identity and verified hire before its fixed RPC/A2A lane can start. The create-only manual entrypoint uses that same bundle; its first bounded NDJSON line binds the request and subsequent lines are timestamped operator events consumed by the no-agent/no-network lane. Agent result: **RAW CAPTURED**. Manual result: **RAW CAPTURED**. Protected pair result: **VERIFIED / TASK-LEVEL CLAIM ONLY**.
 
 ## Task 03 — Venus health-factor replay and intervention decision
 
@@ -129,7 +129,7 @@ The final shared input is now frozen at [`3ba85859ced3-125563831-125564152.canon
 
 The normalized declaration SHA-256 is `987a9e2a728807d6fbd4d5f1d9bb066187288320fa48ec62ab214d89aebed472`, bound to source release `3ba85859ced39b457da819d27637d3fc02101c5d` and ERC-8004 agent `1828`. It was published in commit `e5c48b9` before BSC-testnet randomness block `125568071`. Both fixed RPCs later agreed on hash `0x64e197a460b7edc8e015d9e10110eff0be37158100feaa230708991fcdce5d0c`; LSB `0` forces `agent` then `manual`. Retained verifier tests prove the publication ordering, finality, provider agreement, request/declaration digests and non-authority claims.
 
-The original frozen release was superseded after a manual-release scope drift was detected. The valid replacement declaration SHA-256 is `23e41675965eed45dbd876ab4fdb221c1d403f538b5088bc52dd5c722ab33924`, bound to source release `402edbeae429fd7c0a3d853b1e30208a26bba6f4`. Its valid retained lanes are `venus-health-agent-20260818-v2` and `venus-health-manual-20260818-v2`; both returned `hold`. Their observational pair and self-review are retained, but independent tool-log review and adjudication remain missing.
+The original frozen release was superseded after a manual-release scope drift was detected. The valid replacement declaration SHA-256 is `23e41675965eed45dbd876ab4fdb221c1d403f538b5088bc52dd5c722ab33924`, bound to source release `402edbeae429fd7c0a3d853b1e30208a26bba6f4`. Its valid retained lanes are `venus-health-agent-20260818-v2` and `venus-health-manual-20260818-v2`; both returned `hold`. Their original observational pair and self-review remain immutable source records; the later protected review and adjudication are retained separately.
 
 Rubric (100): state/calculation 30; threshold/latency 20; safe policy compliance 25; explanation/uncertainty 10; evidence/reproducibility 15. Wrong network/account/market/scale/oracle/window, floating-point financial arithmetic, stale-source substitution, unsupported intervention or any timed write is a hard fail.
 
@@ -173,11 +173,13 @@ The manual CLI consumes bounded LF-only UTF-8 NDJSON, makes no network or agent
 request itself, and writes create-only beneath
 `evidence/termix/runs/venus-health/manual/`.
 
-Request paths, run order and the paid hire receipt are **BOUND**. The valid replacement lanes completed on 2026-08-18 and retained `venus-health-agent-20260818-v2.json` plus `manual/venus-health-manual-20260818-v2.json`. The observational pair [`venus-health-pair-20260822-v1.json`](../evidence/termix/pairs/venus-health/venus-health-pair-20260822-v1.json), logical SHA-256 `2f3ac750834b93802b42f3317d35cfd82cb4381aec2497fb9b88232d6adca600`, recomputes all three integer 18-decimal health factors, their 144-second window and the bounded `hold` decision. It records `856,509,100 ns` agent versus `10,048,900 ns` manual, explicit zero incremental native fees and rubric parity at `100/100`. Its implementation-adjacent self-review sets `secondReviewerIndependent: false`; the exact values therefore remain non-publishable and no advantage is claimed.
+Request paths, run order and the paid hire receipt are **BOUND**. The valid replacement lanes completed on 2026-08-18 and retained `venus-health-agent-20260818-v2.json` plus `manual/venus-health-manual-20260818-v2.json`. The original observational pair [`venus-health-pair-20260822-v1.json`](../evidence/termix/pairs/venus-health/venus-health-pair-20260822-v1.json), logical SHA-256 `2f3ac750834b93802b42f3317d35cfd82cb4381aec2497fb9b88232d6adca600`, remains unverified under its implementation-adjacent self-review. The protected derivative [`venus-health-pair-20260822-v1-independent.json`](../evidence/termix/final-pairs/venus-health/venus-health-pair-20260822-v1-independent.json) preserves all three integer 18-decimal health factors, their 144-second window, the bounded `hold` decision, `856,509,100 ns` agent versus `10,048,900 ns` manual, explicit zero incremental native fees and rubric parity at `100/100`.
 
-## Independent-review handoff
+## Protected independent-review result
 
-The digest-bound [`20260822-v1 reviewer packet`](../evidence/termix/reviewer-packets/20260822-v1/) contains the three current unverified pairs, every retained source/capture digest, the post-run Task 02 answer key, expected reviewer output paths and the final compiler contract. The answer key was disclosed only after both blind Task 02 lanes ended. The packet is a handoff, not an adjudication: a distinct reviewer must reobserve sources and receipts, audit each manual boundary, recompute each rubric, emit new verified pairs and sign pair-bound adjudications. Existing artifacts must not be relabelled or changed in place.
+The superseding digest-bound [`20260826-v4 reviewer packet`](../evidence/termix/reviewer-packets/20260826-v4/manifest.json), SHA-256 `ace9453b52cd8735fe8bcbeca8f9ed22170852dc50f245ff4aaad60d0f9c97ac`, fixes three source pairs, 27 exact evidence items and eight protected runtime files. The owner-designated internal review record [`20260826-v4.json`](../evidence/termix/reviews/independent/20260826-v4.json), SHA-256 `827005010f8e8f58f77456effe47a78681651671ef4b6eb06553a5a2307a46ce`, records zero P0/P1/P2 findings and binds all three task outputs. The materializer permits only reviewer-bound verification, QA, evidence state and stale limitations to differ; declaration, method, timing, cost, artifact, receipt and reproduction fields must remain exact. It emitted three verified derivatives and three adjudications under `evidence/termix/final-pairs/` and `evidence/termix/adjudications/`.
+
+The compiler then produced `paired-report.json` (`4ef32457…ac98c`), `raw-runs.json` (`f3989781…b1e1`) and `adjudication.json` (`342b62cb…1ff0`) under [`evidence/submission/final/termix/6d1adf3c948e49be7d9d42332df04904fdd43e3a/`](../evidence/submission/final/termix/6d1adf3c948e49be7d9d42332df04904fdd43e3a/). The review is internal and owner-designated: reviewer identity is not cryptographically authenticated, no external independent review or Sigstore attestation exists, historical A2A calls were not reinvoked, future runtime/archive availability is not proven, and nothing in this review authorizes a transaction.
 
 ## Freeze, run and publication gates
 
@@ -207,4 +209,4 @@ their committed pair/adjudication paths. The generated files are create-only und
 `evidence/submission/final/termix/<releaseCommit>/`; their existence does not replace the required
 manual opening of explorer links and source artifacts.
 
-A task becomes publishable only when both complete runs are independently verified by the harness and every external receipt/source link is manually opened. “Agent advantage” is then reported per task and per measure only. Three experiments cannot support a universal productivity claim.
+Each current task is publishable only as the bounded comparison preserved in the final bundle. “Agent advantage” may be discussed per task and per measure only; the three results have equal quality scores and mixed timing directions, and cannot support a universal productivity or financial claim.
