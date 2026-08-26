@@ -61,7 +61,7 @@ function source(index: number) {
     adjudicationPath: `evidence/termix/adjudications/${taskId}.json`,
     adjudicationBytesSha256: required([SHA_C, SHA_B, SHA_A][index]),
     adjudication: {
-      schemaVersion: "proofera-termix-adjudication-v2.0.0",
+      schemaVersion: "proofera-termix-adjudication-v3.0.0",
       taskId,
       pairId: pairSummary.pairId,
       pairSha256: pairSummary.pairSha256,

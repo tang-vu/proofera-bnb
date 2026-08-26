@@ -8,7 +8,7 @@ import {
   TERMIX_REVIEW_TASK_IDS,
   TermixProtectedIndependentAdjudicationSchema,
   TermixIndependentReviewRecordSchema,
-  TermixReviewerPacketV2Schema,
+  TermixReviewerPacketV3Schema,
   assertTermixAdjudicationBinding,
   benchmarkDeclarationSha256,
   canonicalJson,
@@ -20,8 +20,8 @@ import {
 const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const EXECUTE_FLAG = "--materialize-exact-termix-independent-review";
 const SOURCE_COMMIT_ARGUMENT = "--source-base-commit";
-const PACKET_PATH = "evidence/termix/reviewer-packets/20260826-v2/manifest.json";
-const REVIEW_RECORD_PATH = "evidence/termix/reviews/independent/20260826-v2.json";
+const PACKET_PATH = "evidence/termix/reviewer-packets/20260826-v3/manifest.json";
+const REVIEW_RECORD_PATH = "evidence/termix/reviews/independent/20260826-v3.json";
 const MAXIMUM_ARTIFACT_BYTES = 8_000_000;
 const MAXIMUM_GIT_OUTPUT_BYTES = 10_000_000;
 
@@ -133,7 +133,7 @@ async function pathDoesNotExist(path: string): Promise<boolean> {
   }
 }
 
-async function verifyContract(packet: ReturnType<typeof TermixReviewerPacketV2Schema.parse>) {
+async function verifyContract(packet: ReturnType<typeof TermixReviewerPacketV3Schema.parse>) {
   for (const runtimeFile of packet.reviewContract.runtimeFiles) {
     if (sha256Bytes(await readExactTracked(runtimeFile.path)) !== runtimeFile.sha256) {
       fail("TERMIX_REVIEW_CONTRACT_DRIFT");
@@ -158,7 +158,7 @@ async function main(): Promise<void> {
   verifyRelease(sourceCommit);
 
   const packetBytes = await readExactTracked(PACKET_PATH);
-  const packet = TermixReviewerPacketV2Schema.parse(
+  const packet = TermixReviewerPacketV3Schema.parse(
     parseJson(packetBytes, "TERMIX_REVIEW_PACKET_JSON_INVALID")
   );
   const reviewRecordBytes = await readExactTracked(REVIEW_RECORD_PATH);
@@ -229,7 +229,7 @@ async function main(): Promise<void> {
     }
 
     const adjudication = TermixProtectedIndependentAdjudicationSchema.parse({
-      schemaVersion: "proofera-termix-adjudication-v2.0.0",
+      schemaVersion: "proofera-termix-adjudication-v3.0.0",
       taskId,
       pairId: verifiedPair.pairId,
       pairSha256: after.pairSha256,

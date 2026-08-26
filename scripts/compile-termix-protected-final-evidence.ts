@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   TermixIndependentReviewRecordSchema,
-  TermixReviewerPacketV2Schema,
+  TermixReviewerPacketV3Schema,
   TermixProtectedIndependentAdjudicationSchema,
   assertTermixAdjudicationBinding,
   canonicalJson,
@@ -284,7 +284,7 @@ async function buildSources(sources: readonly SourceInvocation[]) {
       if (sha256Bytes(packetBytes) !== adjudication.packetBytesSha256) {
         fail("TERMIX_FINAL_REVIEW_PACKET_BYTES_DRIFT");
       }
-      const packet = TermixReviewerPacketV2Schema.parse(
+      const packet = TermixReviewerPacketV3Schema.parse(
         parseJson(packetBytes, "TERMIX_FINAL_REVIEW_PACKET_JSON_INVALID")
       );
       await verifyPacketContract(packet);

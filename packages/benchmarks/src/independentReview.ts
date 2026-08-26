@@ -16,8 +16,8 @@ import {
 export const TERMIX_INDEPENDENT_REVIEW_SCHEMA_VERSION =
   "proofera-termix-independent-review-v2.0.0" as const;
 export const TERMIX_REVIEWER_PACKET_SCHEMA_VERSION =
-  "proofera-termix-reviewer-packet-v2.0.0" as const;
-export const TERMIX_ADJUDICATION_SCHEMA_VERSION = "proofera-termix-adjudication-v2.0.0" as const;
+  "proofera-termix-reviewer-packet-v3.0.0" as const;
+export const TERMIX_ADJUDICATION_SCHEMA_VERSION = "proofera-termix-adjudication-v3.0.0" as const;
 
 export const TERMIX_REVIEW_TASK_IDS = [
   "pancake-lp-range-decision",
@@ -64,6 +64,7 @@ export const TermixIndependentReviewChecksSchema = z.strictObject({
 export const TermixReviewEvidenceSchema = z.strictObject({
   path: RepositoryPathSchema,
   sha256: Sha256Schema,
+  payloadSha256: Sha256Schema.optional(),
   purpose: z.string().trim().min(1).max(1_000)
 });
 
@@ -136,7 +137,7 @@ export const TermixIndependentReviewRecordSchema = z
     }
   });
 
-export const TermixReviewerPacketV2Schema = z
+export const TermixReviewerPacketV3Schema = z
   .strictObject({
     schemaVersion: z.literal(TERMIX_REVIEWER_PACKET_SCHEMA_VERSION),
     packetId: BenchmarkIdSchema,
@@ -190,7 +191,10 @@ export const TermixReviewerPacketV2Schema = z
     generatedFrom: z.strictObject({
       sourceCommit: GitCommitShaSchema,
       packetV1Path: RepositoryPathSchema,
-      packetV1BytesSha256: Sha256Schema
+      packetV1BytesSha256: Sha256Schema,
+      supersededPacketPath: RepositoryPathSchema,
+      supersededPacketBytesSha256: Sha256Schema,
+      supersessionReason: z.string().trim().min(1).max(1_000)
     })
   })
   .superRefine((packet, context) => {
