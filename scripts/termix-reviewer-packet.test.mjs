@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
+import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
-import { access, readFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const MANIFEST_PATH = "evidence/termix/reviewer-packets/20260822-v1/manifest.json";
@@ -12,6 +14,7 @@ const TASK_IDS = [
   "autonomous-session-permission-audit",
   "venus-health-factor-decision"
 ];
+const execFileAsync = promisify(execFile);
 
 function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
@@ -27,6 +30,13 @@ async function json(path) {
 
 test("reviewer packet binds three unverified pairs without inventing independence", async () => {
   const manifest = await json(MANIFEST_PATH);
+  const { stdout: packetCommitOutput } = await execFileAsync(
+    "git",
+    ["log", "-1", "--format=%H", "--", MANIFEST_PATH],
+    { cwd: ROOT, encoding: "utf8", windowsHide: true }
+  );
+  const packetCommit = packetCommitOutput.trim();
+  assert.match(packetCommit, /^[0-9a-f]{40}$/u);
   assert.equal(manifest.schemaVersion, "proofera-termix-reviewer-packet-v1.0.0");
   assert.equal(manifest.state, "awaiting_independent_reviewer");
   assert.equal(manifest.independentReviewComplete, false);
@@ -64,8 +74,20 @@ test("reviewer packet binds three unverified pairs without inventing independenc
       }
     }
 
-    await assert.rejects(access(resolve(ROOT, task.reviewerMustProduce.verifiedPairPath)));
-    await assert.rejects(access(resolve(ROOT, task.reviewerMustProduce.adjudicationPath)));
+    await assert.rejects(
+      execFileAsync(
+        "git",
+        ["cat-file", "-e", `${packetCommit}:${task.reviewerMustProduce.verifiedPairPath}`],
+        { cwd: ROOT, encoding: "utf8", windowsHide: true }
+      )
+    );
+    await assert.rejects(
+      execFileAsync(
+        "git",
+        ["cat-file", "-e", `${packetCommit}:${task.reviewerMustProduce.adjudicationPath}`],
+        { cwd: ROOT, encoding: "utf8", windowsHide: true }
+      )
+    );
   }
 });
 

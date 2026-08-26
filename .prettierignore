@@ -38,6 +38,10 @@ evidence/termix/runs/pancake-lp/pancake-lp-agent-20260818-v4.json
 # Byte-exact canonical outputs from the operator-confirmed no-agent timed runners.
 evidence/termix/runs/pancake-lp/manual/*.json
 evidence/termix/runs/venus-health/manual/*.json
+# Byte-exact canonical independent-review records and protected materializations.
+evidence/termix/reviews/independent/*.json
+evidence/termix/final-pairs/**/*.json
+evidence/termix/adjudications/**/*.json
 # Byte-exact JSON.stringify output from the LP declaration freezer.
 evidence/termix/declarations/pancake-lp/68dc21421c60-125719944.json
 evidence/termix/declarations/pancake-lp/6e657638c684-125722978.json

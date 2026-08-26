@@ -35,3 +35,9 @@ evidence/development/pancake-v3-pool-and-deployer-compiler-input-2026-08-13.json
 evidence/development/pancake-v3-pool-init-code-artifacts-2026-08-13.json text eol=lf
 evidence/development/pancake-v3-pool-init-code-provenance-2026-08-13.json text eol=lf
 evidence/development/pancake-v3-pool-init-code-source-bindings-2026-08-13.json text eol=lf
+
+# TermiX review contracts and evidence use byte-exact SHA-256 bindings on Windows.
+packages/benchmarks/src/*.ts text eol=lf
+scripts/*termix*.mjs text eol=lf
+scripts/*termix*.ts text eol=lf
+evidence/termix/**/*.json text eol=lf
