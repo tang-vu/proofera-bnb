@@ -11,6 +11,8 @@ const EXACT_ENTRYPOINTS = new Set([
   resolvePath(REPOSITORY_ROOT, "scripts/freeze-termix-permission-audit-declaration.ts"),
   resolvePath(REPOSITORY_ROOT, "scripts/freeze-termix-venus-health-declaration.ts"),
   resolvePath(REPOSITORY_ROOT, "scripts/compile-termix-final-evidence.ts"),
+  resolvePath(REPOSITORY_ROOT, "scripts/compile-termix-protected-final-evidence.ts"),
+  resolvePath(REPOSITORY_ROOT, "scripts/materialize-termix-independent-review.ts"),
   resolvePath(REPOSITORY_ROOT, "scripts/compile-termix-observational-pairs.ts"),
   resolvePath(REPOSITORY_ROOT, "scripts/compile-termix-permission-audit-pair.ts"),
   resolvePath(REPOSITORY_ROOT, "scripts/run-termix-venus-health-agent.ts"),

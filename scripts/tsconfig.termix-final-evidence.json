@@ -4,5 +4,9 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["compile-termix-final-evidence.ts"]
+  "include": [
+    "compile-termix-final-evidence.ts",
+    "compile-termix-protected-final-evidence.ts",
+    "materialize-termix-independent-review.ts"
+  ]
 }

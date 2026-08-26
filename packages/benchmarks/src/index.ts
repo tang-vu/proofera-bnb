@@ -1,5 +1,6 @@
 export * from "./canonical.js";
 export * from "./finalReport.js";
+export * from "./independentReview.js";
 export * from "./observationalPair.js";
 export * from "./pair.js";
 export * from "./permissionAudit.js";
