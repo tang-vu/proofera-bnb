@@ -74,7 +74,7 @@ const PINNED_POWERSHELL_EXECUTABLE =
   "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
 const PINNED_POWERSHELL_SHA256 = "9785001b0dcf755eddb8af294a373c0b87b2498660f724e76c4d53f9c217c7a3";
 const OWNER_CONFIRMATION_PROTOCOL =
-  "ProofEra:bsc-testnet-pta-wbnb-first-lp-owner-exact-byte-confirmation:v6" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-first-lp-owner-exact-byte-confirmation:v7" as const;
 const OWNER_CONFIRMATION_DECISION =
   "CONFIRM_ONE_EXACT_TESTNET_LP_APPROVE_AND_MINT_NO_RETRY_NO_REPLACEMENT" as const;
 const LOCAL_APPLICATION_DATA_SCRIPT = String.raw`
@@ -203,6 +203,26 @@ export class BscTestnetPtaWbnbLpExecutionFailure extends Error {
   constructor(code: BscTestnetPtaWbnbLpExecutionFailure["code"]) {
     super("The exact BSC-testnet PTA/WBNB LP operation failed closed.");
     this.code = code;
+  }
+}
+
+export type BscTestnetPtaWbnbLpCustodySigningProbeStage =
+  | "platform"
+  | "runtime_precheck"
+  | "custody_location"
+  | "metadata_acl"
+  | "artifact_read"
+  | "artifact_hash"
+  | "dpapi_unprotect"
+  | "keystore_unlock"
+  | "postcheck"
+  | "runtime_postcheck";
+
+class BscTestnetPtaWbnbLpCustodySigningProbeFailure extends Error {
+  override readonly name = "BscTestnetPtaWbnbLpCustodySigningProbeFailure";
+
+  constructor(readonly stage: BscTestnetPtaWbnbLpCustodySigningProbeStage) {
+    super("The bounded LP signing-custody probe failed safely.");
   }
 }
 
@@ -915,11 +935,10 @@ function serializeAndSignExactTransaction(
   }
 }
 
-async function signEncryptedStore(
+async function unlockEncryptedStoreSecretForSigning(
   storeBytes: Buffer,
-  passwordBytes: Buffer,
-  transaction: BscTestnetPtaWbnbLpExactExecutionTransaction
-): Promise<BscTestnetPtaWbnbLpSignedTransaction> {
+  passwordBytes: Buffer
+): Promise<Buffer> {
   let parsed: ReturnType<typeof parseBscTestnetDeployerEncryptedStore> = null;
   let derivedKey: Buffer | null = null;
   let macMaterial: Buffer | null = null;
@@ -953,7 +972,7 @@ async function signEncryptedStore(
     }
     const ownedScalar = secretScalar;
     secretScalar = null;
-    return serializeAndSignExactTransaction(ownedScalar, transaction);
+    return ownedScalar;
   } finally {
     storeBytes.fill(0);
     passwordBytes.fill(0);
@@ -966,6 +985,126 @@ async function signEncryptedStore(
     parsed?.iv.fill(0);
     parsed?.mac.fill(0);
     parsed?.salt.fill(0);
+  }
+}
+
+async function prepareBscTestnetPtaWbnbLpSigningSecretForInternalUse(): Promise<Buffer> {
+  let stage: BscTestnetPtaWbnbLpCustodySigningProbeStage = "platform";
+  let storeBytes: Buffer | null = null;
+  let protectedBytes: Buffer | null = null;
+  let passwordBytes: Buffer | null = null;
+  let executableBytes: Buffer | null = null;
+  let secretScalar: Buffer | null = null;
+  try {
+    if (process.platform !== "win32") {
+      throw new Error("platform");
+    }
+    const signal = new AbortController().signal;
+    stage = "runtime_precheck";
+    await assertPinnedDeterministicSigningRuntimeForInternalUse();
+    stage = "custody_location";
+    const custody = await resolveFixedCustody();
+    stage = "metadata_acl";
+    const readiness = await probeWindowsBscTestnetDeployerCustodyMetadataForInternalUse(
+      custody,
+      signal
+    );
+    if (readiness.status !== "ready") throw new Error("metadata");
+    stage = "artifact_read";
+    const paths = await inspectCustodyPaths(custody);
+    const [storeFile, protectedFile, executableFile] = await Promise.all([
+      readStableRegularFile(paths.storePath, MAXIMUM_STORE_BYTES),
+      readStableRegularFile(paths.protectedBlobPath, MAXIMUM_PROTECTED_BLOB_BYTES),
+      readStableRegularFile(PINNED_POWERSHELL_EXECUTABLE, 1_048_576, false)
+    ]);
+    storeBytes = storeFile.bytes;
+    protectedBytes = protectedFile.bytes;
+    executableBytes = executableFile.bytes;
+    stage = "artifact_hash";
+    if (
+      sha256Hex(storeBytes) !== BSC_TESTNET_DEPLOYER_STORE_SHA256 ||
+      sha256Hex(protectedBytes) !== BSC_TESTNET_DEPLOYER_PROTECTED_BLOB_SHA256 ||
+      sha256Hex(executableBytes) !== PINNED_POWERSHELL_SHA256
+    ) {
+      throw new Error("artifact hash");
+    }
+    executableBytes.fill(0);
+    executableBytes = null;
+    stage = "dpapi_unprotect";
+    const unprotected = await runPinnedPowerShellForInternalUse(
+      DPAPI_UNPROTECT_SCRIPT,
+      protectedBytes,
+      PASSWORD_BYTES,
+      signal
+    );
+    passwordBytes = unprotected.output;
+    stage = "keystore_unlock";
+    secretScalar = await unlockEncryptedStoreSecretForSigning(storeBytes, passwordBytes);
+    storeBytes = null;
+    passwordBytes = null;
+    stage = "postcheck";
+    const afterPaths = await inspectCustodyPaths(custody);
+    if (
+      afterPaths.storePath !== paths.storePath ||
+      afterPaths.protectedBlobPath !== paths.protectedBlobPath
+    ) {
+      throw new Error("path drift");
+    }
+    const [afterStore, afterProtected] = await Promise.all([
+      readStableRegularFile(afterPaths.storePath, MAXIMUM_STORE_BYTES),
+      readStableRegularFile(afterPaths.protectedBlobPath, MAXIMUM_PROTECTED_BLOB_BYTES)
+    ]);
+    try {
+      if (
+        !sameSnapshot(afterStore.snapshot, storeFile.snapshot) ||
+        !sameSnapshot(afterProtected.snapshot, protectedFile.snapshot) ||
+        sha256Hex(afterStore.bytes) !== BSC_TESTNET_DEPLOYER_STORE_SHA256 ||
+        sha256Hex(afterProtected.bytes) !== BSC_TESTNET_DEPLOYER_PROTECTED_BLOB_SHA256
+      ) {
+        throw new Error("artifact drift");
+      }
+    } finally {
+      afterStore.bytes.fill(0);
+      afterProtected.bytes.fill(0);
+    }
+    stage = "runtime_postcheck";
+    await assertPinnedDeterministicSigningRuntimeForInternalUse();
+    const ownedScalar = secretScalar;
+    secretScalar = null;
+    return ownedScalar;
+  } catch (error) {
+    if (error instanceof BscTestnetPtaWbnbLpCustodySigningProbeFailure) throw error;
+    throw new BscTestnetPtaWbnbLpCustodySigningProbeFailure(stage);
+  } finally {
+    storeBytes?.fill(0);
+    protectedBytes?.fill(0);
+    passwordBytes?.fill(0);
+    executableBytes?.fill(0);
+    secretScalar?.fill(0);
+  }
+}
+
+export async function probeBscTestnetPtaWbnbLpSigningCustodyForInternalUse(): Promise<
+  | Readonly<{ status: "ready" }>
+  | Readonly<{
+      status: "unavailable";
+      stage: BscTestnetPtaWbnbLpCustodySigningProbeStage | "unknown";
+    }>
+> {
+  let secretScalar: Buffer | null = null;
+  try {
+    secretScalar = await prepareBscTestnetPtaWbnbLpSigningSecretForInternalUse();
+    return Object.freeze({ status: "ready" as const });
+  } catch (error) {
+    return Object.freeze({
+      status: "unavailable" as const,
+      stage:
+        error instanceof BscTestnetPtaWbnbLpCustodySigningProbeFailure
+          ? error.stage
+          : ("unknown" as const)
+    });
+  } finally {
+    secretScalar?.fill(0);
   }
 }
 
@@ -1037,88 +1176,23 @@ export async function signBscTestnetPtaWbnbLpExactTransactionForInternalUse(
     throw new BscTestnetPtaWbnbLpExecutionFailure("SIGNING_FAILED");
   }
   signedOrders.add(order);
-  if (process.platform !== "win32") {
-    throw new BscTestnetPtaWbnbLpExecutionFailure("CUSTODY_UNAVAILABLE");
-  }
-  const signal = new AbortController().signal;
-  let storeBytes: Buffer | null = null;
-  let protectedBytes: Buffer | null = null;
-  let passwordBytes: Buffer | null = null;
-  let executableBytes: Buffer | null = null;
+  let secretScalar: Buffer | null = null;
   try {
-    await assertPinnedDeterministicSigningRuntimeForInternalUse();
-    const custody = await resolveFixedCustody();
-    const readiness = await probeWindowsBscTestnetDeployerCustodyMetadataForInternalUse(
-      custody,
-      signal
-    );
-    if (readiness.status !== "ready") {
-      throw new BscTestnetPtaWbnbLpExecutionFailure("CUSTODY_UNAVAILABLE");
-    }
-    const paths = await inspectCustodyPaths(custody);
-    const [storeFile, protectedFile, executableFile] = await Promise.all([
-      readStableRegularFile(paths.storePath, MAXIMUM_STORE_BYTES),
-      readStableRegularFile(paths.protectedBlobPath, MAXIMUM_PROTECTED_BLOB_BYTES),
-      readStableRegularFile(PINNED_POWERSHELL_EXECUTABLE, 1_048_576, false)
-    ]);
-    storeBytes = storeFile.bytes;
-    protectedBytes = protectedFile.bytes;
-    executableBytes = executableFile.bytes;
-    if (
-      sha256Hex(storeBytes) !== BSC_TESTNET_DEPLOYER_STORE_SHA256 ||
-      sha256Hex(protectedBytes) !== BSC_TESTNET_DEPLOYER_PROTECTED_BLOB_SHA256 ||
-      sha256Hex(executableBytes) !== PINNED_POWERSHELL_SHA256
-    ) {
-      throw new BscTestnetPtaWbnbLpExecutionFailure("CUSTODY_UNAVAILABLE");
-    }
-    executableBytes.fill(0);
-    executableBytes = null;
-    const unprotected = await runPinnedPowerShellForInternalUse(
-      DPAPI_UNPROTECT_SCRIPT,
-      protectedBytes,
-      PASSWORD_BYTES,
-      signal
-    );
-    passwordBytes = unprotected.output;
-    const signed = await signEncryptedStore(storeBytes, passwordBytes, transaction);
-    storeBytes = null;
-    passwordBytes = null;
-    const afterPaths = await inspectCustodyPaths(custody);
-    if (
-      afterPaths.storePath !== paths.storePath ||
-      afterPaths.protectedBlobPath !== paths.protectedBlobPath
-    ) {
-      throw new BscTestnetPtaWbnbLpExecutionFailure("CUSTODY_UNAVAILABLE");
-    }
-    const [afterStore, afterProtected] = await Promise.all([
-      readStableRegularFile(afterPaths.storePath, MAXIMUM_STORE_BYTES),
-      readStableRegularFile(afterPaths.protectedBlobPath, MAXIMUM_PROTECTED_BLOB_BYTES)
-    ]);
-    try {
-      if (
-        !sameSnapshot(afterStore.snapshot, storeFile.snapshot) ||
-        !sameSnapshot(afterProtected.snapshot, protectedFile.snapshot) ||
-        sha256Hex(afterStore.bytes) !== BSC_TESTNET_DEPLOYER_STORE_SHA256 ||
-        sha256Hex(afterProtected.bytes) !== BSC_TESTNET_DEPLOYER_PROTECTED_BLOB_SHA256
-      ) {
-        throw new BscTestnetPtaWbnbLpExecutionFailure("CUSTODY_UNAVAILABLE");
-      }
-    } finally {
-      afterStore.bytes.fill(0);
-      afterProtected.bytes.fill(0);
-    }
+    secretScalar = await prepareBscTestnetPtaWbnbLpSigningSecretForInternalUse();
     if (Date.now() >= authorization.executionExpiresAtMilliseconds) {
       throw new BscTestnetPtaWbnbLpExecutionFailure("CONFIRMATION_EXPIRED");
     }
-    await assertPinnedDeterministicSigningRuntimeForInternalUse();
+    const ownedScalar = secretScalar;
+    secretScalar = null;
+    const signed = serializeAndSignExactTransaction(ownedScalar, transaction);
     return await assertSignedTransaction(signed, transaction);
   } catch (error) {
+    if (error instanceof BscTestnetPtaWbnbLpCustodySigningProbeFailure) {
+      throw new BscTestnetPtaWbnbLpExecutionFailure("CUSTODY_UNAVAILABLE");
+    }
     if (error instanceof BscTestnetPtaWbnbLpExecutionFailure) throw error;
     throw new BscTestnetPtaWbnbLpExecutionFailure("SIGNING_FAILED");
   } finally {
-    storeBytes?.fill(0);
-    protectedBytes?.fill(0);
-    passwordBytes?.fill(0);
-    executableBytes?.fill(0);
+    secretScalar?.fill(0);
   }
 }

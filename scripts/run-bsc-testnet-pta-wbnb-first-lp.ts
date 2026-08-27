@@ -50,6 +50,7 @@ import {
   confirmBscTestnetPtaWbnbLpOwnerChallengeForInternalUse,
   createBscTestnetPtaWbnbLpOwnerChallengeForInternalUse,
   parseBscTestnetPtaWbnbLpExactExecutionPlanForInternalUse,
+  probeBscTestnetPtaWbnbLpSigningCustodyForInternalUse,
   signBscTestnetPtaWbnbLpExactTransactionForInternalUse,
   type BscTestnetPtaWbnbLpConfirmedExecution,
   type BscTestnetPtaWbnbLpExactExecutionPlan,
@@ -58,7 +59,7 @@ import {
 } from "../packages/integrations/src/bsc-testnet-pta-wbnb-lp-execution.server.ts";
 import {
   BscTestnetPtaWbnbLpJournalFailure,
-  assertRetiredWindowsBscTestnetPtaWbnbLpV1V2V3BoundedForInternalUse,
+  assertRetiredWindowsBscTestnetPtaWbnbLpV1V2V3V4BoundedForInternalUse,
   createWindowsBscTestnetPtaWbnbLpJournalForInternalUse,
   type BscTestnetPtaWbnbLpJournal,
   type BscTestnetPtaWbnbLpJournalState,
@@ -68,6 +69,7 @@ import {
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const EXACT_EXECUTION_FLAG = "--execute-exact-first-lp-chain-97";
 const READ_ONLY_REHEARSAL_FLAG = "--rehearse-read-only-first-lp-chain-97";
+const NO_SIGN_CUSTODY_PROBE_FLAG = "--probe-no-sign-custody-first-lp-chain-97";
 const MAXIMUM_RPC_RESPONSE_BYTES = 1_048_576;
 const RPC_TIMEOUT_MILLISECONDS = 12_000;
 const RECEIPT_TIMEOUT_MILLISECONDS = 90_000;
@@ -1617,13 +1619,32 @@ async function main(): Promise<void> {
   const mode = process.argv[2];
   if (
     process.argv.length !== 3 ||
-    (mode !== EXACT_EXECUTION_FLAG && mode !== READ_ONLY_REHEARSAL_FLAG)
+    (mode !== EXACT_EXECUTION_FLAG &&
+      mode !== READ_ONLY_REHEARSAL_FLAG &&
+      mode !== NO_SIGN_CUSTODY_PROBE_FLAG)
   ) {
     fail("ARGUMENTS_INVALID");
   }
   await assertExactRuntimeInvocation();
   const release = await inspectRelease();
-  await assertRetiredWindowsBscTestnetPtaWbnbLpV1V2V3BoundedForInternalUse();
+  await assertRetiredWindowsBscTestnetPtaWbnbLpV1V2V3V4BoundedForInternalUse();
+  if (mode === NO_SIGN_CUSTODY_PROBE_FLAG) {
+    const result = await probeBscTestnetPtaWbnbLpSigningCustodyForInternalUse();
+    process.stdout.write(
+      `${JSON.stringify({
+        status: result.status === "ready" ? "custody_signing_path_ready" : "blocked",
+        stage: result.status === "ready" ? "complete" : result.stage,
+        custodyAccessed: true,
+        privateKeyReturned: false,
+        journalV5Created: false,
+        signed: false,
+        broadcast: false,
+        mainnetWritePossible: false
+      })}\n`
+    );
+    if (result.status !== "ready") process.exitCode = 1;
+    return;
+  }
   if (mode === READ_ONLY_REHEARSAL_FLAG) {
     const scopeClients = createFixedOfficialBscTestnetPtaWbnbLpRpcClients();
     const scope = await prepareBscTestnetPtaWbnbLpExactScope({
@@ -1648,7 +1669,7 @@ async function main(): Promise<void> {
         exactScopeSha256: plan.exactScopeSha256,
         preSubmissionPasses: 3,
         custodyAccessed: false,
-        journalV4Created: false,
+        journalV5Created: false,
         signed: false,
         broadcast: false,
         mainnetWritePossible: false
