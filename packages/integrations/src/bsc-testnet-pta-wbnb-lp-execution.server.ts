@@ -743,6 +743,7 @@ function sameSnapshot(left: FileSnapshot, right: FileSnapshot): boolean {
 async function readStableRegularFile(
   path: string,
   maximumBytes: number,
+  requireSingleLink = true,
   secret = true
 ): Promise<Readonly<{ bytes: Buffer; snapshot: FileSnapshot }>> {
   const handle = await open(path, fileConstants.O_RDONLY | fileConstants.O_NOFOLLOW);
@@ -752,7 +753,7 @@ async function readStableRegularFile(
     if (
       !before.isFile() ||
       before.isSymbolicLink() ||
-      before.nlink !== 1n ||
+      (requireSingleLink && before.nlink !== 1n) ||
       before.size > BigInt(maximumBytes)
     ) {
       throw new BscTestnetPtaWbnbLpExecutionFailure("CUSTODY_UNAVAILABLE");
@@ -1015,7 +1016,7 @@ async function prepareBscTestnetPtaWbnbLpSigningSecretForInternalUse(): Promise<
     const [storeFile, protectedFile, executableFile] = await Promise.all([
       readStableRegularFile(paths.storePath, MAXIMUM_STORE_BYTES),
       readStableRegularFile(paths.protectedBlobPath, MAXIMUM_PROTECTED_BLOB_BYTES),
-      readStableRegularFile(PINNED_POWERSHELL_EXECUTABLE, 1_048_576, false)
+      readStableRegularFile(PINNED_POWERSHELL_EXECUTABLE, 1_048_576, false, false)
     ]);
     storeBytes = storeFile.bytes;
     protectedBytes = protectedFile.bytes;

@@ -482,6 +482,18 @@ describe("first-LP runner source boundary", () => {
     expect(execution).toContain('stage = "runtime_postcheck"');
   });
 
+  it("allows Windows servicing hard links only for the hash-pinned PowerShell executable", () => {
+    const execution = readFileSync(EXECUTION_PATH, "utf8");
+    expect(execution).toContain("(requireSingleLink && before.nlink !== 1n)");
+    expect(execution).toContain(
+      "readStableRegularFile(PINNED_POWERSHELL_EXECUTABLE, 1_048_576, false, false)"
+    );
+    expect(execution).toContain("readStableRegularFile(paths.storePath, MAXIMUM_STORE_BYTES)");
+    expect(execution).toContain(
+      "readStableRegularFile(paths.protectedBlobPath, MAXIMUM_PROTECTED_BLOB_BYTES)"
+    );
+  });
+
   it("keeps private bytes out of output and package exports", () => {
     const source = [
       readFileSync(RUNNER_PATH, "utf8"),
