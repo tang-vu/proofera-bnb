@@ -75,7 +75,7 @@ const PINNED_POWERSHELL_EXECUTABLE =
   "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
 const PINNED_POWERSHELL_SHA256 = "9785001b0dcf755eddb8af294a373c0b87b2498660f724e76c4d53f9c217c7a3";
 const OWNER_CONFIRMATION_PROTOCOL =
-  "ProofEra:bsc-testnet-pta-wbnb-first-lp-owner-exact-byte-confirmation:v3" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-first-lp-owner-exact-byte-confirmation:v4" as const;
 const OWNER_CONFIRMATION_DECISION =
   "CONFIRM_ONE_EXACT_TESTNET_LP_APPROVE_AND_MINT_NO_RETRY_NO_REPLACEMENT" as const;
 const LOCAL_APPLICATION_DATA_SCRIPT = String.raw`

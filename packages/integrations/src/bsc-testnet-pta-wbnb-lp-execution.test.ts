@@ -213,9 +213,9 @@ function journalRecord(
   fields: Record<string, unknown>
 ): TestRecord {
   return {
-    schema: "bsc_testnet_pta_wbnb_first_lp_journal_v1",
+    schema: "bsc_testnet_pta_wbnb_first_lp_journal_v2",
     operationKey: keccak256(
-      new TextEncoder().encode("ProofEra:bsc-testnet-pta-wbnb-first-lp-durable-operation:v1")
+      new TextEncoder().encode("ProofEra:bsc-testnet-pta-wbnb-first-lp-durable-operation:v2")
     ),
     sequence: index,
     kind: fields.kind,
@@ -403,8 +403,31 @@ describe("first-LP runner source boundary", () => {
     expect(source).toContain("retryBroadcastAllowed: false");
     expect(source).toContain('["finalized", false]');
     expect(source).toContain("canonicalReceiptBlockAgreementVerified: true");
+    expect(source).toContain("response.url !== new URL(this.origin).href");
+    expect(source).toContain('redirect: "error"');
+    expect(source).toContain(
+      "await assertRetiredWindowsBscTestnetPtaWbnbLpV1OwnerOnlyForInternalUse()"
+    );
     expect(source).toContain("approvalTransactionHash = state?.approvalSigned?.transactionHash");
     expect(source).not.toMatch(/chainId=1(?:\D|$)|bsc-dataseed\.binance\.org/u);
+  });
+
+  it("requires the exact owner-only v1 predecessor before opening journal v2", () => {
+    const runner = readFileSync(RUNNER_PATH, "utf8");
+    const journal = readFileSync(JOURNAL_PATH, "utf8");
+    const predecessorAudit = runner.indexOf(
+      "await assertRetiredWindowsBscTestnetPtaWbnbLpV1OwnerOnlyForInternalUse()"
+    );
+    const currentJournal = runner.indexOf(
+      "await createWindowsBscTestnetPtaWbnbLpJournalForInternalUse()"
+    );
+    expect(predecessorAudit).toBeGreaterThan(0);
+    expect(predecessorAudit).toBeLessThan(currentJournal);
+    expect(journal).toContain("bsc-testnet-pta-wbnb-lp-v1");
+    expect(journal).toContain("bsc-testnet-pta-wbnb-lp-v2");
+    expect(journal).toContain("0x3c862be1cff75b04bb1b02cb0b62142452bdc0065a8af43451634b18738e292b");
+    expect(journal).toContain("$entries.Count -ne 1");
+    expect(journal).toContain("sha256(bytes) !== RETIRED_V1_OWNER_RECORD_SHA256");
   });
 
   it("keeps private bytes out of output and package exports", () => {

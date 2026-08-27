@@ -58,6 +58,7 @@ import {
 } from "../packages/integrations/src/bsc-testnet-pta-wbnb-lp-execution.server.ts";
 import {
   BscTestnetPtaWbnbLpJournalFailure,
+  assertRetiredWindowsBscTestnetPtaWbnbLpV1OwnerOnlyForInternalUse,
   createWindowsBscTestnetPtaWbnbLpJournalForInternalUse,
   type BscTestnetPtaWbnbLpJournal,
   type BscTestnetPtaWbnbLpJournalState,
@@ -246,7 +247,11 @@ class FixedRpcClient {
       throw new FirstLpRunnerFailure("RPC_INVALID");
     }
     clearTimeout(timeout);
-    if (!response.ok || response.url !== this.origin || response.type === "opaqueredirect") {
+    if (
+      !response.ok ||
+      response.url !== new URL(this.origin).href ||
+      response.type === "opaqueredirect"
+    ) {
       throw new FirstLpRunnerFailure("RPC_INVALID");
     }
     const bytes = new Uint8Array(await response.arrayBuffer());
@@ -1613,6 +1618,7 @@ async function main(): Promise<void> {
   }
   await assertExactRuntimeInvocation();
   const release = await inspectRelease();
+  await assertRetiredWindowsBscTestnetPtaWbnbLpV1OwnerOnlyForInternalUse();
   const journal = await createWindowsBscTestnetPtaWbnbLpJournalForInternalUse();
   failureJournal = journal;
   const existing = await journal.readState();
