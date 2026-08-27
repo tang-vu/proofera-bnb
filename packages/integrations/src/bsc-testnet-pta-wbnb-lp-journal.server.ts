@@ -265,6 +265,7 @@ function commonRecord(
     sourceCommit: authorization.plan.sourceCommit,
     runtimeManifestSha256: authorization.runtimeManifestSha256,
     ownerConfirmationSha256: authorization.ownerConfirmationSha256,
+    ownerChallengeBindingSha256: authorization.ownerChallengeBindingSha256,
     owner: BSC_TESTNET_PTA_WBNB_LP_OWNER,
     recordedAt: canonicalUtc()
   };
@@ -539,6 +540,7 @@ export function parseBscTestnetPtaWbnbLpJournalRecordsForInternalUse(
       !/^[0-9a-f]{40}$/u.test(owner.sourceCommit) ||
       !exactHex32(owner.runtimeManifestSha256) ||
       !exactHex32(owner.ownerConfirmationSha256) ||
+      !exactHex32(owner.ownerChallengeBindingSha256) ||
       owner.owner !== BSC_TESTNET_PTA_WBNB_LP_OWNER
     ) {
       throw new BscTestnetPtaWbnbLpJournalFailure("JOURNAL_INVALID");
@@ -566,6 +568,7 @@ export function parseBscTestnetPtaWbnbLpJournalRecordsForInternalUse(
         entry.sourceCommit !== owner.sourceCommit ||
         entry.runtimeManifestSha256 !== owner.runtimeManifestSha256 ||
         entry.ownerConfirmationSha256 !== owner.ownerConfirmationSha256 ||
+        entry.ownerChallengeBindingSha256 !== owner.ownerChallengeBindingSha256 ||
         entry.owner !== owner.owner
       ) {
         throw new BscTestnetPtaWbnbLpJournalFailure("JOURNAL_INVALID");
@@ -631,7 +634,8 @@ function assertAuthorizationBinding(
     owner.scopeSha256 !== authorization.plan.exactScopeSha256 ||
     owner.sourceCommit !== authorization.plan.sourceCommit ||
     owner.runtimeManifestSha256 !== authorization.runtimeManifestSha256 ||
-    owner.ownerConfirmationSha256 !== authorization.ownerConfirmationSha256
+    owner.ownerConfirmationSha256 !== authorization.ownerConfirmationSha256 ||
+    owner.ownerChallengeBindingSha256 !== authorization.ownerChallengeBindingSha256
   ) {
     throw new BscTestnetPtaWbnbLpJournalFailure("JOURNAL_INVALID");
   }
@@ -778,6 +782,7 @@ export async function createWindowsBscTestnetPtaWbnbLpJournalForInternalUse(): P
         sourceCommit: owner.sourceCommit,
         runtimeManifestSha256: owner.runtimeManifestSha256,
         ownerConfirmationSha256: owner.ownerConfirmationSha256,
+        ownerChallengeBindingSha256: owner.ownerChallengeBindingSha256,
         owner: BSC_TESTNET_PTA_WBNB_LP_OWNER,
         recordedAt: canonicalUtc(),
         step,

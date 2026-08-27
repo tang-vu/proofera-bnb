@@ -147,27 +147,36 @@ describe("BSC-testnet first-LP exact execution", () => {
     ).toThrow(BscTestnetPtaWbnbLpExecutionFailure);
   });
 
-  it("binds one short exact owner line to scope, runtime, caps and nonce", () => {
+  it("derives one short exact owner code from the complete scope/runtime/nonce binding", () => {
     const plan = validPlan();
     const challenge = createBscTestnetPtaWbnbLpOwnerChallengeForInternalUse({
       plan,
       ceremonyNonce: HEX_A,
       runtimeManifestSha256: HEX_B
     });
-    expect(Buffer.byteLength(challenge.confirmationLine)).toBeLessThan(2_048);
-    expect(challenge.confirmationLine).toContain(`scopeSha256=${plan.exactScopeSha256}`);
-    expect(challenge.confirmationLine).toContain("chainId=97");
-    expect(challenge.confirmationLine).toContain("approvalNonce=10");
-    expect(challenge.confirmationLine).toContain("mintNonce=11");
-    expect(challenge.confirmationLine).toContain(
-      "decision=CONFIRM_ONE_EXACT_TESTNET_LP_APPROVE_AND_MINT_NO_RETRY_NO_REPLACEMENT"
-    );
+    const changedNonce = createBscTestnetPtaWbnbLpOwnerChallengeForInternalUse({
+      plan,
+      ceremonyNonce: HEX_C,
+      runtimeManifestSha256: HEX_B
+    });
+    const changedRuntime = createBscTestnetPtaWbnbLpOwnerChallengeForInternalUse({
+      plan,
+      ceremonyNonce: HEX_A,
+      runtimeManifestSha256: HEX_C
+    });
+    expect(Buffer.byteLength(challenge.confirmationLine)).toBeLessThan(80);
+    expect(challenge.confirmationLine).toMatch(/^PROOFERA-FIRST-LP-V2-[0-9a-f]{32}$/u);
+    expect(challenge.challengeBindingSha256).not.toBe(changedNonce.challengeBindingSha256);
+    expect(challenge.challengeBindingSha256).not.toBe(changedRuntime.challengeBindingSha256);
+    expect(challenge.confirmationLine).not.toBe(changedNonce.confirmationLine);
+    expect(challenge.confirmationLine).not.toBe(changedRuntime.confirmationLine);
     const confirmed = confirmBscTestnetPtaWbnbLpOwnerChallengeForInternalUse(
       challenge,
       challenge.confirmationLine,
       plan.preparedAtMilliseconds + 2_000
     );
     expect(confirmed.ownerConfirmationSha256).toBe(challenge.confirmationLineSha256);
+    expect(confirmed.ownerChallengeBindingSha256).toBe(challenge.challengeBindingSha256);
     expect(() =>
       confirmBscTestnetPtaWbnbLpOwnerChallengeForInternalUse(
         challenge,
@@ -216,6 +225,7 @@ function journalRecord(
     sourceCommit: "087485f4cf1a3f2255bd375e4535b48cbb3eede9",
     runtimeManifestSha256: HEX_B,
     ownerConfirmationSha256: HEX_C,
+    ownerChallengeBindingSha256: HEX_A,
     owner: BSC_TESTNET_PTA_WBNB_LP_OWNER,
     recordedAt: "2026-08-27T00:00:00.000Z",
     ...fields

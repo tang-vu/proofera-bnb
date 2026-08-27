@@ -75,7 +75,7 @@ const PINNED_POWERSHELL_EXECUTABLE =
   "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
 const PINNED_POWERSHELL_SHA256 = "9785001b0dcf755eddb8af294a373c0b87b2498660f724e76c4d53f9c217c7a3";
 const OWNER_CONFIRMATION_PROTOCOL =
-  "ProofEra:bsc-testnet-pta-wbnb-first-lp-owner-exact-byte-confirmation:v1" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-first-lp-owner-exact-byte-confirmation:v2" as const;
 const OWNER_CONFIRMATION_DECISION =
   "CONFIRM_ONE_EXACT_TESTNET_LP_APPROVE_AND_MINT_NO_RETRY_NO_REPLACEMENT" as const;
 const LOCAL_APPLICATION_DATA_SCRIPT = String.raw`
@@ -160,6 +160,7 @@ export interface BscTestnetPtaWbnbLpExactExecutionPlan {
 export interface BscTestnetPtaWbnbLpOwnerChallenge {
   readonly confirmationLine: string;
   readonly confirmationLineSha256: Hex;
+  readonly challengeBindingSha256: Hex;
   readonly ceremonyNonce: Hex;
   readonly runtimeManifestSha256: Hex;
   readonly plan: BscTestnetPtaWbnbLpExactExecutionPlan;
@@ -178,6 +179,7 @@ export interface BscTestnetPtaWbnbLpConfirmedExecution {
   readonly executionExpiresAt: string;
   readonly executionExpiresAtMilliseconds: number;
   readonly ownerConfirmationSha256: Hex;
+  readonly ownerChallengeBindingSha256: Hex;
   readonly runtimeManifestSha256: Hex;
   readonly plan: BscTestnetPtaWbnbLpExactExecutionPlan;
 }
@@ -616,7 +618,7 @@ export function createBscTestnetPtaWbnbLpOwnerChallengeForInternalUse(input: {
     throw new BscTestnetPtaWbnbLpExecutionFailure("PLAN_INVALID");
   }
   const [approval, mint] = input.plan.transactions;
-  const line = [
+  const binding = [
     OWNER_CONFIRMATION_PROTOCOL,
     `chainId=${BSC_TESTNET_PTA_WBNB_LP_CHAIN_ID}`,
     `scopeSha256=${input.plan.exactScopeSha256}`,
@@ -635,9 +637,12 @@ export function createBscTestnetPtaWbnbLpOwnerChallengeForInternalUse(input: {
     `ceremonyNonce=${input.ceremonyNonce}`,
     `decision=${OWNER_CONFIRMATION_DECISION}`
   ].join("|");
+  const challengeBindingSha256 = sha256(stringToHex(binding));
+  const line = `PROOFERA-FIRST-LP-V2-${challengeBindingSha256.slice(2, 34)}`;
   const challenge = Object.freeze({
     confirmationLine: line,
     confirmationLineSha256: sha256(stringToHex(line)),
+    challengeBindingSha256,
     ceremonyNonce: input.ceremonyNonce,
     runtimeManifestSha256: input.runtimeManifestSha256,
     plan: input.plan
@@ -670,6 +675,7 @@ export function confirmBscTestnetPtaWbnbLpOwnerChallengeForInternalUse(
     executionExpiresAt: challenge.plan.scopeExpiresAt,
     executionExpiresAtMilliseconds: challenge.plan.scopeExpiresAtMilliseconds,
     ownerConfirmationSha256: challenge.confirmationLineSha256,
+    ownerChallengeBindingSha256: challenge.challengeBindingSha256,
     runtimeManifestSha256: challenge.runtimeManifestSha256,
     plan: challenge.plan
   });

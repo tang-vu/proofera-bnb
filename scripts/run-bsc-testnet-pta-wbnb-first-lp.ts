@@ -1336,7 +1336,8 @@ async function finishRecoveredMintEvidence(
     release,
     {
       exactScopeSha256: state.ownerRecord.scopeSha256 as Hex,
-      ownerConfirmationSha256: state.ownerRecord.ownerConfirmationSha256 as Hex
+      ownerConfirmationSha256: state.ownerRecord.ownerConfirmationSha256 as Hex,
+      ownerChallengeBindingSha256: state.ownerRecord.ownerChallengeBindingSha256 as Hex
     },
     {
       signed: approval.signed,
@@ -1541,7 +1542,11 @@ async function recoverExisting(
 
 async function writeFinalEvidence(
   release: ReleaseIdentity,
-  binding: Readonly<{ exactScopeSha256: Hex; ownerConfirmationSha256: Hex }>,
+  binding: Readonly<{
+    exactScopeSha256: Hex;
+    ownerConfirmationSha256: Hex;
+    ownerChallengeBindingSha256: Hex;
+  }>,
   approval: Readonly<{
     signed: BscTestnetPtaWbnbLpSignedTransaction;
     receipt: NormalizedReceipt;
@@ -1563,6 +1568,7 @@ async function writeFinalEvidence(
     release,
     exactScopeSha256: binding.exactScopeSha256,
     ownerConfirmationSha256: binding.ownerConfirmationSha256,
+    ownerChallengeBindingSha256: binding.ownerChallengeBindingSha256,
     chain: { environment: "bsc-testnet", chainId: 97, mainnetWritePossible: false },
     boundary: {
       noRetry: true,
@@ -1638,6 +1644,7 @@ async function main(): Promise<void> {
       `releaseCommit=${release.releaseCommit}`,
       `runtimeManifestSha256=${release.runtimeManifestSha256}`,
       `exactScopeSha256=${plan.exactScopeSha256}`,
+      `ownerChallengeBindingSha256=${challenge.challengeBindingSha256}`,
       "chainId=97",
       `owner=${BSC_TESTNET_PTA_WBNB_LP_OWNER}`,
       `approval=PTA approve(manager, ${BSC_TESTNET_PTA_WBNB_LP_PTA_CAPITAL_RAW})`,
@@ -1646,7 +1653,8 @@ async function main(): Promise<void> {
       `maximumNativeOutflowWei=${plan.maximumNativeOutflowWei}`,
       `scopeExpiresAt=${plan.scopeExpiresAt}`,
       "mainnet=false; retry=false; replacement=false; chatIsAuthorization=false",
-      "Paste exactly the following single UTF-8 line, then press Enter:",
+      "The short one-time code below is derived from every displayed scope/runtime/nonce field.",
+      "Paste exactly this single UTF-8 line, then press Enter:",
       challenge.confirmationLine,
       "----- END PROOFERA EXACT BSC-TESTNET FIRST-LP AUTHORIZATION -----",
       ""
@@ -1681,7 +1689,8 @@ async function main(): Promise<void> {
     release,
     {
       exactScopeSha256: authorization.plan.exactScopeSha256,
-      ownerConfirmationSha256: authorization.ownerConfirmationSha256
+      ownerConfirmationSha256: authorization.ownerConfirmationSha256,
+      ownerChallengeBindingSha256: authorization.ownerChallengeBindingSha256
     },
     approval,
     mint,
