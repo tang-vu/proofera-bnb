@@ -1653,8 +1653,8 @@ async function main(): Promise<void> {
       `maximumNativeOutflowWei=${plan.maximumNativeOutflowWei}`,
       `scopeExpiresAt=${plan.scopeExpiresAt}`,
       "mainnet=false; retry=false; replacement=false; chatIsAuthorization=false",
-      "The short one-time code below is derived from every displayed scope/runtime/nonce field.",
-      "Paste exactly this single UTF-8 line, then press Enter:",
+      "The full ownerChallengeBindingSha256 above binds every displayed scope/runtime/nonce field.",
+      "To authorize exactly that same-process challenge, type CONFIRM and press Enter:",
       challenge.confirmationLine,
       "----- END PROOFERA EXACT BSC-TESTNET FIRST-LP AUTHORIZATION -----",
       ""

@@ -147,7 +147,7 @@ describe("BSC-testnet first-LP exact execution", () => {
     ).toThrow(BscTestnetPtaWbnbLpExecutionFailure);
   });
 
-  it("derives one short exact owner code from the complete scope/runtime/nonce binding", () => {
+  it("keeps simple owner presence separate from the complete scope/runtime/nonce binding", () => {
     const plan = validPlan();
     const challenge = createBscTestnetPtaWbnbLpOwnerChallengeForInternalUse({
       plan,
@@ -164,12 +164,11 @@ describe("BSC-testnet first-LP exact execution", () => {
       ceremonyNonce: HEX_A,
       runtimeManifestSha256: HEX_C
     });
-    expect(Buffer.byteLength(challenge.confirmationLine)).toBeLessThan(80);
-    expect(challenge.confirmationLine).toMatch(/^PROOFERA-FIRST-LP-V2-[0-9a-f]{32}$/u);
+    expect(challenge.confirmationLine).toBe("CONFIRM");
     expect(challenge.challengeBindingSha256).not.toBe(changedNonce.challengeBindingSha256);
     expect(challenge.challengeBindingSha256).not.toBe(changedRuntime.challengeBindingSha256);
-    expect(challenge.confirmationLine).not.toBe(changedNonce.confirmationLine);
-    expect(challenge.confirmationLine).not.toBe(changedRuntime.confirmationLine);
+    expect(changedNonce.confirmationLine).toBe("CONFIRM");
+    expect(changedRuntime.confirmationLine).toBe("CONFIRM");
     const confirmed = confirmBscTestnetPtaWbnbLpOwnerChallengeForInternalUse(
       challenge,
       challenge.confirmationLine,
