@@ -26,7 +26,7 @@ export const BSC_TESTNET_PTA_WBNB_LP_NATIVE_CAPITAL_WEI = 10n ** 15n;
 export const BSC_TESTNET_PTA_WBNB_LP_TICK_LOWER = -887_270 as const;
 export const BSC_TESTNET_PTA_WBNB_LP_TICK_UPPER = 887_270 as const;
 export const BSC_TESTNET_PTA_WBNB_LP_SLIPPAGE_BPS = 0 as const;
-export const BSC_TESTNET_PTA_WBNB_LP_SCOPE_LIFETIME_SECONDS = 120 as const;
+export const BSC_TESTNET_PTA_WBNB_LP_SCOPE_LIFETIME_SECONDS = 300 as const;
 export const BSC_TESTNET_PTA_WBNB_LP_DEADLINE_SECONDS = 900 as const;
 export const BSC_TESTNET_PTA_WBNB_LP_MAX_BLOCK_AGE_SECONDS = 120 as const;
 export const BSC_TESTNET_PTA_WBNB_LP_GAS_MARGIN_BPS = 2_000 as const;
@@ -44,28 +44,42 @@ const PTA_ALLOWANCES_STORAGE_SLOT = 1n;
 // These exact values deliberately mirror the independently reviewed initializer envelope. Keeping
 // this read-only LP surface self-contained lets Node execute it without loading any custody or
 // initializer submission module.
-const BSC_TESTNET_PTA_WBNB_POOL_CHAIN_ID = 97 as const;
-const BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN =
+export const BSC_TESTNET_PTA_WBNB_LP_CHAIN_ID = 97 as const;
+export const BSC_TESTNET_PTA_WBNB_LP_PRIMARY_RPC_ORIGIN =
   "https://bsc-testnet-dataseed.bnbchain.org" as const;
-const BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN =
+export const BSC_TESTNET_PTA_WBNB_LP_CORROBORATOR_RPC_ORIGIN =
   "https://bsc-testnet.bnbchain.org" as const;
-const BSC_TESTNET_PTA_WBNB_POOL_SENDER =
+export const BSC_TESTNET_PTA_WBNB_LP_OWNER =
   "0x997cD959798F7c925076eaeFF5855C5C2c1e5A49" as const satisfies Address;
-const BSC_TESTNET_PTA_ADDRESS =
+export const BSC_TESTNET_PTA_WBNB_LP_PTA_ADDRESS =
   "0x4ed64525d6fB06b7dA926C683CBD809632C9B4Cc" as const satisfies Address;
-const BSC_TESTNET_WBNB_ADDRESS =
+export const BSC_TESTNET_PTA_WBNB_LP_WBNB_ADDRESS =
   "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd" as const satisfies Address;
-const BSC_TESTNET_PANCAKE_V3_FACTORY =
+export const BSC_TESTNET_PTA_WBNB_LP_FACTORY =
   "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865" as const satisfies Address;
-const BSC_TESTNET_PANCAKE_V3_POOL_DEPLOYER =
+export const BSC_TESTNET_PTA_WBNB_LP_POOL_DEPLOYER =
   "0x41ff9AA7e16B8B1a8a8dc4f0eFacd93D02d071c9" as const satisfies Address;
-const BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER =
+export const BSC_TESTNET_PTA_WBNB_LP_POSITION_MANAGER =
   "0x427bF5b37357632377eCbEC9de3626C71A5396c1" as const satisfies Address;
-const BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE =
+export const BSC_TESTNET_PTA_WBNB_LP_POOL =
   "0x30b07e82d7181a53Ae2EA98Cd08b6733Ffd831aE" as const satisfies Address;
-const BSC_TESTNET_PTA_WBNB_POOL_FEE = 500 as const;
-const BSC_TESTNET_PTA_WBNB_POOL_TICK_SPACING = 10 as const;
-const BSC_TESTNET_PTA_WBNB_POOL_SQRT_PRICE_X96 = 79_228_162_514_264_337_593_543_950n;
+export const BSC_TESTNET_PTA_WBNB_LP_FEE = 500 as const;
+export const BSC_TESTNET_PTA_WBNB_LP_TICK_SPACING = 10 as const;
+export const BSC_TESTNET_PTA_WBNB_LP_SQRT_PRICE_X96 = 79_228_162_514_264_337_593_543_950n;
+const BSC_TESTNET_PTA_WBNB_POOL_CHAIN_ID = BSC_TESTNET_PTA_WBNB_LP_CHAIN_ID;
+const BSC_TESTNET_PTA_WBNB_POOL_PRIMARY_RPC_ORIGIN = BSC_TESTNET_PTA_WBNB_LP_PRIMARY_RPC_ORIGIN;
+const BSC_TESTNET_PTA_WBNB_POOL_CORROBORATOR_RPC_ORIGIN =
+  BSC_TESTNET_PTA_WBNB_LP_CORROBORATOR_RPC_ORIGIN;
+const BSC_TESTNET_PTA_WBNB_POOL_SENDER = BSC_TESTNET_PTA_WBNB_LP_OWNER;
+const BSC_TESTNET_PTA_ADDRESS = BSC_TESTNET_PTA_WBNB_LP_PTA_ADDRESS;
+const BSC_TESTNET_WBNB_ADDRESS = BSC_TESTNET_PTA_WBNB_LP_WBNB_ADDRESS;
+const BSC_TESTNET_PANCAKE_V3_FACTORY = BSC_TESTNET_PTA_WBNB_LP_FACTORY;
+const BSC_TESTNET_PANCAKE_V3_POOL_DEPLOYER = BSC_TESTNET_PTA_WBNB_LP_POOL_DEPLOYER;
+const BSC_TESTNET_PANCAKE_V3_POSITION_MANAGER = BSC_TESTNET_PTA_WBNB_LP_POSITION_MANAGER;
+const BSC_TESTNET_PTA_WBNB_POOL_CANDIDATE = BSC_TESTNET_PTA_WBNB_LP_POOL;
+const BSC_TESTNET_PTA_WBNB_POOL_FEE = BSC_TESTNET_PTA_WBNB_LP_FEE;
+const BSC_TESTNET_PTA_WBNB_POOL_TICK_SPACING = BSC_TESTNET_PTA_WBNB_LP_TICK_SPACING;
+const BSC_TESTNET_PTA_WBNB_POOL_SQRT_PRICE_X96 = BSC_TESTNET_PTA_WBNB_LP_SQRT_PRICE_X96;
 const BSC_TESTNET_PTA_WBNB_POOL_CODE_IDENTITIES = Object.freeze({
   pta: Object.freeze({
     byteLength: 1_826,
@@ -257,7 +271,7 @@ function canonicalSourceCommit(value: string): string {
   return value;
 }
 
-function stableJson(value: unknown): string {
+export function stableBscTestnetPtaWbnbLpJsonForInternalUse(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map((entry) => stableJson(entry)).join(",")}]`;
   if (isRecord(value)) {
     return `{${Object.keys(value)
@@ -266,6 +280,12 @@ function stableJson(value: unknown): string {
       .join(",")}}`;
   }
   return JSON.stringify(value);
+}
+
+const stableJson = stableBscTestnetPtaWbnbLpJsonForInternalUse;
+
+export function deriveBscTestnetPtaWbnbLpExactScopeSha256ForInternalUse(body: unknown): Hex {
+  return sha256(stringToHex(stableJson(body)));
 }
 
 function marginGas(estimate: bigint, maximum: bigint, label: string): bigint {
@@ -1248,7 +1268,7 @@ export async function prepareBscTestnetPtaWbnbLpExactScope(
   } as const;
   return Object.freeze({
     ...body,
-    exactScopeSha256: sha256(stringToHex(stableJson(body)))
+    exactScopeSha256: deriveBscTestnetPtaWbnbLpExactScopeSha256ForInternalUse(body)
   });
 }
 

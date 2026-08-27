@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "viem": ["../packages/integrations/node_modules/viem/_types/index.d.ts"]
+    },
+    "types": ["node"]
+  },
+  "include": ["run-bsc-testnet-pta-wbnb-first-lp.ts"]
+}
