@@ -213,9 +213,9 @@ function journalRecord(
   fields: Record<string, unknown>
 ): TestRecord {
   return {
-    schema: "bsc_testnet_pta_wbnb_first_lp_journal_v2",
+    schema: "bsc_testnet_pta_wbnb_first_lp_journal_v3",
     operationKey: keccak256(
-      new TextEncoder().encode("ProofEra:bsc-testnet-pta-wbnb-first-lp-durable-operation:v2")
+      new TextEncoder().encode("ProofEra:bsc-testnet-pta-wbnb-first-lp-durable-operation:v3")
     ),
     sequence: index,
     kind: fields.kind,
@@ -405,18 +405,22 @@ describe("first-LP runner source boundary", () => {
     expect(source).toContain("canonicalReceiptBlockAgreementVerified: true");
     expect(source).toContain("response.url !== new URL(this.origin).href");
     expect(source).toContain('redirect: "error"');
+    expect(source).toContain("const requestId = (this.#requestId += 1)");
+    expect(source).toContain("id: requestId, method, params");
+    expect(source).toContain("parsed.id !== requestId");
+    expect(source).not.toContain("parsed.id !== this.#requestId");
     expect(source).toContain(
-      "await assertRetiredWindowsBscTestnetPtaWbnbLpV1OwnerOnlyForInternalUse()"
+      "await assertRetiredWindowsBscTestnetPtaWbnbLpV1V2OwnerOnlyForInternalUse()"
     );
     expect(source).toContain("approvalTransactionHash = state?.approvalSigned?.transactionHash");
     expect(source).not.toMatch(/chainId=1(?:\D|$)|bsc-dataseed\.binance\.org/u);
   });
 
-  it("requires the exact owner-only v1 predecessor before opening journal v2", () => {
+  it("requires exact owner-only v1/v2 predecessors before opening journal v3", () => {
     const runner = readFileSync(RUNNER_PATH, "utf8");
     const journal = readFileSync(JOURNAL_PATH, "utf8");
     const predecessorAudit = runner.indexOf(
-      "await assertRetiredWindowsBscTestnetPtaWbnbLpV1OwnerOnlyForInternalUse()"
+      "await assertRetiredWindowsBscTestnetPtaWbnbLpV1V2OwnerOnlyForInternalUse()"
     );
     const currentJournal = runner.indexOf(
       "await createWindowsBscTestnetPtaWbnbLpJournalForInternalUse()"
@@ -425,9 +429,29 @@ describe("first-LP runner source boundary", () => {
     expect(predecessorAudit).toBeLessThan(currentJournal);
     expect(journal).toContain("bsc-testnet-pta-wbnb-lp-v1");
     expect(journal).toContain("bsc-testnet-pta-wbnb-lp-v2");
+    expect(journal).toContain("bsc-testnet-pta-wbnb-lp-v3");
     expect(journal).toContain("0x3c862be1cff75b04bb1b02cb0b62142452bdc0065a8af43451634b18738e292b");
+    expect(journal).toContain("0xe6b16d01826b8a28ddf392834d1f1c5117ef84df536021c67a88a61c2e042d3c");
     expect(journal).toContain("$entries.Count -ne 1");
-    expect(journal).toContain("sha256(bytes) !== RETIRED_V1_OWNER_RECORD_SHA256");
+    expect(journal).toContain("sha256(bytes) !== expectedSha256");
+  });
+
+  it("keeps the three-pass rehearsal before journal v3 and custody", () => {
+    const source = readFileSync(RUNNER_PATH, "utf8");
+    const rehearsal = source.indexOf("if (mode === READ_ONLY_REHEARSAL_FLAG)");
+    const currentJournal = source.indexOf(
+      "await createWindowsBscTestnetPtaWbnbLpJournalForInternalUse()"
+    );
+    const custody = source.indexOf(
+      "await assertFixedBscTestnetPtaWbnbLpCustodyMetadataForInternalUse"
+    );
+    expect(rehearsal).toBeGreaterThan(0);
+    expect(rehearsal).toBeLessThan(currentJournal);
+    expect(currentJournal).toBeLessThan(custody);
+    expect(source).toContain('status: "read_only_rehearsal_passed"');
+    expect(source).toContain("preSubmissionPasses: 3");
+    expect(source).toContain("journalV3Created: false");
+    expect(source).toContain("custodyAccessed: false");
   });
 
   it("keeps private bytes out of output and package exports", () => {

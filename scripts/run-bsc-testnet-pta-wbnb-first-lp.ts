@@ -58,7 +58,7 @@ import {
 } from "../packages/integrations/src/bsc-testnet-pta-wbnb-lp-execution.server.ts";
 import {
   BscTestnetPtaWbnbLpJournalFailure,
-  assertRetiredWindowsBscTestnetPtaWbnbLpV1OwnerOnlyForInternalUse,
+  assertRetiredWindowsBscTestnetPtaWbnbLpV1V2OwnerOnlyForInternalUse,
   createWindowsBscTestnetPtaWbnbLpJournalForInternalUse,
   type BscTestnetPtaWbnbLpJournal,
   type BscTestnetPtaWbnbLpJournalState,
@@ -67,6 +67,7 @@ import {
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const EXACT_EXECUTION_FLAG = "--execute-exact-first-lp-chain-97";
+const READ_ONLY_REHEARSAL_FLAG = "--rehearse-read-only-first-lp-chain-97";
 const MAXIMUM_RPC_RESPONSE_BYTES = 1_048_576;
 const RPC_TIMEOUT_MILLISECONDS = 12_000;
 const RECEIPT_TIMEOUT_MILLISECONDS = 90_000;
@@ -230,7 +231,7 @@ class FixedRpcClient {
   }
 
   async request(method: RpcMethod, params: readonly unknown[]): Promise<unknown> {
-    this.#requestId += 1;
+    const requestId = (this.#requestId += 1);
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), RPC_TIMEOUT_MILLISECONDS);
     let response: Response;
@@ -238,7 +239,7 @@ class FixedRpcClient {
       response = await fetch(this.origin, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ jsonrpc: "2.0", id: this.#requestId, method, params }),
+        body: JSON.stringify({ jsonrpc: "2.0", id: requestId, method, params }),
         redirect: "error",
         signal: controller.signal
       });
@@ -266,7 +267,7 @@ class FixedRpcClient {
     } catch {
       throw new FirstLpRunnerFailure("RPC_INVALID");
     }
-    if (parsed === null || parsed.jsonrpc !== "2.0" || parsed.id !== this.#requestId) {
+    if (parsed === null || parsed.jsonrpc !== "2.0" || parsed.id !== requestId) {
       throw new FirstLpRunnerFailure("RPC_INVALID");
     }
     if ("error" in parsed) throw new FirstLpRunnerFailure("RPC_INVALID");
@@ -1613,12 +1614,48 @@ async function writeFinalEvidence(
 }
 
 async function main(): Promise<void> {
-  if (process.argv.length !== 3 || process.argv[2] !== EXACT_EXECUTION_FLAG) {
+  const mode = process.argv[2];
+  if (
+    process.argv.length !== 3 ||
+    (mode !== EXACT_EXECUTION_FLAG && mode !== READ_ONLY_REHEARSAL_FLAG)
+  ) {
     fail("ARGUMENTS_INVALID");
   }
   await assertExactRuntimeInvocation();
   const release = await inspectRelease();
-  await assertRetiredWindowsBscTestnetPtaWbnbLpV1OwnerOnlyForInternalUse();
+  await assertRetiredWindowsBscTestnetPtaWbnbLpV1V2OwnerOnlyForInternalUse();
+  if (mode === READ_ONLY_REHEARSAL_FLAG) {
+    const scopeClients = createFixedOfficialBscTestnetPtaWbnbLpRpcClients();
+    const scope = await prepareBscTestnetPtaWbnbLpExactScope({
+      ...scopeClients,
+      now: () => new Date(),
+      sourceCommit: release.releaseCommit
+    });
+    const plan = parseBscTestnetPtaWbnbLpExactExecutionPlanForInternalUse(scope, Date.now());
+    const primary = new FixedRpcClient("primary", BSC_TESTNET_PTA_WBNB_LP_PRIMARY_RPC_ORIGIN);
+    const corroborator = new FixedRpcClient(
+      "corroborator",
+      BSC_TESTNET_PTA_WBNB_LP_CORROBORATOR_RPC_ORIGIN
+    );
+    for (let pass = 0; pass < 3; pass += 1) {
+      await dualPreSubmissionRecheck(primary, corroborator, plan, plan.transactions[0], "approval");
+    }
+    process.stdout.write(
+      `${JSON.stringify({
+        status: "read_only_rehearsal_passed",
+        releaseCommit: release.releaseCommit,
+        runtimeManifestSha256: release.runtimeManifestSha256,
+        exactScopeSha256: plan.exactScopeSha256,
+        preSubmissionPasses: 3,
+        custodyAccessed: false,
+        journalV3Created: false,
+        signed: false,
+        broadcast: false,
+        mainnetWritePossible: false
+      })}\n`
+    );
+    return;
+  }
   const journal = await createWindowsBscTestnetPtaWbnbLpJournalForInternalUse();
   failureJournal = journal;
   const existing = await journal.readState();

@@ -16,24 +16,26 @@ import type {
   BscTestnetPtaWbnbLpSignedTransaction
 } from "./bsc-testnet-pta-wbnb-lp-execution.server";
 
-const JOURNAL_SCHEMA = "bsc_testnet_pta_wbnb_first_lp_journal_v2" as const;
+const JOURNAL_SCHEMA = "bsc_testnet_pta_wbnb_first_lp_journal_v3" as const;
 const OPERATION_KEY = keccak256(
-  stringToHex("ProofEra:bsc-testnet-pta-wbnb-first-lp-durable-operation:v2")
+  stringToHex("ProofEra:bsc-testnet-pta-wbnb-first-lp-durable-operation:v3")
 );
 const RETIRED_V1_OWNER_RECORD_SHA256 =
   "0x3c862be1cff75b04bb1b02cb0b62142452bdc0065a8af43451634b18738e292b" as const;
+const RETIRED_V2_OWNER_RECORD_SHA256 =
+  "0xe6b16d01826b8a28ddf392834d1f1c5117ef84df536021c67a88a61c2e042d3c" as const;
 const ZERO_SHA256 = `0x${"0".repeat(64)}` as Hex;
 const MAXIMUM_RECORD_BYTES = 16_384;
 const RECORD_FILES = Object.freeze([
-  "00-owner-confirmed.v2.json",
-  "10-approval-signing-started.v2.json",
-  "11-approval-signed.v2.json",
-  "12-approval-submission-started.v2.json",
-  "13-approval-terminal.v2.json",
-  "20-mint-signing-started.v2.json",
-  "21-mint-signed.v2.json",
-  "22-mint-submission-started.v2.json",
-  "23-mint-terminal.v2.json"
+  "00-owner-confirmed.v3.json",
+  "10-approval-signing-started.v3.json",
+  "11-approval-signed.v3.json",
+  "12-approval-submission-started.v3.json",
+  "13-approval-terminal.v3.json",
+  "20-mint-signing-started.v3.json",
+  "21-mint-signed.v3.json",
+  "22-mint-submission-started.v3.json",
+  "23-mint-terminal.v3.json"
 ]);
 const LOCAL_APPLICATION_DATA_SCRIPT = String.raw`
 $ErrorActionPreference = 'Stop'
@@ -50,12 +52,12 @@ $path = $reader.ReadToEnd()
 $reader.Dispose()
 $current = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
 $local = [Environment]::GetFolderPath([Environment+SpecialFolder]::LocalApplicationData)
-$expected = [IO.Path]::GetFullPath([IO.Path]::Combine($local, 'ProofEra', 'operations', 'bsc-testnet-pta-wbnb-lp-v2'))
+$expected = [IO.Path]::GetFullPath([IO.Path]::Combine($local, 'ProofEra', 'operations', 'bsc-testnet-pta-wbnb-lp-v3'))
 if ([IO.Path]::GetFullPath($path) -ne $expected) { exit 48 }
 $localItem = Get-Item -LiteralPath $local -Force
 if (-not $localItem.PSIsContainer -or (($localItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)) { exit 49 }
 $cursor = $localItem.FullName
-foreach ($segment in @('ProofEra', 'operations', 'bsc-testnet-pta-wbnb-lp-v2')) {
+foreach ($segment in @('ProofEra', 'operations', 'bsc-testnet-pta-wbnb-lp-v3')) {
   $cursor = [IO.Path]::GetFullPath([IO.Path]::Combine($cursor, $segment))
   if (-not [IO.Directory]::Exists($cursor)) { [IO.Directory]::CreateDirectory($cursor) | Out-Null }
   $item = Get-Item -LiteralPath $cursor -Force
@@ -91,18 +93,18 @@ $path = $reader.ReadToEnd()
 $reader.Dispose()
 $current = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
 $local = [Environment]::GetFolderPath([Environment+SpecialFolder]::LocalApplicationData)
-$expected = [IO.Path]::GetFullPath([IO.Path]::Combine($local, 'ProofEra', 'operations', 'bsc-testnet-pta-wbnb-lp-v2'))
+$expected = [IO.Path]::GetFullPath([IO.Path]::Combine($local, 'ProofEra', 'operations', 'bsc-testnet-pta-wbnb-lp-v3'))
 if ([IO.Path]::GetFullPath($path) -ne $expected) { exit 60 }
 $allowed = @(
-  '00-owner-confirmed.v2.json',
-  '10-approval-signing-started.v2.json',
-  '11-approval-signed.v2.json',
-  '12-approval-submission-started.v2.json',
-  '13-approval-terminal.v2.json',
-  '20-mint-signing-started.v2.json',
-  '21-mint-signed.v2.json',
-  '22-mint-submission-started.v2.json',
-  '23-mint-terminal.v2.json'
+  '00-owner-confirmed.v3.json',
+  '10-approval-signing-started.v3.json',
+  '11-approval-signed.v3.json',
+  '12-approval-submission-started.v3.json',
+  '13-approval-terminal.v3.json',
+  '20-mint-signing-started.v3.json',
+  '21-mint-signed.v3.json',
+  '22-mint-submission-started.v3.json',
+  '23-mint-terminal.v3.json'
 )
 $directory = Get-Item -LiteralPath $path -Force
 if (-not $directory.PSIsContainer -or (($directory.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) -or $directory.FullName -ne $expected) { exit 61 }
@@ -184,6 +186,52 @@ if (
   $fileRule.AccessControlType -ne [System.Security.AccessControl.AccessControlType]::Allow -or
   $fileRule.FileSystemRights -ne [System.Security.AccessControl.FileSystemRights]::FullControl
 ) { exit 74 }
+[Console]::Out.Write('{"ok":true}')
+`;
+const AUDIT_RETIRED_V2_OWNER_ONLY_SCRIPT = String.raw`
+$ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
+$reader = [System.IO.StreamReader]::new([Console]::OpenStandardInput(), [Text.Encoding]::UTF8)
+$path = $reader.ReadToEnd()
+$reader.Dispose()
+$current = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
+$local = [Environment]::GetFolderPath([Environment+SpecialFolder]::LocalApplicationData)
+$expected = [IO.Path]::GetFullPath([IO.Path]::Combine($local, 'ProofEra', 'operations', 'bsc-testnet-pta-wbnb-lp-v2'))
+if ([IO.Path]::GetFullPath($path) -ne $expected) { exit 75 }
+$directory = Get-Item -LiteralPath $path -Force
+if (-not $directory.PSIsContainer -or (($directory.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) -or $directory.FullName -ne $expected) { exit 76 }
+$directoryAcl = Get-Acl -LiteralPath $path
+$owner = try {
+  ([System.Security.Principal.SecurityIdentifier]::new($directoryAcl.Owner)).Value
+} catch {
+  ([System.Security.Principal.NTAccount]::new($directoryAcl.Owner)).Translate([System.Security.Principal.SecurityIdentifier]).Value
+}
+$directoryRules = @($directoryAcl.GetAccessRules($true, $true, [System.Security.Principal.SecurityIdentifier]))
+if ($owner -ne $current.Value -or -not $directoryAcl.AreAccessRulesProtected -or $directoryRules.Count -ne 1) { exit 77 }
+$directoryRule = $directoryRules[0]
+if (
+  $directoryRule.IdentityReference.Value -ne $current.Value -or
+  $directoryRule.AccessControlType -ne [System.Security.AccessControl.AccessControlType]::Allow -or
+  $directoryRule.FileSystemRights -ne [System.Security.AccessControl.FileSystemRights]::FullControl
+) { exit 77 }
+$entries = @(Get-ChildItem -LiteralPath $path -Force)
+if ($entries.Count -ne 1) { exit 78 }
+$entry = $entries[0]
+if ($entry.Name -ne '00-owner-confirmed.v2.json' -or $entry.PSIsContainer -or (($entry.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) -or $entry.Length -le 1 -or $entry.Length -gt 16384) { exit 78 }
+$acl = Get-Acl -LiteralPath $entry.FullName
+$fileOwner = try {
+  ([System.Security.Principal.SecurityIdentifier]::new($acl.Owner)).Value
+} catch {
+  ([System.Security.Principal.NTAccount]::new($acl.Owner)).Translate([System.Security.Principal.SecurityIdentifier]).Value
+}
+$fileRules = @($acl.GetAccessRules($true, $true, [System.Security.Principal.SecurityIdentifier]))
+if ($fileOwner -ne $current.Value -or $fileRules.Count -ne 1) { exit 79 }
+$fileRule = $fileRules[0]
+if (
+  $fileRule.IdentityReference.Value -ne $current.Value -or
+  $fileRule.AccessControlType -ne [System.Security.AccessControl.AccessControlType]::Allow -or
+  $fileRule.FileSystemRights -ne [System.Security.AccessControl.FileSystemRights]::FullControl
+) { exit 79 }
 [Console]::Out.Write('{"ok":true}')
 `;
 
@@ -426,7 +474,7 @@ async function resolveJournalDirectory(): Promise<string> {
     await resolveLocalApplicationData(),
     "ProofEra",
     "operations",
-    "bsc-testnet-pta-wbnb-lp-v2"
+    "bsc-testnet-pta-wbnb-lp-v3"
   );
 }
 
@@ -450,13 +498,18 @@ async function runDirectoryScript(script: string, directory: string): Promise<vo
   }
 }
 
-export async function assertRetiredWindowsBscTestnetPtaWbnbLpV1OwnerOnlyForInternalUse(): Promise<void> {
+async function assertRetiredOwnerOnly(
+  local: string,
+  directoryName: string,
+  recordName: string,
+  expectedSha256: Hex,
+  auditScript: string
+): Promise<void> {
   let bytes: Buffer | null = null;
   try {
-    const local = await resolveLocalApplicationData();
-    const directory = win32.join(local, "ProofEra", "operations", "bsc-testnet-pta-wbnb-lp-v1");
-    await runDirectoryScript(AUDIT_RETIRED_V1_OWNER_ONLY_SCRIPT, directory);
-    const path = join(directory, "00-owner-confirmed.v1.json");
+    const directory = win32.join(local, "ProofEra", "operations", directoryName);
+    await runDirectoryScript(auditScript, directory);
+    const path = join(directory, recordName);
     const beforePath = await lstat(path, { bigint: true });
     const canonicalPath = await realpath(path);
     if (
@@ -481,7 +534,7 @@ export async function assertRetiredWindowsBscTestnetPtaWbnbLpV1OwnerOnlyForInter
         before.mtimeNs !== after.mtimeNs ||
         bytes.byteLength !== Number(before.size) ||
         bytes.at(-1) !== 0x0a ||
-        sha256(bytes) !== RETIRED_V1_OWNER_RECORD_SHA256
+        sha256(bytes) !== expectedSha256
       ) {
         throw new Error("retired record");
       }
@@ -494,6 +547,24 @@ export async function assertRetiredWindowsBscTestnetPtaWbnbLpV1OwnerOnlyForInter
   } finally {
     bytes?.fill(0);
   }
+}
+
+export async function assertRetiredWindowsBscTestnetPtaWbnbLpV1V2OwnerOnlyForInternalUse(): Promise<void> {
+  const local = await resolveLocalApplicationData();
+  await assertRetiredOwnerOnly(
+    local,
+    "bsc-testnet-pta-wbnb-lp-v1",
+    "00-owner-confirmed.v1.json",
+    RETIRED_V1_OWNER_RECORD_SHA256,
+    AUDIT_RETIRED_V1_OWNER_ONLY_SCRIPT
+  );
+  await assertRetiredOwnerOnly(
+    local,
+    "bsc-testnet-pta-wbnb-lp-v2",
+    "00-owner-confirmed.v2.json",
+    RETIRED_V2_OWNER_RECORD_SHA256,
+    AUDIT_RETIRED_V2_OWNER_ONLY_SCRIPT
+  );
 }
 
 async function readRecord(directory: string, name: string): Promise<JournalRecord | null> {
