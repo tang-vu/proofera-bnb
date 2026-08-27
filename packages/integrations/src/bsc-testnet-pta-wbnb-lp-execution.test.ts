@@ -213,9 +213,9 @@ function journalRecord(
   fields: Record<string, unknown>
 ): TestRecord {
   return {
-    schema: "bsc_testnet_pta_wbnb_first_lp_journal_v3",
+    schema: "bsc_testnet_pta_wbnb_first_lp_journal_v4",
     operationKey: keccak256(
-      new TextEncoder().encode("ProofEra:bsc-testnet-pta-wbnb-first-lp-durable-operation:v3")
+      new TextEncoder().encode("ProofEra:bsc-testnet-pta-wbnb-first-lp-durable-operation:v4")
     ),
     sequence: index,
     kind: fields.kind,
@@ -410,17 +410,17 @@ describe("first-LP runner source boundary", () => {
     expect(source).toContain("parsed.id !== requestId");
     expect(source).not.toContain("parsed.id !== this.#requestId");
     expect(source).toContain(
-      "await assertRetiredWindowsBscTestnetPtaWbnbLpV1V2OwnerOnlyForInternalUse()"
+      "await assertRetiredWindowsBscTestnetPtaWbnbLpV1V2V3BoundedForInternalUse()"
     );
     expect(source).toContain("approvalTransactionHash = state?.approvalSigned?.transactionHash");
     expect(source).not.toMatch(/chainId=1(?:\D|$)|bsc-dataseed\.binance\.org/u);
   });
 
-  it("requires exact owner-only v1/v2 predecessors before opening journal v3", () => {
+  it("requires exact bounded v1/v2/v3 predecessors before opening journal v4", () => {
     const runner = readFileSync(RUNNER_PATH, "utf8");
     const journal = readFileSync(JOURNAL_PATH, "utf8");
     const predecessorAudit = runner.indexOf(
-      "await assertRetiredWindowsBscTestnetPtaWbnbLpV1V2OwnerOnlyForInternalUse()"
+      "await assertRetiredWindowsBscTestnetPtaWbnbLpV1V2V3BoundedForInternalUse()"
     );
     const currentJournal = runner.indexOf(
       "await createWindowsBscTestnetPtaWbnbLpJournalForInternalUse()"
@@ -430,13 +430,17 @@ describe("first-LP runner source boundary", () => {
     expect(journal).toContain("bsc-testnet-pta-wbnb-lp-v1");
     expect(journal).toContain("bsc-testnet-pta-wbnb-lp-v2");
     expect(journal).toContain("bsc-testnet-pta-wbnb-lp-v3");
+    expect(journal).toContain("bsc-testnet-pta-wbnb-lp-v4");
     expect(journal).toContain("0x3c862be1cff75b04bb1b02cb0b62142452bdc0065a8af43451634b18738e292b");
     expect(journal).toContain("0xe6b16d01826b8a28ddf392834d1f1c5117ef84df536021c67a88a61c2e042d3c");
+    expect(journal).toContain("0x72d0fac56400572779a63dbd79777b6a3c61d28367e365309fcd712408be4b56");
+    expect(journal).toContain("0x0f5832d0ba142646a36b5d885b65465a90d99f69f845c3674ac387c33ec50d53");
     expect(journal).toContain("$entries.Count -ne 1");
+    expect(journal).toContain("$entries.Count -ne 2");
     expect(journal).toContain("sha256(bytes) !== expectedSha256");
   });
 
-  it("keeps the three-pass rehearsal before journal v3 and custody", () => {
+  it("keeps the three-pass rehearsal before journal v4 and custody", () => {
     const source = readFileSync(RUNNER_PATH, "utf8");
     const rehearsal = source.indexOf("if (mode === READ_ONLY_REHEARSAL_FLAG)");
     const currentJournal = source.indexOf(
@@ -450,8 +454,17 @@ describe("first-LP runner source boundary", () => {
     expect(currentJournal).toBeLessThan(custody);
     expect(source).toContain('status: "read_only_rehearsal_passed"');
     expect(source).toContain("preSubmissionPasses: 3");
-    expect(source).toContain("journalV3Created: false");
+    expect(source).toContain("journalV4Created: false");
     expect(source).toContain("custodyAccessed: false");
+  });
+
+  it("uses one custody unlock path after signing_started", () => {
+    const execution = readFileSync(EXECUTION_PATH, "utf8");
+    expect(execution).toContain(
+      "const readiness = await probeWindowsBscTestnetDeployerCustodyMetadataForInternalUse("
+    );
+    expect(execution).not.toMatch(/\bprobeWindowsBscTestnetDeployerCustody\(/u);
+    expect(execution).toContain("const signed = await signEncryptedStore(");
   });
 
   it("keeps private bytes out of output and package exports", () => {

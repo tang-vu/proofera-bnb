@@ -58,7 +58,7 @@ import {
 } from "../packages/integrations/src/bsc-testnet-pta-wbnb-lp-execution.server.ts";
 import {
   BscTestnetPtaWbnbLpJournalFailure,
-  assertRetiredWindowsBscTestnetPtaWbnbLpV1V2OwnerOnlyForInternalUse,
+  assertRetiredWindowsBscTestnetPtaWbnbLpV1V2V3BoundedForInternalUse,
   createWindowsBscTestnetPtaWbnbLpJournalForInternalUse,
   type BscTestnetPtaWbnbLpJournal,
   type BscTestnetPtaWbnbLpJournalState,
@@ -1623,7 +1623,7 @@ async function main(): Promise<void> {
   }
   await assertExactRuntimeInvocation();
   const release = await inspectRelease();
-  await assertRetiredWindowsBscTestnetPtaWbnbLpV1V2OwnerOnlyForInternalUse();
+  await assertRetiredWindowsBscTestnetPtaWbnbLpV1V2V3BoundedForInternalUse();
   if (mode === READ_ONLY_REHEARSAL_FLAG) {
     const scopeClients = createFixedOfficialBscTestnetPtaWbnbLpRpcClients();
     const scope = await prepareBscTestnetPtaWbnbLpExactScope({
@@ -1648,7 +1648,7 @@ async function main(): Promise<void> {
         exactScopeSha256: plan.exactScopeSha256,
         preSubmissionPasses: 3,
         custodyAccessed: false,
-        journalV3Created: false,
+        journalV4Created: false,
         signed: false,
         broadcast: false,
         mainnetWritePossible: false
