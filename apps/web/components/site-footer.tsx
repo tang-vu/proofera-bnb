@@ -21,7 +21,7 @@ export function SiteFooter() {
           </Link>
         </div>
         <div className="site-footer-bottom">
-          <Link className="wordmark" href="/" aria-label="ProofEra home">
+          <Link className="wordmark" href="/" aria-label="Return to homepage">
             <span aria-hidden="true" className="mark">
               P
             </span>
