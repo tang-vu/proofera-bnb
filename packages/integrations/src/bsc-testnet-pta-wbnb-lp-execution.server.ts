@@ -74,7 +74,7 @@ const PINNED_POWERSHELL_EXECUTABLE =
   "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
 const PINNED_POWERSHELL_SHA256 = "9785001b0dcf755eddb8af294a373c0b87b2498660f724e76c4d53f9c217c7a3";
 const OWNER_CONFIRMATION_PROTOCOL =
-  "ProofEra:bsc-testnet-pta-wbnb-first-lp-owner-exact-byte-confirmation:v7" as const;
+  "ProofEra:bsc-testnet-pta-wbnb-first-lp-owner-exact-byte-confirmation:v8" as const;
 const OWNER_CONFIRMATION_DECISION =
   "CONFIRM_ONE_EXACT_TESTNET_LP_APPROVE_AND_MINT_NO_RETRY_NO_REPLACEMENT" as const;
 const LOCAL_APPLICATION_DATA_SCRIPT = String.raw`
@@ -183,12 +183,14 @@ export interface BscTestnetPtaWbnbLpConfirmedExecution {
   readonly plan: BscTestnetPtaWbnbLpExactExecutionPlan;
 }
 
-export type BscTestnetPtaWbnbLpSignedTransaction = Readonly<{
+export type BscTestnetPtaWbnbLpSignedTransaction<
+  TSigner extends Address = typeof BSC_TESTNET_PTA_WBNB_LP_OWNER
+> = Readonly<{
   rawTransaction: Hex;
   rawTransactionKeccak256: Hex;
   signingHash: Hex;
   transactionHash: Hex;
-  recoveredSigner: typeof BSC_TESTNET_PTA_WBNB_LP_OWNER;
+  recoveredSigner: TSigner;
 }>;
 
 export class BscTestnetPtaWbnbLpExecutionFailure extends Error {
@@ -887,10 +889,11 @@ function deriveKey(password: Uint8Array, salt: Uint8Array): Promise<Buffer> {
   });
 }
 
-function serializeAndSignExactTransaction(
+function serializeAndSignExactTransaction<TSigner extends Address>(
   secretScalar: Buffer,
-  transaction: BscTestnetPtaWbnbLpExactExecutionTransaction
-): BscTestnetPtaWbnbLpSignedTransaction {
+  transaction: BscTestnetPtaWbnbLpExactExecutionTransaction,
+  expectedSigner: TSigner
+): BscTestnetPtaWbnbLpSignedTransaction<TSigner> {
   let digest: Buffer | null = null;
   try {
     if (secretScalar.byteLength !== 32) {
@@ -928,7 +931,7 @@ function serializeAndSignExactTransaction(
       rawTransactionKeccak256: transactionHash,
       signingHash,
       transactionHash,
-      recoveredSigner: BSC_TESTNET_PTA_WBNB_LP_OWNER
+      recoveredSigner: expectedSigner
     };
   } finally {
     digest?.fill(0);
@@ -1109,10 +1112,11 @@ export async function probeBscTestnetPtaWbnbLpSigningCustodyForInternalUse(): Pr
   }
 }
 
-function assertSignedTransaction(
-  signed: BscTestnetPtaWbnbLpSignedTransaction,
-  expected: BscTestnetPtaWbnbLpExactExecutionTransaction
-): Promise<BscTestnetPtaWbnbLpSignedTransaction> {
+function assertSignedTransaction<TSigner extends Address>(
+  signed: BscTestnetPtaWbnbLpSignedTransaction<TSigner>,
+  expected: BscTestnetPtaWbnbLpExactExecutionTransaction,
+  expectedSigner: TSigner
+): Promise<BscTestnetPtaWbnbLpSignedTransaction<TSigner>> {
   return (async () => {
     const serialized = signed.rawTransaction as TransactionSerialized;
     const parsed = parseTransaction(serialized);
@@ -1120,16 +1124,18 @@ function assertSignedTransaction(
       serializedTransaction: serialized
     });
     if (
-      recovered !== BSC_TESTNET_PTA_WBNB_LP_OWNER ||
+      recovered !== expectedSigner ||
       signed.recoveredSigner !== recovered ||
       signed.transactionHash !== keccak256(signed.rawTransaction) ||
       signed.rawTransactionKeccak256 !== signed.transactionHash ||
       parsed.type !== "legacy" ||
       parsed.chainId !== BSC_TESTNET_PTA_WBNB_LP_CHAIN_ID ||
       parsed.nonce !== Number(expected.nonce) ||
-      parsed.to !== expected.to ||
+      parsed.to === null ||
+      parsed.to === undefined ||
+      getAddress(parsed.to) !== expected.to ||
       parsed.data !== expected.data ||
-      parsed.value !== expected.valueWei ||
+      (parsed.value ?? 0n) !== expected.valueWei ||
       parsed.gas !== expected.gasLimit ||
       parsed.gasPrice !== expected.gasPriceWei
     ) {
@@ -1137,6 +1143,27 @@ function assertSignedTransaction(
     }
     return Object.freeze(signed);
   })();
+}
+
+export async function reconstructExactBscTestnetPtaWbnbLpTransactionForInternalUse<
+  TSigner extends Address
+>(
+  secretScalar: Buffer,
+  transaction: BscTestnetPtaWbnbLpExactExecutionTransaction,
+  expectedSigner: TSigner
+): Promise<BscTestnetPtaWbnbLpSignedTransaction<TSigner>> {
+  try {
+    if (getAddress(expectedSigner) !== expectedSigner) {
+      throw new BscTestnetPtaWbnbLpExecutionFailure("SIGNING_FAILED");
+    }
+    const signed = serializeAndSignExactTransaction(secretScalar, transaction, expectedSigner);
+    return await assertSignedTransaction(signed, transaction, expectedSigner);
+  } catch (error) {
+    if (error instanceof BscTestnetPtaWbnbLpExecutionFailure) throw error;
+    throw new BscTestnetPtaWbnbLpExecutionFailure("SIGNING_FAILED");
+  } finally {
+    secretScalar.fill(0);
+  }
 }
 
 export async function assertFixedBscTestnetPtaWbnbLpCustodyMetadataForInternalUse(): Promise<void> {
@@ -1185,8 +1212,11 @@ export async function signBscTestnetPtaWbnbLpExactTransactionForInternalUse(
     }
     const ownedScalar = secretScalar;
     secretScalar = null;
-    const signed = serializeAndSignExactTransaction(ownedScalar, transaction);
-    return await assertSignedTransaction(signed, transaction);
+    return await reconstructExactBscTestnetPtaWbnbLpTransactionForInternalUse(
+      ownedScalar,
+      transaction,
+      BSC_TESTNET_PTA_WBNB_LP_OWNER
+    );
   } catch (error) {
     if (error instanceof BscTestnetPtaWbnbLpCustodySigningProbeFailure) {
       throw new BscTestnetPtaWbnbLpExecutionFailure("CUSTODY_UNAVAILABLE");

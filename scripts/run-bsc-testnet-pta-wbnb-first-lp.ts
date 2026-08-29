@@ -59,7 +59,7 @@ import {
 } from "../packages/integrations/src/bsc-testnet-pta-wbnb-lp-execution.server.ts";
 import {
   BscTestnetPtaWbnbLpJournalFailure,
-  assertRetiredWindowsBscTestnetPtaWbnbLpV1V2V3V4BoundedForInternalUse,
+  assertRetiredWindowsBscTestnetPtaWbnbLpV1V2V3V4V5BoundedForInternalUse,
   createWindowsBscTestnetPtaWbnbLpJournalForInternalUse,
   type BscTestnetPtaWbnbLpJournal,
   type BscTestnetPtaWbnbLpJournalState,
@@ -1627,7 +1627,7 @@ async function main(): Promise<void> {
   }
   await assertExactRuntimeInvocation();
   const release = await inspectRelease();
-  await assertRetiredWindowsBscTestnetPtaWbnbLpV1V2V3V4BoundedForInternalUse();
+  await assertRetiredWindowsBscTestnetPtaWbnbLpV1V2V3V4V5BoundedForInternalUse();
   if (mode === NO_SIGN_CUSTODY_PROBE_FLAG) {
     const result = await probeBscTestnetPtaWbnbLpSigningCustodyForInternalUse();
     process.stdout.write(
@@ -1636,7 +1636,7 @@ async function main(): Promise<void> {
         stage: result.status === "ready" ? "complete" : result.stage,
         custodyAccessed: true,
         privateKeyReturned: false,
-        journalV5Created: false,
+        journalV6Created: false,
         signed: false,
         broadcast: false,
         mainnetWritePossible: false
@@ -1669,7 +1669,7 @@ async function main(): Promise<void> {
         exactScopeSha256: plan.exactScopeSha256,
         preSubmissionPasses: 3,
         custodyAccessed: false,
-        journalV5Created: false,
+        journalV6Created: false,
         signed: false,
         broadcast: false,
         mainnetWritePossible: false

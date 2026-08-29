@@ -4,13 +4,14 @@ import { fileURLToPath } from "node:url";
 
 import * as publicSurface from "@proofera/integrations";
 import { describe, expect, it, vi } from "vitest";
-import { keccak256, sha256, stringToHex, type Hex } from "viem";
+import { keccak256, parseTransaction, sha256, stringToHex, type Hex } from "viem";
 
 import {
   BscTestnetPtaWbnbLpExecutionFailure,
   confirmBscTestnetPtaWbnbLpOwnerChallengeForInternalUse,
   createBscTestnetPtaWbnbLpOwnerChallengeForInternalUse,
   parseBscTestnetPtaWbnbLpExactExecutionPlanForInternalUse,
+  reconstructExactBscTestnetPtaWbnbLpTransactionForInternalUse,
   signBscTestnetPtaWbnbLpExactTransactionForInternalUse
 } from "./bsc-testnet-pta-wbnb-lp-execution.server";
 import {
@@ -199,6 +200,21 @@ describe("BSC-testnet first-LP exact execution", () => {
     ).rejects.toMatchObject({ code: "CONFIRMATION_EXPIRED" });
   });
 
+  it("attests a checksummed scope target after viem parses it as lowercase", async () => {
+    const transaction = validPlan().transactions[0];
+    if (transaction === undefined) throw new Error("Missing approval transaction.");
+    const testScalar = Buffer.alloc(32);
+    testScalar[31] = 1;
+    const signed = await reconstructExactBscTestnetPtaWbnbLpTransactionForInternalUse(
+      testScalar,
+      transaction,
+      "0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf"
+    );
+    expect(parseTransaction(signed.rawTransaction).to).toBe(transaction.to.toLowerCase());
+    expect(signed.recoveredSigner).toBe("0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf");
+    expect(testScalar.every((byte) => byte === 0)).toBe(true);
+  });
+
   it("keeps execution, custody and journal machinery outside the browser package surface", () => {
     expect("signBscTestnetPtaWbnbLpExactTransactionForInternalUse" in publicSurface).toBe(false);
     expect("createWindowsBscTestnetPtaWbnbLpJournalForInternalUse" in publicSurface).toBe(false);
@@ -213,9 +229,9 @@ function journalRecord(
   fields: Record<string, unknown>
 ): TestRecord {
   return {
-    schema: "bsc_testnet_pta_wbnb_first_lp_journal_v5",
+    schema: "bsc_testnet_pta_wbnb_first_lp_journal_v6",
     operationKey: keccak256(
-      new TextEncoder().encode("ProofEra:bsc-testnet-pta-wbnb-first-lp-durable-operation:v5")
+      new TextEncoder().encode("ProofEra:bsc-testnet-pta-wbnb-first-lp-durable-operation:v6")
     ),
     sequence: index,
     kind: fields.kind,
@@ -410,17 +426,17 @@ describe("first-LP runner source boundary", () => {
     expect(source).toContain("parsed.id !== requestId");
     expect(source).not.toContain("parsed.id !== this.#requestId");
     expect(source).toContain(
-      "await assertRetiredWindowsBscTestnetPtaWbnbLpV1V2V3V4BoundedForInternalUse()"
+      "await assertRetiredWindowsBscTestnetPtaWbnbLpV1V2V3V4V5BoundedForInternalUse()"
     );
     expect(source).toContain("approvalTransactionHash = state?.approvalSigned?.transactionHash");
     expect(source).not.toMatch(/chainId=1(?:\D|$)|bsc-dataseed\.binance\.org/u);
   });
 
-  it("requires exact bounded v1/v2/v3/v4 predecessors before opening journal v5", () => {
+  it("requires exact bounded v1/v2/v3/v4/v5 predecessors before opening journal v6", () => {
     const runner = readFileSync(RUNNER_PATH, "utf8");
     const journal = readFileSync(JOURNAL_PATH, "utf8");
     const predecessorAudit = runner.indexOf(
-      "await assertRetiredWindowsBscTestnetPtaWbnbLpV1V2V3V4BoundedForInternalUse()"
+      "await assertRetiredWindowsBscTestnetPtaWbnbLpV1V2V3V4V5BoundedForInternalUse()"
     );
     const currentJournal = runner.indexOf(
       "await createWindowsBscTestnetPtaWbnbLpJournalForInternalUse()"
@@ -432,18 +448,21 @@ describe("first-LP runner source boundary", () => {
     expect(journal).toContain("bsc-testnet-pta-wbnb-lp-v3");
     expect(journal).toContain("bsc-testnet-pta-wbnb-lp-v4");
     expect(journal).toContain("bsc-testnet-pta-wbnb-lp-v5");
+    expect(journal).toContain("bsc-testnet-pta-wbnb-lp-v6");
     expect(journal).toContain("0x3c862be1cff75b04bb1b02cb0b62142452bdc0065a8af43451634b18738e292b");
     expect(journal).toContain("0xe6b16d01826b8a28ddf392834d1f1c5117ef84df536021c67a88a61c2e042d3c");
     expect(journal).toContain("0x72d0fac56400572779a63dbd79777b6a3c61d28367e365309fcd712408be4b56");
     expect(journal).toContain("0x0f5832d0ba142646a36b5d885b65465a90d99f69f845c3674ac387c33ec50d53");
     expect(journal).toContain("0x7f394b5d6aa3079c702163b13c18c5e27b9096889db58c3afe9788e300cb3b17");
     expect(journal).toContain("0xee4d8524606dd523ac80159d5e148390fd09f84ade79cc3fd5f4ab61d9a22e2f");
+    expect(journal).toContain("0x954a4a9e6aeae4836dbba42f5728bf4a4848844623b7f092eaccff60c0795940");
+    expect(journal).toContain("0x7fa50b5589292da880893b02b0400a7c7ad30e2b1fcf035ad0638595391c0725");
     expect(journal).toContain("$entries.Count -ne 1");
     expect(journal).toContain("$entries.Count -ne 2");
     expect(journal).toContain("sha256(bytes) !== expectedSha256");
   });
 
-  it("keeps no-sign probe and three-pass rehearsal before journal v5", () => {
+  it("keeps no-sign probe and three-pass rehearsal before journal v6", () => {
     const source = readFileSync(RUNNER_PATH, "utf8");
     const custodyProbe = source.indexOf("if (mode === NO_SIGN_CUSTODY_PROBE_FLAG)");
     const rehearsal = source.indexOf("if (mode === READ_ONLY_REHEARSAL_FLAG)");
@@ -459,7 +478,7 @@ describe("first-LP runner source boundary", () => {
     expect(currentJournal).toBeLessThan(custody);
     expect(source).toContain('status: "read_only_rehearsal_passed"');
     expect(source).toContain("preSubmissionPasses: 3");
-    expect(source).toContain("journalV5Created: false");
+    expect(source).toContain("journalV6Created: false");
     expect(source).toContain("custodyAccessed: false");
     expect(source).toContain("privateKeyReturned: false");
   });
@@ -470,11 +489,16 @@ describe("first-LP runner source boundary", () => {
       "const readiness = await probeWindowsBscTestnetDeployerCustodyMetadataForInternalUse("
     );
     expect(execution).not.toMatch(/\bprobeWindowsBscTestnetDeployerCustody\(/u);
-    const prepare = execution.indexOf(
+    const productionSigning = execution.slice(
+      execution.indexOf(
+        "export async function signBscTestnetPtaWbnbLpExactTransactionForInternalUse"
+      )
+    );
+    const prepare = productionSigning.indexOf(
       "secretScalar = await prepareBscTestnetPtaWbnbLpSigningSecretForInternalUse()"
     );
-    const sign = execution.indexOf(
-      "const signed = serializeAndSignExactTransaction(ownedScalar, transaction)"
+    const sign = productionSigning.indexOf(
+      "return await reconstructExactBscTestnetPtaWbnbLpTransactionForInternalUse("
     );
     expect(prepare).toBeGreaterThan(0);
     expect(sign).toBeGreaterThan(prepare);
