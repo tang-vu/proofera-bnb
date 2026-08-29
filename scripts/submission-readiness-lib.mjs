@@ -28,7 +28,11 @@ const GATE_DEFINITIONS = Object.freeze([
   },
   {
     gateId: "pancake-benefit",
-    incompleteStates: ["initializer_only", "controlled_lp_confirmed"],
+    incompleteStates: [
+      "initializer_only",
+      "controlled_lp_confirmed",
+      "controlled_outcome_observed"
+    ],
     requiredKinds: ["transaction_receipt", "before_after_metrics", "manual_baseline"]
   },
   {

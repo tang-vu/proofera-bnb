@@ -31,9 +31,10 @@ describe("Proof room", () => {
     expect(html).toContain("BSC-testnet registration verified");
     expect(html).toContain('data-gate-id="termix-pairs" data-gate-state="verified"');
     expect(html).toContain(
-      'data-gate-id="pancake-benefit" data-gate-state="controlled_lp_confirmed"'
+      'data-gate-id="pancake-benefit" data-gate-state="controlled_outcome_observed"'
     );
     expect(html).toContain("controlled test-fixture LP position");
+    expect(html).toContain("No fee income, price movement or liquidity change was observed");
     expect(html).toContain("residual PTA allowance is zero");
     expect(html).toContain("Both lanes scored 100/100 on all three bounded tasks");
     expect(html).toContain("Three paired tasks. Mixed timing. Quality parity.");

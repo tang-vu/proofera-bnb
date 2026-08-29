@@ -41,12 +41,12 @@ The five bounded lifecycle rows now have linked evidence. This closes only the t
 
 Eligibility story: prove a real, measurable benefit to an LP or trader; a logo or read-only integration is insufficient.
 
-| Required evidence               | Current state                                                                                                                                                     | Closure artifact                                                                       |
-| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Authentic Pancake product state | Exact-block public USDT/WBNB position capture and deterministic LP analysis retained                                                                              | Frozen controlled pool/position context                                                |
-| Real bounded operation          | Approval and direct mint have matching finalized receipts; two EIP-1898 providers agree on NFT `37109`, exact position/pool liquidity and zero residual allowance | Retained artifact plus explorer links are complete; keep owner-executed scope explicit |
-| Before/after value              | Initial controlled position state and exact gas/native/token consumption are retained; no performance claim is made                                               | Later range, fee, gas, slippage and estimated-IL outcome                               |
-| Fair alternative                | LP TermiX manual baseline and protected adjudication are retained                                                                                                 | Compare a time-bounded controlled outcome against that baseline                        |
+| Required evidence               | Current state                                                                                                                                                     | Closure artifact                                                                               |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Authentic Pancake product state | Exact-block public USDT/WBNB position capture and deterministic LP analysis retained                                                                              | Frozen controlled pool/position context                                                        |
+| Real bounded operation          | Approval and direct mint have matching finalized receipts; two EIP-1898 providers agree on NFT `37109`, exact position/pool liquidity and zero residual allowance | Retained artifact plus explorer links are complete; keep owner-executed scope explicit         |
+| Before/after value              | Initial controlled position state and exact gas/native/token consumption are retained; no performance claim is made                                               | Later range, fee, gas, slippage and estimated-IL outcome                                       |
+| Fair alternative                | LP TermiX manual baseline and protected adjudication are retained; the controlled outcome explicitly records that this baseline is not an economic comparator     | Run a preregistered comparable autonomous/manual economic experiment before claiming advantage |
 
 ### TermiX
 

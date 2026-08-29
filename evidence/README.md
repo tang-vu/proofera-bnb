@@ -8,6 +8,8 @@ This directory holds reproducible, non-secret evidence for judged claims. It mus
 
 `onchain/bsc-testnet-pta-wbnb-first-lp-eed9c32a107b57735f45bd6246d967cb12fbb1579a05faa9f17e0ead46187d01.json` is the retained controlled first-LP artifact, SHA-256 `3fa80573ea8cd3ee85208670048bffed48d757c2e8674757ac3331077f121d6a`. It binds exact approval and direct mint transaction hashes, successful finalized receipts from both fixed chain-97 RPCs, and matching EIP-1898 mint-block post-state for owner-held NFT `37109`, full-range fee-500 position/pool liquidity and zero residual allowance. It contains no custody or raw signed transaction. This is owner-executed fixture evidence, not autonomous-agent performance, market price, profit, fees, IL or realized economic benefit.
 
+`pancake/runs/pta-wbnb-outcomes/127841040-127861271.json` is the create-only bounded outcome artifact, SHA-256 `cc6534ff6a2101fd219934001701e94d5f967eebbd0940ef5efee7a831482050`. Across `9,104` seconds and `20,231` blocks, two fixed providers agreed on the initializer receipt and a 12-confirmation EIP-1898 observation. Pool price/tick and position/pool liquidity were unchanged; fee growth and recomputed uncollected fees were zero. Estimated IL is exactly zero only inside this unchanged-price window, while recorded approval-plus-mint gas remains `64,146,300,000,000` testnet wei. The result is `not_observed`, not a benefit claim. The frozen manual LP task concerns an unrelated mainnet public position and is therefore retained as non-comparable; no autonomous-agent advantage is established.
+
 Each evidence run will use a manifest containing:
 
 - stable run ID and task definition;

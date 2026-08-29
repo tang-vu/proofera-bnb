@@ -1,6 +1,6 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-29T04:33:50.411Z",
+  "updatedAtUtc": "2026-08-29T06:13:42.000Z",
   "readyForSubmission": false,
   "gates": [
     {
@@ -66,10 +66,10 @@
     },
     {
       "gateId": "pancake-benefit",
-      "state": "controlled_lp_confirmed",
-      "claim": "The initializer remains a separately bounded historical receipt observation. A later exact owner-present chain-97 run sent one PTA approval and one direct Position Manager mint at most once each. Both fixed RPCs agreed on successful finalized receipts and EIP-1898 receipt-block post-state: NFT 37109 belongs to the owner, the full-range fee-500 position and pool each hold raw liquidity 1000000000000000000, exact consumption was 1000 PTA plus 0.001 native BNB, and residual PTA allowance is zero. This proves a controlled test-fixture LP position, not autonomous-agent execution, profit, fee income, IL, market price or realized economic benefit.",
+      "state": "controlled_outcome_observed",
+      "claim": "The controlled test-fixture LP position has exact finalized approval/mint receipts, residual PTA allowance is zero, and a read-only two-provider outcome spans 9104 seconds and 20231 blocks. The initialized and observed sqrt price, tick, position liquidity and pool liquidity were unchanged; recomputed fee growth and uncollected fees were zero, bounded estimated IL was zero only because price and liquidity were unchanged, and recorded gas cost was 64146300000000 testnet wei. No fee income, price movement or liquidity change was observed. The frozen manual task is unrelated and not an economic comparator, so this establishes neither realized economic benefit nor autonomous-agent advantage.",
       "blockers": [
-        "Retain a time-bounded before/after position outcome and compare it against the frozen manual baseline net of gas, fees, slippage and estimated IL before claiming benefit or agent advantage."
+        "No benefit was observed and the owner-executed fixture is not comparable to the frozen read-only manual task; require a preregistered comparable autonomous/manual economic experiment with an admissible valuation source before claiming benefit or agent advantage."
       ],
       "artifacts": [
         {
@@ -88,9 +88,19 @@
           "sha256": "410c538efcdb3bff6589a05a8062d16aaf56386aa9db851760f1a043d04ec3df"
         },
         {
-          "kind": "controlled_first_lp_execution",
+          "kind": "transaction_receipt",
           "path": "evidence/onchain/bsc-testnet-pta-wbnb-first-lp-eed9c32a107b57735f45bd6246d967cb12fbb1579a05faa9f17e0ead46187d01.json",
           "sha256": "3fa80573ea8cd3ee85208670048bffed48d757c2e8674757ac3331077f121d6a"
+        },
+        {
+          "kind": "before_after_metrics",
+          "path": "evidence/pancake/runs/pta-wbnb-outcomes/127841040-127861271.json",
+          "sha256": "cc6534ff6a2101fd219934001701e94d5f967eebbd0940ef5efee7a831482050"
+        },
+        {
+          "kind": "manual_baseline",
+          "path": "evidence/termix/runs/pancake-lp/manual/pancake-lp-manual-20260818-v1.json",
+          "sha256": "5ee72fc3008dde7e94115ea1243eaf8c940be56c1c64753e33707722215cb3b6"
         }
       ]
     },
