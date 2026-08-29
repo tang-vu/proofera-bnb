@@ -1,6 +1,6 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-26T15:20:17.492Z",
+  "updatedAtUtc": "2026-08-29T03:55:33.695Z",
   "readyForSubmission": false,
   "gates": [
     {
@@ -66,11 +66,10 @@
     },
     {
       "gateId": "pancake-benefit",
-      "state": "initializer_only",
-      "claim": "Both fixed chain-97 RPCs observed the initializer receipt; historical EIP-1898 state remains unavailable, so strict durable confirmation remains withheld. At common block 127358821 they also agreed on exact current code, pool liquidity zero, sender balances/allowances/nonces and read-only simulations for a two-transaction zero-slippage first-LP scope. That scope expired without custody access, signature or broadcast; no liquidity, LP position, controlled before/after result or realized benefit is evidenced.",
+      "state": "controlled_lp_confirmed",
+      "claim": "The initializer remains a separately bounded historical receipt observation. A later exact owner-present chain-97 run sent one PTA approval and one direct Position Manager mint at most once each. Both fixed RPCs agreed on successful finalized receipts and EIP-1898 receipt-block post-state: NFT 37109 belongs to the owner, the full-range fee-500 position and pool each hold raw liquidity 1000000000000000000, exact consumption was 1000 PTA plus 0.001 native BNB, and residual PTA allowance is zero. This proves a controlled test-fixture LP position, not autonomous-agent execution, profit, fee income, IL, market price or realized economic benefit.",
       "blockers": [
-        "Regenerate the exact two-minute scope from fresh dual-RPC state and obtain separate exact owner signing/broadcast authorization.",
-        "Retain a controlled Pancake transaction receipt and before/after result against the frozen manual baseline net of known costs."
+        "Retain a time-bounded before/after position outcome and compare it against the frozen manual baseline net of gas, fees, slippage and estimated IL before claiming benefit or agent advantage."
       ],
       "artifacts": [
         {
@@ -87,6 +86,11 @@
           "kind": "read_only_exact_scope_preparation",
           "path": "evidence/development/bsc-testnet-pta-wbnb-lp-exact-scope-127358821.json",
           "sha256": "410c538efcdb3bff6589a05a8062d16aaf56386aa9db851760f1a043d04ec3df"
+        },
+        {
+          "kind": "controlled_first_lp_execution",
+          "path": "evidence/onchain/bsc-testnet-pta-wbnb-first-lp-eed9c32a107b57735f45bd6246d967cb12fbb1579a05faa9f17e0ead46187d01.json",
+          "sha256": "3fa80573ea8cd3ee85208670048bffed48d757c2e8674757ac3331077f121d6a"
         }
       ]
     },

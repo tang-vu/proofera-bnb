@@ -1,18 +1,22 @@
 # PancakeSwap V3 BSC testnet PTA/WBNB pool readiness
 
-Updated: 2026-08-26. Decision: **generation 10 consumed its sole existing-signature send opportunity
-after exact policy/owner gates and durably remains `submission_started`. Both fixed RPCs observe the
-exact transaction, status-1 receipt, expected `PoolCreated`/`Initialize` payloads, receipt block and
-receipt-plus-128 ancestry. Both lack the required historical EIP-1898 canonical/state reads, so the
-strict result is `do_not_retry/CANONICALITY_INVALID`, not durable `confirmed`. Release `bc56a95` has
-two owner-designated internal reviews with zero P0/P1. No resend, replacement, liquidity, LP mint,
-position, oracle or mainnet action is claimed or authorized**.
+Updated: 2026-08-29. Decision: **generation 10 consumed its sole existing-signature initializer send
+and retains the explicit historical EIP-1898 limitation. A separate exact first-LP v6 run on release
+`2f7eb8c` completed one approval and one direct mint at most once each. Both fixed RPCs agree on their
+successful finalized receipts and mint-block EIP-1898 NFT/position/pool/zero-allowance post-state.
+NFT `37109` holds raw full-range liquidity `10^18`. No resend, replacement, autonomous-agent action,
+market price, oracle, profit, fee income, IL, realized benefit or mainnet action is claimed or
+authorized**.
 
 Machine record:
 [`evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json`](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-2026-08-13.json)
 
 Bounded reconciliation observation:
 [`evidence/development/bsc-testnet-pta-wbnb-pool-reconciliation-observation-2026-08-26.json`](../evidence/development/bsc-testnet-pta-wbnb-pool-reconciliation-observation-2026-08-26.json)
+
+Controlled first-LP execution:
+[`evidence/onchain/bsc-testnet-pta-wbnb-first-lp-eed9c32a107b57735f45bd6246d967cb12fbb1579a05faa9f17e0ead46187d01.json`](../evidence/onchain/bsc-testnet-pta-wbnb-first-lp-eed9c32a107b57735f45bd6246d967cb12fbb1579a05faa9f17e0ead46187d01.json),
+SHA-256 `3fa80573ea8cd3ee85208670048bffed48d757c2e8674757ac3331077f121d6a`.
 
 Exact reconciliation-release reviews:
 [`evidence/development/bsc-testnet-pta-wbnb-pool-reconciliation-release-review-2026-08-26.json`](../evidence/development/bsc-testnet-pta-wbnb-pool-reconciliation-release-review-2026-08-26.json)
@@ -512,42 +516,56 @@ read-only reconciliation release `bc56a959dcc29898d9b207f92fb27459b6ccc8d8`, tre
 owner-designated internal reviews with zero P0/P1. Those reviews are not external, cryptographically
 identified, Sigstore-attested, transaction authorization, or review of a future runtime envelope.
 
-## Separate proposed liquidity envelope
+## Historical proposal and completed controlled first LP
 
-A later test-only LP mint may be designed with desired-amount caps of at most `1,000 PTA` and
-`0.001 WBNB`. This is a **proposal, not an approval**. It is not a balance claim, spend authorization,
-valuation, guaranteed consumption amount, position range, minimum amount, or mint request. No WBNB
-funding/wrapping, token approval, LP calldata, recipient, ticks, deadline, slippage minima, gas cap, or
-position authority is approved by this document.
+The `1,000 PTA + 0.001 WBNB` envelope above was only a proposal when this preparation record was
+written. It did not itself approve a balance, spend, position range, calldata, recipient, deadline,
+slippage, gas cap or transaction. Pool initialization and LP mint remained separate decisions.
 
-The two write decisions stay separate:
+A later exact first-LP runner independently refreshed pool/runtime/nonce/balance/gas state, simulated
+the exact direct calls on both fixed RPCs, and bound explicit full-range ticks, equal desired/minimum
+amounts, recipient, deadline and native-outflow cap to one same-process owner-presence challenge. Clean
+published release `2f7eb8c41ae01843ae47e8a182241d055ca4d1ab` then completed:
 
-1. Pool initialization consumed its single authorized existing-signature send. The matching receipt and
-   logs are observed, but strict durable confirmation remains unavailable because both fixed providers
-   lack the required historical EIP-1898 reads. No second initialization send is allowed.
-2. Only after the pool is independently re-reviewed may an LP mint be prepared. It requires separate
-   bounded token approvals, explicit ticks/amounts/minima/deadline/slippage, owner/revoke authority,
-   simulation, user confirmation, and receipt evidence.
+1. PTA approval `0x001c0e6c2f4fc567a455bcb0cd44be6c9ba768066551bdf1d94d978a33138c9d`.
+2. Direct Position Manager mint `0xeed9c32a107b57735f45bd6246d967cb12fbb1579a05faa9f17e0ead46187d01`.
+
+Each signed transaction was durably committed before one at-most-once submission; retry and replacement
+were unavailable. Both fixed RPCs agree on successful finalized receipts. Their EIP-1898 reads at the
+mint block agree that NFT `37109` belongs to owner `0x997cD959798F7c925076eaeFF5855C5C2c1e5A49`,
+its fee-500 full-range position and the pool each have raw liquidity `1000000000000000000`, exact token
+consumption was `1000000000000000000000` PTA raw plus `1000000000000000` wei native BNB, and
+residual PTA allowance to the manager is zero. Combined gas cost was `64146300000000` wei; total native
+outflow was `1064146300000000` wei, below the bound `1080596200000000` wei.
+
+The retained [first-LP execution artifact](../evidence/onchain/bsc-testnet-pta-wbnb-first-lp-eed9c32a107b57735f45bd6246d967cb12fbb1579a05faa9f17e0ead46187d01.json)
+has SHA-256 `3fa80573ea8cd3ee85208670048bffed48d757c2e8674757ac3331077f121d6a`.
+It contains no private key, wallet password or raw signed transaction. Device-local journal v6 is terminal
+and must not be rerun.
 
 ## Remaining blockers
 
 - Keep generation 10 reconciliation-only. Its exact raw transaction must never be resent or replaced.
   A later reconciliation may only re-read the retained transaction using a separately reviewed fixed-
   provider policy; missing archive state must remain explicit rather than becoming success.
+- Keep first-LP journal v6 terminal. Approval and mint must never be resent or replaced; any position
+  change requires a new exact scope and distinct authorization.
 - Preserve the exact `bc56a95` two-review decision only for that 37-file runtime subject. It is
   owner-designated internal review, not external/Sigstore/cryptographic reviewer identity and not
   transaction authority.
 - Establish post-initialization observation cardinality and elapsed oracle history before using the
   pool for analysis; a new pool has no decision-useful history merely because it exists.
-- Review actual liquidity depth, price-manipulation exposure, token funding, LP range, ownership,
-  bounded approvals, Altana policy/authority, and revoke behavior before activation.
+- Observe the controlled position over a bounded interval and compare fees, gas, slippage and estimated
+  IL against the frozen manual baseline before any benefit or agent-advantage claim.
+- Review price-manipulation exposure and require a production Altana policy/authority/revoke path before
+  any autonomous position change. The owner-executed fixture does not prove that path.
 
-The truthful state is: PTA/WBNB identities and construction provenance are evidenced; generation 10
-durably started and exercised its at-most-once exact transaction; both fixed providers return matching
-status-1 receipt/log and bounded ancestry observations. ProofEra has no strict durable `confirmed`
-record because both required EIP-1898 historical reads are unavailable. **No authenticated external/
-third-party review is claimed. No missing historical state is converted into a pool-state claim, and
-no resend, replacement, liquidity, oracle, LP position, mainnet write, or further authority exists**.
+The truthful state is: PTA/WBNB identities and construction provenance are evidenced; generation 10's
+initializer remains bounded by its unavailable historical-state proof; and the separate first-LP v6
+artifact proves two successful finalized transactions plus dual-provider receipt-block position state.
+**No authenticated external/third-party review, autonomous-agent execution, market price, oracle,
+profit, fee-income, IL, realized economic benefit, mainnet write or reusable authority is claimed. No
+missing evidence is converted into any of those claims**.
 
 The machine record is linked to the retained
 [bounded public-result RPC transcript](../evidence/development/bsc-testnet-pta-wbnb-pool-readiness-rpc-transcript-2026-08-13.json)
