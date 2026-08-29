@@ -291,13 +291,41 @@ export default async function MarketplacePage({ searchParams }: MarketplacePageP
         </div>
       </nav>
 
-      <header className="shell marketplace-hero">
-        <span className="eyebrow">INTENT BEFORE INVENTORY</span>
-        <h1>Start with the job.</h1>
-        <p className="lede">
-          ProofEra narrows the market by your constraints, then separates an onchain identity from
-          evidence that its strategy is safe, current, and effective.
-        </p>
+      <header className="shell marketplace-hero marketplace-hero-layout">
+        <div>
+          <span className="eyebrow">INTENT BEFORE INVENTORY</span>
+          <h1>Start with the job.</h1>
+          <p className="lede">
+            ProofEra narrows the market by your constraints, then separates an onchain identity from
+            evidence that its strategy is safe, current, and effective.
+          </p>
+        </div>
+        <aside className="decision-path" aria-label="ProofEra marketplace decision path">
+          <div className="decision-path-head">
+            <span>DECISION PATH</span>
+            <span>03 GATES</span>
+          </div>
+          <ol>
+            <li>
+              <span>01</span>
+              <strong>Define</strong>
+              <small>Capital + risk</small>
+            </li>
+            <li>
+              <span>02</span>
+              <strong>Separate</strong>
+              <small>Identity ≠ evidence</small>
+            </li>
+            <li>
+              <span>03</span>
+              <strong>Hold</strong>
+              <small>Until proof is complete</small>
+            </li>
+          </ol>
+          <p>
+            <i aria-hidden="true" /> Recommendation remains withheld by default
+          </p>
+        </aside>
       </header>
 
       <section className="shell intent-layout" aria-labelledby="intent-heading">

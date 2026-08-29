@@ -1,9 +1,9 @@
 .hero {
   display: grid;
-  align-items: end;
-  gap: 56px;
-  padding-block: 90px 64px;
-  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+  align-items: center;
+  gap: clamp(48px, 7vw, 92px);
+  padding-block: 94px 76px;
+  grid-template-columns: minmax(0, 1.25fr) minmax(340px, 0.75fr);
 }
 
 .hero h1 {
@@ -11,10 +11,111 @@
   font-size: clamp(3rem, 7vw, 6.3rem);
 }
 
+.releasePanel {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px;
+  background:
+    radial-gradient(circle at 0 0, rgb(244 211 94 / 8%), transparent 17rem),
+    linear-gradient(145deg, rgb(20 27 22 / 92%), rgb(8 11 9 / 96%));
+  box-shadow: var(--shadow-soft);
+}
+
+.releaseSignal {
+  display: flex;
+  align-items: center;
+  padding: 6px 2px 18px;
+  gap: 15px;
+}
+
+.releaseSignal > div:last-child {
+  display: grid;
+  gap: 5px;
+}
+
+.releaseSignal span,
+.releaseSignal p {
+  margin: 0;
+  color: var(--muted);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.releaseSignal strong {
+  font-size: 15px;
+}
+
+.releaseOrb {
+  position: relative;
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgb(244 211 94 / 40%);
+  border-radius: 50%;
+}
+
+.releaseOrb::before,
+.releaseOrb span,
+.releaseOrb i {
+  position: absolute;
+  border-radius: 50%;
+  content: "";
+}
+
+.releaseOrb::before {
+  width: 25px;
+  height: 25px;
+  border: 1px dashed rgb(244 211 94 / 48%);
+  animation: release-spin 8s linear infinite;
+}
+
+.releaseOrb span {
+  width: 6px;
+  height: 6px;
+  background: var(--caution);
+  box-shadow: 0 0 14px rgb(240 185 104 / 70%);
+}
+
+.releaseOrb i {
+  top: 5px;
+  right: 8px;
+  width: 5px;
+  height: 5px;
+  background: var(--positive);
+}
+
+.gateMeter {
+  display: grid;
+  margin-bottom: 15px;
+  gap: 5px;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.gateMeter span {
+  height: 4px;
+  border-radius: 999px;
+  background: #3c453e;
+}
+
+.gateMeter span[data-state="verified"] {
+  background: var(--positive);
+  box-shadow: 0 0 10px rgb(120 216 155 / 24%);
+}
+
+.gateMeter span[data-state="controlled_outcome_observed"] {
+  background: var(--caution);
+}
+
 .releaseFacts {
   margin: 0;
   border: 1px solid var(--line);
-  background: rgb(18 21 18 / 82%);
+  border-radius: 11px;
+  background: rgb(8 11 9 / 64%);
 }
 
 .releaseFacts div {
@@ -52,10 +153,40 @@
 }
 
 .agentCard {
+  position: relative;
+  overflow: hidden;
   min-width: 0;
   border: 1px solid var(--line);
-  padding: 24px;
-  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 26px;
+  background: linear-gradient(145deg, rgb(20 27 22 / 84%), rgb(10 13 11 / 94%));
+  box-shadow: 0 16px 46px rgb(0 0 0 / 13%);
+  transition:
+    transform 260ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 260ms ease,
+    box-shadow 260ms ease;
+}
+
+.agentCard::before {
+  position: absolute;
+  top: 0;
+  right: 24px;
+  left: 24px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(244 211 94 / 45%), transparent);
+  content: "";
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+
+.agentCard:hover {
+  border-color: rgb(117 134 120 / 52%);
+  box-shadow: 0 24px 60px rgb(0 0 0 / 22%);
+  transform: translateY(-4px);
+}
+
+.agentCard:hover::before {
+  opacity: 1;
 }
 
 .cardHeading {
@@ -119,23 +250,57 @@
 }
 
 .gateList {
-  margin: 46px 0 0;
+  position: relative;
+  display: grid;
+  margin: 48px 0 0;
   padding: 0;
+  gap: 14px;
   list-style: none;
 }
 
+.gateList::before {
+  position: absolute;
+  top: 30px;
+  bottom: 30px;
+  left: 26px;
+  width: 1px;
+  background: linear-gradient(var(--signal), var(--line) 35%, var(--line));
+  content: "";
+}
+
 .gate {
+  position: relative;
   display: grid;
-  gap: 22px;
-  border-top: 1px solid var(--line);
-  padding-block: 28px;
-  grid-template-columns: 48px minmax(0, 1fr);
+  overflow: hidden;
+  gap: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px;
+  background: linear-gradient(145deg, rgb(17 22 18 / 82%), rgb(10 13 11 / 92%));
+  grid-template-columns: 42px minmax(0, 1fr);
+  transition:
+    border-color 220ms ease,
+    transform 220ms ease;
+}
+
+.gate:hover {
+  border-color: rgb(106 121 109 / 48%);
+  transform: translateX(4px);
 }
 
 .gateNumber {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid rgb(244 211 94 / 35%);
+  border-radius: 50%;
+  background: var(--bg);
   color: var(--signal);
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 12px;
+  font-size: 9px;
 }
 
 .gateBody > p {
@@ -148,7 +313,9 @@
 .blocker {
   max-width: 900px;
   margin-top: 18px;
+  border: 1px solid rgb(240 185 104 / 18%);
   border-left: 3px solid var(--caution);
+  border-radius: 0 10px 10px 0;
   padding: 12px 18px;
   background: rgb(240 185 104 / 6%);
   color: var(--muted);
@@ -174,6 +341,11 @@
 .gate summary {
   width: fit-content;
   cursor: pointer;
+  transition: color 180ms ease;
+}
+
+.gate summary:hover {
+  color: var(--text);
 }
 
 .artifacts {
@@ -219,12 +391,34 @@
     padding-top: 64px;
   }
 
+  .releasePanel {
+    max-width: 560px;
+  }
+
   .gate {
-    grid-template-columns: 32px minmax(0, 1fr);
+    padding: 22px 18px;
+    gap: 12px;
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+
+  .gateList::before {
+    left: 31px;
   }
 
   .cardHeading {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+@keyframes release-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .releaseOrb::before {
+    animation: none;
   }
 }

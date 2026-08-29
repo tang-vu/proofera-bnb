@@ -104,6 +104,10 @@ test("explains the evidence-first marketplace and exposes all four categories", 
 
   await expect(page.getByRole("heading", { name: /hire agents by proof/i })).toBeVisible();
   await expect(page.getByRole("link", { name: "Find an agent" })).toBeVisible();
+  await expect(page.getByLabel("ProofEra evidence gate model")).toBeVisible();
+  await expect(
+    page.getByRole("contentinfo").getByText("BSC testnet first", { exact: false })
+  ).toBeVisible();
 
   for (const [label, category] of [
     ["LP rebalancing", "lp-rebalancing"],
@@ -117,6 +121,25 @@ test("explains the evidence-first marketplace and exposes all four categories", 
       `/marketplace?category=${category}`
     );
   }
+});
+
+test("keeps the premium judge journey bounded on mobile and honors reduced motion", async ({
+  page
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+
+  await expect(page.getByLabel("ProofEra evidence gate model")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Grant a testnet session" })).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+    .toBe(true);
+
+  const orbitAnimationDuration = await page
+    .locator(".proof-orbit-ring-outer")
+    .evaluate((node) => Number.parseFloat(getComputedStyle(node).animationDuration));
+  expect(orbitAnimationDuration).toBeLessThan(0.001);
 });
 
 test("category entry preserves the selected financial job without instructions", async ({

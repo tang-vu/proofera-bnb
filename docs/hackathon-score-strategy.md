@@ -51,6 +51,12 @@ owner-facing session entry point; /mission-control is the read-only authority an
 - Kept the PTA amount-0 Altana effect, owner-executed first-LP state, and still-missing LP economics
   explicit.
 - Added the repository license file declared by package.json.
+- Built a shared proof-control visual system instead of isolated landing-page polish: the five-gate
+  hero, Marketplace decision path, Proof Room gate meter/timeline, responsive card hierarchy and
+  site-wide closing handoff now form one recognizable product language.
+- Kept motion on decorative signal/orbit/entrance layers only, with a tested reduced-motion path,
+  visible keyboard focus and no 390 px document overflow. Evidence values and incomplete states do
+  not animate into stronger claims.
 
 ## Highest-value next actions
 

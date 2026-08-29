@@ -1,6 +1,6 @@
 # ProofEra execution plan
 
-Updated: 2026-08-25
+Updated: 2026-08-29
 Deadline: 2026-09-09 12:00 UTC
 Operating principle: complete and verify the highest-value unblocked judge journey before expanding breadth.
 
@@ -15,6 +15,8 @@ The official page was rechecked on 2026-08-16. The main prize remains winner-tak
 5. Run the three preregistered TermiX pairs, publish only complete results, then freeze the public judge build and submission evidence.
 
 The first UX correction removes diagnostic-route clutter from the landing hero and makes every category card a direct, query-bound marketplace entry. Playwright verifies that the selected financial job survives navigation without instructions. Local verification remains authoritative until GitHub Actions can start jobs; runs are currently rejected before step execution because the repository owner's account reports a failed payment or spending-limit condition.
+
+The current UI candidate adds a shared premium proof-control visual system without changing evidence semantics: the landing page visualizes the five proof gates, Marketplace exposes its decision path, Proof Room renders a truthful release-gate meter and scannable ledger, and every route inherits the same atmospheric shell, interaction hierarchy and footer. Motion is limited to opacity/transform and decorative signals; `prefers-reduced-motion` collapses it, visible focus remains intact, and 390 px previews have no horizontal document overflow. This source candidate remains distinct from the frozen public `e6e55c1` release until separately authorized deployment and a new public probe.
 
 The marketplace and four read-only analyzers now have durable HTTPS endpoints on the owner's always-on Windows host, supervised by PM2 behind a named Cloudflare Tunnel. Repeatable local/public probes cover marketplace health, analyzer health, exact Agent Card URLs, and the exact advertised skill IDs for each agent. Finalized BSC-testnet ERC-8004 receipt evidence binds Agent IDs `1825` through `1828`; it proves identity publication only. All analyzers still declare execution disabled, and evidence-backed live data, marketplace eligibility, activation authority, and execution receipts remain required.
 

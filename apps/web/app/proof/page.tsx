@@ -65,6 +65,7 @@ function formatNanoseconds(value: string): string {
 
 export default function ProofRoomPage() {
   const build = publicBuildIdentifier();
+  const verifiedGateCount = readiness.gates.filter((gate) => gate.state === "verified").length;
 
   return (
     <main id="main-content" tabIndex={-1}>
@@ -94,22 +95,46 @@ export default function ProofRoomPage() {
             measured advantage. A green build cannot turn an incomplete gate into evidence.
           </p>
         </div>
-        <dl className={styles.releaseFacts}>
-          <div>
-            <dt>Public build</dt>
-            <dd>{build}</dd>
+        <aside className={styles.releasePanel} aria-label="Current release evidence status">
+          <div className={styles.releaseSignal}>
+            <div className={styles.releaseOrb} aria-hidden="true">
+              <span />
+              <i />
+            </div>
+            <div>
+              <span>RELEASE LEDGER</span>
+              <strong>
+                {verifiedGateCount} / {readiness.gates.length} gates verified
+              </strong>
+              <p>Non-final states remain visible</p>
+            </div>
           </div>
-          <div>
-            <dt>Closure schema</dt>
-            <dd>{readiness.schemaVersion}</dd>
+          <div
+            aria-label={`${verifiedGateCount} of ${readiness.gates.length} release gates verified`}
+            className={styles.gateMeter}
+            role="img"
+          >
+            {readiness.gates.map((gate) => (
+              <span data-state={gate.state} key={gate.gateId} />
+            ))}
           </div>
-          <div>
-            <dt>Submission-ready</dt>
-            <dd className={readiness.readyForSubmission ? styles.verified : styles.incomplete}>
-              {readiness.readyForSubmission ? "Verified" : "No — gates remain open"}
-            </dd>
-          </div>
-        </dl>
+          <dl className={styles.releaseFacts}>
+            <div>
+              <dt>Public build</dt>
+              <dd>{build}</dd>
+            </div>
+            <div>
+              <dt>Closure schema</dt>
+              <dd>{readiness.schemaVersion}</dd>
+            </div>
+            <div>
+              <dt>Submission-ready</dt>
+              <dd className={readiness.readyForSubmission ? styles.verified : styles.incomplete}>
+                {readiness.readyForSubmission ? "Verified" : "No — gates remain open"}
+              </dd>
+            </div>
+          </dl>
+        </aside>
       </section>
 
       <section className={`shell section ${styles.section}`} aria-labelledby="agents-heading">
