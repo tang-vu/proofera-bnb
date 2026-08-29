@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 interface LiveEvidenceLoadingProps {
   readonly title: string;
   readonly detail: string;
@@ -8,19 +6,6 @@ interface LiveEvidenceLoadingProps {
 export function LiveEvidenceLoading({ title, detail }: LiveEvidenceLoadingProps) {
   return (
     <main aria-busy="true" id="main-content" tabIndex={-1}>
-      <nav className="shell nav" aria-label="Primary navigation">
-        <Link className="wordmark" href="/" aria-label="ProofEra home">
-          <span aria-hidden="true" className="mark">
-            P
-          </span>
-          ProofEra
-        </Link>
-        <div className="nav-links">
-          <Link href="/marketplace">Marketplace</Link>
-          <span className="network-pill">BSC source reads</span>
-        </div>
-      </nav>
-
       <header className="shell route-loading-header">
         <span className="eyebrow">LIVE EVIDENCE REQUEST</span>
         <h1>{title}</h1>

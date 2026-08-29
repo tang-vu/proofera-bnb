@@ -261,36 +261,6 @@ export default async function MarketplacePage({ searchParams }: MarketplacePageP
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <nav className="shell nav" aria-label="Primary navigation">
-        <Link className="wordmark" href="/" aria-label="ProofEra home">
-          <span aria-hidden="true" className="mark">
-            P
-          </span>
-          ProofEra
-        </Link>
-        <div className="nav-links">
-          <span className="nav-current">Marketplace</span>
-          <Link href="/pancake-position">Pancake position</Link>
-          <Link className="nav-optional" href="/lp-activate">
-            LP configuration
-          </Link>
-          <Link className="nav-optional" href="/mission-control">
-            Mission Control
-          </Link>
-          <Link className="nav-optional" href="/session-control">
-            Session control
-          </Link>
-          <Link href="/venus-health">Venus liquidity</Link>
-          <Link className="nav-optional" href="/yield-sources">
-            Lista sources
-          </Link>
-          <a className="nav-optional" href="#registry-results">
-            Registry evidence
-          </a>
-          <span className="network-pill">BSC source reads</span>
-        </div>
-      </nav>
-
       <header className="shell marketplace-hero marketplace-hero-layout">
         <div>
           <span className="eyebrow">INTENT BEFORE INVENTORY</span>
@@ -461,9 +431,16 @@ export default async function MarketplacePage({ searchParams }: MarketplacePageP
                   <br />
                   <strong>Current marketplace eligibility:</strong> false
                 </p>
-                <Link className="text-link" href={`/reference-analyzers/${reference.category}`}>
-                  Open {reference.name} dossier
-                </Link>
+                <div className="agent-card-actions">
+                  <Link className="text-link" href={`/reference-analyzers/${reference.category}`}>
+                    Open {reference.name} dossier
+                  </Link>
+                  {reference.category === "health-factor-monitoring" ? (
+                    <Link className="text-link" href="/venus-health">
+                      Open raw Venus evidence reader
+                    </Link>
+                  ) : null}
+                </div>
               </article>
             );
           })}

@@ -105,20 +105,6 @@ async function ResolvedAgentPassport({ identity }: Readonly<{ identity: AgentRou
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <nav className="shell nav" aria-label="Primary navigation">
-        <Link className="wordmark" href="/" aria-label="ProofEra home">
-          <span aria-hidden="true" className="mark">
-            P
-          </span>
-          ProofEra
-        </Link>
-        <div className="nav-links">
-          <Link href="/marketplace">Marketplace</Link>
-          <span className="nav-current">Agent Passport</span>
-          <span className="network-pill">{network}</span>
-        </div>
-      </nav>
-
       <header className="shell passport-header">
         <div>
           <span className="eyebrow">SOURCE-LINKED AGENT PASSPORT</span>

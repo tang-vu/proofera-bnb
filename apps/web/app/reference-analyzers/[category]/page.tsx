@@ -122,20 +122,6 @@ export default async function ReferenceAnalyzerPage({ params }: ReferenceAnalyze
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <nav className="shell nav" aria-label="Primary navigation">
-        <Link className="wordmark" href="/" aria-label="ProofEra home">
-          <span aria-hidden="true" className="mark">
-            P
-          </span>
-          ProofEra
-        </Link>
-        <div className="nav-links">
-          <Link href="/marketplace">Marketplace</Link>
-          <span className="nav-current">Reference dossier</span>
-          <span className="network-pill">BSC testnet identity</span>
-        </div>
-      </nav>
-
       <header className={["shell", styles.hero].join(" ")}>
         <div>
           <span className="eyebrow">REGISTERED REFERENCE AGENT DOSSIER</span>

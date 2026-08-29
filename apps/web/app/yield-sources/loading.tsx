@@ -1,21 +1,6 @@
-import Link from "next/link";
-
 export default function YieldSourcesLoading() {
   return (
     <main aria-busy="true" id="main-content" tabIndex={-1}>
-      <nav className="shell nav" aria-label="Primary navigation">
-        <Link className="wordmark" href="/" aria-label="ProofEra home">
-          <span aria-hidden="true" className="mark">
-            P
-          </span>
-          ProofEra
-        </Link>
-        <div className="nav-links">
-          <Link href="/marketplace">Marketplace</Link>
-          <span className="network-pill">BSC mainnet · read only</span>
-        </div>
-      </nav>
-
       <header className="shell route-loading-header">
         <span className="eyebrow">LISTA MOOLAH / OFFICIAL API READ</span>
         <h1>Reading current Lista yield-source fields.</h1>

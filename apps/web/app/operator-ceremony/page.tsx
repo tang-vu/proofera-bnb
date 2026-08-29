@@ -20,23 +20,6 @@ export default function OperatorCeremonyPage() {
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <nav className="shell nav" aria-label="Primary navigation">
-        <Link className="wordmark" href="/" aria-label="ProofEra home">
-          <span aria-hidden="true" className="mark">
-            P
-          </span>
-          ProofEra
-        </Link>
-        <div className="nav-links">
-          <Link href="/marketplace">Marketplace</Link>
-          <Link className="nav-optional" href="/proof">
-            Proof room
-          </Link>
-          <span className="nav-current">Internal ceremony</span>
-          <span className="network-pill">Testnet only</span>
-        </div>
-      </nav>
-
       <header className="shell marketplace-hero ceremony-hero">
         <span className="eyebrow">INTERNAL EVIDENCE TOOL / NOT THE PRODUCT ENTRY POINT</span>
         <h1>Reproduce bounded evidence checkpoints.</h1>

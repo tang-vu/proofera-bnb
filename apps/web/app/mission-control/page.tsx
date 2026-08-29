@@ -21,26 +21,6 @@ export default function MissionControlPage() {
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <nav className="shell nav" aria-label="Primary navigation">
-        <Link className="wordmark" href="/" aria-label="ProofEra home">
-          <span aria-hidden="true" className="mark">
-            P
-          </span>
-          ProofEra
-        </Link>
-        <div className="nav-links">
-          <Link href="/marketplace">Marketplace</Link>
-          <Link className="nav-optional" href="/session-control">
-            Session control
-          </Link>
-          <Link className="nav-optional" href="/lp-activate">
-            LP mandate
-          </Link>
-          <span className="nav-current">Mission Control</span>
-          <span className="network-pill">No active authority</span>
-        </div>
-      </nav>
-
       <header className="shell marketplace-hero">
         <span className="eyebrow">ONE GRANT / CONTINUOUS VISIBILITY / IMMEDIATE EXIT</span>
         <h1>Control the mandate, not every action.</h1>

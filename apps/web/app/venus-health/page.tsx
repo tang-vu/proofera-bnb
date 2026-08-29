@@ -3,7 +3,6 @@ import {
   type VenusHealthAvailableResult
 } from "@proofera/integrations";
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import {
   resolveVenusHealthQuery,
@@ -417,26 +416,6 @@ export default async function VenusHealthPage({ searchParams }: VenusHealthPageP
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <nav className="shell nav" aria-label="Primary navigation">
-        <Link className="wordmark" href="/" aria-label="ProofEra home">
-          <span aria-hidden="true" className="mark">
-            P
-          </span>
-          ProofEra
-        </Link>
-        <div className="nav-links">
-          <Link href="/marketplace">Marketplace</Link>
-          <Link className="nav-optional" href="/pancake-position">
-            Pancake position
-          </Link>
-          <Link className="nav-optional" href="/yield-sources">
-            Lista sources
-          </Link>
-          <span className="nav-current">Venus evidence</span>
-          <span className="network-pill">Read only</span>
-        </div>
-      </nav>
-
       <header className="shell pancake-position-header venus-health-header">
         <span className="eyebrow">VENUS CORE POOL / BLOCK-PINNED READ</span>
         <h1>Inspect liquidity without inventing a health factor.</h1>

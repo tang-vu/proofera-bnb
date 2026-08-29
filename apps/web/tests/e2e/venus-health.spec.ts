@@ -7,11 +7,9 @@ test("exposes health-category and raw Venus evidence entry links", async ({ page
   ).toHaveAttribute("href", "/marketplace?category=health-factor-monitoring");
 
   await page.goto("/marketplace");
-  await expect(
-    page.getByRole("navigation", { name: "Primary navigation" }).getByRole("link", {
-      name: "Venus liquidity"
-    })
-  ).toBeVisible();
+  const evidenceReader = page.getByRole("link", { name: "Open raw Venus evidence reader" });
+  await expect(evidenceReader).toBeVisible();
+  await expect(evidenceReader).toHaveAttribute("href", "/venus-health");
 });
 
 test("opens the Venus reader in a no-read state", async ({ page }) => {

@@ -1,21 +1,6 @@
-import Link from "next/link";
-
 export default function MarketplaceLoading() {
   return (
     <main aria-busy="true" id="main-content" tabIndex={-1}>
-      <nav className="shell nav" aria-label="Primary navigation">
-        <Link className="wordmark" href="/" aria-label="ProofEra home">
-          <span aria-hidden="true" className="mark">
-            P
-          </span>
-          ProofEra
-        </Link>
-        <div className="nav-links">
-          <span className="nav-current">Marketplace</span>
-          <span className="network-pill">BSC source reads</span>
-        </div>
-      </nav>
-
       <header className="shell route-loading-header">
         <span className="eyebrow">INTENT BEFORE INVENTORY</span>
         <h1>Start with the job.</h1>

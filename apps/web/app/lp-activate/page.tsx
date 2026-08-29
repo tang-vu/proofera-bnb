@@ -295,29 +295,6 @@ export default async function LpActivatePage({ searchParams }: LpActivatePagePro
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <nav className="shell nav" aria-label="Primary navigation">
-        <Link className="wordmark" href="/" aria-label="ProofEra home">
-          <span aria-hidden="true" className="mark">
-            P
-          </span>
-          ProofEra
-        </Link>
-        <div className="nav-links">
-          <Link href="/marketplace">Marketplace</Link>
-          <Link className="nav-optional" href="/pancake-position">
-            Position evidence
-          </Link>
-          <span className="nav-current">LP mandate</span>
-          <Link className="nav-optional" href="/session-control">
-            Session control
-          </Link>
-          <Link className="nav-optional" href="/mission-control">
-            Mission Control
-          </Link>
-          <span className="network-pill">Testnet only</span>
-        </div>
-      </nav>
-
       <header className="shell pancake-position-header">
         <span className="eyebrow">LP RANGE AGENT / ONE-TIME MANDATE DESIGN</span>
         <h1>Grant once. Keep every action bounded.</h1>

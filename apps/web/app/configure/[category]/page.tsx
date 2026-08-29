@@ -700,21 +700,6 @@ export default async function ConfigureReferenceAgentPage({
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <nav className="shell nav" aria-label="Primary navigation">
-        <Link className="wordmark" href="/" aria-label="ProofEra home">
-          <span aria-hidden="true" className="mark">
-            P
-          </span>
-          ProofEra
-        </Link>
-        <div className="nav-links">
-          <Link href="/marketplace">Marketplace</Link>
-          <Link href={`/reference-analyzers/${category}`}>Reference dossier</Link>
-          <span className="nav-current">Configure mandate</span>
-          <span className="network-pill">No source reads</span>
-        </div>
-      </nav>
-
       <header className="shell pancake-position-header">
         <span className="eyebrow">{copy.eyebrow}</span>
         <h1>{copy.title}</h1>

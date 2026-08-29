@@ -43,26 +43,6 @@ export default function SessionControlPage() {
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <nav className="shell nav" aria-label="Primary navigation">
-        <Link className="wordmark" href="/" aria-label="ProofEra home">
-          <span aria-hidden="true" className="mark">
-            P
-          </span>
-          ProofEra
-        </Link>
-        <div className="nav-links">
-          <Link href="/marketplace">Marketplace</Link>
-          <Link className="nav-optional" href="/lp-activate">
-            LP mandate
-          </Link>
-          <Link className="nav-optional" href="/mission-control">
-            Mission Control
-          </Link>
-          <span className="nav-current">Session control</span>
-          <span className="network-pill">BSC testnet 97</span>
-        </div>
-      </nav>
-
       <header className="shell marketplace-hero ceremony-hero">
         <span className="eyebrow">ONE OWNER GRANT / BOUNDED AGENT AUTHORITY</span>
         <h1>Grant once. Stay inside limits.</h1>

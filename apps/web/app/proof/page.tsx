@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import registrationEvidence from "../../../../evidence/submission/final/agent-registration.json";
 import readiness from "../../../../evidence/submission/readiness.json";
@@ -69,23 +68,6 @@ export default function ProofRoomPage() {
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <nav className="shell nav" aria-label="Primary navigation">
-        <Link className="wordmark" href="/" aria-label="ProofEra home">
-          <span aria-hidden="true" className="mark">
-            P
-          </span>
-          ProofEra
-        </Link>
-        <div className="nav-links">
-          <Link href="/marketplace">Marketplace</Link>
-          <span className="nav-current">Proof room</span>
-          <Link className="nav-optional" href="/mission-control">
-            Mission Control
-          </Link>
-          <span className="network-pill">BSC testnet first</span>
-        </div>
-      </nav>
-
       <section className={`shell ${styles.hero}`} aria-labelledby="proof-room-heading">
         <div>
           <span className="eyebrow">JUDGE-FACING EVIDENCE INDEX</span>

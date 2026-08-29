@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
 import { SiteFooter } from "../components/site-footer";
+import { SiteHeader } from "../components/site-header";
 
 import "./globals.css";
 
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
           <span className="atmosphere-glow atmosphere-glow-two" />
           <span className="atmosphere-beam" />
         </div>
+        <SiteHeader />
         {children}
         <SiteFooter />
       </body>

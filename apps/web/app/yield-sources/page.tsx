@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { loadLiveListaYieldSources } from "../../lib/lista-yield-live";
@@ -20,30 +19,6 @@ function ExternalLink({ href, children }: Readonly<{ href: string; children: Rea
     <a href={href} rel="noopener noreferrer" target="_blank">
       {children} <span aria-hidden="true">↗</span>
     </a>
-  );
-}
-
-function Navigation() {
-  return (
-    <nav className="shell nav" aria-label="Primary navigation">
-      <Link className="wordmark" href="/" aria-label="ProofEra home">
-        <span aria-hidden="true" className="mark">
-          P
-        </span>
-        ProofEra
-      </Link>
-      <div className="nav-links">
-        <Link href="/marketplace">Marketplace</Link>
-        <Link className="nav-optional" href="/pancake-position">
-          Pancake position
-        </Link>
-        <Link className="nav-optional" href="/venus-health">
-          Venus evidence
-        </Link>
-        <span className="nav-current">Lista evidence</span>
-        <span className="network-pill">BSC mainnet · read only</span>
-      </div>
-    </nav>
   );
 }
 
@@ -447,8 +422,6 @@ export default async function YieldSourcesPage() {
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <Navigation />
-
       <header className="shell pancake-position-header">
         <span className="eyebrow">LISTA MOOLAH / OFFICIAL API READ</span>
         <h1>Inspect yield-source fields without inventing net yield.</h1>

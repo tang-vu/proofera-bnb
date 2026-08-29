@@ -1,5 +1,12 @@
 import { expect, test } from "@playwright/test";
 
+const stablePrimaryNavigation = [
+  ["Marketplace", "/marketplace"],
+  ["Proof room", "/proof"],
+  ["Session control", "/session-control"],
+  ["Mission Control", "/mission-control"]
+] as const;
+
 test("health endpoint identifies the ProofEra marketplace", async ({ request }) => {
   const response = await request.get("/api/health");
 
@@ -140,6 +147,96 @@ test("keeps the premium judge journey bounded on mobile and honors reduced motio
     .locator(".proof-orbit-ring-outer")
     .evaluate((node) => Number.parseFloat(getComputedStyle(node).animationDuration));
   expect(orbitAnimationDuration).toBeLessThan(0.001);
+});
+
+test("keeps one motionless header contract through every primary client route", async ({
+  page
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+
+  const navigation = page.getByRole("navigation", { name: "Primary navigation" });
+  const originalNavigation = await navigation.elementHandle();
+  expect(originalNavigation).not.toBeNull();
+
+  const baseline = await navigation.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    const style = getComputedStyle(element);
+    return {
+      animationName: style.animationName,
+      height: box.height,
+      opacity: style.opacity,
+      transform: style.transform,
+      width: box.width,
+      x: box.x,
+      y: box.y
+    };
+  });
+  expect(baseline).toMatchObject({ animationName: "none", opacity: "1", transform: "none" });
+
+  for (const [label, path] of stablePrimaryNavigation) {
+    await navigation.getByRole("link", { exact: true, name: label }).click();
+    await expect(page).toHaveURL(new RegExp(`${path.replaceAll("/", "\\/")}$`, "u"));
+    await expect(navigation.getByRole("link", { exact: true, name: label })).toHaveAttribute(
+      "aria-current",
+      "page"
+    );
+    await expect(navigation.locator("a")).toHaveCount(5);
+    await expect(navigation.locator("a")).toHaveText([
+      /ProofEra/u,
+      ...stablePrimaryNavigation.map(([navigationLabel]) => navigationLabel)
+    ]);
+
+    const current = await navigation.evaluate((element) => {
+      const box = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return {
+        animationName: style.animationName,
+        height: box.height,
+        opacity: style.opacity,
+        transform: style.transform,
+        width: box.width,
+        x: box.x,
+        y: box.y
+      };
+    });
+    expect(current).toEqual(baseline);
+    expect(
+      await page.evaluate(
+        (original) => original === document.querySelector('nav[aria-label="Primary navigation"]'),
+        originalNavigation
+      )
+    ).toBe(true);
+  }
+});
+
+test("never creates transient mobile overflow while the shared header settles", async ({
+  page
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+
+  for (const path of ["/", "/marketplace", "/proof", "/session-control", "/mission-control"]) {
+    await page.goto(path, { waitUntil: "domcontentloaded" });
+    const navigation = page.getByRole("navigation", { name: "Primary navigation" });
+
+    for (const delay of [0, 16, 100, 700]) {
+      if (delay > 0) await page.waitForTimeout(delay);
+      const state = await navigation.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          animationName: style.animationName,
+          clientWidth: document.documentElement.clientWidth,
+          opacity: style.opacity,
+          scrollWidth: document.documentElement.scrollWidth,
+          transform: style.transform
+        };
+      });
+      expect(state).toMatchObject({ animationName: "none", opacity: "1", transform: "none" });
+      expect(state.scrollWidth, `${path} overflowed after ${delay}ms`).toBeLessThanOrEqual(
+        state.clientWidth
+      );
+    }
+  }
 });
 
 test("category entry preserves the selected financial job without instructions", async ({

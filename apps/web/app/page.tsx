@@ -46,29 +46,6 @@ const proofRules = [
 export default function HomePage() {
   return (
     <main id="main-content" tabIndex={-1}>
-      <nav className="shell nav" aria-label="Primary navigation">
-        <Link className="wordmark" href="/" aria-label="ProofEra home">
-          <span aria-hidden="true" className="mark">
-            P
-          </span>
-          ProofEra
-        </Link>
-        <div className="nav-links">
-          <Link href="/marketplace">Marketplace</Link>
-          <Link href="/proof">Proof room</Link>
-          <Link className="nav-optional" href="/session-control">
-            Session control
-          </Link>
-          <Link className="nav-optional" href="/mission-control">
-            Mission Control
-          </Link>
-          <a className="nav-optional" href="#method">
-            How proof works
-          </a>
-          <span className="network-pill">BSC testnet first</span>
-        </div>
-      </nav>
-
       <section className="shell hero home-hero">
         <div className="hero-stage">
           <div className="hero-copy">

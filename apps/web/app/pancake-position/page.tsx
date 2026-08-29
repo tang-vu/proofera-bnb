@@ -4,7 +4,6 @@ import {
   type PancakeV3LatestSnapshotProvenance
 } from "@proofera/integrations";
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import {
   resolvePancakePositionQuery,
@@ -313,29 +312,6 @@ export default async function PancakePositionPage({ searchParams }: PancakePosit
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <nav className="shell nav" aria-label="Primary navigation">
-        <Link className="wordmark" href="/" aria-label="ProofEra home">
-          <span aria-hidden="true" className="mark">
-            P
-          </span>
-          ProofEra
-        </Link>
-        <div className="nav-links">
-          <Link href="/marketplace">Marketplace</Link>
-          <span className="nav-current">Pancake position</span>
-          <Link className="nav-optional" href="/lp-activate">
-            LP configuration
-          </Link>
-          <Link className="nav-optional" href="/venus-health">
-            Venus evidence
-          </Link>
-          <Link className="nav-optional" href="/yield-sources">
-            Lista sources
-          </Link>
-          <span className="network-pill">Read only</span>
-        </div>
-      </nav>
-
       <header className="shell pancake-position-header">
         <span className="eyebrow">PANCAKESWAP V3 · BLOCK-PINNED READ</span>
         <h1>Inspect a position without inventing performance.</h1>

@@ -114,20 +114,6 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <nav className="shell nav" aria-label="Primary navigation">
-        <Link className="wordmark" href="/" aria-label="ProofEra home">
-          <span aria-hidden="true" className="mark">
-            P
-          </span>
-          ProofEra
-        </Link>
-        <div className="nav-links">
-          <Link href="/marketplace">Marketplace</Link>
-          <span className="nav-current">Compare</span>
-          <span className="network-pill">Evidence first</span>
-        </div>
-      </nav>
-
       <header className="shell comparison-header">
         <span className="eyebrow">TRADE-OFFS BEFORE AUTHORITY</span>
         <h1>Compare the evidence, including what is missing.</h1>
