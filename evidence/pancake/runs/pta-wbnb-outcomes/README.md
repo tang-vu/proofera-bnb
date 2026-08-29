@@ -13,8 +13,11 @@ corepack pnpm capture:pancake:pta-wbnb-outcome $sourceCommit
 ```
 
 The collector reads owner, position, pool price/liquidity, global fee growth and boundary-tick fee
-growth. It recomputes uncollected fees without poking or collecting the position. It never loads
-custody, signs, approves, swaps, burns, collects, broadcasts or changes liquidity.
+growth. The initial price comes from the Initialize receipt returned by both providers, while the
+initial position comes from the digest-pinned first-LP artifact; this avoids pretending that public
+RPCs provide archival state calls. It recomputes uncollected fees without poking or collecting the
+position. It never loads custody, signs, approves, swaps, burns, collects, broadcasts or changes
+liquidity.
 
 An observation can establish a bounded unchanged/changed state and exact raw-unit costs. It cannot
 turn fixture tokens into economic value, make an external-oracle claim, or compare an owner-executed

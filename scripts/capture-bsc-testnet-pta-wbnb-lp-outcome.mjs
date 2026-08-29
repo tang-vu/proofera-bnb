@@ -22,6 +22,13 @@ const TOKEN_ID = 37_109n;
 const FEE = 500n;
 const TICK_LOWER = -887_270;
 const TICK_UPPER = 887_270;
+const INITIALIZER_TRANSACTION_HASH =
+  "0xa24d1dfa3440de3fcb644d9b52847bcc8d54f43a2e29b425f50bbce4bd684022";
+const INITIALIZER_BLOCK_HASH = "0xd7b9b18b3a02e3b0b8bcc8f403507e2fb53ba575eb02b9ca0002d9a8bb9131d6";
+const INITIALIZER_BLOCK_NUMBER = 127_284_872n;
+const INITIALIZE_TOPIC = "0x98636036cb66a9c19a37435efc1e90142190214e8abeb821bdba3f2990dd4c95";
+const INITIAL_SQRT_PRICE_X96 = 79_228_162_514_264_337_593_543_950n;
+const INITIAL_TICK = -138_163;
 const INITIAL_LIQUIDITY = 1_000_000_000_000_000_000n;
 const DESIRED_PTA_RAW = 1_000_000_000_000_000_000_000n;
 const DESIRED_NATIVE_WEI = 1_000_000_000_000_000n;
@@ -173,7 +180,11 @@ function abiInt(value, bits) {
 }
 
 function sameAddress(left, right) {
-  return left.toLowerCase() === right.toLowerCase();
+  return (
+    typeof left === "string" &&
+    typeof right === "string" &&
+    left.toLowerCase() === right.toLowerCase()
+  );
 }
 
 function normalizeBlock(value, expectedNumber, code) {
@@ -184,6 +195,40 @@ function normalizeBlock(value, expectedNumber, code) {
   const parentHash = hex32(value.parentHash, code);
   if (number !== expectedNumber) fail(code);
   return Object.freeze({ hash, number, parentHash, timestamp });
+}
+
+function normalizeInitializerReceipt(value) {
+  const code = "PTA_WBNB_OUTCOME_INITIALIZER_RECEIPT_INVALID";
+  if (value === null || typeof value !== "object" || !Array.isArray(value.logs)) fail(code);
+  if (
+    hex32(value.transactionHash, code) !== INITIALIZER_TRANSACTION_HASH ||
+    hex32(value.blockHash, code) !== INITIALIZER_BLOCK_HASH ||
+    quantity(value.blockNumber, code) !== INITIALIZER_BLOCK_NUMBER ||
+    quantity(value.status, code) !== 1n
+  ) {
+    fail(code);
+  }
+  const initializeLogs = value.logs.filter(
+    (log) =>
+      log !== null &&
+      typeof log === "object" &&
+      sameAddress(log.address ?? "", POOL) &&
+      Array.isArray(log.topics) &&
+      log.topics.length === 1 &&
+      log.topics[0] === INITIALIZE_TOPIC
+  );
+  if (initializeLogs.length !== 1) fail(code);
+  const decoded = words(initializeLogs[0].data, 2, code);
+  const sqrtPriceX96 = unsigned(decoded[0], 160, code);
+  const tick = Number(signed(decoded[1], 24, code));
+  if (sqrtPriceX96 !== INITIAL_SQRT_PRICE_X96 || tick !== INITIAL_TICK) fail(code);
+  return Object.freeze({
+    blockHash: INITIALIZER_BLOCK_HASH,
+    blockNumber: INITIALIZER_BLOCK_NUMBER,
+    sqrtPriceX96,
+    tick,
+    transactionHash: INITIALIZER_TRANSACTION_HASH
+  });
 }
 
 function decodePosition(raw) {
@@ -419,6 +464,8 @@ async function capture(sourceCommit) {
   );
   const mintAmount0 = BigInt(firstLp?.postState?.events?.amount0Raw ?? "");
   const mintAmount1 = BigInt(firstLp?.postState?.events?.amount1Raw ?? "");
+  const initialObservation = firstLp?.postState?.observations?.[0];
+  const initialPosition = initialObservation?.position;
   const approvalGas =
     BigInt(firstLp?.approval?.receipt?.gasUsed ?? "") *
     BigInt(firstLp?.approval?.receipt?.effectiveGasPrice ?? "");
@@ -428,7 +475,21 @@ async function capture(sourceCommit) {
   if (
     mintBlockNumber !== 127_841_040n ||
     mintAmount0 !== DESIRED_PTA_RAW ||
-    mintAmount1 !== DESIRED_NATIVE_WEI
+    mintAmount1 !== DESIRED_NATIVE_WEI ||
+    firstLp?.postState?.providerAgreementVerified !== true ||
+    !sameAddress(initialObservation?.owner ?? "", OWNER) ||
+    !sameAddress(initialPosition?.operator ?? "", "0x0000000000000000000000000000000000000000") ||
+    !sameAddress(initialPosition?.token0 ?? "", PTA) ||
+    !sameAddress(initialPosition?.token1 ?? "", WBNB) ||
+    BigInt(initialPosition?.fee ?? "") !== FEE ||
+    initialPosition?.tickLower !== TICK_LOWER ||
+    initialPosition?.tickUpper !== TICK_UPPER ||
+    BigInt(initialPosition?.liquidity ?? "") !== INITIAL_LIQUIDITY ||
+    BigInt(initialPosition?.feeGrowthInside0LastX128 ?? "") !== 0n ||
+    BigInt(initialPosition?.feeGrowthInside1LastX128 ?? "") !== 0n ||
+    BigInt(initialPosition?.tokensOwed0 ?? "") !== 0n ||
+    BigInt(initialPosition?.tokensOwed1 ?? "") !== 0n ||
+    BigInt(initialObservation?.poolLiquidityRaw ?? "") !== INITIAL_LIQUIDITY
   ) {
     fail("PTA_WBNB_OUTCOME_FIRST_LP_INVALID");
   }
@@ -459,22 +520,23 @@ async function capture(sourceCommit) {
       mintBlockNumber,
       "PTA_WBNB_OUTCOME_MINT_BLOCK_INVALID"
     );
+    const initializerReceipt = normalizeInitializerReceipt(
+      await client.call("eth_getTransactionReceipt", [INITIALIZER_TRANSACTION_HASH])
+    );
     const observationBlock = normalizeBlock(
       await client.call("eth_getBlockByNumber", [observationTag, false]),
       observationBlockNumber,
       "PTA_WBNB_OUTCOME_OBSERVATION_BLOCK_INVALID"
     );
-    const initialState = await readState(client, mintBlock.hash);
     const currentState = await readState(client, observationBlock.hash);
-    validateIdentity(initialState);
     validateIdentity(currentState);
     providerObservations.push({
       provider: client.provider.id,
       rpcOrigin: client.provider.url,
       headBlockNumber: heads[index],
       mintBlock,
+      initializerReceipt,
       observationBlock,
-      initialState,
       currentState,
       transcript: client.transcript
     });
@@ -491,9 +553,9 @@ async function capture(sourceCommit) {
     "PTA_WBNB_OUTCOME_OBSERVATION_BLOCK_DISAGREEMENT"
   );
   assertProviderAgreement(
-    providerObservations[0].initialState,
-    providerObservations[1].initialState,
-    "PTA_WBNB_OUTCOME_INITIAL_STATE_DISAGREEMENT"
+    providerObservations[0].initializerReceipt,
+    providerObservations[1].initializerReceipt,
+    "PTA_WBNB_OUTCOME_INITIALIZER_RECEIPT_DISAGREEMENT"
   );
   assertProviderAgreement(
     providerObservations[0].currentState,
@@ -501,21 +563,13 @@ async function capture(sourceCommit) {
     "PTA_WBNB_OUTCOME_CURRENT_STATE_DISAGREEMENT"
   );
 
-  const initialState = providerObservations[0].initialState;
   const currentState = providerObservations[0].currentState;
-  if (
-    initialState.position.liquidity !== INITIAL_LIQUIDITY ||
-    initialState.poolLiquidity !== INITIAL_LIQUIDITY
-  ) {
-    fail("PTA_WBNB_OUTCOME_INITIAL_STATE_INVALID");
-  }
   const fees = currentUncollectedFees(currentState);
-  const initialFees = currentUncollectedFees(initialState);
-  const priceUnchanged = initialState.slot0.sqrtPriceX96 === currentState.slot0.sqrtPriceX96;
-  const tickUnchanged = initialState.slot0.tick === currentState.slot0.tick;
+  const priceUnchanged = INITIAL_SQRT_PRICE_X96 === currentState.slot0.sqrtPriceX96;
+  const tickUnchanged = INITIAL_TICK === currentState.slot0.tick;
   const positionUnchanged =
-    initialState.position.liquidity === currentState.position.liquidity &&
-    initialState.poolLiquidity === currentState.poolLiquidity;
+    INITIAL_LIQUIDITY === currentState.position.liquidity &&
+    INITIAL_LIQUIDITY === currentState.poolLiquidity;
   const durationSeconds =
     providerObservations[0].observationBlock.timestamp -
     providerObservations[0].mintBlock.timestamp;
@@ -573,16 +627,16 @@ async function capture(sourceCommit) {
       providerAgreementVerified: true
     },
     initialState: {
-      sqrtPriceX96: initialState.slot0.sqrtPriceX96,
-      tick: initialState.slot0.tick,
-      positionLiquidityRaw: initialState.position.liquidity,
-      poolLiquidityRaw: initialState.poolLiquidity,
-      feeGrowthGlobal0X128: initialState.feeGrowthGlobal0X128,
-      feeGrowthGlobal1X128: initialState.feeGrowthGlobal1X128,
-      feeGrowthInside0X128: initialFees.feeGrowthInside0X128,
-      feeGrowthInside1X128: initialFees.feeGrowthInside1X128,
-      tokensOwed0Raw: initialState.position.tokensOwed0,
-      tokensOwed1Raw: initialState.position.tokensOwed1
+      priceSource: "dual-provider initializer receipt",
+      positionSource: FIRST_LP_ARTIFACT,
+      sqrtPriceX96: INITIAL_SQRT_PRICE_X96,
+      tick: INITIAL_TICK,
+      positionLiquidityRaw: INITIAL_LIQUIDITY,
+      poolLiquidityRaw: INITIAL_LIQUIDITY,
+      feeGrowthInside0LastX128: 0n,
+      feeGrowthInside1LastX128: 0n,
+      tokensOwed0Raw: 0n,
+      tokensOwed1Raw: 0n
     },
     currentState: {
       sqrtPriceX96: currentState.slot0.sqrtPriceX96,
@@ -635,6 +689,7 @@ async function capture(sourceCommit) {
       "PTA is a fixed-supply BSC-testnet fixture without an asserted market value; WBNB and gas amounts are testnet units.",
       "Zero estimated impermanent loss is limited to the exact unchanged pool-price and unchanged-liquidity window; it is not a forecast.",
       "Position-manager tokensOwed fields alone can be stale, so fee amounts are recomputed from exact fee-growth state and position liquidity.",
+      "The initial price is bound to the Initialize event returned in the same transaction receipt by both fixed providers; the exact initial position fields come from the digest-pinned first-LP artifact because the public RPCs do not promise archival eth_call support.",
       "No external price oracle, token valuation, swap simulation, withdrawal, collect, burn, approval, signature or broadcast is introduced.",
       "The owner-executed mint cannot establish autonomous-agent performance or superiority over the unrelated manual decision baseline."
     ]

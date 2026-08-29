@@ -22,6 +22,8 @@ test("PTA/WBNB outcome collector is exact, dual-provider, read-only and create-o
   assert.match(source, /https:\/\/data-seed-prebsc-2-s2\.binance\.org:8545/u);
   assert.match(source, /https:\/\/bsc-testnet-rpc\.publicnode\.com/u);
   assert.match(source, /eth_call/u);
+  assert.match(source, /eth_getTransactionReceipt/u);
+  assert.match(source, /dual-provider initializer receipt/u);
   assert.match(source, /requireCanonical: true/u);
   assert.match(source, /writeFile\(outputPath, outputBytes, \{ flag: "wx" \}\)/u);
   assert.doesNotMatch(source, /eth_sendRawTransaction|privateKey|keystore|decrypt/u);
