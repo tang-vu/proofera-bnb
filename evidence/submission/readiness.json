@@ -1,20 +1,20 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-29T06:13:42.000Z",
+  "updatedAtUtc": "2026-08-29T09:49:43.590Z",
   "readyForSubmission": false,
   "gates": [
     {
       "gateId": "production-release",
       "state": "deployed_unfrozen",
-      "claim": "A two-resolver, five-host TLS and eleven-response rehearsal is retained for publicly deployed commit d4057ad2f183da4330375dc09b751f9b1a828e33; the final judging release and final probe are not frozen.",
+      "claim": "Commit c476b01b5eb01d9595232e90cca40dece564e91a is publicly deployed on the existing ProofEra PM2 and Cloudflare Tunnel topology. Its retained rehearsal binds two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses and the exact public build. This is a production deployment observation, not a final release freeze.",
       "blockers": [
-        "Freeze the final published commit and retain an independently reviewable public probe artifact."
+        "Final-mode preflight still requires the Pancake gate to be verified, while the honest measured state is controlled_outcome_observed with no benefit; revise that prerequisite without promoting a negative outcome into a benefit claim, then retain the final probe and rollback exercise."
       ],
       "artifacts": [
         {
           "kind": "release_rehearsal",
-          "path": "evidence/submission/release-probes/d4057ad2f183da4330375dc09b751f9b1a828e33/rehearsal/manifest.json",
-          "sha256": "72720968961320a1a43e09bff0896cb8347eb5b28ecbb265fe0e33ae0251de05"
+          "path": "evidence/submission/release-probes/c476b01b5eb01d9595232e90cca40dece564e91a/rehearsal/manifest.json",
+          "sha256": "ba4e8fc1ddc31bdae7240457f1e5ae2029bc4f06fb5e24945e73c733f723becf"
         }
       ]
     },

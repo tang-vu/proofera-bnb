@@ -47,6 +47,15 @@ $releaseCommit = (git rev-parse HEAD).Trim()
 corepack pnpm capture:production:release $releaseCommit --mode final
 ```
 
+On 2026-08-29, commit `c476b01b5eb01d9595232e90cca40dece564e91a` was deployed and passed the
+exact public smoke probe. Rehearsal manifest SHA-256
+`ba4e8fc1ddc31bdae7240457f1e5ae2029bc4f06fb5e24945e73c733f723becf` retains the bounded
+DNS/TLS/HTTP observations. Final mode stopped before network with
+`PRODUCTION_RELEASE_PREREQUISITES_OPEN`: the prerequisite still requires Pancake `verified`, while
+the measured state is truthfully `controlled_outcome_observed` with no benefit. Do not promote that
+negative outcome into a benefit claim merely to freeze a release; the prerequisite model must be
+revised and reviewed first.
+
 After final capture, retain a separate release manifest beneath `evidence/submission/final/`, perform
 the documented rollback exercise, update the production readiness gate from exact artifacts, deploy
 that evidence-bearing commit only when its relationship to the observed application release is
