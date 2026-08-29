@@ -75,3 +75,12 @@ the prior `e6e55c1` verified-release ledger rather than a reopened `deployed_unf
 fail-closed release-state transition, not an HTTP/TLS failure. The evidence carrier reopens the gate;
 it must be separately deployed and then pass a fresh final capture and bounded rollback/restoration
 exercise before the current UI release is called frozen.
+
+On 2026-08-30 local time, header-stable release
+`ad0cee11885b2131c27bfa14c3b0a27f2f8fee69` was deployed on the existing PM2/Cloudflare topology.
+Its final host-origin capture passed two-resolver agreement for all five hosts, five authorized TLS
+observations and all eleven exact HTTPS checks, including exact build identity and honest readiness
+`503`. Manifest SHA-256 is
+`3a296042cd9bd2ccbfba37c9c15ba8085e5ec82afd9d87d6042397df7ad70e68`.
+The release remains `deployed_unfrozen`: a bounded rollback/restoration exercise, independent uptime
+monitoring and the final demo are still separate gates.
