@@ -63,3 +63,15 @@ Altana worker were not restarted; the worker PID remained `40632`. Final release
 operational evidence, not independent uptime, Windows reboot, DNS/tunnel rollback, database restore,
 wallet, signing or transaction evidence. The next release work is the final narrated demo and
 authoritative submission receipt; independent monitoring/paging remains open.
+
+Later on 2026-08-29, the premium UI release
+`676ab796bec729a734355737d6c0509a27c9d1d5` replaced only the marketplace and release monitor. The
+four analyzer PIDs and Altana worker PID `40632` did not change. Its exact public release probe passed
+all eleven checkpoints, and rehearsal manifest SHA-256
+`fd1e13ad7c309267c67d705b6ad690d4ebd003fb32c51ff0e58219bd687cf618` retains two-resolver
+agreement, five authorized TLS hosts and eleven exact HTTP observations. Final mode stopped before
+network with `PRODUCTION_RELEASE_PREREQUISITES_OPEN` because the exact deployed source still carried
+the prior `e6e55c1` verified-release ledger rather than a reopened `deployed_unfrozen` gate. This is a
+fail-closed release-state transition, not an HTTP/TLS failure. The evidence carrier reopens the gate;
+it must be separately deployed and then pass a fresh final capture and bounded rollback/restoration
+exercise before the current UI release is called frozen.
