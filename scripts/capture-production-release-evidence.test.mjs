@@ -67,15 +67,21 @@ test("collector binds official Google and Cloudflare DoH plus authorized TLS", (
   assert.match(source, /submissionReady: false/u);
 });
 
-test("final mode requires the core receipt and paired-run gates before freeze", () => {
-  for (const gate of [
-    "agent-registration",
-    "altana-lifecycle",
-    "pancake-benefit",
-    "termix-pairs"
-  ]) {
+test("final mode requires core verified gates and an exact terminal Pancake outcome", () => {
+  for (const gate of ["agent-registration", "altana-lifecycle", "termix-pairs"]) {
     assert.match(source, new RegExp(`"${gate}"`, "u"));
   }
+  for (const kind of ["transaction_receipt", "before_after_metrics", "manual_baseline"]) {
+    assert.match(source, new RegExp(`"${kind}"`, "u"));
+  }
+  assert.match(source, /gate\.state === "controlled_outcome_observed"/u);
+  assert.match(source, /No fee income, price movement or liquidity change was observed/u);
+  assert.match(source, /neither realized economic benefit nor autonomous-agent advantage/u);
+  assert.match(source, /pancakeBenefitClaimVerified: pancakeGate\.state === "verified"/u);
+  assert.match(
+    source,
+    /pancakeBenefitClaimVerified: prerequisites\?\.pancakeBenefitClaimVerified === true/u
+  );
   assert.match(source, /gates\.get\("production-release"\)\?\.state !== "deployed_unfrozen"/u);
   assert.match(source, /gates\.get\("demo"\)\?\.state !== "not_recorded"/u);
   assert.match(source, /finalReleaseCheck: mode === "final"/u);

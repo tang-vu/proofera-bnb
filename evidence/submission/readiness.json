@@ -8,7 +8,7 @@
       "state": "deployed_unfrozen",
       "claim": "Commit c476b01b5eb01d9595232e90cca40dece564e91a is publicly deployed on the existing ProofEra PM2 and Cloudflare Tunnel topology. Its retained rehearsal binds two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses and the exact public build. This is a production deployment observation, not a final release freeze.",
       "blockers": [
-        "Final-mode preflight still requires the Pancake gate to be verified, while the honest measured state is controlled_outcome_observed with no benefit; revise that prerequisite without promoting a negative outcome into a benefit claim, then retain the final probe and rollback exercise."
+        "Deploy the evidence-policy revision that accepts the exact negative Pancake outcome for release-freeze purposes without closing its benefit gate, then retain the final probe and rollback exercise."
       ],
       "artifacts": [
         {

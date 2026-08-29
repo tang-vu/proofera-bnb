@@ -16,8 +16,12 @@ const JUDGING_THROUGH_UTC = "2026-09-23T23:59:59.000Z";
 const FINAL_PREREQUISITE_GATES = Object.freeze([
   "agent-registration",
   "altana-lifecycle",
-  "pancake-benefit",
   "termix-pairs"
+]);
+const PANCAKE_OUTCOME_REQUIRED_KINDS = Object.freeze([
+  "transaction_receipt",
+  "before_after_metrics",
+  "manual_baseline"
 ]);
 
 const AGENTS = Object.freeze([
@@ -98,6 +102,21 @@ function verifyRelease(sourceCommit) {
   }
 }
 
+function pancakeOutcomeSupportsReleaseFreeze(gate) {
+  if (gate === null || typeof gate !== "object" || !Array.isArray(gate.artifacts)) return false;
+  const kinds = new Set(gate.artifacts.map((artifact) => artifact?.kind));
+  if (!PANCAKE_OUTCOME_REQUIRED_KINDS.every((kind) => kinds.has(kind))) return false;
+  if (gate.state === "verified") return Array.isArray(gate.blockers) && gate.blockers.length === 0;
+  return (
+    gate.state === "controlled_outcome_observed" &&
+    Array.isArray(gate.blockers) &&
+    gate.blockers.length > 0 &&
+    typeof gate.claim === "string" &&
+    gate.claim.includes("No fee income, price movement or liquidity change was observed") &&
+    gate.claim.includes("neither realized economic benefit nor autonomous-agent advantage")
+  );
+}
+
 function verifyFinalPrerequisites() {
   let readiness;
   try {
@@ -107,18 +126,24 @@ function verifyFinalPrerequisites() {
   }
   if (!Array.isArray(readiness?.gates)) fail("PRODUCTION_RELEASE_READINESS_INVALID");
   const gates = new Map(readiness.gates.map((gate) => [gate?.gateId, gate]));
+  const pancakeGate = gates.get("pancake-benefit");
   if (
     gates.get("production-release")?.state !== "deployed_unfrozen" ||
     FINAL_PREREQUISITE_GATES.some(
       (gateId) =>
         gates.get(gateId)?.state !== "verified" || gates.get(gateId)?.blockers?.length !== 0
     ) ||
+    !pancakeOutcomeSupportsReleaseFreeze(pancakeGate) ||
     gates.get("demo")?.state !== "not_recorded" ||
     gates.get("submission")?.state !== "draft" ||
     readiness.readyForSubmission !== false
   ) {
     fail("PRODUCTION_RELEASE_PREREQUISITES_OPEN");
   }
+  return Object.freeze({
+    pancakeBenefitClaimVerified: pancakeGate.state === "verified",
+    pancakeOutcomeGateState: pancakeGate.state
+  });
 }
 
 function sha256(bytes) {
@@ -441,7 +466,7 @@ async function captureTls(mode) {
 
 async function capture({ mode, sourceCommit }) {
   verifyRelease(sourceCommit);
-  if (mode === "final") verifyFinalPrerequisites();
+  const prerequisites = mode === "final" ? verifyFinalPrerequisites() : null;
   const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
   const outputDirectory = resolve(
     repositoryRoot,
@@ -468,6 +493,8 @@ async function capture({ mode, sourceCommit }) {
       hackathonEntrySubmitted: false,
       independentDnsResolvers: DNS_RESOLVERS.length,
       onchainReceiptEvidenceIntroduced: false,
+      pancakeBenefitClaimVerified: prerequisites?.pancakeBenefitClaimVerified === true,
+      pancakeOutcomeGateState: prerequisites?.pancakeOutcomeGateState ?? null,
       readOnly: true,
       submissionReady: false
     },
