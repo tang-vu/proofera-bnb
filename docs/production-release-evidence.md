@@ -49,16 +49,17 @@ $releaseCommit = (git rev-parse HEAD).Trim()
 corepack pnpm capture:production:release $releaseCommit --mode final
 ```
 
-On 2026-08-29, commit `c476b01b5eb01d9595232e90cca40dece564e91a` was deployed and passed the
-exact public smoke probe. Rehearsal manifest SHA-256
-`ba4e8fc1ddc31bdae7240457f1e5ae2029bc4f06fb5e24945e73c733f723becf` retains the bounded
-DNS/TLS/HTTP observations. The then-deployed `c476b01` final attempt stopped before network with
-`PRODUCTION_RELEASE_PREREQUISITES_OPEN` because the prior prerequisite accepted only Pancake
-`verified`. The subsequent policy revision admits the exact negative terminal outcome for release
-freeze only and records `pancakeBenefitClaimVerified: false`; it does not close the Pancake benefit
-gate. That revision must itself be deployed and probed before a final artifact can exist.
+On 2026-08-29, commit `e6e55c161f324f03b401b1e9f0a17f5fbff2d373` was deployed and passed final
+capture. Manifest SHA-256 `682fecefd8dd444fb52dfef5dbdc054b274f1416dbbd31666dae4b1a51c7c133`
+retains two-resolver agreement, five authorized TLS hosts, eleven exact HTTP observations and the
+exact public build. It records `pancakeBenefitClaimVerified: false` and the truthful
+`controlled_outcome_observed` state; it does not close the Pancake benefit gate.
 
-After final capture, retain a separate release manifest beneath `evidence/submission/final/`, perform
-the documented rollback exercise, update the production readiness gate from exact artifacts, deploy
-that evidence-bearing commit only when its relationship to the observed application release is
-explicit, and run the final narrated demo pipeline.
+The bounded rollback exercise then ran web and monitor from detached commit
+`c476b01b5eb01d9595232e90cca40dece564e91a`, passed all eleven public checkpoints, restored the
+frozen commit, passed all eleven checkpoints again and saved PM2. Four analyzers, the tunnel and the
+Altana worker were not restarted; the worker PID remained `40632`. Final release manifest SHA-256 is
+`9bfd056576ebc62b4fb296b2a793965e3d6f3f0d6b3a2c8b006cb8140f2b3c88`. This is host-origin
+operational evidence, not independent uptime, Windows reboot, DNS/tunnel rollback, database restore,
+wallet, signing or transaction evidence. The next release work is the final narrated demo and
+authoritative submission receipt; independent monitoring/paging remains open.

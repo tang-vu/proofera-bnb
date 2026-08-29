@@ -149,3 +149,52 @@ test("retained rehearsal binds DNS agreement, TLS authorization and eleven exact
   });
   assert.equal(manifest.http.find(({ key }) => key === "marketplace-readiness")?.status, 503);
 });
+
+test("retained final release binds the exact negative-benefit boundary and rollback exercise", async () => {
+  const probeUrl = new URL(
+    "../evidence/submission/release-probes/e6e55c161f324f03b401b1e9f0a17f5fbff2d373/final/manifest.json",
+    import.meta.url
+  );
+  const releaseUrl = new URL(
+    "../evidence/submission/final/production-release.json",
+    import.meta.url
+  );
+  const probeBytes = await readFile(probeUrl);
+  const releaseBytes = await readFile(releaseUrl);
+  const probe = JSON.parse(probeBytes.toString("utf8"));
+  const release = JSON.parse(releaseBytes.toString("utf8"));
+  assert.equal(
+    createHash("sha256").update(probeBytes).digest("hex"),
+    "682fecefd8dd444fb52dfef5dbdc054b274f1416dbbd31666dae4b1a51c7c133"
+  );
+  assert.equal(
+    createHash("sha256").update(releaseBytes).digest("hex"),
+    "9bfd056576ebc62b4fb296b2a793965e3d6f3f0d6b3a2c8b006cb8140f2b3c88"
+  );
+  assert.equal(probe.sourceCommit, "e6e55c161f324f03b401b1e9f0a17f5fbff2d373");
+  assert.equal(probe.mode, "final");
+  assert.equal(probe.classification.pancakeBenefitClaimVerified, false);
+  assert.equal(probe.classification.pancakeOutcomeGateState, "controlled_outcome_observed");
+  assert.deepEqual(probe.summary, {
+    dnsAgreement: true,
+    exactBuildObserved: true,
+    httpObservationCount: 11,
+    tlsAuthorized: true
+  });
+  assert.equal(release.status, "verified");
+  assert.equal(release.classification.finalReleaseFrozen, true);
+  assert.equal(release.classification.submissionReady, false);
+  assert.equal(release.publicProbe.sha256, createHash("sha256").update(probeBytes).digest("hex"));
+  assert.equal(release.rollbackExercise.rollbackProbe.exitCode, 0);
+  assert.equal(release.rollbackExercise.restorationProbe.exitCode, 0);
+  assert.equal(release.rollbackExercise.altanaWorkerPidBefore, 40632);
+  assert.equal(release.rollbackExercise.altanaWorkerPidAfter, 40632);
+  assert.deepEqual(release.securityBoundary, {
+    mainnetWritePossible: false,
+    walletAccessed: false,
+    signingAttempted: false,
+    transactionBroadcastAttempted: false,
+    altanaWorkerRestarted: false,
+    databaseOrApplicationStateRolledBack: false
+  });
+});

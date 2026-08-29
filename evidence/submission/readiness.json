@@ -1,20 +1,28 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-29T09:49:43.590Z",
+  "updatedAtUtc": "2026-08-29T10:56:23.253Z",
   "readyForSubmission": false,
   "gates": [
     {
       "gateId": "production-release",
-      "state": "deployed_unfrozen",
-      "claim": "Commit c476b01b5eb01d9595232e90cca40dece564e91a is publicly deployed on the existing ProofEra PM2 and Cloudflare Tunnel topology. Its retained rehearsal binds two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses and the exact public build. This is a production deployment observation, not a final release freeze.",
-      "blockers": [
-        "Deploy the evidence-policy revision that accepts the exact negative Pancake outcome for release-freeze purposes without closing its benefit gate, then retain the final probe and rollback exercise."
-      ],
+      "state": "verified",
+      "claim": "Commit e6e55c161f324f03b401b1e9f0a17f5fbff2d373 is publicly deployed and frozen on the existing ProofEra PM2 and Cloudflare Tunnel topology. The final host-origin probe binds two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses and the exact public build. A bounded rollback to c476b01b5eb01d9595232e90cca40dece564e91a and restoration to the frozen release both passed all eleven checkpoints. This proves the bounded release and rollback path only; it is not independent uptime monitoring and does not verify Pancake benefit.",
+      "blockers": [],
       "artifacts": [
         {
-          "kind": "release_rehearsal",
-          "path": "evidence/submission/release-probes/c476b01b5eb01d9595232e90cca40dece564e91a/rehearsal/manifest.json",
-          "sha256": "ba4e8fc1ddc31bdae7240457f1e5ae2029bc4f06fb5e24945e73c733f723becf"
+          "kind": "public_probe",
+          "path": "evidence/submission/final/production-release.json",
+          "sha256": "9bfd056576ebc62b4fb296b2a793965e3d6f3f0d6b3a2c8b006cb8140f2b3c88"
+        },
+        {
+          "kind": "release_manifest",
+          "path": "evidence/submission/final/production-release.json",
+          "sha256": "9bfd056576ebc62b4fb296b2a793965e3d6f3f0d6b3a2c8b006cb8140f2b3c88"
+        },
+        {
+          "kind": "rollback_exercise",
+          "path": "evidence/submission/final/production-release.json",
+          "sha256": "9bfd056576ebc62b4fb296b2a793965e3d6f3f0d6b3a2c8b006cb8140f2b3c88"
         }
       ]
     },

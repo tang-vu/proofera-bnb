@@ -26,7 +26,7 @@ test("submission readiness records all seven objective gates without claiming co
   assert.deepEqual(
     readiness.gates.map(({ gateId, state }) => [gateId, state]),
     [
-      ["production-release", "deployed_unfrozen"],
+      ["production-release", "verified"],
       ["agent-registration", "verified"],
       ["altana-lifecycle", "verified"],
       ["pancake-benefit", "controlled_outcome_observed"],
@@ -56,6 +56,9 @@ test("a verified gate requires its full final-evidence kind set and final paths"
   const missingKinds = structuredClone(manifest);
   missingKinds.gates[0].state = "verified";
   missingKinds.gates[0].blockers = [];
+  missingKinds.gates[0].artifacts = missingKinds.gates[0].artifacts.filter(
+    ({ kind }) => kind !== "release_manifest"
+  );
   assert.throws(
     () => validateSubmissionReadiness(missingKinds),
     /SUBMISSION_READINESS_VERIFIED_EVIDENCE_INCOMPLETE/u
