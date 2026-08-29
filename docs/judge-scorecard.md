@@ -1,6 +1,6 @@
 # ProofEra judge scorecard
 
-Updated: 2026-08-29. This is an internal pre-submission control sheet derived from the official Smart Money Era page review recorded in [`research.md`](./research.md) and the current [score strategy](./hackathon-score-strategy.md). It is not a judging result, partner endorsement, or submission receipt. Every “current proof” item must remain independently inspectable; every open item blocks the corresponding claim.
+Updated: 2026-08-30. This is an internal pre-submission control sheet derived from the official Smart Money Era page review recorded in [`research.md`](./research.md) and the current [score strategy](./hackathon-score-strategy.md). It is not a judging result, partner endorsement, or submission receipt. Every “current proof” item must remain independently inspectable; every open item blocks the corresponding claim.
 
 ## Top-1 thesis
 
@@ -12,14 +12,14 @@ The differentiator is not agent count. It is the evidence and authority layer be
 
 ## Main-track score control
 
-| Judge signal                       | Current proof                                                                                                                                                                                       | Must close before final claim                                                                                    | Demo moment             |
-| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ----------------------- |
-| End-to-end journey                 | Landing, marketplace, four registered dossiers, one-grant Session Control, LP mandate, historical receipt-backed Mission Control, `/proof`, and one controlled chain-97 LP position are implemented | Publish a final release that exposes the new receipt artifact; autonomous production activation remains separate | 0:00–4:05               |
-| Decision-useful live data          | Typed ERC-8004/8004scan ingestion; exact-block Pancake and Venus readers; explicit unavailable/stale/null states                                                                                    | Freeze current data timestamps and receipt-linked outcome/cost evidence for the judged action                    | 0:35–1:25 and 2:30–3:30 |
-| Four first-class categories        | LP, grid, yield, and health each have a public analyzer, category contract, dossier, configuration surface, exact Agent Card skill, and finalized BSC-testnet ERC-8004 identity (`1825`–`1828`)     | Keep all four public through judging and show equal discovery depth without implying equal execution history     | 4:35–5:00               |
-| Usability without Studio knowledge | Goal-first landing, one-grant copy, direct Session Control, plain-language mandate forms, permission ownership labels, and failure-safe states                                                      | Clean-room run with a new viewer; retain mobile/keyboard evidence for the frozen release                         | Throughout              |
-| Trust and safety                   | Exact grant/execute/revoke receipts, PTA zero Approval, finalized negative-authority evidence, and no-re-sign mandate decisions are exposed without hiding historical provider limits               | Keep the PTA effect separate from Pancake economics and demonstrate the frozen public release                    | 1:25–4:05               |
-| Production credibility             | Durable custom-domain deployment, PM2 supervision, frozen exact-build host-origin probe, proof room, six-scene rehearsal, and bounded rollback/restoration exercise                                 | Retain independent uptime/paging evidence; host-origin probe is not independent monitoring                       | Before recording        |
+| Judge signal                       | Current proof                                                                                                                                                                                       | Must close before final claim                                                                                       | Demo moment             |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| End-to-end journey                 | Landing, marketplace, four registered dossiers, one-grant Session Control, LP mandate, historical receipt-backed Mission Control, `/proof`, and one controlled chain-97 LP position are implemented | Publish a final release that exposes the new receipt artifact; autonomous production activation remains separate    | 0:00–4:05               |
+| Decision-useful live data          | Typed ERC-8004/8004scan ingestion; exact-block Pancake and Venus readers; explicit unavailable/stale/null states                                                                                    | Freeze current data timestamps and receipt-linked outcome/cost evidence for the judged action                       | 0:35–1:25 and 2:30–3:30 |
+| Four first-class categories        | LP, grid, yield, and health each have a public analyzer, category contract, dossier, configuration surface, exact Agent Card skill, and finalized BSC-testnet ERC-8004 identity (`1825`–`1828`)     | Keep all four public through judging and show equal discovery depth without implying equal execution history        | 4:35–5:00               |
+| Usability without Studio knowledge | Goal-first landing, one-grant copy, direct Session Control, plain-language mandate forms, permission ownership labels, and failure-safe states                                                      | Clean-room run with a new viewer; retain mobile/keyboard evidence for the frozen release                            | Throughout              |
+| Trust and safety                   | Exact grant/execute/revoke receipts, PTA zero Approval, finalized negative-authority evidence, and no-re-sign mandate decisions are exposed without hiding historical provider limits               | Keep the PTA effect separate from Pancake economics and demonstrate the frozen public release                       | 1:25–4:05               |
+| Production credibility             | Durable custom-domain deployment, PM2 supervision, current exact-build 11-check host-origin probe, proof room, six-scene rehearsal, and one historical rollback/restoration exercise                | Run the bounded rollback/restoration exercise for the current UI release; retain independent uptime/paging evidence | Before recording        |
 
 ## Partner-track score control
 
@@ -75,11 +75,16 @@ All six methods and the protected final bundle are retained. Narration must rema
 | Four public agents | A2A/MCP endpoints and five skill IDs live; BSC-testnet identities `1825`–`1828` are receipt-verified | Retain final-release availability and real hire evidence   |
 | Source repository  | Public, strict verification and evidence manifests                                                   | Frozen release commit and hosted CI record                 |
 | Proof room         | Public seven-gate ledger                                                                             | All seven gates verified by final artifacts                |
-| Demo               | Six-scene exact-build rehearsal retained                                                             | Final video and timestamped clean-room playback check      |
+| Demo               | Six-scene exact-build rehearsal plus 303.918-second hashed timing track retained                     | Final video and timestamped clean-room playback check      |
 | Pitch deck         | Draft in [`pitch-deck.md`](./pitch-deck.md)                                                          | Export/freeze only after receipts and paired numbers exist |
 | Submission copy    | Evidence-backed draft in [`submission.md`](./submission.md)                                          | Final copy plus authoritative entry receipt                |
 
-Submission-flow watch: as rechecked on 2026-08-17, both canonical calls to action still lead to a registration-only Google Form with no final artifact fields. The form's partner checkbox omits Altana while the canonical page retains its eligibility section. Do not substitute that registration response for the final-entry receipt or infer a partner-track decision from the inconsistent checkbox.
+Submission-flow watch: as rechecked on 2026-08-30, both canonical calls to action still lead to a
+registration-only Google Form with no final artifact fields. The build period closes at
+`2026-09-09T12:00:00Z`; judging runs through 2026-09-23. The form's partner checkbox omits Altana
+while the canonical page retains its eligibility section. Do not substitute that registration
+response for the final-entry receipt or infer a partner-track decision from the inconsistent
+checkbox.
 
 ## Red-team narration rules
 

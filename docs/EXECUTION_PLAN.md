@@ -11,7 +11,8 @@ The official page was rechecked on 2026-08-16. The main prize remains winner-tak
 1. Make the zero-instruction `land → choose a job → discover → understand → activate` journey coherent across all four categories.
 2. Deploy four durable Agent Studio endpoints and record BSC registrations before treating deeper LP execution as judge-eligible breadth.
 3. Attach comparable, source/time/methodology-bound evidence and category-specific configuration to every live agent.
-4. Complete one bounded Altana session lifecycle and one real PancakeSwap benefit receipt without weakening the other three categories.
+4. Complete one bounded Altana session lifecycle and one receipt-backed PancakeSwap outcome without
+   promoting an unchanged/zero-fee observation into a benefit claim.
 5. Run the three preregistered TermiX pairs, publish only complete results, then freeze the public judge build and submission evidence.
 
 The first UX correction removes diagnostic-route clutter from the landing hero and makes every category card a direct, query-bound marketplace entry. Playwright verifies that the selected financial job survives navigation without instructions. Local verification remains authoritative until GitHub Actions can start jobs; runs are currently rejected before step execution because the repository owner's account reports a failed payment or spending-limit condition.
@@ -20,9 +21,23 @@ The public UI release `ad0cee11885b2131c27bfa14c3b0a27f2f8fee69` retains the pre
 
 The deployed header-stability correction moves the sole primary navigation into the preserved root layout, fixes one ordered four-link contract, changes only `aria-current` across routes and removes the repeated 650 ms entrance animation. Unit coverage binds route-group mapping and invariant link order; browser coverage checks DOM identity, exact geometry, motionlessness and transient 390 px overflow at multiple frames. The exact public build and honest `not_ready` response are now probe-bound; this does not change activation evidence.
 
+Playwright's local server now accepts a strictly validated loopback port override and writes only to
+an ignored port-specific `.tmp` dist directory. This allows all 112 deterministic desktop/mobile
+journeys to run while the durable public server keeps port `3217`, without stopping it or replacing
+its production `.next` bytes. The two opt-in live-RPC cases remain skipped by routine E2E.
+
 The marketplace and four read-only analyzers now have durable HTTPS endpoints on the owner's always-on Windows host, supervised by PM2 behind a named Cloudflare Tunnel. Repeatable local/public probes cover marketplace health, analyzer health, exact Agent Card URLs, and the exact advertised skill IDs for each agent. Finalized BSC-testnet ERC-8004 receipt evidence binds Agent IDs `1825` through `1828`; it proves identity publication only. All analyzers still declare execution disabled, and evidence-backed live data, marketplace eligibility, activation authority, and execution receipts remain required.
 
 The Windows release topology now fails closed without an immutable build identifier. Its release probe binds the public health response to the exact published commit and requires readiness to be honestly `not_ready`, never `misconfigured`; a PM2 monitor repeats the same marketplace/agent/Card/readiness checks every five minutes. The public `/proof` route renders the exact build, four endpoint skill contracts and the committed seven-gate submission ledger, including blockers and digest-bound artifacts. Release `e6e55c161f324f03b401b1e9f0a17f5fbff2d373` remains the historical frozen/rollback-tested release. The current UI release `ad0cee11885b2131c27bfa14c3b0a27f2f8fee69` passed the fresh final host-origin capture with two-resolver agreement, five authorized TLS hosts and eleven exact HTTP observations, but remains explicitly `deployed_unfrozen` until a separately authorized bounded rollback/restoration exercise passes. External alert delivery, independent uptime evidence, deployed data/worker probes, final demo, authoritative submission receipt and a genuinely ready activation path remain open.
+
+The final-demo path now has an exact 650-word evidence-backed script and a create-only synthesized
+303.918-second MP3 timing track with SHA-256
+`aea3992fb2badedf8e52c7a5dbbaf57c6400d0a1190a7355e09b8cf3c31939bf`. Final capture accepts the
+retained Pancake `controlled_outcome_observed` state only when receipt, before/after, baseline,
+blocker and explicit no-benefit/no-agent-advantage claims all remain present; its manifest records
+that benefit verification is false. This removes a false-positive gate requirement without closing
+the Pancake benefit gate. Current-release rollback/freeze, exact-build final capture, clean-room
+playback and organizer receipt remain separate external transitions.
 
 ## Status legend
 
@@ -328,3 +343,5 @@ The bounded v2 attempt then completed without rewriting v1. Grant `0xbfa1e3216d3
 | 2026-08-13 | Keep PTA/WBNB initialization and LP mint as separately approved BSC-testnet writes    | A historical empty-pool snapshot and conditional CREATE2 candidate are preparation evidence only; initialization fixes arbitrary state but adds no liquidity, while minting introduces separate funding, approval, ownership, slippage and oracle risks |
 | 2026-08-14 | Historical generation-2 recovery exercise                                             | It fenced generation 1, then later stopped at exact generation-2 claim-only state; neither historical owner confirmation authorizes generation 3                                                                                                        |
 | 2026-08-29 | Close the controlled first-LP fixture without promoting it to agent benefit           | Exact approval/mint receipts and dual-provider post-state establish product use; explicit owner presence, fixture assets and missing time-series economics keep autonomous/performance claims open                                                      |
+| 2026-08-30 | Admit the exact controlled negative Pancake outcome to final-demo capture             | Receipt, before/after, baseline and explicit no-benefit boundaries are presentation-complete; requiring a positive benefit would incentivize a false claim and unnecessarily block an honest demo                                                       |
+| 2026-08-30 | Isolate Playwright development bytes from the durable production build                | The public host owns the historical default test port and production `.next`; a validated free port plus ignored port-specific dist directory lets routine E2E run without stopping or mutating the deployed service                                    |

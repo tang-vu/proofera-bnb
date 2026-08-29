@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
+const e2eOrigin = `http://127.0.0.1:${process.env.PROOFERA_E2E_PORT ?? "3217"}`;
+
 const hugeCapital =
   "115792089237316195423570985008687907853269984665640564039457584007913129639935";
 
@@ -90,7 +92,7 @@ for (const journey of journeys) {
     const offOriginRequests: string[] = [];
     page.on("request", (request) => {
       const url = new URL(request.url());
-      if (url.origin !== "http://127.0.0.1:3217") offOriginRequests.push(url.origin);
+      if (url.origin !== e2eOrigin) offOriginRequests.push(url.origin);
     });
 
     await page.goto(`/reference-analyzers/${journey.category}`);

@@ -22,6 +22,11 @@ pnpm audit --prod --audit-level moderate
 
 Expected gates are formatting, zero-warning lint, strict typecheck, unit/integration tests, Next production build and isolated-port desktop/mobile Playwright. Routine commands never create wallets or send transactions.
 
+If the durable marketplace already listens on Playwright's default loopback port `3217`, set a free
+`PROOFERA_E2E_PORT` for the test process instead of stopping production. The Playwright config rejects
+non-numeric/out-of-range ports and forces Next development output into ignored
+`.tmp/next-e2e-<port>`, keeping the production `.next` tree separate.
+
 ### Durable Windows host
 
 The owner's always-on Windows host serves the production build through a named Cloudflare Tunnel. PM2 supervises the loopback-only marketplace and four analyzers defined in `deploy/windows/ecosystem.config.cjs`; the tunnel credential and ingress configuration remain outside the repository. Public endpoints are:

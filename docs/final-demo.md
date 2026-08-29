@@ -1,17 +1,20 @@
 # ProofEra final demo runbook
 
-Updated: 2026-08-19. This runbook prepares the required demo asset; it is not evidence that a final
+Updated: 2026-08-30. This runbook prepares the required demo asset; it is not evidence that a final
 video or hackathon entry exists.
 
 ## Gate order
 
-The final capture deliberately avoids circular proof. Before it can run, the exact committed
-`evidence/submission/readiness.json` must mark production release, agent registration, Altana
-lifecycle, Pancake benefit, and all three TermiX pairs `verified`, with no blockers. The demo must
-still be `not_recorded`, the submission must still be `draft`, and the top-level readiness flag must
-remain false.
+The final capture deliberately avoids circular proof. The exact committed
+`evidence/submission/readiness.json` must have verified production release, agent registration,
+Altana lifecycle and all three TermiX pairs. Pancake may be either verified or the exact retained
+`controlled_outcome_observed` state, but that negative path is admitted only when the gate includes
+the transaction receipt, before/after metrics, manual baseline, a blocker, and explicit statements
+that no fee income, price movement, liquidity change, realized benefit or autonomous-agent advantage
+was observed. The final manifest records `pancakeBenefitClaimVerified: false` on that path.
 
-The capture then requires all of the following:
+The demo must still be `not_recorded`, the submission must still be `draft`, and top-level readiness
+must remain false. The capture then requires all of the following:
 
 - clean `HEAD`, equal to `origin/main` and the exact public `/api/health` build;
 - a narration file committed under `evidence/submission/narration/` at that same release;
@@ -24,16 +27,33 @@ The capture then requires all of the following:
 The final manifest still says `hackathonEntrySubmitted: false` and `submissionReady: false`. A
 timestamped clean-room playback check and authoritative submission receipt are separate artifacts.
 
+## Current exact boundary
+
+The evidence-backed narration source and a 303.918-second synthesized timing track are retained under
+`evidence/submission/narration/`. The timing track SHA-256 is
+`aea3992fb2badedf8e52c7a5dbbaf57c6400d0a1190a7355e09b8cf3c31939bf`.
+
+Final capture is still blocked because the current public UI release has an exact 11-check final
+probe but no current-release rollback/restoration exercise. Do not weaken the gate or record against
+a source commit that differs from `HEAD`, `origin/main`, or the public build.
+
 ## Commands
 
-Use rehearsal mode to validate recording on a published exact release without closing the demo gate:
+Generate the create-only timing track on a Windows host with the reviewed SAPI voice and local FFmpeg:
+
+```powershell
+& .\scripts\generate-demo-narration.ps1
+```
+
+Use rehearsal mode to validate a published exact release without closing the demo gate:
 
 ```powershell
 $releaseCommit = (git rev-parse HEAD).Trim()
 corepack pnpm capture:demo:video $releaseCommit --mode rehearsal
 ```
 
-Final mode is intentionally unavailable until the five prerequisite gates are verified:
+After the production gate is verified and that exact clean commit is pushed and deployed, run final
+mode:
 
 ```powershell
 $releaseCommit = (git rev-parse HEAD).Trim()
@@ -41,72 +61,21 @@ corepack pnpm capture:demo:video $releaseCommit --mode final `
   --voiceover evidence/submission/narration/proofera-final-demo.mp3
 ```
 
-Use `docs/demo-script.md` as the canonical shot list and spoken-content boundary. The narration below is a timing scaffold; every bracketed value must be replaced from the final retained artifacts before recording the MP3.
-
 ## Five-minute narration map
 
-The final wording must be regenerated from retained receipts and paired-run values. Bracketed fields
-must never be spoken until their exact artifacts exist.
+The exact spoken source is
+`evidence/submission/narration/proofera-final-demo-script.txt`; it contains no bracketed placeholder.
+Its six paragraphs map to the fixed scenes in this order:
 
-### 0:00-0:32 — The trust gap
+1. trust gap and the rule that missing evidence stays missing;
+2. job-first marketplace and ERC-8004 IDs 1825 through 1828;
+3. Pancake exact-block refusal plus the controlled no-benefit LP outcome;
+4. bounded Altana grant, execute, revoke and final authority absence;
+5. three task-specific TermiX pairs, mixed timings and reviewer limitations;
+6. Proof Room, eleven public checks, honest not-ready state and closing thesis.
 
-“Autonomous financial agents can now own wallets and transact, but an identity and a description do
-not tell a capital owner whether an agent deserves authority. ProofEra is the evidence and control
-layer between ERC-8004 identity and capital access. Its rule is simple: missing evidence stays
-missing.”
-
-Show the landing page, the four financial jobs, and the proof-first promise.
-
-### 0:32-1:16 — Discover by job
-
-“A user starts with the outcome they need: manage concentrated liquidity, run a bounded grid, compare
-yield, or protect a Venus loan. Each category has its own decision contract because LP range time,
-grid drawdown, withdrawal liquidity, and health factor cannot be compressed into one misleading
-return score.”
-
-Show the marketplace and the four registered identity links: `[FOUR ERC-8004 IDS]`.
-
-### 1:16-2:04 — Inspect evidence and downside
-
-“This LP Passport separates sourced observations, calculations, freshness, costs, downside, and
-unknowns. Here the agent detected `[FROZEN PANCAKE CONDITION]`. The controlled operation produced
-`[PANCAKE RECEIPT]`; before-and-after value is reported net of `[GAS / FEES / SLIPPAGE / IL INPUTS]`,
-not inferred from a logo or a backtest.”
-
-Show the LP Passport, source links, environment labels, and limitations.
-
-### 2:04-2:56 — Bound authority before activation
-
-“Before activation, ProofEra fixes the chain, targets, selectors, spend cap, expiry, deadline, and
-enforcement owner. The Altana session was registered at `[GRANT RECEIPT]`. The agent executed only the
-declared call at `[EXECUTE RECEIPT]`. Unknown outcomes are reconciled; they are never blind-retried.”
-
-Show configuration and the exact permission bundle. Do not expose private signer material.
-
-### 2:56-4:02 — Verify every claim
-
-“The Proof Room is a closure ledger, not a marketing page. Every gate links to its retained artifact
-and SHA-256. Three preregistered TermiX pairs compare the same frozen tasks across agent and manual
-lanes. The measured results are `[THREE TIME / COST / QUALITY RESULTS]`; the limitations are
-`[ADJUDICATED LIMITATIONS]`. No winner is narrated unless both lanes and their receipts validate.”
-
-Show receipt links, paired results, and the exact production build.
-
-### 4:02-4:50 — Revoke and prove absence
-
-“Mission Control joins the execution status to onchain evidence, then revokes the scoped session at
-`[REVOKE RECEIPT]`. ProofEra does not call revoke complete merely because a button was pressed. Both
-RPCs re-observed that the key was absent after finality at `[NEGATIVE AUTHORITY CHECKPOINT]`. This is
-the full loop: discover, verify, bound, execute, measure, reconcile, and revoke.”
-
-Show the lifecycle timeline and negative-authority evidence.
-
-### 4:50-5:00 — Close
-
-“BNB Agent Studio makes autonomous agents easier to create. ProofEra makes them safer to choose and
-control. Hire agents by proof, not promises.”
-
-End on the public product URL and repository URL.
+Use `docs/demo-script.md` as the canonical visual shot list. Do not improvise a benefit, performance,
+execution or readiness claim beyond the retained narration bytes.
 
 ## Clean-room playback
 

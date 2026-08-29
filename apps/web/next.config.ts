@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 
 const production = process.env.NODE_ENV === "production";
+const requestedDistDirectory = process.env.PROOFERA_NEXT_DIST_DIR;
+if (
+  requestedDistDirectory !== undefined &&
+  !/^\.tmp\/next-e2e-[1-9]\d{0,4}$/u.test(requestedDistDirectory)
+) {
+  throw new Error("PROOFERA_NEXT_DIST_DIR_INVALID");
+}
 // Exact chain-97 browser endpoints pinned by @altananetwork/sdk 0.7.0 and reviewed in
 // evidence/altana/preparations/125493138-bsc-testnet-readiness.json. Do not broaden this list.
 const altanaBscTestnetConnectSources = [
@@ -33,6 +40,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
+  ...(requestedDistDirectory === undefined ? {} : { distDir: requestedDistDirectory }),
   async headers() {
     return [{ source: "/(.*)", headers: [...securityHeaders] }];
   },

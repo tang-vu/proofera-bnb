@@ -8,6 +8,10 @@ import { fileURLToPath } from "node:url";
 const scriptUrl = new URL("./capture-public-demo-video.mjs", import.meta.url);
 const scriptPath = fileURLToPath(scriptUrl);
 const source = await readFile(scriptUrl, "utf8");
+const narrationGenerator = await readFile(
+  new URL("./generate-demo-narration.ps1", import.meta.url),
+  "utf8"
+);
 const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
 const prettierIgnore = await readFile(new URL("../.prettierignore", import.meta.url), "utf8");
 
@@ -31,13 +35,22 @@ test("final mode requires prior objective gates, tracked narration and decoded m
     "production-release",
     "agent-registration",
     "altana-lifecycle",
-    "pancake-benefit",
     "termix-pairs"
   ]) {
     assert.match(source, new RegExp(`"${gate}"`, "u"));
   }
   assert.match(source, /gates\.get\("demo"\)\?\.state !== "not_recorded"/u);
   assert.match(source, /gates\.get\("submission"\)\?\.state !== "draft"/u);
+  assert.match(source, /gate\.state === "controlled_outcome_observed"/u);
+  assert.match(source, /PANCAKE_OUTCOME_REQUIRED_KINDS/u);
+  assert.match(source, /No fee income, price movement or liquidity change was observed/u);
+  assert.match(source, /neither realized economic benefit nor autonomous-agent advantage/u);
+  assert.match(source, /pancakeBenefitClaimVerified: pancakeGate\.state === "verified"/u);
+  assert.match(
+    source,
+    /pancakeBenefitClaimVerified:\s+prerequisites\?\.pancakeBenefitClaimVerified === true/u
+  );
+  assert.match(source, /pancakeOutcomeGateState: prerequisites\?\.pancakeOutcomeGateState/u);
   assert.match(source, /ls-files", "--error-unmatch/u);
   assert.match(source, /PUBLIC_DEMO_VIDEO_VOICEOVER_BYTES_MISMATCH/u);
   assert.match(source, /"ffprobe"/u);
@@ -116,4 +129,50 @@ test("retained silent rehearsal binds the exact release and decoded media bytes"
   const mediaBytes = await readFile(new URL(manifest.media.path, directory));
   assert.equal(mediaBytes.length, manifest.media.bytes);
   assert.equal(createHash("sha256").update(mediaBytes).digest("hex"), manifest.media.sha256);
+});
+
+test("retained narration is create-only, bounded, hashed and decodable", async () => {
+  const narrationUrl = new URL(
+    "../evidence/submission/narration/proofera-final-demo.mp3",
+    import.meta.url
+  );
+  const scriptText = await readFile(
+    new URL("../evidence/submission/narration/proofera-final-demo-script.txt", import.meta.url),
+    "utf8"
+  );
+  const narrationBytes = await readFile(narrationUrl);
+  assert.equal(narrationBytes.length, 6_080_306);
+  assert.equal(
+    createHash("sha256").update(narrationBytes).digest("hex"),
+    "aea3992fb2badedf8e52c7a5dbbaf57c6400d0a1190a7355e09b8cf3c31939bf"
+  );
+  assert.doesNotMatch(scriptText, /\[[A-Z][A-Z /-]+\]/u);
+  assert.match(narrationGenerator, /Narration output already exists; generation is create-only/u);
+  assert.match(narrationGenerator, /durationSeconds -lt 240 -or \$durationSeconds -gt 330/u);
+  assert.match(narrationGenerator, /Microsoft Zira Desktop/u);
+
+  const probe = spawnSync(
+    "ffprobe",
+    [
+      "-v",
+      "error",
+      "-show_entries",
+      "format=duration:stream=codec_type,codec_name,sample_rate,channels",
+      "-of",
+      "json",
+      fileURLToPath(narrationUrl)
+    ],
+    { encoding: "utf8", timeout: 10_000, windowsHide: true }
+  );
+  assert.equal(probe.status, 0, probe.stderr);
+  const media = JSON.parse(probe.stdout);
+  assert.equal(Number.parseFloat(media.format.duration).toFixed(3), "303.918");
+  assert.deepEqual(media.streams, [
+    {
+      channels: 1,
+      codec_name: "mp3",
+      codec_type: "audio",
+      sample_rate: "22050"
+    }
+  ]);
 });

@@ -28,8 +28,12 @@ const FINAL_PREREQUISITE_GATES = Object.freeze([
   "production-release",
   "agent-registration",
   "altana-lifecycle",
-  "pancake-benefit",
   "termix-pairs"
+]);
+const PANCAKE_OUTCOME_REQUIRED_KINDS = Object.freeze([
+  "transaction_receipt",
+  "before_after_metrics",
+  "manual_baseline"
 ]);
 
 const SCENES = Object.freeze([
@@ -125,6 +129,21 @@ function verifyRelease(sourceCommit) {
   }
 }
 
+function pancakeOutcomeSupportsFinalDemo(gate) {
+  if (gate === null || typeof gate !== "object" || !Array.isArray(gate.artifacts)) return false;
+  const kinds = new Set(gate.artifacts.map((artifact) => artifact?.kind));
+  if (!PANCAKE_OUTCOME_REQUIRED_KINDS.every((kind) => kinds.has(kind))) return false;
+  if (gate.state === "verified") return Array.isArray(gate.blockers) && gate.blockers.length === 0;
+  return (
+    gate.state === "controlled_outcome_observed" &&
+    Array.isArray(gate.blockers) &&
+    gate.blockers.length > 0 &&
+    typeof gate.claim === "string" &&
+    gate.claim.includes("No fee income, price movement or liquidity change was observed") &&
+    gate.claim.includes("neither realized economic benefit nor autonomous-agent advantage")
+  );
+}
+
 function verifyFinalPrerequisites() {
   let readiness;
   try {
@@ -134,17 +153,23 @@ function verifyFinalPrerequisites() {
   }
   if (!Array.isArray(readiness?.gates)) fail("PUBLIC_DEMO_VIDEO_READINESS_INVALID");
   const gates = new Map(readiness.gates.map((gate) => [gate?.gateId, gate]));
+  const pancakeGate = gates.get("pancake-benefit");
   if (
     FINAL_PREREQUISITE_GATES.some(
       (gateId) =>
         gates.get(gateId)?.state !== "verified" || gates.get(gateId)?.blockers?.length !== 0
     ) ||
+    !pancakeOutcomeSupportsFinalDemo(pancakeGate) ||
     gates.get("demo")?.state !== "not_recorded" ||
     gates.get("submission")?.state !== "draft" ||
     readiness.readyForSubmission !== false
   ) {
     fail("PUBLIC_DEMO_VIDEO_PREREQUISITES_OPEN");
   }
+  return Object.freeze({
+    pancakeBenefitClaimVerified: pancakeGate.state === "verified",
+    pancakeOutcomeGateState: pancakeGate.state
+  });
 }
 
 function sha256(bytes) {
@@ -400,7 +425,7 @@ async function muxFinalVideo(rawPath, voiceoverPath, outputPath) {
 
 async function capture({ mode, sourceCommit, voiceover }) {
   verifyRelease(sourceCommit);
-  if (mode === "final") verifyFinalPrerequisites();
+  const prerequisites = mode === "final" ? verifyFinalPrerequisites() : null;
   const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
   const outputDirectory = resolve(
     repositoryRoot,
@@ -443,6 +468,12 @@ async function capture({ mode, sourceCommit, voiceover }) {
         finalDemoCheck: mode === "final",
         hackathonEntrySubmitted: false,
         onchainReceiptEvidenceIntroduced: false,
+        ...(mode === "final"
+          ? {
+              pancakeBenefitClaimVerified: prerequisites?.pancakeBenefitClaimVerified === true,
+              pancakeOutcomeGateState: prerequisites?.pancakeOutcomeGateState
+            }
+          : {}),
         playbackDecoded: true,
         submissionReady: false,
         videoRecorded: true
@@ -470,6 +501,9 @@ async function capture({ mode, sourceCommit, voiceover }) {
           ? [
               "This artifact proves exact-release public rendering, retained narration bytes, media decoding and the listed scene assertions; it does not prove the hackathon entry was submitted or accepted.",
               "The collector introduces no onchain evidence; all receipt claims shown in the product must already be bound by the prerequisite readiness gates.",
+              prerequisites?.pancakeBenefitClaimVerified === true
+                ? "The Pancake benefit gate was verified by the retained readiness record."
+                : "The retained Pancake result is a controlled negative outcome, not a realized-benefit or autonomous-agent-advantage claim.",
               "A separate timestamped clean-room playback and authoritative submission receipt remain required."
             ]
           : [

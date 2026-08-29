@@ -20,6 +20,7 @@ export default defineConfig([
   globalIgnores([
     "**/.next/**",
     "**/.studio/**",
+    "**/.tmp/**",
     "**/artifacts/**",
     "**/cache/**",
     "**/coverage/**",

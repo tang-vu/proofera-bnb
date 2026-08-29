@@ -1,6 +1,6 @@
 # ProofEra pitch deck draft
 
-Updated: 2026-08-17. Ten-slide narrative for the BNB Chain Smart Money Era submission. Bracketed fields and statements marked pending must be replaced only by final retained evidence. This Markdown file is not the exported deck or proof that it was submitted.
+Updated: 2026-08-30. Ten-slide evidence-backed narrative for the BNB Chain Smart Money Era submission. This Markdown file is not an exported deck or proof that it was submitted.
 
 ## Slide 1 — ProofEra
 
@@ -39,7 +39,9 @@ ProofEra's governing rule: missing evidence remains missing; it never becomes a 
 6. Activate only after identity, authority, and evidence gates pass.
 7. Reconcile receipts in Mission Control and revoke with negative authority proof.
 
-Current truth: steps 1–4 and the honest empty/rehearsal states are public. Steps 5–7 require the final receipt-backed lifecycle.
+Current truth: the discovery, configuration, Proof Room and receipt-backed historical lifecycle are
+public. Autonomous production activation remains fail-closed, and the current release is not final
+until its rollback/restoration exercise and final demo are retained.
 
 ## Slide 4 — Proof, not a leaderboard
 
@@ -80,9 +82,12 @@ ProofEra combines:
 - no blind retry when SDK grant outcome is unknown;
 - revoke completion only after a fresh authority read proves absence.
 
-Pending evidence: `[ALTANA ACCOUNT]`, `[KEY]`, `[GRANT RECEIPT]`, `[EXECUTE RECEIPT]`, `[REVOKE RECEIPT]`, and `[NEGATIVE AUTHORITY PROBE]`.
+The retained chain-97 lifecycle joins successful grant `0xbfa1…0c7`, scoped execute `0xad65…268e`,
+revoke `0x72e7…ceb7`, and finalized two-provider authority absence at block `126543819`. The action was a
+zero-amount PTA approval with no economic or Pancake effect. Historical authority is single-provider,
+and no private passkey or session signer enters the public artifact.
 
-## Slide 7 — PancakeSwap: from signal to measurable benefit
+## Slide 7 — PancakeSwap: measure the outcome honestly
 
 Current retained proof:
 
@@ -93,7 +98,10 @@ Current retained proof:
 
 Why this matters: the agent found a decision boundary and refused to manufacture economics.
 
-Final partner proof must add one controlled bounded operation, before/after metrics, and a manual baseline net of gas, fees, slippage, and estimated IL: `[PANCAKE RECEIPT + RESULT]`.
+A separate owner-executed chain-97 position now has finalized approval `0x001c…8c9d` and mint
+`0xeed9…7d01` receipts, exact post-state and zero residual allowance. Over 9,104 seconds, price,
+liquidity and fee growth were unchanged; fees were zero and recorded gas remained a cost. This is an
+authentic controlled outcome, but it proves neither realized benefit nor autonomous-agent advantage.
 
 ## Slide 8 — TermiX: measure the agent advantage
 
@@ -137,6 +145,8 @@ BNB Agent Studio makes agents easier to build. ProofEra makes them safer to choo
 - Transparent failure, stale data, unknown outcomes, and revoke state.
 - A measurable path from discovery to economic value.
 
-Close with the final live loop: `[REGISTERED AGENT] → [BOUNDED ALTANA AUTHORITY] → [PANCAKE RECEIPT] → [TERMIX RESULT] → [REVOKE PROOF]`.
+Close with the verified bounded loop: registered agent identity → bounded Altana authority → scoped
+testnet receipt → controlled Pancake outcome → task-specific TermiX comparison → revoke receipt and
+final authority absence.
 
 Call to action: open `https://proofera.tangvu.dev/proof` and verify every claim directly.

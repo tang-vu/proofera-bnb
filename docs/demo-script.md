@@ -1,6 +1,6 @@
 # ProofEra judge demo script
 
-Updated: 2026-08-26. This is the production script and shot list, not evidence that the final video has been recorded. Keep the final cut between 4:00 and 5:30. Never show a secret, wallet export, environment file, passkey credential payload, or session signer.
+Updated: 2026-08-30. This is the production script and shot list, not evidence that the final video has been recorded. Keep the final cut between 4:00 and 5:30. Never show a secret, wallet export, environment file, passkey credential payload, or session signer.
 
 ## Current recording boundary
 
@@ -12,13 +12,20 @@ Ready to show now:
 - all six retained TermiX raw captures, immutable source pairs, protected verified derivatives, adjudications, and the final three-artifact bundle;
 - Session Control showing one owner grant, autonomous in-scope execution, explicit scope-expansion rules, and revoke; the internal operator ceremony is not part of the user journey.
 
-Do not record the final cut yet. The following must exist first: controlled Pancake before/after evidence and the final production freeze. The Altana lifecycle and TermiX gates are verified; the final TermiX review remains owner-designated internal and identity-limited. Until the remaining objective gates close, use rehearsal mode only.
+The controlled Pancake before/after outcome now exists: the position was unchanged and produced no
+observed fee income or agent advantage. It is valid negative evidence, not a verified benefit. Do not
+record the final cut yet because the current public UI release still needs its bounded
+rollback/restoration exercise and final freeze. Altana and TermiX are verified; the TermiX review
+remains owner-designated internal and identity-limited. Until the production gate closes, use
+rehearsal mode only.
 
 ## One-session operator checklist
 
 1. Close notifications, password managers, terminal history, and every tab that could reveal a secret.
 2. Open the public product, BscScan receipt tabs, Proof Room, Mission Control, and the final TermiX report before recording.
-3. Verify `pnpm submission:check`; final recording is allowed only when its first five gates are `verified` and the demo gate is `not_recorded`.
+3. Verify `pnpm submission:check`; production, registration, Altana and TermiX must be `verified` and
+   the demo must be `not_recorded`. Pancake may remain `controlled_outcome_observed` only under the
+   exact negative-evidence boundary documented in `docs/final-demo.md`.
 4. Record at 1440x900 with browser zoom 100%. Keep the cursor deliberate and avoid scrolling while speaking.
 5. Use the committed MP3 voice-over with the exact-release capture command in `docs/final-demo.md`.
 6. Play the generated MP4 end to end on a separate viewer boundary and retain the clean-room check before submission.

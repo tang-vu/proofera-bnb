@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+const e2eOrigin = `http://127.0.0.1:${process.env.PROOFERA_E2E_PORT ?? "3217"}`;
+
 const analyzers = [
   {
     category: "lp-rebalancing",
@@ -43,7 +45,7 @@ for (const analyzer of analyzers) {
     const offOriginRequests: string[] = [];
     page.on("request", (request) => {
       const url = new URL(request.url());
-      if (url.origin !== "http://127.0.0.1:3217") offOriginRequests.push(url.origin);
+      if (url.origin !== e2eOrigin) offOriginRequests.push(url.origin);
     });
 
     const response = await page.goto(`/reference-analyzers/${analyzer.category}`);
