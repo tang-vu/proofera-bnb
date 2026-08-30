@@ -1,20 +1,28 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-29T17:22:35.473Z",
+  "updatedAtUtc": "2026-08-30T02:55:56.863Z",
   "readyForSubmission": false,
   "gates": [
     {
       "gateId": "production-release",
-      "state": "deployed_unfrozen",
-      "claim": "Commit ad0cee11885b2131c27bfa14c3b0a27f2f8fee69 is publicly deployed on the existing ProofEra PM2 and Cloudflare Tunnel topology. Its retained final host-origin capture binds two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses, the exact public build and honest not-ready activation state. This is a bounded deployment observation, not a completed rollback exercise, independent uptime proof or activation claim.",
-      "blockers": [
-        "Run and retain a separately authorized bounded rollback/restoration exercise before freezing the current UI release."
-      ],
+      "state": "verified",
+      "claim": "Commit ad0cee11885b2131c27bfa14c3b0a27f2f8fee69 is publicly deployed and frozen on the existing ProofEra PM2 and Cloudflare Tunnel topology. Its retained final host-origin capture binds two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses, the exact public build and honest not-ready activation state. A bounded rollback to 676ab796bec729a734355737d6c0509a27c9d1d5 and restoration to ad0cee11885b2131c27bfa14c3b0a27f2f8fee69 each ran the exact web and monitor paths and passed all eleven checkpoints. An environment-only PM2 preflight was rejected and contributes no evidence. This proves the bounded host-local release path only; it is not independent uptime, reboot, data-restore or activation evidence.",
+      "blockers": [],
       "artifacts": [
         {
-          "kind": "release_final_probe",
-          "path": "evidence/submission/release-probes/ad0cee11885b2131c27bfa14c3b0a27f2f8fee69/final/manifest.json",
-          "sha256": "3a296042cd9bd2ccbfba37c9c15ba8085e5ec82afd9d87d6042397df7ad70e68"
+          "kind": "public_probe",
+          "path": "evidence/submission/final/production-release.json",
+          "sha256": "8eb9d66f8db0f522b00df87b45e4ec5f68829fcc21a271266747d57ce8526a29"
+        },
+        {
+          "kind": "release_manifest",
+          "path": "evidence/submission/final/production-release.json",
+          "sha256": "8eb9d66f8db0f522b00df87b45e4ec5f68829fcc21a271266747d57ce8526a29"
+        },
+        {
+          "kind": "rollback_exercise",
+          "path": "evidence/submission/final/production-release.json",
+          "sha256": "8eb9d66f8db0f522b00df87b45e4ec5f68829fcc21a271266747d57ce8526a29"
         }
       ]
     },

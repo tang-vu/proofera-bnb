@@ -82,5 +82,11 @@ Its final host-origin capture passed two-resolver agreement for all five hosts, 
 observations and all eleven exact HTTPS checks, including exact build identity and honest readiness
 `503`. Manifest SHA-256 is
 `3a296042cd9bd2ccbfba37c9c15ba8085e5ec82afd9d87d6042397df7ad70e68`.
-The release remains `deployed_unfrozen`: a bounded rollback/restoration exercise, independent uptime
-monitoring and the final demo are still separate gates.
+The separately authorized exercise then moved the exact web and monitor runtime paths to
+`676ab796bec729a734355737d6c0509a27c9d1d5`, passed all eleven checkpoints, restored exact release
+`ad0cee11885b2131c27bfa14c3b0a27f2f8fee69`, passed all eleven checkpoints again and saved PM2. An
+initial `startOrRestart` preflight changed only the environment while retaining old runtime paths; it
+was rejected and is not counted. Four analyzers, the tunnel and Altana worker PID `37120` were not
+restarted. Final production manifest SHA-256 is
+`8eb9d66f8db0f522b00df87b45e4ec5f68829fcc21a271266747d57ce8526a29`. Independent uptime,
+evidence-carrier deployment and the final demo remain separate gates.

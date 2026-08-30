@@ -13,11 +13,11 @@ Ready to show now:
 - Session Control showing one owner grant, autonomous in-scope execution, explicit scope-expansion rules, and revoke; the internal operator ceremony is not part of the user journey.
 
 The controlled Pancake before/after outcome now exists: the position was unchanged and produced no
-observed fee income or agent advantage. It is valid negative evidence, not a verified benefit. Do not
-record the final cut yet because the current public UI release still needs its bounded
-rollback/restoration exercise and final freeze. Altana and TermiX are verified; the TermiX review
-remains owner-designated internal and identity-limited. Until the production gate closes, use
-rehearsal mode only.
+observed fee income or agent advantage. It is valid negative evidence, not a verified benefit. The
+current public UI release has now passed its exact-path rollback/restoration exercise and production
+freeze. Do not record the final cut until the commit carrying this evidence is explicitly deployed
+and its exact public build passes the final probe. Altana and TermiX are verified; the TermiX review
+remains owner-designated internal and identity-limited.
 
 ## One-session operator checklist
 

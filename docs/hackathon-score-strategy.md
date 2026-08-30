@@ -60,7 +60,7 @@ owner-facing session entry point; /mission-control is the read-only authority an
 
 ## Highest-value next actions
 
-1. Run the bounded current-release rollback/restoration exercise and freeze its exact public probe.
+1. Explicitly deploy the evidence-carrier commit and run its exact final public probe.
 2. Record the clean-room journey: discover → inspect evidence → define mandate → observe the retained
    grant/execute/revoke chain → inspect the controlled LP outcome and Proof Room.
 3. Freeze the prepared submission copy and retain the authoritative entry receipt when the organizer

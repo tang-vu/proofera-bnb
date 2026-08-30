@@ -41,7 +41,7 @@ ProofEra's governing rule: missing evidence remains missing; it never becomes a 
 
 Current truth: the discovery, configuration, Proof Room and receipt-backed historical lifecycle are
 public. Autonomous production activation remains fail-closed, and the current release is not final
-until its rollback/restoration exercise and final demo are retained.
+until its retained rollback/restoration evidence is deployed with the final demo.
 
 ## Slide 4 — Proof, not a leaderboard
 

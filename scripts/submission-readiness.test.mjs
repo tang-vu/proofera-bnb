@@ -26,7 +26,7 @@ test("submission readiness records all seven objective gates without claiming co
   assert.deepEqual(
     readiness.gates.map(({ gateId, state }) => [gateId, state]),
     [
-      ["production-release", "deployed_unfrozen"],
+      ["production-release", "verified"],
       ["agent-registration", "verified"],
       ["altana-lifecycle", "verified"],
       ["pancake-benefit", "controlled_outcome_observed"],
