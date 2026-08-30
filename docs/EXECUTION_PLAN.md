@@ -26,6 +26,14 @@ an ignored port-specific `.tmp` dist directory. This allows all 112 deterministi
 journeys to run while the durable public server keeps port `3217`, without stopping it or replacing
 its production `.next` bytes. The two opt-in live-RPC cases remain skipped by routine E2E.
 
+The current repository release candidate also removes the last Vietnamese strings from the shared
+Altana passkey/session controls. A source-level regression test binds those public controls to
+English copy, while state-specific unit and desktop/mobile browser checks retain the unknown,
+failure, expiry, grant and revoke boundaries. The internal `/operator-ceremony` harness remains
+available to local development but redirects to `/session-control` in production; an isolated
+production build observed the exact `307` redirect. This change is not yet a public deployment, so
+the evidence-carrier release remains the public runtime until a separately authorized release.
+
 The marketplace and four read-only analyzers now have durable HTTPS endpoints on the owner's always-on Windows host, supervised by PM2 behind a named Cloudflare Tunnel. Repeatable local/public probes cover marketplace health, analyzer health, exact Agent Card URLs, and the exact advertised skill IDs for each agent. Finalized BSC-testnet ERC-8004 receipt evidence binds Agent IDs `1825` through `1828`; it proves identity publication only. All analyzers still declare execution disabled, and evidence-backed live data, marketplace eligibility, activation authority, and execution receipts remain required.
 
 The Windows release topology now fails closed without an immutable build identifier. Its release probe binds the public health response to the exact published commit and requires readiness to be honestly `not_ready`, never `misconfigured`; a PM2 monitor repeats the same marketplace/agent/Card/readiness checks every five minutes. The public `/proof` route renders the exact build, four endpoint skill contracts and the committed seven-gate submission ledger, including blockers and digest-bound artifacts. Release `e6e55c161f324f03b401b1e9f0a17f5fbff2d373` remains historical. Base release `ad0cee11885b2131c27bfa14c3b0a27f2f8fee69` retains the final DNS/TLS/HTTP capture and bounded rollback to `676ab796bec729a734355737d6c0509a27c9d1d5`; both rollback and restoration ran the exact web/monitor paths and passed all eleven checkpoints. Evidence carrier `1663e1f3a8755744739d4b63b32b7cb288221245` then became the exact public web/monitor build, passed eleven host-origin checkpoints and was saved to PM2 without restarting analyzers, tunnel or Altana worker. The carrier probe did not repeat the independent-resolver/TLS capture. External alert delivery, independent uptime evidence, deployed data/worker probes, final demo, authoritative submission receipt and a genuinely ready activation path remain open.

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { altanaTestActionConfigSchema } from "@proofera/integrations";
 
@@ -15,6 +16,8 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default function OperatorCeremonyPage() {
+  if (process.env.NODE_ENV === "production") redirect("/session-control");
+
   const passkey = readPasskeyRuntimeConfig();
   const altanaTestAction = altanaTestActionConfigSchema.parse(altanaTestActionConfig);
 

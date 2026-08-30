@@ -104,17 +104,17 @@ function defaultBoundaryMessage(
   canonicalOrigin: string,
   canonicalPath: AltanaPasskeyCeremonyProps["canonicalPath"]
 ): string {
-  if (snapshot === "checking") return "Đang kiểm tra HTTPS origin và WebAuthn trên thiết bị này.";
+  if (snapshot === "checking") return "Checking this device's HTTPS origin and WebAuthn support.";
   if (snapshot === "origin_mismatch") {
-    return "Mở đúng " + canonicalOrigin + canonicalPath + " để dùng passkey.";
+    return "Open " + canonicalOrigin + canonicalPath + " to use this passkey.";
   }
   if (snapshot === "unsupported") {
-    return "Trình duyệt hoặc HTTPS context này không hỗ trợ WebAuthn passkey.";
+    return "This browser or HTTPS context does not support WebAuthn passkeys.";
   }
   if (snapshot.startsWith("ready:")) {
-    return "Đã tìm thấy metadata công khai của passkey trên thiết bị này; private key vẫn nằm trong authenticator.";
+    return "Public passkey metadata is available on this device; the private key remains inside the authenticator.";
   }
-  return "Chưa có passkey ProofEra trên thiết bị này.";
+  return "No ProofEra passkey is available on this device.";
 }
 
 export function AltanaPasskeyCeremony({
@@ -176,14 +176,14 @@ export function AltanaPasskeyCeremony({
     window.dispatchEvent(new Event(PASSKEY_WALLET_EVENT));
     setOperationPhase("idle");
     setOperationMessage(
-      "Altana đã trả về ví và metadata passkey công khai đã được giữ trên thiết bị này. Không cần bấm Khôi phục ở cùng thiết bị. Session grant, quyền thực thi và transaction receipt vẫn chưa được tạo."
+      "Altana returned a wallet and its public passkey metadata is now retained on this device. Recovery is not needed on this device. No session grant, execution authority, or transaction receipt has been created."
     );
   }
 
   async function createPasskeyWallet() {
     if (!canCreateOrRecover) return;
     setOperationPhase("creating");
-    setOperationMessage("Đang chờ xác nhận WebAuthn trên thiết bị…");
+    setOperationMessage("Waiting for WebAuthn confirmation on this device…");
     try {
       const { BNB_TESTNET, createClient } = await import("@altananetwork/sdk");
       const client = createClient({ chains: [BNB_TESTNET], defaultChainId: 97 });
@@ -192,8 +192,8 @@ export function AltanaPasskeyCeremony({
       setOperationPhase(isUserRejection(error) ? "rejected" : "failed");
       setOperationMessage(
         isUserRejection(error)
-          ? "Yêu cầu passkey đã bị hủy; chưa có quyền hay transaction nào được ghi nhận."
-          : "Altana chưa trả về một ví hoàn tất. Windows Hello có thể đã tạo credential cục bộ trước khi bước chuẩn bị ví dừng lại; không dùng nút Khôi phục cho credential chưa có giao dịch đầu tiên. Mã: ALTANA_CREATE_INCOMPLETE. Không có grant hay transaction nào được ghi nhận."
+          ? "The passkey request was cancelled; no authority or transaction was recorded."
+          : "Altana did not return a complete wallet. Windows Hello may have created a local credential before wallet preparation stopped; do not use recovery for a credential with no first transaction. Code: ALTANA_CREATE_INCOMPLETE. No grant or transaction was recorded."
       );
     }
   }
@@ -201,7 +201,7 @@ export function AltanaPasskeyCeremony({
   async function recoverPasskeyWallet() {
     if (!canCreateOrRecover) return;
     setOperationPhase("recovering");
-    setOperationMessage("Chọn passkey ProofEra trong trình xác thực của thiết bị…");
+    setOperationMessage("Select the ProofEra passkey in this device's authenticator…");
     try {
       const { BNB_TESTNET, createClient } = await import("@altananetwork/sdk");
       const client = createClient({ chains: [BNB_TESTNET], defaultChainId: 97 });
@@ -210,10 +210,10 @@ export function AltanaPasskeyCeremony({
       setOperationPhase(isUserRejection(error) ? "rejected" : "failed");
       setOperationMessage(
         isUserRejection(error)
-          ? "Khôi phục passkey đã bị hủy; trạng thái authority không được suy diễn."
+          ? "Passkey recovery was cancelled; authority state remains unknown."
           : isUnregisteredCounterfactualWallet(error)
-            ? "Authenticator đã trả về ví, nhưng KeyStore chain 97 chưa có admin key on-chain. Đây là trạng thái counterfactual trước giao dịch Altana đầu tiên, không phải bằng chứng passkey bị mất hay authority đã tồn tại. Mã: ALTANA_KEYSTORE_NOT_REGISTERED."
-            : "Không khôi phục được passkey từ KeyStore BSC testnet; trạng thái authority vẫn chưa biết."
+            ? "The authenticator returned a wallet, but the chain-97 KeyStore has no onchain admin key. This is the counterfactual state before the first Altana transaction, not evidence of a lost passkey or existing authority. Code: ALTANA_KEYSTORE_NOT_REGISTERED."
+            : "The passkey could not be recovered from the BSC testnet KeyStore; authority state remains unknown."
       );
     }
   }
@@ -222,9 +222,9 @@ export function AltanaPasskeyCeremony({
     if (walletAddress === null) return;
     try {
       await navigator.clipboard.writeText(walletAddress);
-      setOperationMessage("Đã sao chép địa chỉ ví công khai. Không sao chép credential hoặc khóa.");
+      setOperationMessage("Public wallet address copied. No credential or key was copied.");
     } catch {
-      setOperationMessage("Không thể sao chép tự động; địa chỉ công khai vẫn hiển thị bên dưới.");
+      setOperationMessage("Automatic copy failed; the public address remains visible below.");
     }
   }
 
@@ -233,7 +233,7 @@ export function AltanaPasskeyCeremony({
       <div className="ceremony-passkey-heading">
         <div>
           <span className="panel-overline">FINAL HTTPS ORIGIN / BSC TESTNET 97</span>
-          <h3 id="altana-passkey-heading">Xác nhận Altana passkey</h3>
+          <h3 id="altana-passkey-heading">Confirm an Altana passkey</h3>
         </div>
         <span className={`state-badge ${ready ? "state-positive" : "state-caution"}`}>
           {ready ? "Local passkey ready" : "User presence required"}
@@ -250,10 +250,10 @@ export function AltanaPasskeyCeremony({
           type="button"
         >
           {ready
-            ? "Passkey đã tạo"
+            ? "Passkey created"
             : operationPhase === "creating"
-              ? "Đang chờ passkey…"
-              : "Tạo Altana passkey"}
+              ? "Waiting for passkey…"
+              : "Create Altana passkey"}
         </button>
         <button
           className="button button-secondary"
@@ -262,29 +262,30 @@ export function AltanaPasskeyCeremony({
           type="button"
         >
           {ready
-            ? "Không cần khôi phục"
+            ? "Recovery not needed"
             : operationPhase === "recovering"
-              ? "Đang khôi phục…"
-              : "Khôi phục ví đã có giao dịch"}
+              ? "Recovering…"
+              : "Recover transacted wallet"}
         </button>
       </div>
       <p className="registry-footnote">
-        Khôi phục từ KeyStore chỉ dùng cho ví đã đăng ký admin key qua giao dịch Altana đầu tiên.
-        Passkey vừa tạo có thể vẫn là ví counterfactual; nếu địa chỉ ví đang hiện bên dưới thì
-        metadata trên thiết bị này đã sẵn sàng và không cần khôi phục.
+        KeyStore recovery is only for a wallet whose admin key was registered by its first Altana
+        transaction. A newly created passkey wallet may still be counterfactual; when its address is
+        visible below, this device already has the required metadata and does not need recovery.
       </p>
       {walletAddress === null ? null : (
         <div className="ceremony-passkey-wallet" role="status">
           <span>Altana wallet / chain 97</span>
           <code>{walletAddress}</code>
           <button className="button button-secondary" onClick={copyWalletAddress} type="button">
-            Sao chép địa chỉ
+            Copy address
           </button>
         </div>
       )}
       <p className="registry-footnote">
-        Chỉ credential ID và public key được giữ cục bộ để tiếp tục trên thiết bị này. Private
-        passkey không rời authenticator. Bước này không tự nhận đã grant, execute hoặc tạo receipt.
+        Only the credential ID and public key are retained locally to continue on this device. The
+        private passkey never leaves the authenticator. This step does not claim a grant, execution,
+        or receipt.
       </p>
     </section>
   );

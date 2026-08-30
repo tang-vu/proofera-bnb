@@ -115,9 +115,10 @@ This is a real host-local staging deployment, not production activation evidence
 ## Bounded Altana test-action worker
 
 The bounded session proof has one local-only chain-97 worker for lifecycle evidence. The user-facing
-entry is `/session-control`; `/operator-ceremony` retains the benchmark/recovery ceremony and is
-non-indexed. Both reuse the same public-state API and are deliberately narrower than the production
-LP activation composition:
+entry is `/session-control`. `/operator-ceremony` retains the benchmark/recovery harness for local
+development, remains non-indexed, and redirects to `/session-control` in every production runtime.
+Both reuse the same public-state API and are deliberately narrower than the production LP activation
+composition:
 
 - tracked public configuration: `deploy/windows/altana-test-action.v2.json`;
 - pinned admin wallet: `0x91Aa0E6627bFF6C911B38CEd5F7885E063b7C27a`;

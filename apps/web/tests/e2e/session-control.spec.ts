@@ -32,10 +32,10 @@ test("keeps the owner controls visible but never labels a click as evidence", as
   await page.goto("/session-control");
 
   await expect(
-    page.getByRole("button", { name: /Grant quyền testnet|Authority đã hiện/ })
+    page.getByRole("button", { name: /Grant testnet authority|Authority observed/ })
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: /Revoke session|Đã revoke|Authority đã hết hạn/ })
+    page.getByRole("button", { name: /Revoke session|Revoked|Authority expired/ })
   ).toBeVisible();
-  await expect(page.getByText(/Không receipt thì không có claim hoàn tất/i)).toBeVisible();
+  await expect(page.getByText(/without a receipt, there is no completion claim/i)).toBeVisible();
 });

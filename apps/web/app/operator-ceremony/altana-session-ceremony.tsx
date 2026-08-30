@@ -411,7 +411,7 @@ export function AltanaSessionCeremony({
   async function grant(event: MouseEvent<HTMLButtonElement>) {
     if (!canGrant || wallet === null) return;
     setBusy(true);
-    setMessage("Đang yêu cầu Windows Hello ký đúng grant chain 97…");
+    setMessage("Requesting Windows Hello for the exact chain-97 grant…");
     const eventEpochMilliseconds =
       event.timeStamp > 1_000_000_000_000
         ? event.timeStamp
@@ -456,14 +456,14 @@ export function AltanaSessionCeremony({
         updatedAt: new Date().toISOString()
       });
       setMessage(
-        "Relay báo grant đã xác nhận; đang chờ hai RPC thấy authority rồi worker mới chạy."
+        "The relay reports a confirmed grant. The worker will wait until both RPCs observe the authority."
       );
       await refreshWorker();
     } catch (error) {
       if (isUserRejection(error)) {
         window.localStorage.removeItem(OPERATION_STORAGE_KEY);
         window.dispatchEvent(new Event(OPERATION_EVENT));
-        setMessage("Bạn đã hủy Windows Hello; không có grant hay transaction nào được ghi nhận.");
+        setMessage("Windows Hello was cancelled; no grant or transaction was recorded.");
       } else {
         const retained = readBrowserOperation(config) ?? initial;
         retainOperation({
@@ -473,7 +473,7 @@ export function AltanaSessionCeremony({
           updatedAt: new Date().toISOString()
         });
         setMessage(
-          "Kết quả grant chưa xác định. Hệ thống đã khóa retry và chỉ chờ authority/receipt công khai."
+          "The grant outcome is unknown. Retries are locked while public authority and receipt evidence are reconciled."
         );
       }
     } finally {
@@ -484,7 +484,7 @@ export function AltanaSessionCeremony({
   async function revoke() {
     if (!canRevoke || wallet === null || operation === null) return;
     setBusy(true);
-    setMessage("Đang yêu cầu Windows Hello ký revoke riêng biệt…");
+    setMessage("Requesting a separate Windows Hello confirmation for revocation…");
     const submitting: BrowserOperation = {
       ...operation,
       status: "revoke_submitting",
@@ -511,13 +511,13 @@ export function AltanaSessionCeremony({
         updatedAt: new Date().toISOString()
       });
       setMessage(
-        "Relay đã xử lý revoke; completion chỉ hiện sau khi worker thấy authority vắng mặt."
+        "The relay processed the revocation. Completion appears only after the worker observes that authority is absent."
       );
       await refreshWorker();
     } catch (error) {
       if (isUserRejection(error)) {
         retainOperation(operation);
-        setMessage("Bạn đã hủy Windows Hello; authority hiện tại không bị suy diễn là đã revoke.");
+        setMessage("Windows Hello was cancelled; current authority is not inferred to be revoked.");
       } else {
         const retained = readBrowserOperation(config) ?? submitting;
         retainOperation({
@@ -527,7 +527,7 @@ export function AltanaSessionCeremony({
           updatedAt: new Date().toISOString()
         });
         setMessage(
-          "Kết quả revoke chưa xác định; không retry mù, tiếp tục probe authority công khai."
+          "The revocation outcome is unknown. No blind retry is allowed; public authority probing continues."
         );
       }
     } finally {
@@ -552,34 +552,34 @@ export function AltanaSessionCeremony({
       </div>
 
       <div className="ceremony-command" aria-label="Exact Altana test action policy">
-        <span>Quyền chính xác</span>
+        <span>Exact permission</span>
         <code>chain 97 · PTA approve(address,uint256) · amount 0 · value 0</code>
         <code>target {config.action.target}</code>
         <code>
-          session {config.sessionKey.address} · expiry 1 giờ · native fee cap{" "}
-          {config.permissions.spend[0].limit} wei/ngày (0.0005 tBNB)
+          session {config.sessionKey.address} · 1-hour expiry · native fee cap{" "}
+          {config.permissions.spend[0].limit} wei/day (0.0005 tBNB)
         </code>
       </div>
 
       <p aria-live="polite" role="status">
         {message ??
           (lifecycleComplete
-            ? "Execute receipt đã xác nhận và hai RPC không còn thấy session authority."
+            ? "The execution receipt is confirmed and neither RPC observes session authority."
             : !walletMatches
-              ? `Luồng này chỉ nhận passkey wallet ${config.walletAddress}.`
+              ? `This flow accepts only passkey wallet ${config.walletAddress}.`
               : !funded
-                ? `Ví đang có ${workerState?.balanceWei ?? "chưa rõ"} wei; cần ít nhất ${config.minimumNativeBalanceWei} wei tBNB để đăng ký hai key và trả gas.`
+                ? `The wallet balance is ${workerState?.balanceWei ?? "unknown"} wei; at least ${config.minimumNativeBalanceWei} wei of tBNB is required to register both keys and pay gas.`
                 : executeFailed
-                  ? `Relay đã kết thúc test action ở trạng thái failure ${workerState.execute?.relayStatusCode ?? "không rõ"}; không có receipt nên không có claim thực thi thành công.`
+                  ? `The relay ended the test action with failure status ${workerState.execute?.relayStatusCode ?? "unknown"}; without a receipt there is no successful-execution claim.`
                   : sessionExpired && !authorityPresent
-                    ? "Session đã hết hạn và hai RPC không còn thấy authority. Không cần gửi revoke; execute vẫn chưa có receipt nên lifecycle chưa hoàn tất."
+                    ? "The session expired and neither RPC observes authority. No revocation is needed; without an execution receipt the lifecycle remains incomplete."
                     : authorityPresent
                       ? executeConfirmed
-                        ? "Test action đã có receipt; cần một lần Windows Hello riêng để revoke."
-                        : "Authority đang hoạt động nhưng execute chưa có receipt; bạn có thể revoke ngay. Lifecycle vẫn chưa hoàn tất nếu execute không xác nhận."
+                        ? "The test action has a receipt; revocation requires a separate Windows Hello confirmation."
+                        : "Authority is active but execution has no receipt; you may revoke immediately. The lifecycle remains incomplete unless execution is confirmed."
                       : operation !== null
-                        ? "Grant đã được gửi hoặc đang reconciliation; retry bị khóa cho tới khi authority rõ ràng."
-                        : "Worker và funding đã sẵn sàng; grant cần một lần xác nhận Windows Hello.")}
+                        ? "The grant was submitted or is being reconciled; retries remain locked until authority is known."
+                        : "The worker and funding are ready; the grant requires one Windows Hello confirmation.")}
       </p>
 
       <div className="ceremony-passkey-actions">
@@ -589,7 +589,11 @@ export function AltanaSessionCeremony({
           onClick={grant}
           type="button"
         >
-          {busy ? "Đang xử lý…" : authorityPresent ? "Authority đã hiện" : "Grant quyền testnet"}
+          {busy
+            ? "Processing…"
+            : authorityPresent
+              ? "Authority observed"
+              : "Grant testnet authority"}
         </button>
         <button
           className="button button-secondary"
@@ -598,9 +602,9 @@ export function AltanaSessionCeremony({
           type="button"
         >
           {lifecycleComplete
-            ? "Đã revoke"
+            ? "Revoked"
             : sessionExpired && !authorityPresent
-              ? "Authority đã hết hạn"
+              ? "Authority expired"
               : "Revoke session"}
         </button>
       </div>
@@ -609,10 +613,14 @@ export function AltanaSessionCeremony({
         <p className="registry-footnote">Worker public state unavailable: {worker.reason}.</p>
       ) : null}
       {unboundWorkerState !== null && workerState === null ? (
-        <p className="registry-footnote">Worker public state không khớp wallet/session đã pin.</p>
+        <p className="registry-footnote">
+          Public worker state does not match the pinned wallet and session.
+        </p>
       ) : null}
       {workerState?.error === undefined ? null : (
-        <p className="registry-footnote">Worker dừng an toàn với mã {workerState.error}.</p>
+        <p className="registry-footnote">
+          The worker stopped safely with code {workerState.error}.
+        </p>
       )}
 
       <dl className="ceremony-session-meta">
@@ -665,9 +673,9 @@ export function AltanaSessionCeremony({
       )}
 
       <p className="registry-footnote">
-        PTA là fixed-supply test asset không có giá trị kinh tế. Quyền selector không khóa được tham
-        số; worker chỉ ký calldata amount 0 đã pin và session hết hạn sau một giờ. Không receipt thì
-        không có claim hoàn tất.
+        PTA is a fixed-supply test asset with no economic value. Selector-level permission cannot
+        constrain arguments, so the worker signs only the pinned amount-0 calldata and the session
+        expires after one hour. Without a receipt, there is no completion claim.
       </p>
     </section>
   );

@@ -28,10 +28,12 @@ test("starts one honest operator session and keeps it through a reload", async (
   await expect(page.getByText("Ready after faucet funding")).toBeVisible();
   await expect(page.getByText("Waits for a real grant")).toBeVisible();
   await expect(page.getByText("Start ProofEra Ceremony.cmd")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Tạo Altana passkey" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Khôi phục ví đã có giao dịch" })).toBeVisible();
-  await expect(page.getByText(/passkey vừa tạo có thể vẫn là ví counterfactual/i)).toBeVisible();
-  await expect(page.getByRole("button", { name: "Grant quyền testnet" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Create Altana passkey" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Recover transacted wallet" })).toBeVisible();
+  await expect(
+    page.getByText(/newly created passkey wallet may still be counterfactual/i)
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Grant testnet authority" })).toBeDisabled();
   await expect(
     page
       .getByLabel("Exact Altana test action policy")
@@ -85,8 +87,8 @@ test("enables the bounded grant only for the pinned funded passkey wallet", asyn
 
   await page.goto("/operator-ceremony");
 
-  await expect(page.getByRole("button", { name: "Grant quyền testnet" })).toBeEnabled();
-  await expect(page.getByText(/worker và funding đã sẵn sàng/i)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Grant testnet authority" })).toBeEnabled();
+  await expect(page.getByText(/worker and funding are ready/i)).toBeVisible();
   await expect(page.getByRole("button", { name: "Revoke session" })).toBeDisabled();
 });
 
@@ -148,7 +150,9 @@ test("offers immediate revoke while an authorized execute is still pending", asy
   await page.goto("/operator-ceremony");
 
   await expect(page.getByRole("button", { name: "Revoke session" })).toBeEnabled();
-  await expect(page.getByText(/execute chưa có receipt; bạn có thể revoke ngay/i)).toBeVisible();
+  await expect(
+    page.getByText(/execution has no receipt; you may revoke immediately/i)
+  ).toBeVisible();
 });
 
 test("shows terminal relay failure and never offers a consumed signer grant again", async ({
@@ -198,8 +202,8 @@ test("shows terminal relay failure and never offers a consumed signer grant agai
 
   await page.goto("/operator-ceremony");
 
-  await expect(page.getByText(/trạng thái failure 300/i)).toBeVisible();
+  await expect(page.getByText(/failure status 300/i)).toBeVisible();
   await expect(page.getByText("300", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Grant quyền testnet" })).toBeDisabled();
-  await expect(page.getByRole("button", { name: "Authority đã hết hạn" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Grant testnet authority" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Authority expired" })).toBeDisabled();
 });
