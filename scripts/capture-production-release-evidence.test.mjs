@@ -152,7 +152,7 @@ test("retained rehearsal binds DNS agreement, TLS authorization and eleven exact
 
 test("retained final release binds the exact negative-benefit boundary and rollback exercise", async () => {
   const probeUrl = new URL(
-    "../evidence/submission/release-probes/e6e55c161f324f03b401b1e9f0a17f5fbff2d373/final/manifest.json",
+    "../evidence/submission/release-probes/ad0cee11885b2131c27bfa14c3b0a27f2f8fee69/final/manifest.json",
     import.meta.url
   );
   const releaseUrl = new URL(
@@ -165,13 +165,13 @@ test("retained final release binds the exact negative-benefit boundary and rollb
   const release = JSON.parse(releaseBytes.toString("utf8"));
   assert.equal(
     createHash("sha256").update(probeBytes).digest("hex"),
-    "682fecefd8dd444fb52dfef5dbdc054b274f1416dbbd31666dae4b1a51c7c133"
+    "3a296042cd9bd2ccbfba37c9c15ba8085e5ec82afd9d87d6042397df7ad70e68"
   );
   assert.equal(
     createHash("sha256").update(releaseBytes).digest("hex"),
-    "9bfd056576ebc62b4fb296b2a793965e3d6f3f0d6b3a2c8b006cb8140f2b3c88"
+    "8eb9d66f8db0f522b00df87b45e4ec5f68829fcc21a271266747d57ce8526a29"
   );
-  assert.equal(probe.sourceCommit, "e6e55c161f324f03b401b1e9f0a17f5fbff2d373");
+  assert.equal(probe.sourceCommit, "ad0cee11885b2131c27bfa14c3b0a27f2f8fee69");
   assert.equal(probe.mode, "final");
   assert.equal(probe.classification.pancakeBenefitClaimVerified, false);
   assert.equal(probe.classification.pancakeOutcomeGateState, "controlled_outcome_observed");
@@ -186,9 +186,22 @@ test("retained final release binds the exact negative-benefit boundary and rollb
   assert.equal(release.classification.submissionReady, false);
   assert.equal(release.publicProbe.sha256, createHash("sha256").update(probeBytes).digest("hex"));
   assert.equal(release.rollbackExercise.rollbackProbe.exitCode, 0);
+  assert.equal(release.rollbackExercise.rollbackProbe.checkpointCount, 11);
+  assert.equal(release.rollbackExercise.rollbackProbe.exactWebRuntimePathObserved, true);
+  assert.equal(release.rollbackExercise.rollbackProbe.exactMonitorRuntimePathObserved, true);
   assert.equal(release.rollbackExercise.restorationProbe.exitCode, 0);
-  assert.equal(release.rollbackExercise.altanaWorkerPidBefore, 40632);
-  assert.equal(release.rollbackExercise.altanaWorkerPidAfter, 40632);
+  assert.equal(release.rollbackExercise.restorationProbe.checkpointCount, 11);
+  assert.equal(release.rollbackExercise.restorationProbe.exactWebRuntimePathObserved, true);
+  assert.equal(release.rollbackExercise.restorationProbe.exactMonitorRuntimePathObserved, true);
+  assert.equal(release.rollbackExercise.rejectedPreflight.status, "rejected_not_counted");
+  assert.equal(release.rollbackExercise.rejectedPreflight.runtimePathsChanged, false);
+  assert.equal(release.rollbackExercise.rejectedPreflight.evidenceClaimed, false);
+  for (const processName of release.rollbackExercise.processesNotRestarted) {
+    assert.equal(
+      release.rollbackExercise.pidsBefore[processName],
+      release.rollbackExercise.pidsAfter[processName]
+    );
+  }
   assert.deepEqual(release.securityBoundary, {
     mainnetWritePossible: false,
     walletAccessed: false,

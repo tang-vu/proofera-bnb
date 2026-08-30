@@ -10,21 +10,23 @@
     "onchainEvidenceIntroduced": false
   },
   "release": {
-    "sourceCommit": "e6e55c161f324f03b401b1e9f0a17f5fbff2d373",
-    "sourceTree": "efd94f0c0e17bdca6490fe60ca6760ea785584dc",
+    "sourceCommit": "ad0cee11885b2131c27bfa14c3b0a27f2f8fee69",
+    "sourceTree": "715ffe0e4b10e7159de78ea910a9e67778b51545",
     "publicOrigin": "https://proofera.tangvu.dev",
     "agentOrigins": [
       "https://proofera-lp.tangvu.dev",
       "https://proofera-grid.tangvu.dev",
       "https://proofera-yield.tangvu.dev",
       "https://proofera-health.tangvu.dev"
-    ]
+    ],
+    "buildIdSha256": "a06d5926c6f6a1031578e70d7470985a3c33d0321e1f89f644221fcf24b54990",
+    "buildManifestSha256": "109bbfd6366e314b26c24225d9ec2fc66bf6e58f3dbf40263adcc6bf71bba455"
   },
   "publicProbe": {
-    "path": "evidence/submission/release-probes/e6e55c161f324f03b401b1e9f0a17f5fbff2d373/final/manifest.json",
-    "sha256": "682fecefd8dd444fb52dfef5dbdc054b274f1416dbbd31666dae4b1a51c7c133",
-    "observedAtUtc": "2026-08-29T10:37:27.597Z",
-    "completedAtUtc": "2026-08-29T10:37:32.780Z",
+    "path": "evidence/submission/release-probes/ad0cee11885b2131c27bfa14c3b0a27f2f8fee69/final/manifest.json",
+    "sha256": "3a296042cd9bd2ccbfba37c9c15ba8085e5ec82afd9d87d6042397df7ad70e68",
+    "observedAtUtc": "2026-08-29T17:22:29.310Z",
+    "completedAtUtc": "2026-08-29T17:22:35.473Z",
     "dnsResolverAgreement": true,
     "tlsAuthorizedHostCount": 5,
     "httpObservationCount": 11,
@@ -34,23 +36,43 @@
   "rollbackExercise": {
     "status": "verified",
     "rollbackRelease": {
-      "sourceCommit": "c476b01b5eb01d9595232e90cca40dece564e91a",
-      "sourceTree": "7f1f455bceba5500e6ac91d4eaf0927f147e88a6"
+      "sourceCommit": "676ab796bec729a734355737d6c0509a27c9d1d5",
+      "sourceTree": "bce73ffc3aa975ce27de46dea8e64377b024d28f",
+      "buildIdSha256": "867bf3d88fb71f25db491a20552b9cbd3b354a38332c587ee76e3de482477aa2",
+      "buildManifestSha256": "df7d41ce35a8e8ba15da84efc58a9b4c40fd0d9eb9952b8c6659db5b9ea16aa8"
     },
-    "rollbackStartedAtUtc": "2026-08-29T10:55:38.594Z",
-    "rollbackReadyAtUtc": "2026-08-29T10:55:46.340Z",
-    "rollbackProbeCompletedAtUtc": "2026-08-29T10:56:12.799Z",
+    "rejectedPreflight": {
+      "status": "rejected_not_counted",
+      "issue": "pm2_start_or_restart_retained_existing_script_paths",
+      "environmentChanged": true,
+      "runtimePathsChanged": false,
+      "probeExitCode": 0,
+      "evidenceClaimed": false
+    },
+    "rollbackStartedAtUtc": "2026-08-30T02:50:04.380Z",
+    "rollbackReadyAtUtc": "2026-08-30T02:50:10.807Z",
+    "rollbackProbeStartedAtUtc": "2026-08-30T02:50:29.503Z",
+    "rollbackProbeCompletedAtUtc": "2026-08-30T02:50:32.781Z",
     "rollbackProbe": {
       "exitCode": 0,
       "checkpointCount": 11,
-      "exactRollbackBuildObserved": true
+      "exactRollbackBuildObserved": true,
+      "exactWebRuntimePathObserved": true,
+      "exactMonitorRuntimePathObserved": true
     },
-    "restoredAtUtc": "2026-08-29T10:56:23.253Z",
+    "restorationStartedAtUtc": "2026-08-30T02:50:57.208Z",
+    "restoredAtUtc": "2026-08-30T02:51:03.619Z",
+    "restorationProbeStartedAtUtc": "2026-08-30T02:51:22.932Z",
+    "restorationProbeCompletedAtUtc": "2026-08-30T02:51:25.730Z",
     "restorationProbe": {
       "exitCode": 0,
       "checkpointCount": 11,
       "exactFrozenBuildObserved": true,
-      "pm2ProcessListSaved": true
+      "exactWebRuntimePathObserved": true,
+      "exactMonitorRuntimePathObserved": true,
+      "monitorInitialProbeHealthy": true,
+      "pm2ProcessListSaved": true,
+      "pm2SaveCompletedAtUtc": "2026-08-30T02:53:44.856Z"
     },
     "processScope": ["proofera-web", "proofera-monitor"],
     "processesNotRestarted": [
@@ -61,8 +83,26 @@
       "proofera-tunnel",
       "proofera-altana-test-action-worker"
     ],
-    "altanaWorkerPidBefore": 40632,
-    "altanaWorkerPidAfter": 40632
+    "pidsBefore": {
+      "proofera-agent-lp": 50064,
+      "proofera-agent-grid": 29464,
+      "proofera-agent-yield": 53444,
+      "proofera-agent-health": 28556,
+      "proofera-tunnel": 22444,
+      "proofera-altana-test-action-worker": 37120,
+      "proofera-web": 60556,
+      "proofera-monitor": 48812
+    },
+    "pidsAfter": {
+      "proofera-agent-lp": 50064,
+      "proofera-agent-grid": 29464,
+      "proofera-agent-yield": 53444,
+      "proofera-agent-health": 28556,
+      "proofera-tunnel": 22444,
+      "proofera-altana-test-action-worker": 37120,
+      "proofera-web": 7948,
+      "proofera-monitor": 42392
+    }
   },
   "securityBoundary": {
     "mainnetWritePossible": false,
@@ -75,6 +115,7 @@
   "limitations": [
     "The public and rollback probes originated from the production host network and are not independent external uptime monitoring.",
     "The rollback exercise covered the web application and host-local monitor. The four analyzer source trees did not change between the two commits and their running processes were intentionally left untouched.",
+    "An initial PM2 start-or-restart preflight changed the build environment but retained the existing runtime paths; it was rejected and contributes no rollback evidence.",
     "This exercise did not test a Windows reboot, Cloudflare Tunnel rollback, DNS rollback, database restore, external paging, wallet custody, signing or transaction submission.",
     "The frozen production release does not close the Pancake benefit, final demo or hackathon-submission gates."
   ]
