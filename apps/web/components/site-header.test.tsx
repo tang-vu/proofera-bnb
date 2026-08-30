@@ -17,13 +17,20 @@ describe("SiteHeader", () => {
   it("keeps one ordered primary navigation contract on every route", () => {
     expect(primaryNavigationItems.map(({ href, label }) => [href, label])).toEqual([
       ["/marketplace", "Marketplace"],
+      ["/studio", "Studio"],
       ["/proof", "Proof room"],
       ["/session-control", "Session control"],
       ["/mission-control", "Mission Control"]
     ]);
 
     const baselineLinks = renderToStaticMarkup(<SiteHeader />).match(/href="[^"]+"/gu);
-    for (const pathname of ["/marketplace", "/proof", "/session-control", "/mission-control"]) {
+    for (const pathname of [
+      "/marketplace",
+      "/studio",
+      "/proof",
+      "/session-control",
+      "/mission-control"
+    ]) {
       navigation.pathname = pathname;
       expect(renderToStaticMarkup(<SiteHeader />).match(/href="[^"]+"/gu)).toEqual(baselineLinks);
     }
@@ -36,6 +43,7 @@ describe("SiteHeader", () => {
     ["/configure/lp-rebalancing", "marketplace"],
     ["/reference-analyzers/grid-trading", "marketplace"],
     ["/pancake-position", "marketplace"],
+    ["/studio", "studio"],
     ["/proof", "proof"],
     ["/session-control", "session"],
     ["/operator-ceremony", "session"],

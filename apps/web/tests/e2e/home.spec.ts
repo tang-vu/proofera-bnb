@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 const stablePrimaryNavigation = [
   ["Marketplace", "/marketplace"],
+  ["Studio", "/studio"],
   ["Proof room", "/proof"],
   ["Session control", "/session-control"],
   ["Mission Control", "/mission-control"]
@@ -181,7 +182,7 @@ test("keeps one motionless header contract through every primary client route", 
       "aria-current",
       "page"
     );
-    await expect(navigation.locator("a")).toHaveCount(5);
+    await expect(navigation.locator("a")).toHaveCount(6);
     await expect(navigation.locator("a")).toHaveText([
       /ProofEra/u,
       ...stablePrimaryNavigation.map(([navigationLabel]) => navigationLabel)

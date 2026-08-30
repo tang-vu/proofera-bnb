@@ -27,11 +27,11 @@ const validQueries = {
   },
   "yield-optimisation": {
     capitalRaw: maxUint256,
-    network: "bsc-mainnet",
+    network: "bsc-testnet",
     risk: "conservative",
     horizon: "months",
     asset: "stablecoins",
-    protocol: "lista",
+    protocol: "venus",
     minimumNetApyBps: "450",
     minimumWithdrawableBps: "9000",
     maxGasCostRaw: "4500000000000001"
@@ -221,42 +221,47 @@ describe("reference-agent mandate configuration", () => {
     });
   });
 
-  it("binds Lista to BSC mainnet and rejects a chain-97 Lista mandate", () => {
-    const mainnet = parseReferenceAgentConfiguration(
-      "yield-optimisation",
-      validQueries["yield-optimisation"]
-    );
-    const testnet = parseReferenceAgentConfiguration("yield-optimisation", {
+  it("rejects mainnet and unsupported yield protocols at the product boundary", () => {
+    const mainnet = parseReferenceAgentConfiguration("yield-optimisation", {
       ...validQueries["yield-optimisation"],
-      network: "bsc-testnet"
-    });
-
-    expect(mainnet.status).toBe("configured");
-    if (mainnet.status === "configured") expect(mainnet.configuration.chainId).toBe(56);
-    expect(testnet).toMatchObject({ status: "invalid", issues: [{ field: "network" }] });
-  });
-
-  it("maps each explicitly selected supported network to its chain ID", () => {
-    const gridMainnet = parseReferenceAgentConfiguration("grid-trading", {
-      ...validQueries["grid-trading"],
       network: "bsc-mainnet"
     });
+    const unsupportedProtocol = parseReferenceAgentConfiguration("yield-optimisation", {
+      ...validQueries["yield-optimisation"],
+      protocol: "lista"
+    });
+
+    expect(mainnet).toMatchObject({ status: "invalid", issues: [{ field: "network" }] });
+    expect(unsupportedProtocol).toMatchObject({
+      status: "invalid",
+      issues: [{ field: "protocol" }]
+    });
+  });
+
+  it("maps every supported product mandate to BSC testnet chain 97", () => {
+    const gridTestnet = parseReferenceAgentConfiguration(
+      "grid-trading",
+      validQueries["grid-trading"]
+    );
     const venusYieldTestnet = parseReferenceAgentConfiguration("yield-optimisation", {
       ...validQueries["yield-optimisation"],
       network: "bsc-testnet",
       protocol: "venus"
     });
-    const healthMainnet = parseReferenceAgentConfiguration("health-factor-monitoring", {
-      ...validQueries["health-factor-monitoring"],
-      network: "bsc-mainnet"
-    });
+    const healthTestnet = parseReferenceAgentConfiguration(
+      "health-factor-monitoring",
+      validQueries["health-factor-monitoring"]
+    );
 
-    expect(gridMainnet).toMatchObject({ status: "configured", configuration: { chainId: 56 } });
+    expect(gridTestnet).toMatchObject({ status: "configured", configuration: { chainId: 97 } });
     expect(venusYieldTestnet).toMatchObject({
       status: "configured",
       configuration: { chainId: 97 }
     });
-    expect(healthMainnet).toMatchObject({ status: "configured", configuration: { chainId: 56 } });
+    expect(healthTestnet).toMatchObject({
+      status: "configured",
+      configuration: { chainId: 97 }
+    });
   });
 
   it("requires ordered health-factor thresholds above one", () => {

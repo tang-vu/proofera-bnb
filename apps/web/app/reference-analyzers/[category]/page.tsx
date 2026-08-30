@@ -362,29 +362,29 @@ export default async function ReferenceAnalyzerPage({ params }: ReferenceAnalyze
         aria-labelledby="execution-boundary-heading"
       >
         <div>
-          <span className="eyebrow">EXECUTION BOUNDARY</span>
-          <h2 id="execution-boundary-heading">Registered analyzer, execution disabled.</h2>
+          <span className="eyebrow">LIVE PRODUCT BOUNDARY</span>
+          <h2 id="execution-boundary-heading">
+            Analysis is live. Strategy execution stays disabled.
+          </h2>
           <p id="execution-disabled-reason">
-            There is no connected wallet, active scoped authority, verified strategy execution
-            receipt, or current user-facing hire control. ProofEra cannot activate this analyzer
-            from this dossier.
+            Run this exact public analyzer in the testnet studio with a bounded input. The result is
+            read-only decision support: it creates no wallet authority, strategy transaction,
+            completion receipt, or performance claim.
           </p>
         </div>
         <div className="hero-actions">
+          <Link
+            className="button button-primary button-arrow"
+            href={`/studio?agent=${passport.category}`}
+          >
+            Run live analyzer
+          </Link>
           <Link className="button button-secondary" href={configurationRoutes[passport.category]}>
             Configure mandate
           </Link>
           <Link className="button button-secondary" href="/session-control">
             Inspect session controls
           </Link>
-          <button
-            aria-describedby="execution-disabled-reason"
-            className="button"
-            disabled
-            type="button"
-          >
-            Execution unavailable
-          </button>
         </div>
       </section>
     </main>

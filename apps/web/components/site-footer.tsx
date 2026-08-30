@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 const productLinks = [
+  ["Studio", "/studio"],
   ["Marketplace", "/marketplace"],
   ["Proof room", "/proof"],
   ["Mission Control", "/mission-control"],

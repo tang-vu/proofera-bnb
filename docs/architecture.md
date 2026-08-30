@@ -1,6 +1,6 @@
 # ProofEra architecture
 
-Updated: 2026-08-26. This document describes the target architecture and the local boundaries already built to support the judged journey without turning registry metadata or simulated results into execution authority. The complete diagram is not a deployment-status claim.
+Updated: 2026-08-30. This document describes the target architecture and the local boundaries already built to support the judged journey without turning registry metadata or simulated results into execution authority. The complete diagram is not a deployment-status claim.
 
 ## System boundary
 
@@ -25,6 +25,8 @@ The browser owns the user's grant and revoke passkey ceremonies and must display
 flowchart LR
   L[Land] --> C[Choose one of four jobs]
   C --> D[Inspect identity, evidence, and unknowns]
+  D --> S[Run a read-only chain-97 scenario in Studio]
+  S --> V[Inspect decision, rationale, limits, and raw output]
   D --> M[Define mandate]
   M --> E{Trusted evidence complete?}
   E -->|No| H[Show exact blockers]
@@ -37,9 +39,14 @@ flowchart LR
   O -->|Revoke| R[Fresh probe proves authority absent]
 ```
 
-The current bounded Altana proof covers create/recover, one grant, one automatic in-scope PTA
-amount-0 action, receipt reconciliation, owner revoke, and final authority absence. The production
-LP journey still stops at the trusted evidence/policy handoff and must not be narrated as complete.
+The current judge-usable product path covers goal-first discovery, four registered dossiers,
+testnet-only mandates, and a Studio console that runs all four public read-only analyzers. Studio
+labels synthetic scenarios separately from the one retained historical Venus replay, renders
+rejections and limitations, stores only bounded summaries in device-local history, and never asks
+for a wallet. The bounded Altana proof separately covers create/recover, one grant, one automatic
+in-scope PTA amount-0 action, receipt reconciliation, owner revoke, and final authority absence.
+The production LP activation journey still stops at the trusted evidence/policy handoff and must
+not be narrated as complete.
 
 ## Repository boundaries
 
@@ -53,7 +60,7 @@ LP journey still stops at the trusted evidence/policy handoff and must not be na
 | `contracts/testnet-fixed-asset` | Isolated fixed-supply chain-97 fixture plus unsigned deployment/pool preparation        | Act as a protocol guard, stablecoin, valued asset, deployment/pool proof, or authority   |
 | `evidence`                      | Non-secret manifests, raw outputs, hashes, receipts and limitations                     | Contain keys, fabricated hashes, or unlabelled simulations                               |
 
-Reference-agent analysis and execution are separate capabilities. LP, Grid, Yield, and Health-Factor packages expose strict public A2A/MCP analyzers over caller-supplied, source-identified evidence. They schema-enforce non-execution and leave unverified realized outcomes unknown. All four have hardened exact-pinned HTTP packaging and local suites of 17, 24, 33, and 42 tests respectively, plus fail-independent CI matrix entries. Current Studio 0.0.5 does not recognize these TypeScript runtimes as deploy-ready AgentCore projects; they are durably self-hosted instead. The marketplace renders one validated development dossier for each category with finalized BSC-testnet ERC-8004 identities `1825` through `1828`, while marketplace eligibility, activation, execution, and hiring remain false. Each metric independently says either `implemented_not_run` with the exact analyzer version or `definition_documented_calculator_absent` with no version; the implemented set is LP `current_range_state`, Grid `configured_range`, Yield `net_apy`/`gas_impact`, and Health `current_health_factor`/`minimum_health_factor`/`alert_latency`. The dossier never applies one analyzer-wide method label to fields the code does not calculate. Public hosting and registration are verified; execution evidence is absent. A future execution worker must add authenticated evidence ingestion, policy/authority checks, durable idempotency, health probes, and a receipt pipeline. Analyzer availability or registration alone never makes an agent hireable.
+Reference-agent analysis and execution are separate capabilities. LP, Grid, Yield, and Health-Factor packages expose strict public A2A/MCP analyzers over caller-supplied, source-identified evidence. They schema-enforce non-execution and leave unverified realized outcomes unknown. All four have hardened exact-pinned HTTP packaging and local suites of 17, 24, 33, and 42 tests respectively, plus fail-independent CI matrix entries. Current Studio 0.0.5 does not recognize these TypeScript runtimes as deploy-ready AgentCore projects; they are durably self-hosted instead. The marketplace renders one validated development dossier for each category with finalized BSC-testnet ERC-8004 identities `1825` through `1828`, while marketplace eligibility, activation, execution, and hiring remain false. `/studio` is the product run surface: its server route chooses one exact allowlisted endpoint, requires the category's exact skill and chain ID 97, rejects credential-like fields, applies bounded request/response sizes and timeout, and rejects any upstream result that weakens the non-execution or testnet boundary. The four supplied scenarios are deterministic demonstrations, not live market evidence; only Health uses a hash-checked retained historical replay. Each metric independently says either `implemented_not_run` with the exact analyzer version or `definition_documented_calculator_absent` with no version; the implemented set is LP `current_range_state`, Grid `configured_range`, Yield `net_apy`/`gas_impact`, and Health `current_health_factor`/`minimum_health_factor`/`alert_latency`. The dossier never applies one analyzer-wide method label to fields the code does not calculate. Public hosting and registration are verified; execution evidence is absent. A future execution worker must add authenticated evidence ingestion, policy/authority checks, durable idempotency, health probes, and a receipt pipeline. Analyzer availability or registration alone never makes an agent hireable.
 
 ## Marketplace read path
 
@@ -64,7 +71,7 @@ Reference-agent analysis and execution are separate capabilities. LP, Grid, Yiel
 5. The versioned recommendation engine applies one requested category, chain, capital, complete requested-asset coverage, permitted-protocol overlap, risk tolerance and permission horizon. Stale/missing evidence remains insufficient rather than imputed, duplicate candidates cannot occupy multiple recommendation slots, and no APY, PnL or other economic return is used for ordering.
 6. Proof Score operates only on validated, category-bound evidence. Cross-category returns are not ranked as if they were equivalent.
 
-The marketplace page isolates registry suspense from its local intent/analyzer shell: intent controls and the four non-live development records render before 8004scan settles, and only the registry region transitions through pending/available/authoritative-empty/unavailable states. The category mandate routes are another deliberately narrower boundary. `/lp-activate` remains the LP-specific bounded configuration surface; `/configure/grid-trading`, `/configure/yield-optimisation`, and `/configure/health-factor-monitoring` parse allowlisted GET fields into exact raw values and an explicit chain 56/97 choice. Those three configuration handlers perform no RPC read, HTTP fetch, application-environment lookup, wallet access, or write, and every evidence/identity/permission/authority/receipt/activation/execution/revoke readiness flag remains false.
+The marketplace page isolates registry suspense from its local intent/analyzer shell: intent controls and the four development records render before 8004scan settles, and only the registry region transitions through pending/available/authoritative-empty/unavailable states. The category mandate routes are another deliberately narrower boundary. `/lp-activate` remains the LP-specific bounded configuration surface; `/configure/grid-trading`, `/configure/yield-optimisation`, and `/configure/health-factor-monitoring` parse allowlisted GET fields into exact raw values and accept BSC testnet chain 97 only. Those three configuration handlers perform no RPC read, HTTP fetch, application-environment lookup, wallet access, or write, and every evidence/permission/authority/receipt/activation/execution/revoke readiness flag except the separately receipt-verified registry identity remains false. Their Studio link starts a separate category preset and does not silently convert mandate values into analyzer evidence.
 
 Marketplace evidence is still limited to bounded Next.js caching. The one deliberate persistence exception is the activation replay ledger: a server-only PostgreSQL 17 append-only schema atomically consumes context and quote IDs. Its versioned migration pins an OID-free catalog/ACL/rule digest, an administrator verifier issues an in-process nominal capability, and a separate least-privilege application pool exposes `consumeOrRead` only after that proof plus a fresh access probe. The activation package recognizes that exact WeakSet-backed capability rather than any structurally similar callback; the internal mint is not a package export. Evidence time series and a broader worker index still require measured retention/load need.
 
@@ -138,6 +145,7 @@ grant/revoke mechanics; `/mission-control` displays the retained public lifecycl
 ## Deployment shape
 
 - Marketplace: one durable Next.js deployment on a stable HTTPS origin.
+- Studio: `/studio` is a read-only product console; `/api/analyzer-run` proxies only four exact HTTPS analyzer endpoints with chain/skill/output validation, a 15-second timeout, 96 KiB request and 384 KiB response caps, and a process-local 120-run/minute capacity bound. The bound resets on restart and is not a durable distributed rate limit.
 - Passkey: a stable, explicit RP ID compatible with that origin; never inferred from forwarded host headers. Production rejects IP, special-use, and public-suffix-only hosts through an exact-pinned Public Suffix List parser.
 - Operations: `/api/health` proves only process liveness. `/api/readiness` reports configuration and capability states without secrets, describes provider-backed adapters as unprobed until actually checked, and cannot report activation ready before the worker handoff exists.
 - Agent runtime: durable self-hosted or AWS AgentCore path prepared by `bag deploy prepare`; the BNB-managed 48-hour test deployment is evidence-window tooling only.

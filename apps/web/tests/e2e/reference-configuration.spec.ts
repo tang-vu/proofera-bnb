@@ -41,14 +41,14 @@ const journeys = [
     },
     selects: {
       "Risk tolerance": "conservative",
-      "BSC network": "bsc-mainnet",
+      "BSC network": "bsc-testnet",
       "Time horizon": "months",
       "Preferred asset or pair": "stablecoins",
-      "Permitted protocol": "lista"
+      "Permitted protocol": "venus"
     },
     expectedFacts: ["450 bps", "9000 bps", "4500000000000001"],
-    expectedNetwork: "BSC mainnet / 56",
-    expectedSelections: ["conservative", "months", "stablecoins", "lista"]
+    expectedNetwork: "BSC testnet / 97",
+    expectedSelections: ["conservative", "months", "stablecoins", "venus"]
   },
   {
     category: "health-factor-monitoring",
@@ -219,10 +219,10 @@ test("field errors describe only the invalid grid control", async ({ page }) => 
   );
 });
 
-test("Lista testnet mismatch is associated only with the network control", async ({ page }) => {
+test("mainnet and unsupported Lista mandates fail at their exact controls", async ({ page }) => {
   const query = new URLSearchParams({
     capitalRaw: "1",
-    network: "bsc-testnet",
+    network: "bsc-mainnet",
     risk: "conservative",
     horizon: "months",
     asset: "stablecoins",
@@ -237,10 +237,10 @@ test("Lista testnet mismatch is associated only with the network control", async
   const protocol = page.getByRole("combobox", { name: "Permitted protocol" });
   await expect(network).toHaveAttribute("aria-invalid", "true");
   await expect(network).toHaveAttribute("aria-describedby", "mandate-network-errors");
-  await expect(page.locator("#mandate-network-errors")).toHaveText(
-    "Lista source mandates require BSC mainnet; no official Lista testnet source is configured."
-  );
-  await expect(protocol).not.toHaveAttribute("aria-invalid");
+  await expect(page.locator("#mandate-network-errors")).toContainText("bsc-testnet");
+  await expect(protocol).toHaveAttribute("aria-invalid", "true");
+  await expect(protocol).toHaveAttribute("aria-describedby", "mandate-protocol-errors");
+  await expect(page.locator("#mandate-protocol-errors")).toContainText(/venus|pancakeswap/u);
 });
 
 test("unknown keys stay at form level without invalidating valid controls", async ({ page }) => {

@@ -75,10 +75,7 @@ const riskOptions = [
 
 const optionSets = {
   "grid-trading": {
-    network: [
-      ["bsc-testnet", "BSC testnet (97)"],
-      ["bsc-mainnet", "BSC mainnet (56)"]
-    ],
+    network: [["bsc-testnet", "BSC testnet (97)"]],
     horizon: [
       ["hours", "Hours"],
       ["days", "Days"],
@@ -92,10 +89,7 @@ const optionSets = {
     protocol: [["pancakeswap-v3", "PancakeSwap V3"]]
   },
   "yield-optimisation": {
-    network: [
-      ["bsc-mainnet", "BSC mainnet (56)"],
-      ["bsc-testnet", "BSC testnet (97)"]
-    ],
+    network: [["bsc-testnet", "BSC testnet (97)"]],
     horizon: [
       ["weeks", "Weeks"],
       ["months", "Months"],
@@ -107,16 +101,12 @@ const optionSets = {
       ["cake", "CAKE"]
     ],
     protocol: [
-      ["lista", "Lista"],
       ["venus", "Venus"],
       ["pancakeswap", "PancakeSwap"]
     ]
   },
   "health-factor-monitoring": {
-    network: [
-      ["bsc-testnet", "BSC testnet (97)"],
-      ["bsc-mainnet", "BSC mainnet (56)"]
-    ],
+    network: [["bsc-testnet", "BSC testnet (97)"]],
     horizon: [
       ["continuous", "Continuous monitoring"],
       ["days", "Days"],
@@ -497,7 +487,7 @@ function SummaryState({ values }: Readonly<{ values: ReferenceConfigurationFormV
         </div>
         <div>
           <dt>Network</dt>
-          <dd>{values.network === "bsc-mainnet" ? "BSC mainnet / 56" : "BSC testnet / 97"}</dd>
+          <dd>BSC testnet / 97</dd>
         </div>
         <div>
           <dt>Risk</dt>
@@ -575,11 +565,7 @@ function ConfigurationReadiness({
             Mandate captured. Identity verified; trust incomplete.
           </h2>
         </div>
-        <span className="state-badge state-caution">
-          {configuration.network === "bsc-mainnet"
-            ? "BSC mainnet / chain 56"
-            : "BSC testnet / chain 97"}
-        </span>
+        <span className="state-badge state-caution">BSC testnet / chain 97</span>
       </div>
 
       <div className="unavailable-panel" role="status">
@@ -614,11 +600,7 @@ function ConfigurationReadiness({
             </div>
             <div>
               <dt>Network</dt>
-              <dd>
-                {configuration.network === "bsc-mainnet"
-                  ? "BSC mainnet / chain 56"
-                  : "BSC testnet / chain 97"}
-              </dd>
+              <dd>BSC testnet / chain 97</dd>
             </div>
             <div>
               <dt>Risk / horizon</dt>
@@ -676,6 +658,16 @@ function ConfigurationReadiness({
           This configuration handler performed no RPC read, HTTP fetch, wallet access, application
           environment lookup, or write. A later evidence service must independently establish every
           trusted fact.
+        </p>
+        <Link
+          className="button button-secondary button-arrow"
+          href={`/studio?agent=${configuration.category}`}
+        >
+          Run this category in Studio <span aria-hidden="true">→</span>
+        </Link>
+        <p>
+          Studio runs a separate read-only chain-97 scenario. It does not treat this mandate as
+          source evidence or carry configuration values into an agent request.
         </p>
         <Link className="text-link" href="/session-control">
           Inspect the bounded session-key model <span aria-hidden="true">→</span>

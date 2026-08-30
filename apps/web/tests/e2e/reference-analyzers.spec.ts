@@ -39,7 +39,7 @@ const analyzers = [
 ] as const;
 
 for (const analyzer of analyzers) {
-  test(`${analyzer.category} dossier is truthful, complete, and execution-disabled`, async ({
+  test(`${analyzer.category} dossier exposes live read-only analysis without strategy execution`, async ({
     page
   }) => {
     const offOriginRequests: string[] = [];
@@ -66,7 +66,10 @@ for (const analyzer of analyzers) {
     await expect(
       page.getByText("Definition documented; calculator absent", { exact: true })
     ).toHaveCount(8 - analyzer.implementedMetrics.length);
-    await expect(page.getByRole("button", { name: "Execution unavailable" })).toBeDisabled();
+    await expect(page.getByRole("link", { name: "Run live analyzer" })).toHaveAttribute(
+      "href",
+      `/studio?agent=${analyzer.category}`
+    );
     await expect(page.getByRole("link", { name: "Inspect session controls" })).toHaveAttribute(
       "href",
       "/session-control"
@@ -88,7 +91,9 @@ for (const analyzer of analyzers) {
       ).toBeVisible();
     }
 
-    await expect(page.getByText(/no connected wallet, active scoped authority/i)).toBeVisible();
+    await expect(
+      page.getByText(/creates no wallet authority, strategy transaction/i)
+    ).toBeVisible();
     await expect(page.getByText(/activation enabled/i)).toHaveCount(0);
     await expect(page.getByRole("link", { name: /^Hire/i })).toHaveCount(0);
     expect(offOriginRequests).toEqual([]);
@@ -154,5 +159,5 @@ test("unknown reference categories return a truthful 404", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "This page could not be found." })).toBeVisible();
   await expect(page.getByText("Local analyzer", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Configure mandate" })).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Execution unavailable" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Run live analyzer" })).toHaveCount(0);
 });

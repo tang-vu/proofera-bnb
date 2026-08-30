@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 export const primaryNavigationItems = [
   { href: "/marketplace", key: "marketplace", label: "Marketplace", secondary: false },
+  { href: "/studio", key: "studio", label: "Studio", secondary: false },
   { href: "/proof", key: "proof", label: "Proof room", secondary: false },
   { href: "/session-control", key: "session", label: "Session control", secondary: true },
   { href: "/mission-control", key: "mission", label: "Mission Control", secondary: true }
@@ -31,6 +32,7 @@ export function primaryNavigationKey(pathname: string): PrimaryNavigationKey | n
     return "marketplace";
   }
   if (pathname === "/proof") return "proof";
+  if (pathname === "/studio") return "studio";
   if (pathname === "/session-control" || pathname === "/operator-ceremony") return "session";
   if (pathname === "/mission-control") return "mission";
   return null;

@@ -71,6 +71,7 @@ export default function HomePage() {
               </Link>
             </div>
             <div className="hero-quick-links" aria-label="Additional product paths">
+              <Link href="/studio">Run a live testnet analyzer</Link>
               <Link href="/mission-control">See active mandates</Link>
               <Link href="/session-control">Grant a testnet session</Link>
               <a href="#method">How proof works</a>

@@ -13,7 +13,7 @@ export type ReferenceConfigurationCategory = z.infer<typeof configurableCategory
 export type ReferenceConfigurationSearchParams = Record<string, string | string[] | undefined>;
 
 const riskSchema = z.enum(["conservative", "balanced", "adventurous"]);
-const networkSchema = z.enum(["bsc-mainnet", "bsc-testnet"]);
+const networkSchema = z.literal("bsc-testnet");
 const MAX_UINT256 = (1n << 256n) - 1n;
 const CANONICAL_DECIMAL_PATTERN = /^(?:0|[1-9][0-9]*)(?:\.[0-9]{1,18})?$/;
 
@@ -86,28 +86,17 @@ const gridFormSchema = z
     }
   });
 
-const yieldFormSchema = z
-  .strictObject({
-    capitalRaw: uint256String("Maximum allocation", false),
-    network: networkSchema,
-    risk: riskSchema,
-    horizon: z.enum(["weeks", "months", "year-plus"]),
-    asset: z.enum(["stablecoins", "bnb", "cake"]),
-    protocol: z.enum(["lista", "venus", "pancakeswap"]),
-    minimumNetApyBps: integerString("Minimum acceptable net APY", 0n, 10_000n),
-    minimumWithdrawableBps: integerString("Minimum withdrawable share", 1n, 10_000n),
-    maxGasCostRaw: uint256String("Maximum gas cost", true)
-  })
-  .superRefine((value, context) => {
-    if (value.protocol === "lista" && value.network !== "bsc-mainnet") {
-      context.addIssue({
-        code: "custom",
-        path: ["network"],
-        message:
-          "Lista source mandates require BSC mainnet; no official Lista testnet source is configured."
-      });
-    }
-  });
+const yieldFormSchema = z.strictObject({
+  capitalRaw: uint256String("Maximum allocation", false),
+  network: networkSchema,
+  risk: riskSchema,
+  horizon: z.enum(["weeks", "months", "year-plus"]),
+  asset: z.enum(["stablecoins", "bnb", "cake"]),
+  protocol: z.enum(["venus", "pancakeswap"]),
+  minimumNetApyBps: integerString("Minimum acceptable net APY", 0n, 10_000n),
+  minimumWithdrawableBps: integerString("Minimum withdrawable share", 1n, 10_000n),
+  maxGasCostRaw: uint256String("Maximum gas cost", true)
+});
 
 const healthFormSchema = z
   .strictObject({
@@ -204,7 +193,7 @@ export interface ReferenceConfigurationReadiness {
 }
 
 export type ReferenceAgentConfiguration = Readonly<
-  { schemaVersion: 1; chainId: 56 | 97 } & ReferenceConfigurationFormValues
+  { schemaVersion: 1; chainId: 97 } & ReferenceConfigurationFormValues
 >;
 
 export type ReferenceConfigurationState =
@@ -245,11 +234,11 @@ const defaults = {
   "yield-optimisation": {
     category: "yield-optimisation",
     capitalRaw: "",
-    network: "bsc-mainnet",
+    network: "bsc-testnet",
     risk: "balanced",
     horizon: "months",
     asset: "stablecoins",
-    protocol: "lista",
+    protocol: "venus",
     minimumNetApyBps: "300",
     minimumWithdrawableBps: "8000",
     maxGasCostRaw: ""
@@ -368,7 +357,7 @@ export function parseReferenceAgentConfiguration(
     formValues: validatedFormValues,
     configuration: {
       schemaVersion: 1 as const,
-      chainId: validatedFormValues.network === "bsc-mainnet" ? (56 as const) : (97 as const),
+      chainId: 97 as const,
       ...validatedFormValues
     },
     readiness: createReadiness(category)
