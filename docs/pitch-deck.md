@@ -39,9 +39,10 @@ ProofEra's governing rule: missing evidence remains missing; it never becomes a 
 6. Activate only after identity, authority, and evidence gates pass.
 7. Reconcile receipts in Mission Control and revoke with negative authority proof.
 
-Current truth: the discovery, configuration, Proof Room and receipt-backed historical lifecycle are
-public. Autonomous production activation remains fail-closed, and the current release is not final
-until its retained rollback/restoration evidence is deployed with the final demo.
+Current truth: discovery, configuration, Proof Room, receipt-backed historical lifecycle and the
+evidence carrier are public. The base release retains exact rollback/restoration evidence and the
+carrier passed eleven host-origin checkpoints. Autonomous production activation remains fail-closed;
+the narrated final demo and authoritative submission receipt are still absent.
 
 ## Slide 4 — Proof, not a leaderboard
 

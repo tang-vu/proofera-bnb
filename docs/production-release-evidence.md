@@ -88,5 +88,11 @@ The separately authorized exercise then moved the exact web and monitor runtime 
 initial `startOrRestart` preflight changed only the environment while retaining old runtime paths; it
 was rejected and is not counted. Four analyzers, the tunnel and Altana worker PID `37120` were not
 restarted. Final production manifest SHA-256 is
-`8eb9d66f8db0f522b00df87b45e4ec5f68829fcc21a271266747d57ce8526a29`. Independent uptime,
-evidence-carrier deployment and the final demo remain separate gates.
+`bf02e8d1df867baa64c1b7b237e4e71be60cacd0cc041263c727055787eb591f`.
+
+Later on 2026-08-30, explicitly authorized evidence carrier
+`1663e1f3a8755744739d4b63b32b7cb288221245` replaced only the web and monitor runtime. Its exact
+host-origin probe passed all eleven HTTP/build/runtime checkpoints, readiness remained honestly
+`503`, and PM2 state was saved. The four analyzer PIDs, tunnel PID and Altana-worker PID were
+unchanged. This carrier probe did not repeat the two-resolver or TLS capture retained for the base
+release. Independent uptime and the final demo remain separate gates.

@@ -1,28 +1,28 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-30T02:55:56.863Z",
+  "updatedAtUtc": "2026-08-30T08:54:54.781Z",
   "readyForSubmission": false,
   "gates": [
     {
       "gateId": "production-release",
       "state": "verified",
-      "claim": "Commit ad0cee11885b2131c27bfa14c3b0a27f2f8fee69 is publicly deployed and frozen on the existing ProofEra PM2 and Cloudflare Tunnel topology. Its retained final host-origin capture binds two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses, the exact public build and honest not-ready activation state. A bounded rollback to 676ab796bec729a734355737d6c0509a27c9d1d5 and restoration to ad0cee11885b2131c27bfa14c3b0a27f2f8fee69 each ran the exact web and monitor paths and passed all eleven checkpoints. An environment-only PM2 preflight was rejected and contributes no evidence. This proves the bounded host-local release path only; it is not independent uptime, reboot, data-restore or activation evidence.",
+      "claim": "Commit ad0cee11885b2131c27bfa14c3b0a27f2f8fee69 remains the frozen base release with retained two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses and bounded rollback/restoration evidence. Evidence carrier 1663e1f3a8755744739d4b63b32b7cb288221245 is now the exact public web/monitor build and passed all eleven host-origin HTTP/build/runtime checkpoints with honest not-ready activation state; PM2 state was saved and the analyzer, tunnel and Altana-worker processes were not restarted. The carrier probe did not repeat the independent-resolver or TLS capture. This proves the bounded host-local release path only; it is not independent uptime, reboot, data-restore or activation evidence.",
       "blockers": [],
       "artifacts": [
         {
           "kind": "public_probe",
           "path": "evidence/submission/final/production-release.json",
-          "sha256": "8eb9d66f8db0f522b00df87b45e4ec5f68829fcc21a271266747d57ce8526a29"
+          "sha256": "bf02e8d1df867baa64c1b7b237e4e71be60cacd0cc041263c727055787eb591f"
         },
         {
           "kind": "release_manifest",
           "path": "evidence/submission/final/production-release.json",
-          "sha256": "8eb9d66f8db0f522b00df87b45e4ec5f68829fcc21a271266747d57ce8526a29"
+          "sha256": "bf02e8d1df867baa64c1b7b237e4e71be60cacd0cc041263c727055787eb591f"
         },
         {
           "kind": "rollback_exercise",
           "path": "evidence/submission/final/production-release.json",
-          "sha256": "8eb9d66f8db0f522b00df87b45e4ec5f68829fcc21a271266747d57ce8526a29"
+          "sha256": "bf02e8d1df867baa64c1b7b237e4e71be60cacd0cc041263c727055787eb591f"
         }
       ]
     },

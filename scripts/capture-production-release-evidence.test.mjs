@@ -150,7 +150,7 @@ test("retained rehearsal binds DNS agreement, TLS authorization and eleven exact
   assert.equal(manifest.http.find(({ key }) => key === "marketplace-readiness")?.status, 503);
 });
 
-test("retained final release binds the exact negative-benefit boundary and rollback exercise", async () => {
+test("retained final release binds the negative-benefit boundary, rollback and evidence carrier", async () => {
   const probeUrl = new URL(
     "../evidence/submission/release-probes/ad0cee11885b2131c27bfa14c3b0a27f2f8fee69/final/manifest.json",
     import.meta.url
@@ -169,7 +169,7 @@ test("retained final release binds the exact negative-benefit boundary and rollb
   );
   assert.equal(
     createHash("sha256").update(releaseBytes).digest("hex"),
-    "8eb9d66f8db0f522b00df87b45e4ec5f68829fcc21a271266747d57ce8526a29"
+    "bf02e8d1df867baa64c1b7b237e4e71be60cacd0cc041263c727055787eb591f"
   );
   assert.equal(probe.sourceCommit, "ad0cee11885b2131c27bfa14c3b0a27f2f8fee69");
   assert.equal(probe.mode, "final");
@@ -200,6 +200,24 @@ test("retained final release binds the exact negative-benefit boundary and rollb
     assert.equal(
       release.rollbackExercise.pidsBefore[processName],
       release.rollbackExercise.pidsAfter[processName]
+    );
+  }
+  assert.equal(release.classification.evidenceCarrierDeployed, true);
+  assert.equal(
+    release.evidenceCarrierDeployment.sourceCommit,
+    "1663e1f3a8755744739d4b63b32b7cb288221245"
+  );
+  assert.equal(release.evidenceCarrierDeployment.finalProbe.exitCode, 0);
+  assert.equal(release.evidenceCarrierDeployment.finalProbe.checkpointCount, 11);
+  assert.equal(release.evidenceCarrierDeployment.finalProbe.exactBuildObserved, true);
+  assert.equal(release.evidenceCarrierDeployment.finalProbe.exactWebRuntimePathObserved, true);
+  assert.equal(release.evidenceCarrierDeployment.finalProbe.exactMonitorRuntimePathObserved, true);
+  assert.equal(release.evidenceCarrierDeployment.finalProbe.readinessObservedAsNotReady, true);
+  assert.equal(release.evidenceCarrierDeployment.runtime.pm2ProcessListSaved, true);
+  for (const processName of release.evidenceCarrierDeployment.processesNotRestarted) {
+    assert.equal(
+      release.evidenceCarrierDeployment.pidsBefore[processName],
+      release.evidenceCarrierDeployment.pidsAfter[processName]
     );
   }
   assert.deepEqual(release.securityBoundary, {

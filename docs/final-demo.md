@@ -33,9 +33,10 @@ The evidence-backed narration source and a 303.918-second synthesized timing tra
 `evidence/submission/narration/`. The timing track SHA-256 is
 `aea3992fb2badedf8e52c7a5dbbaf57c6400d0a1190a7355e09b8cf3c31939bf`.
 
-The current public UI release has an exact 11-check final probe and an exact-path rollback/restoration
-exercise. Final capture remains blocked until the commit carrying that retained evidence is pushed,
-explicitly deployed and observed as the exact public build. Do not weaken the gate or record against
+The base public UI release has an exact 11-check final probe and an exact-path rollback/restoration
+exercise. Evidence carrier `1663e1f3a8755744739d4b63b32b7cb288221245` is pushed, explicitly
+deployed and observed as the exact public web/monitor build through eleven host-origin checkpoints.
+The narrated capture still has no retained final artifact. Do not weaken the gate or record against
 a source commit that differs from `HEAD`, `origin/main`, or the public build.
 
 ## Commands

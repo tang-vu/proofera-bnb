@@ -14,10 +14,11 @@ Ready to show now:
 
 The controlled Pancake before/after outcome now exists: the position was unchanged and produced no
 observed fee income or agent advantage. It is valid negative evidence, not a verified benefit. The
-current public UI release has now passed its exact-path rollback/restoration exercise and production
-freeze. Do not record the final cut until the commit carrying this evidence is explicitly deployed
-and its exact public build passes the final probe. Altana and TermiX are verified; the TermiX review
-remains owner-designated internal and identity-limited.
+base UI release has passed its exact-path rollback/restoration exercise and production freeze.
+Evidence carrier `1663e1f3a8755744739d4b63b32b7cb288221245` is now deployed and passed the exact
+eleven-check host-origin public probe. Altana and TermiX are verified; the TermiX review remains
+owner-designated internal and identity-limited. The narrated final capture and clean-room playback
+still require retained artifacts before either is claimed complete.
 
 ## One-session operator checklist
 

@@ -60,16 +60,15 @@ owner-facing session entry point; /mission-control is the read-only authority an
 
 ## Highest-value next actions
 
-1. Explicitly deploy the evidence-carrier commit and run its exact final public probe.
-2. Record the clean-room journey: discover → inspect evidence → define mandate → observe the retained
+1. Record the final journey, then perform a separate clean-room playback: discover → inspect evidence → define mandate → observe the retained
    grant/execute/revoke chain → inspect the controlled LP outcome and Proof Room.
-3. Freeze the prepared submission copy and retain the authoritative entry receipt when the organizer
+2. Freeze the prepared submission copy and retain the authoritative entry receipt when the organizer
    exposes a final-entry flow.
-4. Add independent uptime/paging evidence if the judging window and remaining time permit.
-5. Add a public hire path only when its payment, task completion, and failure/refund semantics are
+3. Add independent uptime/paging evidence if the judging window and remaining time permit.
+4. Add a public hire path only when its payment, task completion, and failure/refund semantics are
    fully implemented; do not present the retained paid-hire collector as that UX.
 
-Items 1–4 require external publication, recording, monitoring or submission state and are not
+Items 1–3 require external recording, monitoring or submission state and are not
 created by a source commit. No additional onchain write is required for the truthful current demo.
 Item 5 is a separate product feature, not a copy change.
 

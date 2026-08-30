@@ -7,7 +7,8 @@
     "independentExternalMonitoring": false,
     "pancakeBenefitClaimVerified": false,
     "pancakeOutcomeGateState": "controlled_outcome_observed",
-    "onchainEvidenceIntroduced": false
+    "onchainEvidenceIntroduced": false,
+    "evidenceCarrierDeployed": true
   },
   "release": {
     "sourceCommit": "ad0cee11885b2131c27bfa14c3b0a27f2f8fee69",
@@ -32,6 +33,61 @@
     "httpObservationCount": 11,
     "exactBuildObserved": true,
     "readinessObservedAsNotReady": true
+  },
+  "evidenceCarrierDeployment": {
+    "status": "verified",
+    "sourceCommit": "1663e1f3a8755744739d4b63b32b7cb288221245",
+    "sourceTree": "f49fa34db27bdc111bdc2f77bd10a87300e3668d",
+    "publicOrigin": "https://proofera.tangvu.dev",
+    "webStartedAtUtc": "2026-08-30T08:53:24.015Z",
+    "monitorStartedAtUtc": "2026-08-30T08:53:24.059Z",
+    "finalProbeStartedAtUtc": "2026-08-30T08:54:51.9777437Z",
+    "finalProbeCompletedAtUtc": "2026-08-30T08:54:54.7816498Z",
+    "finalProbe": {
+      "exitCode": 0,
+      "checkpointCount": 11,
+      "exactBuildObserved": true,
+      "exactWebRuntimePathObserved": true,
+      "exactMonitorRuntimePathObserved": true,
+      "readinessObservedAsNotReady": true
+    },
+    "runtime": {
+      "webPid": 18920,
+      "monitorPid": 37740,
+      "webCwd": "C:\\Users\\tangm\\Documents\\GitHub\\proofera-bnb\\apps\\web",
+      "monitorCwd": "C:\\Users\\tangm\\Documents\\GitHub\\proofera-bnb",
+      "buildIdSha256": "cbf86638caaaefb4eee288ccc69ab69fb81255eea53b3db524d07b973f798255",
+      "buildManifestSha256": "1831657bcb44555c31b60d8c86ba50db854dd0a8dcd17ae539f021da50995bcb",
+      "rollbackBuildIdSha256": "a06d5926c6f6a1031578e70d7470985a3c33d0321e1f89f644221fcf24b54990",
+      "rollbackArtifactRetainedOutsideRepository": true,
+      "pm2ProcessListSaved": true,
+      "pm2SaveCompletedAtUtc": "2026-08-30T08:53:54.5250008Z"
+    },
+    "processScope": ["proofera-web", "proofera-monitor"],
+    "processesNotRestarted": [
+      "proofera-agent-lp",
+      "proofera-agent-grid",
+      "proofera-agent-yield",
+      "proofera-agent-health",
+      "proofera-tunnel",
+      "proofera-altana-test-action-worker"
+    ],
+    "pidsBefore": {
+      "proofera-agent-lp": 50064,
+      "proofera-agent-grid": 29464,
+      "proofera-agent-yield": 53444,
+      "proofera-agent-health": 28556,
+      "proofera-tunnel": 22444,
+      "proofera-altana-test-action-worker": 37120
+    },
+    "pidsAfter": {
+      "proofera-agent-lp": 50064,
+      "proofera-agent-grid": 29464,
+      "proofera-agent-yield": 53444,
+      "proofera-agent-health": 28556,
+      "proofera-tunnel": 22444,
+      "proofera-altana-test-action-worker": 37120
+    }
   },
   "rollbackExercise": {
     "status": "verified",
@@ -116,7 +172,8 @@
     "The public and rollback probes originated from the production host network and are not independent external uptime monitoring.",
     "The rollback exercise covered the web application and host-local monitor. The four analyzer source trees did not change between the two commits and their running processes were intentionally left untouched.",
     "An initial PM2 start-or-restart preflight changed the build environment but retained the existing runtime paths; it was rejected and contributes no rollback evidence.",
+    "The evidence-carrier deployment passed the exact eleven host-origin HTTP/build/runtime checks, but it did not repeat the independent-resolver and TLS capture retained for the frozen base release.",
     "This exercise did not test a Windows reboot, Cloudflare Tunnel rollback, DNS rollback, database restore, external paging, wallet custody, signing or transaction submission.",
-    "The frozen production release does not close the Pancake benefit, final demo or hackathon-submission gates."
+    "The evidence carrier does not close the Pancake benefit, final demo or hackathon-submission gates."
   ]
 }

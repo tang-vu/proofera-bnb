@@ -38,28 +38,28 @@ const PANCAKE_OUTCOME_REQUIRED_KINDS = Object.freeze([
 
 const SCENES = Object.freeze([
   Object.freeze({
-    assertions: ["Hire agents by proof,", "Four jobs. Equal scrutiny."],
+    assertions: ["Four jobs. Equal scrutiny.", "Missing evidence is a result."],
     finalHoldMs: 32_000,
     key: "home",
     path: "/",
     rehearsalHoldMs: 3_000
   }),
   Object.freeze({
-    assertions: ["Start with the job.", "Four analyzers. Zero invented agents."],
+    assertions: ["Start with the job.", "Four registered analyzers. Zero invented performance."],
     finalHoldMs: 44_000,
     key: "marketplace",
     path: "/marketplace",
     rehearsalHoldMs: 3_000
   }),
   Object.freeze({
-    assertions: ["LP Range Analyzer", "Every execution gate is closed."],
+    assertions: ["LP Range Analyzer", "Identity exists. Execution gates remain closed."],
     finalHoldMs: 48_000,
     key: "lp-passport",
     path: "/reference-analyzers/lp-rebalancing",
     rehearsalHoldMs: 3_000
   }),
   Object.freeze({
-    assertions: ["Set boundaries before authority.", "Define the boundaries"],
+    assertions: ["Grant once. Keep every action bounded.", "Define the boundaries"],
     finalHoldMs: 52_000,
     key: "lp-configuration",
     path: "/lp-activate",
@@ -73,7 +73,7 @@ const SCENES = Object.freeze([
     rehearsalHoldMs: 3_000
   }),
   Object.freeze({
-    assertions: ["Mission Control begins with verified state."],
+    assertions: ["Control the mandate, not every action.", "No active agent session exists."],
     finalHoldMs: 48_000,
     key: "mission-control",
     path: "/mission-control",
@@ -388,6 +388,20 @@ async function recordBrowserVideo(sourceCommit, mode, temporaryDirectory) {
   return Object.freeze({ playwrightVersion, rawPath, scenes: retainedScenes });
 }
 
+async function removeTemporaryDirectory(temporaryDirectory) {
+  try {
+    await rm(temporaryDirectory, {
+      force: true,
+      maxRetries: 20,
+      recursive: true,
+      retryDelay: 250
+    });
+  } catch (error) {
+    const code = typeof error?.code === "string" ? error.code : "UNKNOWN";
+    process.stderr.write(`PUBLIC_DEMO_VIDEO_TEMPORARY_CLEANUP_WARNING:${code}\n`);
+  }
+}
+
 async function muxFinalVideo(rawPath, voiceoverPath, outputPath) {
   runMediaTool(
     "ffmpeg",
@@ -536,7 +550,7 @@ async function capture({ mode, sourceCommit, voiceover }) {
       scenes: recording.scenes.length
     });
   } finally {
-    await rm(temporaryDirectory, { force: true, recursive: true });
+    await removeTemporaryDirectory(temporaryDirectory);
   }
 }
 

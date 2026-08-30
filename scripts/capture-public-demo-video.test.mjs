@@ -84,6 +84,14 @@ test("capture fixes six public scenes and performs no wallet or transaction acti
   assert.ok(contextClose >= 0 && contextClose < videoSave && videoSave < browserClose);
 });
 
+test("capture retries Windows temporary cleanup without masking the capture outcome", () => {
+  assert.match(source, /async function removeTemporaryDirectory/u);
+  assert.match(source, /maxRetries: 20/u);
+  assert.match(source, /retryDelay: 250/u);
+  assert.match(source, /PUBLIC_DEMO_VIDEO_TEMPORARY_CLEANUP_WARNING/u);
+  assert.match(source, /await removeTemporaryDirectory\(temporaryDirectory\)/u);
+});
+
 test("capture rejects missing invocation before Git, media tools or network", () => {
   const result = spawnSync(process.execPath, [scriptPath], {
     encoding: "utf8",
