@@ -56,7 +56,8 @@ const SAFE_ID = /^[a-z][a-z0-9_-]{0,99}$/u;
 const SHA256 = /^[0-9a-f]{64}$/u;
 const SAFE_PATH = /^evidence\/[A-Za-z0-9._/-]+$/u;
 const UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/u;
-const MAXIMUM_GIT_OUTPUT_BYTES = 8_000_000;
+const MAXIMUM_ARTIFACT_BYTES = 64 * 1024 * 1024;
+const MAXIMUM_GIT_OUTPUT_BYTES = MAXIMUM_ARTIFACT_BYTES + 1_000_000;
 
 export function validateSubmissionReadiness(value) {
   assertRecord(value, "SUBMISSION_READINESS_ROOT_INVALID");
@@ -175,15 +176,20 @@ export async function verifySubmissionArtifacts(readiness, repositoryRoot) {
       const absolutePath = resolve(root, ...artifact.path.split("/"));
       const canonicalPath = await realpath(absolutePath);
       const local = relative(root, canonicalPath);
+      const artifactStats = await lstat(canonicalPath);
       if (
         local === "" ||
         local === ".." ||
         local.startsWith(`..${sep}`) ||
         isAbsolute(local) ||
         resolve(absolutePath).toLowerCase() !== resolve(canonicalPath).toLowerCase() ||
-        (await lstat(canonicalPath)).isSymbolicLink()
+        artifactStats.isSymbolicLink() ||
+        !artifactStats.isFile()
       ) {
         throw new Error("SUBMISSION_READINESS_ARTIFACT_UNTRUSTED");
+      }
+      if (artifactStats.size > MAXIMUM_ARTIFACT_BYTES) {
+        throw new Error("SUBMISSION_READINESS_ARTIFACT_TOO_LARGE");
       }
       const bytes = await readFile(canonicalPath);
       try {

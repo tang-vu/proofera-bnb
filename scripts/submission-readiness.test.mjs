@@ -104,6 +104,8 @@ test("artifact bytes are digest-bound", async () => {
 });
 
 test("final release gate binds tracked HEAD bytes and a clean published commit", () => {
+  assert.match(librarySource, /MAXIMUM_ARTIFACT_BYTES = 64 \* 1024 \* 1024/u);
+  assert.match(librarySource, /SUBMISSION_READINESS_ARTIFACT_TOO_LARGE/u);
   assert.match(librarySource, /\["ls-files", "--error-unmatch", "--", artifact\.path\]/u);
   assert.match(librarySource, /\["show", `HEAD:\$\{artifact\.path\}`\]/u);
   assert.match(librarySource, /\["status", "--porcelain=v1", "--untracked-files=all"\]/u);
