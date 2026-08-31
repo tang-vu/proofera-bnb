@@ -12,6 +12,10 @@ $plainKey = $null
 try {
   if (-not $keyWasPresent) {
     Write-Host "Use only a newly rotated MiMo Token Plan key. The key previously shared in chat is compromised and must not be reused."
+    $rotationConfirmation = Read-Host "After revoking the exposed key and creating a new one, type ROTATED"
+    if ($rotationConfirmation -cne "ROTATED") {
+      throw "MiMo key rotation was not confirmed."
+    }
     $secureKey = Read-Host "Enter the new MiMo API key (input hidden)" -AsSecureString
     $plainKey = [System.Net.NetworkCredential]::new("", $secureKey).Password
     if ([string]::IsNullOrWhiteSpace($plainKey)) {

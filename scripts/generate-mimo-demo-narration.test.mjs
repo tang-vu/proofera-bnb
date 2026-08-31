@@ -125,6 +125,8 @@ test("premium source has exact visual chapter order and a bounded reviewed voice
 });
 
 test("interactive wrapper hides a new key and the generator fails before network without one", () => {
+  assert.match(wrapper, /type ROTATED/u);
+  assert.match(wrapper, /-cne "ROTATED"/u);
   assert.match(wrapper, /Read-Host .* -AsSecureString/u);
   assert.match(wrapper, /previously shared in chat is compromised/u);
   assert.match(wrapper, /Remove-Item Env:MIMO_API_KEY/u);
