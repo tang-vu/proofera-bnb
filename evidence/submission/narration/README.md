@@ -17,3 +17,21 @@ generated with Microsoft Zira Desktop at rate 0 and has these bounded media prop
 - byte length: `6080306`;
 - duration: `303.918` seconds;
 - audio: MP3, mono, 22,050 Hz.
+
+## Premium MiMo successor pipeline
+
+`proofera-final-demo-mimo-v2.5-script.json` is the reviewed eight-chapter successor source. It maps
+an editorial intro, the same six public evidence scenes, and an editorial outro. The source pins
+`mimo-v2.5-tts`, the built-in `Dean` voice, English, and a restrained product-film delivery prompt.
+It does not claim that MiMo audio already exists.
+
+Run `pnpm generate:demo:narration:mimo` interactively only after rotating any credential previously
+shared in chat or logs. The wrapper accepts a new API key through hidden console input, passes it to
+one child process, removes it afterward, and never creates a `.env` file. The Node generator
+allowlists the official pay-as-you-go endpoint and the Singapore Token Plan endpoint, makes
+create-only chapter TTS calls, checks each WAV with `mimo-v2.5-asr`, rejects low sequence similarity,
+normalizes the final mono MP3, and retains an explicit machine-ASR limitation. It stores no request
+headers, raw provider responses, or credential material.
+
+The output MP3, ASR record, and generation manifest remain absent until that interactive run
+succeeds. Their absence must not be described as completed premium narration.

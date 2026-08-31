@@ -43,6 +43,14 @@ The repository scanner asks Git for tracked and non-ignored untracked paths; it 
 
 Tooling must never print an entire process environment or package-manager configuration: registry tokens can be inherited from user-level config and emitted even when the repository contains no secret. Use only narrowly scoped non-secret queries, keep CI logs redacted, and rotate any credential that appears in tool output. The source scanner reports rule/path only and never matched material.
 
+The one-off MiMo narration generator follows the same rule. It accepts a newly rotated API key only
+through hidden interactive console input, places it in one child process, prints only bounded error
+codes, removes the process variable on exit, and writes no `.env`, request header, or raw provider
+response. Its two exact HTTPS base URLs are code-allowlisted. This is an interactive development
+asset generator, not a browser feature, server route, background job, or production dependency.
+Machine ASR output is retained only as a transcribability check and never promoted to a human
+quality attestation.
+
 ### Local BSC testnet deployer custody
 
 A dedicated development EOA exists for the approved chain-97 PTA deployment at `0x997cD959798F7c925076eaeFF5855C5C2c1e5A49`. Its private key was generated with viem's secp256k1 CSPRNG path, encrypted as Web3 Secret Storage v3 with scrypt (`N=131072`, `r=8`, `p=1`) and AES-128-CTR, and stored outside the repository. The independent 48-byte random keystore password is wrapped with Windows DPAPI `CurrentUser`; the local directory has inheritance disabled and one effective allow rule for the current Windows SID. A second process independently unwrapped the password, verified the keystore MAC, recovered the same address and recovered an offline EIP-191 signature. Only public records are retained: the [custody record](../evidence/development/bsc-testnet-deployer-wallet-2026-08-12.json), [funding record](../evidence/development/bsc-testnet-pta-funding-2026-08-12.json), and [finalized deployment receipt](../evidence/development/bsc-testnet-pta-deployment-2026-08-12.json).

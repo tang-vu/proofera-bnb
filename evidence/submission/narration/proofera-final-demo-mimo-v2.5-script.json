@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "proofera-demo-narration-script-v1.0.0",
+  "language": "en",
+  "model": "mimo-v2.5-tts",
+  "voice": "Dean",
+  "stylePrompt": "Polished English narration for a premium technology product film. Calm, authoritative, warm, and precise. Medium pace with crisp pronunciation of blockchain terms, contract addresses, decimals, and measured results. Use restrained dramatic emphasis and natural pauses. Never sound promotional, breathless, theatrical, or exaggerated.",
+  "chapters": [
+    {
+      "key": "intro",
+      "text": "Autonomous agents can move capital. But identity alone does not make them trustworthy. ProofEra puts proof before permission."
+    },
+    {
+      "key": "home",
+      "text": "ProofEra is the evidence and control layer between E R C eight thousand four identity and wallet authority. Its governing rule is simple: missing evidence stays missing. An unavailable metric, a stale source, an uncertain transaction, or an open release gate never becomes a marketing claim. The product follows one continuous decision path: discover an agent by the job, inspect its evidence, define a bounded mandate, observe execution, reconcile uncertainty, and prove revocation. Every screen stays on B N B Smart Chain testnet."
+    },
+    {
+      "key": "marketplace",
+      "text": "A capital owner starts with the outcome they need: manage concentrated liquidity, run a bounded grid, compare sustainable yield, or protect a Venus lending position. Each category has its own decision contract, because range status, grid drawdown, withdrawal liquidity, and health factor cannot safely collapse into one return number. Four public read-only analyzers are registered on B N B Smart Chain testnet as agent identities eighteen twenty-five through eighteen twenty-eight. Registration proves identity publication. It does not prove performance or grant execution rights. ProofEra keeps that distinction visible before the user opens an agent passport."
+    },
+    {
+      "key": "lp-passport",
+      "text": "The Liquidity Position Passport separates observations, calculations, freshness, costs, downside, and unknowns. In the frozen public Pancake position, an exact-block replay placed the current tick one tick above the lower boundary. The analyzer returned insufficient evidence because projected fees, gas, and slippage were unavailable. ProofEra refused to turn a range trigger into a profit claim. A separate owner-executed testnet fixture later created a full-range position with one thousand ProofEra Test Asset and zero point zero zero one test B N B. Two official providers verified both receipts and the post-state. During the retained observation window, price and liquidity stayed unchanged, fees were zero, and known gas remained a cost. The honest conclusion is no observed benefit and no autonomous-agent advantage."
+    },
+    {
+      "key": "lp-configuration",
+      "text": "Before authority exists, ProofEra fixes the chain, direct target, function selector, token, recipient, spend cap, expiry, quote age, and enforcement owner. The bounded Altana lifecycle ran on chain ninety-seven. The owner granted one scoped session. That session executed only the declared zero-amount test approval. Then the owner revoked it. Grant, execute, and revoke each have successful receipts. A button press alone is never treated as completion. The retained evidence also joins a fresh finalized checkpoint where both providers observed that the scoped authority was absent. Historical-state limitations and the zero-value economic effect remain disclosed. This proves one bounded testnet lifecycle, not a production trading mandate."
+    },
+    {
+      "key": "proof-room",
+      "text": "The Proof Room is a closure ledger, not a victory page. Every verified gate links to retained bytes and a S H A two fifty-six digest. Every open gate stays open. Three TermiX tasks were preregistered: a Pancake range decision, an Altana permission audit, and a Venus health-factor replay. Both lanes scored one hundred out of one hundred with zero incremental native fee in every bounded task. For the Pancake task, the agent took about one point zero seven seconds, compared with six hundred twenty point five six seconds manually. For the permission audit, the agent took about two point three two seconds, compared with zero point zero one three seconds manually. For Venus health, the agent took about zero point eight six seconds, compared with zero point zero one zero seconds manually. The timings point in different directions, so ProofEra claims no universal winner. The review is owner-designated and internal, without cryptographic reviewer identity, external independence, or Sigstore attestation."
+    },
+    {
+      "key": "mission-control",
+      "text": "Mission Control joins state to receipts and keeps the revoke boundary visible. Pending, failed, unknown, and expired outcomes remain distinct. Uncertain actions are never blind-retried. The public release passed eleven exact host-and-origin checks across marketplace health, four analyzer pings, four Agent Cards, the Proof Room, and honest readiness. Readiness still says not ready whenever required activation or submission evidence is incomplete. This is what a testnet product should look like: complete enough to use, strict enough to refuse unsupported claims, and explicit about the boundary between an agent identity and authority over capital."
+    },
+    {
+      "key": "outro",
+      "text": "B N B Agent Studio makes autonomous agents easier to create. ProofEra makes them safer to choose and control. Hire agents by proof, not promises."
+    }
+  ]
+}

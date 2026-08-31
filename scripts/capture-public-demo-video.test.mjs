@@ -84,6 +84,21 @@ test("capture fixes six public scenes and performs no wallet or transaction acti
   assert.ok(contextClose >= 0 && contextClose < videoSave && videoSave < browserClose);
 });
 
+test("capture opens and closes with dark editorial cards and smooth deterministic motion", () => {
+  assert.match(source, /buildDemoTitleCard/u);
+  assert.match(source, /RECORDING_LEAD_TRIM_SECONDS = 1/u);
+  assert.match(source, /trim=start=\$\{RECORDING_LEAD_TRIM_SECONDS\}/u);
+  assert.match(source, /await recordTitleCard\(page, "intro"/u);
+  assert.match(source, /await recordTitleCard\(page, "outro"/u);
+  assert.match(source, /requestAnimationFrame/u);
+  assert.match(source, /await context\.addInitScript/u);
+  assert.match(source, /document\.documentElement\.style\.background = "#070a08"/u);
+  assert.match(source, /await revealScene\(page\)/u);
+  assert.match(source, /await concealScene\(page\)/u);
+  assert.match(source, /localEditorialTitleCards: true/u);
+  assert.match(source, /schemaVersion: "proofera-public-demo-video-v1\.1\.0"/u);
+});
+
 test("capture retries Windows temporary cleanup without masking the capture outcome", () => {
   assert.match(source, /async function removeTemporaryDirectory/u);
   assert.match(source, /maxRetries: 20/u);

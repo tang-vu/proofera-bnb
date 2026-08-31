@@ -15,6 +15,7 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 import { createRequire } from "node:module";
+import { buildDemoTitleCard } from "./demo-video-title-card.mjs";
 
 const EXECUTE_FLAG = "--capture-exact-public-demo-video";
 const SOURCE_COMMIT_ARGUMENT = "--source-base-commit";
@@ -24,6 +25,13 @@ const PUBLIC_ORIGIN = "https://proofera.tangvu.dev";
 const VIEWPORT = Object.freeze({ height: 900, width: 1440 });
 const TIMEOUT_MS = 30_000;
 const MAXIMUM_GIT_OUTPUT_BYTES = 8_000_000;
+const FINAL_INTRO_HOLD_MS = 8_000;
+const FINAL_OUTRO_HOLD_MS = 8_000;
+const REHEARSAL_TITLE_HOLD_MS = 2_000;
+const RECORDING_LEAD_TRIM_SECONDS = 1;
+const NAVIGATION_FADE_MS = 650;
+const NAVIGATION_BUDGET_PER_SCENE_MS = 1_000;
+const FINAL_VISUAL_TAIL_PADDING_MS = 1_500;
 const FINAL_PREREQUISITE_GATES = Object.freeze([
   "production-release",
   "agent-registration",
@@ -39,42 +47,42 @@ const PANCAKE_OUTCOME_REQUIRED_KINDS = Object.freeze([
 const SCENES = Object.freeze([
   Object.freeze({
     assertions: ["Four jobs. Equal scrutiny.", "Missing evidence is a result."],
-    finalHoldMs: 32_000,
+    finalWeight: 83,
     key: "home",
     path: "/",
     rehearsalHoldMs: 3_000
   }),
   Object.freeze({
     assertions: ["Start with the job.", "Four registered analyzers. Zero invented performance."],
-    finalHoldMs: 44_000,
+    finalWeight: 98,
     key: "marketplace",
     path: "/marketplace",
     rehearsalHoldMs: 3_000
   }),
   Object.freeze({
     assertions: ["LP Range Analyzer", "Identity exists. Execution gates remain closed."],
-    finalHoldMs: 48_000,
+    finalWeight: 125,
     key: "lp-passport",
     path: "/reference-analyzers/lp-rebalancing",
     rehearsalHoldMs: 3_000
   }),
   Object.freeze({
     assertions: ["Grant once. Keep every action bounded.", "Define the boundaries"],
-    finalHoldMs: 52_000,
+    finalWeight: 109,
     key: "lp-configuration",
     path: "/lp-activate",
     rehearsalHoldMs: 3_000
   }),
   Object.freeze({
     assertions: ["Proof, including what is missing.", "Seven gates."],
-    finalHoldMs: 66_000,
+    finalWeight: 163,
     key: "proof-room",
     path: "/proof",
     rehearsalHoldMs: 3_000
   }),
   Object.freeze({
     assertions: ["Control the mandate, not every action.", "No active agent session exists."],
-    finalHoldMs: 48_000,
+    finalWeight: 96,
     key: "mission-control",
     path: "/mission-control",
     rehearsalHoldMs: 3_000
@@ -309,6 +317,46 @@ function probeMedia(path, mode) {
   });
 }
 
+function probeNarration(path) {
+  const stdout = runMediaTool(
+    "ffprobe",
+    [
+      "-v",
+      "error",
+      "-show_entries",
+      "format=duration:stream=codec_type,codec_name,channels,sample_rate",
+      "-of",
+      "json",
+      path
+    ],
+    "PUBLIC_DEMO_VIDEO_VOICEOVER_PROBE_FAILED"
+  );
+  let probe;
+  try {
+    probe = JSON.parse(stdout);
+  } catch {
+    fail("PUBLIC_DEMO_VIDEO_VOICEOVER_PROBE_INVALID");
+  }
+  const durationSeconds = Number.parseFloat(probe?.format?.duration ?? "");
+  const audioStreams = Array.isArray(probe?.streams)
+    ? probe.streams.filter((stream) => stream.codec_type === "audio")
+    : [];
+  if (
+    !Number.isFinite(durationSeconds) ||
+    durationSeconds < 220 ||
+    durationSeconds > 330 ||
+    audioStreams.length !== 1
+  ) {
+    fail("PUBLIC_DEMO_VIDEO_VOICEOVER_MEDIA_INVALID");
+  }
+  return Object.freeze({
+    channels: audioStreams[0].channels,
+    codecName: audioStreams[0].codec_name,
+    durationSeconds,
+    sampleRate: audioStreams[0].sample_rate
+  });
+}
+
 function decodeMedia(path) {
   runMediaTool(
     "ffmpeg",
@@ -317,46 +365,115 @@ function decodeMedia(path) {
   );
 }
 
-async function tour(page, holdMs) {
-  const started = Date.now();
-  const stepMs = 750;
-  while (Date.now() - started < holdMs) {
-    const elapsed = Date.now() - started;
-    const phase = Math.min(1, elapsed / holdMs);
-    const triangular = phase <= 0.75 ? phase / 0.75 : (1 - phase) / 0.25;
-    await page.evaluate(
-      (fraction) => {
+async function glide(page, targetFraction, durationMs) {
+  await page.evaluate(
+    ({ duration, fraction }) =>
+      new Promise((resolveGlide) => {
         const maximum = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-        window.scrollTo({ behavior: "instant", left: 0, top: Math.round(maximum * fraction) });
-      },
-      Math.max(0, triangular)
-    );
-    await page.waitForTimeout(Math.min(stepMs, holdMs - elapsed));
-  }
-  await page.evaluate(() => window.scrollTo({ behavior: "instant", left: 0, top: 0 }));
+        const from = window.scrollY;
+        const to = Math.round(maximum * fraction);
+        const started = performance.now();
+        const frame = (now) => {
+          const progress = Math.min(1, (now - started) / duration);
+          const eased = progress < 0.5 ? 4 * progress ** 3 : 1 - (-2 * progress + 2) ** 3 / 2;
+          window.scrollTo({
+            behavior: "instant",
+            left: 0,
+            top: Math.round(from + (to - from) * eased)
+          });
+          if (progress < 1) requestAnimationFrame(frame);
+          else resolveGlide();
+        };
+        requestAnimationFrame(frame);
+      }),
+    { duration: durationMs, fraction: targetFraction }
+  );
 }
 
-async function recordBrowserVideo(sourceCommit, mode, temporaryDirectory) {
+async function tour(page, holdMs) {
+  const leadInMs = Math.min(2_500, Math.round(holdMs * 0.12));
+  const returnMs = Math.min(5_000, Math.round(holdMs * 0.22));
+  const descendMs = Math.max(1_000, holdMs - leadInMs - returnMs);
+  await page.waitForTimeout(leadInMs);
+  await glide(page, 1, descendMs);
+  await glide(page, 0, returnMs);
+}
+
+function plannedSceneHolds(mode, narrationDurationSeconds) {
+  if (mode === "rehearsal") return SCENES.map((scene) => scene.rehearsalHoldMs);
+  const weights = SCENES.map((scene) => scene.finalWeight);
+  const transitionBudgetMs =
+    SCENES.length * (NAVIGATION_FADE_MS * 2 + NAVIGATION_BUDGET_PER_SCENE_MS);
+  const availableMs = Math.max(
+    180_000,
+    Math.round(narrationDurationSeconds * 1_000) +
+      RECORDING_LEAD_TRIM_SECONDS * 1_000 +
+      FINAL_VISUAL_TAIL_PADDING_MS -
+      FINAL_INTRO_HOLD_MS -
+      FINAL_OUTRO_HOLD_MS -
+      transitionBudgetMs
+  );
+  const totalWeight = weights.reduce((sum, value) => sum + value, 0);
+  return weights.map((weight) => Math.round((availableMs * weight) / totalWeight));
+}
+
+async function recordTitleCard(page, kind, sourceCommit, holdMs) {
+  await page.setContent(buildDemoTitleCard({ kind, sourceCommit }), { waitUntil: "load" });
+  await page.locator(`[data-proofera-title-card="${kind}"]`).waitFor({ state: "visible" });
+  await page.waitForTimeout(holdMs);
+}
+
+async function revealScene(page) {
+  await page.evaluate((durationMs) => {
+    document.documentElement.style.transition = `opacity ${durationMs}ms cubic-bezier(.2,.8,.2,1)`;
+    document.documentElement.style.opacity = "1";
+  }, NAVIGATION_FADE_MS);
+  await page.waitForTimeout(NAVIGATION_FADE_MS);
+}
+
+async function concealScene(page) {
+  await page.evaluate(() => {
+    document.documentElement.style.opacity = "0";
+  });
+  await page.waitForTimeout(NAVIGATION_FADE_MS);
+}
+
+async function recordBrowserVideo(
+  sourceCommit,
+  mode,
+  temporaryDirectory,
+  narrationDurationSeconds
+) {
   const workspaceRequire = createRequire(new URL("../package.json", import.meta.url));
   const { chromium } = workspaceRequire("@playwright/test");
   const playwrightVersion = workspaceRequire("@playwright/test/package.json").version;
   const browser = await chromium.launch({ headless: true });
   const retainedScenes = [];
+  const retainedTitleCards = [];
   let video;
   const rawPath = join(temporaryDirectory, "browser-tour.webm");
   try {
     const context = await browser.newContext({
-      colorScheme: "light",
+      colorScheme: "dark",
       locale: "en-US",
       recordVideo: { dir: temporaryDirectory, size: VIEWPORT },
       reducedMotion: "reduce",
       serviceWorkers: "block",
       viewport: VIEWPORT
     });
+    await context.addInitScript(() => {
+      document.documentElement.style.background = "#070a08";
+      document.documentElement.style.opacity = "0";
+    });
     const page = await context.newPage();
     video = page.video();
     page.setDefaultTimeout(TIMEOUT_MS);
-    for (const scene of SCENES) {
+    const introHoldMs = mode === "final" ? FINAL_INTRO_HOLD_MS : REHEARSAL_TITLE_HOLD_MS;
+    const outroHoldMs = mode === "final" ? FINAL_OUTRO_HOLD_MS : REHEARSAL_TITLE_HOLD_MS;
+    await recordTitleCard(page, "intro", sourceCommit, introHoldMs);
+    retainedTitleCards.push({ holdMs: introHoldMs, key: "intro", localEditorialCard: true });
+    const sceneHolds = plannedSceneHolds(mode, narrationDurationSeconds);
+    for (const [sceneIndex, scene] of SCENES.entries()) {
       const expectedUrl = `${PUBLIC_ORIGIN}${scene.path}`;
       const response = await page.goto(expectedUrl, { waitUntil: "domcontentloaded" });
       if (response === null || response.status() !== 200 || page.url() !== expectedUrl) {
@@ -365,10 +482,17 @@ async function recordBrowserVideo(sourceCommit, mode, temporaryDirectory) {
       for (const assertion of scene.assertions) {
         await page.getByText(assertion, { exact: false }).first().waitFor({ state: "visible" });
       }
+      await page.evaluate(async () => {
+        await document.fonts.ready;
+        await new Promise((resolveFrame) =>
+          requestAnimationFrame(() => requestAnimationFrame(resolveFrame))
+        );
+      });
       if (scene.key === "proof-room") {
         await page.getByText(sourceCommit, { exact: true }).waitFor({ state: "visible" });
       }
-      const holdMs = mode === "final" ? scene.finalHoldMs : scene.rehearsalHoldMs;
+      await revealScene(page);
+      const holdMs = sceneHolds[sceneIndex];
       retainedScenes.push({
         assertions: scene.assertions,
         holdMs,
@@ -378,14 +502,22 @@ async function recordBrowserVideo(sourceCommit, mode, temporaryDirectory) {
         url: page.url()
       });
       await tour(page, holdMs);
+      await concealScene(page);
     }
+    await recordTitleCard(page, "outro", sourceCommit, outroHoldMs);
+    retainedTitleCards.push({ holdMs: outroHoldMs, key: "outro", localEditorialCard: true });
     await context.close();
     if (video === null || video === undefined) fail("PUBLIC_DEMO_VIDEO_RECORDING_MISSING");
     await video.saveAs(rawPath);
   } finally {
     await browser.close();
   }
-  return Object.freeze({ playwrightVersion, rawPath, scenes: retainedScenes });
+  return Object.freeze({
+    playwrightVersion,
+    rawPath,
+    scenes: retainedScenes,
+    titleCards: retainedTitleCards
+  });
 }
 
 async function removeTemporaryDirectory(temporaryDirectory) {
@@ -412,8 +544,10 @@ async function muxFinalVideo(rawPath, voiceoverPath, outputPath) {
       rawPath,
       "-i",
       voiceoverPath,
+      "-filter_complex",
+      `[0:v:0]trim=start=${RECORDING_LEAD_TRIM_SECONDS},setpts=PTS-STARTPTS[video]`,
       "-map",
-      "0:v:0",
+      "[video]",
       "-map",
       "1:a:0",
       "-c:v",
@@ -437,6 +571,31 @@ async function muxFinalVideo(rawPath, voiceoverPath, outputPath) {
   );
 }
 
+async function trimRehearsalVideo(rawPath, outputPath) {
+  runMediaTool(
+    "ffmpeg",
+    [
+      "-v",
+      "error",
+      "-i",
+      rawPath,
+      "-filter_complex",
+      `[0:v:0]trim=start=${RECORDING_LEAD_TRIM_SECONDS},setpts=PTS-STARTPTS[video]`,
+      "-map",
+      "[video]",
+      "-an",
+      "-c:v",
+      "libvpx",
+      "-crf",
+      "20",
+      "-b:v",
+      "2M",
+      outputPath
+    ],
+    "PUBLIC_DEMO_VIDEO_REHEARSAL_TRIM_FAILED"
+  );
+}
+
 async function capture({ mode, sourceCommit, voiceover }) {
   verifyRelease(sourceCommit);
   const prerequisites = mode === "final" ? verifyFinalPrerequisites() : null;
@@ -453,11 +612,18 @@ async function capture({ mode, sourceCommit, voiceover }) {
 
   const voiceoverEvidence =
     mode === "final" ? await exactTrackedVoiceover(repositoryRoot, voiceover, sourceCommit) : null;
+  const narrationProbe =
+    mode === "final" ? probeNarration(resolve(repositoryRoot, voiceover)) : null;
   const health = await exactHealth(sourceCommit);
   const observedAtUtc = new Date().toISOString();
   const temporaryDirectory = await mkdtemp(join(tmpdir(), "proofera-demo-video-"));
   try {
-    const recording = await recordBrowserVideo(sourceCommit, mode, temporaryDirectory);
+    const recording = await recordBrowserVideo(
+      sourceCommit,
+      mode,
+      temporaryDirectory,
+      narrationProbe?.durationSeconds ?? 0
+    );
     const extension = mode === "final" ? "mp4" : "webm";
     const mediaFilename = `proofera-${mode}-demo.${extension}`;
     const temporaryMediaPath = join(temporaryDirectory, mediaFilename);
@@ -468,19 +634,20 @@ async function capture({ mode, sourceCommit, voiceover }) {
         temporaryMediaPath
       );
     } else {
-      await copyFile(recording.rawPath, temporaryMediaPath, fsConstants.COPYFILE_EXCL);
+      await trimRehearsalVideo(recording.rawPath, temporaryMediaPath);
     }
     const mediaProbe = probeMedia(temporaryMediaPath, mode);
     decodeMedia(temporaryMediaPath);
     const mediaBytes = await readFile(temporaryMediaPath);
     const manifest = {
-      schemaVersion: "proofera-public-demo-video-v1.0.0",
+      schemaVersion: "proofera-public-demo-video-v1.1.0",
       classification: {
         artifact: mode === "final" ? "final_public_demo_video" : "public_demo_video_rehearsal",
         audioPresent: mode === "final",
         browserAutomation: true,
         finalDemoCheck: mode === "final",
         hackathonEntrySubmitted: false,
+        localEditorialTitleCards: true,
         onchainReceiptEvidenceIntroduced: false,
         ...(mode === "final"
           ? {
@@ -498,11 +665,14 @@ async function capture({ mode, sourceCommit, voiceover }) {
       captureEnvironment: {
         browser: "chromium",
         locale: "en-US",
+        navigationFadeMs: NAVIGATION_FADE_MS,
         playwrightVersion: recording.playwrightVersion,
         reducedMotion: "reduce",
         viewport: VIEWPORT
       },
-      voiceover: voiceoverEvidence,
+      voiceover:
+        voiceoverEvidence === null ? null : { ...voiceoverEvidence, probe: narrationProbe },
+      titleCards: recording.titleCards,
       scenes: recording.scenes,
       media: {
         bytes: mediaBytes.length,

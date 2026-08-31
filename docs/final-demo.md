@@ -97,3 +97,37 @@ The automated portion is retained at
 It verifies copy identity, structure, full decode and current public scenes. The owner still needs to
 listen/watch once on a separate viewer and retain a timestamped statement about intelligibility and
 presentation; that owner statement is not independent review.
+
+## Prepared premium successor
+
+The next create-only capture path is implemented but is not yet a retained final-video claim. It
+adds a self-contained dark HTML/CSS intro and outro, exact testnet/build labels, a black-to-scene
+navigation curtain, eased continuous scrolling, and scene durations weighted to the narration.
+The first second of browser-startup footage is removed during encoding, so the about-blank frame
+cannot become a white opening. Editorial cards are recorded separately in the manifest and never
+presented as public product pages.
+
+The reviewed successor narration source has eight chapters and uses Xiaomi MiMo V2.5 TTS with the
+built-in `Dean` voice. The official TTS contract puts delivery direction in a `user` message and the
+exact spoken text in an `assistant` message; output is requested as WAV. Each chapter is then sent
+to MiMo V2.5 ASR as one English WAV input. The ASR transcript is a machine-transcribability check,
+not human playback, independent review, or evidence that narrated claims are true.
+
+Generate it from an interactive Windows console only:
+
+```powershell
+corepack pnpm generate:demo:narration:mimo
+```
+
+The wrapper requires hidden entry of a newly rotated key, keeps it process-local, and removes it on
+exit. It deliberately does not read or create `.env`. The output is create-only; a failed or absent
+generation remains absent. After the MP3, ASR record and manifest are reviewed and committed, a
+future exact published commit still needs its own public deployment authorization before rehearsal
+or final capture. No deployment, wallet access, signature, transaction, or mainnet action is part of
+the narration generator.
+
+Reviewed provider references:
+
+- [MiMo V2.5 speech synthesis API](https://mimo.mi.com/docs/en-US/api/audio/tts)
+- [MiMo V2.5 speech recognition API](https://mimo.mi.com/docs/en-US/api/audio/Speech-Recognition)
+- [MiMo Token Plan quick access](https://mimo.mi.com/docs/en-US/tokenplan/Token%20Plan/quick-access)

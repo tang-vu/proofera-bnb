@@ -21,6 +21,11 @@ owner-designated internal and identity-limited. The 297.080-second narrated fina
 separate-process automated playback are retained. Human-perceived narration/presentation quality
 and organizer submission remain open.
 
+A premium successor pipeline is now prepared but has not replaced this retained artifact. Its
+reviewed script uses an eight-chapter MiMo V2.5 TTS/ASR flow, a dark animated exact-build opener,
+smooth scene motion and an editorial close. Until the create-only audio, exact-release capture and
+playback artifacts exist, the `ad03498` video above remains the only retained final demo.
+
 ## One-session operator checklist
 
 1. Close notifications, password managers, terminal history, and every tab that could reveal a secret.
