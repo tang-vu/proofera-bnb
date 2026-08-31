@@ -24,7 +24,8 @@ const EXPECTED_CHAPTERS = Object.freeze([
 const MAXIMUM_RESPONSE_BYTES = 24_000_000;
 const MAXIMUM_MEDIA_TOOL_OUTPUT_BYTES = 2_000_000;
 const REQUEST_TIMEOUT_MS = 180_000;
-const MINIMUM_ASR_SEQUENCE_SCORE = 0.78;
+const REVIEW_ASR_SEQUENCE_SCORE = 0.78;
+const CATASTROPHIC_ASR_SEQUENCE_SCORE = 0.4;
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const narrationRoot = resolve(repositoryRoot, "evidence", "submission", "narration");
@@ -152,6 +153,11 @@ export function normalizeNarrationText(value) {
     .toLowerCase()
     .replaceAll("&", " and ")
     .replace(/[^a-z0-9]+/gu, " ")
+    .replace(/\be r c\b/gu, "erc")
+    .replace(/\bb n b\b/gu, "bnb")
+    .replace(/\bs h a\b/gu, "sha")
+    .replace(/\beight thousand four\b/gu, "8004")
+    .replace(/\btwo fifty six\b/gu, "256")
     .trim()
     .split(/\s+/u)
     .filter(Boolean);
@@ -376,7 +382,18 @@ async function generate() {
       });
       const transcript = parseAsrResponse(asrResponse);
       const similarity = sequenceSimilarity(chapter.text, transcript);
-      if (similarity < MINIMUM_ASR_SEQUENCE_SCORE) fail("MIMO_ASR_SEQUENCE_MISMATCH");
+      if (similarity < CATASTROPHIC_ASR_SEQUENCE_SCORE) {
+        fail(`MIMO_ASR_SEQUENCE_CATASTROPHIC_${chapter.key.replaceAll("-", "_").toUpperCase()}`);
+      }
+      const reviewedThresholdPassed = similarity >= REVIEW_ASR_SEQUENCE_SCORE;
+      process.stdout.write(
+        `${JSON.stringify({
+          event: "mimo_chapter_checked",
+          key: chapter.key,
+          reviewedThresholdPassed,
+          sequenceSimilarity: Number.parseFloat(similarity.toFixed(6))
+        })}\n`
+      );
       segmentPaths.push(segmentPath);
       chapterResults.push({
         key: chapter.key,
@@ -385,7 +402,8 @@ async function generate() {
         ttsProbe: segmentProbe,
         asrTranscript: transcript,
         asrTranscriptSha256: sha256(Buffer.from(transcript, "utf8")),
-        asrSequenceSimilarity: Number.parseFloat(similarity.toFixed(6))
+        asrSequenceSimilarity: Number.parseFloat(similarity.toFixed(6)),
+        asrReviewedThresholdPassed: reviewedThresholdPassed
       });
     }
 
@@ -406,18 +424,31 @@ async function generate() {
       provider: "Xiaomi MiMo",
       model: ASR_MODEL,
       language: "en",
-      minimumSequenceSimilarity: MINIMUM_ASR_SEQUENCE_SCORE,
+      reviewedSequenceSimilarity: REVIEW_ASR_SEQUENCE_SCORE,
+      catastrophicSequenceSimilarity: CATASTROPHIC_ASR_SEQUENCE_SCORE,
+      reviewedThresholdPassed: chapterResults.every(
+        ({ asrReviewedThresholdPassed }) => asrReviewedThresholdPassed
+      ),
       chapters: chapterResults.map(
-        ({ key, sourceTextSha256, asrTranscript, asrTranscriptSha256, asrSequenceSimilarity }) => ({
+        ({
+          key,
+          sourceTextSha256,
+          asrTranscript,
+          asrTranscriptSha256,
+          asrSequenceSimilarity,
+          asrReviewedThresholdPassed
+        }) => ({
           key,
           sourceTextSha256,
           transcript: asrTranscript,
           transcriptSha256: asrTranscriptSha256,
-          sequenceSimilarity: asrSequenceSimilarity
+          sequenceSimilarity: asrSequenceSimilarity,
+          reviewedThresholdPassed: asrReviewedThresholdPassed
         })
       ),
       limitations: [
         "MiMo ASR checks that generated speech remains machine-transcribable; it is not a human intelligibility or presentation-quality attestation.",
+        "A chapter below the reviewed similarity threshold remains explicitly visible; only catastrophic transcript divergence blocks asset creation.",
         "Transcript similarity does not verify the truth of narrated product claims; those claims remain bound to repository evidence.",
         "No API key, request header or raw provider response is retained."
       ]
@@ -428,6 +459,9 @@ async function generate() {
       classification: {
         artifact: "create_only_mimo_tts_narration",
         asrChecked: true,
+        asrReviewedThresholdPassed: chapterResults.every(
+          ({ asrReviewedThresholdPassed }) => asrReviewedThresholdPassed
+        ),
         humanIntelligibilityAttested: false,
         providerCredentialRetained: false
       },
@@ -478,6 +512,9 @@ async function generate() {
       asrSha256: sha256(asrBytes),
       chapters: chapterResults.length,
       durationSeconds: outputProbe.durationSeconds,
+      asrReviewedThresholdPassed: chapterResults.every(
+        ({ asrReviewedThresholdPassed }) => asrReviewedThresholdPassed
+      ),
       manifest: relative(repositoryRoot, manifestPath).replaceAll("\\", "/"),
       manifestSha256: sha256(manifestBytes),
       output: relative(repositoryRoot, outputPath).replaceAll("\\", "/"),

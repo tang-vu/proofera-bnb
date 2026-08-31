@@ -29,9 +29,11 @@ Run `pnpm generate:demo:narration:mimo` interactively only after rotating any cr
 shared in chat or logs. The wrapper accepts a new API key through hidden console input, passes it to
 one child process, removes it afterward, and never creates a `.env` file. The Node generator
 allowlists the official pay-as-you-go endpoint and the Singapore Token Plan endpoint, makes
-create-only chapter TTS calls, checks each WAV with `mimo-v2.5-asr`, rejects low sequence similarity,
-normalizes the final mono MP3, and retains an explicit machine-ASR limitation. It stores no request
-headers, raw provider responses, or credential material.
+create-only chapter TTS calls, and checks each WAV with `mimo-v2.5-asr`. Domain spellings such as
+`BNB`, `ERC-8004`, and `SHA-256` are normalized before comparison. A reviewed similarity miss stays
+visible in evidence; only catastrophic transcript divergence blocks asset creation. The generator
+normalizes the final mono MP3 and stores no request headers, raw provider responses, or credential
+material.
 
 The output MP3, ASR record, and generation manifest remain absent until that interactive run
 succeeds. Their absence must not be described as completed premium narration.

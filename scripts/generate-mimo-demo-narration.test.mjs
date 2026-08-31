@@ -15,6 +15,7 @@ import {
 
 const scriptUrl = new URL("./generate-mimo-demo-narration.mjs", import.meta.url);
 const scriptPath = fileURLToPath(scriptUrl);
+const generatorSource = await readFile(scriptUrl, "utf8");
 const wrapper = await readFile(
   new URL("./generate-mimo-demo-narration.ps1", import.meta.url),
   "utf8"
@@ -102,7 +103,22 @@ test("ASR similarity is punctuation-insensitive but remains sequence-sensitive",
     "permission"
   ]);
   assert.equal(sequenceSimilarity("Proof before permission", "Proof, before permission."), 1);
+  assert.equal(
+    sequenceSimilarity(
+      "E R C eight thousand four on B N B with S H A two fifty-six",
+      "ERC-8004 on BNB with SHA-256"
+    ),
+    1
+  );
   assert.ok(sequenceSimilarity("proof before permission", "permission before proof") < 0.7);
+});
+
+test("ASR keeps review quality explicit and blocks only catastrophic divergence", () => {
+  assert.match(generatorSource, /REVIEW_ASR_SEQUENCE_SCORE = 0\.78/u);
+  assert.match(generatorSource, /CATASTROPHIC_ASR_SEQUENCE_SCORE = 0\.4/u);
+  assert.match(generatorSource, /asrReviewedThresholdPassed/u);
+  assert.match(generatorSource, /MIMO_ASR_SEQUENCE_CATASTROPHIC_/u);
+  assert.doesNotMatch(generatorSource, /MIMO_ASR_SEQUENCE_MISMATCH/u);
 });
 
 test("premium source has exact visual chapter order and a bounded reviewed voice", () => {

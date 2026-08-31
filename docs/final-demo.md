@@ -111,7 +111,9 @@ The reviewed successor narration source has eight chapters and uses Xiaomi MiMo 
 built-in `Dean` voice. The official TTS contract puts delivery direction in a `user` message and the
 exact spoken text in an `assistant` message; output is requested as WAV. Each chapter is then sent
 to MiMo V2.5 ASR as one English WAV input. The ASR transcript is a machine-transcribability check,
-not human playback, independent review, or evidence that narrated claims are true.
+not human playback, independent review, or evidence that narrated claims are true. Domain-equivalent
+spellings are normalized; a miss against the reviewed threshold remains explicit, while only
+catastrophic transcript divergence blocks asset creation.
 
 Generate it from an interactive Windows console only:
 
