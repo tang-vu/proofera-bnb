@@ -1,9 +1,9 @@
 {
   "schemaVersion": "proofera-current-public-release-derivative-v1.0.0",
   "status": "observed_rehearsal",
-  "sourceCommit": "ad0349811df96f39b110a505f0c6d9ded6d4746b",
-  "observedAtUtc": "2026-08-31T04:12:45.238Z",
-  "completedAtUtc": "2026-08-31T04:12:50.021Z",
+  "sourceCommit": "9f32dda65d8123f6f37a58fa869daef6340fd1be",
+  "observedAtUtc": "2026-08-31T09:30:39.807Z",
+  "completedAtUtc": "2026-08-31T09:30:45.814Z",
   "classification": {
     "artifact": "current_public_release_derivative",
     "finalReleaseFrozen": false,
@@ -14,8 +14,8 @@
     "submissionReady": false
   },
   "sourceProbe": {
-    "path": "evidence/submission/release-probes/ad0349811df96f39b110a505f0c6d9ded6d4746b/rehearsal/manifest.json",
-    "sha256": "30fe670108738ca5f823d43f201317dba86d1ceaf974bac039c50d08290b90a3",
+    "path": "evidence/submission/release-probes/9f32dda65d8123f6f37a58fa869daef6340fd1be/rehearsal/manifest.json",
+    "sha256": "9d05a26b683c038d15137c05cbb8a89db3c9305b807e073cea4c1fc425d6818b",
     "mode": "rehearsal"
   },
   "summary": {

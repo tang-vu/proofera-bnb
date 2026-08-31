@@ -34,7 +34,7 @@ The evidence-backed narration source and a 303.918-second synthesized timing tra
 `aea3992fb2badedf8e52c7a5dbbaf57c6400d0a1190a7355e09b8cf3c31939bf`.
 
 The base public UI release has an exact 11-check final probe and an exact-path rollback/restoration
-exercise. Current public product commit `ad0349811df96f39b110a505f0c6d9ded6d4746b` has a separate
+exercise. Current public product commit `9f32dda65d8123f6f37a58fa869daef6340fd1be` has a separate
 read-only rehearsal observation with two-resolver agreement, five authorized TLS hosts, eleven
 exact responses and honest readiness `503`.
 

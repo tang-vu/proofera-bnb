@@ -95,15 +95,25 @@ Later on 2026-08-30, explicitly authorized evidence carrier
 host-origin probe passed all eleven HTTP/build/runtime checkpoints, readiness remained honestly
 `503`, and PM2 state was saved. The four analyzer PIDs, tunnel PID and Altana-worker PID were
 unchanged. This carrier probe did not repeat the two-resolver or TLS capture retained for the base
-release. Independent uptime remains separate. The later `ad03498` product and demo observations
-below do not rewrite this frozen base-release record.
+release. Independent uptime remains separate. The later `ad03498` demo observation and `9f32dda`
+product observation below do not rewrite this frozen base-release record.
 
-On 2026-08-31, current public product commit
+On 2026-08-31, retained demo source commit
 `ad0349811df96f39b110a505f0c6d9ded6d4746b` passed a separate read-only rehearsal observation with
 two-resolver agreement for five hosts, five authorized TLS observations and eleven exact responses,
 including exact build identity and honest readiness `503`. Manifest SHA-256 is
 `30fe670108738ca5f823d43f201317dba86d1ceaf974bac039c50d08290b90a3`. The observation did not
 deploy, restart services, access a wallet, sign or broadcast, and it is not relabeled as a frozen
-release. The same public commit now has a 297.080-second narrated final demo and separate-process
+release. The same commit has a 297.080-second narrated final demo and separate-process
 automated copy/hash/full-decode/six-scene verification. Human playback, independent uptime and the
 organizer receipt remain open.
+
+Later on 2026-08-31, explicitly authorized current public product commit
+`9f32dda65d8123f6f37a58fa869daef6340fd1be` replaced only the web and monitor runtime. The exact
+release probe passed all eleven checkpoints and PM2 state was saved while the four analyzers,
+tunnel and Altana worker were not restarted. A subsequent read-only rehearsal retained
+two-resolver agreement for five hosts, five authorized TLS observations, eleven exact responses,
+exact build identity and honest readiness `503`. Manifest SHA-256 is
+`9d05a26b683c038d15137c05cbb8a89db3c9305b807e073cea4c1fc425d6818b`. The capture itself did not
+restart a service, access a wallet, sign or broadcast, and it is not relabeled as a new frozen
+release.

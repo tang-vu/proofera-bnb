@@ -230,10 +230,10 @@ test("retained final release binds the negative-benefit boundary, rollback and e
   });
 });
 
-test("current public product derivative binds the exact ad03498 rehearsal without upgrading it", async () => {
+test("current public product derivative binds the exact 9f32dda rehearsal without upgrading it", async () => {
   const probeBytes = await readFile(
     new URL(
-      "../evidence/submission/release-probes/ad0349811df96f39b110a505f0c6d9ded6d4746b/rehearsal/manifest.json",
+      "../evidence/submission/release-probes/9f32dda65d8123f6f37a58fa869daef6340fd1be/rehearsal/manifest.json",
       import.meta.url
     )
   );

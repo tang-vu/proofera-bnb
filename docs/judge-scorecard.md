@@ -19,7 +19,7 @@ The differentiator is not agent count. It is the evidence and authority layer be
 | Four first-class categories        | LP, grid, yield, and health each have a public analyzer, category contract, dossier, configuration surface, exact Agent Card skill, and finalized BSC-testnet ERC-8004 identity (`1825`–`1828`)       | Keep all four public through judging and show equal discovery depth without implying equal execution history     | 4:35–5:00               |
 | Usability without Studio knowledge | Goal-first landing, one-grant copy, direct Session Control, plain-language mandate forms, permission ownership labels, and failure-safe states                                                        | Clean-room run with a new viewer; retain mobile/keyboard evidence for the frozen release                         | Throughout              |
 | Trust and safety                   | Exact grant/execute/revoke receipts, PTA zero Approval, finalized negative-authority evidence, and no-re-sign mandate decisions are exposed without hiding historical provider limits                 | Keep the PTA effect separate from Pancake economics and demonstrate the frozen public release                    | 1:25–4:05               |
-| Production credibility             | Durable custom-domain deployment, PM2 supervision, frozen base rollback/restoration, current `ad03498` two-resolver/five-TLS-host/11-response observation, and a decoded 297.080-second narrated demo | Retain independent uptime/paging evidence and owner-confirmed separate-viewer playback                           | Before submission       |
+| Production credibility             | Durable custom-domain deployment, PM2 supervision, frozen base rollback/restoration, current `9f32dda` two-resolver/five-TLS-host/11-response observation, and a decoded 297.080-second narrated demo | Retain independent uptime/paging evidence and owner-confirmed separate-viewer playback                           | Before submission       |
 
 ## Partner-track score control
 
@@ -71,7 +71,7 @@ All six methods and the protected final bundle are retained. Narration must rema
 
 | Asset              | Current state                                                                                        | Final gate                                               |
 | ------------------ | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| Public product     | `ad03498` live on `proofera.tangvu.dev`; two-resolver, five-TLS-host and 11/11 observation retained  | Independent uptime/paging remains unavailable            |
+| Public product     | `9f32dda` live on `proofera.tangvu.dev`; two-resolver, five-TLS-host and 11/11 observation retained  | Independent uptime/paging remains unavailable            |
 | Four public agents | A2A/MCP endpoints and five skill IDs live; BSC-testnet identities `1825`–`1828` are receipt-verified | Retain final-release availability and real hire evidence |
 | Source repository  | Public, strict verification and evidence manifests                                                   | Frozen release commit and hosted CI record               |
 | Proof room         | Public seven-gate ledger                                                                             | All seven gates verified by final artifacts              |

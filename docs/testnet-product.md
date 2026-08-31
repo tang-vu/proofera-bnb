@@ -1,8 +1,9 @@
 # ProofEra testnet product surface
 
-Updated: 2026-08-30. This document defines the release-candidate product that can be used end to
-end without a wallet on BSC testnet. It is not a public-deployment claim and does not change the
-separate activation-readiness or transaction evidence gates.
+Updated: 2026-08-31. This document defines the product surface deployed at public commit
+`9f32dda65d8123f6f37a58fa869daef6340fd1be` that can be used end to end without a wallet on BSC
+testnet. Its deployment is separately bound by the retained release observation and does not change
+the activation-readiness or transaction evidence gates.
 
 ## Product promise
 
@@ -65,8 +66,8 @@ result. Missing evidence remains missing. Analysis never becomes transaction aut
 
 ## Explicitly incomplete
 
-The current public carrier does not include this release candidate until a separate public deploy is
-authorized and probed. Production activation, authenticated current portfolio ingestion, durable
+The current public carrier includes this product slice and has passed the exact-build 11-check
+release probe. Production activation, authenticated current portfolio ingestion, durable
 distributed rate limiting, an autonomous strategy worker, live execution readiness, and any new
 transaction remain outside this product slice. Existing historical testnet receipts remain evidence
 only for their exact recorded actions.

@@ -41,7 +41,7 @@ ProofEra's governing rule: missing evidence remains missing; it never becomes a 
 
 Current truth: discovery, Studio analysis, configuration, Proof Room and receipt-backed historical
 lifecycle are public. The base release retains exact rollback/restoration evidence; current public
-commit `ad03498` has a two-resolver, five-host TLS and eleven-response observation. A narrated
+commit `9f32dda` has a two-resolver, five-host TLS and eleven-response observation. A narrated
 297.080-second final demo is retained with a separate automated playback verification. Autonomous
 production activation remains fail-closed, human playback confirmation and the authoritative
 submission receipt remain absent.

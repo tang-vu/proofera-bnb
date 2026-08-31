@@ -1,12 +1,12 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.1.0",
-  "updatedAtUtc": "2026-08-31T04:19:43.387Z",
+  "updatedAtUtc": "2026-08-31T09:30:45.814Z",
   "readyForSubmission": false,
   "gates": [
     {
       "gateId": "production-release",
       "state": "verified",
-      "claim": "Commit ad0cee11885b2131c27bfa14c3b0a27f2f8fee69 remains the frozen base release with retained two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses and bounded rollback/restoration evidence. The current public product commit ad0349811df96f39b110a505f0c6d9ded6d4746b now has a separate read-only rehearsal observation with two-resolver agreement, five authorized TLS hosts, eleven exact responses, exact build identity and honest not-ready activation state. The current observation did not deploy, restart services or replace the frozen base-release claim. This proves bounded observations only; it is not independent uptime, reboot, data-restore or activation evidence.",
+      "claim": "Commit ad0cee11885b2131c27bfa14c3b0a27f2f8fee69 remains the frozen base release with retained two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses and bounded rollback/restoration evidence. The current public product commit 9f32dda65d8123f6f37a58fa869daef6340fd1be now has a separate read-only rehearsal observation with two-resolver agreement, five authorized TLS hosts, eleven exact responses, exact build identity and honest not-ready activation state. The capture itself did not restart services or replace the frozen base-release claim. This proves bounded observations only; it is not independent uptime, reboot, data-restore or activation evidence.",
       "blockers": [],
       "artifacts": [
         {
@@ -27,7 +27,7 @@
         {
           "kind": "current_public_probe",
           "path": "evidence/submission/final/current-public-release.json",
-          "sha256": "bcc9edabc067c32c0e3c0ac4d6279ec96e44c60d86d6f1d1b77c5b47d6603078"
+          "sha256": "e5297b1a0a531a97f7e10263692386f8b17c722331c77b2a15a39346dafc0f67"
         }
       ]
     },
