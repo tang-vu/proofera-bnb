@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "proofera-final-demo-automated-playback-v1.0.0",
+  "classification": {
+    "artifact": "bounded_automated_playback_verification",
+    "fullAudioVideoDecode": true,
+    "hackathonEntrySubmitted": false,
+    "humanAudioIntelligibilityAttested": false,
+    "independentHumanReviewer": false,
+    "mediaCopiedToTemporaryBoundary": true,
+    "separateProcessFromCapture": true,
+    "submissionReady": false
+  },
+  "sourceCommit": "ad0349811df96f39b110a505f0c6d9ded6d4746b",
+  "observedAtUtc": "2026-08-31T04:18:17.652Z",
+  "sourceDemo": {
+    "manifestPath": "evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/final/manifest.json",
+    "manifestSha256": "85a092e883fbc2b2ac4359a0a5598facd3fe0316fd7f240eac98376be74db1d6",
+    "mediaPath": "evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/final/proofera-final-demo.mp4",
+    "mediaSha256": "b93515b52ad29d811f3cc6fd38cc2ddb3ecb54a312e7fac5534a9a5dcca6558f"
+  },
+  "temporaryCopy": {
+    "byteIdentityVerified": true,
+    "bytes": 37636488,
+    "sha256": "b93515b52ad29d811f3cc6fd38cc2ddb3ecb54a312e7fac5534a9a5dcca6558f"
+  },
+  "playback": {
+    "fullDecodeCompleted": true,
+    "probe": {
+      "audioStream": {
+        "channels": 1,
+        "codecName": "aac",
+        "sampleRate": "22050"
+      },
+      "durationSeconds": "297.080",
+      "formatNames": "mov,mp4,m4a,3gp,3g2,mj2",
+      "sizeBytes": 37636488,
+      "videoStream": {
+        "codecName": "h264",
+        "height": 900,
+        "width": 1440
+      }
+    }
+  },
+  "publicScenes": [
+    {
+      "assertionCount": 2,
+      "bodySha256": "a70a49c3dfbdc5c50bbf8879fda95144b71ff02bbeaee1ca32131e74877982e2",
+      "key": "home",
+      "responseDate": "Mon, 31 Aug 2026 04:18:14 GMT",
+      "status": 200,
+      "title": "ProofEra — Hire agents by proof",
+      "url": "https://proofera.tangvu.dev/"
+    },
+    {
+      "assertionCount": 2,
+      "bodySha256": "9f9d412a6e66b3f4464b0df85807f1b6953e8d599752bfc455ab073990244c81",
+      "key": "marketplace",
+      "responseDate": "Mon, 31 Aug 2026 04:18:14 GMT",
+      "status": 200,
+      "title": "Agent marketplace — ProofEra",
+      "url": "https://proofera.tangvu.dev/marketplace"
+    },
+    {
+      "assertionCount": 2,
+      "bodySha256": "4a783362be454239a4e404365604725623e17a9bb3eabc327b7ad46390b3e577",
+      "key": "lp-passport",
+      "responseDate": "Mon, 31 Aug 2026 04:18:15 GMT",
+      "status": 200,
+      "title": "LP Range Analyzer reference dossier — ProofEra",
+      "url": "https://proofera.tangvu.dev/reference-analyzers/lp-rebalancing"
+    },
+    {
+      "assertionCount": 2,
+      "bodySha256": "829f939d8a4a9cc478ca07dca704823dba9204f3e71353c3b53aa566f779c191",
+      "key": "lp-configuration",
+      "responseDate": "Mon, 31 Aug 2026 04:18:15 GMT",
+      "status": 200,
+      "title": "LP configuration readiness — ProofEra",
+      "url": "https://proofera.tangvu.dev/lp-activate"
+    },
+    {
+      "assertionCount": 2,
+      "bodySha256": "f879ea07ec40ce4f7e0990611999e6b9bd51a58dce6324b1ef4dd0049ace29bd",
+      "key": "proof-room",
+      "responseDate": "Mon, 31 Aug 2026 04:18:16 GMT",
+      "status": 200,
+      "title": "Proof room — ProofEra",
+      "url": "https://proofera.tangvu.dev/proof"
+    },
+    {
+      "assertionCount": 2,
+      "bodySha256": "f5eafb4b2292ed7b7adb8a55c98b3dd6034afc6b84b00e9153f266051c54d672",
+      "key": "mission-control",
+      "responseDate": "Mon, 31 Aug 2026 04:18:16 GMT",
+      "status": 200,
+      "title": "Mission Control — ProofEra",
+      "url": "https://proofera.tangvu.dev/mission-control"
+    }
+  ],
+  "limitations": [
+    "This separate-process check verifies byte identity, one complete audio/video decode, media structure and the six public scene assertions; it is not an independent human review or a separate physical device attestation.",
+    "Audio presence and decodability do not prove human-perceived narration intelligibility or presentation quality.",
+    "The public checks introduce no transaction evidence and do not prove uptime outside the retained observation window.",
+    "This artifact is not an organizer submission receipt and does not claim that the hackathon entry was submitted or accepted."
+  ]
+}

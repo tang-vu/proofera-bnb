@@ -404,6 +404,10 @@ test("opens the judge proof room without promoting incomplete gates", async ({ p
     "data-gate-state",
     "controlled_outcome_observed"
   );
+  await expect(page.locator('[data-gate-id="demo"]')).toHaveAttribute(
+    "data-gate-state",
+    "recorded_pending_human_playback"
+  );
   await expect(page.getByText(/BSC testnet ERC-8004 Agent ID/u)).toHaveCount(4);
   await expect(page.getByText(/Execution disabled/u)).toHaveCount(4);
   await expect(

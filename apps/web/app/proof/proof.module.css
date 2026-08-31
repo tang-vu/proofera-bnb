@@ -107,7 +107,8 @@
   box-shadow: 0 0 10px rgb(120 216 155 / 24%);
 }
 
-.gateMeter span[data-state="controlled_outcome_observed"] {
+.gateMeter span[data-state="controlled_outcome_observed"],
+.gateMeter span[data-state="recorded_pending_human_playback"] {
   background: var(--caution);
 }
 

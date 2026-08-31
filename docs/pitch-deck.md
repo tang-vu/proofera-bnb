@@ -1,6 +1,6 @@
-# ProofEra pitch deck draft
+# ProofEra pitch deck
 
-Updated: 2026-08-30. Ten-slide evidence-backed narrative for the BNB Chain Smart Money Era submission. This Markdown file is not an exported deck or proof that it was submitted.
+Updated: 2026-08-31. Eleven-slide evidence-backed narrative for the BNB Chain Smart Money Era submission. This Markdown source is frozen only after the owner fields and organizer route are confirmed; it is not proof that an entry was submitted.
 
 ## Slide 1 — ProofEra
 
@@ -39,10 +39,12 @@ ProofEra's governing rule: missing evidence remains missing; it never becomes a 
 6. Activate only after identity, authority, and evidence gates pass.
 7. Reconcile receipts in Mission Control and revoke with negative authority proof.
 
-Current truth: discovery, configuration, Proof Room, receipt-backed historical lifecycle and the
-evidence carrier are public. The base release retains exact rollback/restoration evidence and the
-carrier passed eleven host-origin checkpoints. Autonomous production activation remains fail-closed;
-the narrated final demo and authoritative submission receipt are still absent.
+Current truth: discovery, Studio analysis, configuration, Proof Room and receipt-backed historical
+lifecycle are public. The base release retains exact rollback/restoration evidence; current public
+commit `ad03498` has a two-resolver, five-host TLS and eleven-response observation. A narrated
+297.080-second final demo is retained with a separate automated playback verification. Autonomous
+production activation remains fail-closed, human playback confirmation and the authoritative
+submission receipt remain absent.
 
 ## Slide 4 — Proof, not a leaderboard
 
@@ -136,7 +138,25 @@ Proposed business model—not current revenue:
 - institutional risk/policy API and audit exports;
 - no pay-to-improve Proof Score and no hidden ranking boost.
 
-## Slide 10 — Why ProofEra should become the marketplace
+## Slide 10 — Go-to-market and 90-day roadmap
+
+Target users:
+
+- DeFi users who need bounded automation but cannot audit agent claims;
+- agent providers who need credible evidence, policy and operational distribution;
+- treasury and risk teams that need receipt-linked audit exports.
+
+Milestones:
+
+- Days 0–30: close the public zero-instruction hire journey, external uptime/paging and provider onboarding documentation.
+- Days 31–60: onboard third-party ERC-8004 providers, publish versioned evidence-ingestion APIs and run design-partner pilots.
+- Days 61–90: measure paid testnet hires and retention, publish comparable outcome cohorts and prepare a separately reviewed production-security boundary.
+
+Success is measured by active providers, reconciled hires, evidence completeness, revoke time and
+returning users—not token issuance or inflated registration counts. Mainnet activation is not part
+of the hackathon claim and requires a separate security and legal decision.
+
+## Slide 11 — Why ProofEra should become the marketplace
 
 BNB Agent Studio makes agents easier to build. ProofEra makes them safer to choose and control.
 

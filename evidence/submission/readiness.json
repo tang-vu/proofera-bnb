@@ -1,12 +1,12 @@
 {
-  "schemaVersion": "proofera-submission-readiness-v1.0.0",
-  "updatedAtUtc": "2026-08-30T08:54:54.781Z",
+  "schemaVersion": "proofera-submission-readiness-v1.1.0",
+  "updatedAtUtc": "2026-08-31T04:19:43.387Z",
   "readyForSubmission": false,
   "gates": [
     {
       "gateId": "production-release",
       "state": "verified",
-      "claim": "Commit ad0cee11885b2131c27bfa14c3b0a27f2f8fee69 remains the frozen base release with retained two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses and bounded rollback/restoration evidence. Evidence carrier 1663e1f3a8755744739d4b63b32b7cb288221245 is now the exact public web/monitor build and passed all eleven host-origin HTTP/build/runtime checkpoints with honest not-ready activation state; PM2 state was saved and the analyzer, tunnel and Altana-worker processes were not restarted. The carrier probe did not repeat the independent-resolver or TLS capture. This proves the bounded host-local release path only; it is not independent uptime, reboot, data-restore or activation evidence.",
+      "claim": "Commit ad0cee11885b2131c27bfa14c3b0a27f2f8fee69 remains the frozen base release with retained two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses and bounded rollback/restoration evidence. The current public product commit ad0349811df96f39b110a505f0c6d9ded6d4746b now has a separate read-only rehearsal observation with two-resolver agreement, five authorized TLS hosts, eleven exact responses, exact build identity and honest not-ready activation state. The current observation did not deploy, restart services or replace the frozen base-release claim. This proves bounded observations only; it is not independent uptime, reboot, data-restore or activation evidence.",
       "blockers": [],
       "artifacts": [
         {
@@ -23,6 +23,11 @@
           "kind": "rollback_exercise",
           "path": "evidence/submission/final/production-release.json",
           "sha256": "bf02e8d1df867baa64c1b7b237e4e71be60cacd0cc041263c727055787eb591f"
+        },
+        {
+          "kind": "current_public_probe",
+          "path": "evidence/submission/final/current-public-release.json",
+          "sha256": "bcc9edabc067c32c0e3c0ac4d6279ec96e44c60d86d6f1d1b77c5b47d6603078"
         }
       ]
     },
@@ -137,12 +142,27 @@
     },
     {
       "gateId": "demo",
-      "state": "not_recorded",
-      "claim": "Six-scene screenshot and silent-video exact-build public-browser rehearsals are retained; no narrated final video or clean-room playback check exists.",
+      "state": "recorded_pending_human_playback",
+      "claim": "A 297.080-second narrated MP4 bound to public commit ad0349811df96f39b110a505f0c6d9ded6d4746b retains six public scenes, one 1440x900 H.264 video stream, one AAC audio stream and a complete decode. A separate-process automated playback copied and rehashed the media, completed another full audio/video decode and rechecked all six public scene assertions. That check is not a human review or separate physical-device attestation, so narration intelligibility and presentation quality remain owner-confirmed rather than inferred.",
       "blockers": [
-        "Record the final release journey and retain the video plus a timestamped evidence-link playback check."
+        "Play the retained final MP4 once on a separate viewer, confirm narration intelligibility and evidence-link presentation, then retain the owner timestamp without treating it as independent review."
       ],
       "artifacts": [
+        {
+          "kind": "video",
+          "path": "evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/final/proofera-final-demo.mp4",
+          "sha256": "b93515b52ad29d811f3cc6fd38cc2ddb3ecb54a312e7fac5534a9a5dcca6558f"
+        },
+        {
+          "kind": "demo_check",
+          "path": "evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/final/manifest.json",
+          "sha256": "85a092e883fbc2b2ac4359a0a5598facd3fe0316fd7f240eac98376be74db1d6"
+        },
+        {
+          "kind": "automated_playback_check",
+          "path": "evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/playback/manifest.json",
+          "sha256": "0015b0b490c1118e15f60bce315f5c2eb2a62b0af2851a7affabb0ac73c77bae"
+        },
         {
           "kind": "current_video_rehearsal_manifest",
           "path": "evidence/submission/demo-videos/f3bd7d4daf231acd096f7b241376feb02575dd36/rehearsal/manifest.json",

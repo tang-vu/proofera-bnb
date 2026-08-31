@@ -1,6 +1,6 @@
 # ProofEra execution plan
 
-Updated: 2026-08-30
+Updated: 2026-08-31
 Deadline: 2026-09-09 12:00 UTC
 Operating principle: complete and verify the highest-value unblocked judge journey before expanding breadth.
 
@@ -27,35 +27,34 @@ desktop/mobile journeys to run while the durable public server keeps port `3217`
 it or replacing its production `.next` bytes. The two opt-in live-RPC cases remain skipped by
 routine E2E.
 
-The current repository release candidate also removes the last Vietnamese strings from the shared
+Public product commit `ad0349811df96f39b110a505f0c6d9ded6d4746b` removes the last Vietnamese strings from the shared
 Altana passkey/session controls. A source-level regression test binds those public controls to
 English copy, while state-specific unit and desktop/mobile browser checks retain the unknown,
 failure, expiry, grant and revoke boundaries. The internal `/operator-ceremony` harness remains
-available to local development but redirects to `/session-control` in production; an isolated
-production build observed the exact `307` redirect. This change is not yet a public deployment, so
-the evidence-carrier release remains the public runtime until a separately authorized release.
+available to local development but redirects to `/session-control` in production; the deployed
+release and browser coverage retain the exact redirect boundary.
 
-The current release candidate turns the four analyzer dossiers into a usable testnet product
+The current public release turns the four analyzer dossiers into a usable testnet product
 without widening execution authority. `/studio` runs exact allowlisted LP, Grid, Yield, and Health
 A2A endpoints through a bounded server proxy, displays decision provenance and limitations, and
 retains only summary history on the device. All configuration routes now accept chain 97 only.
 Synthetic presets remain labelled as demonstrations; the Venus preset is a hash-checked retained
 historical replay. API and browser tests cover invalid input, upstream boundary failures, all four
-presets, responsive UI, and local-history minimization. This source change is not yet a public
-deployment; see [`testnet-product.md`](./testnet-product.md).
+presets, responsive UI, and local-history minimization. See [`testnet-product.md`](./testnet-product.md).
 
 The marketplace and four read-only analyzers now have durable HTTPS endpoints on the owner's always-on Windows host, supervised by PM2 behind a named Cloudflare Tunnel. Repeatable local/public probes cover marketplace health, analyzer health, exact Agent Card URLs, and the exact advertised skill IDs for each agent. Finalized BSC-testnet ERC-8004 receipt evidence binds Agent IDs `1825` through `1828`; it proves identity publication only. All analyzers still declare execution disabled, and evidence-backed live data, marketplace eligibility, activation authority, and execution receipts remain required.
 
-The Windows release topology now fails closed without an immutable build identifier. Its release probe binds the public health response to the exact published commit and requires readiness to be honestly `not_ready`, never `misconfigured`; a PM2 monitor repeats the same marketplace/agent/Card/readiness checks every five minutes. The public `/proof` route renders the exact build, four endpoint skill contracts and the committed seven-gate submission ledger, including blockers and digest-bound artifacts. Release `e6e55c161f324f03b401b1e9f0a17f5fbff2d373` remains historical. Base release `ad0cee11885b2131c27bfa14c3b0a27f2f8fee69` retains the final DNS/TLS/HTTP capture and bounded rollback to `676ab796bec729a734355737d6c0509a27c9d1d5`; both rollback and restoration ran the exact web/monitor paths and passed all eleven checkpoints. Evidence carrier `1663e1f3a8755744739d4b63b32b7cb288221245` then became the exact public web/monitor build, passed eleven host-origin checkpoints and was saved to PM2 without restarting analyzers, tunnel or Altana worker. The carrier probe did not repeat the independent-resolver/TLS capture. External alert delivery, independent uptime evidence, deployed data/worker probes, final demo, authoritative submission receipt and a genuinely ready activation path remain open.
+The Windows release topology now fails closed without an immutable build identifier. Its release probe binds the public health response to the exact published commit and requires readiness to be honestly `not_ready`, never `misconfigured`; a PM2 monitor repeats the same marketplace/agent/Card/readiness checks every five minutes. The public `/proof` route renders the exact build, four endpoint skill contracts and the committed seven-gate submission ledger, including blockers and digest-bound artifacts. Base release `ad0cee11885b2131c27bfa14c3b0a27f2f8fee69` retains the final DNS/TLS/HTTP capture and bounded rollback to `676ab796bec729a734355737d6c0509a27c9d1d5`; both rollback and restoration ran the exact web/monitor paths and passed all eleven checkpoints. Current public product `ad0349811df96f39b110a505f0c6d9ded6d4746b` now has a separate retained two-resolver, five-TLS-host, eleven-response rehearsal observation with exact build identity and honest readiness `503`. It did not restart services or replace the frozen base-release claim. External alert delivery, independent uptime evidence, authoritative submission receipt and a genuinely ready activation path remain open.
 
-The final-demo path now has an exact 650-word evidence-backed script and a create-only synthesized
+The final-demo path has an exact 650-word evidence-backed script and a create-only synthesized
 303.918-second MP3 timing track with SHA-256
 `aea3992fb2badedf8e52c7a5dbbaf57c6400d0a1190a7355e09b8cf3c31939bf`. Final capture accepts the
 retained Pancake `controlled_outcome_observed` state only when receipt, before/after, baseline,
 blocker and explicit no-benefit/no-agent-advantage claims all remain present; its manifest records
 that benefit verification is false. This removes a false-positive gate requirement without closing
-the Pancake benefit gate. The rollback/freeze and evidence-carrier deployment gates are now
-verified; exact-build final video capture, clean-room playback and organizer receipt remain separate
+the Pancake benefit gate. Current public commit `ad03498` now has a 297.080-second narrated MP4 with
+one video and one audio stream plus a separate-process copy/hash/full-decode/six-scene verification.
+Human-perceived narration quality, independent review and the organizer receipt remain separate
 external transitions.
 
 ## Status legend
@@ -333,7 +332,7 @@ derivative and adjudication are now retained. They prove only the frozen
 read-only replay and bounded `hold` decision, not intervention authority or a
 realized financial outcome.
 
-## Milestone 5 — submission-grade product (`PLANNED`)
+## Milestone 5 — submission-grade product (`ACTIVE`)
 
 Acceptance criteria:
 
@@ -366,3 +365,5 @@ The bounded v2 attempt then completed without rewriting v1. Grant `0xbfa1e3216d3
 | 2026-08-30 | Admit the exact controlled negative Pancake outcome to final-demo capture             | Receipt, before/after, baseline and explicit no-benefit boundaries are presentation-complete; requiring a positive benefit would incentivize a false claim and unnecessarily block an honest demo                                                                        |
 | 2026-08-30 | Isolate Playwright development bytes from the durable production build                | The public host owns the historical default test port and production `.next`; a validated free port plus ignored port-specific dist directory lets routine E2E run without stopping or mutating the deployed service                                                     |
 | 2026-08-30 | Freeze `ad0cee1` only after exact runtime-path rollback and restoration               | A PM2 environment change can make health report a requested build without changing runtime paths; the rejected preflight is retained as non-evidence, while only the delete/start exercise with exact web/monitor paths and 11 checks in both directions closes the gate |
+| 2026-08-31 | Bind current public `ad03498` without rewriting the frozen base release               | A fresh two-resolver/TLS/11-response rehearsal records the current product while preserving the earlier final rollback claim and clearly keeping independent uptime open                                                                                                 |
+| 2026-08-31 | Retain automated final-demo playback without claiming human review                    | Byte copy, rehash, full audio/video decode and six live scene assertions are reproducible; narration intelligibility and presentation quality still require an owner viewer check                                                                                        |

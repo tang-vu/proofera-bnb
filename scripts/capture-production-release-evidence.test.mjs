@@ -229,3 +229,45 @@ test("retained final release binds the negative-benefit boundary, rollback and e
     databaseOrApplicationStateRolledBack: false
   });
 });
+
+test("current public product derivative binds the exact ad03498 rehearsal without upgrading it", async () => {
+  const probeBytes = await readFile(
+    new URL(
+      "../evidence/submission/release-probes/ad0349811df96f39b110a505f0c6d9ded6d4746b/rehearsal/manifest.json",
+      import.meta.url
+    )
+  );
+  const derivative = JSON.parse(
+    await readFile(
+      new URL("../evidence/submission/final/current-public-release.json", import.meta.url),
+      "utf8"
+    )
+  );
+  const probe = JSON.parse(probeBytes.toString("utf8"));
+  assert.equal(derivative.status, "observed_rehearsal");
+  assert.equal(derivative.sourceCommit, probe.sourceCommit);
+  assert.equal(derivative.sourceProbe.mode, "rehearsal");
+  assert.equal(derivative.classification.finalReleaseFrozen, false);
+  assert.equal(derivative.classification.submissionReady, false);
+  assert.equal(
+    derivative.sourceProbe.sha256,
+    createHash("sha256").update(probeBytes).digest("hex")
+  );
+  assert.deepEqual(derivative.summary, {
+    dnsHostCount: probe.dns.length,
+    dnsResolverAgreement: probe.summary.dnsAgreement,
+    tlsHostCount: probe.tls.length,
+    tlsAuthorized: probe.summary.tlsAuthorized,
+    httpObservationCount: probe.summary.httpObservationCount,
+    exactBuildObserved: probe.summary.exactBuildObserved,
+    readinessObservedAsNotReady: true
+  });
+  assert.equal(probe.http.find(({ key }) => key === "marketplace-readiness")?.status, 503);
+  assert.deepEqual(derivative.securityBoundary, {
+    mainnetWritePossible: false,
+    walletAccessed: false,
+    signingAttempted: false,
+    transactionBroadcastAttempted: false,
+    serviceRestarted: false
+  });
+});

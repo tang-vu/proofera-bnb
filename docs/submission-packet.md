@@ -1,6 +1,6 @@
 # ProofEra ready-to-paste submission packet
 
-Updated: 2026-08-30. This packet is prepared copy, not an organizer receipt or evidence that an
+Updated: 2026-08-31. This packet is prepared copy, not an organizer receipt or evidence that an
 entry was submitted. Personal contact fields and a prize-payment wallet remain owner-only inputs;
 the BSC-testnet development wallets in this repository must not be reused as a payout wallet.
 
@@ -13,7 +13,7 @@ the BSC-testnet development wallets in this repository must not be reused as a p
 | One-line pitch    | ProofEra helps users hire BNB Chain DeFi agents by verifiable evidence, bounded authority and receipt-backed revocation—not promises.                              |
 | Public product    | https://proofera.tangvu.dev                                                                                                                                        |
 | Source repository | https://github.com/tang-vu/proofera-bnb                                                                                                                            |
-| Current stage     | Working public prototype on BSC testnet; activation remains fail-closed where evidence is incomplete.                                                              |
+| Current stage     | Public testnet product with live discovery and bounded analysis; autonomous execution remains fail-closed where evidence is incomplete.                            |
 | Requested tracks  | Main track, PancakeSwap, Altana and TermiX. The current registration form omits Altana; preserve that discrepancy in notes instead of silently dropping the track. |
 
 ## Project description
@@ -47,8 +47,24 @@ governing rule is simple: missing evidence stays missing.
 - The Pancake result is authentic controlled negative evidence, not economic benefit.
 - The Altana review limitation and single-provider historical-authority limitation are disclosed.
 - The TermiX review is owner-designated internal, not external or cryptographically identified.
+- The retained final demo is a 297.080-second narrated exact-build MP4. Automated playback verifies
+  byte identity, full audio/video decode and six public scenes; owner-perceived narration quality
+  remains separate.
 - The current linked Google Form appears to be registration-only and exposes no final demo/evidence
   upload field. A response to it must not be labeled the final hackathon submission receipt.
+
+## Evidence links for the final entry
+
+| Asset                          | Path or URL                                                                                                                                                                                    |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Public product                 | https://proofera.tangvu.dev                                                                                                                                                                    |
+| Proof Room                     | https://proofera.tangvu.dev/proof                                                                                                                                                              |
+| Public source                  | https://github.com/tang-vu/proofera-bnb                                                                                                                                                        |
+| Final narrated demo            | `evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/final/proofera-final-demo.mp4`                                                                                       |
+| Demo and playback manifests    | `evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/`                                                                                                                    |
+| TermiX final bundle            | `evidence/submission/final/termix/6d1adf3c948e49be7d9d42332df04904fdd43e3a/`                                                                                                                   |
+| Altana lifecycle               | `evidence/submission/final/altana-lifecycle.json`                                                                                                                                              |
+| Pancake controlled LP evidence | `evidence/onchain/bsc-testnet-pta-wbnb-first-lp-eed9c32a107b57735f45bd6246d967cb12fbb1579a05faa9f17e0ead46187d01.json` plus `evidence/pancake/runs/pta-wbnb-outcomes/127841040-127861271.json` |
 
 ## Owner-only fields still required by the current form
 

@@ -1,0 +1,134 @@
+{
+  "schemaVersion": "proofera-public-demo-video-v1.0.0",
+  "classification": {
+    "artifact": "final_public_demo_video",
+    "audioPresent": true,
+    "browserAutomation": true,
+    "finalDemoCheck": true,
+    "hackathonEntrySubmitted": false,
+    "onchainReceiptEvidenceIntroduced": false,
+    "pancakeBenefitClaimVerified": false,
+    "pancakeOutcomeGateState": "controlled_outcome_observed",
+    "playbackDecoded": true,
+    "submissionReady": false,
+    "videoRecorded": true
+  },
+  "sourceCommit": "ad0349811df96f39b110a505f0c6d9ded6d4746b",
+  "observedAtUtc": "2026-08-31T04:05:58.599Z",
+  "publicHealth": {
+    "build": "ad0349811df96f39b110a505f0c6d9ded6d4746b",
+    "responseDate": "Mon, 31 Aug 2026 04:05:57 GMT",
+    "status": 200,
+    "url": "https://proofera.tangvu.dev/api/health"
+  },
+  "captureEnvironment": {
+    "browser": "chromium",
+    "locale": "en-US",
+    "playwrightVersion": "1.62.1",
+    "reducedMotion": "reduce",
+    "viewport": {
+      "height": 900,
+      "width": 1440
+    }
+  },
+  "voiceover": {
+    "bytes": 6080306,
+    "path": "evidence/submission/narration/proofera-final-demo.mp3",
+    "sha256": "aea3992fb2badedf8e52c7a5dbbaf57c6400d0a1190a7355e09b8cf3c31939bf"
+  },
+  "scenes": [
+    {
+      "assertions": [
+        "Four jobs. Equal scrutiny.",
+        "Missing evidence is a result."
+      ],
+      "holdMs": 32000,
+      "httpStatus": 200,
+      "key": "home",
+      "title": "ProofEra — Hire agents by proof",
+      "url": "https://proofera.tangvu.dev/"
+    },
+    {
+      "assertions": [
+        "Start with the job.",
+        "Four registered analyzers. Zero invented performance."
+      ],
+      "holdMs": 44000,
+      "httpStatus": 200,
+      "key": "marketplace",
+      "title": "Agent marketplace — ProofEra",
+      "url": "https://proofera.tangvu.dev/marketplace"
+    },
+    {
+      "assertions": [
+        "LP Range Analyzer",
+        "Identity exists. Execution gates remain closed."
+      ],
+      "holdMs": 48000,
+      "httpStatus": 200,
+      "key": "lp-passport",
+      "title": "LP Range Analyzer reference dossier — ProofEra",
+      "url": "https://proofera.tangvu.dev/reference-analyzers/lp-rebalancing"
+    },
+    {
+      "assertions": [
+        "Grant once. Keep every action bounded.",
+        "Define the boundaries"
+      ],
+      "holdMs": 52000,
+      "httpStatus": 200,
+      "key": "lp-configuration",
+      "title": "LP configuration readiness — ProofEra",
+      "url": "https://proofera.tangvu.dev/lp-activate"
+    },
+    {
+      "assertions": [
+        "Proof, including what is missing.",
+        "Seven gates."
+      ],
+      "holdMs": 66000,
+      "httpStatus": 200,
+      "key": "proof-room",
+      "title": "Proof room — ProofEra",
+      "url": "https://proofera.tangvu.dev/proof"
+    },
+    {
+      "assertions": [
+        "Control the mandate, not every action.",
+        "No active agent session exists."
+      ],
+      "holdMs": 48000,
+      "httpStatus": 200,
+      "key": "mission-control",
+      "title": "Mission Control — ProofEra",
+      "url": "https://proofera.tangvu.dev/mission-control"
+    }
+  ],
+  "media": {
+    "bytes": 37636488,
+    "path": "proofera-final-demo.mp4",
+    "probe": {
+      "audioStreams": [
+        {
+          "channels": 1,
+          "codecName": "aac",
+          "sampleRate": "22050"
+        }
+      ],
+      "durationSeconds": "297.080",
+      "formatNames": "mov,mp4,m4a,3gp,3g2,mj2",
+      "videoStream": {
+        "codecName": "h264",
+        "height": 900,
+        "width": 1440
+      }
+    },
+    "sha256": "b93515b52ad29d811f3cc6fd38cc2ddb3ecb54a312e7fac5534a9a5dcca6558f"
+  },
+  "limitations": [
+    "This artifact proves exact-release public rendering, retained narration bytes, media decoding and the listed scene assertions; it does not prove the hackathon entry was submitted or accepted.",
+    "The collector introduces no onchain evidence; all receipt claims shown in the product must already be bound by the prerequisite readiness gates.",
+    "The retained Pancake result is a controlled negative outcome, not a realized-benefit or autonomous-agent-advantage claim.",
+    "A separate timestamped clean-room playback and authoritative submission receipt remain required."
+  ]
+}

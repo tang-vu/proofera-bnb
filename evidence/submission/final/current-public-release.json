@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "proofera-current-public-release-derivative-v1.0.0",
+  "status": "observed_rehearsal",
+  "sourceCommit": "ad0349811df96f39b110a505f0c6d9ded6d4746b",
+  "observedAtUtc": "2026-08-31T04:12:45.238Z",
+  "completedAtUtc": "2026-08-31T04:12:50.021Z",
+  "classification": {
+    "artifact": "current_public_release_derivative",
+    "finalReleaseFrozen": false,
+    "readOnly": true,
+    "independentDnsResolvers": 2,
+    "externalHttpMonitoring": false,
+    "hackathonEntrySubmitted": false,
+    "submissionReady": false
+  },
+  "sourceProbe": {
+    "path": "evidence/submission/release-probes/ad0349811df96f39b110a505f0c6d9ded6d4746b/rehearsal/manifest.json",
+    "sha256": "30fe670108738ca5f823d43f201317dba86d1ceaf974bac039c50d08290b90a3",
+    "mode": "rehearsal"
+  },
+  "summary": {
+    "dnsHostCount": 5,
+    "dnsResolverAgreement": true,
+    "tlsHostCount": 5,
+    "tlsAuthorized": true,
+    "httpObservationCount": 11,
+    "exactBuildObserved": true,
+    "readinessObservedAsNotReady": true
+  },
+  "securityBoundary": {
+    "mainnetWritePossible": false,
+    "walletAccessed": false,
+    "signingAttempted": false,
+    "transactionBroadcastAttempted": false,
+    "serviceRestarted": false
+  },
+  "limitations": [
+    "This derivative binds the current public product commit to the retained two-resolver, TLS and eleven-response rehearsal probe; it does not replace the earlier frozen base release or its rollback/restoration evidence.",
+    "The observation is host-external HTTP evidence from the owner workstation, not an independent uptime monitor, paging record, reboot exercise or data-restore test.",
+    "The honest 503 readiness response remains required and does not imply that autonomous production activation is ready.",
+    "No wallet, signature, transaction broadcast, mainnet write or service restart occurred during this read-only observation."
+  ]
+}

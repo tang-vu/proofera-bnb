@@ -37,7 +37,7 @@ $releaseCommit = (git rev-parse HEAD).Trim()
 corepack pnpm capture:production:release $releaseCommit --mode rehearsal
 ```
 
-Final mode additionally requires registration, Altana and TermiX readiness gates to be verified.
+For a new first-time final capture, final mode additionally requires registration, Altana and TermiX readiness gates to be verified.
 Pancake must either be verified or retain the exact `controlled_outcome_observed` state, all three
 required receipt/metrics/manual artifacts, an explicit open blocker, and the exact negative-benefit
 claim. This allows a truthful release to freeze without converting a negative financial result into
@@ -95,4 +95,15 @@ Later on 2026-08-30, explicitly authorized evidence carrier
 host-origin probe passed all eleven HTTP/build/runtime checkpoints, readiness remained honestly
 `503`, and PM2 state was saved. The four analyzer PIDs, tunnel PID and Altana-worker PID were
 unchanged. This carrier probe did not repeat the two-resolver or TLS capture retained for the base
-release. Independent uptime and the final demo remain separate gates.
+release. Independent uptime remains separate. The later `ad03498` product and demo observations
+below do not rewrite this frozen base-release record.
+
+On 2026-08-31, current public product commit
+`ad0349811df96f39b110a505f0c6d9ded6d4746b` passed a separate read-only rehearsal observation with
+two-resolver agreement for five hosts, five authorized TLS observations and eleven exact responses,
+including exact build identity and honest readiness `503`. Manifest SHA-256 is
+`30fe670108738ca5f823d43f201317dba86d1ceaf974bac039c50d08290b90a3`. The observation did not
+deploy, restart services, access a wallet, sign or broadcast, and it is not relabeled as a frozen
+release. The same public commit now has a 297.080-second narrated final demo and separate-process
+automated copy/hash/full-decode/six-scene verification. Human playback, independent uptime and the
+organizer receipt remain open.

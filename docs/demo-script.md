@@ -1,6 +1,6 @@
 # ProofEra judge demo script
 
-Updated: 2026-08-30. This is the production script and shot list, not evidence that the final video has been recorded. Keep the final cut between 4:00 and 5:30. Never show a secret, wallet export, environment file, passkey credential payload, or session signer.
+Updated: 2026-08-31. This is the retained production script and shot list for the exact `ad03498` final video. The file is not an organizer receipt or a human presentation-quality attestation. Never show a secret, wallet export, environment file, passkey credential payload, or session signer.
 
 ## Current recording boundary
 
@@ -15,21 +15,24 @@ Ready to show now:
 The controlled Pancake before/after outcome now exists: the position was unchanged and produced no
 observed fee income or agent advantage. It is valid negative evidence, not a verified benefit. The
 base UI release has passed its exact-path rollback/restoration exercise and production freeze.
-Evidence carrier `1663e1f3a8755744739d4b63b32b7cb288221245` is now deployed and passed the exact
-eleven-check host-origin public probe. Altana and TermiX are verified; the TermiX review remains
-owner-designated internal and identity-limited. The narrated final capture and clean-room playback
-still require retained artifacts before either is claimed complete.
+Current public product `ad0349811df96f39b110a505f0c6d9ded6d4746b` passed the two-resolver,
+five-TLS-host, eleven-response observation. Altana and TermiX are verified; the TermiX review remains
+owner-designated internal and identity-limited. The 297.080-second narrated final capture and
+separate-process automated playback are retained. Human-perceived narration/presentation quality
+and organizer submission remain open.
 
 ## One-session operator checklist
 
 1. Close notifications, password managers, terminal history, and every tab that could reveal a secret.
 2. Open the public product, BscScan receipt tabs, Proof Room, Mission Control, and the final TermiX report before recording.
-3. Verify `pnpm submission:check`; production, registration, Altana and TermiX must be `verified` and
-   the demo must be `not_recorded`. Pancake may remain `controlled_outcome_observed` only under the
-   exact negative-evidence boundary documented in `docs/final-demo.md`.
+3. For the already-retained first capture, `pnpm submission:check` required production,
+   registration, Altana and TermiX to be `verified`, demo `not_recorded`, and Pancake to retain the
+   exact negative-evidence boundary documented in `docs/final-demo.md`. Do not overwrite that
+   create-only output.
 4. Record at 1440x900 with browser zoom 100%. Keep the cursor deliberate and avoid scrolling while speaking.
 5. Use the committed MP3 voice-over with the exact-release capture command in `docs/final-demo.md`.
-6. Play the generated MP4 end to end on a separate viewer boundary and retain the clean-room check before submission.
+6. Play the retained MP4 end to end on a separate owner viewer and retain the timestamped
+   intelligibility/presentation check before submission.
 
 ## 0:00-0:30 — thesis
 

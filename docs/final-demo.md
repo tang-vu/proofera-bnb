@@ -1,7 +1,7 @@
 # ProofEra final demo runbook
 
-Updated: 2026-08-30. This runbook prepares the required demo asset; it is not evidence that a final
-video or hackathon entry exists.
+Updated: 2026-08-31. The exact narrated demo and automated playback artifacts now exist; this
+runbook records their gate and the remaining owner playback/submission boundaries.
 
 ## Gate order
 
@@ -13,8 +13,8 @@ the transaction receipt, before/after metrics, manual baseline, a blocker, and e
 that no fee income, price movement, liquidity change, realized benefit or autonomous-agent advantage
 was observed. The final manifest records `pancakeBenefitClaimVerified: false` on that path.
 
-The demo must still be `not_recorded`, the submission must still be `draft`, and top-level readiness
-must remain false. The capture then requires all of the following:
+Before the first create-only final capture, the demo had to be `not_recorded`, submission `draft`,
+and top-level readiness false. That retained capture required all of the following:
 
 - clean `HEAD`, equal to `origin/main` and the exact public `/api/health` build;
 - a narration file committed under `evidence/submission/narration/` at that same release;
@@ -34,10 +34,15 @@ The evidence-backed narration source and a 303.918-second synthesized timing tra
 `aea3992fb2badedf8e52c7a5dbbaf57c6400d0a1190a7355e09b8cf3c31939bf`.
 
 The base public UI release has an exact 11-check final probe and an exact-path rollback/restoration
-exercise. Evidence carrier `1663e1f3a8755744739d4b63b32b7cb288221245` is pushed, explicitly
-deployed and observed as the exact public web/monitor build through eleven host-origin checkpoints.
-The narrated capture still has no retained final artifact. Do not weaken the gate or record against
-a source commit that differs from `HEAD`, `origin/main`, or the public build.
+exercise. Current public product commit `ad0349811df96f39b110a505f0c6d9ded6d4746b` has a separate
+read-only rehearsal observation with two-resolver agreement, five authorized TLS hosts, eleven
+exact responses and honest readiness `503`.
+
+That exact public commit also has a retained six-scene narrated MP4: duration `297.080` seconds,
+1440x900 H.264 video, mono AAC audio, media SHA-256
+`b93515b52ad29d811f3cc6fd38cc2ddb3ecb54a312e7fac5534a9a5dcca6558f`. A separate process copied
+the media, verified byte identity, completed another full decode and rechecked the six public scene
+assertions. It did not attest human-perceived narration quality or organizer submission.
 
 ## Commands
 
@@ -54,14 +59,15 @@ $releaseCommit = (git rev-parse HEAD).Trim()
 corepack pnpm capture:demo:video $releaseCommit --mode rehearsal
 ```
 
-After the production gate is verified and that exact clean commit is pushed and deployed, run final
-mode:
+The retained final mode invocation was:
 
 ```powershell
 $releaseCommit = (git rev-parse HEAD).Trim()
 corepack pnpm capture:demo:video $releaseCommit --mode final `
   --voiceover evidence/submission/narration/proofera-final-demo.mp3
 ```
+
+Final output is create-only. Do not rerun or overwrite the retained `ad03498` directory.
 
 ## Five-minute narration map
 
@@ -85,3 +91,9 @@ After committing the final video and manifest, copy or download the exact retain
 viewer boundary, recompute SHA-256, play it from beginning to end, verify audio intelligibility and
 all explorer/source links, and retain the timestamped result. This check may validate presentation;
 it cannot add a missing receipt or repair unsupported narration.
+
+The automated portion is retained at
+`evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/playback/manifest.json`.
+It verifies copy identity, structure, full decode and current public scenes. The owner still needs to
+listen/watch once on a separate viewer and retain a timestamped statement about intelligibility and
+presentation; that owner statement is not independent review.

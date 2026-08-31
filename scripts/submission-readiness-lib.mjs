@@ -3,7 +3,7 @@ import { execFileSync } from "node:child_process";
 import { lstat, readFile, realpath } from "node:fs/promises";
 import { isAbsolute, relative, resolve, sep } from "node:path";
 
-export const SUBMISSION_READINESS_SCHEMA_VERSION = "proofera-submission-readiness-v1.0.0";
+export const SUBMISSION_READINESS_SCHEMA_VERSION = "proofera-submission-readiness-v1.1.0";
 
 const GATE_DEFINITIONS = Object.freeze([
   {
@@ -42,7 +42,7 @@ const GATE_DEFINITIONS = Object.freeze([
   },
   {
     gateId: "demo",
-    incompleteStates: ["not_recorded"],
+    incompleteStates: ["not_recorded", "recorded_pending_human_playback"],
     requiredKinds: ["video", "demo_check"]
   },
   {
