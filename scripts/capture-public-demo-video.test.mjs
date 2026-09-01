@@ -189,7 +189,10 @@ test("retained narration is create-only, bounded, hashed and decodable", async (
   );
   assert.equal(probe.status, 0, probe.stderr);
   const media = JSON.parse(probe.stdout);
-  assert.equal(Number.parseFloat(media.format.duration).toFixed(3), "303.918");
+  const durationSeconds = Number.parseFloat(media.format.duration);
+  // ffprobe versions account for the final MP3 padding frame differently. Exact
+  // bytes are enforced above; this bound verifies the same decodable timeline.
+  assert.ok(durationSeconds >= 303.8 && durationSeconds <= 304.1);
   assert.deepEqual(media.streams, [
     {
       channels: 1,
