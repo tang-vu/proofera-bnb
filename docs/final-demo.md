@@ -38,8 +38,8 @@ exercise. Current public carrier `12829109f26b8f6d15fc2f7beda2008548ae9be0` has 
 read-only rehearsal observation with two-resolver agreement, five authorized TLS hosts, eleven
 exact responses and honest split readiness: analysis implemented, capital/judging false.
 
-That exact public commit also has a retained six-scene narrated MP4: duration `297.080` seconds,
-1440x900 H.264 video, mono AAC audio, media SHA-256
+Retained video source commit `ad0349811df96f39b110a505f0c6d9ded6d4746b` separately has a
+six-scene narrated MP4: duration `297.080` seconds, 1440x900 H.264 video, mono AAC audio, media SHA-256
 `b93515b52ad29d811f3cc6fd38cc2ddb3ecb54a312e7fac5534a9a5dcca6558f`. A separate process copied
 the media, verified byte identity, completed another full decode and rechecked the six public scene
 assertions. It did not attest human-perceived narration quality or organizer submission.
