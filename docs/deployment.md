@@ -51,7 +51,7 @@ pm2 save
 Remove-Item Env:PROOFERA_BUILD_VERSION
 ```
 
-`proofera-monitor` repeats that exact release probe every five minutes and records state changes in its bounded PM2 logs. The release probe also requires `/proof` to render the exact build, the honest open-gate statement, and the permission-audit skill marker; it does not accept endpoint health alone. This is host-local detection, not an independent uptime service or external paging channel. Public health is only an availability observation. Readiness v2 marks the four-category read-only analysis-service path available while keeping capital activation and judging readiness false. The analyzers intentionally report `executionEnabled: false`; public endpoints do not prove BSC/ERC-8004 registration, marketplace eligibility, live data provenance, transaction authority, or execution receipts.
+`proofera-monitor` repeats that exact release probe every five minutes and records state changes in its bounded PM2 logs. The separate `public uptime` Actions workflow runs the same eleven-surface probe from a GitHub-hosted Ubuntu runner at minutes 17 and 47 of each hour through the declared judging window, remains manually dispatchable afterward, and pins the exact public carrier build. It checks out without persisted credentials, requests no write permission, reads no secret, and performs no wallet or transaction action. The release probe also requires `/proof` to render the exact build, the honest open-gate statement, and the permission-audit skill marker; it does not accept endpoint health alone. These checks provide host-local detection plus externally originated scheduled observations, but no independent paging owner, SLA, reboot proof, or third-party monitoring guarantee. Public health is only an availability observation. Readiness v2 marks the four-category read-only analysis-service path available while keeping capital activation and judging readiness false. The analyzers intentionally report `executionEnabled: false`; public endpoints do not prove BSC/ERC-8004 registration, marketplace eligibility, live data provenance, transaction authority, or execution receipts.
 
 ## Required environment
 
@@ -153,7 +153,7 @@ After a completed revoke, the KeyStore revocation is monotonic and this signer/c
 5. Deploy an immutable build; verify security headers, source-map policy, `/api/health`, `/api/readiness`, `X-ProofEra-Service: proofera-marketplace`, and the rollback artifact. Health is liveness only and must not claim data or activation readiness. Readiness returns a generic no-store `503` for invalid strict-mode/passkey/RPC/build configuration and remains `not_ready` until canonical database/application probes, an eligible write target, the signer handoff, exact authority and the passkey ceremony all pass; configured-but-unprobed adapters are never labelled live.
 6. Run public smoke tests for home, all four categories, unavailable/stale states and external-source links.
 7. Run virtual WebAuthn critical E2E and a real-device ceremony.
-8. Enable monitoring through at least 2026-09-23 UTC, with alert owner and rollback procedure.
+8. Keep the host-local PM2 monitor and hosted `public uptime` workflow enabled through 2026-09-23 UTC; GitHub run failures are observations, not proof that an alert owner received a page. Preserve the rollback procedure.
 
 Public deployment requires the user's hosting/domain credentials or approval. It does not authorize mainnet writes.
 

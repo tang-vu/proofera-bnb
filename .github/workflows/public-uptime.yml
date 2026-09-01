@@ -1,0 +1,43 @@
+name: public uptime
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17,47 * * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: public-uptime
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check judging window
+        id: judging-window
+        shell: bash
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]] || (( $(date -u +%s) <= $(date -u --date='2026-09-23T23:59:59Z' +%s) )); then
+            echo "active=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "active=false" >> "$GITHUB_OUTPUT"
+            echo "Scheduled public monitoring window has ended."
+          fi
+      - if: steps.judging-window.outputs.active == 'true'
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - if: steps.judging-window.outputs.active == 'true'
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24.14.1
+      - name: Probe exact public carrier
+        if: steps.judging-window.outputs.active == 'true'
+        run: >-
+          node scripts/check-local-production.mjs
+          --public
+          --expected-build=6c862265fa8da29fd2e82ca84ee54e8b273a2beb

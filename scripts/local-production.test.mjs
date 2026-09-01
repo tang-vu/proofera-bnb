@@ -9,6 +9,12 @@ import { fileURLToPath } from "node:url";
 const directory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(directory, "..");
 const configPath = path.join(repositoryRoot, "deploy", "windows", "ecosystem.config.cjs");
+const publicUptimeWorkflowPath = path.join(
+  repositoryRoot,
+  ".github",
+  "workflows",
+  "public-uptime.yml"
+);
 const require = createRequire(import.meta.url);
 const testBuild = "test-release-0123456789";
 const previousBuild = process.env.PROOFERA_BUILD_VERSION;
@@ -130,4 +136,19 @@ test("production monitor keeps one long-lived interval without an unsettled awai
   assert.match(source, /setInterval\(\(\) => void monitor\(\), intervalCandidate\);/);
   assert.doesNotMatch(source, /\.unref\(\)/);
   assert.doesNotMatch(source, /new Promise\(\(\) => \{\}\)/);
+});
+
+test("hosted public monitor is read-only, exact-build pinned, and judging-window bounded", async () => {
+  const source = await readFile(publicUptimeWorkflowPath, "utf8");
+
+  assert.match(source, /workflow_dispatch:/);
+  assert.match(source, /cron: "17,47 \* \* \* \*"/);
+  assert.match(source, /contents: read/);
+  assert.match(source, /persist-credentials: false/);
+  assert.match(source, /2026-09-23T23:59:59Z/);
+  assert.match(source, /node scripts\/check-local-production\.mjs/);
+  assert.match(source, /--public/);
+  assert.match(source, /--expected-build=6c862265fa8da29fd2e82ca84ee54e8b273a2beb/);
+  assert.doesNotMatch(source, /issues: write/);
+  assert.doesNotMatch(source, /secrets\./);
 });
