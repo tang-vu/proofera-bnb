@@ -287,6 +287,7 @@ async function captureRun(page, agent) {
   const runPanel = page
     .getByText("ANALYSIS SERVICE RUN RECORD", { exact: true })
     .locator("xpath=ancestor::section");
+  await runPanel.evaluate((element) => element.scrollIntoView({ block: "center" }));
   const analysisRunScreenshotBytes = await runPanel.screenshot({ type: "png" });
   const analysisRunScreenshot = screenshotMetadata(
     `${agent.category}-analysis-run.png`,
@@ -376,7 +377,7 @@ async function main() {
   const browser = await chromium.launch({ headless: true });
   const captures = [];
   try {
-    const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+    const page = await browser.newPage({ viewport: { width: 1440, height: 1400 } });
     await page.goto(PUBLIC_ORIGIN, { waitUntil: "domcontentloaded", timeout: 30_000 });
     await page.getByRole("link", { name: "Find an agent" }).click();
     await page.waitForURL(`${PUBLIC_ORIGIN}/marketplace`, { timeout: 15_000 });

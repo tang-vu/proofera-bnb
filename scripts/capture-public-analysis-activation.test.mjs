@@ -32,6 +32,8 @@ test("capture traverses four categories and preserves the no-capital boundary", 
   assert.match(source, /evidenceFactLabels/u);
   assert.match(source, /currentEvidenceAppliedToAnalyzer: false/u);
   assert.match(source, /screenshotMetadata/u);
+  assert.match(source, /height: 1400/u);
+  assert.match(source, /scrollIntoView\(\{ block: "center" \}\)/u);
   assert.match(source, /readyForAnalysisActivation/u);
   assert.match(source, /readyForCapitalActivation/u);
   assert.match(source, /capitalExecutionPerformed: false/u);
