@@ -16,7 +16,9 @@ The controlled Pancake before/after outcome now exists: the position was unchang
 observed fee income or agent advantage. It is valid negative evidence, not a verified benefit. The
 base UI release has passed its exact-path rollback/restoration exercise and production freeze.
 The retained video source `ad0349811df96f39b110a505f0c6d9ded6d4746b` passed the two-resolver,
-five-TLS-host, eleven-response observation before capture. Current public product `9f32dda65d8123f6f37a58fa869daef6340fd1be` later passed the same bounded observation contract. Altana and TermiX are verified; the TermiX review remains
+five-TLS-host, eleven-response observation before capture. Current public submission carrier
+`6c862265fa8da29fd2e82ca84ee54e8b273a2beb` later passed the same bounded observation contract with
+analysis-only readiness. Altana and TermiX are verified; the TermiX review remains
 owner-designated internal and identity-limited. The 297.080-second narrated final capture and
 separate-process automated playback are retained. Human-perceived narration/presentation quality
 and organizer submission remain open.

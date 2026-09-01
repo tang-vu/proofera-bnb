@@ -13,7 +13,7 @@ This repository is under active development for BNB Chain's “The Smart Money E
 - Final narrated demo: [`proofera-final-demo.mp4`](./evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/final/proofera-final-demo.mp4)
 - Prepared form copy and exact evidence links: [`docs/submission-packet.md`](./docs/submission-packet.md)
 
-Production code release `a09e70fb7f3a9fe264b83934110eab68c4c06505` passed the exact public release probe and a retained four-category `land → find → understand → activate analysis → inspect` journey. All four A2A analysis runs completed with bounded run identity, methodology, latency and hashed response evidence. Readiness v2 reports analysis-service activation as implemented while keeping capital activation and judging readiness false. Three presets are synthetic scenarios and health is a retained historical replay; this is not current-market, performance, economic-benefit or transaction evidence.
+Public submission carrier `6c862265fa8da29fd2e82ca84ee54e8b273a2beb` passed a two-resolver, five-host TLS and eleven-response rehearsal with exact build identity. Its code ancestor `a09e70fb7f3a9fe264b83934110eab68c4c06505` has a retained four-category `land → find → understand → activate analysis → inspect` journey. All four A2A analysis runs completed with bounded run identity, methodology, latency and hashed response evidence. Readiness v2 reports analysis-service activation as implemented while keeping capital activation and judging readiness false. Three presets are synthetic scenarios and health is a retained historical replay; this is not current-market, performance, economic-benefit or transaction evidence.
 
 ## What ProofEra is building
 

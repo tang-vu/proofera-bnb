@@ -117,3 +117,13 @@ exact build identity and honest readiness `503`. Manifest SHA-256 is
 `9d05a26b683c038d15137c05cbb8a89db3c9305b807e073cea4c1fc425d6818b`. The capture itself did not
 restart a service, access a wallet, sign or broadcast, and it is not relabeled as a new frozen
 release.
+
+On 2026-09-01, public submission carrier `6c862265fa8da29fd2e82ca84ee54e8b273a2beb`
+passed a fresh rehearsal with two-resolver agreement for five hosts, five authorized TLS
+observations, eleven exact responses and exact build identity. Readiness remained HTTP `503` while
+explicitly recording analysis activation as implemented and capital activation/judging readiness as
+false. Raw manifest SHA-256 is
+`6c36e5e129c55b522cd576d7718a0ef2c94aadd0e8873f43682adfc2020158e5`; the promoted derivative is
+`evidence/submission/final/submission-public-release.json`. The collector ran after deployment and
+did not itself restart services, access a wallet, sign or broadcast. It is rehearsal evidence, not a
+new frozen release, independent uptime or rollback repetition.

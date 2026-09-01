@@ -1,12 +1,12 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.2.0",
-  "updatedAtUtc": "2026-09-01T08:01:40.444Z",
+  "updatedAtUtc": "2026-09-01T08:13:58.704Z",
   "readyForSubmission": false,
   "gates": [
     {
       "gateId": "production-release",
       "state": "verified",
-      "claim": "Commit ad0cee11885b2131c27bfa14c3b0a27f2f8fee69 remains the frozen base release with retained two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses and bounded rollback/restoration evidence. The current public product commit 9f32dda65d8123f6f37a58fa869daef6340fd1be now has a separate read-only rehearsal observation with two-resolver agreement, five authorized TLS hosts, eleven exact responses, exact build identity and honest not-ready activation state. The capture itself did not restart services or replace the frozen base-release claim. This proves bounded observations only; it is not independent uptime, reboot, data-restore or activation evidence.",
+      "claim": "Commit ad0cee11885b2131c27bfa14c3b0a27f2f8fee69 remains the frozen base release with retained two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses and bounded rollback/restoration evidence. Public submission carrier 6c862265fa8da29fd2e82ca84ee54e8b273a2beb has a separate read-only rehearsal with two-resolver agreement, five authorized TLS hosts, eleven exact responses, exact build identity and split readiness: analysis activation implemented, capital activation and judging readiness false. The capture did not restart services or replace the frozen base-release claim. This proves bounded observations only; it is not independent uptime, reboot, data restore, capital execution or organizer acceptance evidence.",
       "blockers": [],
       "artifacts": [
         {
@@ -28,6 +28,11 @@
           "kind": "current_public_probe",
           "path": "evidence/submission/final/current-public-release.json",
           "sha256": "e5297b1a0a531a97f7e10263692386f8b17c722331c77b2a15a39346dafc0f67"
+        },
+        {
+          "kind": "submission_public_probe",
+          "path": "evidence/submission/final/submission-public-release.json",
+          "sha256": "88576af95545c5f831391a295c9b00501d94e0c42821357f653d20a6e164c02a"
         }
       ]
     },
