@@ -1,0 +1,140 @@
+{
+  "schemaVersion": "proofera-public-analysis-activation-v1.0.0",
+  "observedAtUtc": "2026-09-01T08:00:16.947Z",
+  "sourceCommit": "a09e70fb7f3a9fe264b83934110eab68c4c06505",
+  "publicOrigin": "https://proofera.tangvu.dev",
+  "classification": {
+    "boundedHostOriginObservation": true,
+    "analysisServiceActivated": true,
+    "capitalExecutionPerformed": false,
+    "transactionSubmitted": false,
+    "walletAccessed": false,
+    "organizerEligibilityDecision": false,
+    "submissionCompleted": false
+  },
+  "journey": [
+    "land",
+    "find",
+    "understand",
+    "activate_analysis",
+    "inspect"
+  ],
+  "categoryParity": {
+    "required": 4,
+    "observed": 4,
+    "categories": [
+      "lp-rebalancing",
+      "grid-trading",
+      "yield-optimisation",
+      "health-factor-monitoring"
+    ]
+  },
+  "readiness": {
+    "httpStatus": 503,
+    "status": "not_ready",
+    "readyForAnalysisActivation": true,
+    "readyForCapitalActivation": false,
+    "readyForJudging": false,
+    "activation": "analysis_only",
+    "capitalExecution": "unavailable"
+  },
+  "runs": [
+    {
+      "category": "lp-rebalancing",
+      "marketplaceHref": "/studio?agent=lp-rebalancing",
+      "agentId": "1825",
+      "endpoint": "https://proofera-lp.tangvu.dev/",
+      "skill": "analyze_lp_range",
+      "status": "completed",
+      "runId": "3fae4417-b635-4182-ac4f-2a75d35e78b2",
+      "observedAtUtc": "2026-09-01T08:00:08.102Z",
+      "latencyMilliseconds": 1345,
+      "methodologyVersion": "proofera-lp-range-v1.0.0",
+      "terminal": "review_rebalance",
+      "responseBytes": 2594,
+      "responseSha256": "3fcc51cb6c0739ce3f8c4fface10ba4df109c44cb8ef602bac0409255b4d9bd8",
+      "boundary": {
+        "chainId": 97,
+        "environment": "bsc-testnet",
+        "executionEnabled": false,
+        "walletAccessed": false,
+        "transactionSubmitted": false,
+        "serverPersistence": false
+      }
+    },
+    {
+      "category": "grid-trading",
+      "marketplaceHref": "/studio?agent=grid-trading",
+      "agentId": "1826",
+      "endpoint": "https://proofera-grid.tangvu.dev/",
+      "skill": "analyze_grid_trading",
+      "status": "completed",
+      "runId": "7437013a-5ba3-4a0c-ac29-f3284f08dc71",
+      "observedAtUtc": "2026-09-01T08:00:11.462Z",
+      "latencyMilliseconds": 412,
+      "methodologyVersion": "proofera-grid-trading-v1.0.0",
+      "terminal": "review_grid",
+      "responseBytes": 6824,
+      "responseSha256": "b9c5ad4b91d0f3afe075c1e5b37821247aa870eba30fe3daea33fd0c66411e60",
+      "boundary": {
+        "chainId": 97,
+        "environment": "bsc-testnet",
+        "executionEnabled": false,
+        "walletAccessed": false,
+        "transactionSubmitted": false,
+        "serverPersistence": false
+      }
+    },
+    {
+      "category": "yield-optimisation",
+      "marketplaceHref": "/studio?agent=yield-optimisation",
+      "agentId": "1827",
+      "endpoint": "https://proofera-yield.tangvu.dev/",
+      "skill": "analyze_yield_opportunities",
+      "status": "completed",
+      "runId": "21759c00-46d5-4f0b-a12a-8f6d1adca9c8",
+      "observedAtUtc": "2026-09-01T08:00:12.685Z",
+      "latencyMilliseconds": 411,
+      "methodologyVersion": "proofera-yield-route-v2.0.0",
+      "terminal": "review_route",
+      "responseBytes": 8524,
+      "responseSha256": "cbb444b4fd600d0781f2c4f62b2a35074619a569369dca0d3baa7d47ac2ce443",
+      "boundary": {
+        "chainId": 97,
+        "environment": "bsc-testnet",
+        "executionEnabled": false,
+        "walletAccessed": false,
+        "transactionSubmitted": false,
+        "serverPersistence": false
+      }
+    },
+    {
+      "category": "health-factor-monitoring",
+      "marketplaceHref": "/studio?agent=health-factor-monitoring",
+      "agentId": "1828",
+      "endpoint": "https://proofera-health.tangvu.dev/",
+      "skill": "analyze_venus_health_factor",
+      "status": "completed",
+      "runId": "037a7367-164c-4436-8355-19ee18576d3b",
+      "observedAtUtc": "2026-09-01T08:00:16.671Z",
+      "latencyMilliseconds": 909,
+      "methodologyVersion": "proofera-venus-core-health-factor-v1.3.0",
+      "terminal": "hold",
+      "responseBytes": 38390,
+      "responseSha256": "64be7040ec0af76eb8fdbf08151f0cb262910aa3854df1a4f3938428c36721bf",
+      "boundary": {
+        "chainId": 97,
+        "environment": "bsc-testnet",
+        "executionEnabled": false,
+        "walletAccessed": false,
+        "transactionSubmitted": false,
+        "serverPersistence": false
+      }
+    }
+  ],
+  "limitations": [
+    "Three presets are synthetic scenarios and the health-factor input is a retained historical replay; these runs are service-availability evidence, not current market evidence.",
+    "A completed or rejected terminal analyzer response proves the bounded A2A service path, not trading, capital execution, strategy performance or economic benefit.",
+    "This host-origin capture is not independent uptime monitoring or an organizer eligibility decision."
+  ]
+}
