@@ -274,9 +274,9 @@ test("primary call to action reaches a non-dead marketplace route", async ({ pag
   ).toBeVisible();
   await expect(page.getByText("BSC testnet registered", { exact: true })).toHaveCount(4);
   await expect(page.getByText("Execution disabled", { exact: true })).toHaveCount(4);
-  await expect(page.getByRole("link", { name: "Run live analyzer" })).toHaveCount(4);
+  await expect(page.getByRole("link", { name: "Activate analysis service" })).toHaveCount(5);
 
-  await page.getByRole("link", { name: "Run live analyzer" }).nth(1).click();
+  await page.getByRole("link", { name: "Activate analysis service" }).nth(2).click();
   await expect(page).toHaveURL(/\/studio\?agent=grid-trading$/);
   await expect(page.getByRole("heading", { name: "Grid Trading Analyzer" })).toBeVisible();
 });

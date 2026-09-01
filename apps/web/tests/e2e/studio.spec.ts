@@ -61,16 +61,16 @@ test("studio runs one bounded analyzer and retains only a local summary", async 
   await expect(page.getByLabel("Analyzer input JSON")).toContainText("analyze_grid_trading");
   await expect(page.getByText("Synthetic scenario", { exact: true })).toBeVisible();
 
-  await page.getByRole("button", { name: "Run public analyzer" }).click();
+  await page.getByRole("button", { name: "Activate & run analysis service" }).click();
   await expect(page.getByRole("heading", { name: "review grid" })).toBeVisible();
-  await expect(page.getByText("Analysis complete", { exact: true })).toBeVisible();
+  await expect(page.getByText("Analysis service complete", { exact: true })).toBeVisible();
   await expect(page.getByText("Caller-supplied, unverified", { exact: true })).toBeVisible();
   await expect(page.getByText("No wallet", { exact: true })).toBeVisible();
   await expect(page.getByText("No transaction", { exact: true })).toBeVisible();
   await expect(
     page.getByText("The analyzer does not execute trades.", { exact: true })
   ).toBeVisible();
-  await expect(page.getByText("e2e-studio-grid-run-0001")).toHaveCount(0);
+  await expect(page.getByText("e2e-studio-grid-run-0001", { exact: true })).toBeVisible();
 
   await page.reload();
   await expect(page.getByRole("heading", { name: "Your last bounded analyses" })).toBeVisible();
@@ -119,7 +119,7 @@ test("studio reports invalid input without calling the product API", async ({ pa
   });
   await page.goto("/studio");
   await page.getByLabel("Analyzer input JSON").fill("{");
-  await page.getByRole("button", { name: "Run public analyzer" }).click();
+  await page.getByRole("button", { name: "Activate & run analysis service" }).click();
 
   await expect(page.getByRole("heading", { name: "The run failed closed." })).toBeVisible();
   await expect(page.getByText(/Input is not valid JSON/u)).toBeVisible();

@@ -65,3 +65,33 @@ test("the streamed marketplace keeps keyboard navigation and analyzer dossiers u
   await expect(lpDossier).toBeFocused();
   await expect(lpDossier).toHaveAttribute("href", "/reference-analyzers/lp-rebalancing");
 });
+
+test("the selected mandate resolves to explicit live data or an honest source failure", async ({
+  page
+}) => {
+  await page.goto("/marketplace?category=yield-optimisation");
+
+  await expect(
+    page.getByRole("heading", { name: "Live evidence for this mandate." })
+  ).toBeVisible();
+  const terminal = page.locator("[data-live-evidence-terminal-state]");
+  await expect(terminal).toHaveCount(1, { timeout: 30_000 });
+
+  const state = await terminal.getAttribute("data-live-evidence-terminal-state");
+  expect(["available", "empty", "unavailable"]).toContain(state);
+  await expect(terminal.getByText("No fallback applied", { exact: true })).toBeVisible();
+  await expect(terminal.getByText("Capital execution disabled", { exact: true })).toBeVisible();
+  await expect(terminal.getByRole("link", { name: "Activate analysis service" })).toHaveAttribute(
+    "href",
+    "/studio?agent=yield-optimisation"
+  );
+
+  if (state === "available") {
+    await expect(terminal.getByText("APY / raw decimal", { exact: true })).toBeVisible();
+    await expect(terminal.getByText("Source total", { exact: true })).toBeVisible();
+  } else if (state === "empty") {
+    await expect(terminal).toContainText("authoritative empty");
+  } else {
+    await expect(terminal).toContainText("No current Lista yield-source snapshot was established");
+  }
+});

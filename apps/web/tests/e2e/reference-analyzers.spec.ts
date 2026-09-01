@@ -66,7 +66,7 @@ for (const analyzer of analyzers) {
     await expect(
       page.getByText("Definition documented; calculator absent", { exact: true })
     ).toHaveCount(8 - analyzer.implementedMetrics.length);
-    await expect(page.getByRole("link", { name: "Run live analyzer" })).toHaveAttribute(
+    await expect(page.getByRole("link", { name: "Activate analysis service" })).toHaveAttribute(
       "href",
       `/studio?agent=${analyzer.category}`
     );
@@ -159,5 +159,5 @@ test("unknown reference categories return a truthful 404", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "This page could not be found." })).toBeVisible();
   await expect(page.getByText("Local analyzer", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Configure mandate" })).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "Run live analyzer" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Activate analysis service" })).toHaveCount(0);
 });

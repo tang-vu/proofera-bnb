@@ -377,7 +377,7 @@ export default async function ReferenceAnalyzerPage({ params }: ReferenceAnalyze
             className="button button-primary button-arrow"
             href={`/studio?agent=${passport.category}`}
           >
-            Run live analyzer
+            Activate analysis service
           </Link>
           <Link className="button button-secondary" href={configurationRoutes[passport.category]}>
             Configure mandate

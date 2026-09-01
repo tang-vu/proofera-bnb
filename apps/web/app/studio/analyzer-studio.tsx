@@ -146,7 +146,7 @@ function ResultPanel({ response }: Readonly<{ response: AnalyzerResponse }>) {
     <section className={styles.resultPanel} aria-labelledby="studio-result-heading">
       <div className={styles.resultTopline}>
         <div>
-          <span className="panel-overline">TERMINAL ANALYZER OUTPUT</span>
+          <span className="panel-overline">ANALYSIS SERVICE RUN RECORD</span>
           <h2 id="studio-result-heading">{decision.replaceAll("_", " ")}</h2>
         </div>
         <span
@@ -156,10 +156,18 @@ function ResultPanel({ response }: Readonly<{ response: AnalyzerResponse }>) {
               : "state-badge state-caution"
           }
         >
-          {response.status === "completed" ? "Analysis complete" : "Input rejected"}
+          {response.status === "completed" ? "Analysis service complete" : "Input rejected"}
         </span>
       </div>
       <dl className={styles.resultFacts}>
+        <div>
+          <dt>Service run ID</dt>
+          <dd>{response.runId}</dd>
+        </div>
+        <div>
+          <dt>Observed</dt>
+          <dd>{new Date(response.observedAtUtc).toLocaleString("en-GB")}</dd>
+        </div>
         <div>
           <dt>Method</dt>
           <dd>{methodology(response)}</dd>
@@ -440,7 +448,9 @@ export function AnalyzerStudio({
                 onClick={() => void runAnalysis()}
                 type="button"
               >
-                {runState === "running" ? "Running bounded analysis…" : "Run public analyzer"}
+                {runState === "running"
+                  ? "Activating analysis service…"
+                  : "Activate & run analysis service"}
               </button>
               <div>
                 <span>{analyzer.skill}</span>

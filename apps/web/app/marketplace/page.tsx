@@ -12,6 +12,7 @@ import { referenceAgentCoverage } from "../../lib/reference-agent-coverage";
 import { loadRegistryCandidates } from "../../lib/registry";
 import { verifiedReferenceEvidenceForCategory } from "../../lib/verified-submission-evidence";
 import { ComparisonSelectionForm } from "./comparison-selection";
+import { LiveDecisionEvidence } from "./live-decision-evidence";
 
 export const metadata = {
   title: "Agent marketplace"
@@ -162,6 +163,27 @@ function RegistryPending() {
       <span>
         The intent controls and repository-backed analyzer dossiers remain available while this
         independent source request completes.
+      </span>
+    </div>
+  );
+}
+
+function LiveDecisionEvidencePending() {
+  return (
+    <div
+      aria-atomic="true"
+      aria-busy="true"
+      aria-label="Live decision evidence pending"
+      aria-live="polite"
+      className="source-status"
+      role="status"
+    >
+      <div>
+        <span aria-hidden="true" className="status-dot status-dot-pending" />
+        <strong>Reading selected-category evidence</strong>
+      </div>
+      <span>
+        The mandate and all four analysis services remain usable while this read completes.
       </span>
     </div>
   );
@@ -389,10 +411,27 @@ export default async function MarketplacePage({ searchParams }: MarketplacePageP
         </aside>
       </section>
 
+      <section className="shell section" aria-labelledby="live-decision-heading">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">02 · CURRENT DECISION INPUTS</span>
+            <h2 id="live-decision-heading">Live evidence for this mandate.</h2>
+          </div>
+          <p>
+            ProofEra reads one bounded category-specific source now, exposes its block or retrieval
+            time, and keeps unsupported economics unavailable. Change the financial job above to
+            inspect every category at equal depth.
+          </p>
+        </div>
+        <Suspense fallback={<LiveDecisionEvidencePending />}>
+          <LiveDecisionEvidence category={intent.category} />
+        </Suspense>
+      </section>
+
       <section className="shell section" aria-labelledby="reference-coverage-heading">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">02 · FIRST-PARTY DEVELOPMENT COVERAGE</span>
+            <span className="eyebrow">03 · FIRST-PARTY ANALYSIS SERVICES</span>
             <h2 id="reference-coverage-heading">
               Four registered analyzers. Zero invented performance.
             </h2>
@@ -433,7 +472,7 @@ export default async function MarketplacePage({ searchParams }: MarketplacePageP
                 </p>
                 <div className="agent-card-actions">
                   <Link className="text-link" href={`/studio?agent=${reference.category}`}>
-                    Run live analyzer
+                    Activate analysis service
                   </Link>
                   <Link className="text-link" href={`/reference-analyzers/${reference.category}`}>
                     Open {reference.name} dossier
@@ -457,7 +496,7 @@ export default async function MarketplacePage({ searchParams }: MarketplacePageP
       >
         <div className="section-heading registry-heading">
           <div>
-            <span className="eyebrow">03 · LIVE IDENTITY INGRESS</span>
+            <span className="eyebrow">04 · LIVE IDENTITY INGRESS</span>
             <h2 id="registry-heading">Registry candidates, not endorsements.</h2>
           </div>
           <p>
