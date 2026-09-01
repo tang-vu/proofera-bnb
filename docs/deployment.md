@@ -51,7 +51,7 @@ pm2 save
 Remove-Item Env:PROOFERA_BUILD_VERSION
 ```
 
-`proofera-monitor` repeats that exact release probe every five minutes and records state changes in its bounded PM2 logs. The release probe also requires `/proof` to render the exact build, the honest open-gate statement, and the permission-audit skill marker; it does not accept endpoint health alone. This is host-local detection, not an independent uptime service or external paging channel. Public health is only an availability observation. Readiness remains `not_ready` until the real activation gates close. The analyzers intentionally report `executionEnabled: false`; public endpoints do not prove BSC/ERC-8004 registration, marketplace eligibility, live data provenance, transaction authority, or execution receipts.
+`proofera-monitor` repeats that exact release probe every five minutes and records state changes in its bounded PM2 logs. The release probe also requires `/proof` to render the exact build, the honest open-gate statement, and the permission-audit skill marker; it does not accept endpoint health alone. This is host-local detection, not an independent uptime service or external paging channel. Public health is only an availability observation. Readiness v2 marks the four-category read-only analysis-service path available while keeping capital activation and judging readiness false. The analyzers intentionally report `executionEnabled: false`; public endpoints do not prove BSC/ERC-8004 registration, marketplace eligibility, live data provenance, transaction authority, or execution receipts.
 
 ## Required environment
 

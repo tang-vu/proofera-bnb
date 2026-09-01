@@ -1,6 +1,6 @@
 # ProofEra submission draft
 
-Updated: 2026-09-01. Status: evidence-backed copy awaiting owner fields and organizer response. The marketplace, Studio and four read-only analyzer endpoints are public; all four ERC-8004 registrations are receipt-verified on BSC testnet, and the bounded Altana v2 grant/execute/revoke lifecycle is retained with explicit archive/provenance limits. The protected TermiX bundle closes its bounded three-pair gate. The controlled PTA/WBNB first-LP run has two finalized chain-97 receipts plus dual-provider post-state, while its later outcome honestly records unchanged price/liquidity and zero fees rather than inventing benefit. Frozen base-release rollback evidence remains retained, public commit `9f32dda65d8123f6f37a58fa869daef6340fd1be` has a two-resolver, five-TLS-host, eleven-response observation, and the retained `ad03498` 297.080-second narrated final demo has a separate automated playback verification. Anonymous source access is now verified through the repository, API, raw README, exact commit and raw final demo. The next release distinguishes implemented analysis-service activation from unavailable capital execution; comparable autonomous-agent economics, human playback confirmation, owner-only form fields and an authoritative entry response remain incomplete.
+Updated: 2026-09-01. Status: evidence-backed copy awaiting owner fields and organizer response. The marketplace, Studio and four read-only analyzer endpoints are public; all four ERC-8004 registrations are receipt-verified on BSC testnet, and the bounded Altana v2 grant/execute/revoke lifecycle is retained with explicit archive/provenance limits. The protected TermiX bundle closes its bounded three-pair gate. The controlled PTA/WBNB first-LP run has two finalized chain-97 receipts plus dual-provider post-state, while its later outcome honestly records unchanged price/liquidity and zero fees rather than inventing benefit. Frozen base-release rollback evidence and the later `9f32dda` two-resolver/five-TLS-host/eleven-response rehearsal remain retained. Public release `a09e70fb7f3a9fe264b83934110eab68c4c06505` passed the exact release probe and a separate public `land → find → understand → activate analysis → inspect` capture: all four A2A analyzers completed with run IDs, latency, methodology and hashed responses. Anonymous source access is verified through the repository, API, raw README, exact commit and raw final demo. Capital execution, comparable autonomous-agent economics, human playback confirmation, owner-only form fields and an authoritative entry response remain incomplete.
 
 ## Core copy
 
@@ -13,14 +13,14 @@ Users begin with a financial job—protect a Venus loan, manage Pancake concentr
 ## Why it can become the Agent Studio marketplace
 
 - Ingests third-party ERC-8004 identities without mistaking self-description for proof.
-- Locally renders one explicitly non-live Reference Analyzer dossier for each required category, with per-metric implemented/not-run versus absent-calculator truth. LP has a separate bounded configuration surface; Grid, Yield, and Health have strict configuration-only mandate routes. Equal live Passports, permission controls, activation, and receipts are still implementation/deployment work.
+- Renders one explicitly non-live Reference Analyzer dossier for each required category, with per-metric implemented/not-run versus absent-calculator truth. LP has a separate bounded configuration surface; Grid, Yield, and Health have strict configuration-only mandate routes. All four public A2A analysis services now share a direct Studio activation path; capital-bearing permission handoff and execution receipts remain separate implementation/deployment work.
 - Includes four exact-pinned, hardened, non-executing self-hosted A2A/MCP reference analyzers: LP Range (17 tests), Grid Trading (24), Yield Optimisation (33), and Health-Factor Guardian (42). All four expose public HTTPS health and Agent Card endpoints and are ERC-8004-registered on BSC testnet as Agent IDs `1825`–`1828`. Two RPCs independently joined all eight finalized receipts to the exact prepared calldata, wallet owners and final SDK URIs at block `125541239`. Registration does not make them execution-enabled, hireable, performance-proven, or mainnet agents. Studio 0.0.5 does not classify the TypeScript runtimes as AgentCore-deployable, and ProofEra does not claim otherwise.
 - Uses typed adapter boundaries, exact versions and evidence manifests that can survive undisclosed Phase 2 requirements.
 - Treats permission inspection, status reconciliation and revoke as core marketplace features.
 - Exposes a public `/proof` room that renders the committed seven-gate closure ledger, exact public Agent Card skills, build identity, blockers and artifact SHA-256 values. Four gates are verified and three remain explicitly open; the current source renders the 2026-09-01 official-track audit, restores artifact links after the successful public-source probe and separates analysis activation from capital execution. The page is an evidence index, not a readiness claim.
 - Retains a six-scene, full-page public-browser rehearsal bound to exact production commit `b0e46cc192fbf15220a557c4b5bc8639c3c75eba`. The manifest verifies render assertions and screenshot hashes while explicitly denying video, final-demo, receipt, and submission claims.
 - Provides an exact-release [demo-video pipeline](./final-demo.md) with separate rehearsal/final modes. Public commit `ad0349811df96f39b110a505f0c6d9ded6d4746b` now has a six-scene, 297.080-second MP4 with one 1440x900 H.264 video stream, one AAC audio stream, committed narration and successful full decode. A separate process copied and rehashed the MP4, completed another full decode and rechecked all six public scene assertions. This is automated playback evidence, not a human narration-quality attestation or submission receipt.
-- Provides an exact-release [production evidence pipeline](./production-release-evidence.md) that joins two documented DoH resolvers, authorized TLS and the complete bounded public marketplace/agent surface. Frozen base UI release `ad0cee11885b2131c27bfa14c3b0a27f2f8fee69` passed the final capture and exact-path rollback/restoration. Current public product commit `9f32dda65d8123f6f37a58fa869daef6340fd1be` separately passed a read-only rehearsal observation with five agreed A-record sets across two resolvers, five authorized TLS observations and eleven exact no-redirect HTTPS observations including honest readiness `503`. The capture itself did not deploy or restart services and is not relabeled as a frozen release. These remain bounded observations, not independent uptime, and do not turn the controlled negative Pancake outcome into a benefit claim.
+- Provides an exact-release [production evidence pipeline](./production-release-evidence.md) that joins two documented DoH resolvers, authorized TLS and the complete bounded public marketplace/agent surface. Frozen base UI release `ad0cee11885b2131c27bfa14c3b0a27f2f8fee69` passed the final capture and exact-path rollback/restoration; later release `9f32dda65d8123f6f37a58fa869daef6340fd1be` passed a separate two-resolver/five-TLS-host/eleven-response rehearsal. Current public release `a09e70fb7f3a9fe264b83934110eab68c4c06505` passed the exact host release probe and the four-category analysis-activation capture. These remain bounded host-origin observations, not independent uptime, capital execution or a replacement for the frozen rollback claim, and they do not turn the controlled negative Pancake outcome into a benefit claim.
 
 ## Partner-track story
 
@@ -48,22 +48,22 @@ unannounced replacement.
 
 The judge-facing claim/evidence/missing-evidence map is maintained in [`judge-scorecard.md`](./judge-scorecard.md). The eleven-slide narrative and 90-day roadmap are maintained in [`pitch-deck.md`](./pitch-deck.md); it remains a source document, not an exported or submitted deck, and owner fields must be filled only by the owner.
 
-| Item                          | Value                                                            |
-| ----------------------------- | ---------------------------------------------------------------- |
-| Public marketplace URL        | `https://proofera.tangvu.dev`; activation not ready              |
-| Public product commit         | `9f32dda65d8123f6f37a58fa869daef6340fd1be`; OBSERVED PUBLIC      |
-| Source repository access      | PUBLIC; PAGE/API/RAW README/COMMIT/FINAL VIDEO RETURN `200`      |
-| Four public agent endpoints   | DEPLOYED READ-ONLY; BSC-TESTNET IDENTITIES VERIFIED              |
-| ERC-8004 agent IDs/addresses  | CHAIN 97 AGENT IDS `1825`–`1828`; RECEIPTS VERIFIED              |
-| Altana account/key links      | BOUNDED V2 CHAIN-97 LIFECYCLE RETAINED                           |
-| Grant/execute/revoke receipts | VERIFIED WITH EXPLICIT SINGLE-ARCHIVE HISTORICAL LIMIT           |
-| Pancake benefit run           | BOUNDED OUTCOME RETAINED; NO BENEFIT OR AGENT ADVANTAGE OBSERVED |
-| TermiX hire receipts          | THREE FINALIZED PAID TESTNET HIRES; ALL SIX LANES CAPTURED       |
-| TermiX three-task report      | THREE PROTECTED PAIRS VERIFIED; BOUNDED INTERNAL REVIEW          |
-| Demo video                    | 297.080 S NARRATED FINAL; AUTOMATED PLAYBACK VERIFIED            |
-| CI/public smoke evidence      | LOCAL GATES AND PUBLIC SMOKE PASS; HOSTED CI BILLING-BLOCKED     |
-| PTA fixture deployment        | FINALIZED CHAIN 97; NOT POOL/LP EVIDENCE                         |
-| PTA/WBNB pool readiness       | LP NFT `37109`; DUAL-RPC RECEIPTS/POST-STATE VERIFIED            |
+| Item                          | Value                                                                             |
+| ----------------------------- | --------------------------------------------------------------------------------- |
+| Public marketplace URL        | `https://proofera.tangvu.dev`; analysis activation live, capital activation false |
+| Public product commit         | `a09e70fb7f3a9fe264b83934110eab68c4c06505`; EXACT PROBE + 4/4 ANALYSIS CAPTURE    |
+| Source repository access      | PUBLIC; PAGE/API/RAW README/COMMIT/FINAL VIDEO RETURN `200`                       |
+| Four public agent endpoints   | DEPLOYED READ-ONLY; BSC-TESTNET IDENTITIES VERIFIED                               |
+| ERC-8004 agent IDs/addresses  | CHAIN 97 AGENT IDS `1825`–`1828`; RECEIPTS VERIFIED                               |
+| Altana account/key links      | BOUNDED V2 CHAIN-97 LIFECYCLE RETAINED                                            |
+| Grant/execute/revoke receipts | VERIFIED WITH EXPLICIT SINGLE-ARCHIVE HISTORICAL LIMIT                            |
+| Pancake benefit run           | BOUNDED OUTCOME RETAINED; NO BENEFIT OR AGENT ADVANTAGE OBSERVED                  |
+| TermiX hire receipts          | THREE FINALIZED PAID TESTNET HIRES; ALL SIX LANES CAPTURED                        |
+| TermiX three-task report      | THREE PROTECTED PAIRS VERIFIED; BOUNDED INTERNAL REVIEW                           |
+| Demo video                    | 297.080 S NARRATED FINAL; AUTOMATED PLAYBACK VERIFIED                             |
+| CI/public smoke evidence      | LOCAL GATES AND PUBLIC SMOKE PASS; HOSTED CI BILLING-BLOCKED                      |
+| PTA fixture deployment        | FINALIZED CHAIN 97; NOT POOL/LP EVIDENCE                                          |
+| PTA/WBNB pool readiness       | LP NFT `37109`; DUAL-RPC RECEIPTS/POST-STATE VERIFIED                             |
 
 ## Required final validation
 

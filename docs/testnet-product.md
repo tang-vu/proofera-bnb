@@ -1,9 +1,9 @@
 # ProofEra testnet product surface
 
-Updated: 2026-08-31. This document defines the product surface deployed at public commit
-`9f32dda65d8123f6f37a58fa869daef6340fd1be` that can be used end to end without a wallet on BSC
-testnet. Its deployment is separately bound by the retained release observation and does not change
-the activation-readiness or transaction evidence gates.
+Updated: 2026-09-01. This document defines the product surface deployed at public commit
+`a09e70fb7f3a9fe264b83934110eab68c4c06505` that can be used end to end without a wallet on BSC
+testnet. The retained four-category public journey binds analysis-service activation to that release.
+Capital activation, transaction authority and judging readiness remain false.
 
 ## Product promise
 

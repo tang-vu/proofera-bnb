@@ -76,7 +76,7 @@ Paste only after every public link is rechecked and the owner has reviewed every
 >
 > Requested tracks: Main Track, Best Built with Altana, TermiX, PancakeSwap, and AltLayer/8004scan. The current form omits Altana from its checkbox although the official page retains the track.
 >
-> Environment: BSC testnet chain 97. The public analyzers are read-only and execution-disabled; no mainnet execution or general autonomous activation is claimed.
+> Environment: BSC testnet chain 97. Analysis-service activation is public for all four categories; every analyzer remains execution-disabled, and no wallet access, capital execution or mainnet execution is claimed.
 >
 > Altana account wallet: 0x91aa0e6627bff6c911b38ced5f7885e063b7c27a
 >
@@ -98,16 +98,17 @@ Paste only after every public link is rechecked and the owner has reviewed every
 
 ## Evidence links to recheck before entry
 
-| Asset                 | Path or URL                                                                                                                                                                                   | Current access state                                                    |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| Public product        | https://proofera.tangvu.dev                                                                                                                                                                   | Public; activation/readiness still false                                |
-| Proof Room            | https://proofera.tangvu.dev/proof                                                                                                                                                             | Public build `9f32dda`; source update requires separate deploy approval |
-| Source repository     | https://github.com/tang-vu/proofera-bnb                                                                                                                                                       | Public; page/API/raw README/exact commit returned `200`                 |
-| Final narrated demo   | `evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/final/proofera-final-demo.mp4`                                                                                      | Public blob/raw endpoints returned `200`; raw length 37,636,488 bytes   |
-| Demo manifests        | `evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/`                                                                                                                   | Public repository path                                                  |
-| TermiX final bundle   | `evidence/submission/final/termix/6d1adf3c948e49be7d9d42332df04904fdd43e3a/`                                                                                                                  | Public repository path                                                  |
-| Altana lifecycle      | `evidence/submission/final/altana-lifecycle.json`                                                                                                                                             | Public repository copy and explorer links are reachable                 |
-| Pancake controlled LP | `evidence/onchain/bsc-testnet-pta-wbnb-first-lp-eed9c32a107b57735f45bd6246d967cb12fbb1579a05faa9f17e0ead46187d01.json` and `evidence/pancake/runs/pta-wbnb-outcomes/127841040-127861271.json` | Public repository copies; transaction hashes remain public on BscScan   |
+| Asset                 | Path or URL                                                                                                                                                                                   | Current access state                                                                     |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Public product        | https://proofera.tangvu.dev                                                                                                                                                                   | Public release `a09e70f`; 4/4 analysis journey retained; capital/judging readiness false |
+| Proof Room            | https://proofera.tangvu.dev/proof                                                                                                                                                             | Public release `a09e70f`; source links and split readiness are live                      |
+| Main-track journey    | `evidence/submission/public-analysis-activation/a09e70fb7f3a9fe264b83934110eab68c4c06505/manifest.json`                                                                                       | Four completed A2A analysis runs; no wallet, transaction or capital execution            |
+| Source repository     | https://github.com/tang-vu/proofera-bnb                                                                                                                                                       | Public; page/API/raw README/exact commit returned `200`                                  |
+| Final narrated demo   | `evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/final/proofera-final-demo.mp4`                                                                                      | Public blob/raw endpoints returned `200`; raw length 37,636,488 bytes                    |
+| Demo manifests        | `evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/`                                                                                                                   | Public repository path                                                                   |
+| TermiX final bundle   | `evidence/submission/final/termix/6d1adf3c948e49be7d9d42332df04904fdd43e3a/`                                                                                                                  | Public repository path                                                                   |
+| Altana lifecycle      | `evidence/submission/final/altana-lifecycle.json`                                                                                                                                             | Public repository copy and explorer links are reachable                                  |
+| Pancake controlled LP | `evidence/onchain/bsc-testnet-pta-wbnb-first-lp-eed9c32a107b57735f45bd6246d967cb12fbb1579a05faa9f17e0ead46187d01.json` and `evidence/pancake/runs/pta-wbnb-outcomes/127841040-127861271.json` | Public repository copies; transaction hashes remain public on BscScan                    |
 
 ## Owner completion order
 
