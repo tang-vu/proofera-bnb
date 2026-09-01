@@ -158,7 +158,11 @@ async function captureRun(page, agent) {
     timeout: 30_000
   });
   const activationLink = page.locator(`a[href="/studio?agent=${agent.category}"]`);
-  if ((await activationLink.count()) !== 1) {
+  await activationLink.waitFor({ state: "visible", timeout: 15_000 });
+  if (
+    (await activationLink.count()) !== 1 ||
+    (await activationLink.innerText()).trim() !== "Run live analyzer"
+  ) {
     fail("PUBLIC_ANALYSIS_ACTIVATION_MARKETPLACE_LINK_INVALID");
   }
   await activationLink.click();
@@ -252,8 +256,15 @@ async function main() {
     await page.goto(PUBLIC_ORIGIN, { waitUntil: "domcontentloaded", timeout: 30_000 });
     await page.getByRole("link", { name: "Find an agent" }).click();
     await page.waitForURL(`${PUBLIC_ORIGIN}/marketplace`, { timeout: 15_000 });
-    if ((await page.getByRole("link", { name: "Run live analyzer" }).count()) !== agents.length) {
-      fail("PUBLIC_ANALYSIS_ACTIVATION_CATEGORY_PARITY_INVALID");
+    for (const agent of agents) {
+      const activationLink = page.locator(`a[href="/studio?agent=${agent.category}"]`);
+      await activationLink.waitFor({ state: "visible", timeout: 15_000 });
+      if (
+        (await activationLink.count()) !== 1 ||
+        (await activationLink.innerText()).trim() !== "Run live analyzer"
+      ) {
+        fail("PUBLIC_ANALYSIS_ACTIVATION_CATEGORY_PARITY_INVALID");
+      }
     }
     for (const agent of agents) runs.push(await captureRun(page, agent));
   } finally {
