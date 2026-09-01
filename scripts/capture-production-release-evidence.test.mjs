@@ -150,6 +150,60 @@ test("retained rehearsal binds DNS agreement, TLS authorization and eleven exact
   assert.equal(manifest.http.find(({ key }) => key === "marketplace-readiness")?.status, 503);
 });
 
+test("current public carrier rehearsal binds release 1282910 without upgrading readiness", async () => {
+  const manifestUrl = new URL(
+    "../evidence/submission/release-probes/12829109f26b8f6d15fc2f7beda2008548ae9be0/rehearsal/manifest.json",
+    import.meta.url
+  );
+  const bytes = await readFile(manifestUrl);
+  const manifest = JSON.parse(bytes.toString("utf8"));
+  assert.equal(
+    createHash("sha256").update(bytes).digest("hex"),
+    "7e89c2e3badf94e3fbf0ddbf8feafc6aa3492ad3da0f0883598dc961532ce6c6"
+  );
+  assert.equal(manifest.schemaVersion, "proofera-production-release-evidence-v1.0.0");
+  assert.equal(manifest.sourceCommit, "12829109f26b8f6d15fc2f7beda2008548ae9be0");
+  assert.equal(manifest.mode, "rehearsal");
+  assert.deepEqual(manifest.classification, {
+    artifact: "production_release_rehearsal",
+    externalHttpMonitoring: false,
+    finalReleaseCheck: false,
+    hackathonEntrySubmitted: false,
+    independentDnsResolvers: 2,
+    onchainReceiptEvidenceIntroduced: false,
+    pancakeBenefitClaimVerified: false,
+    pancakeOutcomeGateState: null,
+    readOnly: true,
+    submissionReady: false
+  });
+  assert.equal(manifest.dns.length, 5);
+  assert.ok(
+    manifest.dns.every(
+      ({ resolverAgreement, resolvers }) => resolverAgreement && resolvers.length === 2
+    )
+  );
+  assert.equal(manifest.tls.length, 5);
+  assert.ok(
+    manifest.tls.every(
+      ({ authorized, validToUtc }) =>
+        authorized && Date.parse(validToUtc) >= Date.parse(manifest.judgingThroughUtc)
+    )
+  );
+  assert.equal(manifest.http.length, 11);
+  assert.deepEqual(manifest.summary, {
+    dnsAgreement: true,
+    exactBuildObserved: true,
+    httpObservationCount: 11,
+    tlsAuthorized: true
+  });
+  const readiness = manifest.http.find(({ key }) => key === "marketplace-readiness");
+  assert.equal(readiness?.status, 503);
+  assert.equal(readiness?.facts.analysisActivation, "implemented");
+  assert.equal(readiness?.facts.capitalExecution, "unavailable");
+  assert.equal(readiness?.facts.readyForJudging, false);
+  assert.match(manifest.limitations.join("\n"), /not an independent external uptime monitor/u);
+});
+
 test("retained final release binds the negative-benefit boundary, rollback and evidence carrier", async () => {
   const probeUrl = new URL(
     "../evidence/submission/release-probes/ad0cee11885b2131c27bfa14c3b0a27f2f8fee69/final/manifest.json",
