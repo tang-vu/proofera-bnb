@@ -23,7 +23,6 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 24.14.1
-          cache: pnpm
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
       - run: pnpm audit --prod --audit-level moderate
@@ -68,7 +67,6 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 24.14.1
-          cache: pnpm
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
       - name: Verify canonical LP reservation migration, ACLs, concurrency, and append-only behavior
@@ -113,8 +111,6 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 24.14.1
-          cache: pnpm
-          cache-dependency-path: ${{ matrix.lockfile }}
       - run: corepack enable
       - run: corepack pnpm install --frozen-lockfile
         working-directory: ${{ matrix.path }}
@@ -134,8 +130,6 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 24.14.1
-          cache: pnpm
-          cache-dependency-path: contracts/testnet-fixed-asset/pnpm-lock.yaml
       - run: corepack enable
       - run: corepack pnpm install --frozen-lockfile
         working-directory: contracts/testnet-fixed-asset
@@ -153,8 +147,6 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 24.14.1
-          cache: pnpm
-          cache-dependency-path: contracts/testnet-hire-receipt/pnpm-lock.yaml
       - run: corepack enable
       - run: corepack pnpm install --frozen-lockfile
         working-directory: contracts/testnet-hire-receipt
@@ -171,7 +163,6 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 24.14.1
-          cache: pnpm
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
