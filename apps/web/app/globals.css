@@ -26,6 +26,8 @@
 }
 
 html {
+  max-width: 100%;
+  overflow-x: clip;
   background: var(--bg);
   color: var(--text);
   scroll-behavior: smooth;

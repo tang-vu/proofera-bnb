@@ -19,12 +19,25 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 24.14.1
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
+      - name: Prepare isolated fixed-asset artifact
+        run: |
+          corepack pnpm install --frozen-lockfile
+          corepack pnpm compile
+        working-directory: contracts/testnet-fixed-asset
+      - name: Prepare Venus evidence dependency graph
+        run: corepack pnpm install --frozen-lockfile
+        working-directory: agents/healthFactorGuardianAgent/app/agent
+      - name: Prepare browser and media evidence tools
+        run: |
+          pnpm exec playwright install --with-deps chromium
+          sudo apt-get install --yes --no-install-recommends ffmpeg
       - run: pnpm audit --prod --audit-level moderate
       - run: pnpm verify
       - name: Generate production license evidence

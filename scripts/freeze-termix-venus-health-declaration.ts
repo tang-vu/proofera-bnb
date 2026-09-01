@@ -15,8 +15,6 @@ import {
   sha256Bytes,
   sha256Canonical
 } from "../packages/benchmarks/src/index";
-import { buildHealthFactorInputFromExactWindow } from "../agents/healthFactorGuardianAgent/app/agent/src/venusExactWindow";
-
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const WINDOW_MANIFEST =
   "evidence/development/venus-core-exact-window-125563831-125564152-9d4fbf6b.json";
@@ -221,6 +219,8 @@ async function writeCreateOnly(path: string, body: string): Promise<void> {
 
 async function main(): Promise<void> {
   const options = parseArguments(process.argv.slice(2));
+  const { buildHealthFactorInputFromExactWindow } =
+    await import("../agents/healthFactorGuardianAgent/app/agent/src/venusExactWindow");
   verifyExactPublishedSource(options.sourceCommitSha);
   const [{ manifest, manifestSha256, captureDigests }, selection] = await Promise.all([
     loadWindow(),

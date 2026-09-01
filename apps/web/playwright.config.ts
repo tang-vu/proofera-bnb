@@ -14,9 +14,9 @@ process.env.PROOFERA_NEXT_DIST_DIR = `.tmp/next-e2e-${e2ePort}`;
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: true,
-  // Keep the single Next.js development server responsive during form-heavy
-  // desktop and mobile journeys, regardless of host CPU count.
-  workers: 4,
+  // Keep the single CI Next.js server responsive during form-heavy desktop
+  // and mobile journeys while retaining faster local feedback.
+  workers: process.env.CI ? 2 : 4,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? "github" : "list",
