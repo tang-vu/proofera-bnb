@@ -74,6 +74,10 @@ Paste only after every public link is rechecked and the owner has reviewed every
 >
 > Source: https://github.com/tang-vu/proofera-bnb
 >
+> Hosted clean-checkout CI: https://github.com/tang-vu/proofera-bnb/actions/runs/33489679675
+>
+> Hosted exact-build availability probe: https://github.com/tang-vu/proofera-bnb/actions/runs/33491370110
+>
 > Requested tracks: Main Track, Best Built with Altana, TermiX, PancakeSwap, and AltLayer/8004scan. The current form omits Altana from its checkbox although the official page retains the track.
 >
 > Environment: BSC testnet chain 97. Analysis-service activation is public for all four categories; every analyzer remains execution-disabled, and no wallet access, capital execution or mainnet execution is claimed.
@@ -104,6 +108,8 @@ Paste only after every public link is rechecked and the owner has reviewed every
 | Proof Room            | https://proofera.tangvu.dev/proof                                                                                                                                                             | Public carrier `6c86226`; source and journey artifacts are visible                      |
 | Main-track journey    | `evidence/submission/public-analysis-activation/a09e70fb7f3a9fe264b83934110eab68c4c06505/manifest.json`                                                                                       | Four completed A2A analysis runs; no wallet, transaction or capital execution           |
 | Source repository     | https://github.com/tang-vu/proofera-bnb                                                                                                                                                       | Public; page/API/raw README/exact commit returned `200`                                 |
+| Hosted clean CI       | https://github.com/tang-vu/proofera-bnb/actions/runs/33489679675                                                                                                                              | Nine of nine clean-checkout jobs passed                                                 |
+| Hosted uptime probe   | https://github.com/tang-vu/proofera-bnb/actions/runs/33491370110                                                                                                                              | All eleven exact-build public checks passed; recurring history remains                  |
 | Final narrated demo   | `evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/final/proofera-final-demo.mp4`                                                                                      | Public blob/raw endpoints returned `200`; raw length 37,636,488 bytes                   |
 | Demo manifests        | `evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/`                                                                                                                   | Public repository path                                                                  |
 | TermiX final bundle   | `evidence/submission/final/termix/6d1adf3c948e49be7d9d42332df04904fdd43e3a/`                                                                                                                  | Public repository path                                                                  |
