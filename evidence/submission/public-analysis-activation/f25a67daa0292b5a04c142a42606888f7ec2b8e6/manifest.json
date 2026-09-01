@@ -1,0 +1,313 @@
+{
+  "schemaVersion": "proofera-public-analysis-activation-v2.0.0",
+  "observedAtUtc": "2026-09-01T16:12:20.465Z",
+  "sourceCommit": "f25a67daa0292b5a04c142a42606888f7ec2b8e6",
+  "publicOrigin": "https://proofera.tangvu.dev",
+  "classification": {
+    "boundedHostOriginObservation": true,
+    "currentEvidenceObserved": true,
+    "currentEvidenceAppliedToAnalyzer": false,
+    "analysisServiceActivated": true,
+    "capitalExecutionPerformed": false,
+    "transactionSubmitted": false,
+    "walletAccessed": false,
+    "organizerEligibilityDecision": false,
+    "submissionCompleted": false
+  },
+  "journey": [
+    "land",
+    "find",
+    "inspect_current_evidence",
+    "understand",
+    "activate_analysis",
+    "inspect_run"
+  ],
+  "categoryParity": {
+    "required": 4,
+    "observed": 4,
+    "categories": [
+      "lp-rebalancing",
+      "grid-trading",
+      "yield-optimisation",
+      "health-factor-monitoring"
+    ]
+  },
+  "readiness": {
+    "httpStatus": 503,
+    "status": "not_ready",
+    "readyForAnalysisActivation": true,
+    "readyForCapitalActivation": false,
+    "readyForJudging": false,
+    "activation": "analysis_only",
+    "capitalExecution": "unavailable"
+  },
+  "runs": [
+    {
+      "category": "lp-rebalancing",
+      "marketplaceHref": "/studio?agent=lp-rebalancing",
+      "currentEvidence": {
+        "status": "available",
+        "source": "PancakeSwap V3 / controlled ProofEra fixture",
+        "environment": "bsc testnet",
+        "observed": "01/09/2026, 16:12:02 UTC",
+        "freshness": "Block 128516927 / 1s old at observation / 120s maximum admitted",
+        "methodology": "atomic_latest_multicall3",
+        "facts": [
+          {
+            "label": "Current tick",
+            "value": "-138163"
+          },
+          {
+            "label": "Position range",
+            "value": "[-887270, 887270)"
+          },
+          {
+            "label": "Range state",
+            "value": "In range"
+          },
+          {
+            "label": "Position liquidity / raw",
+            "value": "1000000000000000000"
+          },
+          {
+            "label": "Fee tier / raw",
+            "value": "500"
+          }
+        ],
+        "fallbackApplied": false,
+        "capitalExecutionEnabled": false,
+        "screenshot": {
+          "file": "lp-rebalancing-current-evidence.png",
+          "bytes": 45903,
+          "sha256": "aab81d2a9b233db6b9d1bdd2dfa2b8a641bf292d098169f9c048f2f4ac1a2648"
+        }
+      },
+      "agentId": "1825",
+      "endpoint": "https://proofera-lp.tangvu.dev/",
+      "skill": "analyze_lp_range",
+      "status": "completed",
+      "runId": "4dd3ef13-1822-40f9-9c8c-a62a5caf9c48",
+      "observedAtUtc": "2026-09-01T16:12:05.753Z",
+      "latencyMilliseconds": 399,
+      "methodologyVersion": "proofera-lp-range-v1.0.0",
+      "terminal": "review_rebalance",
+      "responseBytes": 2593,
+      "responseSha256": "4d83559b6ca04368f1ce221a5bd9daaefbfe7ea5c300cbb40e42061573a69939",
+      "screenshot": {
+        "file": "lp-rebalancing-analysis-run.png",
+        "bytes": 99523,
+        "sha256": "acc12497145565e989c87df34155768bf583d945d26f43ff4d17afe747f4388a"
+      },
+      "boundary": {
+        "chainId": 97,
+        "environment": "bsc-testnet",
+        "executionEnabled": false,
+        "walletAccessed": false,
+        "transactionSubmitted": false,
+        "serverPersistence": false
+      }
+    },
+    {
+      "category": "grid-trading",
+      "marketplaceHref": "/studio?agent=grid-trading",
+      "currentEvidence": {
+        "status": "available",
+        "source": "PancakeSwap V3 / controlled ProofEra fixture",
+        "environment": "bsc testnet",
+        "observed": "01/09/2026, 16:12:06 UTC",
+        "freshness": "Block 128516940 / 0s old at observation / 120s maximum admitted",
+        "methodology": "atomic_latest_multicall3",
+        "facts": [
+          {
+            "label": "Current tick",
+            "value": "-138163"
+          },
+          {
+            "label": "sqrtPriceX96 / raw",
+            "value": "79228162514264337593543950"
+          },
+          {
+            "label": "Tick spacing",
+            "value": "10"
+          },
+          {
+            "label": "Oracle observations",
+            "value": "1 current / 1 next"
+          },
+          {
+            "label": "Pool lock state",
+            "value": "Unlocked"
+          }
+        ],
+        "fallbackApplied": false,
+        "capitalExecutionEnabled": false,
+        "screenshot": {
+          "file": "grid-trading-current-evidence.png",
+          "bytes": 46109,
+          "sha256": "413f88081cfa1b3c8af176c0d537ce97cff9eaadf2ded4957e98da01be782104"
+        }
+      },
+      "agentId": "1826",
+      "endpoint": "https://proofera-grid.tangvu.dev/",
+      "skill": "analyze_grid_trading",
+      "status": "completed",
+      "runId": "5ed69c25-3cfa-45dc-bb4a-e38ab1702090",
+      "observedAtUtc": "2026-09-01T16:12:09.679Z",
+      "latencyMilliseconds": 490,
+      "methodologyVersion": "proofera-grid-trading-v1.0.0",
+      "terminal": "review_grid",
+      "responseBytes": 6824,
+      "responseSha256": "e414a7f42423d7c5352791c17dcb430ca8caa5e196b4d33d5b44ebbd6346a900",
+      "screenshot": {
+        "file": "grid-trading-analysis-run.png",
+        "bytes": 113658,
+        "sha256": "e431aeeab0664a8015a4fd86ae3c49b3cebae15d14ac36202532b8ee6e6aac7f"
+      },
+      "boundary": {
+        "chainId": 97,
+        "environment": "bsc-testnet",
+        "executionEnabled": false,
+        "walletAccessed": false,
+        "transactionSubmitted": false,
+        "serverPersistence": false
+      }
+    },
+    {
+      "category": "yield-optimisation",
+      "marketplaceHref": "/studio?agent=yield-optimisation",
+      "currentEvidence": {
+        "status": "available",
+        "source": "Lista Moolah vault list / official API",
+        "environment": "bsc mainnet",
+        "observed": "01/09/2026, 16:12:10 UTC",
+        "freshness": "Unknown per item / ProofEra retrieval time only",
+        "methodology": "lista-moolah-vault-list-v2",
+        "facts": [
+          {
+            "label": "Source total",
+            "value": "21"
+          },
+          {
+            "label": "First source / source order",
+            "value": "RockawayX PT Yield / USDT"
+          },
+          {
+            "label": "APY / raw decimal",
+            "value": "0.046598610900267442"
+          },
+          {
+            "label": "Deposits USD / raw decimal",
+            "value": "2224889.247597873066088812"
+          },
+          {
+            "label": "Utilization / raw decimal",
+            "value": "0.877566687191285089"
+          }
+        ],
+        "fallbackApplied": false,
+        "capitalExecutionEnabled": false,
+        "screenshot": {
+          "file": "yield-optimisation-current-evidence.png",
+          "bytes": 50177,
+          "sha256": "9d267738c7a65979ea2c1f073913e7394c0314f53a1831e793fa3f533aef9d83"
+        }
+      },
+      "agentId": "1827",
+      "endpoint": "https://proofera-yield.tangvu.dev/",
+      "skill": "analyze_yield_opportunities",
+      "status": "completed",
+      "runId": "c792e021-39c6-46e9-bfdb-92676f459c4b",
+      "observedAtUtc": "2026-09-01T16:12:15.089Z",
+      "latencyMilliseconds": 1982,
+      "methodologyVersion": "proofera-yield-route-v2.0.0",
+      "terminal": "review_route",
+      "responseBytes": 8525,
+      "responseSha256": "5fe5f071d35b09c9dc0a827e00e5df25d67ee090a0ada01345b75cf2f91498f5",
+      "screenshot": {
+        "file": "yield-optimisation-analysis-run.png",
+        "bytes": 101134,
+        "sha256": "4756183f0d000c5dbec70ecec60a78410fba5945e1d1f71b143b2eef3e0b8550"
+      },
+      "boundary": {
+        "chainId": 97,
+        "environment": "bsc-testnet",
+        "executionEnabled": false,
+        "walletAccessed": false,
+        "transactionSubmitted": false,
+        "serverPersistence": false
+      }
+    },
+    {
+      "category": "health-factor-monitoring",
+      "marketplaceHref": "/studio?agent=health-factor-monitoring",
+      "currentEvidence": {
+        "status": "available",
+        "source": "Venus Core Pool / unrelated public replay account",
+        "environment": "bsc testnet",
+        "observed": "01/09/2026, 16:12:16 UTC",
+        "freshness": "Block 128516954 / 3s old at observation / 120s maximum admitted",
+        "methodology": "venus-core-account-risk-v1",
+        "facts": [
+          {
+            "label": "Excess liquidity / raw",
+            "value": "1006944299999191907892126"
+          },
+          {
+            "label": "Shortfall / raw",
+            "value": "0"
+          },
+          {
+            "label": "Contract signal",
+            "value": "excess liquidity reported"
+          },
+          {
+            "label": "Health factor",
+            "value": "UNKNOWN / not computed"
+          },
+          {
+            "label": "Block hash",
+            "value": "0x845638fd4d5621b958806e33ed43dc7456741944cec332725d1d9ecf53933f93"
+          }
+        ],
+        "fallbackApplied": false,
+        "capitalExecutionEnabled": false,
+        "screenshot": {
+          "file": "health-factor-monitoring-current-evidence.png",
+          "bytes": 50835,
+          "sha256": "3e14d25b1bbd8f8df1fcb547fc335bc991fb8e085be4df7cc82d1241727f5d71"
+        }
+      },
+      "agentId": "1828",
+      "endpoint": "https://proofera-health.tangvu.dev/",
+      "skill": "analyze_venus_health_factor",
+      "status": "completed",
+      "runId": "9767fe9e-eb8c-487f-b5b0-cd34b10d7ca1",
+      "observedAtUtc": "2026-09-01T16:12:19.385Z",
+      "latencyMilliseconds": 772,
+      "methodologyVersion": "proofera-venus-core-health-factor-v1.3.0",
+      "terminal": "hold",
+      "responseBytes": 38390,
+      "responseSha256": "131cefd684633aaec2d4bbb36445d1d41db2015bb0710965b58c4741c7bc0d64",
+      "screenshot": {
+        "file": "health-factor-monitoring-analysis-run.png",
+        "bytes": 135144,
+        "sha256": "bc15b5fbe1a89b5893dcda08a401111d81121824bf8b4e106a8faaa01eec017f"
+      },
+      "boundary": {
+        "chainId": 97,
+        "environment": "bsc-testnet",
+        "executionEnabled": false,
+        "walletAccessed": false,
+        "transactionSubmitted": false,
+        "serverPersistence": false
+      }
+    }
+  ],
+  "limitations": [
+    "The current-evidence rail and analyzer preset are separate product boundaries. Current marketplace facts are not forwarded into the analyzer request.",
+    "Three analyzer presets are synthetic scenarios and the health-factor analyzer input is a retained historical replay; the service runs remain availability/capability evidence.",
+    "The controlled Pancake position, source-ordered Lista fields and unrelated public Venus replay do not establish recommendation quality, autonomous performance or economic benefit.",
+    "A completed or rejected terminal analyzer response proves the bounded A2A service path, not trading, capital execution, strategy performance or economic benefit.",
+    "This host-origin capture is not independent uptime monitoring or an organizer eligibility decision."
+  ]
+}
