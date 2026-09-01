@@ -61,8 +61,9 @@ owner-facing session entry point; /mission-control is the read-only authority an
   Proof Room artifact links without relabeling bounded reachability as uptime.
 - Split implemented analysis-service activation from unavailable capital execution in machine
   readiness and the judge-facing Proof Room.
-- Retained the exact `a09e70f` public land-to-find-to-understand-to-run-to-inspect journey for all
-  four categories with run IDs, latency, methodology and hashed A2A responses.
+- Retained the exact `f25a67d` public land-to-find-to-inspect-current-evidence-to-run-to-inspect
+  journey for all four categories with 20 source-specific facts, eight PNG hashes, run IDs,
+  latency, methodology and hashed A2A responses.
 
 ## Highest-value next actions
 

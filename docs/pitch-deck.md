@@ -39,13 +39,14 @@ ProofEra's governing rule: missing evidence remains missing; it never becomes a 
 6. Activate only after identity, authority, and evidence gates pass.
 7. Reconcile receipts in Mission Control and revoke with negative authority proof.
 
-Current truth: discovery, Studio analysis, configuration, Proof Room and receipt-backed historical
-lifecycle are public. The base release retains exact rollback/restoration evidence; current public
-carrier `6c86226` has a two-resolver, five-host TLS and eleven-response observation, while ancestor
-`a09e70f` retains the four-category analysis-service journey. A narrated 297.080-second final demo is
-retained with a separate automated playback verification. Capital-bearing production activation
-remains fail-closed; human playback confirmation and the authoritative submission receipt remain
-absent.
+Current truth: discovery, selected-category current evidence, Studio analysis, configuration, Proof
+Room and receipt-backed historical lifecycle are public. The base release retains exact
+rollback/restoration evidence; prior carrier `6c86226` retains a two-resolver, five-host TLS and
+eleven-response observation, while code release `f25a67d` retains four available evidence panels,
+20 facts, eight screenshots and four completed analysis-service runs. A narrated 297.080-second
+final demo is retained with a separate automated playback verification. Capital-bearing production
+activation remains fail-closed; human playback confirmation and the authoritative submission
+receipt remain absent.
 
 ## Slide 4 — Proof, not a leaderboard
 

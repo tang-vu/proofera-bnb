@@ -40,4 +40,4 @@ jobs:
         run: >-
           node scripts/check-local-production.mjs
           --public
-          --expected-build=6c862265fa8da29fd2e82ca84ee54e8b273a2beb
+          --expected-build=f25a67daa0292b5a04c142a42606888f7ec2b8e6

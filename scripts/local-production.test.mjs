@@ -148,7 +148,7 @@ test("hosted public monitor is read-only, exact-build pinned, and judging-window
   assert.match(source, /2026-09-23T23:59:59Z/);
   assert.match(source, /node scripts\/check-local-production\.mjs/);
   assert.match(source, /--public/);
-  assert.match(source, /--expected-build=6c862265fa8da29fd2e82ca84ee54e8b273a2beb/);
+  assert.match(source, /--expected-build=f25a67daa0292b5a04c142a42606888f7ec2b8e6/);
   assert.doesNotMatch(source, /issues: write/);
   assert.doesNotMatch(source, /secrets\./);
 });

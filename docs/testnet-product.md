@@ -1,10 +1,9 @@
 # ProofEra testnet product surface
 
-Updated: 2026-09-01. This document defines the product surface deployed at public submission carrier
-`6c862265fa8da29fd2e82ca84ee54e8b273a2beb` that can be used end to end without a wallet on BSC
-testnet. The retained four-category public journey binds analysis-service activation to code ancestor
-`a09e70fb7f3a9fe264b83934110eab68c4c06505`. Capital activation, transaction authority and judging
-readiness remain false.
+Updated: 2026-09-01. This document defines the product surface verified on public code release
+`f25a67daa0292b5a04c142a42606888f7ec2b8e6` that can be used end to end without a wallet on BSC
+testnet. Its retained four-category journey binds current marketplace evidence and analysis-service
+activation separately. Capital activation, transaction authority and judging readiness remain false.
 
 ## Product promise
 
@@ -16,14 +15,16 @@ result. Missing evidence remains missing. Analysis never becomes transaction aut
 ## Shipped journey
 
 1. `/` explains the evidence-first product and offers a direct Studio entry.
-2. `/marketplace` preserves one of four category intents while registry ingress streams
-   independently.
+2. `/marketplace` preserves one of four category intents while registry ingress and a selected
+   current-evidence read stream independently. Each available category exposes five bounded facts,
+   source/environment, observation or retrieval time, freshness, methodology and limitations.
 3. `/reference-analyzers/[category]` exposes exact BSC-testnet identity, implemented/not-run
    metrics, missing calculators, endpoint scope, and an analysis CTA.
 4. `/configure/[category]` accepts only allowlisted BSC-testnet values and reports exact readiness
    blockers. Its Studio CTA starts a separate preset; configuration values do not become evidence.
 5. `/studio` runs LP range, grid trading, yield optimisation, or health-factor analysis through one
-   first-party proxy. The browser renders running, completed, rejected, and fail-closed states.
+   first-party proxy. The browser renders running, completed, rejected, and fail-closed states plus a
+   terminal service-run ID and observation time. Marketplace facts are not forwarded into presets.
 6. Studio history stores at most twelve summaries and input digests in local storage. It does not
    store raw input, wallet data, or a server-side run ledger.
 7. `/proof`, `/mission-control`, and `/session-control` remain separate evidence, observation, and
@@ -55,20 +56,21 @@ result. Missing evidence remains missing. Analysis never becomes transaction aut
 
 ## Acceptance and evidence
 
-| Criterion                                                                                                               | Verification                                                            |
-| ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| All four shipped presets satisfy their exact analyzer schemas                                                           | Server integration test invokes all four local handler implementations  |
-| Public endpoint contracts still match exact skill/testnet/non-execution scope                                           | Bounded no-wallet HTTP smoke against all four existing analyzer origins |
-| Invalid JSON, oversized input, wrong chain/skill, secrets, malformed upstream data, and weakened boundaries fail closed | Route unit tests                                                        |
-| Desktop and mobile users can select every analyzer, run a scenario, inspect a result, and retain only summary history   | Playwright Studio journey                                               |
-| Shared navigation is stable, keyboard reachable, responsive, and reduced-motion safe                                    | Existing header, accessibility, responsive, and Studio browser suites   |
-| Configuration rejects mainnet and non-allowlisted protocol values                                                       | Configuration parser/unit/browser tests                                 |
-| Formatting, lint, secret scan, strict types, tests, production build, and full E2E pass                                 | Root verification gates before commit                                   |
+| Criterion                                                                                                               | Verification                                                             |
+| ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| All four shipped presets satisfy their exact analyzer schemas                                                           | Server integration test invokes all four local handler implementations   |
+| Public endpoint contracts still match exact skill/testnet/non-execution scope                                           | Bounded no-wallet HTTP smoke against all four existing analyzer origins  |
+| Invalid JSON, oversized input, wrong chain/skill, secrets, malformed upstream data, and weakened boundaries fail closed | Route unit tests                                                         |
+| Desktop and mobile users can select every analyzer, run a scenario, inspect a result, and retain only summary history   | Playwright Studio journey                                                |
+| Shared navigation is stable, keyboard reachable, responsive, and reduced-motion safe                                    | Existing header, accessibility, responsive, and Studio browser suites    |
+| Configuration rejects mainnet and non-allowlisted protocol values                                                       | Configuration parser/unit/browser tests                                  |
+| Formatting, lint, secret scan, strict types, tests, production build, and full E2E pass                                 | Root verification gates before commit                                    |
+| Four public current-evidence panels and four service runs are release-bound and visually inspectable                    | v2 journey manifest, 20 facts, eight PNG hashes and four response hashes |
 
 ## Explicitly incomplete
 
-The current public carrier includes this product slice and has passed the exact-build 11-check
-release probe. Production activation, authenticated current portfolio ingestion, durable
+Public code release `f25a67d` passed the exact-build 11-check host-origin release probe and the
+four-category v2 journey capture. Production activation, authenticated current portfolio ingestion, durable
 distributed rate limiting, an autonomous strategy worker, live execution readiness, and any new
 transaction remain outside this product slice. Existing historical testnet receipts remain evidence
 only for their exact recorded actions.
