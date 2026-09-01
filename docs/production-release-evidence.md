@@ -127,3 +127,14 @@ false. Raw manifest SHA-256 is
 `evidence/submission/final/submission-public-release.json`. The collector ran after deployment and
 did not itself restart services, access a wallet, sign or broadcast. It is rehearsal evidence, not a
 new frozen release, independent uptime or rollback repetition.
+
+Later on 2026-09-01, current public carrier
+`12829109f26b8f6d15fc2f7beda2008548ae9be0` passed a fresh read-only rehearsal. Google and
+Cloudflare agreed on public A records for all five hosts, all five TLS certificates were authorized
+through the judging window, and all eleven bounded HTTPS checks returned the exact deployed build.
+Readiness remained HTTP `503`, analysis activation implemented, capital execution unavailable and
+judging readiness false. Manifest SHA-256 is
+`7e89c2e3badf94e3fbf0ddbf8feafc6aa3492ad3da0f0883598dc961532ce6c6`. The collector did not
+restart a service, access a wallet, sign or broadcast. This is host-origin rehearsal evidence, not
+independent uptime, a new frozen release, rollback repetition, capital execution or organizer
+acceptance.

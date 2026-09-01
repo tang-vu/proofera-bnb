@@ -1,12 +1,12 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.2.0",
-  "updatedAtUtc": "2026-09-01T08:13:58.704Z",
+  "updatedAtUtc": "2026-09-01T16:33:19.159Z",
   "readyForSubmission": false,
   "gates": [
     {
       "gateId": "production-release",
       "state": "verified",
-      "claim": "Commit ad0cee11885b2131c27bfa14c3b0a27f2f8fee69 remains the frozen base release with retained two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses and bounded rollback/restoration evidence. Prior public submission carrier 6c862265fa8da29fd2e82ca84ee54e8b273a2beb has a separate read-only rehearsal with two-resolver agreement, five authorized TLS hosts, eleven exact responses, exact build identity and split readiness: analysis activation implemented, capital activation and judging readiness false. The capture did not restart services or replace the frozen base-release claim. This proves bounded observations only; it is not independent uptime, reboot, data restore, capital execution or organizer acceptance evidence.",
+      "claim": "Commit ad0cee11885b2131c27bfa14c3b0a27f2f8fee69 remains the frozen base release with retained two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses and bounded rollback/restoration evidence. Current public carrier 12829109f26b8f6d15fc2f7beda2008548ae9be0 has a separate read-only rehearsal with two-resolver agreement, five authorized TLS hosts, eleven exact responses, exact build identity and split readiness: analysis activation implemented, capital activation unavailable and judging readiness false. The capture did not restart services or replace the frozen base-release claim. This proves bounded observations only; it is not independent uptime, reboot, data restore, capital execution or organizer acceptance evidence.",
       "blockers": [],
       "artifacts": [
         {
