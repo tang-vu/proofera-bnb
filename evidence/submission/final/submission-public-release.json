@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "proofera-submission-public-release-derivative-v1.0.0",
+  "status": "observed_rehearsal",
+  "sourceCommit": "6c862265fa8da29fd2e82ca84ee54e8b273a2beb",
+  "observedAtUtc": "2026-09-01T08:11:06.820Z",
+  "completedAtUtc": "2026-09-01T08:11:13.942Z",
+  "classification": {
+    "artifact": "submission_public_release_derivative",
+    "finalReleaseFrozen": false,
+    "readOnly": true,
+    "independentDnsResolvers": 2,
+    "externalHttpMonitoring": false,
+    "hackathonEntrySubmitted": false,
+    "submissionReady": false
+  },
+  "sourceProbe": {
+    "path": "evidence/submission/release-probes/6c862265fa8da29fd2e82ca84ee54e8b273a2beb/rehearsal/manifest.json",
+    "sha256": "6c36e5e129c55b522cd576d7718a0ef2c94aadd0e8873f43682adfc2020158e5",
+    "mode": "rehearsal"
+  },
+  "summary": {
+    "dnsHostCount": 5,
+    "dnsResolverAgreement": true,
+    "tlsHostCount": 5,
+    "tlsAuthorized": true,
+    "httpObservationCount": 11,
+    "exactBuildObserved": true
+  },
+  "readiness": {
+    "httpStatus": 503,
+    "status": "not_ready",
+    "activation": "analysis_only",
+    "analysisActivation": "implemented",
+    "capitalExecution": "unavailable",
+    "readyForAnalysisActivation": true,
+    "readyForCapitalActivation": false,
+    "readyForActivation": false,
+    "readyForJudging": false
+  },
+  "securityBoundary": {
+    "mainnetWritePossible": false,
+    "walletAccessed": false,
+    "signingAttempted": false,
+    "transactionBroadcastAttempted": false,
+    "captureServiceRestarted": false
+  },
+  "limitations": [
+    "This derivative binds the submission evidence carrier to the retained two-resolver, TLS and eleven-response rehearsal; it does not replace the frozen base release, rollback/restoration evidence or the earlier four-category analysis journey.",
+    "The observation originated from the production host network and is not an independent uptime monitor, paging record, reboot exercise or data-restore test.",
+    "Analysis-service readiness does not imply capital execution, transaction authority, strategy performance, economic benefit, main-track testnet eligibility or organizer acceptance.",
+    "No wallet, signature, transaction broadcast or mainnet write occurred during this read-only capture. The release deployment happened before the collector started and is documented separately."
+  ]
+}

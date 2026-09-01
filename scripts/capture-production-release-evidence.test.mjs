@@ -271,3 +271,56 @@ test("current public product derivative binds the exact 9f32dda rehearsal withou
     serviceRestarted: false
   });
 });
+
+test("submission public release derivative binds readiness v2 without upgrading the rehearsal", async () => {
+  const probeBytes = await readFile(
+    new URL(
+      "../evidence/submission/release-probes/6c862265fa8da29fd2e82ca84ee54e8b273a2beb/rehearsal/manifest.json",
+      import.meta.url
+    )
+  );
+  const derivative = JSON.parse(
+    await readFile(
+      new URL("../evidence/submission/final/submission-public-release.json", import.meta.url),
+      "utf8"
+    )
+  );
+  const probe = JSON.parse(probeBytes.toString("utf8"));
+  const readiness = probe.http.find(({ key }) => key === "marketplace-readiness");
+  assert.equal(derivative.status, "observed_rehearsal");
+  assert.equal(derivative.sourceCommit, probe.sourceCommit);
+  assert.equal(derivative.sourceProbe.mode, "rehearsal");
+  assert.equal(derivative.classification.finalReleaseFrozen, false);
+  assert.equal(derivative.classification.submissionReady, false);
+  assert.equal(
+    derivative.sourceProbe.sha256,
+    createHash("sha256").update(probeBytes).digest("hex")
+  );
+  assert.deepEqual(derivative.summary, {
+    dnsHostCount: probe.dns.length,
+    dnsResolverAgreement: probe.summary.dnsAgreement,
+    tlsHostCount: probe.tls.length,
+    tlsAuthorized: probe.summary.tlsAuthorized,
+    httpObservationCount: probe.summary.httpObservationCount,
+    exactBuildObserved: probe.summary.exactBuildObserved
+  });
+  assert.equal(readiness?.status, derivative.readiness.httpStatus);
+  assert.deepEqual(derivative.readiness, {
+    httpStatus: readiness?.status,
+    status: readiness?.facts.status,
+    activation: readiness?.facts.activation,
+    analysisActivation: readiness?.facts.analysisActivation,
+    capitalExecution: readiness?.facts.capitalExecution,
+    readyForAnalysisActivation: readiness?.facts.readyForAnalysisActivation,
+    readyForCapitalActivation: readiness?.facts.readyForCapitalActivation,
+    readyForActivation: readiness?.facts.readyForActivation,
+    readyForJudging: readiness?.facts.readyForJudging
+  });
+  assert.deepEqual(derivative.securityBoundary, {
+    mainnetWritePossible: false,
+    walletAccessed: false,
+    signingAttempted: false,
+    transactionBroadcastAttempted: false,
+    captureServiceRestarted: false
+  });
+});
