@@ -27,7 +27,7 @@ const provenance: ListaYieldProvenance = {
   endpoint: "Lista Moolah vault list",
   officialDocumentationUrl: LISTA_YIELD_OFFICIAL_LINKS.documentation,
   officialSdkClientUrl: LISTA_YIELD_OFFICIAL_LINKS.sdkClient,
-  methodologyVersion: "lista-moolah-vault-list-v1",
+  methodologyVersion: "lista-moolah-vault-list-v2",
   methodologyBoundary: {
     reportedValuesOnly: true,
     apyScale: "undocumented",
@@ -79,7 +79,15 @@ function availableResult(): ListaYieldAvailableResult {
             total: "12345678901234567890.000000000000000001"
           }
         ],
-        collateralMarkets: [{ id: collateral, name: "slisBNB / BNB" }],
+        collateralMarkets: [
+          {
+            id: collateral,
+            idKind: "address",
+            name: "slisBNB / BNB",
+            loanSymbol: null,
+            allocation: null
+          }
+        ],
         withdrawalConstraints: {
           state: "unknown",
           lockup: null,

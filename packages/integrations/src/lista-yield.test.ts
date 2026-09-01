@@ -10,6 +10,7 @@ import {
 const VAULT = "0x1111111111111111111111111111111111111111";
 const ASSET = "0x2222222222222222222222222222222222222222";
 const COLLATERAL = "0x3333333333333333333333333333333333333333";
+const MARKET_ID = `0x${"ab".repeat(32)}`;
 const OBSERVED_AT = "2026-08-11T16:00:30.000Z";
 
 const defaultVault = {
@@ -179,7 +180,7 @@ describe("Lista yield-source adapter", () => {
           reset: "Tue, 11 Aug 2026 16:01:00 GMT",
           retryAfter: "2"
         },
-        methodologyVersion: "lista-moolah-vault-list-v1",
+        methodologyVersion: "lista-moolah-vault-list-v2",
         methodologyBoundary: {
           reportedValuesOnly: true,
           apyScale: "undocumented",
@@ -208,6 +209,60 @@ describe("Lista yield-source adapter", () => {
     });
     expect(new Headers(fetchInit?.headers).get("accept")).toBe("application/json");
     expect(fetchInit?.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it("accepts the bounded production market-ID additions without treating bytes32 as an address", async () => {
+    const currentShape = {
+      ...defaultVault,
+      collaterals: [
+        {
+          name: "PT market",
+          icon: "https://assets.lista.org/pt.png",
+          id: MARKET_ID.toUpperCase().replace("0X", "0x"),
+          loanSymbol: "USDT",
+          allocation: "1.000000000000000000"
+        }
+      ],
+      marketIds: [MARKET_ID],
+      styleType: 1,
+      holderEmissionApy: "0"
+    };
+    const fetchMock = vi.fn<typeof fetch>(async () => jsonResponse(envelope([currentShape], 1)));
+
+    const result = await createReader(fetchMock).getYieldSources(request());
+
+    expect(result).toMatchObject({
+      status: "available",
+      sources: [
+        {
+          collateralMarkets: [
+            {
+              id: MARKET_ID,
+              idKind: "bytes32",
+              name: "PT market",
+              loanSymbol: "USDT",
+              allocation: "1.000000000000000000"
+            }
+          ]
+        }
+      ]
+    });
+  });
+
+  it("requires production marketIds to agree exactly with collateral identifiers", async () => {
+    const mismatched = {
+      ...defaultVault,
+      marketIds: [MARKET_ID]
+    };
+    const fetchMock = vi.fn<typeof fetch>(async () => jsonResponse(envelope([mismatched], 1)));
+
+    const result = await createReader(fetchMock).getYieldSources(request());
+
+    expect(result).toMatchObject({
+      status: "unavailable",
+      reason: "schema_drift",
+      stage: "schema"
+    });
   });
 
   it("distinguishes an authoritative empty first page from unavailability", async () => {

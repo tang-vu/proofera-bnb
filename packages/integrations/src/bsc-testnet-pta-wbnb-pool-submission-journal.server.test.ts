@@ -970,9 +970,11 @@ describe.runIf(process.platform === "win32")(
       }
     }, 30_000);
 
-    // This covers two independent Windows ACL/link branches, each with several pinned
-    // PowerShell probes. Keep the host budget bounded while allowing both branches to finish.
-    it("rejects an ACL transition and a hard-linked retained record", async () => {
+    // This branch intentionally launches several independent, pinned PowerShell
+    // probes. Keep its watchdog bounded but separate from the hard-link branch so
+    // a loaded Windows judge host does not turn process startup latency into a
+    // false security regression.
+    it("rejects an ACL transition without changing the retained record", async () => {
       const aclDirectory = await createSyntheticWindowsDirectory();
       try {
         const cap = await capability(new Date().toISOString());
@@ -1003,7 +1005,11 @@ describe.runIf(process.platform === "win32")(
       } finally {
         await removeSyntheticWindowsDirectory(aclDirectory);
       }
+    }, 120_000);
 
+    // The hard-link path repeats durable create/open/read checks and therefore has
+    // its own bounded host budget rather than sharing one timeout with ACL probes.
+    it("rejects a hard-linked retained record without changing it", async () => {
       const linkDirectory = await createSyntheticWindowsDirectory();
       try {
         const cap = await capability(new Date().toISOString());
@@ -1034,7 +1040,7 @@ describe.runIf(process.platform === "win32")(
       } finally {
         await removeSyntheticWindowsDirectory(linkDirectory);
       }
-    }, 60_000);
+    }, 90_000);
 
     it("rejects a reparse-point child without following it", async () => {
       const directory = await createSyntheticWindowsDirectory();

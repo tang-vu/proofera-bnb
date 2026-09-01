@@ -174,6 +174,7 @@ function UnknownEvidence({ source }: Readonly<{ source: ListaYieldSourceView }>)
 
 function YieldSourceCard({ source }: Readonly<{ source: ListaYieldSourceView }>) {
   const headingId = `lista-source-${source.vaultAddress.slice(2).toLowerCase()}`;
+  const displayedMarkets = source.collateralMarkets.slice(0, 8);
   return (
     <article className="passport-panel" aria-labelledby={headingId}>
       <div className="passport-panel-heading">
@@ -236,6 +237,10 @@ function YieldSourceCard({ source }: Readonly<{ source: ListaYieldSourceView }>)
           <dt>Fee / raw decimal</dt>
           <dd className="raw-value">{source.raw.fee ?? "Not supplied"}</dd>
         </div>
+        <div>
+          <dt>Collateral market records</dt>
+          <dd className="raw-value">{source.collateralMarkets.length}</dd>
+        </div>
         {source.rewards.length === 0 ? (
           <div>
             <dt>Emission detail</dt>
@@ -256,14 +261,30 @@ function YieldSourceCard({ source }: Readonly<{ source: ListaYieldSourceView }>)
       <p className="panel-overline">UNKNOWN / NOT COMPUTED</p>
       <UnknownEvidence source={source} />
 
-      <div className="pancake-source-links" aria-label={`BscScan links for ${source.name}`}>
+      <div
+        className="pancake-source-links"
+        aria-label={`Lista vault and market evidence for ${source.name}`}
+      >
         <ExternalLink href={source.vaultExplorerUrl}>Vault on BscScan</ExternalLink>
         <ExternalLink href={source.asset.explorerUrl}>Asset on BscScan</ExternalLink>
-        {source.collateralMarkets.map((market) => (
-          <ExternalLink href={market.explorerUrl} key={market.id}>
-            Collateral: {market.name}
-          </ExternalLink>
+        {displayedMarkets.map((market) => (
+          <span className="raw-value" key={market.id}>
+            Market: {market.name} / ID {market.id} / loan {market.loanSymbol ?? "not supplied"} /
+            allocation {market.allocation ?? "not supplied"}
+            {market.explorerUrl === null ? null : (
+              <>
+                {" / "}
+                <ExternalLink href={market.explorerUrl}>BscScan</ExternalLink>
+              </>
+            )}
+          </span>
         ))}
+        {displayedMarkets.length < source.collateralMarkets.length ? (
+          <span>
+            Showing the first {displayedMarkets.length} of {source.collateralMarkets.length}
+            source-ordered market records.
+          </span>
+        ) : null}
       </div>
     </article>
   );

@@ -1,4 +1,4 @@
-import { getAddress, isAddress, type Address } from "viem";
+import { getAddress, isAddress, type Address, type Hex } from "viem";
 import { z } from "zod";
 
 export const LISTA_PRODUCTION_API_ORIGIN = "https://api.lista.org";
@@ -9,7 +9,7 @@ const LISTA_SUCCESS_CODE = "000000000";
 const MAX_BODY_CHUNKS = 4_096;
 
 /**
- * Primary sources checked 2026-08-11:
+ * Primary sources checked 2026-09-01:
  * https://docs.bsc.lista.org/for-developer/services/lending-api
  * https://docs.bsc.lista.org/for-developer/services/lending-api/vault
  * https://github.com/lista-dao/lending-sdk
@@ -21,8 +21,12 @@ const MAX_BODY_CHUNKS = 4_096;
  * The docs specify the vault-list path and conceptual yield/liquidity fields but
  * do not publish an absolute host or envelope. The current official SDK supplies
  * the production host, exact query construction, success envelope, and concrete
- * ApiVaultItem shape used here. Its chain map enables BSC 56 and leaves BSC
- * testnet commented out, so this adapter deliberately rejects chain 97.
+ * ApiVaultItem shape used here. The production response currently adds bounded
+ * marketIds/styleType/holderEmissionApy fields and represents Moolah market IDs
+ * as bytes32 even though the SDK type still declares collateral IDs as Address.
+ * Those observed additions are validated explicitly and never used as a numeric
+ * or performance claim. The SDK chain map enables BSC 56 and leaves BSC testnet
+ * commented out, so this adapter deliberately rejects chain 97.
  */
 
 const exactNonNegativeDecimalSchema = z
@@ -45,6 +49,16 @@ const addressSchema = z
     (value) => value !== "0x0000000000000000000000000000000000000000",
     "The zero address is not allowed"
   );
+
+const bytes32Schema = z
+  .string()
+  .regex(/^0x[0-9a-fA-F]{64}$/, "Invalid bytes32 identifier")
+  .transform((value) => value.toLowerCase() as Hex);
+
+const marketIdentifierSchema = z.union([
+  addressSchema.transform((value) => ({ kind: "address" as const, value })),
+  bytes32Schema.transform((value) => ({ kind: "bytes32" as const, value }))
+]);
 
 const boundedNameSchema = z
   .string()
@@ -76,7 +90,9 @@ const emissionDetailSchema = z
 const collateralSchema = z.strictObject({
   name: boundedNameSchema,
   icon: boundedLocatorSchema,
-  id: addressSchema
+  id: marketIdentifierSchema,
+  loanSymbol: boundedSymbolSchema.optional(),
+  allocation: exactNonNegativeDecimalSchema.optional()
 });
 
 const listaApiVaultItemSchema = z
@@ -96,11 +112,14 @@ const listaApiVaultItemSchema = z
     emissionApy: exactNonNegativeDecimalSchema.optional(),
     emissionDetail: emissionDetailSchema,
     emissionEnabled: z.union([z.literal(0), z.literal(1)]),
-    collaterals: z.array(collateralSchema).max(64),
+    collaterals: z.array(collateralSchema).max(128),
+    marketIds: z.array(marketIdentifierSchema).max(128).optional(),
     zone: z.number().int().min(0).max(65_535),
+    styleType: z.number().int().min(0).max(65_535).optional(),
     utilization: exactNonNegativeDecimalSchema,
     chain: z.literal("bsc"),
-    fee: exactNonNegativeDecimalSchema.optional()
+    fee: exactNonNegativeDecimalSchema.optional(),
+    holderEmissionApy: exactNonNegativeDecimalSchema.optional()
   })
   .superRefine((item, context) => {
     if (item.address === item.asset) {
@@ -110,13 +129,31 @@ const listaApiVaultItemSchema = z
         message: "Vault and underlying asset addresses must be distinct"
       });
     }
-    const collateralIds = new Set(item.collaterals.map((collateral) => collateral.id));
+    const collateralIds = new Set(
+      item.collaterals.map((collateral) => `${collateral.id.kind}:${collateral.id.value}`)
+    );
     if (collateralIds.size !== item.collaterals.length) {
       context.addIssue({
         code: "custom",
         path: ["collaterals"],
-        message: "Collateral addresses must be unique within a vault"
+        message: "Collateral market identifiers must be unique within a vault"
       });
+    }
+    if (item.marketIds !== undefined) {
+      const marketIds = new Set(
+        item.marketIds.map((marketId) => `${marketId.kind}:${marketId.value}`)
+      );
+      if (
+        marketIds.size !== item.marketIds.length ||
+        marketIds.size !== collateralIds.size ||
+        [...marketIds].some((marketId) => !collateralIds.has(marketId))
+      ) {
+        context.addIssue({
+          code: "custom",
+          path: ["marketIds"],
+          message: "Market IDs must be unique and match the collateral records"
+        });
+      }
     }
   });
 
@@ -194,8 +231,11 @@ export interface ListaYieldSource {
     readonly total: string;
   }[];
   readonly collateralMarkets: readonly {
-    readonly id: Address;
+    readonly id: Address | Hex;
+    readonly idKind: "address" | "bytes32";
     readonly name: string;
+    readonly loanSymbol: string | null;
+    readonly allocation: string | null;
   }[];
   readonly withdrawalConstraints: {
     readonly state: "unknown";
@@ -224,7 +264,7 @@ export interface ListaYieldProvenance {
   readonly endpoint: "Lista Moolah vault list";
   readonly officialDocumentationUrl: string;
   readonly officialSdkClientUrl: string;
-  readonly methodologyVersion: "lista-moolah-vault-list-v1";
+  readonly methodologyVersion: "lista-moolah-vault-list-v2";
   readonly methodologyBoundary: {
     readonly reportedValuesOnly: true;
     readonly apyScale: "undocumented";
@@ -566,8 +606,11 @@ function toYieldSource(item: z.output<typeof listaApiVaultItemSchema>): ListaYie
       .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
       .map(([name, detail]) => ({ name, apy: detail.apy, total: detail.total })),
     collateralMarkets: item.collaterals.map((collateral) => ({
-      id: collateral.id,
-      name: collateral.name
+      id: collateral.id.value,
+      idKind: collateral.id.kind,
+      name: collateral.name,
+      loanSymbol: collateral.loanSymbol ?? null,
+      allocation: collateral.allocation ?? null
     })),
     withdrawalConstraints: {
       state: "unknown",
@@ -605,7 +648,7 @@ function createProvenance(
     officialDocumentationUrl: "https://docs.bsc.lista.org/for-developer/services/lending-api/vault",
     officialSdkClientUrl:
       "https://raw.githubusercontent.com/lista-dao/lending-sdk/refs/heads/main/packages/moolah-sdk-core/src/api/client.ts",
-    methodologyVersion: "lista-moolah-vault-list-v1",
+    methodologyVersion: "lista-moolah-vault-list-v2",
     methodologyBoundary: {
       reportedValuesOnly: true,
       apyScale: "undocumented",

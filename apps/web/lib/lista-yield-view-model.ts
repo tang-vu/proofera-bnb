@@ -76,7 +76,10 @@ export interface ListaYieldSourceView {
   readonly collateralMarkets: readonly {
     readonly id: string;
     readonly name: string;
-    readonly explorerUrl: string;
+    readonly idKind: "address" | "bytes32";
+    readonly explorerUrl: string | null;
+    readonly loanSymbol: string | null;
+    readonly allocation: string | null;
   }[];
   readonly unknowns: ListaYieldUnknownBoundaries;
   readonly executionEnabled: false;
@@ -89,7 +92,7 @@ export interface ListaYieldProvenanceView {
   readonly sourceTimestampRaw: string | null;
   readonly sourceTimestampUnit: "undocumented" | "absent";
   readonly itemFreshness: "unknown_no_item_timestamp";
-  readonly methodologyVersion: "lista-moolah-vault-list-v1";
+  readonly methodologyVersion: "lista-moolah-vault-list-v2";
   readonly page: 1;
   readonly pageSize: number;
   readonly total: string;
@@ -165,8 +168,11 @@ function toSourceView(source: ListaYieldSource, observedAt: string): ListaYieldS
     })),
     collateralMarkets: source.collateralMarkets.map((market) => ({
       id: market.id,
+      idKind: market.idKind,
       name: market.name,
-      explorerUrl: `${explorerOrigin}/address/${market.id}`
+      explorerUrl: market.idKind === "address" ? `${explorerOrigin}/address/${market.id}` : null,
+      loanSymbol: market.loanSymbol,
+      allocation: market.allocation
     })),
     unknowns: unknownBoundaries(observedAt),
     executionEnabled: false
