@@ -1,6 +1,6 @@
 # ProofEra submission draft
 
-Updated: 2026-08-31. Status: evidence-backed copy awaiting owner fields and organizer receipt. The marketplace, Studio and four read-only analyzer endpoints are public; all four ERC-8004 registrations are receipt-verified on BSC testnet, and the bounded Altana v2 grant/execute/revoke lifecycle is retained with explicit archive/provenance limits. The protected TermiX bundle closes its bounded three-pair gate. The controlled PTA/WBNB first-LP run has two finalized chain-97 receipts plus dual-provider post-state, while its later outcome honestly records unchanged price/liquidity and zero fees rather than inventing benefit. Frozen base-release rollback evidence remains retained, current public commit `9f32dda65d8123f6f37a58fa869daef6340fd1be` has a two-resolver, five-TLS-host, eleven-response observation, and the retained `ad03498` 297.080-second narrated final demo has a separate automated playback verification. Comparable autonomous-agent economics, human playback confirmation, owner-only form fields and an authoritative hackathon entry receipt remain incomplete.
+Updated: 2026-09-01. Status: evidence-backed copy awaiting owner fields and organizer response. The marketplace, Studio and four read-only analyzer endpoints are public; all four ERC-8004 registrations are receipt-verified on BSC testnet, and the bounded Altana v2 grant/execute/revoke lifecycle is retained with explicit archive/provenance limits. The protected TermiX bundle closes its bounded three-pair gate. The controlled PTA/WBNB first-LP run has two finalized chain-97 receipts plus dual-provider post-state, while its later outcome honestly records unchanged price/liquidity and zero fees rather than inventing benefit. Frozen base-release rollback evidence remains retained, current public commit `9f32dda65d8123f6f37a58fa869daef6340fd1be` has a two-resolver, five-TLS-host, eleven-response observation, and the retained `ad03498` 297.080-second narrated final demo has a separate automated playback verification. The observed build still reports activation unavailable and not ready for judging; the GitHub repository is private and inaccessible anonymously. Main-track activation evidence, public source access, comparable autonomous-agent economics, human playback confirmation, owner-only form fields and an authoritative entry response remain incomplete.
 
 ## Core copy
 
@@ -17,7 +17,7 @@ Users begin with a financial job—protect a Venus loan, manage Pancake concentr
 - Includes four exact-pinned, hardened, non-executing self-hosted A2A/MCP reference analyzers: LP Range (17 tests), Grid Trading (24), Yield Optimisation (33), and Health-Factor Guardian (42). All four expose public HTTPS health and Agent Card endpoints and are ERC-8004-registered on BSC testnet as Agent IDs `1825`–`1828`. Two RPCs independently joined all eight finalized receipts to the exact prepared calldata, wallet owners and final SDK URIs at block `125541239`. Registration does not make them execution-enabled, hireable, performance-proven, or mainnet agents. Studio 0.0.5 does not classify the TypeScript runtimes as AgentCore-deployable, and ProofEra does not claim otherwise.
 - Uses typed adapter boundaries, exact versions and evidence manifests that can survive undisclosed Phase 2 requirements.
 - Treats permission inspection, status reconciliation and revoke as core marketplace features.
-- Exposes a public `/proof` room that renders the committed seven-gate closure ledger, exact public Agent Card skills, build identity, blockers and artifact SHA-256 values. Four gates are verified and three remain explicitly open; the page is an evidence index, not a readiness claim.
+- Exposes a public `/proof` room that renders the committed seven-gate closure ledger, exact public Agent Card skills, build identity, blockers and artifact SHA-256 values. Four gates are verified and three remain explicitly open; the current source additionally renders the 2026-09-01 official-track audit and suppresses known-broken private-GitHub artifact links. Deployment of that source change is a separate owner-approved transition. The page is an evidence index, not a readiness claim.
 - Retains a six-scene, full-page public-browser rehearsal bound to exact production commit `b0e46cc192fbf15220a557c4b5bc8639c3c75eba`. The manifest verifies render assertions and screenshot hashes while explicitly denying video, final-demo, receipt, and submission claims.
 - Provides an exact-release [demo-video pipeline](./final-demo.md) with separate rehearsal/final modes. Public commit `ad0349811df96f39b110a505f0c6d9ded6d4746b` now has a six-scene, 297.080-second MP4 with one 1440x900 H.264 video stream, one AAC audio stream, committed narration and successful full decode. A separate process copied and rehashed the MP4, completed another full decode and rechecked all six public scene assertions. This is automated playback evidence, not a human narration-quality attestation or submission receipt.
 - Provides an exact-release [production evidence pipeline](./production-release-evidence.md) that joins two documented DoH resolvers, authorized TLS and the complete bounded public marketplace/agent surface. Frozen base UI release `ad0cee11885b2131c27bfa14c3b0a27f2f8fee69` passed the final capture and exact-path rollback/restoration. Current public product commit `9f32dda65d8123f6f37a58fa869daef6340fd1be` separately passed a read-only rehearsal observation with five agreed A-record sets across two resolvers, five authorized TLS observations and eleven exact no-redirect HTTPS observations including honest readiness `503`. The capture itself did not deploy or restart services and is not relabeled as a frozen release. These remain bounded observations, not independent uptime, and do not turn the controlled negative Pancake outcome into a benefit claim.
@@ -34,22 +34,25 @@ Users begin with a financial job—protect a Venus loan, manage Pancake concentr
 
 The machine-readable closure ledger is [`evidence/submission/readiness.json`](../evidence/submission/readiness.json). `pnpm submission:check` verifies the current honest state and digest-binds every referenced artifact; `pnpm submission:require-ready` remains intentionally red until all seven gates carry their required final evidence. Neither a normal green build nor the default status command is submission approval.
 
-The [canonical page](https://www.bnbchain.org/en/hackathons/smart-money-era) and linked form were
-rechecked on 2026-08-30. The public build period closes at `2026-09-09T12:00:00Z`, with judging
-through 2026-09-23. Both public calls to action still open the same registration-only Google Form,
-which has no deck, demo, receipt or final-evidence upload fields. Its current partner checkbox lists
-PancakeSwap, AltLayer and TermiX but omits Altana even though the canonical page still publishes
-Altana eligibility. ProofEra therefore keeps the ready-to-paste
-[submission packet](./submission-packet.md) host-independent, monitors for the actual final flow, and
-does not interpret a registration response as a completed entry or Altana's omission as track
-removal.
+The [canonical page](https://www.bnbchain.org/en/hackathons/smart-money-era), its CMS data and linked
+form were rechecked on 2026-09-01. The public build period closes at `2026-09-09T12:00:00Z`, with
+judging through 2026-09-23. The CMS explicitly labels the Google Form URL as `submit_project_url`, so
+ProofEra treats it as the current official linked entry flow. It asks for project name, pitch,
+description, GitHub repository, prototype stage and Additional Notes but has no product, demo or
+evidence field. Its partner checkbox lists PancakeSwap, AltLayer and TermiX but omits Altana even
+though the canonical page still publishes Altana eligibility. The owner-completion
+[submission packet](./submission-packet.md) therefore places public product/evidence links and the
+Altana request/wallet evidence in Additional Notes. A blank form is not a submission, but a retained
+response to the official linked form can be the authoritative entry record; do not wait for an
+unannounced replacement.
 
 The judge-facing claim/evidence/missing-evidence map is maintained in [`judge-scorecard.md`](./judge-scorecard.md). The eleven-slide narrative and 90-day roadmap are maintained in [`pitch-deck.md`](./pitch-deck.md); it remains a source document, not an exported or submitted deck, and owner fields must be filled only by the owner.
 
 | Item                          | Value                                                            |
 | ----------------------------- | ---------------------------------------------------------------- |
 | Public marketplace URL        | `https://proofera.tangvu.dev`; activation not ready              |
-| Public source commit          | `9f32dda65d8123f6f37a58fa869daef6340fd1be`; OBSERVED PUBLIC      |
+| Public product commit         | `9f32dda65d8123f6f37a58fa869daef6340fd1be`; OBSERVED PUBLIC      |
+| Source repository access      | PRIVATE; ANONYMOUS PAGE/API/RAW PROBES RETURN `404`              |
 | Four public agent endpoints   | DEPLOYED READ-ONLY; BSC-TESTNET IDENTITIES VERIFIED              |
 | ERC-8004 agent IDs/addresses  | CHAIN 97 AGENT IDS `1825`–`1828`; RECEIPTS VERIFIED              |
 | Altana account/key links      | BOUNDED V2 CHAIN-97 LIFECYCLE RETAINED                           |
@@ -64,4 +67,4 @@ The judge-facing claim/evidence/missing-evidence map is maintained in [`judge-sc
 
 ## Required final validation
 
-Before submission, the owner must play the retained MP4 once on a separate viewer, confirm narration intelligibility and evidence-link presentation, provide the owner-only form fields, and retain the organizer response. Cross-check every sentence against a live URL, receipt, raw run or explicitly cited methodology. Remove any feature whose judged path is incomplete rather than describing planned work in the present tense. Verify public uptime through 2026-09-23 UTC, mobile/keyboard accessibility, final hostname passkey recovery, agent health, explorer links and exact environment labels.
+Before submission, the owner must play the retained MP4 once on a separate viewer and confirm narration intelligibility/evidence-link presentation; make the submitted source and evidence anonymously reachable (or provide an organizer-approved alternative) and retain the probe; decide whether to close the real main-track activation gap or submit with that limitation explicit; provide every owner-only form field; place public product, Proof Room, Altana wallet/session and evidence links in Additional Notes; submit the official linked form with a response copy; and retain the organizer response. Cross-check every sentence against a live URL, receipt, raw run or explicitly cited methodology. Remove any feature whose judged path is incomplete rather than describing planned work in the present tense. Verify public uptime through 2026-09-23 UTC, mobile/keyboard accessibility, final hostname passkey recovery, agent health, explorer links and exact environment labels.

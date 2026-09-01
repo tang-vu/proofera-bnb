@@ -55,6 +55,12 @@ describe("Proof room", () => {
     }
     expect(html).toContain("Finalized paid hire receipts 2");
     expect(html).toContain("Finalized paid hire receipts 1");
+    expect(html).toContain("What the official page requires — and what remains.");
+    expect(html).toContain("readyForJudging=false and activation=unavailable");
+    expect(html).toContain("Build the Era Hackathon Registration");
+    expect(html).toContain("PancakeSwap, AltLayer, TermiX, Not sure");
+    expect(html).toContain("No — repository observed private");
+    expect(html).not.toContain("https://github.com/tang-vu/proofera-bnb/blob/");
   });
 
   it("does not render successful receipt or submission claims from the incomplete ledger", () => {

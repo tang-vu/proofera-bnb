@@ -83,6 +83,27 @@ test("a verified gate requires its full final-evidence kind set and final paths"
     () => validateSubmissionReadiness(preparationAsFinal),
     /SUBMISSION_READINESS_VERIFIED_PATH_INVALID/u
   );
+
+  const submissionWithoutJourneyAndSource = structuredClone(manifest);
+  const submissionGate = submissionWithoutJourneyAndSource.gates.at(-1);
+  submissionGate.state = "verified";
+  submissionGate.blockers = [];
+  submissionGate.artifacts = [
+    {
+      kind: "final_copy",
+      path: "evidence/submission/final/final-copy.json",
+      sha256: "0".repeat(64)
+    },
+    {
+      kind: "hackathon_entry",
+      path: "evidence/submission/final/hackathon-entry.json",
+      sha256: "1".repeat(64)
+    }
+  ];
+  assert.throws(
+    () => validateSubmissionReadiness(submissionWithoutJourneyAndSource),
+    /SUBMISSION_READINESS_VERIFIED_EVIDENCE_INCOMPLETE/u
+  );
 });
 
 test("artifact bytes are digest-bound", async () => {

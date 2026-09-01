@@ -3,7 +3,7 @@ import { execFileSync } from "node:child_process";
 import { lstat, readFile, realpath } from "node:fs/promises";
 import { isAbsolute, relative, resolve, sep } from "node:path";
 
-export const SUBMISSION_READINESS_SCHEMA_VERSION = "proofera-submission-readiness-v1.1.0";
+export const SUBMISSION_READINESS_SCHEMA_VERSION = "proofera-submission-readiness-v1.2.0";
 
 const GATE_DEFINITIONS = Object.freeze([
   {
@@ -48,7 +48,7 @@ const GATE_DEFINITIONS = Object.freeze([
   {
     gateId: "submission",
     incompleteStates: ["draft"],
-    requiredKinds: ["final_copy", "hackathon_entry"]
+    requiredKinds: ["final_copy", "hackathon_entry", "main_track_journey", "public_source_probe"]
   }
 ]);
 

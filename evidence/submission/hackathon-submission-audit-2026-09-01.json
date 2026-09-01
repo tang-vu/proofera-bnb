@@ -1,0 +1,140 @@
+{
+  "schemaVersion": "proofera-hackathon-submission-audit-v1.0.0",
+  "observedAtUtc": "2026-09-01T06:13:37.616Z",
+  "classification": {
+    "boundedObservationOnly": true,
+    "organizerReceipt": false,
+    "submissionCompleted": false,
+    "rawResponseRetained": false,
+    "freshRevalidationRequired": true
+  },
+  "officialPage": {
+    "url": "https://www.bnbchain.org/en/hackathons/smart-money-era",
+    "httpStatus": 200,
+    "serverTimeUtc": "2026-09-01T06:13:37.616Z",
+    "cmsUpdatedAtUtc": "2026-08-19T09:39:39.000Z",
+    "title": "The Smart Money Era: Build the Era",
+    "status": "Ongoing",
+    "startsAtUtc": "2026-08-05T12:00:00Z",
+    "endsAtUtc": "2026-09-09T12:00:00Z",
+    "timezone": "UTC +0",
+    "mainPrizeUsd": 30000,
+    "submitProjectUrl": "https://forms.gle/9g9XPNFwnYaHAz9L8",
+    "mainTrack": {
+      "categories": [
+        "Rebalancing",
+        "Grid Trading",
+        "Yield Optimisation",
+        "Health Factor Monitoring"
+      ],
+      "journey": ["land", "find", "understand", "activate"],
+      "functionalAndPublicDuringJudgingRequired": true,
+      "agentsLiveOnBscRequired": true
+    },
+    "altana": {
+      "testnetAccepted": true,
+      "walletAddressesRequestedInSubmission": true,
+      "requirements": [
+        "agent-owned Altana wallet",
+        "call allowlist, spend cap, and expiry",
+        "Keystore registration",
+        "session-key onchain transaction",
+        "in-product permission inspection and revoke"
+      ]
+    },
+    "termix": {
+      "reportTaskPairsMinimum": 3,
+      "highStakesTaskMinimum": 1,
+      "requiredMeasures": ["time", "cost", "output quality", "actual outputs"],
+      "weightsPercent": {
+        "serviceValue": 30,
+        "provenAgentAdvantage": 30,
+        "highStakesAndTrackRecord": 20,
+        "marketplaceQuality": 20
+      }
+    },
+    "pancakeSwap": {
+      "realBenefitRequired": true,
+      "prizeCake": 1000
+    }
+  },
+  "linkedForm": {
+    "title": "Build the Era Hackathon Registration",
+    "shortUrl": "https://forms.gle/9g9XPNFwnYaHAz9L8",
+    "resolvedUrl": "https://docs.google.com/forms/d/e/1FAIpQLSdFb30r24sZcFJVDbMqXNJ1_45BJHanc7eFqwUniScDYZfX9A/viewform?usp=send_form",
+    "httpStatus": 200,
+    "availabilityJudgingEndDateUtc": "2026-09-23",
+    "fields": [
+      "Email",
+      "Full Name",
+      "Email Address",
+      "Telegram Handle",
+      "X (Twitter) Handle",
+      "Discord Handle (Optional)",
+      "How did you hear about this hackathon?",
+      "Country and Timezone",
+      "Are you registering as a solo builder or a team?",
+      "Number of Teammates",
+      "Teammate Names, Emails, and Roles",
+      "Project Name",
+      "One-Line Pitch",
+      "Project Description",
+      "Sub-prize tracks you are interested in (Select all that apply)",
+      "Project GitHub Repo Link",
+      "Prototype Stage",
+      "BSC/EVM Experience Level",
+      "Check all areas you are comfortable with",
+      "Are you interested in mentorship during the build period?",
+      "Please confirm your availability for the build period and judging dates",
+      "Please give us a wallet address in case you win",
+      "Additional Notes (Optional)",
+      "Terms of Participation"
+    ],
+    "trackOptions": ["PancakeSwap", "AltLayer", "TermiX", "Not sure"],
+    "projectFieldsPresent": true,
+    "githubFieldPresent": true,
+    "payoutWalletFieldPresent": true,
+    "additionalNotesFieldPresent": true,
+    "publicProductFieldPresent": false,
+    "demoFieldPresent": false,
+    "evidenceFieldPresent": false,
+    "altanaTrackOptionPresent": false
+  },
+  "candidateObservation": {
+    "publicProduct": {
+      "url": "https://proofera.tangvu.dev",
+      "build": "9f32dda65d8123f6f37a58fa869daef6340fd1be",
+      "routeHttpStatus": {
+        "home": 200,
+        "marketplace": 200,
+        "studio": 200,
+        "sessionControl": 200,
+        "missionControl": 200,
+        "proofRoom": 200,
+        "health": 200,
+        "readiness": 503
+      },
+      "readiness": {
+        "status": "not_ready",
+        "readyForJudging": false,
+        "readyForActivation": false,
+        "activation": "unavailable"
+      }
+    },
+    "publicAgentCardHttpStatus": {
+      "lpRebalancing": 200,
+      "gridTrading": 200,
+      "yieldOptimisation": 200,
+      "healthFactorMonitoring": 200
+    },
+    "sourceRepository": {
+      "url": "https://github.com/tang-vu/proofera-bnb",
+      "authenticatedVisibility": "PRIVATE",
+      "anonymousPageHttpStatus": 404,
+      "anonymousApiHttpStatus": 404,
+      "anonymousRawReadmeHttpStatus": 404,
+      "anonymousRawFinalVideoHttpStatus": 404,
+      "publicSourceVerified": false
+    }
+  }
+}

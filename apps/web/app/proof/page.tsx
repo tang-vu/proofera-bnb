@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import registrationEvidence from "../../../../evidence/submission/final/agent-registration.json";
 import readiness from "../../../../evidence/submission/readiness.json";
+import { hackathonSubmissionAudit } from "../../lib/hackathon-submission-audit";
 import { publicBuildIdentifier } from "../../lib/runtime-readiness";
 import {
   verifiedReferenceEvidence,
@@ -49,7 +50,12 @@ function humanize(value: string): string {
 }
 
 function sourceUrl(build: string, path: string): string | null {
-  if (!/^[0-9a-f]{40}$/u.test(build)) return null;
+  if (
+    !hackathonSubmissionAudit.candidateObservation.sourceRepository.publicSourceVerified ||
+    !/^[0-9a-f]{40}$/u.test(build)
+  ) {
+    return null;
+  }
   return `https://github.com/tang-vu/proofera-bnb/blob/${build}/${path}`;
 }
 
@@ -65,6 +71,44 @@ function formatNanoseconds(value: string): string {
 export default function ProofRoomPage() {
   const build = publicBuildIdentifier();
   const verifiedGateCount = readiness.gates.filter((gate) => gate.state === "verified").length;
+  const official = hackathonSubmissionAudit.officialPage;
+  const linkedForm = hackathonSubmissionAudit.linkedForm;
+  const candidate = hackathonSubmissionAudit.candidateObservation;
+
+  const trackAudit = [
+    {
+      title: "Main track",
+      state: "Blocked",
+      positive: false,
+      evidence:
+        "Four public analyzer endpoints, equal category dossiers, live discovery and bounded analysis are reachable.",
+      gap: "The observed build reports readyForJudging=false and activation=unavailable. BSC-testnet identity publication does not resolve the official live-on-BSC or end-to-end activation requirement."
+    },
+    {
+      title: "Altana",
+      state: "Bounded lifecycle",
+      positive: true,
+      evidence:
+        "A chain-97 grant, allowlist, spend cap, expiry, session action, revoke and final authority absence are receipt-backed and shown in-product.",
+      gap: "The action was PTA Approval(..., 0), historical authority is single-provider, and organizer qualification is not inferred."
+    },
+    {
+      title: "TermiX",
+      state: "Report retained",
+      positive: true,
+      evidence:
+        "Three agent/manual pairs include time, explicit cost, output quality and attached bounded outputs; trading/security-relevant work is present.",
+      gap: "Both lanes scored 100/100 and timing is mixed. No universal agent advantage or live trading track record is claimed."
+    },
+    {
+      title: "PancakeSwap",
+      state: "Benefit not observed",
+      positive: false,
+      evidence:
+        "Finalized testnet approval/mint receipts and a two-provider before/after position observation are retained.",
+      gap: "Price, liquidity and fees were unchanged. The official real-benefit requirement remains unmet by this controlled outcome."
+    }
+  ] as const;
 
   return (
     <main id="main-content" tabIndex={-1}>
@@ -113,6 +157,14 @@ export default function ProofRoomPage() {
               <dt>Submission-ready</dt>
               <dd className={readiness.readyForSubmission ? styles.verified : styles.incomplete}>
                 {readiness.readyForSubmission ? "Verified" : "No — gates remain open"}
+              </dd>
+            </div>
+            <div>
+              <dt>Anonymous source access</dt>
+              <dd className={styles.incomplete}>
+                {candidate.sourceRepository.publicSourceVerified
+                  ? "Verified"
+                  : "No — repository observed private"}
               </dd>
             </div>
           </dl>
@@ -221,6 +273,68 @@ export default function ProofRoomPage() {
           Raw outputs, paired report, and adjudication remain digest-bound in the closure ledger
           below.
         </p>
+      </section>
+
+      <section
+        className={`shell section ${styles.section}`}
+        aria-labelledby="official-audit-heading"
+      >
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">OFFICIAL TRACK ALIGNMENT · BOUNDED OBSERVATION</span>
+            <h2 id="official-audit-heading">What the official page requires — and what remains.</h2>
+          </div>
+          <p>
+            Source checked at{" "}
+            {new Date(official.serverTimeUtc).toLocaleString("en-GB", {
+              timeZone: "UTC"
+            })}{" "}
+            UTC. The CMS had last changed at{" "}
+            {new Date(official.cmsUpdatedAtUtc).toLocaleString("en-GB", { timeZone: "UTC" })} UTC.
+            This snapshot can age and is not an organizer eligibility decision.
+          </p>
+        </div>
+        <div className={styles.agentGrid}>
+          {trackAudit.map((track) => (
+            <article className={styles.agentCard} key={track.title}>
+              <div className={styles.cardHeading}>
+                <h3>{track.title}</h3>
+                <span className={track.positive ? styles.available : styles.incomplete}>
+                  {track.state}
+                </span>
+              </div>
+              <p>
+                <strong>Current evidence:</strong> {track.evidence}
+              </p>
+              <p>
+                <strong>Boundary:</strong> {track.gap}
+              </p>
+            </article>
+          ))}
+        </div>
+        <div className={styles.blocker} role="status">
+          <strong>Official entry flow and source-access blockers</strong>
+          <ul>
+            <li>
+              The CMS submit-project URL resolves to “{linkedForm.title}” and asks for project name,
+              pitch, description and GitHub link. It is the official linked entry form, even though
+              it has no public-product, demo or evidence field.
+            </li>
+            <li>
+              Its track options are {linkedForm.trackOptions.join(", ")}; Altana is absent despite
+              remaining on the official track page, so the Altana request and public testnet wallet
+              evidence belong in Additional Notes.
+            </li>
+            <li>
+              Anonymous GitHub page, API and raw README probes returned 404 while authenticated
+              visibility was PRIVATE. Artifact paths are therefore rendered without broken public
+              GitHub links until a fresh public-source probe succeeds.
+            </li>
+          </ul>
+          <a href={official.url} rel="noopener noreferrer" target="_blank">
+            Open the official hackathon page <span aria-hidden="true">↗</span>
+          </a>
+        </div>
       </section>
 
       <section className={`shell section ${styles.section}`} aria-labelledby="closure-heading">

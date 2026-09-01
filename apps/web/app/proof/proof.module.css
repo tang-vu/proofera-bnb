@@ -229,6 +229,10 @@
   font-size: 12px;
 }
 
+.agentCard > p + p {
+  margin-top: 12px;
+}
+
 .available,
 .verified,
 .incomplete {
@@ -331,6 +335,14 @@
   margin: 8px 0 0;
   padding-left: 18px;
   line-height: 1.55;
+}
+
+.blocker > a {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--signal);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .gate details {

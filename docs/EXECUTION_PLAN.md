@@ -1,12 +1,12 @@
 # ProofEra execution plan
 
-Updated: 2026-08-31
+Updated: 2026-09-01
 Deadline: 2026-09-09 12:00 UTC
 Operating principle: complete and verify the highest-value unblocked judge journey before expanding breadth.
 
 ## Winner path
 
-The official page was rechecked on 2026-08-16. The main prize remains winner-takes-all: $30,000 equivalent plus adoption as the canonical BNB Agent Studio marketplace. The explicit rubric is the end-to-end journey, decision-useful live data, and equal first-class coverage of all four agent categories. Work is therefore ordered as follows:
+The official page, CMS entry URL and linked form were rechecked on 2026-09-01. The main prize remains winner-takes-all: $30,000 equivalent plus adoption as the canonical BNB Agent Studio marketplace. The explicit rubric is the end-to-end journey, decision-useful live data, and equal first-class coverage of all four agent categories. Work is therefore ordered as follows:
 
 1. Make the zero-instruction `land → choose a job → discover → understand → activate` journey coherent across all four categories.
 2. Deploy four durable Agent Studio endpoints and record BSC registrations before treating deeper LP execution as judge-eligible breadth.
@@ -57,6 +57,16 @@ one video and one audio stream plus a separate-process copy/hash/full-decode/six
 Human-perceived narration quality, independent review and the organizer receipt remain separate
 external transitions.
 
+The 2026-09-01 submission audit corrected two avoidable release assumptions. First, the official CMS
+names the current Google Form as `submit_project_url`; it is the entry flow to use now, with public
+product, evidence and the omitted Altana request carried in Additional Notes. Second, authenticated
+GitHub visibility is `PRIVATE` and anonymous page/API/raw probes return `404`, so the source and
+final MP4 are not judge-accessible. The readiness schema is now v1.2.0: a verified submission gate
+requires final copy, the official entry, a real main-track journey artifact and a public-source
+probe. Current `readyForJudging=false` and `activation=unavailable` remain explicit blockers. The
+retained [audit](../evidence/submission/hackathon-submission-audit-2026-09-01.json) is a bounded
+observation, not a submission or organizer eligibility decision.
+
 ## Status legend
 
 - `DONE`: acceptance criteria and evidence exist.
@@ -81,7 +91,7 @@ Evidence:
 - [`requirements-traceability.md`](./requirements-traceability.md)
 - Root [`AGENTS.md`](../AGENTS.md)
 
-Completed evidence includes the exact Studio CLI compatibility/scaffold/doctor spike, dependency compatibility checks, Venus/Lista reads, deployment constraints and verification requirements. The implementation record was updated on 2026-08-16; official competition facts were last checked on 2026-08-16. Fast-moving packages and official competition pages remain re-check items before deployment/submission rather than blockers to implementation.
+Completed evidence includes the exact Studio CLI compatibility/scaffold/doctor spike, dependency compatibility checks, Venus/Lista reads, deployment constraints and verification requirements. Official competition facts, the CMS entry URL, linked form, candidate readiness and source visibility were last checked on 2026-09-01. Fast-moving packages and official competition pages remain re-check items before deployment/submission rather than blockers to implementation.
 
 ## Milestone 1 — winning marketplace journey (`ACTIVE`)
 

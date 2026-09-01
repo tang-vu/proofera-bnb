@@ -432,6 +432,9 @@ export default async function MarketplacePage({ searchParams }: MarketplacePageP
                   <strong>Current marketplace eligibility:</strong> false
                 </p>
                 <div className="agent-card-actions">
+                  <Link className="text-link" href={`/studio?agent=${reference.category}`}>
+                    Run live analyzer
+                  </Link>
                   <Link className="text-link" href={`/reference-analyzers/${reference.category}`}>
                     Open {reference.name} dossier
                   </Link>
