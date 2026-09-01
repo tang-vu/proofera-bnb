@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import registrationEvidence from "../../../../evidence/submission/final/agent-registration.json";
 import readiness from "../../../../evidence/submission/readiness.json";
 import { hackathonSubmissionAudit } from "../../lib/hackathon-submission-audit";
+import { publicSourceAccess } from "../../lib/public-source-access";
 import { publicBuildIdentifier } from "../../lib/runtime-readiness";
 import {
   verifiedReferenceEvidence,
@@ -50,13 +51,10 @@ function humanize(value: string): string {
 }
 
 function sourceUrl(build: string, path: string): string | null {
-  if (
-    !hackathonSubmissionAudit.candidateObservation.sourceRepository.publicSourceVerified ||
-    !/^[0-9a-f]{40}$/u.test(build)
-  ) {
-    return null;
-  }
-  return `https://github.com/tang-vu/proofera-bnb/blob/${build}/${path}`;
+  const sourceCommit = /^[0-9a-f]{40}$/u.test(build)
+    ? build
+    : publicSourceAccess.repository.observedCommit;
+  return `https://github.com/tang-vu/proofera-bnb/blob/${sourceCommit}/${path}`;
 }
 
 function formatNanoseconds(value: string): string {
@@ -73,16 +71,15 @@ export default function ProofRoomPage() {
   const verifiedGateCount = readiness.gates.filter((gate) => gate.state === "verified").length;
   const official = hackathonSubmissionAudit.officialPage;
   const linkedForm = hackathonSubmissionAudit.linkedForm;
-  const candidate = hackathonSubmissionAudit.candidateObservation;
 
   const trackAudit = [
     {
       title: "Main track",
-      state: "Blocked",
-      positive: false,
+      state: "Analysis activation live",
+      positive: true,
       evidence:
-        "Four public analyzer endpoints, equal category dossiers, live discovery and bounded analysis are reachable.",
-      gap: "The observed build reports readyForJudging=false and activation=unavailable. BSC-testnet identity publication does not resolve the official live-on-BSC or end-to-end activation requirement."
+        "All four categories have a direct Marketplace-to-Studio handoff. Studio invokes the selected public A2A agent and returns a run ID, observed time, latency, methodology and bounded result.",
+      gap: "This is read-only analysis-service activation on BSC testnet, not autonomous capital execution. Main-track treatment of testnet identities and the missing capital path is not inferred."
     },
     {
       title: "Altana",
@@ -161,11 +158,7 @@ export default function ProofRoomPage() {
             </div>
             <div>
               <dt>Anonymous source access</dt>
-              <dd className={styles.incomplete}>
-                {candidate.sourceRepository.publicSourceVerified
-                  ? "Verified"
-                  : "No — repository observed private"}
-              </dd>
+              <dd className={styles.verified}>Verified — repository and demo return 200</dd>
             </div>
           </dl>
         </aside>
@@ -313,7 +306,7 @@ export default function ProofRoomPage() {
           ))}
         </div>
         <div className={styles.blocker} role="status">
-          <strong>Official entry flow and source-access blockers</strong>
+          <strong>Official entry flow and remaining product boundaries</strong>
           <ul>
             <li>
               The CMS submit-project URL resolves to “{linkedForm.title}” and asks for project name,
@@ -326,9 +319,13 @@ export default function ProofRoomPage() {
               evidence belong in Additional Notes.
             </li>
             <li>
-              Anonymous GitHub page, API and raw README probes returned 404 while authenticated
-              visibility was PRIVATE. Artifact paths are therefore rendered without broken public
-              GitHub links until a fresh public-source probe succeeds.
+              A later anonymous source probe at{" "}
+              {new Date(publicSourceAccess.observedAtUtc).toLocaleString("en-GB", {
+                timeZone: "UTC"
+              })}{" "}
+              UTC returned 200 for the repository page, API, raw README, exact commit, demo page and
+              raw 37,636,488-byte MP4. The earlier private/404 audit remains historical; source
+              artifact links are now restored.
             </li>
           </ul>
           <a href={official.url} rel="noopener noreferrer" target="_blank">

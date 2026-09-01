@@ -47,13 +47,21 @@ test("serves the finance UI with clickjacking and content-type defenses", async 
   expect(headers["permissions-policy"]).toContain("payment=()");
 });
 
-test("readiness does not claim the unimplemented activation handoff", async ({ request }) => {
+test("readiness separates implemented analysis activation from unavailable capital execution", async ({
+  request
+}) => {
   const response = await request.get("/api/readiness");
 
   expect(response.status()).toBe(503);
   expect(response.headers()["cache-control"]).toBe("no-store");
   await expect(response.json()).resolves.toMatchObject({
-    capabilities: { activation: "unavailable" },
+    capabilities: {
+      activation: "analysis_only",
+      analysisActivation: "implemented",
+      capitalExecution: "unavailable"
+    },
+    readyForAnalysisActivation: true,
+    readyForCapitalActivation: false,
     readyForActivation: false,
     readyForJudging: false,
     status: "not_ready"

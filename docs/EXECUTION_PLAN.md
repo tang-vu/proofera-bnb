@@ -59,11 +59,12 @@ external transitions.
 
 The 2026-09-01 submission audit corrected two avoidable release assumptions. First, the official CMS
 names the current Google Form as `submit_project_url`; it is the entry flow to use now, with public
-product, evidence and the omitted Altana request carried in Additional Notes. Second, authenticated
-GitHub visibility is `PRIVATE` and anonymous page/API/raw probes return `404`, so the source and
-final MP4 are not judge-accessible. The readiness schema is now v1.2.0: a verified submission gate
+product, evidence and the omitted Altana request carried in Additional Notes. Second, the original
+audit observed private/404 source access; the later owner visibility change and anonymous six-target
+`200` probe supersede that access state without rewriting history. The readiness schema is now v1.2.0: a verified submission gate
 requires final copy, the official entry, a real main-track journey artifact and a public-source
-probe. Current `readyForJudging=false` and `activation=unavailable` remain explicit blockers. The
+probe. The current release distinguishes implemented read-only analysis activation from unavailable
+capital execution; `readyForJudging=false` remains explicit. The
 retained [audit](../evidence/submission/hackathon-submission-audit-2026-09-01.json) is a bounded
 observation, not a submission or organizer eligibility decision.
 

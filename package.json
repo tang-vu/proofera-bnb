@@ -17,6 +17,7 @@
     "rehearse:pancake:first-lp:testnet": "node --no-warnings --conditions=react-server --experimental-loader ./scripts/typescript-extension-loader.mjs ./scripts/run-bsc-testnet-pta-wbnb-first-lp.ts --rehearse-read-only-first-lp-chain-97",
     "probe:pancake:first-lp-custody:testnet": "node --no-warnings --conditions=react-server --experimental-loader ./scripts/typescript-extension-loader.mjs ./scripts/run-bsc-testnet-pta-wbnb-first-lp.ts --probe-no-sign-custody-first-lp-chain-97",
     "capture:production:release": "node ./scripts/capture-production-release-evidence.mjs --capture-exact-production-release --source-base-commit",
+    "capture:public:analysis-activation": "pnpm --filter @proofera/web exec node scripts/capture-public-analysis-activation.mjs --capture-public-analysis-activation --source-commit",
     "capture:demo:rehearsal": "node ./scripts/capture-public-demo-rehearsal.mjs --capture-exact-public-demo-rehearsal --source-base-commit",
     "capture:demo:video": "node ./scripts/capture-public-demo-video.mjs --capture-exact-public-demo-video --source-base-commit",
     "generate:demo:narration:mimo": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-mimo-demo-narration.ps1",

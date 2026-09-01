@@ -27,17 +27,17 @@ owner-facing session entry point; /mission-control is the read-only authority an
 
 ## Score and penalty audit
 
-| Track / signal       | Current defensible proof                                                                                                                                                                           | Likely point gain                                                                                | Remaining penalty risk                                                                                                                                            |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Main · functionality | Goal-first landing, four-category marketplace, registered dossiers, LP mandate, one-grant Session Control, verified historical Mission Control, Proof Room, and one controlled testnet LP position | One coherent path now includes an explorer-verifiable Pancake state change                       | The LP write used explicit owner presence and shared test custody; autonomous production activation and independent uptime remain open                            |
-| Main · data quality  | Typed 8004scan ingestion, exact-block Pancake/Venus evidence, explicit freshness/null/unavailable states, source-linked receipts                                                                   | Decision-useful provenance is stronger than counts or self-declared metadata                     | Most strategy performance fields remain unknown; this is honest but weak versus a competitor with current realized outcomes                                       |
-| Main · diversity     | Four public analyzers, five skills, Agent IDs 1825–1828, equal eight-field evidence contracts                                                                                                      | Meets the four-category depth requirement structurally                                           | Grid and yield have no paid hire or execution evidence; category parity is stronger in schema than in track record                                                |
-| Altana               | Real chain-97 grant, scoped call, spend cap, expiry, Keystore authority, session action, revoke, and final authority absence; controls now visible in-product                                      | Directly matches “no human signing every transaction” and user-facing revoke criteria            | Application effect is only Approval(..., 0); historical authority is single-provider; no ERC-8183/x402 bonus                                                      |
-| TermiX · value       | Three finalized paid testnet hires plus three protected paired tasks                                                                                                                               | Demonstrates real commerce and reproducible outputs                                              | Hire receipts do not prove task completion; no public zero-instruction hire control                                                                               |
-| TermiX · advantage   | Three task pairs report time, cost, output, and 100/100 quality for both lanes                                                                                                                     | Complete, bounded report avoids unsupported marketing                                            | Quality parity and mixed timing do not prove a universal advantage; reviewer identity is internal and unauthenticated                                             |
-| TermiX · high stakes | LP decision, permission-security audit, Venus liquidation-risk replay                                                                                                                              | Includes trading/security-relevant tasks                                                         | No realized trading record, win rate, drawdown, or financial outcome                                                                                              |
-| PancakeSwap          | Exact initializer plus approval/mint receipts, dual-provider EIP-1898 post-state, NFT `37109`, zero residual allowance, deterministic baseline, and a 9,104-second controlled outcome              | Authentic Pancake integration includes a controlled position and honest before/after measurement | Price/liquidity were unchanged and fees were zero; no realized benefit or autonomous-agent advantage may be claimed                                               |
-| General engineering  | Strict TypeScript, deterministic tests, secrets scan, architecture diagram, evidence manifests, MIT license, frozen base release, current-build probe and narrated final demo                      | Clean, inspectable, security-aware implementation                                                | Repository is private/anonymous-404; owner playback, entry response, hosted CI billing, dependency/SBOM review and independent uptime/paging evidence remain open |
+| Track / signal       | Current defensible proof                                                                                                                                                                                                 | Likely point gain                                                                                | Remaining penalty risk                                                                                                       |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| Main · functionality | Goal-first landing, four-category marketplace, direct Studio handoff, public A2A analysis activation, one-grant Session Control, verified historical Mission Control, Proof Room, and one controlled testnet LP position | The full read-only service journey is runnable without Agent Studio knowledge                    | Capital execution remains unavailable; BSC-testnet treatment and independent uptime remain organizer/external boundaries     |
+| Main · data quality  | Typed 8004scan ingestion, exact-block Pancake/Venus evidence, explicit freshness/null/unavailable states, source-linked receipts                                                                                         | Decision-useful provenance is stronger than counts or self-declared metadata                     | Most strategy performance fields remain unknown; this is honest but weak versus a competitor with current realized outcomes  |
+| Main · diversity     | Four public analyzers, five skills, Agent IDs 1825–1828, equal eight-field evidence contracts                                                                                                                            | Meets the four-category depth requirement structurally                                           | Grid and yield have no paid hire or execution evidence; category parity is stronger in schema than in track record           |
+| Altana               | Real chain-97 grant, scoped call, spend cap, expiry, Keystore authority, session action, revoke, and final authority absence; controls now visible in-product                                                            | Directly matches “no human signing every transaction” and user-facing revoke criteria            | Application effect is only Approval(..., 0); historical authority is single-provider; no ERC-8183/x402 bonus                 |
+| TermiX · value       | Three finalized paid testnet hires plus three protected paired tasks                                                                                                                                                     | Demonstrates real commerce and reproducible outputs                                              | Hire receipts do not prove task completion; no public zero-instruction hire control                                          |
+| TermiX · advantage   | Three task pairs report time, cost, output, and 100/100 quality for both lanes                                                                                                                                           | Complete, bounded report avoids unsupported marketing                                            | Quality parity and mixed timing do not prove a universal advantage; reviewer identity is internal and unauthenticated        |
+| TermiX · high stakes | LP decision, permission-security audit, Venus liquidation-risk replay                                                                                                                                                    | Includes trading/security-relevant tasks                                                         | No realized trading record, win rate, drawdown, or financial outcome                                                         |
+| PancakeSwap          | Exact initializer plus approval/mint receipts, dual-provider EIP-1898 post-state, NFT `37109`, zero residual allowance, deterministic baseline, and a 9,104-second controlled outcome                                    | Authentic Pancake integration includes a controlled position and honest before/after measurement | Price/liquidity were unchanged and fees were zero; no realized benefit or autonomous-agent advantage may be claimed          |
+| General engineering  | Strict TypeScript, deterministic tests, secrets scan, architecture diagram, evidence manifests, MIT license, public source/raw demo, frozen base release, current-build probe and narrated final demo                    | Clean, inspectable, security-aware implementation                                                | Owner playback, entry response, hosted CI billing, dependency/SBOM review and independent uptime/paging evidence remain open |
 
 ## Changes made to remove avoidable deductions
 
@@ -57,24 +57,26 @@ owner-facing session entry point; /mission-control is the read-only authority an
 - Kept motion on decorative signal/orbit/entrance layers only, with a tested reduced-motion path,
   visible keyboard focus and no 390 px document overflow. Evidence values and incomplete states do
   not animate into stronger claims.
+- Verified anonymous access to the repository, exact commit, raw README and final MP4; restored
+  Proof Room artifact links without relabeling bounded reachability as uptime.
+- Split implemented analysis-service activation from unavailable capital execution in machine
+  readiness and the judge-facing Proof Room.
 
 ## Highest-value next actions
 
-1. Make the submitted source/evidence anonymously reachable or provide an organizer-approved
-   alternative, then retain fresh page/API/raw artifact/video probes.
-2. Close and evidence the official end-to-end activation journey, or keep main-track readiness
-   blocked and the limitation explicit.
-3. Play the retained final MP4 on a separate owner viewer and retain a timestamped intelligibility
+1. Play the retained final MP4 on a separate owner viewer and retain a timestamped intelligibility
    and presentation check without relabeling it as independent review.
-4. Fill the owner-only fields, place product/evidence/Altana wallet links in Additional Notes,
+2. Fill the owner-only fields, place product/evidence/Altana wallet links in Additional Notes,
    submit the official CMS-linked form, request a response copy and retain it.
-5. Add independent uptime/paging evidence if the judging window and remaining time permit.
-6. Add a public hire path only when its payment, task completion, and failure/refund semantics are
-   fully implemented; do not present the retained paid-hire collector as that UX.
+3. Add independent uptime/paging evidence if the judging window and remaining time permit.
+4. Run a preregistered comparable Pancake economic experiment before claiming partner benefit.
+5. Add a capital-bearing public hire path only when its payment, task completion, authority,
+   failure and refund semantics are fully implemented; do not present the retained paid-hire
+   collector as that UX.
 
-Items 1, 3 and 4 require owner or organizer state and are not created by a source commit. Item 2 is
-a real product/evidence gap, not a copy fix. No additional onchain write is required for the
-truthful current read-only demo. Item 6 is a separate product feature.
+Items 1 and 2 require owner or organizer state and are not created by a source commit. Items 4 and 5
+are separate experiments/product features. No additional onchain write is required for the truthful
+current read-only service-activation claim.
 
 ## Explicit non-goals for this release
 

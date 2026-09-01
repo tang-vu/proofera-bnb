@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "proofera-public-source-access-v1.0.0",
+  "observedAtUtc": "2026-09-01T07:27:51.768Z",
+  "classification": {
+    "boundedObservationOnly": true,
+    "organizerReceipt": false,
+    "submissionCompleted": false,
+    "freshRevalidationRequired": true
+  },
+  "repository": {
+    "url": "https://github.com/tang-vu/proofera-bnb",
+    "visibility": "PUBLIC",
+    "defaultBranch": "main",
+    "observedCommit": "7ad4a8ef3f361bcb8e5dae27d516b3e6f27f5641"
+  },
+  "anonymousHeadObservations": [
+    {
+      "name": "repository page",
+      "url": "https://github.com/tang-vu/proofera-bnb",
+      "httpStatus": 200,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "name": "repository API",
+      "url": "https://api.github.com/repos/tang-vu/proofera-bnb",
+      "httpStatus": 200,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "name": "raw README",
+      "url": "https://raw.githubusercontent.com/tang-vu/proofera-bnb/main/README.md",
+      "httpStatus": 200,
+      "contentType": "text/plain; charset=utf-8"
+    },
+    {
+      "name": "observed commit page",
+      "url": "https://github.com/tang-vu/proofera-bnb/commit/7ad4a8ef3f361bcb8e5dae27d516b3e6f27f5641",
+      "httpStatus": 200,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "name": "final demo blob page",
+      "url": "https://github.com/tang-vu/proofera-bnb/blob/main/evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/final/proofera-final-demo.mp4",
+      "httpStatus": 200,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "name": "raw final demo",
+      "url": "https://raw.githubusercontent.com/tang-vu/proofera-bnb/main/evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/final/proofera-final-demo.mp4",
+      "httpStatus": 200,
+      "contentType": "application/octet-stream"
+    }
+  ],
+  "rawFinalDemo": {
+    "contentLengthBytes": 37636488,
+    "etag": "34c470c1709fad87d5d4714f7809916ce23f0118948dde3770b8b68dd51b64e4"
+  },
+  "limitations": [
+    "Anonymous HEAD requests prove bounded reachability at the observation time, not continued uptime or organizer access policy.",
+    "The raw video HEAD request did not download or decode the media; separate retained playback evidence owns that claim.",
+    "Repository visibility does not complete the official form or establish hackathon eligibility."
+  ]
+}

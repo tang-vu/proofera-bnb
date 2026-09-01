@@ -193,10 +193,9 @@
     {
       "gateId": "submission",
       "state": "draft",
-      "claim": "The official CMS-linked hackathon form is reachable and contains project-entry fields, but no ProofEra response is retained. The observed public build reports readyForJudging=false and activation=unavailable, while the GitHub repository is private and returns 404 to anonymous page, API, README and video requests. No completed entry, public-source observation or end-to-end main-track activation evidence is claimed.",
+      "claim": "The official CMS-linked hackathon form is reachable and contains project-entry fields, but no ProofEra response is retained. A fresh anonymous probe verifies public access to the repository, exact commit, raw README and final demo. The current release implements direct read-only analysis-service activation for all four categories while capital execution and judging readiness remain false. No completed entry or organizer decision is claimed.",
       "blockers": [
-        "Close and retain the official land-to-find-to-understand-to-activate journey for a genuinely executable curated agent; the current read-only Studio and historical receipts do not satisfy that missing product transition.",
-        "Make the submitted source and evidence anonymously reachable, or provide an organizer-approved accessible alternative, then retain a fresh anonymous-access probe; the current GitHub repository is private.",
+        "Deploy the exact release and retain a public land-to-find-to-understand-to-run-to-inspect analysis-service journey; keep capital execution and the organizer's treatment of BSC-testnet identities explicit.",
         "Fill the owner-only identity, team, contact, experience, availability and payout-wallet fields; include the public Altana testnet wallet/session evidence in Additional Notes because the form omits Altana from its track options.",
         "Freeze the evidence-backed copy, submit the official CMS-linked form, request a response copy and retain the organizer response or authoritative submission record."
       ],

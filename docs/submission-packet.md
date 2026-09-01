@@ -4,13 +4,13 @@ Updated: 2026-09-01. The canonical CMS currently names the linked Google Form as
 `submit_project_url`. This packet maps that exact one-page form and prepares every non-personal
 field. It is not an organizer receipt or evidence that ProofEra was submitted.
 
-Two hard blockers must remain visible:
+Remaining product and owner boundaries must stay visible:
 
-1. `https://github.com/tang-vu/proofera-bnb` is currently private; anonymous page, API, raw README
-   and raw demo requests returned `404`. Do not call it public until a fresh anonymous probe passes.
-2. The observed public build reports `readyForJudging=false`, `readyForActivation=false` and
-   `activation=unavailable`. Four read-only analyzers do not complete the official main-track
-   activation journey.
+1. Anonymous source access is now verified: repository page/API, raw README, exact commit, demo page
+   and raw 37,636,488-byte MP4 returned `200`. This bounded probe is not uptime or submission proof.
+2. The release implements direct analysis-service activation across all four categories. It remains
+   read-only: capital execution and judging readiness are false, and organizer treatment of BSC
+   testnet identities is not inferred.
 
 Personal contact fields and the prize-payment wallet remain owner-only inputs. The public Altana
 testnet wallet/session addresses below are qualification evidence, not a payout-wallet suggestion.
@@ -34,7 +34,7 @@ testnet wallet/session addresses below are qualification evidence, not a payout-
 | One-Line Pitch                         | `ProofEra helps users hire BNB Chain DeFi agents by verifiable evidence, bounded authority and receipt-backed revocation—not promises.` |
 | Project Description                    | Use the prepared copy below                                                                                                             |
 | Sub-prize tracks                       | Select `PancakeSwap`, `AltLayer`, and `TermiX`; request `Best Built with Altana` in Additional Notes because the form omits it          |
-| Project GitHub Repo Link               | `https://github.com/tang-vu/proofera-bnb` **only after anonymous access succeeds**                                                      |
+| Project GitHub Repo Link               | `https://github.com/tang-vu/proofera-bnb`                                                                                               |
 | Prototype Stage                        | `Working MVP`                                                                                                                           |
 | BSC/EVM Experience Level               | **OWNER INPUT**                                                                                                                         |
 | Comfortable areas                      | **OWNER INPUT**                                                                                                                         |
@@ -66,8 +66,7 @@ to retained evidence. Missing evidence stays missing.
 
 ## Additional Notes — prepared text
 
-Paste only after the repository/evidence links are anonymously reachable and the owner has reviewed
-every sentence:
+Paste only after every public link is rechecked and the owner has reviewed every sentence:
 
 > Public product: https://proofera.tangvu.dev
 >
@@ -99,25 +98,24 @@ every sentence:
 
 ## Evidence links to recheck before entry
 
-| Asset                 | Path or URL                                                                                                                                                                                   | Current access state                                                        |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| Public product        | https://proofera.tangvu.dev                                                                                                                                                                   | Public; activation/readiness still false                                    |
-| Proof Room            | https://proofera.tangvu.dev/proof                                                                                                                                                             | Public build `9f32dda`; source update requires separate deploy approval     |
-| Source repository     | https://github.com/tang-vu/proofera-bnb                                                                                                                                                       | **Private / anonymous 404 blocker**                                         |
-| Final narrated demo   | `evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/final/proofera-final-demo.mp4`                                                                                      | Retained locally/Git; not anonymously reachable while repository is private |
-| Demo manifests        | `evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/`                                                                                                                   | Same source-access blocker                                                  |
-| TermiX final bundle   | `evidence/submission/final/termix/6d1adf3c948e49be7d9d42332df04904fdd43e3a/`                                                                                                                  | Same source-access blocker                                                  |
-| Altana lifecycle      | `evidence/submission/final/altana-lifecycle.json`                                                                                                                                             | Repository copy private; public explorer links above are reachable          |
-| Pancake controlled LP | `evidence/onchain/bsc-testnet-pta-wbnb-first-lp-eed9c32a107b57735f45bd6246d967cb12fbb1579a05faa9f17e0ead46187d01.json` and `evidence/pancake/runs/pta-wbnb-outcomes/127841040-127861271.json` | Repository copies private; transaction hashes remain public on BscScan      |
+| Asset                 | Path or URL                                                                                                                                                                                   | Current access state                                                    |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Public product        | https://proofera.tangvu.dev                                                                                                                                                                   | Public; activation/readiness still false                                |
+| Proof Room            | https://proofera.tangvu.dev/proof                                                                                                                                                             | Public build `9f32dda`; source update requires separate deploy approval |
+| Source repository     | https://github.com/tang-vu/proofera-bnb                                                                                                                                                       | Public; page/API/raw README/exact commit returned `200`                 |
+| Final narrated demo   | `evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/final/proofera-final-demo.mp4`                                                                                      | Public blob/raw endpoints returned `200`; raw length 37,636,488 bytes   |
+| Demo manifests        | `evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/`                                                                                                                   | Public repository path                                                  |
+| TermiX final bundle   | `evidence/submission/final/termix/6d1adf3c948e49be7d9d42332df04904fdd43e3a/`                                                                                                                  | Public repository path                                                  |
+| Altana lifecycle      | `evidence/submission/final/altana-lifecycle.json`                                                                                                                                             | Public repository copy and explorer links are reachable                 |
+| Pancake controlled LP | `evidence/onchain/bsc-testnet-pta-wbnb-first-lp-eed9c32a107b57735f45bd6246d967cb12fbb1579a05faa9f17e0ead46187d01.json` and `evidence/pancake/runs/pta-wbnb-outcomes/127841040-127861271.json` | Public repository copies; transaction hashes remain public on BscScan   |
 
 ## Owner completion order
 
 1. Play the retained MP4 in a separate viewer; confirm narration intelligibility, scene order and
    evidence-link presentation, then retain the timestamp as owner review only.
-2. Make source/evidence anonymously reachable or obtain organizer approval for another accessible
-   host. Re-run anonymous page, API, README, artifact and video checks.
-3. Decide whether to implement and evidence a real main-track activation journey. If not, keep the
-   read-only limitation explicit and do not mark submission readiness green.
+2. Re-run anonymous repository/API/README/artifact/video checks immediately before form submission.
+3. Confirm the retained public analysis-activation capture for all four categories while keeping
+   capital execution, current-market evidence and testnet eligibility boundaries explicit.
 4. Recheck the official page/form for changes, fill every owner-only field, select PancakeSwap,
    AltLayer and TermiX, and request Altana in Additional Notes.
 5. Keep the payout wallet distinct from testnet evidence addresses unless the owner intentionally

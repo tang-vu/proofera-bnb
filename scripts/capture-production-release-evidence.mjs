@@ -241,10 +241,15 @@ async function captureHttp(sourceCommit) {
   const readinessBody = exactJson(readiness.bytes, "PRODUCTION_RELEASE_READINESS_JSON_INVALID");
   if (
     readinessBody?.build !== sourceCommit ||
+    readinessBody?.schemaVersion !== "2" ||
     readinessBody?.status !== "not_ready" ||
+    readinessBody?.readyForAnalysisActivation !== true ||
+    readinessBody?.readyForCapitalActivation !== false ||
     readinessBody?.readyForActivation !== false ||
     readinessBody?.readyForJudging !== false ||
-    readinessBody?.capabilities?.activation !== "unavailable"
+    readinessBody?.capabilities?.activation !== "analysis_only" ||
+    readinessBody?.capabilities?.analysisActivation !== "implemented" ||
+    readinessBody?.capabilities?.capitalExecution !== "unavailable"
   ) {
     fail("PRODUCTION_RELEASE_READINESS_HTTP_INVALID");
   }
@@ -252,6 +257,10 @@ async function captureHttp(sourceCommit) {
     httpObservation("marketplace-readiness", readiness, {
       build: readinessBody.build,
       activation: readinessBody.capabilities.activation,
+      analysisActivation: readinessBody.capabilities.analysisActivation,
+      capitalExecution: readinessBody.capabilities.capitalExecution,
+      readyForAnalysisActivation: readinessBody.readyForAnalysisActivation,
+      readyForCapitalActivation: readinessBody.readyForCapitalActivation,
       readyForActivation: readinessBody.readyForActivation,
       readyForJudging: readinessBody.readyForJudging,
       status: readinessBody.status

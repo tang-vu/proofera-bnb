@@ -8,6 +8,7 @@ import {
 
 export const PROOFERA_SERVICE_NAME = "proofera-marketplace" as const;
 export const RUNTIME_STATUS_SCHEMA_VERSION = "1" as const;
+export const READINESS_STATUS_SCHEMA_VERSION = "2" as const;
 
 const buildIdentifierSchema = z
   .string()
@@ -17,7 +18,7 @@ const buildIdentifierSchema = z
   .regex(/^[A-Za-z0-9._-]+$/);
 
 export type RuntimeReadinessReasonCode =
-  | "ACTIVATION_PATH_UNAVAILABLE"
+  | "CAPITAL_ACTIVATION_UNAVAILABLE"
   | "BUILD_IDENTITY_INVALID"
   | "DATA_MODE_INVALID"
   | "PASSKEY_BOUNDARY_INVALID"
@@ -29,26 +30,32 @@ export type RuntimeReadinessEvaluation = {
     | {
         readonly build: string;
         readonly capabilities: {
-          readonly activation: "unavailable";
+          readonly activation: "analysis_only";
+          readonly analysisActivation: "implemented";
           readonly bscRpc: "configured_unprobed";
           readonly listaYieldReads: "configured_unprobed";
           readonly marketplacePublication: "configured_unprobed";
           readonly pancakePositionReads: "configured_unprobed";
           readonly passkeyBoundary: "configured";
+          readonly capitalExecution: "unavailable";
           readonly registryReads: "configured_unprobed";
           readonly venusHealthReads: "configured_unprobed";
         };
+        readonly readyForAnalysisActivation: true;
+        readonly readyForCapitalActivation: false;
         readonly readyForActivation: false;
         readonly readyForJudging: false;
-        readonly schemaVersion: typeof RUNTIME_STATUS_SCHEMA_VERSION;
+        readonly schemaVersion: typeof READINESS_STATUS_SCHEMA_VERSION;
         readonly service: typeof PROOFERA_SERVICE_NAME;
         readonly status: "not_ready";
       }
     | {
         readonly build: string;
+        readonly readyForAnalysisActivation: false;
+        readonly readyForCapitalActivation: false;
         readonly readyForActivation: false;
         readonly readyForJudging: false;
-        readonly schemaVersion: typeof RUNTIME_STATUS_SCHEMA_VERSION;
+        readonly schemaVersion: typeof READINESS_STATUS_SCHEMA_VERSION;
         readonly service: typeof PROOFERA_SERVICE_NAME;
         readonly status: "misconfigured";
       };
@@ -77,14 +84,16 @@ export function publicBuildIdentifier(
 
 function misconfigured(
   environment: Readonly<Record<string, string | undefined>>,
-  reasonCode: Exclude<RuntimeReadinessReasonCode, "ACTIVATION_PATH_UNAVAILABLE">
+  reasonCode: Exclude<RuntimeReadinessReasonCode, "CAPITAL_ACTIVATION_UNAVAILABLE">
 ): RuntimeReadinessEvaluation {
   return {
     body: {
       build: publicBuildIdentifier(environment),
+      readyForAnalysisActivation: false,
+      readyForCapitalActivation: false,
       readyForActivation: false,
       readyForJudging: false,
-      schemaVersion: RUNTIME_STATUS_SCHEMA_VERSION,
+      schemaVersion: READINESS_STATUS_SCHEMA_VERSION,
       service: PROOFERA_SERVICE_NAME,
       status: "misconfigured"
     },
@@ -95,8 +104,9 @@ function misconfigured(
 
 /**
  * Cheap configuration readiness, deliberately not a provider-health probe.
- * Until the signer bootstrap, exact authority probe, and worker handoff exist,
- * no environment flag can turn activation readiness green.
+ * The public Studio implements read-only analysis-service activation. Until the signer bootstrap,
+ * exact authority probe, and worker handoff exist, no environment flag can turn capital-bearing
+ * activation or judging readiness green.
  */
 export function evaluateRuntimeReadiness(
   environment: Readonly<Record<string, string | undefined>> = process.env
@@ -132,22 +142,26 @@ export function evaluateRuntimeReadiness(
     body: {
       build: build ?? "development-unversioned",
       capabilities: {
-        activation: "unavailable",
+        activation: "analysis_only",
+        analysisActivation: "implemented",
         bscRpc: "configured_unprobed",
         listaYieldReads: "configured_unprobed",
         marketplacePublication: "configured_unprobed",
         pancakePositionReads: "configured_unprobed",
         passkeyBoundary: "configured",
+        capitalExecution: "unavailable",
         registryReads: "configured_unprobed",
         venusHealthReads: "configured_unprobed"
       },
+      readyForAnalysisActivation: true,
+      readyForCapitalActivation: false,
       readyForActivation: false,
       readyForJudging: false,
-      schemaVersion: RUNTIME_STATUS_SCHEMA_VERSION,
+      schemaVersion: READINESS_STATUS_SCHEMA_VERSION,
       service: PROOFERA_SERVICE_NAME,
       status: "not_ready"
     },
-    reasonCode: "ACTIVATION_PATH_UNAVAILABLE",
+    reasonCode: "CAPITAL_ACTIVATION_UNAVAILABLE",
     status: 503
   };
 }

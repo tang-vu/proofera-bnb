@@ -11,7 +11,7 @@ const validProduction = {
 } as const;
 
 describe("readiness route", () => {
-  it("keeps a valid read configuration non-ready until activation exists", async () => {
+  it("reports analysis activation while keeping capital activation and judging non-ready", async () => {
     const log = vi.fn();
     const response = createReadinessResponse(validProduction, log);
 
@@ -21,24 +21,28 @@ describe("readiness route", () => {
     await expect(response.json()).resolves.toEqual({
       build: "git-abc123",
       capabilities: {
-        activation: "unavailable",
+        activation: "analysis_only",
+        analysisActivation: "implemented",
         bscRpc: "configured_unprobed",
         listaYieldReads: "configured_unprobed",
         marketplacePublication: "configured_unprobed",
         pancakePositionReads: "configured_unprobed",
         passkeyBoundary: "configured",
+        capitalExecution: "unavailable",
         registryReads: "configured_unprobed",
         venusHealthReads: "configured_unprobed"
       },
+      readyForAnalysisActivation: true,
+      readyForCapitalActivation: false,
       readyForActivation: false,
       readyForJudging: false,
-      schemaVersion: "1",
+      schemaVersion: "2",
       service: "proofera-marketplace",
       status: "not_ready"
     });
     expect(log).toHaveBeenCalledWith({
       event: "runtime_readiness_not_ready",
-      reasonCode: "ACTIVATION_PATH_UNAVAILABLE"
+      reasonCode: "CAPITAL_ACTIVATION_UNAVAILABLE"
     });
   });
 
@@ -89,6 +93,8 @@ describe("readiness route", () => {
     expect(response.status).toBe(503);
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(body).toMatchObject({
+      readyForAnalysisActivation: false,
+      readyForCapitalActivation: false,
       readyForActivation: false,
       readyForJudging: false,
       service: "proofera-marketplace",

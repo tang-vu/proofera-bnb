@@ -72,10 +72,15 @@ const probes = [
           expectedStatus: 503,
           validate: (body) =>
             body?.build === expectedBuild &&
+            body?.schemaVersion === "2" &&
             body?.status === "not_ready" &&
+            body?.readyForAnalysisActivation === true &&
+            body?.readyForCapitalActivation === false &&
             body?.readyForActivation === false &&
             body?.readyForJudging === false &&
-            body?.capabilities?.activation === "unavailable"
+            body?.capabilities?.activation === "analysis_only" &&
+            body?.capabilities?.analysisActivation === "implemented" &&
+            body?.capabilities?.capitalExecution === "unavailable"
         }
       ]
     : [])
