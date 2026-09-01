@@ -61,7 +61,7 @@ The judge-facing claim/evidence/missing-evidence map is maintained in [`judge-sc
 | TermiX hire receipts          | THREE FINALIZED PAID TESTNET HIRES; ALL SIX LANES CAPTURED                        |
 | TermiX three-task report      | THREE PROTECTED PAIRS VERIFIED; BOUNDED INTERNAL REVIEW                           |
 | Demo video                    | 297.080 S NARRATED FINAL; AUTOMATED PLAYBACK VERIFIED                             |
-| CI/public smoke evidence      | HOSTED CI 33489679675 PASSED 9/9; HOSTED UPTIME 33491370110 PASSED 11/11          |
+| CI/public smoke evidence      | HOSTED CI 33489679675 PASSED 9/9; HOSTED UPTIME 33533498008 PASSED 11/11          |
 | PTA fixture deployment        | FINALIZED CHAIN 97; NOT POOL/LP EVIDENCE                                          |
 | PTA/WBNB pool readiness       | LP NFT `37109`; DUAL-RPC RECEIPTS/POST-STATE VERIFIED                             |
 
