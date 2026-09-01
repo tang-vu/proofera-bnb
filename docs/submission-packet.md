@@ -74,6 +74,12 @@ Paste only after every public link is rechecked and the owner has reviewed every
 >
 > Source: https://github.com/tang-vu/proofera-bnb
 >
+> Final narrated demo (297 seconds): https://github.com/tang-vu/proofera-bnb/blob/main/evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/final/proofera-final-demo.mp4
+>
+> Four-category current-evidence and analysis journey: https://github.com/tang-vu/proofera-bnb/tree/main/evidence/submission/public-analysis-activation/f25a67daa0292b5a04c142a42606888f7ec2b8e6
+>
+> Agent Advantage Report: https://github.com/tang-vu/proofera-bnb/blob/main/docs/agent-advantage-report.md
+>
 > Hosted clean-checkout CI: https://github.com/tang-vu/proofera-bnb/actions/runs/33489679675
 >
 > Hosted exact-build availability probe: https://github.com/tang-vu/proofera-bnb/actions/runs/33533498008
@@ -98,7 +104,7 @@ Paste only after every public link is rechecked and the owner has reviewed every
 >
 > PancakeSwap: the controlled LP receipts and before/after evidence are authentic, but price/liquidity were unchanged and fees were zero, so no real benefit is claimed.
 >
-> Final narrated demo and exact evidence paths are listed in the repository submission packet and Proof Room.
+> Exact artifact hashes, receipts, limitations and remaining blockers are indexed in the Proof Room and repository.
 
 ## Evidence links to recheck before entry
 
