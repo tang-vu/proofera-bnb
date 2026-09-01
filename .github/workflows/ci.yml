@@ -37,6 +37,12 @@ jobs:
       - name: Prepare LP evidence dependency graph
         run: corepack pnpm install --frozen-lockfile
         working-directory: agents/lpRangeAgent/app/agent
+      - name: Prepare grid evidence dependency graph
+        run: corepack pnpm install --frozen-lockfile
+        working-directory: agents/gridTradingAgent/app/agent
+      - name: Prepare yield evidence dependency graph
+        run: corepack pnpm install --frozen-lockfile
+        working-directory: agents/yieldOptimisationAgent/app/agent
       - name: Prepare browser and media evidence tools
         run: |
           pnpm exec playwright install --with-deps chromium
