@@ -17,25 +17,61 @@ const agents = Object.freeze([
     category: "lp-rebalancing",
     agentId: "1825",
     endpoint: "https://proofera-lp.tangvu.dev/",
-    skill: "analyze_lp_range"
+    skill: "analyze_lp_range",
+    evidenceSource: "PancakeSwap V3 / controlled ProofEra fixture",
+    evidenceEnvironment: "bsc testnet",
+    evidenceFactLabels: [
+      "Current tick",
+      "Position range",
+      "Range state",
+      "Position liquidity / raw",
+      "Fee tier / raw"
+    ]
   }),
   Object.freeze({
     category: "grid-trading",
     agentId: "1826",
     endpoint: "https://proofera-grid.tangvu.dev/",
-    skill: "analyze_grid_trading"
+    skill: "analyze_grid_trading",
+    evidenceSource: "PancakeSwap V3 / controlled ProofEra fixture",
+    evidenceEnvironment: "bsc testnet",
+    evidenceFactLabels: [
+      "Current tick",
+      "sqrtPriceX96 / raw",
+      "Tick spacing",
+      "Oracle observations",
+      "Pool lock state"
+    ]
   }),
   Object.freeze({
     category: "yield-optimisation",
     agentId: "1827",
     endpoint: "https://proofera-yield.tangvu.dev/",
-    skill: "analyze_yield_opportunities"
+    skill: "analyze_yield_opportunities",
+    evidenceSource: "Lista Moolah vault list / official API",
+    evidenceEnvironment: "bsc mainnet",
+    evidenceFactLabels: [
+      "Source total",
+      "First source / source order",
+      "APY / raw decimal",
+      "Deposits USD / raw decimal",
+      "Utilization / raw decimal"
+    ]
   }),
   Object.freeze({
     category: "health-factor-monitoring",
     agentId: "1828",
     endpoint: "https://proofera-health.tangvu.dev/",
-    skill: "analyze_venus_health_factor"
+    skill: "analyze_venus_health_factor",
+    evidenceSource: "Venus Core Pool / unrelated public replay account",
+    evidenceEnvironment: "bsc testnet",
+    evidenceFactLabels: [
+      "Excess liquidity / raw",
+      "Shortfall / raw",
+      "Contract signal",
+      "Health factor",
+      "Block hash"
+    ]
   })
 ]);
 
@@ -128,6 +164,21 @@ function terminalText(result) {
   return "terminal_without_decision";
 }
 
+function sha256(bytes) {
+  return createHash("sha256").update(bytes).digest("hex");
+}
+
+async function writeExclusive(path, bytes) {
+  await writeFile(path, bytes, {
+    encoding: typeof bytes === "string" ? "utf8" : undefined,
+    flag: "wx"
+  });
+}
+
+function screenshotMetadata(file, bytes) {
+  return Object.freeze({ file, bytes: bytes.byteLength, sha256: sha256(bytes) });
+}
+
 function validateRun(agent, body) {
   if (
     (body?.status !== "completed" && body?.status !== "rejected") ||
@@ -153,15 +204,48 @@ function validateRun(agent, body) {
 }
 
 async function captureRun(page, agent) {
-  await page.goto(`${PUBLIC_ORIGIN}/marketplace`, {
+  await page.goto(`${PUBLIC_ORIGIN}/marketplace?category=${agent.category}`, {
     waitUntil: "domcontentloaded",
     timeout: 30_000
   });
-  const activationLink = page.locator(`a[href="/studio?agent=${agent.category}"]`);
+  const liveEvidencePanel = page.locator("[data-live-evidence-terminal-state]");
+  await liveEvidencePanel.waitFor({ state: "visible", timeout: 30_000 });
+  if ((await liveEvidencePanel.getAttribute("data-live-evidence-terminal-state")) !== "available") {
+    fail("PUBLIC_ANALYSIS_ACTIVATION_CURRENT_EVIDENCE_UNAVAILABLE");
+  }
+  const definitionRows = await liveEvidencePanel.locator("dl > div").evaluateAll((rows) =>
+    rows.map((row) => ({
+      label: row.querySelector("dt")?.textContent?.trim() ?? "",
+      value: row.querySelector("dd")?.textContent?.trim() ?? ""
+    }))
+  );
+  const labels = definitionRows.map(({ label }) => label);
+  const requiredMetadata = ["Source", "Environment", "Observed", "Freshness", "Method"];
+  if (
+    new Set(labels).size !== labels.length ||
+    definitionRows.some(({ label, value }) => label.length === 0 || value.length === 0) ||
+    definitionRows.find(({ label }) => label === "Source")?.value !== agent.evidenceSource ||
+    definitionRows.find(({ label }) => label === "Environment")?.value !==
+      agent.evidenceEnvironment ||
+    definitionRows.find(({ label }) => label === "Observed")?.value === "Not established" ||
+    JSON.stringify(labels.filter((label) => !requiredMetadata.includes(label))) !==
+      JSON.stringify(agent.evidenceFactLabels) ||
+    !(await liveEvidencePanel.getByText("No fallback applied", { exact: true }).isVisible()) ||
+    !(await liveEvidencePanel.getByText("Capital execution disabled", { exact: true }).isVisible())
+  ) {
+    fail("PUBLIC_ANALYSIS_ACTIVATION_CURRENT_EVIDENCE_INVALID");
+  }
+  const currentEvidenceScreenshotBytes = await liveEvidencePanel.screenshot({ type: "png" });
+  const currentEvidenceScreenshot = screenshotMetadata(
+    `${agent.category}-current-evidence.png`,
+    currentEvidenceScreenshotBytes
+  );
+
+  const activationLink = liveEvidencePanel.locator(`a[href="/studio?agent=${agent.category}"]`);
   await activationLink.waitFor({ state: "visible", timeout: 15_000 });
   if (
     (await activationLink.count()) !== 1 ||
-    (await activationLink.innerText()).trim() !== "Run live analyzer"
+    (await activationLink.innerText()).trim() !== "Activate analysis service"
   ) {
     fail("PUBLIC_ANALYSIS_ACTIVATION_MARKETPLACE_LINK_INVALID");
   }
@@ -180,7 +264,7 @@ async function captureRun(page, agent) {
       response.request().method() === "POST",
     { timeout: 30_000 }
   );
-  await page.getByRole("button", { name: "Run public analyzer" }).click();
+  await page.getByRole("button", { name: "Activate & run analysis service" }).click();
   const response = await responsePromise;
   if (response.status() !== 200) fail("PUBLIC_ANALYSIS_ACTIVATION_HTTP_INVALID");
   const bytes = await response.body();
@@ -195,51 +279,91 @@ async function captureRun(page, agent) {
   }
   validateRun(agent, body);
   await page
-    .getByText(body.status === "completed" ? "Analysis complete" : "Input rejected", {
+    .getByText(body.status === "completed" ? "Analysis service complete" : "Input rejected", {
       exact: true
     })
     .waitFor({ state: "visible", timeout: 15_000 });
+  await page.getByText(body.runId, { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  const runPanel = page
+    .getByText("ANALYSIS SERVICE RUN RECORD", { exact: true })
+    .locator("xpath=ancestor::section");
+  const analysisRunScreenshotBytes = await runPanel.screenshot({ type: "png" });
+  const analysisRunScreenshot = screenshotMetadata(
+    `${agent.category}-analysis-run.png`,
+    analysisRunScreenshotBytes
+  );
+
+  const metadata = Object.fromEntries(
+    definitionRows
+      .filter(({ label }) => requiredMetadata.includes(label))
+      .map(({ label, value }) => [label, value])
+  );
+  const facts = definitionRows
+    .filter(({ label }) => !requiredMetadata.includes(label))
+    .map(({ label, value }) => Object.freeze({ label, value }));
 
   return Object.freeze({
-    category: agent.category,
-    marketplaceHref: `/studio?agent=${agent.category}`,
-    agentId: agent.agentId,
-    endpoint: agent.endpoint,
-    skill: agent.skill,
-    status: body.status,
-    runId: body.runId,
-    observedAtUtc: body.observedAtUtc,
-    latencyMilliseconds: body.latencyMilliseconds,
-    methodologyVersion:
-      typeof body?.result?.methodologyVersion === "string"
-        ? body.result.methodologyVersion
-        : body.agent.expectedMethodologyVersion,
-    terminal: terminalText(body.result),
-    responseBytes: bytes.byteLength,
-    responseSha256: createHash("sha256").update(bytes).digest("hex"),
-    boundary: Object.freeze({
-      chainId: 97,
-      environment: "bsc-testnet",
-      executionEnabled: false,
-      walletAccessed: false,
-      transactionSubmitted: false,
-      serverPersistence: false
-    })
+    manifestRun: Object.freeze({
+      category: agent.category,
+      marketplaceHref: `/studio?agent=${agent.category}`,
+      currentEvidence: Object.freeze({
+        status: "available",
+        source: metadata.Source,
+        environment: metadata.Environment,
+        observed: metadata.Observed,
+        freshness: metadata.Freshness,
+        methodology: metadata.Method,
+        facts,
+        fallbackApplied: false,
+        capitalExecutionEnabled: false,
+        screenshot: currentEvidenceScreenshot
+      }),
+      agentId: agent.agentId,
+      endpoint: agent.endpoint,
+      skill: agent.skill,
+      status: body.status,
+      runId: body.runId,
+      observedAtUtc: body.observedAtUtc,
+      latencyMilliseconds: body.latencyMilliseconds,
+      methodologyVersion:
+        typeof body?.result?.methodologyVersion === "string"
+          ? body.result.methodologyVersion
+          : body.agent.expectedMethodologyVersion,
+      terminal: terminalText(body.result),
+      responseBytes: bytes.byteLength,
+      responseSha256: sha256(bytes),
+      screenshot: analysisRunScreenshot,
+      boundary: Object.freeze({
+        chainId: 97,
+        environment: "bsc-testnet",
+        executionEnabled: false,
+        walletAccessed: false,
+        transactionSubmitted: false,
+        serverPersistence: false
+      })
+    }),
+    screenshots: Object.freeze([
+      Object.freeze({
+        file: currentEvidenceScreenshot.file,
+        bytes: currentEvidenceScreenshotBytes
+      }),
+      Object.freeze({ file: analysisRunScreenshot.file, bytes: analysisRunScreenshotBytes })
+    ])
   });
 }
 
 async function main() {
   const sourceCommit = parseArguments(process.argv.slice(2));
   verifyRelease(sourceCommit);
-  const outputPath = resolve(
+  const outputDirectory = resolve(
     repositoryRoot,
     "evidence",
     "submission",
     "public-analysis-activation",
-    sourceCommit,
-    "manifest.json"
+    sourceCommit
   );
-  if (!(await pathDoesNotExist(outputPath))) {
+  const outputPath = resolve(outputDirectory, "manifest.json");
+  if (!(await pathDoesNotExist(outputDirectory))) {
     fail("PUBLIC_ANALYSIS_ACTIVATION_OUTPUT_EXISTS");
   }
 
@@ -250,34 +374,40 @@ async function main() {
   validateRelease(sourceCommit, health, readiness);
 
   const browser = await chromium.launch({ headless: true });
-  const runs = [];
+  const captures = [];
   try {
     const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
     await page.goto(PUBLIC_ORIGIN, { waitUntil: "domcontentloaded", timeout: 30_000 });
     await page.getByRole("link", { name: "Find an agent" }).click();
     await page.waitForURL(`${PUBLIC_ORIGIN}/marketplace`, { timeout: 15_000 });
+    const services = page
+      .getByRole("heading", { name: "Four registered analyzers. Zero invented performance." })
+      .locator("xpath=ancestor::section");
     for (const agent of agents) {
-      const activationLink = page.locator(`a[href="/studio?agent=${agent.category}"]`);
+      const activationLink = services.locator(`a[href="/studio?agent=${agent.category}"]`);
       await activationLink.waitFor({ state: "visible", timeout: 15_000 });
       if (
         (await activationLink.count()) !== 1 ||
-        (await activationLink.innerText()).trim() !== "Run live analyzer"
+        (await activationLink.innerText()).trim() !== "Activate analysis service"
       ) {
         fail("PUBLIC_ANALYSIS_ACTIVATION_CATEGORY_PARITY_INVALID");
       }
     }
-    for (const agent of agents) runs.push(await captureRun(page, agent));
+    for (const agent of agents) captures.push(await captureRun(page, agent));
   } finally {
     await browser.close();
   }
 
+  const runs = captures.map(({ manifestRun }) => manifestRun);
   const manifest = {
-    schemaVersion: "proofera-public-analysis-activation-v1.0.0",
+    schemaVersion: "proofera-public-analysis-activation-v2.0.0",
     observedAtUtc: new Date().toISOString(),
     sourceCommit,
     publicOrigin: PUBLIC_ORIGIN,
     classification: {
       boundedHostOriginObservation: true,
+      currentEvidenceObserved: true,
+      currentEvidenceAppliedToAnalyzer: false,
       analysisServiceActivated: true,
       capitalExecutionPerformed: false,
       transactionSubmitted: false,
@@ -285,7 +415,14 @@ async function main() {
       organizerEligibilityDecision: false,
       submissionCompleted: false
     },
-    journey: ["land", "find", "understand", "activate_analysis", "inspect"],
+    journey: [
+      "land",
+      "find",
+      "inspect_current_evidence",
+      "understand",
+      "activate_analysis",
+      "inspect_run"
+    ],
     categoryParity: {
       required: 4,
       observed: runs.length,
@@ -302,16 +439,20 @@ async function main() {
     },
     runs,
     limitations: [
-      "Three presets are synthetic scenarios and the health-factor input is a retained historical replay; these runs are service-availability evidence, not current market evidence.",
+      "The current-evidence rail and analyzer preset are separate product boundaries. Current marketplace facts are not forwarded into the analyzer request.",
+      "Three analyzer presets are synthetic scenarios and the health-factor analyzer input is a retained historical replay; the service runs remain availability/capability evidence.",
+      "The controlled Pancake position, source-ordered Lista fields and unrelated public Venus replay do not establish recommendation quality, autonomous performance or economic benefit.",
       "A completed or rejected terminal analyzer response proves the bounded A2A service path, not trading, capital execution, strategy performance or economic benefit.",
       "This host-origin capture is not independent uptime monitoring or an organizer eligibility decision."
     ]
   };
-  await mkdir(dirname(outputPath), { recursive: true });
-  await writeFile(outputPath, `${JSON.stringify(manifest, null, 2)}\n`, {
-    encoding: "utf8",
-    flag: "wx"
-  });
+  await mkdir(outputDirectory);
+  for (const { screenshots } of captures) {
+    for (const screenshot of screenshots) {
+      await writeExclusive(resolve(outputDirectory, screenshot.file), screenshot.bytes);
+    }
+  }
+  await writeExclusive(outputPath, `${JSON.stringify(manifest, null, 2)}\n`);
   process.stdout.write(`${outputPath}\n`);
 }
 
