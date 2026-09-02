@@ -1,6 +1,6 @@
 # ProofEra execution plan
 
-Updated: 2026-09-01
+Updated: 2026-09-02
 Deadline: 2026-09-09 12:00 UTC
 Operating principle: complete and verify the highest-value unblocked judge journey before expanding breadth.
 
@@ -389,3 +389,4 @@ The bounded v2 attempt then completed without rewriting v1. Grant `0xbfa1e3216d3
 | 2026-09-01 | Bind the public submission carrier without reopening the frozen base release                  | Carrier `6c86226` passed two-resolver agreement for five hosts, authorized TLS 5/5 and eleven exact HTTPS observations with analysis-only readiness; the derivative remains rehearsal evidence, not an independent monitor, rollback repetition, capital execution or submission receipt |
 | 2026-09-01 | Bind current evidence and service runs in one four-category journey                           | Release `f25a67d` observed all four current-evidence panels available with five facts each, retained eight visually inspected PNGs and completed four bounded A2A runs; current data was not forwarded into the preset, and no capital/performance claim follows                         |
 | 2026-09-01 | Bind the current `1282910` public carrier without rewriting frozen release history            | Two resolvers agreed for five hosts, TLS was authorized 5/5, and eleven exact-build HTTPS observations passed with analysis-only readiness; the create-only artifact is host-origin rehearsal, not independent uptime, rollback repetition, capital execution or organizer acceptance    |
+| 2026-09-02 | Keep MiMo credential lifecycle under account-owner control                                    | The interactive wrapper protects transport with hidden input, process-local scope and cleanup but no longer requires or claims a credential-rotation attestation; generated media remains create-only and evidence-bound                                                                 |

@@ -1,6 +1,6 @@
 # ProofEra final demo runbook
 
-Updated: 2026-08-31. The exact narrated demo and automated playback artifacts now exist; this
+Updated: 2026-09-02. The exact narrated demo and automated playback artifacts now exist; this
 runbook records their gate and the remaining owner playback/submission boundaries.
 
 ## Gate order
@@ -121,8 +121,9 @@ Generate it from an interactive Windows console only:
 corepack pnpm generate:demo:narration:mimo
 ```
 
-The wrapper requires hidden entry of a newly rotated key, keeps it process-local, and removes it on
-exit. It deliberately does not read or create `.env`. The output is create-only; a failed or absent
+The wrapper requires hidden entry of an API key, keeps it process-local, and removes it on exit.
+Credential rotation remains an account-owner decision and is not attested by this generator. It
+deliberately does not read or create `.env`. The output is create-only; a failed or absent
 generation remains absent. After the MP3, ASR record and manifest are reviewed and committed, a
 future exact published commit still needs its own public deployment authorization before rehearsal
 or final capture. No deployment, wallet access, signature, transaction, or mainnet action is part of

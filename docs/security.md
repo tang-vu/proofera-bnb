@@ -1,6 +1,6 @@
 # ProofEra security review and threat model
 
-Updated: 2026-08-27. Scope: marketplace browser/server, live data adapters, BNB Agent Studio workers, Altana session lifecycle, PancakeSwap execution and evidence operations.
+Updated: 2026-09-02. Scope: marketplace browser/server, live data adapters, BNB Agent Studio workers, Altana session lifecycle, PancakeSwap execution and evidence operations.
 
 Status labels below are `implemented`, `building`, or `release gate`. Financial-risk disclosure is not treated as a substitute for a technical control.
 
@@ -43,10 +43,11 @@ The repository scanner asks Git for tracked and non-ignored untracked paths; it 
 
 Tooling must never print an entire process environment or package-manager configuration: registry tokens can be inherited from user-level config and emitted even when the repository contains no secret. Use only narrowly scoped non-secret queries, keep CI logs redacted, and rotate any credential that appears in tool output. The source scanner reports rule/path only and never matched material.
 
-The one-off MiMo narration generator follows the same rule. It accepts a newly rotated API key only
-through hidden interactive console input, places it in one child process, prints only bounded error
-codes, removes the process variable on exit, and writes no `.env`, request header, or raw provider
-response. Its two exact HTTPS base URLs are code-allowlisted. This is an interactive development
+The one-off MiMo narration generator accepts an API key only through hidden interactive console
+input, places it in one child process, prints only bounded error codes, removes the process variable
+on exit, and writes no `.env`, request header, or raw provider response. Credential lifecycle and
+rotation remain account-owner decisions and are not attested by the wrapper. Its two exact HTTPS
+base URLs are code-allowlisted. This is an interactive development
 asset generator, not a browser feature, server route, background job, or production dependency.
 Machine ASR output is retained only as a transcribability check and never promoted to a human
 quality attestation.

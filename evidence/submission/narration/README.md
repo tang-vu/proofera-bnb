@@ -25,9 +25,10 @@ an editorial intro, the same six public evidence scenes, and an editorial outro.
 `mimo-v2.5-tts`, the built-in `Dean` voice, English, and a restrained product-film delivery prompt.
 It does not claim that MiMo audio already exists.
 
-Run `pnpm generate:demo:narration:mimo` interactively only after rotating any credential previously
-shared in chat or logs. The wrapper accepts a new API key through hidden console input, passes it to
-one child process, removes it afterward, and never creates a `.env` file. The Node generator
+Run `pnpm generate:demo:narration:mimo` interactively. The wrapper accepts an API key through hidden
+console input, passes it to one child process, removes it afterward, and never creates a `.env`
+file. Credential lifecycle remains an account-owner decision rather than a generator attestation.
+The Node generator
 allowlists the official pay-as-you-go endpoint and the Singapore Token Plan endpoint, makes
 create-only chapter TTS calls, and checks each WAV with `mimo-v2.5-asr`. Domain spellings such as
 `BNB`, `ERC-8004`, and `SHA-256` are normalized before comparison. A reviewed similarity miss stays

@@ -140,11 +140,9 @@ test("premium source has exact visual chapter order and a bounded reviewed voice
   assert.match(source.stylePrompt, /Calm, authoritative, warm, and precise/u);
 });
 
-test("interactive wrapper hides a new key and the generator fails before network without one", () => {
-  assert.match(wrapper, /type ROTATED/u);
-  assert.match(wrapper, /-cne "ROTATED"/u);
+test("interactive wrapper hides the key and the generator fails before network without one", () => {
   assert.match(wrapper, /Read-Host .* -AsSecureString/u);
-  assert.match(wrapper, /previously shared in chat is compromised/u);
+  assert.doesNotMatch(wrapper, /ROTATED|rotationConfirmation/u);
   assert.match(wrapper, /Remove-Item Env:MIMO_API_KEY/u);
   const environment = { ...process.env };
   delete environment.MIMO_API_KEY;
