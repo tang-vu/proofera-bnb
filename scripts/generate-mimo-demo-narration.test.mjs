@@ -8,6 +8,7 @@ import {
   buildTtsRequest,
   exactMimoBaseUrl,
   normalizeNarrationText,
+  planNarrationTiming,
   parseAsrResponse,
   parseTtsResponse,
   sequenceSimilarity
@@ -119,6 +120,31 @@ test("ASR keeps review quality explicit and blocks only catastrophic divergence"
   assert.match(generatorSource, /asrReviewedThresholdPassed/u);
   assert.match(generatorSource, /MIMO_ASR_SEQUENCE_CATASTROPHIC_/u);
   assert.doesNotMatch(generatorSource, /MIMO_ASR_SEQUENCE_MISMATCH/u);
+});
+
+test("narration timing stays unchanged in range and safely fits short or long speech", () => {
+  assert.match(generatorSource, /proofera-mimo-demo-narration-v1\.1\.0/u);
+  assert.deepEqual(planNarrationTiming(280), {
+    adjusted: false,
+    sourceDurationSeconds: 280,
+    targetDurationSeconds: 280,
+    tempoFactor: 1
+  });
+  assert.deepEqual(planNarrationTiming(210), {
+    adjusted: true,
+    sourceDurationSeconds: 210,
+    targetDurationSeconds: 250,
+    tempoFactor: 0.84
+  });
+  assert.deepEqual(planNarrationTiming(350), {
+    adjusted: true,
+    sourceDurationSeconds: 350,
+    targetDurationSeconds: 325,
+    tempoFactor: 1.07692308
+  });
+  assert.throws(() => planNarrationTiming(100), /MIMO_NARRATION_TEMPO_ADJUSTMENT_UNSAFE/u);
+  assert.throws(() => planNarrationTiming(Number.NaN), /MIMO_NARRATION_SOURCE_DURATION_INVALID/u);
+  assert.match(generatorSource, /atempo=\$\{tempoFactor\.toFixed\(8\)\}/u);
 });
 
 test("premium source has exact visual chapter order and a bounded reviewed voice", () => {

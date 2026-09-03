@@ -33,8 +33,10 @@ allowlists the official pay-as-you-go endpoint and the Singapore Token Plan endp
 create-only chapter TTS calls, and checks each WAV with `mimo-v2.5-asr`. Domain spellings such as
 `BNB`, `ERC-8004`, and `SHA-256` are normalized before comparison. A reviewed similarity miss stays
 visible in evidence; only catastrophic transcript divergence blocks asset creation. The generator
-normalizes the final mono MP3 and stores no request headers, raw provider responses, or credential
-material.
+fits an out-of-range raw delivery to a safe 250- or 325-second target with one bounded local FFmpeg
+tempo filter, then normalizes the final mono MP3. The manifest records the source-duration estimate,
+target and exact tempo factor. No additional provider call, request header, raw response, or
+credential material is retained by this local timing step.
 
 The output MP3, ASR record, and generation manifest remain absent until that interactive run
 succeeds. Their absence must not be described as completed premium narration.

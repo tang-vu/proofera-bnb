@@ -26,6 +26,11 @@ const MAXIMUM_MEDIA_TOOL_OUTPUT_BYTES = 2_000_000;
 const REQUEST_TIMEOUT_MS = 180_000;
 const REVIEW_ASR_SEQUENCE_SCORE = 0.78;
 const CATASTROPHIC_ASR_SEQUENCE_SCORE = 0.4;
+const INTER_CHAPTER_PAUSE_SECONDS = 0.65;
+const MINIMUM_FINAL_NARRATION_SECONDS = 240;
+const MAXIMUM_FINAL_NARRATION_SECONDS = 330;
+const SHORT_NARRATION_TARGET_SECONDS = 250;
+const LONG_NARRATION_TARGET_SECONDS = 325;
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const narrationRoot = resolve(repositoryRoot, "evidence", "submission", "narration");
@@ -182,6 +187,28 @@ export function sequenceSimilarity(expectedText, observedText) {
   return previous[observed.length] / Math.max(expected.length, observed.length);
 }
 
+export function planNarrationTiming(sourceDurationSeconds) {
+  if (!Number.isFinite(sourceDurationSeconds) || sourceDurationSeconds <= 0) {
+    fail("MIMO_NARRATION_SOURCE_DURATION_INVALID");
+  }
+  const targetDurationSeconds =
+    sourceDurationSeconds < MINIMUM_FINAL_NARRATION_SECONDS
+      ? SHORT_NARRATION_TARGET_SECONDS
+      : sourceDurationSeconds > MAXIMUM_FINAL_NARRATION_SECONDS
+        ? LONG_NARRATION_TARGET_SECONDS
+        : sourceDurationSeconds;
+  const tempoFactor = sourceDurationSeconds / targetDurationSeconds;
+  if (tempoFactor < 0.5 || tempoFactor > 2) {
+    fail("MIMO_NARRATION_TEMPO_ADJUSTMENT_UNSAFE");
+  }
+  return Object.freeze({
+    adjusted: targetDurationSeconds !== sourceDurationSeconds,
+    sourceDurationSeconds: Number.parseFloat(sourceDurationSeconds.toFixed(3)),
+    targetDurationSeconds: Number.parseFloat(targetDurationSeconds.toFixed(3)),
+    tempoFactor: Number.parseFloat(tempoFactor.toFixed(8))
+  });
+}
+
 function parseSource(bytes) {
   let source;
   try {
@@ -299,7 +326,7 @@ function probeAudio(path, minimumSeconds, maximumSeconds) {
   });
 }
 
-function assembleNarration(segmentPaths, temporaryOutputPath) {
+function assembleNarration(segmentPaths, temporaryOutputPath, tempoFactor) {
   const inputs = segmentPaths.flatMap((path) => ["-i", path]);
   const filters = [];
   const sequence = [];
@@ -309,13 +336,16 @@ function assembleNarration(segmentPaths, temporaryOutputPath) {
     );
     sequence.push(`[a${index}]`);
     if (index < segmentPaths.length - 1) {
-      filters.push(`aevalsrc=0:d=0.65:s=48000,aformat=channel_layouts=mono[p${index}]`);
+      filters.push(
+        `aevalsrc=0:d=${INTER_CHAPTER_PAUSE_SECONDS}:s=48000,aformat=channel_layouts=mono[p${index}]`
+      );
       sequence.push(`[p${index}]`);
     }
   }
-  filters.push(
-    `${sequence.join("")}concat=n=${sequence.length}:v=0:a=1,loudnorm=I=-16:TP=-1.5:LRA=9[out]`
-  );
+  const finalFilters = [`concat=n=${sequence.length}:v=0:a=1`];
+  if (tempoFactor !== 1) finalFilters.push(`atempo=${tempoFactor.toFixed(8)}`);
+  finalFilters.push("loudnorm=I=-16:TP=-1.5:LRA=9");
+  filters.push(`${sequence.join("")}${finalFilters.join(",")}[out]`);
   runMediaTool(
     "ffmpeg",
     [
@@ -407,9 +437,23 @@ async function generate() {
       });
     }
 
+    const sourceDurationSeconds =
+      chapterResults.reduce(
+        (total, { ttsProbe }) => total + Number.parseFloat(ttsProbe.durationSeconds),
+        0
+      ) +
+      INTER_CHAPTER_PAUSE_SECONDS * (chapterResults.length - 1);
+    const timing = planNarrationTiming(sourceDurationSeconds);
+    process.stdout.write(
+      `${JSON.stringify({ event: "mimo_narration_timing_planned", ...timing })}\n`
+    );
     const temporaryOutputPath = resolve(temporaryDirectory, "proofera-final-demo-mimo-v2.5.mp3");
-    assembleNarration(segmentPaths, temporaryOutputPath);
-    const outputProbe = probeAudio(temporaryOutputPath, 220, 330);
+    assembleNarration(segmentPaths, temporaryOutputPath, timing.tempoFactor);
+    const outputProbe = probeAudio(
+      temporaryOutputPath,
+      MINIMUM_FINAL_NARRATION_SECONDS,
+      MAXIMUM_FINAL_NARRATION_SECONDS
+    );
     const outputBytes = await readFile(temporaryOutputPath);
     const observedAtUtc = new Date().toISOString();
     const asrEvidence = {
@@ -455,7 +499,7 @@ async function generate() {
     };
     const asrBytes = Buffer.from(`${JSON.stringify(asrEvidence, null, 2)}\n`, "utf8");
     const manifest = {
-      schemaVersion: "proofera-mimo-demo-narration-v1.0.0",
+      schemaVersion: "proofera-mimo-demo-narration-v1.1.0",
       classification: {
         artifact: "create_only_mimo_tts_narration",
         asrChecked: true,
@@ -479,6 +523,7 @@ async function generate() {
         evidencePath: relative(repositoryRoot, asrPath).replaceAll("\\", "/"),
         evidenceSha256: sha256(asrBytes)
       },
+      timing,
       source: {
         path: relative(repositoryRoot, sourcePath).replaceAll("\\", "/"),
         sha256: sha256(sourceBytes),

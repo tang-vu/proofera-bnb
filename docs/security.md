@@ -1,6 +1,6 @@
 # ProofEra security review and threat model
 
-Updated: 2026-09-02. Scope: marketplace browser/server, live data adapters, BNB Agent Studio workers, Altana session lifecycle, PancakeSwap execution and evidence operations.
+Updated: 2026-09-03. Scope: marketplace browser/server, live data adapters, BNB Agent Studio workers, Altana session lifecycle, PancakeSwap execution and evidence operations.
 
 Status labels below are `implemented`, `building`, or `release gate`. Financial-risk disclosure is not treated as a substitute for a technical control.
 
@@ -50,7 +50,9 @@ rotation remain account-owner decisions and are not attested by the wrapper. Its
 base URLs are code-allowlisted. This is an interactive development
 asset generator, not a browser feature, server route, background job, or production dependency.
 Machine ASR output is retained only as a transcribability check and never promoted to a human
-quality attestation.
+quality attestation. A raw narration outside the final-video duration envelope is fitted only by a
+bounded local FFmpeg tempo filter; the exact factor is retained and no retrying provider call is
+silently substituted.
 
 ### Local BSC testnet deployer custody
 

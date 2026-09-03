@@ -1,6 +1,6 @@
 # ProofEra final demo runbook
 
-Updated: 2026-09-02. The exact narrated demo and automated playback artifacts now exist; this
+Updated: 2026-09-03. The exact narrated demo and automated playback artifacts now exist; this
 runbook records their gate and the remaining owner playback/submission boundaries.
 
 ## Gate order
@@ -113,7 +113,10 @@ exact spoken text in an `assistant` message; output is requested as WAV. Each ch
 to MiMo V2.5 ASR as one English WAV input. The ASR transcript is a machine-transcribability check,
 not human playback, independent review, or evidence that narrated claims are true. Domain-equivalent
 spellings are normalized; a miss against the reviewed threshold remains explicit, while only
-catastrophic transcript divergence blocks asset creation.
+catastrophic transcript divergence blocks asset creation. If MiMo's raw delivery falls outside the
+240-to-330-second final-video envelope, one bounded local FFmpeg tempo filter targets 250 seconds for
+a short read or 325 seconds for a long read. The manifest retains the raw-duration estimate, target
+and exact factor; no extra remote synthesis is hidden behind this fit.
 
 Generate it from an interactive Windows console only:
 
