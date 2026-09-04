@@ -62,3 +62,34 @@ test("playback collector uses a copied boundary, full decode and live scene asse
   assert.match(scriptSource, /runtime_equivalent_descendant/u);
   assert.match(scriptSource, /humanAudioIntelligibilityAttested: false/u);
 });
+
+test("retained MiMo successor playback rehashes the runtime-bound final media", async () => {
+  const successorDirectory = resolve(
+    repositoryRoot,
+    "evidence",
+    "submission",
+    "demo-videos",
+    "89a99e84c62905fa77aed9c431e7cb730f2c342f"
+  );
+  const successorFinal = JSON.parse(
+    await readFile(resolve(successorDirectory, "final", "manifest.json"), "utf8")
+  );
+  const successorPlaybackBytes = await readFile(
+    resolve(successorDirectory, "playback", "manifest.json")
+  );
+  const successorPlayback = JSON.parse(successorPlaybackBytes.toString("utf8"));
+
+  assert.equal(successorPlayback.schemaVersion, "proofera-final-demo-automated-playback-v1.1.0");
+  assert.equal(successorPlayback.sourceCommit, successorFinal.sourceCommit);
+  assert.equal(successorPlayback.sourceDemo.publicBuildCommit, successorFinal.publicHealth.build);
+  assert.equal(successorPlayback.sourceDemo.mediaSha256, successorFinal.media.sha256);
+  assert.equal(successorPlayback.temporaryCopy.byteIdentityVerified, true);
+  assert.equal(successorPlayback.playback.fullDecodeCompleted, true);
+  assert.equal(successorPlayback.playback.probe.durationSeconds, "325.014");
+  assert.equal(successorPlayback.publicScenes.length, 6);
+  assert.ok(successorPlayback.publicScenes.every(({ status }) => status === 200));
+  assert.equal(
+    sha256(successorPlaybackBytes),
+    "612add66becfc9fbbf962efde445dc9a6a6c8fbd1ae00c621c1a99edf2abda1f"
+  );
+});

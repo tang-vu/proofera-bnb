@@ -1,6 +1,6 @@
 # ProofEra owner-completion submission packet
 
-Updated: 2026-09-01. The canonical CMS currently names the linked Google Form as its
+Updated: 2026-09-04. The canonical CMS currently names the linked Google Form as its
 `submit_project_url`. This packet maps that exact one-page form and prepares every non-personal
 field. It is not an organizer receipt or evidence that ProofEra was submitted.
 
@@ -74,7 +74,7 @@ Paste only after every public link is rechecked and the owner has reviewed every
 >
 > Source: https://github.com/tang-vu/proofera-bnb
 >
-> Final narrated demo (297 seconds): https://github.com/tang-vu/proofera-bnb/blob/main/evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/final/proofera-final-demo.mp4
+> Final narrated demo (325 seconds): https://github.com/tang-vu/proofera-bnb/blob/main/evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/final/proofera-final-demo.mp4
 >
 > Four-category current-evidence and analysis journey: https://github.com/tang-vu/proofera-bnb/tree/main/evidence/submission/public-analysis-activation/f25a67daa0292b5a04c142a42606888f7ec2b8e6
 >
@@ -116,8 +116,8 @@ Paste only after every public link is rechecked and the owner has reviewed every
 | Source repository     | https://github.com/tang-vu/proofera-bnb                                                                                                                                                       | Public; page/API/raw README/exact commit returned `200`                                |
 | Hosted clean CI       | https://github.com/tang-vu/proofera-bnb/actions/runs/33489679675                                                                                                                              | Nine of nine clean-checkout jobs passed                                                |
 | Hosted uptime probe   | https://github.com/tang-vu/proofera-bnb/actions/runs/33533498008                                                                                                                              | Current carrier passed all eleven exact-build public checks; recurring history remains |
-| Final narrated demo   | `evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/final/proofera-final-demo.mp4`                                                                                      | Public blob/raw endpoints returned `200`; raw length 37,636,488 bytes                  |
-| Demo manifests        | `evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/`                                                                                                                   | Public repository path                                                                 |
+| Final narrated demo   | `evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/final/proofera-final-demo.mp4`                                                                                      | Public blob/raw returned `200`; exact 68,211,573-byte length                           |
+| Demo manifests        | `evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/`                                                                                                                   | Public final-capture and automated-playback records                                    |
 | TermiX final bundle   | `evidence/submission/final/termix/6d1adf3c948e49be7d9d42332df04904fdd43e3a/`                                                                                                                  | Public repository path                                                                 |
 | Altana lifecycle      | `evidence/submission/final/altana-lifecycle.json`                                                                                                                                             | Public repository copy and explorer links are reachable                                |
 | Pancake controlled LP | `evidence/onchain/bsc-testnet-pta-wbnb-first-lp-eed9c32a107b57735f45bd6246d967cb12fbb1579a05faa9f17e0ead46187d01.json` and `evidence/pancake/runs/pta-wbnb-outcomes/127841040-127861271.json` | Public repository copies; transaction hashes remain public on BscScan                  |

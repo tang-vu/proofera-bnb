@@ -104,9 +104,11 @@ two-resolver agreement for five hosts, five authorized TLS observations and elev
 including exact build identity and honest readiness `503`. Manifest SHA-256 is
 `30fe670108738ca5f823d43f201317dba86d1ceaf974bac039c50d08290b90a3`. The observation did not
 deploy, restart services, access a wallet, sign or broadcast, and it is not relabeled as a frozen
-release. The same commit has a 297.080-second narrated final demo and separate-process
-automated copy/hash/full-decode/six-scene verification. Human playback, independent uptime and the
-organizer receipt remain open.
+release. The same commit retains the historical 297.080-second demo. Published media descendant
+`89a99e84c62905fa77aed9c431e7cb730f2c342f` now retains the primary 325.014-second MiMo demo; its
+manifest binds rendered pages to runtime-equivalent public carrier `1282910`, and a separate process
+copied, rehashed, fully decoded and rechecked all six scenes. Human playback, independent uptime and
+the organizer receipt remain open.
 
 Later on 2026-08-31, explicitly authorized current public product commit
 `9f32dda65d8123f6f37a58fa869daef6340fd1be` replaced only the web and monitor runtime. The exact

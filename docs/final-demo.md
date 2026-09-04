@@ -65,17 +65,18 @@ $releaseCommit = (git rev-parse HEAD).Trim()
 corepack pnpm capture:demo:video $releaseCommit --mode rehearsal
 ```
 
-The retained final mode invocation was:
+The retained MiMo final mode invocation was:
 
 ```powershell
 $releaseCommit = (git rev-parse HEAD).Trim()
 corepack pnpm capture:demo:video $releaseCommit --mode final `
-  --voiceover evidence/submission/narration/proofera-final-demo.mp3
+  --voiceover evidence/submission/narration/proofera-final-demo-mimo-v2.5.mp3
 ```
 
-Final output is create-only. Do not rerun or overwrite the retained `ad03498` directory.
+Final output is create-only. Do not rerun or overwrite the retained `ad03498` or `89a99e8`
+directories.
 
-## Five-minute narration map
+## Historical five-minute narration map
 
 The exact spoken source is
 `evidence/submission/narration/proofera-final-demo-script.txt`; it contains no bracketed placeholder.
@@ -98,8 +99,8 @@ viewer boundary, recompute SHA-256, play it from beginning to end, verify audio 
 all explorer/source links, and retain the timestamped result. This check may validate presentation;
 it cannot add a missing receipt or repair unsupported narration.
 
-The automated portion is retained at
-`evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/playback/manifest.json`.
+The current automated portion is retained at
+`evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/playback/manifest.json`.
 It verifies copy identity, structure, full decode and current public scenes. The owner still needs to
 listen/watch once on a separate viewer and retain a timestamped statement about intelligibility and
 presentation; that owner statement is not independent review.
@@ -138,8 +139,13 @@ rendered pages to runtime-equivalent public ancestor `12829109f26b8f6d15fc2f7bed
 lists all 29 changed paths, and records that the protected runtime path set did not change. FFmpeg
 completed a full decode; contact-sheet review found the expected dark title cards and six public
 scenes. The encoded audio had true peak `-1.6 dBFS` and no silence of at least two seconds at the
-`-45 dB` threshold. Separate-process automated playback and owner-perceived review remain pending at
-this point.
+`-45 dB` threshold. Separate-process playback then copied and rehashed the media, completed another
+full decode, and rechecked all six public scenes at HTTP 200. Its manifest SHA-256 is
+`612add66becfc9fbbf962efde445dc9a6a6c8fbd1ae00c621c1a99edf2abda1f`. Owner-perceived review
+remains pending.
+
+The readiness verifier retains a 95,000,000-byte per-artifact ceiling. This admits the 68,211,573-byte
+MP4 without removing the bounded-file guard and stays below GitHub's 100 MB hard per-file limit.
 
 The historical generation command was:
 

@@ -50,14 +50,14 @@ Public code release `f25a67daa0292b5a04c142a42606888f7ec2b8e6` adds the selected
 
 Current public carrier `12829109f26b8f6d15fc2f7beda2008548ae9be0` then passed a fresh create-only rehearsal: two independent documented DoH resolvers agreed for all five hosts, TLS was authorized 5/5 through the judging window, and all eleven HTTPS surfaces reported the exact build. Readiness remained analysis implemented, capital unavailable and judging false. Manifest SHA-256 is `7e89c2e3badf94e3fbf0ddbf8feafc6aa3492ad3da0f0883598dc961532ce6c6`; this is host-origin availability evidence, not independent uptime, a new frozen release, rollback repetition or submission.
 
-The final-demo path has an exact 650-word evidence-backed script and a create-only synthesized
-303.918-second MP3 timing track with SHA-256
-`aea3992fb2badedf8e52c7a5dbbaf57c6400d0a1190a7355e09b8cf3c31939bf`. Final capture accepts the
+The final-demo path retains the historical timing track plus an eight-chapter MiMo V2.5 narration
+with SHA-256 `017adf5ca85588da4be7c447b1cd02def705b8cd144665b8952413348f1cf81e`. Final capture accepts the
 retained Pancake `controlled_outcome_observed` state only when receipt, before/after, baseline,
 blocker and explicit no-benefit/no-agent-advantage claims all remain present; its manifest records
 that benefit verification is false. This removes a false-positive gate requirement without closing
-the Pancake benefit gate. Retained demo source commit `ad03498` now has a 297.080-second narrated MP4 with
-one video and one audio stream plus a separate-process copy/hash/full-decode/six-scene verification.
+the Pancake benefit gate. Published media source `89a99e8` has a 325.014-second narrated MP4 bound to
+runtime-equivalent public UI build `1282910`, with one video and one audio stream plus a
+separate-process copy/hash/full-decode/six-scene verification.
 Human-perceived narration quality, independent review and the organizer receipt remain separate
 external transitions.
 
@@ -393,3 +393,4 @@ The bounded v2 attempt then completed without rewriting v1. Grant `0xbfa1e3216d3
 | 2026-09-03 | Fit variable MiMo delivery to the final-video timing envelope                                 | Eight successful chapter TTS/ASR calls exposed an out-of-range assembled duration; a bounded deterministic local tempo plan now targets 250 or 325 seconds, records its exact factor and avoids blind provider retries                                                                   |
 | 2026-09-04 | Retain the MiMo V2.5 successor narration                                                      | Eight chapter TTS and ASR checks completed; all reviewed transcript thresholds passed, the bounded local fit produced a fully decoded 325.014-second mono MP3, and exact audio/ASR/manifest hashes are retained without claiming human playback or a successor video                     |
 | 2026-09-04 | Bind successor capture to a runtime-equivalent ancestor                                       | The collector separates media source from public UI build, requires ancestor lineage, records changed paths, rejects runtime-path deltas, and admits a prior demo only with its retained video, manifest, playback check and blocker                                                     |
+| 2026-09-04 | Retain the MiMo successor video and automated playback                                        | The 325.014-second MP4 binds six public scenes and exact narration bytes; a separate process copied, rehashed, fully decoded and rechecked it without claiming human listening or organizer submission                                                                                   |

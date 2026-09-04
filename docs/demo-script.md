@@ -1,6 +1,6 @@
 # ProofEra judge demo script
 
-Updated: 2026-09-04. This is the retained production script and shot list for the exact `ad03498` final video. The file is not an organizer receipt or a human presentation-quality attestation. Never show a secret, wallet export, environment file, passkey credential payload, or session signer.
+Updated: 2026-09-04. This is the retained production script and shot list for the MiMo final video sourced at `89a99e8`. The file is not an organizer receipt or a human presentation-quality attestation. Never show a secret, wallet export, environment file, passkey credential payload, or session signer.
 
 ## Current recording boundary
 
@@ -15,27 +15,25 @@ Ready to show now:
 The controlled Pancake before/after outcome now exists: the position was unchanged and produced no
 observed fee income or agent advantage. It is valid negative evidence, not a verified benefit. The
 base UI release has passed its exact-path rollback/restoration exercise and production freeze.
-The retained video source `ad0349811df96f39b110a505f0c6d9ded6d4746b` passed the two-resolver,
-five-TLS-host, eleven-response observation before capture. Current public carrier
-`12829109f26b8f6d15fc2f7beda2008548ae9be0` later passed the same bounded observation contract with
-analysis-only readiness and exact build identity. Altana and TermiX are verified; the TermiX review remains
-owner-designated internal and identity-limited. The 297.080-second narrated final capture and
-separate-process automated playback are retained. Human-perceived narration/presentation quality
-and organizer submission remain open.
+Current public carrier `12829109f26b8f6d15fc2f7beda2008548ae9be0` passed the two-resolver,
+five-TLS-host, eleven-response observation with analysis-only readiness and exact build identity.
+Published media source `89a99e84c62905fa77aed9c431e7cb730f2c342f` is its runtime-equivalent Git
+descendant: the capture manifest lists all changed paths and rejects runtime drift. Altana and TermiX
+are verified; the TermiX review remains owner-designated internal and identity-limited.
 
-A premium successor narration is now retained but has not replaced this final-video artifact. Its
-eight-chapter MiMo V2.5 TTS/ASR flow passed all reviewed machine-transcription thresholds and the
-325.014-second MP3 fully decodes. The successor capture adds a dark animated exact-build opener,
-smooth scene motion and an editorial close. Until its exact-release capture and playback artifacts
-exist, the `ad03498` video above remains the only retained final demo.
+The 325.014-second MiMo V2.5 capture now replaces the earlier video as the primary final demo. Its
+eight ASR chapters passed the reviewed machine-transcription threshold, and the retained MP4 adds a
+dark animated opener, smooth scene motion and an editorial close. A separate process copied,
+rehashed and fully decoded it, then rechecked all six public scenes. Human-perceived narration and
+presentation quality plus organizer submission remain open.
 
 ## One-session operator checklist
 
 1. Close notifications, password managers, terminal history, and every tab that could reveal a secret.
 2. Open the public product, BscScan receipt tabs, Proof Room, Mission Control, and the final TermiX report before recording.
-3. For the already-retained first capture, `pnpm submission:check` required production,
-   registration, Altana and TermiX to be `verified`, demo `not_recorded`, and Pancake to retain the
-   exact negative-evidence boundary documented in `docs/final-demo.md`. Do not overwrite that
+3. The successor capture required production, registration, Altana and TermiX to be `verified`, the
+   prior demo evidence and owner-playback blocker to remain intact, and Pancake to retain the exact
+   negative-evidence boundary documented in `docs/final-demo.md`. Do not overwrite either
    create-only output.
 4. Record at 1440x900 with browser zoom 100%. Keep the cursor deliberate and avoid scrolling while speaking.
 5. Use the committed MP3 voice-over with the exact-release capture command in `docs/final-demo.md`.
@@ -96,7 +94,8 @@ Narration: “The Proof Room is a closure ledger, not a victory page. Every veri
 
 ## Rehearsal command
 
-Run only from a clean commit already pushed and deployed as the exact public build:
+Run only from a clean commit already pushed and either deployed as the exact public build or
+verified by the collector as its runtime-equivalent descendant:
 
 ```powershell
 $releaseCommit = (git rev-parse HEAD).Trim()

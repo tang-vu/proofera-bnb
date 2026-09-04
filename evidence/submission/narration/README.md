@@ -50,4 +50,5 @@ credential material is retained by this local timing step.
 The retained MP3 is now bound into the create-only successor capture at
 `evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/final/`. That MP4 and
 its manifest do not attest human-perceived intelligibility, source-claim truth, independent review,
-automated playback, or hackathon submission.
+or hackathon submission. A separate automated playback record now verifies copy identity, another
+full decode and all six live scene assertions without upgrading those human or submission claims.

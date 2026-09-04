@@ -1,6 +1,6 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.2.0",
-  "updatedAtUtc": "2026-09-01T16:33:19.159Z",
+  "updatedAtUtc": "2026-09-04T08:25:52.772Z",
   "readyForSubmission": false,
   "gates": [
     {
@@ -148,25 +148,25 @@
     {
       "gateId": "demo",
       "state": "recorded_pending_human_playback",
-      "claim": "A 297.080-second narrated MP4 bound to public commit ad0349811df96f39b110a505f0c6d9ded6d4746b retains six public scenes, one 1440x900 H.264 video stream, one AAC audio stream and a complete decode. A separate-process automated playback copied and rehashed the media, completed another full audio/video decode and rechecked all six public scene assertions. That check is not a human review or separate physical-device attestation, so narration intelligibility and presentation quality remain owner-confirmed rather than inferred.",
+      "claim": "A 325.014-second MiMo narrated MP4 from published media source 89a99e84c62905fa77aed9c431e7cb730f2c342f retains six scenes from runtime-equivalent public UI build 12829109f26b8f6d15fc2f7beda2008548ae9be0, one 1440x900 H.264 video stream, one AAC audio stream and a complete decode. A separate-process automated playback copied and rehashed the media, completed another full audio/video decode and rechecked all six public scene assertions. That check is not a human review or separate physical-device attestation, so narration intelligibility and presentation quality remain owner-confirmed rather than inferred.",
       "blockers": [
         "Play the retained final MP4 once on a separate viewer, confirm narration intelligibility and evidence-link presentation, then retain the owner timestamp without treating it as independent review."
       ],
       "artifacts": [
         {
           "kind": "video",
-          "path": "evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/final/proofera-final-demo.mp4",
-          "sha256": "b93515b52ad29d811f3cc6fd38cc2ddb3ecb54a312e7fac5534a9a5dcca6558f"
+          "path": "evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/final/proofera-final-demo.mp4",
+          "sha256": "b78b364efc104aed35da4ed70af3a030bc7ded59a781af82a7a7499bf13a4c8b"
         },
         {
           "kind": "demo_check",
-          "path": "evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/final/manifest.json",
-          "sha256": "85a092e883fbc2b2ac4359a0a5598facd3fe0316fd7f240eac98376be74db1d6"
+          "path": "evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/final/manifest.json",
+          "sha256": "65b5b7fea2a3172285c45b2799d39cda1b3fc4d4793be7fdc3be3f3ad22d2c2f"
         },
         {
           "kind": "automated_playback_check",
-          "path": "evidence/submission/demo-videos/ad0349811df96f39b110a505f0c6d9ded6d4746b/playback/manifest.json",
-          "sha256": "0015b0b490c1118e15f60bce315f5c2eb2a62b0af2851a7affabb0ac73c77bae"
+          "path": "evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/playback/manifest.json",
+          "sha256": "612add66becfc9fbbf962efde445dc9a6a6c8fbd1ae00c621c1a99edf2abda1f"
         },
         {
           "kind": "current_video_rehearsal_manifest",

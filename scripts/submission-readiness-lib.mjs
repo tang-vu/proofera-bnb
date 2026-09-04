@@ -56,7 +56,7 @@ const SAFE_ID = /^[a-z][a-z0-9_-]{0,99}$/u;
 const SHA256 = /^[0-9a-f]{64}$/u;
 const SAFE_PATH = /^evidence\/[A-Za-z0-9._/-]+$/u;
 const UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/u;
-const MAXIMUM_ARTIFACT_BYTES = 64 * 1024 * 1024;
+const MAXIMUM_ARTIFACT_BYTES = 95_000_000;
 const MAXIMUM_GIT_OUTPUT_BYTES = MAXIMUM_ARTIFACT_BYTES + 1_000_000;
 
 export function validateSubmissionReadiness(value) {
