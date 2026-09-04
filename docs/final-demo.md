@@ -13,11 +13,17 @@ the transaction receipt, before/after metrics, manual baseline, a blocker, and e
 that no fee income, price movement, liquidity change, realized benefit or autonomous-agent advantage
 was observed. The final manifest records `pancakeBenefitClaimVerified: false` on that path.
 
-Before the first create-only final capture, the demo had to be `not_recorded`, submission `draft`,
-and top-level readiness false. That retained capture required all of the following:
+Before the first create-only final capture, the demo had to be `not_recorded`. A create-only
+successor may also start from `recorded_pending_human_playback`, but only when the retained prior
+gate still contains a video, demo manifest, automated playback check and an explicit blocker.
+Submission must remain `draft` and top-level readiness false. A final capture requires all of the
+following:
 
-- clean `HEAD`, equal to `origin/main` and the exact public `/api/health` build;
-- a narration file committed under `evidence/submission/narration/` at that same release;
+- clean `HEAD`, equal to `origin/main`;
+- a valid public `/api/health` build that either equals `HEAD` or is its Git ancestor with no change
+  under the public runtime path set (`apps`, `packages`, root package/lock/workspace/TypeScript
+  configuration, and the Windows production process definition);
+- a narration file committed under `evidence/submission/narration/` at `HEAD`;
 - six fixed public browser scenes at 1440x900;
 - one video stream and one audio stream in the final MP4;
 - a duration from 240 through 330 seconds;
@@ -135,9 +141,10 @@ The output is create-only and must not be regenerated or overwritten. The wrappe
 entry of an API key, kept it process-local, and removed it on exit.
 Credential rotation remains an account-owner decision and is not attested by this generator. It
 deliberately did not read or create `.env`. After the MP3, ASR record and manifest are committed, a
-future exact published commit still needs its own public deployment authorization before rehearsal
-or final capture. No deployment, wallet access, signature, transaction, or mainnet action was part
-of the narration generator.
+published media-only descendant may be captured against its runtime-equivalent public ancestor. The
+video manifest must name both commits, list every intervening changed path, and reject a difference
+in the runtime path set. This does not claim that the media commit itself was deployed. No deployment,
+wallet access, signature, transaction, or mainnet action was part of the narration generator.
 
 Reviewed provider references:
 

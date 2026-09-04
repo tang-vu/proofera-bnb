@@ -15,11 +15,15 @@ const narrationGenerator = await readFile(
 const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
 const prettierIgnore = await readFile(new URL("../.prettierignore", import.meta.url), "utf8");
 
-test("public demo video capture is exact-release gated and create-only", () => {
+test("public demo video capture is published-source gated and create-only", () => {
   assert.match(source, /--capture-exact-public-demo-video/u);
   assert.match(source, /--source-base-commit/u);
   assert.match(source, /rev-parse", "origin\/main/u);
   assert.match(source, /status", "--porcelain=v1", "--untracked-files=all/u);
+  assert.match(source, /merge-base", "--is-ancestor"/u);
+  assert.match(source, /PUBLIC_DEMO_VIDEO_PUBLIC_RUNTIME_MISMATCH/u);
+  assert.match(source, /relationship: "runtime_equivalent_descendant"/u);
+  assert.match(source, /publicSourceLineage/u);
   assert.match(source, /PUBLIC_DEMO_VIDEO_OUTPUT_EXISTS/u);
   assert.match(source, /COPYFILE_EXCL/u);
   assert.match(source, /flag: "wx"/u);
@@ -39,7 +43,6 @@ test("final mode requires prior objective gates, tracked narration and decoded m
   ]) {
     assert.match(source, new RegExp(`"${gate}"`, "u"));
   }
-  assert.match(source, /gates\.get\("demo"\)\?\.state !== "not_recorded"/u);
   assert.match(source, /gates\.get\("submission"\)\?\.state !== "draft"/u);
   assert.match(source, /gate\.state === "controlled_outcome_observed"/u);
   assert.match(source, /PANCAKE_OUTCOME_REQUIRED_KINDS/u);
@@ -51,6 +54,9 @@ test("final mode requires prior objective gates, tracked narration and decoded m
     /pancakeBenefitClaimVerified:\s+prerequisites\?\.pancakeBenefitClaimVerified === true/u
   );
   assert.match(source, /pancakeOutcomeGateState: prerequisites\?\.pancakeOutcomeGateState/u);
+  assert.match(source, /priorDemoSupportsSuccessor/u);
+  assert.match(source, /"recorded_pending_human_playback"/u);
+  assert.match(source, /PRIOR_DEMO_REQUIRED_KINDS/u);
   assert.match(source, /ls-files", "--error-unmatch/u);
   assert.match(source, /PUBLIC_DEMO_VIDEO_VOICEOVER_BYTES_MISMATCH/u);
   assert.match(source, /"ffprobe"/u);
@@ -96,7 +102,7 @@ test("capture opens and closes with dark editorial cards and smooth deterministi
   assert.match(source, /await revealScene\(page\)/u);
   assert.match(source, /await concealScene\(page\)/u);
   assert.match(source, /localEditorialTitleCards: true/u);
-  assert.match(source, /schemaVersion: "proofera-public-demo-video-v1\.1\.0"/u);
+  assert.match(source, /schemaVersion: "proofera-public-demo-video-v1\.2\.0"/u);
 });
 
 test("capture retries Windows temporary cleanup without masking the capture outcome", () => {

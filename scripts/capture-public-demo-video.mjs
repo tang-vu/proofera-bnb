@@ -43,6 +43,21 @@ const PANCAKE_OUTCOME_REQUIRED_KINDS = Object.freeze([
   "before_after_metrics",
   "manual_baseline"
 ]);
+const PRIOR_DEMO_REQUIRED_KINDS = Object.freeze([
+  "video",
+  "demo_check",
+  "automated_playback_check"
+]);
+const PUBLIC_RUNTIME_PATHS = Object.freeze([
+  "apps",
+  "packages",
+  "package.json",
+  "pnpm-lock.yaml",
+  "pnpm-workspace.yaml",
+  "tsconfig.base.json",
+  "deploy/windows/ecosystem.config.cjs"
+]);
+const MAXIMUM_LINEAGE_PATHS = 256;
 
 const SCENES = Object.freeze([
   Object.freeze({
@@ -152,6 +167,20 @@ function pancakeOutcomeSupportsFinalDemo(gate) {
   );
 }
 
+function priorDemoSupportsSuccessor(gate) {
+  if (gate?.state === "not_recorded") return true;
+  if (
+    gate?.state !== "recorded_pending_human_playback" ||
+    !Array.isArray(gate.artifacts) ||
+    !Array.isArray(gate.blockers) ||
+    gate.blockers.length === 0
+  ) {
+    return false;
+  }
+  const kinds = new Set(gate.artifacts.map((artifact) => artifact?.kind));
+  return PRIOR_DEMO_REQUIRED_KINDS.every((kind) => kinds.has(kind));
+}
+
 function verifyFinalPrerequisites() {
   let readiness;
   try {
@@ -162,19 +191,21 @@ function verifyFinalPrerequisites() {
   if (!Array.isArray(readiness?.gates)) fail("PUBLIC_DEMO_VIDEO_READINESS_INVALID");
   const gates = new Map(readiness.gates.map((gate) => [gate?.gateId, gate]));
   const pancakeGate = gates.get("pancake-benefit");
+  const demoGate = gates.get("demo");
   if (
     FINAL_PREREQUISITE_GATES.some(
       (gateId) =>
         gates.get(gateId)?.state !== "verified" || gates.get(gateId)?.blockers?.length !== 0
     ) ||
     !pancakeOutcomeSupportsFinalDemo(pancakeGate) ||
-    gates.get("demo")?.state !== "not_recorded" ||
+    !priorDemoSupportsSuccessor(demoGate) ||
     gates.get("submission")?.state !== "draft" ||
     readiness.readyForSubmission !== false
   ) {
     fail("PUBLIC_DEMO_VIDEO_PREREQUISITES_OPEN");
   }
   return Object.freeze({
+    priorDemoGateState: demoGate.state,
     pancakeBenefitClaimVerified: pancakeGate.state === "verified",
     pancakeOutcomeGateState: pancakeGate.state
   });
@@ -217,7 +248,7 @@ async function exactTrackedVoiceover(repositoryRoot, requestedPath, sourceCommit
   return Object.freeze({ bytes: disk.length, path: repositoryPath, sha256: sha256(disk) });
 }
 
-async function exactHealth(sourceCommit) {
+async function exactHealth() {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   let response;
@@ -238,7 +269,7 @@ async function exactHealth(sourceCommit) {
   if (
     body?.service !== "proofera-marketplace" ||
     body?.status !== "ok" ||
-    body?.build !== sourceCommit
+    !/^[0-9a-f]{40}$/u.test(body?.build ?? "")
   ) {
     fail("PUBLIC_DEMO_VIDEO_BUILD_MISMATCH");
   }
@@ -247,6 +278,53 @@ async function exactHealth(sourceCommit) {
     responseDate: response.headers.get("date"),
     status: response.status,
     url: response.url
+  });
+}
+
+function verifyPublicSourceLineage(publicBuildCommit, sourceCommit) {
+  if (publicBuildCommit === sourceCommit) {
+    return Object.freeze({
+      changedPaths: Object.freeze([]),
+      publicBuildCommit,
+      relationship: "exact_commit",
+      runtimePathsChecked: PUBLIC_RUNTIME_PATHS,
+      sourceCommit
+    });
+  }
+
+  const ancestor = spawnSync(
+    "git",
+    ["merge-base", "--is-ancestor", publicBuildCommit, sourceCommit],
+    { encoding: "utf8", maxBuffer: MAXIMUM_GIT_OUTPUT_BYTES, windowsHide: true }
+  );
+  if (ancestor.status !== 0 || ancestor.error) fail("PUBLIC_DEMO_VIDEO_BUILD_MISMATCH");
+
+  const runtimeChanges = gitText([
+    "diff",
+    "--name-only",
+    `${publicBuildCommit}..${sourceCommit}`,
+    "--",
+    ...PUBLIC_RUNTIME_PATHS
+  ]);
+  if (runtimeChanges !== "") fail("PUBLIC_DEMO_VIDEO_PUBLIC_RUNTIME_MISMATCH");
+
+  const changedText = gitText([
+    "diff",
+    "--name-only",
+    "--diff-filter=ACDMRTUXB",
+    `${publicBuildCommit}..${sourceCommit}`,
+    "--"
+  ]);
+  const changedPaths = changedText === "" ? [] : changedText.split(/\r?\n/u);
+  if (changedPaths.length === 0 || changedPaths.length > MAXIMUM_LINEAGE_PATHS) {
+    fail("PUBLIC_DEMO_VIDEO_LINEAGE_INVALID");
+  }
+  return Object.freeze({
+    changedPaths: Object.freeze(changedPaths),
+    publicBuildCommit,
+    relationship: "runtime_equivalent_descendant",
+    runtimePathsChecked: PUBLIC_RUNTIME_PATHS,
+    sourceCommit
   });
 }
 
@@ -614,12 +692,13 @@ async function capture({ mode, sourceCommit, voiceover }) {
     mode === "final" ? await exactTrackedVoiceover(repositoryRoot, voiceover, sourceCommit) : null;
   const narrationProbe =
     mode === "final" ? probeNarration(resolve(repositoryRoot, voiceover)) : null;
-  const health = await exactHealth(sourceCommit);
+  const health = await exactHealth();
+  const publicSourceLineage = verifyPublicSourceLineage(health.build, sourceCommit);
   const observedAtUtc = new Date().toISOString();
   const temporaryDirectory = await mkdtemp(join(tmpdir(), "proofera-demo-video-"));
   try {
     const recording = await recordBrowserVideo(
-      sourceCommit,
+      health.build,
       mode,
       temporaryDirectory,
       narrationProbe?.durationSeconds ?? 0
@@ -640,7 +719,7 @@ async function capture({ mode, sourceCommit, voiceover }) {
     decodeMedia(temporaryMediaPath);
     const mediaBytes = await readFile(temporaryMediaPath);
     const manifest = {
-      schemaVersion: "proofera-public-demo-video-v1.1.0",
+      schemaVersion: "proofera-public-demo-video-v1.2.0",
       classification: {
         artifact: mode === "final" ? "final_public_demo_video" : "public_demo_video_rehearsal",
         audioPresent: mode === "final",
@@ -649,10 +728,12 @@ async function capture({ mode, sourceCommit, voiceover }) {
         hackathonEntrySubmitted: false,
         localEditorialTitleCards: true,
         onchainReceiptEvidenceIntroduced: false,
+        publicRuntimeTreeMatchesCaptureSource: true,
         ...(mode === "final"
           ? {
               pancakeBenefitClaimVerified: prerequisites?.pancakeBenefitClaimVerified === true,
-              pancakeOutcomeGateState: prerequisites?.pancakeOutcomeGateState
+              pancakeOutcomeGateState: prerequisites?.pancakeOutcomeGateState,
+              priorDemoGateState: prerequisites?.priorDemoGateState
             }
           : {}),
         playbackDecoded: true,
@@ -662,6 +743,7 @@ async function capture({ mode, sourceCommit, voiceover }) {
       sourceCommit,
       observedAtUtc,
       publicHealth: health,
+      publicSourceLineage,
       captureEnvironment: {
         browser: "chromium",
         locale: "en-US",
@@ -683,7 +765,8 @@ async function capture({ mode, sourceCommit, voiceover }) {
       limitations:
         mode === "final"
           ? [
-              "This artifact proves exact-release public rendering, retained narration bytes, media decoding and the listed scene assertions; it does not prove the hackathon entry was submitted or accepted.",
+              "This artifact binds public rendering to publicHealth.build and retained narration bytes to sourceCommit; publicSourceLineage records their exact relationship and rejects any runtime-path difference.",
+              "It proves media decoding and the listed scene assertions; it does not prove the hackathon entry was submitted or accepted.",
               "The collector introduces no onchain evidence; all receipt claims shown in the product must already be bound by the prerequisite readiness gates.",
               prerequisites?.pancakeBenefitClaimVerified === true
                 ? "The Pancake benefit gate was verified by the retained readiness record."
@@ -691,7 +774,8 @@ async function capture({ mode, sourceCommit, voiceover }) {
               "A separate timestamped clean-room playback and authoritative submission receipt remain required."
             ]
           : [
-              "This rehearsal proves only that the exact public release rendered and that the retained silent browser recording decoded.",
+              "This rehearsal binds the rendered pages to publicHealth.build and records how sourceCommit relates to that public build without admitting runtime-path differences.",
+              "It proves only that those public pages rendered and that the retained silent browser recording decoded.",
               "It is not the narrated final demo, a clean-room playback, an uptime record, a transaction receipt, or a hackathon submission receipt.",
               "Dynamic upstream data outside the asserted text is not independently authenticated by this artifact."
             ]
