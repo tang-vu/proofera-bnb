@@ -57,5 +57,8 @@ test("playback collector uses a copied boundary, full decode and live scene asse
   assert.match(scriptSource, /"ffprobe"/u);
   assert.match(scriptSource, /"ffmpeg"/u);
   assert.match(scriptSource, /page\.getByText\(assertion/u);
+  assert.match(scriptSource, /sourceManifest\.publicHealth\.build/u);
+  assert.match(scriptSource, /publicRuntimeTreeMatchesCaptureSource/u);
+  assert.match(scriptSource, /runtime_equivalent_descendant/u);
   assert.match(scriptSource, /humanAudioIntelligibilityAttested: false/u);
 });

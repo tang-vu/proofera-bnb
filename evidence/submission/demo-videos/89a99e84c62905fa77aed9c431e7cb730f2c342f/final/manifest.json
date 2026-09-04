@@ -1,0 +1,202 @@
+{
+  "schemaVersion": "proofera-public-demo-video-v1.2.0",
+  "classification": {
+    "artifact": "final_public_demo_video",
+    "audioPresent": true,
+    "browserAutomation": true,
+    "finalDemoCheck": true,
+    "hackathonEntrySubmitted": false,
+    "localEditorialTitleCards": true,
+    "onchainReceiptEvidenceIntroduced": false,
+    "publicRuntimeTreeMatchesCaptureSource": true,
+    "pancakeBenefitClaimVerified": false,
+    "pancakeOutcomeGateState": "controlled_outcome_observed",
+    "priorDemoGateState": "recorded_pending_human_playback",
+    "playbackDecoded": true,
+    "submissionReady": false,
+    "videoRecorded": true
+  },
+  "sourceCommit": "89a99e84c62905fa77aed9c431e7cb730f2c342f",
+  "observedAtUtc": "2026-09-04T08:09:36.538Z",
+  "publicHealth": {
+    "build": "12829109f26b8f6d15fc2f7beda2008548ae9be0",
+    "responseDate": "Fri, 04 Sep 2026 08:09:36 GMT",
+    "status": 200,
+    "url": "https://proofera.tangvu.dev/api/health"
+  },
+  "publicSourceLineage": {
+    "changedPaths": [
+      ".gitattributes",
+      ".github/workflows/public-uptime.yml",
+      "README.md",
+      "docs/EXECUTION_PLAN.md",
+      "docs/demo-script.md",
+      "docs/deployment.md",
+      "docs/final-demo.md",
+      "docs/hackathon-score-strategy.md",
+      "docs/judge-scorecard.md",
+      "docs/pitch-deck.md",
+      "docs/production-release-evidence.md",
+      "docs/requirements-traceability.md",
+      "docs/research.md",
+      "docs/security.md",
+      "docs/submission-packet.md",
+      "docs/submission.md",
+      "evidence/submission/narration/README.md",
+      "evidence/submission/narration/proofera-final-demo-mimo-v2.5-asr.json",
+      "evidence/submission/narration/proofera-final-demo-mimo-v2.5-manifest.json",
+      "evidence/submission/narration/proofera-final-demo-mimo-v2.5.mp3",
+      "evidence/submission/readiness.json",
+      "evidence/submission/release-probes/12829109f26b8f6d15fc2f7beda2008548ae9be0/rehearsal/manifest.json",
+      "scripts/capture-production-release-evidence.test.mjs",
+      "scripts/capture-public-demo-video.mjs",
+      "scripts/capture-public-demo-video.test.mjs",
+      "scripts/generate-mimo-demo-narration.mjs",
+      "scripts/generate-mimo-demo-narration.ps1",
+      "scripts/generate-mimo-demo-narration.test.mjs",
+      "scripts/local-production.test.mjs"
+    ],
+    "publicBuildCommit": "12829109f26b8f6d15fc2f7beda2008548ae9be0",
+    "relationship": "runtime_equivalent_descendant",
+    "runtimePathsChecked": [
+      "apps",
+      "packages",
+      "package.json",
+      "pnpm-lock.yaml",
+      "pnpm-workspace.yaml",
+      "tsconfig.base.json",
+      "deploy/windows/ecosystem.config.cjs"
+    ],
+    "sourceCommit": "89a99e84c62905fa77aed9c431e7cb730f2c342f"
+  },
+  "captureEnvironment": {
+    "browser": "chromium",
+    "locale": "en-US",
+    "navigationFadeMs": 650,
+    "playwrightVersion": "1.62.1",
+    "reducedMotion": "reduce",
+    "viewport": {
+      "height": 900,
+      "width": 1440
+    }
+  },
+  "voiceover": {
+    "bytes": 7801965,
+    "path": "evidence/submission/narration/proofera-final-demo-mimo-v2.5.mp3",
+    "sha256": "017adf5ca85588da4be7c447b1cd02def705b8cd144665b8952413348f1cf81e",
+    "probe": {
+      "channels": 1,
+      "codecName": "mp3",
+      "durationSeconds": 325.013938,
+      "sampleRate": "48000"
+    }
+  },
+  "titleCards": [
+    {
+      "holdMs": 8000,
+      "key": "intro",
+      "localEditorialCard": true
+    },
+    {
+      "holdMs": 8000,
+      "key": "outro",
+      "localEditorialCard": true
+    }
+  ],
+  "scenes": [
+    {
+      "assertions": [
+        "Four jobs. Equal scrutiny.",
+        "Missing evidence is a result."
+      ],
+      "holdMs": 36662,
+      "httpStatus": 200,
+      "key": "home",
+      "title": "ProofEra — Hire agents by proof",
+      "url": "https://proofera.tangvu.dev/"
+    },
+    {
+      "assertions": [
+        "Start with the job.",
+        "Four registered analyzers. Zero invented performance."
+      ],
+      "holdMs": 43288,
+      "httpStatus": 200,
+      "key": "marketplace",
+      "title": "Agent marketplace — ProofEra",
+      "url": "https://proofera.tangvu.dev/marketplace"
+    },
+    {
+      "assertions": [
+        "LP Range Analyzer",
+        "Identity exists. Execution gates remain closed."
+      ],
+      "holdMs": 55214,
+      "httpStatus": 200,
+      "key": "lp-passport",
+      "title": "LP Range Analyzer reference dossier — ProofEra",
+      "url": "https://proofera.tangvu.dev/reference-analyzers/lp-rebalancing"
+    },
+    {
+      "assertions": [
+        "Grant once. Keep every action bounded.",
+        "Define the boundaries"
+      ],
+      "holdMs": 48147,
+      "httpStatus": 200,
+      "key": "lp-configuration",
+      "title": "LP configuration readiness — ProofEra",
+      "url": "https://proofera.tangvu.dev/lp-activate"
+    },
+    {
+      "assertions": [
+        "Proof, including what is missing.",
+        "Seven gates."
+      ],
+      "holdMs": 71999,
+      "httpStatus": 200,
+      "key": "proof-room",
+      "title": "Proof room — ProofEra",
+      "url": "https://proofera.tangvu.dev/proof"
+    },
+    {
+      "assertions": [
+        "Control the mandate, not every action.",
+        "No active agent session exists."
+      ],
+      "holdMs": 42404,
+      "httpStatus": 200,
+      "key": "mission-control",
+      "title": "Mission Control — ProofEra",
+      "url": "https://proofera.tangvu.dev/mission-control"
+    }
+  ],
+  "media": {
+    "bytes": 68211573,
+    "path": "proofera-final-demo.mp4",
+    "probe": {
+      "audioStreams": [
+        {
+          "channels": 1,
+          "codecName": "aac",
+          "sampleRate": "48000"
+        }
+      ],
+      "durationSeconds": "325.014",
+      "formatNames": "mov,mp4,m4a,3gp,3g2,mj2",
+      "videoStream": {
+        "codecName": "h264",
+        "height": 900,
+        "width": 1440
+      }
+    },
+    "sha256": "b78b364efc104aed35da4ed70af3a030bc7ded59a781af82a7a7499bf13a4c8b"
+  },
+  "limitations": [
+    "This artifact binds public rendering to publicHealth.build and retained narration bytes to sourceCommit; publicSourceLineage records their exact relationship and rejects any runtime-path difference.",
+    "It proves media decoding and the listed scene assertions; it does not prove the hackathon entry was submitted or accepted.",
+    "The collector introduces no onchain evidence; all receipt claims shown in the product must already be bound by the prerequisite readiness gates.",
+    "The retained Pancake result is a controlled negative outcome, not a realized-benefit or autonomous-agent-advantage claim.",
+    "A separate timestamped clean-room playback and authoritative submission receipt remain required."
+  ]
+}

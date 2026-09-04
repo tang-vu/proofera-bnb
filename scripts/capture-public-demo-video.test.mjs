@@ -14,6 +14,7 @@ const narrationGenerator = await readFile(
 );
 const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
 const prettierIgnore = await readFile(new URL("../.prettierignore", import.meta.url), "utf8");
+const gitAttributes = await readFile(new URL("../.gitattributes", import.meta.url), "utf8");
 
 test("public demo video capture is published-source gated and create-only", () => {
   assert.match(source, /--capture-exact-public-demo-video/u);
@@ -28,9 +29,44 @@ test("public demo video capture is published-source gated and create-only", () =
   assert.match(source, /COPYFILE_EXCL/u);
   assert.match(source, /flag: "wx"/u);
   assert.match(prettierIgnore, /^evidence\/submission\/demo-videos\/\*\/\*\/manifest\.json$/mu);
+  assert.match(
+    gitAttributes,
+    /^evidence\/submission\/demo-videos\/\*\/\*\/manifest\.json text eol=lf$/mu
+  );
+  assert.match(gitAttributes, /^evidence\/submission\/demo-videos\/\*\/\*\/\*\.mp4 binary$/mu);
   assert.equal(
     packageJson.scripts["capture:demo:video"],
     "node ./scripts/capture-public-demo-video.mjs --capture-exact-public-demo-video --source-base-commit"
+  );
+});
+
+test("retained MiMo successor video binds published media and runtime-equivalent public UI", async () => {
+  const directory = new URL(
+    "../evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/final/",
+    import.meta.url
+  );
+  const manifestBytes = await readFile(new URL("manifest.json", directory));
+  const manifest = JSON.parse(manifestBytes.toString("utf8"));
+  const mediaBytes = await readFile(new URL(manifest.media.path, directory));
+
+  assert.equal(manifest.schemaVersion, "proofera-public-demo-video-v1.2.0");
+  assert.equal(manifest.sourceCommit, "89a99e84c62905fa77aed9c431e7cb730f2c342f");
+  assert.equal(manifest.publicHealth.build, "12829109f26b8f6d15fc2f7beda2008548ae9be0");
+  assert.equal(manifest.publicSourceLineage.relationship, "runtime_equivalent_descendant");
+  assert.equal(manifest.publicSourceLineage.sourceCommit, manifest.sourceCommit);
+  assert.equal(manifest.publicSourceLineage.publicBuildCommit, manifest.publicHealth.build);
+  assert.equal(manifest.classification.publicRuntimeTreeMatchesCaptureSource, true);
+  assert.equal(manifest.classification.priorDemoGateState, "recorded_pending_human_playback");
+  assert.equal(
+    manifest.voiceover.sha256,
+    "017adf5ca85588da4be7c447b1cd02def705b8cd144665b8952413348f1cf81e"
+  );
+  assert.equal(manifest.media.probe.durationSeconds, "325.014");
+  assert.equal(manifest.scenes.length, 6);
+  assert.equal(mediaBytes.length, 68_211_573);
+  assert.equal(
+    createHash("sha256").update(mediaBytes).digest("hex"),
+    "b78b364efc104aed35da4ed70af3a030bc7ded59a781af82a7a7499bf13a4c8b"
   );
 });
 

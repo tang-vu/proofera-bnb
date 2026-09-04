@@ -46,3 +46,6 @@ evidence/submission/final/termix/**/*.json text eol=lf
 # Demo narration manifests and sources are hashed byte-for-byte; audio stays binary.
 evidence/submission/narration/*.json text eol=lf
 evidence/submission/narration/*.mp3 binary
+evidence/submission/demo-videos/*/*/manifest.json text eol=lf
+evidence/submission/demo-videos/*/*/*.mp4 binary
+evidence/submission/demo-videos/*/*/*.webm binary

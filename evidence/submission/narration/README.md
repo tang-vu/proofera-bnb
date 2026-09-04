@@ -47,6 +47,7 @@ tempo filter, then normalizes the final mono MP3. The manifest records the sourc
 target and exact tempo factor. No additional provider call, request header, raw response, or
 credential material is retained by this local timing step.
 
-The retained media and machine transcript do not attest human-perceived intelligibility,
-presentation quality, source-claim truth, independent review, final video capture, playback, or
-hackathon submission.
+The retained MP3 is now bound into the create-only successor capture at
+`evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/final/`. That MP4 and
+its manifest do not attest human-perceived intelligibility, source-claim truth, independent review,
+automated playback, or hackathon submission.

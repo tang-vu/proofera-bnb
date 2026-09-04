@@ -183,6 +183,7 @@ async function verifyPlayback(sourceCommit) {
     fail("FINAL_DEMO_PLAYBACK_SOURCE_MANIFEST_INVALID");
   }
   if (
+    sourceManifest?.schemaVersion !== "proofera-public-demo-video-v1.2.0" ||
     sourceManifest?.sourceCommit !== sourceCommit ||
     sourceManifest?.classification?.artifact !== "final_public_demo_video" ||
     sourceManifest?.classification?.videoRecorded !== true ||
@@ -190,7 +191,14 @@ async function verifyPlayback(sourceCommit) {
     !Array.isArray(sourceManifest?.scenes) ||
     sourceManifest.scenes.length !== 6 ||
     sourceManifest?.media?.path !== "proofera-final-demo.mp4" ||
-    !/^[0-9a-f]{64}$/u.test(sourceManifest?.media?.sha256 ?? "")
+    !/^[0-9a-f]{64}$/u.test(sourceManifest?.media?.sha256 ?? "") ||
+    !/^[0-9a-f]{40}$/u.test(sourceManifest?.publicHealth?.build ?? "") ||
+    sourceManifest?.publicSourceLineage?.sourceCommit !== sourceCommit ||
+    sourceManifest?.publicSourceLineage?.publicBuildCommit !== sourceManifest.publicHealth.build ||
+    !["exact_commit", "runtime_equivalent_descendant"].includes(
+      sourceManifest?.publicSourceLineage?.relationship
+    ) ||
+    sourceManifest?.classification?.publicRuntimeTreeMatchesCaptureSource !== true
   ) {
     fail("FINAL_DEMO_PLAYBACK_SOURCE_MANIFEST_INVALID");
   }
@@ -223,12 +231,12 @@ async function verifyPlayback(sourceCommit) {
     const probe = probeMedia(copiedMediaPath);
     decodeMedia(copiedMediaPath);
     const publicScenes = await verifyPublicScenes(
-      sourceCommit,
+      sourceManifest.publicHealth.build,
       sourceManifest.scenes,
       repositoryRoot
     );
     const manifest = {
-      schemaVersion: "proofera-final-demo-automated-playback-v1.0.0",
+      schemaVersion: "proofera-final-demo-automated-playback-v1.1.0",
       classification: {
         artifact: "bounded_automated_playback_verification",
         fullAudioVideoDecode: true,
@@ -245,7 +253,8 @@ async function verifyPlayback(sourceCommit) {
         manifestPath: relative(repositoryRoot, sourceManifestPath).replaceAll("\\", "/"),
         manifestSha256: canonicalTextSha256(sourceManifestBytes),
         mediaPath: relative(repositoryRoot, mediaPath).replaceAll("\\", "/"),
-        mediaSha256: sha256(mediaBytes)
+        mediaSha256: sha256(mediaBytes),
+        publicBuildCommit: sourceManifest.publicHealth.build
       },
       temporaryCopy: {
         byteIdentityVerified: true,

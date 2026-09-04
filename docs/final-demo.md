@@ -104,10 +104,10 @@ It verifies copy identity, structure, full decode and current public scenes. The
 listen/watch once on a separate viewer and retain a timestamped statement about intelligibility and
 presentation; that owner statement is not independent review.
 
-## Retained premium narration; successor video pending
+## Retained MiMo successor capture
 
-The next create-only capture path is implemented but is not yet a retained final-video claim. It
-adds a self-contained dark HTML/CSS intro and outro, exact testnet/build labels, a black-to-scene
+The create-only successor capture is now retained. It adds a self-contained dark HTML/CSS intro and
+outro, exact testnet/build labels, a black-to-scene
 navigation curtain, eased continuous scrolling, and scene durations weighted to the narration.
 The first second of browser-startup footage is removed during encoding, so the about-blank frame
 cannot become a white opening. Editorial cards are recorded separately in the manifest and never
@@ -130,6 +130,16 @@ SHA-256 `017adf5ca85588da4be7c447b1cd02def705b8cd144665b8952413348f1cf81e`. FFmp
 decode; an EBU R128 observation reported `-16.6 LUFS` integrated loudness and `-1.7 dBFS` true peak,
 with no silence of at least two seconds at the reviewed `-45 dB` threshold. These machine checks do
 not establish human-perceived narration quality.
+
+Source commit `89a99e84c62905fa77aed9c431e7cb730f2c342f` produced a 325.014-second,
+68,211,573-byte MP4 with one 1440x900 H.264 stream and one mono 48 kHz AAC stream. Its SHA-256 is
+`b78b364efc104aed35da4ed70af3a030bc7ded59a781af82a7a7499bf13a4c8b`. The manifest binds the
+rendered pages to runtime-equivalent public ancestor `12829109f26b8f6d15fc2f7beda2008548ae9be0`,
+lists all 29 changed paths, and records that the protected runtime path set did not change. FFmpeg
+completed a full decode; contact-sheet review found the expected dark title cards and six public
+scenes. The encoded audio had true peak `-1.6 dBFS` and no silence of at least two seconds at the
+`-45 dB` threshold. Separate-process automated playback and owner-perceived review remain pending at
+this point.
 
 The historical generation command was:
 
