@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "proofera-mimo-demo-narration-v1.1.0",
+  "classification": {
+    "artifact": "create_only_mimo_tts_narration",
+    "asrChecked": true,
+    "asrReviewedThresholdPassed": true,
+    "humanIntelligibilityAttested": false,
+    "providerCredentialRetained": false
+  },
+  "observedAtUtc": "2026-09-04T07:40:56.443Z",
+  "provider": "Xiaomi MiMo",
+  "apiBaseUrl": "https://token-plan-sgp.xiaomimimo.com/v1",
+  "tts": {
+    "model": "mimo-v2.5-tts",
+    "voice": "Dean",
+    "formatRequested": "wav",
+    "stylePrompt": "Polished English narration for a premium technology product film. Calm, authoritative, warm, and precise. Medium pace with crisp pronunciation of blockchain terms, contract addresses, decimals, and measured results. Use restrained dramatic emphasis and natural pauses. Never sound promotional, breathless, theatrical, or exaggerated."
+  },
+  "asr": {
+    "model": "mimo-v2.5-asr",
+    "evidencePath": "evidence/submission/narration/proofera-final-demo-mimo-v2.5-asr.json",
+    "evidenceSha256": "144893d776b478d6cd206923ed3a585f1a6fe9719ecbb07f4e59ceaa943e503d"
+  },
+  "timing": {
+    "adjusted": true,
+    "sourceDurationSeconds": 397.03,
+    "targetDurationSeconds": 325,
+    "tempoFactor": 1.22163077
+  },
+  "source": {
+    "path": "evidence/submission/narration/proofera-final-demo-mimo-v2.5-script.json",
+    "sha256": "0e500fef5e70e7160d334c63825918c1d0834f2eb25b66802322a9ccd3d797e2",
+    "chapters": [
+      {
+        "key": "intro",
+        "sourceTextSha256": "447d34f9e1232df517ffcb53f41601e7599ffa3e8406a6c11650691a772bd6e1",
+        "ttsAudioSha256": "561754d198651c469ed6624ca12ef4cd22077a9fe66d0e117a45fa66be7ecb62",
+        "ttsProbe": {
+          "bytes": 583724,
+          "channels": 1,
+          "codecName": "pcm_s16le",
+          "durationSeconds": "12.160",
+          "sampleRate": "24000"
+        }
+      },
+      {
+        "key": "home",
+        "sourceTextSha256": "545e80abb079a0e0190a0b46d83b2019a53c30fbdb520fa9172b95799c4597ab",
+        "ttsAudioSha256": "c8bc95b7d779eb9a7d71fcda75d8d5b004d5d1d30cb90b05cc094435037ae6df",
+        "ttsProbe": {
+          "bytes": 2119724,
+          "channels": 1,
+          "codecName": "pcm_s16le",
+          "durationSeconds": "44.160",
+          "sampleRate": "24000"
+        }
+      },
+      {
+        "key": "marketplace",
+        "sourceTextSha256": "1bb6794024ed4436e1ae6ea7f9e8e7588eef16285a04bfa7d29af06eac85c300",
+        "ttsAudioSha256": "71fadbc78f86782bc2e7d14e875ed76f181e25a682bea1e3a02d42c9fbde999d",
+        "ttsProbe": {
+          "bytes": 2449964,
+          "channels": 1,
+          "codecName": "pcm_s16le",
+          "durationSeconds": "51.040",
+          "sampleRate": "24000"
+        }
+      },
+      {
+        "key": "lp-passport",
+        "sourceTextSha256": "659d352681cf1761b4f54aad86894d775e9d229bcdf83873154aa1c674c19874",
+        "ttsAudioSha256": "0d9939f472a189419fa934999386e3d2e75ea87c73bd1b56d9f950a0e41c382e",
+        "ttsProbe": {
+          "bytes": 3640364,
+          "channels": 1,
+          "codecName": "pcm_s16le",
+          "durationSeconds": "75.840",
+          "sampleRate": "24000"
+        }
+      },
+      {
+        "key": "lp-configuration",
+        "sourceTextSha256": "81a5d80617136b5cc2101a3be1113b4e892b719ddfd4db5b75888cc6eca3a7e2",
+        "ttsAudioSha256": "38727357bebe30d0deb6ea779762e7dcff33d6b367062da94029307ec796e6a6",
+        "ttsProbe": {
+          "bytes": 2534444,
+          "channels": 1,
+          "codecName": "pcm_s16le",
+          "durationSeconds": "52.800",
+          "sampleRate": "24000"
+        }
+      },
+      {
+        "key": "proof-room",
+        "sourceTextSha256": "45de94ed38bce957d74e3c018cf51d457cd816239b75207b277066d231730d00",
+        "ttsAudioSha256": "178a46aa42867c50d30b49be93d46ad0c8e5d6f443599a823f8fbdd226c90bdf",
+        "ttsProbe": {
+          "bytes": 4538924,
+          "channels": 1,
+          "codecName": "pcm_s16le",
+          "durationSeconds": "94.560",
+          "sampleRate": "24000"
+        }
+      },
+      {
+        "key": "mission-control",
+        "sourceTextSha256": "c54290aba2111d4c40e7423e9b6e72f7518089d45339cf075a67f20fe6fd3c15",
+        "ttsAudioSha256": "38562a53cb409d6150550f1e18b67f833a0c21d83835362df9847c6035a234b4",
+        "ttsProbe": {
+          "bytes": 2281004,
+          "channels": 1,
+          "codecName": "pcm_s16le",
+          "durationSeconds": "47.520",
+          "sampleRate": "24000"
+        }
+      },
+      {
+        "key": "outro",
+        "sourceTextSha256": "6d6b294a6b7bb8cb576b939d5205914f3dbcd9547b4b73f57b4fb1fe1d82c176",
+        "ttsAudioSha256": "959d352b68b8387c308db8e5ed6a2acb67dcd5c53c0a4b3da32d55e80c522619",
+        "ttsProbe": {
+          "bytes": 691244,
+          "channels": 1,
+          "codecName": "pcm_s16le",
+          "durationSeconds": "14.400",
+          "sampleRate": "24000"
+        }
+      }
+    ]
+  },
+  "output": {
+    "path": "evidence/submission/narration/proofera-final-demo-mimo-v2.5.mp3",
+    "sha256": "017adf5ca85588da4be7c447b1cd02def705b8cd144665b8952413348f1cf81e",
+    "probe": {
+      "bytes": 7801965,
+      "channels": 1,
+      "codecName": "mp3",
+      "durationSeconds": "325.014",
+      "sampleRate": "48000"
+    }
+  },
+  "limitations": [
+    "The retained audio proves exact generated bytes and media properties, not human-perceived narration quality.",
+    "Generation is a one-off interactive development action, not an application backend or production runtime dependency.",
+    "The API credential is process-local, is not written to repository files and is removed by the interactive wrapper."
+  ]
+}

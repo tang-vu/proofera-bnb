@@ -1,6 +1,6 @@
 # ProofEra judge demo script
 
-Updated: 2026-08-31. This is the retained production script and shot list for the exact `ad03498` final video. The file is not an organizer receipt or a human presentation-quality attestation. Never show a secret, wallet export, environment file, passkey credential payload, or session signer.
+Updated: 2026-09-04. This is the retained production script and shot list for the exact `ad03498` final video. The file is not an organizer receipt or a human presentation-quality attestation. Never show a secret, wallet export, environment file, passkey credential payload, or session signer.
 
 ## Current recording boundary
 
@@ -23,10 +23,11 @@ owner-designated internal and identity-limited. The 297.080-second narrated fina
 separate-process automated playback are retained. Human-perceived narration/presentation quality
 and organizer submission remain open.
 
-A premium successor pipeline is now prepared but has not replaced this retained artifact. Its
-reviewed script uses an eight-chapter MiMo V2.5 TTS/ASR flow, a dark animated exact-build opener,
-smooth scene motion and an editorial close. Until the create-only audio, exact-release capture and
-playback artifacts exist, the `ad03498` video above remains the only retained final demo.
+A premium successor narration is now retained but has not replaced this final-video artifact. Its
+eight-chapter MiMo V2.5 TTS/ASR flow passed all reviewed machine-transcription thresholds and the
+325.014-second MP3 fully decodes. The successor capture adds a dark animated exact-build opener,
+smooth scene motion and an editorial close. Until its exact-release capture and playback artifacts
+exist, the `ad03498` video above remains the only retained final demo.
 
 ## One-session operator checklist
 

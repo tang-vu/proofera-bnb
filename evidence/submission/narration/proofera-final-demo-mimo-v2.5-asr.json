@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "proofera-mimo-asr-verification-v1.0.0",
+  "classification": {
+    "artifact": "automated_narration_transcript_check",
+    "humanIntelligibilityAttested": false,
+    "independentHumanReviewer": false,
+    "sourceClaimVerification": false
+  },
+  "observedAtUtc": "2026-09-04T07:40:56.443Z",
+  "provider": "Xiaomi MiMo",
+  "model": "mimo-v2.5-asr",
+  "language": "en",
+  "reviewedSequenceSimilarity": 0.78,
+  "catastrophicSequenceSimilarity": 0.4,
+  "reviewedThresholdPassed": true,
+  "chapters": [
+    {
+      "key": "intro",
+      "sourceTextSha256": "447d34f9e1232df517ffcb53f41601e7599ffa3e8406a6c11650691a772bd6e1",
+      "transcript": "autonomous agents can move capital, but identity alone does not make them trustworthy. Proof Era puts proof before permission.",
+      "transcriptSha256": "adc01ca6b4697a137ae0d6bd0feacbce040dfad70c1a67ae3f9ef23610501860",
+      "sequenceSimilarity": 0.894737,
+      "reviewedThresholdPassed": true
+    },
+    {
+      "key": "home",
+      "sourceTextSha256": "545e80abb079a0e0190a0b46d83b2019a53c30fbdb520fa9172b95799c4597ab",
+      "transcript": "think>\n<chinese> Proof to Error is the evidence and control layer between ERC 8004 identity and wallet authority. Its governing rule is simple: missing evidence stays missing. An unavailable metric, a stale source, an uncertain transaction, or an open release gate never becomes a marketing claim. The product follows one continuous decision path: discover an agent by the job, inspect its evidence, define a bounded mandate, observe execution, reconcile uncertainty, and prove revocation. Every screen stays on BNB Smart Chain testnet.",
+      "transcriptSha256": "5fc006d5ee4bb18a1748c54f57d290e5267a31ecfc0bbb8ecf911466e255704d",
+      "sequenceSimilarity": 0.938272,
+      "reviewedThresholdPassed": true
+    },
+    {
+      "key": "marketplace",
+      "sourceTextSha256": "1bb6794024ed4436e1ae6ea7f9e8e7588eef16285a04bfa7d29af06eac85c300",
+      "transcript": "3. A capital owner starts with the outcome they need: manage concentrated liquidity, run a bounded grid, compare sustainable yield, or protect a Venus lending position. Each category has its own decision contract, because range status, grid drawdown, withdraw liquidity, and health factor cannot safely collapse into one return number. Four public read-only analyzers are registered on BNB Smart Chain Testnet as agent identities 1825 through 1828. Registration proves identity publication; it does not prove performance or grant execution rights. Proof Era keeps that distinction visible before the user opens an agent passport.",
+      "transcriptSha256": "cc0aa561d12e64f0fdf95b4f69a385349244fdc17fa0b7a8272fd6cc83c2d4e1",
+      "sequenceSimilarity": 0.916667,
+      "reviewedThresholdPassed": true
+    },
+    {
+      "key": "lp-passport",
+      "sourceTextSha256": "659d352681cf1761b4f54aad86894d775e9d229bcdf83873154aa1c674c19874",
+      "transcript": "2. The liquidity position passport separates observations, calculations, freshness, costs, downside, and unknowns. In the frozen public pancake position, an exact block replay placed the current tick one tick above the lower boundary. The analyzer returned insufficient evidence because projected fees, gas, and slippage were unavailable. Proof错 refused to turn a range trigger into a profit claim. A separate owner executed test net fixture, later created a full range position with 1,000 proof错 test asset and 0.001 test BNB. Two official providers verified both receipts and the post state. During the retained observation window, price and liquidity stayed unchanged, fees were zero, and known gas remained a cost. The honest conclusion is no observed benefit and no autonomous agent advantage.",
+      "transcriptSha256": "ce0c5827b382bb438bb73f1bb6bdef7153043d2bbfc13d460b69e393d4f17ee6",
+      "sequenceSimilarity": 0.918699,
+      "reviewedThresholdPassed": true
+    },
+    {
+      "key": "lp-configuration",
+      "sourceTextSha256": "81a5d80617136b5cc2101a3be1113b4e892b719ddfd4db5b75888cc6eca3a7e2",
+      "transcript": "4. Proof era. Fix the chain. Direct target, function selector, token, recipient, spend cap, expiry, quote age, and enforcement owner. The bounded Altona life cycle ran on chain 97. The owner granted one scoped session. That session executed only the declared zero amount test approval. Then the owner revoked it. Grant, execute, and revoke each have successful receipts. A button press alone is never treated as completion. The retained evidence also joins a fresh finalized checkpoint where both providers observed that the scoped authority was absent. Historical state limitations and the zero value economic effect remain disclosed. This proves one bounded testnet life cycle, not a production trading mandate.",
+      "transcriptSha256": "c8891eb5226e0b17e097f70fad574b61f27f4401977c8cd6806be738e53ad09e",
+      "sequenceSimilarity": 0.908257,
+      "reviewedThresholdPassed": true
+    },
+    {
+      "key": "proof-room",
+      "sourceTextSha256": "45de94ed38bce957d74e3c018cf51d457cd816239b75207b277066d231730d00",
+      "transcript": "3. The proof room is a closure ledger, not a victory page. Every verified gate links to retained bytes and a SHA-256 digest. Every open gate stays open. Three Termix tasks were pre-registered: a Pancake range decision, an Altana permission audit, and a Venus health factor replay. Both lanes scored 100 out of 100, with zero incremental native fee in every bounded task. For the Pancake task, the agent took about 1.07 seconds, compared with 620.56 seconds manually. For the permission audit, the agent took about 2.32 seconds, compared with 0.013 seconds manually. For Venus health, the agent took about 0.86 seconds, compared with 0.010 seconds manually. The timings point in different directions, so Proof Era claims no universal winner. The review is owner-designated and internal, without cryptographic reviewer identity, external independence, or Sigstore attestation.",
+      "transcriptSha256": "ac47fc2ea86295c9a98a13ac1a01d95d6130035ecc387eaf1d55496ae8df48e7",
+      "sequenceSimilarity": 0.786164,
+      "reviewedThresholdPassed": true
+    },
+    {
+      "key": "mission-control",
+      "sourceTextSha256": "c54290aba2111d4c40e7423e9b6e72f7518089d45339cf075a67f20fe6fd3c15",
+      "transcript": "2. Mission control joins state to receipts and keeps the revoke boundary visible. Pending, failed, unknown, and expired outcomes remain distinct. Uncertain actions are never blind retried. The public release passed eleven exact host and origin checks across marketplace health, four analyzer pings, four agent cards, the proof room, and honest readiness. Readiness still says not ready whenever required activation or submission evidence is incomplete. This is what a testnet product should look like: complete enough to use, strict enough to refuse unsupported claims, and explicit about the boundary between an agent identity and authority over capital.",
+      "transcriptSha256": "4e6ce05610af6362ce14616d066db7067c4a4fb3b71fc7c1d63e5401967de5b6",
+      "sequenceSimilarity": 0.989691,
+      "reviewedThresholdPassed": true
+    },
+    {
+      "key": "outro",
+      "sourceTextSha256": "6d6b294a6b7bb8cb576b939d5205914f3dbcd9547b4b73f57b4fb1fe1d82c176",
+      "transcript": "1. BNB Agent Studio makes autonomous agents easier to create. Proof Error makes them safer to choose and control. Hire agents by proof, not promises.",
+      "transcriptSha256": "b50e814d6efdf6c19be111406df1b9446197ae5546ff4619c9509c606a27cf09",
+      "sequenceSimilarity": 0.88,
+      "reviewedThresholdPassed": true
+    }
+  ],
+  "limitations": [
+    "MiMo ASR checks that generated speech remains machine-transcribable; it is not a human intelligibility or presentation-quality attestation.",
+    "A chapter below the reviewed similarity threshold remains explicitly visible; only catastrophic transcript divergence blocks asset creation.",
+    "Transcript similarity does not verify the truth of narrated product claims; those claims remain bound to repository evidence.",
+    "No API key, request header or raw provider response is retained."
+  ]
+}

@@ -1,6 +1,6 @@
 # ProofEra final demo runbook
 
-Updated: 2026-09-03. The exact narrated demo and automated playback artifacts now exist; this
+Updated: 2026-09-04. The exact narrated demo and automated playback artifacts now exist; this
 runbook records their gate and the remaining owner playback/submission boundaries.
 
 ## Gate order
@@ -98,7 +98,7 @@ It verifies copy identity, structure, full decode and current public scenes. The
 listen/watch once on a separate viewer and retain a timestamped statement about intelligibility and
 presentation; that owner statement is not independent review.
 
-## Prepared premium successor
+## Retained premium narration; successor video pending
 
 The next create-only capture path is implemented but is not yet a retained final-video claim. It
 adds a self-contained dark HTML/CSS intro and outro, exact testnet/build labels, a black-to-scene
@@ -118,19 +118,26 @@ catastrophic transcript divergence blocks asset creation. If MiMo's raw delivery
 a short read or 325 seconds for a long read. The manifest retains the raw-duration estimate, target
 and exact factor; no extra remote synthesis is hidden behind this fit.
 
-Generate it from an interactive Windows console only:
+The create-only run completed at `2026-09-04T07:40:56.443Z`. All eight ASR chapter scores met the
+reviewed 0.78 threshold. The retained MP3 is 325.014 seconds, mono 48 kHz at 192 kbps, and has
+SHA-256 `017adf5ca85588da4be7c447b1cd02def705b8cd144665b8952413348f1cf81e`. FFmpeg completed a full
+decode; an EBU R128 observation reported `-16.6 LUFS` integrated loudness and `-1.7 dBFS` true peak,
+with no silence of at least two seconds at the reviewed `-45 dB` threshold. These machine checks do
+not establish human-perceived narration quality.
+
+The historical generation command was:
 
 ```powershell
 corepack pnpm generate:demo:narration:mimo
 ```
 
-The wrapper requires hidden entry of an API key, keeps it process-local, and removes it on exit.
+The output is create-only and must not be regenerated or overwritten. The wrapper required hidden
+entry of an API key, kept it process-local, and removed it on exit.
 Credential rotation remains an account-owner decision and is not attested by this generator. It
-deliberately does not read or create `.env`. The output is create-only; a failed or absent
-generation remains absent. After the MP3, ASR record and manifest are reviewed and committed, a
+deliberately did not read or create `.env`. After the MP3, ASR record and manifest are committed, a
 future exact published commit still needs its own public deployment authorization before rehearsal
-or final capture. No deployment, wallet access, signature, transaction, or mainnet action is part of
-the narration generator.
+or final capture. No deployment, wallet access, signature, transaction, or mainnet action was part
+of the narration generator.
 
 Reviewed provider references:
 

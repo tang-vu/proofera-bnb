@@ -42,3 +42,7 @@ scripts/*termix*.mjs text eol=lf
 scripts/*termix*.ts text eol=lf
 evidence/termix/**/*.json text eol=lf
 evidence/submission/final/termix/**/*.json text eol=lf
+
+# Demo narration manifests and sources are hashed byte-for-byte; audio stays binary.
+evidence/submission/narration/*.json text eol=lf
+evidence/submission/narration/*.mp3 binary

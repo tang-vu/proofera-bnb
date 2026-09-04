@@ -23,7 +23,16 @@ generated with Microsoft Zira Desktop at rate 0 and has these bounded media prop
 `proofera-final-demo-mimo-v2.5-script.json` is the reviewed eight-chapter successor source. It maps
 an editorial intro, the same six public evidence scenes, and an editorial outro. The source pins
 `mimo-v2.5-tts`, the built-in `Dean` voice, English, and a restrained product-film delivery prompt.
-It does not claim that MiMo audio already exists.
+The retained generation completed at `2026-09-04T07:40:56.443Z`:
+
+- `proofera-final-demo-mimo-v2.5.mp3` is 7,801,965 bytes, mono MP3 at 48 kHz, lasts 325.014 seconds,
+  and has SHA-256 `017adf5ca85588da4be7c447b1cd02def705b8cd144665b8952413348f1cf81e`;
+- `proofera-final-demo-mimo-v2.5-asr.json` has SHA-256
+  `144893d776b478d6cd206923ed3a585f1a6fe9719ecbb07f4e59ceaa943e503d`; all eight chapters met the
+  reviewed 0.78 sequence threshold;
+- `proofera-final-demo-mimo-v2.5-manifest.json` has SHA-256
+  `3ad50d739e93565bddb4a0618abf476813096013d2cb72ea2e85f816893c4ed1` and records a local tempo
+  factor of 1.22163077 from the 397.030-second source estimate to the 325-second target.
 
 Run `pnpm generate:demo:narration:mimo` interactively. The wrapper accepts an API key through hidden
 console input, passes it to one child process, removes it afterward, and never creates a `.env`
@@ -38,5 +47,6 @@ tempo filter, then normalizes the final mono MP3. The manifest records the sourc
 target and exact tempo factor. No additional provider call, request header, raw response, or
 credential material is retained by this local timing step.
 
-The output MP3, ASR record, and generation manifest remain absent until that interactive run
-succeeds. Their absence must not be described as completed premium narration.
+The retained media and machine transcript do not attest human-perceived intelligibility,
+presentation quality, source-claim truth, independent review, final video capture, playback, or
+hackathon submission.
