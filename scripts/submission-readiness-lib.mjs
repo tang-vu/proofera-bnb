@@ -42,7 +42,11 @@ const GATE_DEFINITIONS = Object.freeze([
   },
   {
     gateId: "demo",
-    incompleteStates: ["not_recorded", "recorded_pending_human_playback"],
+    incompleteStates: [
+      "not_recorded",
+      "recorded_pending_human_playback",
+      "recorded_pending_human_visual_review"
+    ],
     requiredKinds: ["video", "demo_check"]
   },
   {

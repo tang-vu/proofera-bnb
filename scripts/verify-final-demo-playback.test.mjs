@@ -136,3 +136,43 @@ test("retained YouTube publication observation stays bounded to anonymous availa
   assert.match(observation.limitations.join(" "), /does not prove byte identity/u);
   assert.match(observation.limitations.join(" "), /organizer acceptance/u);
 });
+
+test("owner audio review closes only the human narration check", async () => {
+  const publishedMediaBytes = await readFile(
+    resolve(
+      repositoryRoot,
+      "evidence",
+      "submission",
+      "demo-videos",
+      "89a99e84c62905fa77aed9c431e7cb730f2c342f",
+      "final",
+      "proofera-final-demo.mp4"
+    )
+  );
+  const review = JSON.parse(
+    await readFile(
+      resolve(
+        repositoryRoot,
+        "evidence",
+        "submission",
+        "final",
+        "demo-owner-audio-review-2026-09-05.json"
+      ),
+      "utf8"
+    )
+  );
+
+  assert.equal(review.schemaVersion, "proofera-demo-owner-audio-review-v1.0.0");
+  assert.equal(review.media.playbackSurface, "unspecified_by_owner");
+  assert.equal(review.media.youtubeUrl, "https://youtu.be/ron927GeVXI");
+  assert.equal(review.media.retainedSha256, sha256(publishedMediaBytes));
+  assert.equal(review.ownerReview.humanAudioPlaybackCompleted, true);
+  assert.equal(review.ownerReview.narrationAcceptableToOwner, true);
+  assert.equal(review.ownerReview.visualSceneOrderReviewed, false);
+  assert.equal(review.ownerReview.evidenceLinkPresentationReviewed, false);
+  assert.equal(review.ownerReview.independentReviewer, false);
+  assert.equal(review.classification.hackathonEntrySubmitted, false);
+  assert.equal(review.classification.organizerAcceptanceObserved, false);
+  assert.match(review.limitations.join(" "), /does not attest visual scene order/u);
+  assert.match(review.limitations.join(" "), /not an independent review/u);
+});

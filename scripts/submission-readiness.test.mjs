@@ -52,6 +52,19 @@ test("submission readiness cannot turn green by changing only its top-level bool
   );
 });
 
+test("an audio-only owner review keeps the visual demo review incomplete", () => {
+  const audioReviewed = structuredClone(manifest);
+  const demoGate = audioReviewed.gates.find(({ gateId }) => gateId === "demo");
+  demoGate.state = "recorded_pending_human_visual_review";
+  demoGate.blockers = [
+    "Retain an owner review of visual scene order and evidence-link presentation."
+  ];
+
+  const readiness = validateSubmissionReadiness(audioReviewed);
+  assert.equal(readiness.readyForSubmission, false);
+  assert.equal(readiness.gates.at(-2).state, "recorded_pending_human_visual_review");
+});
+
 test("a verified gate requires its full final-evidence kind set and final paths", () => {
   const missingKinds = structuredClone(manifest);
   missingKinds.gates[0].state = "verified";
