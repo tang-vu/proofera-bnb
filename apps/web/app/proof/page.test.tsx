@@ -33,14 +33,13 @@ describe("Proof room", () => {
     expect(html).toContain(
       'data-gate-id="pancake-benefit" data-gate-state="controlled_outcome_observed"'
     );
-    expect(html).toContain(
-      'data-gate-id="demo" data-gate-state="recorded_pending_human_visual_review"'
-    );
+    expect(html).toContain('data-gate-id="demo" data-gate-state="verified"');
     expect(html).toContain("325.014-second MiMo narrated MP4");
     expect(html).toContain("proofera-final-demo.mp4");
     expect(html).toContain("automated playback check");
     expect(html).toContain("owner audio review");
-    expect(html).toContain("listened and found the audio acceptable");
+    expect(html).toContain("owner visual review");
+    expect(html).toContain("confirmed visual playback, scene order and evidence-link presentation");
     expect(html).toContain("controlled test-fixture LP position");
     expect(html).toContain("No fee income, price movement or liquidity change was observed");
     expect(html).toContain("residual PTA allowance is zero");

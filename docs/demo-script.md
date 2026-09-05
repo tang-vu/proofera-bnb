@@ -25,7 +25,8 @@ The 325.014-second MiMo V2.5 capture now replaces the earlier video as the prima
 eight ASR chapters passed the reviewed machine-transcription threshold, and the retained MP4 adds a
 dark animated opener, smooth scene motion and an editorial close. A separate process copied,
 rehashed and fully decoded it, then rechecked all six public scenes. The owner subsequently listened
-to and accepted the narration; visual presentation review and organizer submission remain open.
+to and accepted the narration, then confirmed visual scene order and evidence-link presentation.
+The scoped human demo review is complete; organizer submission remains open.
 
 ## One-session operator checklist
 
@@ -37,8 +38,8 @@ to and accepted the narration; visual presentation review and organizer submissi
    create-only output.
 4. Record at 1440x900 with browser zoom 100%. Keep the cursor deliberate and avoid scrolling while speaking.
 5. Use the committed MP3 voice-over with the exact-release capture command in `docs/final-demo.md`.
-6. The owner-audio check is retained. Visually review the retained MP4 or public YouTube video and
-   retain the scene-order/evidence-link presentation check before submission.
+6. The owner audio and visual checks are retained. Keep both classified as owner attestations, not
+   independent review or organizer evidence.
 
 ## 0:00-0:30 — thesis
 

@@ -1,8 +1,8 @@
 # ProofEra final demo runbook
 
-Updated: 2026-09-05. The exact narrated demo, automated playback artifact and public YouTube
-observation now exist; this runbook records their gate and the remaining owner visual-review and
-submission boundaries.
+Updated: 2026-09-05. The exact narrated demo, automated playback artifact, public YouTube
+observation and scoped owner audio/visual reviews now exist; this runbook records their verified
+demo gate and the remaining submission boundary.
 
 ## Gate order
 
@@ -156,9 +156,12 @@ acceptance.
 The repository owner subsequently confirmed that they listened and found the narration acceptable.
 The retained [owner audio review](../evidence/submission/final/demo-owner-audio-review-2026-09-05.json)
 has SHA-256 `3c1ff87f27ef7aa1de112ac7aa1bde8dfa1d776e1f58e065f6ce6063ea87291b`.
-The owner did not specify the playback surface or attest visual scene order and evidence-link
-presentation, so those visual checks remain open. This is an owner attestation, not independent
-review or organizer evidence.
+The owner then confirmed visual playback, scene order and evidence-link presentation. The retained
+[owner visual review](../evidence/submission/final/demo-owner-visual-review-2026-09-05.json) has
+SHA-256 `ab60da9467ebecc0c83493aef275bb156a3de2e24e87721ec2f6d0c288dee44a`.
+These two scoped owner attestations close the human demo review. The playback surface and source
+timestamp remain unspecified, and neither record is independent review, form submission or
+organizer evidence.
 
 The readiness verifier retains a 95,000,000-byte per-artifact ceiling. This admits the 68,211,573-byte
 MP4 without removing the bounded-file guard and stays below GitHub's 100 MB hard per-file limit.

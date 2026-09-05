@@ -14,6 +14,8 @@ separate process copied the media to a temporary boundary, rehashed it, complete
 audio/video decode and rechecked all six public scene assertions. YouTube video `ron927GeVXI` has a
 separate timestamped anonymous publication observation in
 `evidence/submission/youtube-publication-2026-09-05.json`. The owner's later audio acceptance is
-retained separately in `evidence/submission/final/demo-owner-audio-review-2026-09-05.json`; visual
-scene/link review remains open. Neither automated check is a human attestation, and the owner record
-is not an independent review, separate physical-device attestation, or hackathon submission receipt.
+retained in `evidence/submission/final/demo-owner-audio-review-2026-09-05.json`, and the owner's
+subsequent visual scene/link acceptance is retained in
+`evidence/submission/final/demo-owner-visual-review-2026-09-05.json`. Together they close the scoped
+human demo review. Neither automated check is a human attestation, and neither owner record is an
+independent review, separate physical-device attestation, or hackathon submission receipt.

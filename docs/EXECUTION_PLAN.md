@@ -6,7 +6,7 @@ Operating principle: complete and verify the highest-value unblocked judge journ
 
 ## Winner path
 
-The official page, CMS entry URL and linked form were rechecked on 2026-09-01. The main prize remains winner-takes-all: $30,000 equivalent plus adoption as the canonical BNB Agent Studio marketplace. The explicit rubric is the end-to-end journey, decision-useful live data, and equal first-class coverage of all four agent categories. Work is therefore ordered as follows:
+The official page, CMS entry URL and linked form were rechecked through 2026-09-05. The main prize remains winner-takes-all: $30,000 equivalent plus adoption as the canonical BNB Agent Studio marketplace. The explicit rubric is the end-to-end journey, decision-useful live data, and equal first-class coverage of all four agent categories. Work is therefore ordered as follows:
 
 1. Make the zero-instruction `land → choose a job → discover → understand → activate` journey coherent across all four categories.
 2. Deploy four durable Agent Studio endpoints and record BSC registrations before treating deeper LP execution as judge-eligible breadth.
@@ -60,8 +60,9 @@ runtime-equivalent public UI build `1282910`, with one video and one audio strea
 separate-process copy/hash/full-decode/six-scene verification.
 YouTube video `ron927GeVXI` has a retained anonymous `200`/playability/public-visibility observation
 and reports the matching rounded 325-second duration. The owner subsequently listened to and
-accepted the narration; visual presentation review, independent review and the organizer receipt
-remain separate transitions.
+accepted the narration, then confirmed visual scene order and evidence-link presentation. Those
+scoped owner attestations close the demo review; independent review and the organizer receipt remain
+separate transitions.
 
 The 2026-09-01 submission audit corrected two avoidable release assumptions. First, the official CMS
 names the current Google Form as `submit_project_url`; it is the entry flow to use now, with public
@@ -99,7 +100,7 @@ Evidence:
 - [`requirements-traceability.md`](./requirements-traceability.md)
 - Root [`AGENTS.md`](../AGENTS.md)
 
-Completed evidence includes the exact Studio CLI compatibility/scaffold/doctor spike, dependency compatibility checks, Venus/Lista reads, deployment constraints and verification requirements. Official competition facts, the CMS entry URL, linked form, candidate readiness and source visibility were last checked on 2026-09-01. Fast-moving packages and official competition pages remain re-check items before deployment/submission rather than blockers to implementation.
+Completed evidence includes the exact Studio CLI compatibility/scaffold/doctor spike, dependency compatibility checks, Venus/Lista reads, deployment constraints and verification requirements. Official competition facts and the CMS-linked form were rechecked through 2026-09-05; candidate readiness and source visibility retain their separately timestamped 2026-09-01 observations. Fast-moving packages and official competition pages remain re-check items before deployment/submission rather than blockers to implementation.
 
 ## Milestone 1 — winning marketplace journey (`ACTIVE`)
 
@@ -398,3 +399,4 @@ The bounded v2 attempt then completed without rewriting v1. Grant `0xbfa1e3216d3
 | 2026-09-04 | Retain the MiMo successor video and automated playback                                        | The 325.014-second MP4 binds six public scenes and exact narration bytes; a separate process copied, rehashed, fully decoded and rechecked it without claiming human listening or organizer submission                                                                                   |
 | 2026-09-05 | Retain the public YouTube publication observation                                             | Anonymous oEmbed/watch requests returned `200`; the watch page reported `OK`, public visibility and 325 seconds for `ron927GeVXI`. The bounded artifact does not claim byte identity, human playback, hackathon submission or organizer acceptance                                       |
 | 2026-09-05 | Retain the owner audio review without widening its scope                                      | The owner confirmed listening and acceptable narration; the record keeps playback surface and source timestamp unspecified, visual scene/link review false, and independent-review/submission/acceptance claims false                                                                    |
+| 2026-09-05 | Close the scoped demo review and prepare the current form                                     | The owner confirmed visual scene order and evidence-link presentation; a separate bounded form read retained HTTP `200`, 23 fields and prepared non-personal values. Neither record is independent review, a submitted response or organizer acceptance                                  |

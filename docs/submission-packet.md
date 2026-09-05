@@ -4,6 +4,12 @@ Updated: 2026-09-05. The canonical CMS currently names the linked Google Form as
 `submit_project_url`. This packet maps that exact one-page form and prepares every non-personal
 field. It is not an organizer receipt or evidence that ProofEra was submitted.
 
+A fresh anonymous form read at `2026-09-05T05:26:01Z` returned HTTP `200`, title
+`Build the Era Hackathon Registration`, and 23 question fields. The retained
+[form-preparation observation](../evidence/submission/form-preparation-observation-2026-09-05.json)
+has SHA-256 `82139448361b692dca5979961e575725103f6d1d79304b13f5a9e5a038beb2ef`.
+It proves preparation only; it created no response.
+
 Remaining product and owner boundaries must stay visible:
 
 1. Anonymous source access is verified for the repository and retained media. The 325-second
@@ -20,7 +26,7 @@ testnet wallet/session addresses below are qualification evidence, not a payout-
 
 | Current form field                     | Prepared value or owner action                                                                                                          |
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| Email                                  | **OWNER INPUT; Google Forms account/receipt email**                                                                                     |
+| Google Forms account/receipt email     | **OWNER INPUT if shown outside the 23-question payload**                                                                                |
 | Full Name                              | **OWNER INPUT**                                                                                                                         |
 | Email Address                          | **OWNER INPUT**                                                                                                                         |
 | Telegram Handle                        | **OWNER INPUT**                                                                                                                         |
@@ -121,17 +127,19 @@ Paste only after every public link is rechecked and the owner has reviewed every
 | Retained demo media   | `evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/final/proofera-final-demo.mp4`                                                                                      | Exact 68,211,573-byte source media and SHA-256 remain retained                         |
 | Demo manifests        | `evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/`                                                                                                                   | Public final-capture and automated-playback records                                    |
 | YouTube observation   | `evidence/submission/youtube-publication-2026-09-05.json`                                                                                                                                     | Timestamped anonymous availability record; not playback or submission proof            |
-| Owner audio review    | `evidence/submission/final/demo-owner-audio-review-2026-09-05.json`                                                                                                                           | Narration accepted by owner; visual and independent review remain open                 |
+| Owner audio review    | `evidence/submission/final/demo-owner-audio-review-2026-09-05.json`                                                                                                                           | Narration accepted by owner; not independent review                                    |
+| Owner visual review   | `evidence/submission/final/demo-owner-visual-review-2026-09-05.json`                                                                                                                          | Scene order and evidence-link presentation accepted; not independent review            |
+| Form preparation      | `evidence/submission/form-preparation-observation-2026-09-05.json`                                                                                                                            | HTTP `200`, 23 fields and prepared project values; no response created                 |
 | TermiX final bundle   | `evidence/submission/final/termix/6d1adf3c948e49be7d9d42332df04904fdd43e3a/`                                                                                                                  | Public repository path                                                                 |
 | Altana lifecycle      | `evidence/submission/final/altana-lifecycle.json`                                                                                                                                             | Public repository copy and explorer links are reachable                                |
 | Pancake controlled LP | `evidence/onchain/bsc-testnet-pta-wbnb-first-lp-eed9c32a107b57735f45bd6246d967cb12fbb1579a05faa9f17e0ead46187d01.json` and `evidence/pancake/runs/pta-wbnb-outcomes/127841040-127861271.json` | Public repository copies; transaction hashes remain public on BscScan                  |
 
 ## Owner completion order
 
-1. Owner audio review is retained. Visually review the retained MP4 or public YouTube video; confirm
-   scene order and evidence-link presentation, then retain that owner review without calling it
-   independent.
-2. Re-run anonymous repository/API/README/artifact and YouTube checks immediately before form submission.
+1. Owner audio and visual scene/link reviews are retained. Keep them classified as scoped owner
+   attestations, not independent or organizer review.
+2. Re-run anonymous repository/API/README/artifact and YouTube checks immediately before form
+   submission.
 3. Confirm the retained public analysis-activation capture for all four categories while keeping
    capital execution, current-market evidence and testnet eligibility boundaries explicit.
 4. Recheck the official page/form for changes, fill every owner-only field, select PancakeSwap,

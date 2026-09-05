@@ -31,7 +31,7 @@ test("submission readiness records all seven objective gates without claiming co
       ["altana-lifecycle", "verified"],
       ["pancake-benefit", "controlled_outcome_observed"],
       ["termix-pairs", "verified"],
-      ["demo", "recorded_pending_human_visual_review"],
+      ["demo", "verified"],
       ["submission", "draft"]
     ]
   );
@@ -59,6 +59,7 @@ test("an audio-only owner review keeps the visual demo review incomplete", () =>
   demoGate.blockers = [
     "Retain an owner review of visual scene order and evidence-link presentation."
   ];
+  demoGate.artifacts = demoGate.artifacts.filter(({ kind }) => kind !== "owner_visual_review");
 
   const readiness = validateSubmissionReadiness(audioReviewed);
   assert.equal(readiness.readyForSubmission, false);
