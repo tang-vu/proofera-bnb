@@ -1,6 +1,6 @@
 # ProofEra pitch deck
 
-Updated: 2026-09-04. Eleven-slide evidence-backed narrative for the BNB Chain Smart Money Era submission. This Markdown source is frozen only after the owner fields and organizer route are confirmed; it is not proof that an entry was submitted.
+Updated: 2026-09-05. Eleven-slide evidence-backed narrative for the BNB Chain Smart Money Era submission. This Markdown source is frozen only after the owner fields and organizer route are confirmed; it is not proof that an entry was submitted.
 
 ## Slide 1 — ProofEra
 
@@ -44,7 +44,8 @@ Room and receipt-backed historical lifecycle are public. The base release retain
 rollback/restoration evidence; current carrier `1282910` retains a two-resolver, five-host TLS and
 eleven-response observation, while product ancestor `f25a67d` retains four available evidence panels,
 20 facts, eight screenshots and four completed analysis-service runs. A narrated 325.014-second
-MiMo final demo is retained with a separate automated playback verification. Capital-bearing production
+MiMo final demo is retained with a separate automated playback verification and published at
+`https://youtu.be/ron927GeVXI`. Capital-bearing production
 activation remains fail-closed; human playback confirmation and the authoritative submission
 receipt remain absent.
 

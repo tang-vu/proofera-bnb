@@ -1,7 +1,8 @@
 # ProofEra final demo runbook
 
-Updated: 2026-09-04. The exact narrated demo and automated playback artifacts now exist; this
-runbook records their gate and the remaining owner playback/submission boundaries.
+Updated: 2026-09-05. The exact narrated demo, automated playback artifact and public YouTube
+observation now exist; this runbook records their gate and the remaining owner playback/submission
+boundaries.
 
 ## Gate order
 
@@ -143,6 +144,15 @@ scenes. The encoded audio had true peak `-1.6 dBFS` and no silence of at least t
 full decode, and rechecked all six public scenes at HTTP 200. Its manifest SHA-256 is
 `612add66becfc9fbbf962efde445dc9a6a6c8fbd1ae00c621c1a99edf2abda1f`. Owner-perceived review
 remains pending.
+
+On 2026-09-05, an anonymous oEmbed request and watch-page request both returned HTTP `200` for
+[YouTube video `ron927GeVXI`](https://youtu.be/ron927GeVXI). The watch page reported playability
+`OK`, `isPrivate: false`, `isUnlisted: false`, the expected title, and a rounded duration of 325
+seconds. The retained [publication observation](../evidence/submission/youtube-publication-2026-09-05.json)
+has SHA-256 `2315379f90bd1f04e3550054df0b7518980794f30bb2c4640c5a2232ab6bcdd0`.
+This establishes timestamped anonymous YouTube availability only; it does not prove byte identity
+with the retained MP4, human playback, narration intelligibility, entry submission or organizer
+acceptance.
 
 The readiness verifier retains a 95,000,000-byte per-artifact ceiling. This admits the 68,211,573-byte
 MP4 without removing the bounded-file guard and stays below GitHub's 100 MB hard per-file limit.

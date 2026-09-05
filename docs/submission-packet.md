@@ -1,13 +1,14 @@
 # ProofEra owner-completion submission packet
 
-Updated: 2026-09-04. The canonical CMS currently names the linked Google Form as its
+Updated: 2026-09-05. The canonical CMS currently names the linked Google Form as its
 `submit_project_url`. This packet maps that exact one-page form and prepares every non-personal
 field. It is not an organizer receipt or evidence that ProofEra was submitted.
 
 Remaining product and owner boundaries must stay visible:
 
-1. Anonymous source access is now verified: repository page/API, raw README, exact commit, demo page
-   and raw 37,636,488-byte MP4 returned `200`. This bounded probe is not uptime or submission proof.
+1. Anonymous source access is verified for the repository and retained media. The 325-second
+   YouTube watch page and oEmbed endpoint also returned `200`, reported playability `OK`, and exposed
+   neither private nor unlisted state. These bounded observations are not uptime or submission proof.
 2. The release implements direct analysis-service activation across all four categories. It remains
    read-only: capital execution and judging readiness are false, and organizer treatment of BSC
    testnet identities is not inferred.
@@ -74,7 +75,7 @@ Paste only after every public link is rechecked and the owner has reviewed every
 >
 > Source: https://github.com/tang-vu/proofera-bnb
 >
-> Final narrated demo (325 seconds): https://github.com/tang-vu/proofera-bnb/blob/main/evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/final/proofera-final-demo.mp4
+> Final narrated demo (325 seconds): https://youtu.be/ron927GeVXI
 >
 > Four-category current-evidence and analysis journey: https://github.com/tang-vu/proofera-bnb/tree/main/evidence/submission/public-analysis-activation/f25a67daa0292b5a04c142a42606888f7ec2b8e6
 >
@@ -116,8 +117,10 @@ Paste only after every public link is rechecked and the owner has reviewed every
 | Source repository     | https://github.com/tang-vu/proofera-bnb                                                                                                                                                       | Public; page/API/raw README/exact commit returned `200`                                |
 | Hosted clean CI       | https://github.com/tang-vu/proofera-bnb/actions/runs/33489679675                                                                                                                              | Nine of nine clean-checkout jobs passed                                                |
 | Hosted uptime probe   | https://github.com/tang-vu/proofera-bnb/actions/runs/33533498008                                                                                                                              | Current carrier passed all eleven exact-build public checks; recurring history remains |
-| Final narrated demo   | `evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/final/proofera-final-demo.mp4`                                                                                      | Public blob/raw returned `200`; exact 68,211,573-byte length                           |
+| YouTube demo          | https://youtu.be/ron927GeVXI                                                                                                                                                                  | Anonymous oEmbed/watch returned `200`; playability `OK`; 325-second public video       |
+| Retained demo media   | `evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/final/proofera-final-demo.mp4`                                                                                      | Exact 68,211,573-byte source media and SHA-256 remain retained                         |
 | Demo manifests        | `evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/`                                                                                                                   | Public final-capture and automated-playback records                                    |
+| YouTube observation   | `evidence/submission/youtube-publication-2026-09-05.json`                                                                                                                                     | Timestamped anonymous availability record; not playback or submission proof            |
 | TermiX final bundle   | `evidence/submission/final/termix/6d1adf3c948e49be7d9d42332df04904fdd43e3a/`                                                                                                                  | Public repository path                                                                 |
 | Altana lifecycle      | `evidence/submission/final/altana-lifecycle.json`                                                                                                                                             | Public repository copy and explorer links are reachable                                |
 | Pancake controlled LP | `evidence/onchain/bsc-testnet-pta-wbnb-first-lp-eed9c32a107b57735f45bd6246d967cb12fbb1579a05faa9f17e0ead46187d01.json` and `evidence/pancake/runs/pta-wbnb-outcomes/127841040-127861271.json` | Public repository copies; transaction hashes remain public on BscScan                  |
@@ -126,7 +129,7 @@ Paste only after every public link is rechecked and the owner has reviewed every
 
 1. Play the retained MP4 in a separate viewer; confirm narration intelligibility, scene order and
    evidence-link presentation, then retain the timestamp as owner review only.
-2. Re-run anonymous repository/API/README/artifact/video checks immediately before form submission.
+2. Re-run anonymous repository/API/README/artifact and YouTube checks immediately before form submission.
 3. Confirm the retained public analysis-activation capture for all four categories while keeping
    capital execution, current-market evidence and testnet eligibility boundaries explicit.
 4. Recheck the official page/form for changes, fill every owner-only field, select PancakeSwap,

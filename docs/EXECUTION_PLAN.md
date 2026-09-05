@@ -1,6 +1,6 @@
 # ProofEra execution plan
 
-Updated: 2026-09-04
+Updated: 2026-09-05
 Deadline: 2026-09-09 12:00 UTC
 Operating principle: complete and verify the highest-value unblocked judge journey before expanding breadth.
 
@@ -58,8 +58,9 @@ that benefit verification is false. This removes a false-positive gate requireme
 the Pancake benefit gate. Published media source `89a99e8` has a 325.014-second narrated MP4 bound to
 runtime-equivalent public UI build `1282910`, with one video and one audio stream plus a
 separate-process copy/hash/full-decode/six-scene verification.
-Human-perceived narration quality, independent review and the organizer receipt remain separate
-external transitions.
+YouTube video `ron927GeVXI` has a retained anonymous `200`/playability/public-visibility observation
+and reports the matching rounded 325-second duration. Human-perceived narration quality,
+independent review and the organizer receipt remain separate external transitions.
 
 The 2026-09-01 submission audit corrected two avoidable release assumptions. First, the official CMS
 names the current Google Form as `submit_project_url`; it is the entry flow to use now, with public
@@ -394,3 +395,4 @@ The bounded v2 attempt then completed without rewriting v1. Grant `0xbfa1e3216d3
 | 2026-09-04 | Retain the MiMo V2.5 successor narration                                                      | Eight chapter TTS and ASR checks completed; all reviewed transcript thresholds passed, the bounded local fit produced a fully decoded 325.014-second mono MP3, and exact audio/ASR/manifest hashes are retained without claiming human playback or a successor video                     |
 | 2026-09-04 | Bind successor capture to a runtime-equivalent ancestor                                       | The collector separates media source from public UI build, requires ancestor lineage, records changed paths, rejects runtime-path deltas, and admits a prior demo only with its retained video, manifest, playback check and blocker                                                     |
 | 2026-09-04 | Retain the MiMo successor video and automated playback                                        | The 325.014-second MP4 binds six public scenes and exact narration bytes; a separate process copied, rehashed, fully decoded and rechecked it without claiming human listening or organizer submission                                                                                   |
+| 2026-09-05 | Retain the public YouTube publication observation                                             | Anonymous oEmbed/watch requests returned `200`; the watch page reported `OK`, public visibility and 325 seconds for `ron927GeVXI`. The bounded artifact does not claim byte identity, human playback, hackathon submission or organizer acceptance                                       |
