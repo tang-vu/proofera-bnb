@@ -6,6 +6,12 @@
 
 This repository is under active development for BNB Chain's “The Smart Money Era: Build the Era” hackathon. A feature is labeled live only after its endpoint and onchain receipts are independently verifiable. Unknown evidence stays unknown.
 
+[**Live marketplace**](https://proofera.tangvu.dev) · [**Watch the 5:25 demo**](https://youtu.be/ron927GeVXI) · [**Proof Room**](https://proofera.tangvu.dev/proof) · [**Agent Advantage Report**](./docs/agent-advantage-report.md)
+
+> **Hackathon entry:** the repository owner confirmed submission on 2026-09-05. The official form
+> exposed no dedicated demo-link field, so the public demo and judge-facing evidence links are kept
+> prominent here. This owner-confirmed status is not an organizer acceptance or judging result.
+
 ## Public judge surface
 
 - Marketplace: [proofera.tangvu.dev](https://proofera.tangvu.dev)
@@ -14,7 +20,7 @@ This repository is under active development for BNB Chain's “The Smart Money E
 - Retained demo bytes and publication observation: [`proofera-final-demo.mp4`](./evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/final/proofera-final-demo.mp4) · [`youtube-publication-2026-09-05.json`](./evidence/submission/youtube-publication-2026-09-05.json)
 - Prepared form copy and exact evidence links: [`docs/submission-packet.md`](./docs/submission-packet.md)
 
-Public submission carrier `6c862265fa8da29fd2e82ca84ee54e8b273a2beb` passed a two-resolver, five-host TLS and eleven-response rehearsal with exact build identity. Its code ancestor `a09e70fb7f3a9fe264b83934110eab68c4c06505` has a retained four-category `land → find → understand → activate analysis → inspect` journey. All four A2A analysis runs completed with bounded run identity, methodology, latency and hashed response evidence. Readiness v2 reports analysis-service activation as implemented while keeping capital activation and judging readiness false. Three presets are synthetic scenarios and health is a retained historical replay; this is not current-market, performance, economic-benefit or transaction evidence.
+Current public carrier `12829109f26b8f6d15fc2f7beda2008548ae9be0` passed a two-resolver, five-host TLS and eleven-response rehearsal with exact build identity. Its product ancestor `f25a67daa0292b5a04c142a42606888f7ec2b8e6` retains the richer four-category `land → find → inspect current evidence → activate analysis → inspect run` journey: 20 source-specific facts, eight screenshots, four completed A2A runs and four hashed responses. Readiness v2 reports analysis-service activation as implemented while keeping capital activation and judging readiness false. Current-source evidence remains separate from analyzer presets; this is not performance, economic-benefit or transaction evidence.
 
 ## What ProofEra is building
 
