@@ -1,0 +1,170 @@
+{
+  "schemaVersion": "proofera-hackathon-form-preparation-observation-v1.0.0",
+  "observedAtUtc": "2026-09-05T05:26:01.000Z",
+  "classification": {
+    "boundedObservationOnly": true,
+    "formPrepared": true,
+    "formSubmitted": false,
+    "responseReceiptRetained": false,
+    "organizerAcceptanceObserved": false,
+    "rawResponseRetained": false
+  },
+  "officialPage": {
+    "url": "https://www.bnbchain.org/en/hackathons/smart-money-era",
+    "submitProjectUrl": "https://forms.gle/9g9XPNFwnYaHAz9L8"
+  },
+  "linkedForm": {
+    "title": "Build the Era Hackathon Registration",
+    "resolvedUrl": "https://docs.google.com/forms/d/e/1FAIpQLSdFb30r24sZcFJVDbMqXNJ1_45BJHanc7eFqwUniScDYZfX9A/viewform?usp=send_form",
+    "httpStatus": 200,
+    "responseServerTimeUtc": "2026-09-05T05:26:01.000Z",
+    "responseBytes": 167957,
+    "publicLoadPayloadFound": true,
+    "fieldCount": 23,
+    "fields": [
+      { "entryId": 511893123, "title": "Full Name", "required": true, "options": [] },
+      { "entryId": 1700296026, "title": "Email Address", "required": true, "options": [] },
+      { "entryId": 961167680, "title": "Telegram Handle", "required": true, "options": [] },
+      { "entryId": 1925352146, "title": "X (Twitter) Handle", "required": true, "options": [] },
+      {
+        "entryId": 1497362733,
+        "title": "Discord Handle (Optional)",
+        "required": false,
+        "options": []
+      },
+      {
+        "entryId": 10320007,
+        "title": "How did you hear about this hackathon?",
+        "required": true,
+        "options": [
+          "X (Twitter)",
+          "Discord",
+          "Telegram",
+          "BNB Chain Website",
+          "Partner Announcement",
+          "Friend/Colleague",
+          "Other"
+        ]
+      },
+      { "entryId": 1056268012, "title": "Country and Timezone", "required": true, "options": [] },
+      {
+        "entryId": 499633636,
+        "title": "Are you registering as a solo builder or a team?",
+        "required": true,
+        "options": ["Solo", "Team"]
+      },
+      {
+        "entryId": 1640907232,
+        "title": "Number of Teammates",
+        "required": true,
+        "options": ["1 (Solo)", "2", "3", "4", "5+"]
+      },
+      {
+        "entryId": 1031982515,
+        "title": "Teammate Names, Emails, and Roles",
+        "required": false,
+        "options": []
+      },
+      { "entryId": 1725652707, "title": "Project Name", "required": true, "options": [] },
+      { "entryId": 271548434, "title": "One-Line Pitch", "required": true, "options": [] },
+      { "entryId": 834077171, "title": "Project Description", "required": true, "options": [] },
+      {
+        "entryId": 1785545258,
+        "title": "Sub-prize tracks you are interested in (Select all that apply)",
+        "required": true,
+        "options": ["PancakeSwap", "AltLayer", "TermiX", "Not sure"]
+      },
+      {
+        "entryId": 1717829161,
+        "title": "Project GitHub Repo Link",
+        "required": true,
+        "options": []
+      },
+      {
+        "entryId": 935194608,
+        "title": "Prototype Stage",
+        "required": true,
+        "options": ["Fresh idea", "Early prototype", "Working MVP"]
+      },
+      {
+        "entryId": 1947546689,
+        "title": "BSC/EVM Experience Level",
+        "required": false,
+        "options": ["Beginner", "Intermediate", "Advanced"]
+      },
+      {
+        "entryId": 513078976,
+        "title": "Check all areas you are comfortable with",
+        "required": false,
+        "options": ["Solidity", "AI agent frameworks", "Onchain data/APIs", "Frontend development"]
+      },
+      {
+        "entryId": 170240638,
+        "title": "Are you interested in mentorship during the build period?",
+        "required": true,
+        "options": [
+          "Yes, I would appreciate mentorship",
+          "No, I am confident building solo/as a team"
+        ]
+      },
+      {
+        "entryId": 1342261345,
+        "title": "Please confirm your availability for the build period (Aug 5 - Sep 9) and judging dates (Sep 9 - Sep 23)?",
+        "required": true,
+        "options": ["Yes, I confirm availability"]
+      },
+      {
+        "entryId": 420617500,
+        "title": "Please give us a wallet address in case you win :) (compatible ERC-20/BEP-20)",
+        "required": true,
+        "options": []
+      },
+      {
+        "entryId": 993807193,
+        "title": "Additional Notes (Optional)",
+        "required": false,
+        "options": []
+      },
+      {
+        "entryId": 2100155740,
+        "title": "Terms of Participation",
+        "required": true,
+        "options": ["I have read and agree to the Terms of Participation"]
+      }
+    ]
+  },
+  "preparedProjectValues": {
+    "projectName": "ProofEra",
+    "oneLinePitch": "ProofEra helps users hire BNB Chain DeFi agents by verifiable evidence, bounded authority and receipt-backed revocation—not promises.",
+    "projectDescriptionPrepared": true,
+    "selectedSubPrizeTracks": ["PancakeSwap", "AltLayer", "TermiX"],
+    "altanaRequestedInAdditionalNotesBecauseCheckboxIsAbsent": true,
+    "githubUrl": "https://github.com/tang-vu/proofera-bnb",
+    "prototypeStage": "Working MVP",
+    "additionalNotesPrepared": true,
+    "preparedCopyPath": "docs/submission-packet.md"
+  },
+  "ownerInputsStillRequired": [
+    "Full Name",
+    "Email Address",
+    "Telegram Handle",
+    "X (Twitter) Handle",
+    "How did you hear about this hackathon?",
+    "Country and Timezone",
+    "Solo or team selection",
+    "Number of teammates",
+    "Teammate details when applicable",
+    "BSC/EVM experience level when supplied",
+    "Comfortable areas when supplied",
+    "Mentorship choice",
+    "Availability confirmation",
+    "Owner-designated prize payout wallet",
+    "Terms acceptance"
+  ],
+  "limitations": [
+    "The current Google Form metadata was read without submitting a response; no form response or organizer receipt was created.",
+    "The form has no direct public-product, demo, evidence or Altana-track field, so the prepared Additional Notes carries those bounded links and the Altana request.",
+    "Personal, team, experience, availability, payout-wallet and legal-acceptance values are intentionally not inferred from repository or testnet evidence.",
+    "The recorded response byte count may vary between anonymous requests and is not a content digest."
+  ]
+}

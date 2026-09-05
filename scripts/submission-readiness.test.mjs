@@ -119,6 +119,34 @@ test("a verified gate requires its full final-evidence kind set and final paths"
   );
 });
 
+test("the verified demo gate accepts only its bounded media and review namespaces", () => {
+  const verifiedDemo = structuredClone(manifest);
+  const demoGate = verifiedDemo.gates.find(({ gateId }) => gateId === "demo");
+  demoGate.state = "verified";
+  demoGate.blockers = [];
+  demoGate.artifacts = demoGate.artifacts.filter(
+    ({ kind }) =>
+      ![
+        "current_video_rehearsal_manifest",
+        "current_video_rehearsal",
+        "rehearsal",
+        "video_rehearsal_manifest",
+        "video_rehearsal"
+      ].includes(kind)
+  );
+  assert.doesNotThrow(() => validateSubmissionReadiness(verifiedDemo));
+
+  demoGate.artifacts.push({
+    kind: "unbounded_demo_artifact",
+    path: "evidence/development/unreviewed-demo.json",
+    sha256: "0".repeat(64)
+  });
+  assert.throws(
+    () => validateSubmissionReadiness(verifiedDemo),
+    /SUBMISSION_READINESS_VERIFIED_PATH_INVALID/u
+  );
+});
+
 test("artifact bytes are digest-bound", async () => {
   const altered = validateSubmissionReadiness({
     ...structuredClone(manifest),

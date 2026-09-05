@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "proofera-demo-owner-visual-review-v1.0.0",
+  "recordedAtUtc": "2026-09-05T05:26:25.765Z",
+  "source": {
+    "type": "repository_owner_confirmation",
+    "channel": "interactive_project_session",
+    "language": "vi",
+    "sourceTimestampUtc": null,
+    "verbatimStatementRetained": false,
+    "confirmationScope": "visual_scene_order_and_evidence_link_presentation_from_preceding_assistant_summary"
+  },
+  "media": {
+    "playbackSurface": "unspecified_by_owner",
+    "youtubeUrl": "https://youtu.be/ron927GeVXI",
+    "retainedPath": "evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/final/proofera-final-demo.mp4",
+    "retainedSha256": "b78b364efc104aed35da4ed70af3a030bc7ded59a781af82a7a7499bf13a4c8b",
+    "durationSeconds": "325.014"
+  },
+  "priorOwnerAudioReview": {
+    "path": "evidence/submission/final/demo-owner-audio-review-2026-09-05.json",
+    "sha256": "3c1ff87f27ef7aa1de112ac7aa1bde8dfa1d776e1f58e065f6ce6063ea87291b"
+  },
+  "ownerReview": {
+    "visualPlaybackCompleted": true,
+    "sceneOrderAcceptableToOwner": true,
+    "evidenceLinkPresentationAcceptableToOwner": true,
+    "independentReviewer": false
+  },
+  "classification": {
+    "ownerAttestation": true,
+    "demoHumanReviewComplete": true,
+    "independentReview": false,
+    "hackathonEntrySubmitted": false,
+    "organizerAcceptanceObserved": false
+  },
+  "limitations": [
+    "The owner confirmed the previously open visual scene-order and evidence-link presentation review; the exact playback surface and source timestamp were not specified.",
+    "This is an owner attestation recorded in the interactive project session, not an independent or organizer review.",
+    "This record does not prove Google Form submission, receipt delivery, prize eligibility or organizer acceptance."
+  ]
+}

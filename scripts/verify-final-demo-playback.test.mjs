@@ -176,3 +176,85 @@ test("owner audio review closes only the human narration check", async () => {
   assert.match(review.limitations.join(" "), /does not attest visual scene order/u);
   assert.match(review.limitations.join(" "), /not an independent review/u);
 });
+
+test("owner visual review closes the scoped human demo check without claiming submission", async () => {
+  const publishedMediaBytes = await readFile(
+    resolve(
+      repositoryRoot,
+      "evidence",
+      "submission",
+      "demo-videos",
+      "89a99e84c62905fa77aed9c431e7cb730f2c342f",
+      "final",
+      "proofera-final-demo.mp4"
+    )
+  );
+  const audioReviewBytes = await readFile(
+    resolve(
+      repositoryRoot,
+      "evidence",
+      "submission",
+      "final",
+      "demo-owner-audio-review-2026-09-05.json"
+    )
+  );
+  const review = JSON.parse(
+    await readFile(
+      resolve(
+        repositoryRoot,
+        "evidence",
+        "submission",
+        "final",
+        "demo-owner-visual-review-2026-09-05.json"
+      ),
+      "utf8"
+    )
+  );
+
+  assert.equal(review.schemaVersion, "proofera-demo-owner-visual-review-v1.0.0");
+  assert.equal(review.media.playbackSurface, "unspecified_by_owner");
+  assert.equal(review.media.youtubeUrl, "https://youtu.be/ron927GeVXI");
+  assert.equal(review.media.retainedSha256, sha256(publishedMediaBytes));
+  assert.equal(review.priorOwnerAudioReview.sha256, sha256(audioReviewBytes));
+  assert.equal(review.ownerReview.visualPlaybackCompleted, true);
+  assert.equal(review.ownerReview.sceneOrderAcceptableToOwner, true);
+  assert.equal(review.ownerReview.evidenceLinkPresentationAcceptableToOwner, true);
+  assert.equal(review.ownerReview.independentReviewer, false);
+  assert.equal(review.classification.demoHumanReviewComplete, true);
+  assert.equal(review.classification.hackathonEntrySubmitted, false);
+  assert.equal(review.classification.organizerAcceptanceObserved, false);
+  assert.match(review.limitations.join(" "), /not an independent or organizer review/u);
+  assert.match(review.limitations.join(" "), /does not prove Google Form submission/u);
+});
+
+test("fresh form preparation retains exact choices without inventing owner inputs", async () => {
+  const observation = JSON.parse(
+    await readFile(
+      resolve(
+        repositoryRoot,
+        "evidence",
+        "submission",
+        "form-preparation-observation-2026-09-05.json"
+      ),
+      "utf8"
+    )
+  );
+
+  assert.equal(observation.schemaVersion, "proofera-hackathon-form-preparation-observation-v1.0.0");
+  assert.equal(observation.linkedForm.httpStatus, 200);
+  assert.equal(observation.linkedForm.fieldCount, 23);
+  assert.equal(observation.linkedForm.fields.length, 23);
+  assert.deepEqual(observation.preparedProjectValues.selectedSubPrizeTracks, [
+    "PancakeSwap",
+    "AltLayer",
+    "TermiX"
+  ]);
+  assert.equal(
+    observation.preparedProjectValues.altanaRequestedInAdditionalNotesBecauseCheckboxIsAbsent,
+    true
+  );
+  assert.ok(observation.ownerInputsStillRequired.includes("Owner-designated prize payout wallet"));
+  assert.equal(observation.classification.formPrepared, true);
+  assert.equal(observation.classification.formSubmitted, false);
+  assert.equal(observation.classification.responseReceiptRetained, false);
+});

@@ -47,7 +47,12 @@ const GATE_DEFINITIONS = Object.freeze([
       "recorded_pending_human_playback",
       "recorded_pending_human_visual_review"
     ],
-    requiredKinds: ["video", "demo_check"]
+    requiredKinds: ["video", "demo_check"],
+    verifiedPathPrefixes: [
+      "evidence/submission/demo-videos/",
+      "evidence/submission/final/",
+      "evidence/submission/youtube-publication-"
+    ]
   },
   {
     gateId: "submission",
@@ -136,7 +141,10 @@ function validateGate(value, definition) {
     if (!definition.requiredKinds.every((kind) => kinds.has(kind))) {
       throw new Error("SUBMISSION_READINESS_VERIFIED_EVIDENCE_INCOMPLETE");
     }
-    if (!artifacts.every(({ path }) => path.startsWith("evidence/submission/final/"))) {
+    const verifiedPathPrefixes = definition.verifiedPathPrefixes ?? ["evidence/submission/final/"];
+    if (
+      !artifacts.every(({ path }) => verifiedPathPrefixes.some((prefix) => path.startsWith(prefix)))
+    ) {
       throw new Error("SUBMISSION_READINESS_VERIFIED_PATH_INVALID");
     }
   } else if (blockers.length === 0) {
