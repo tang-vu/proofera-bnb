@@ -93,3 +93,46 @@ test("retained MiMo successor playback rehashes the runtime-bound final media", 
     "612add66becfc9fbbf962efde445dc9a6a6c8fbd1ae00c621c1a99edf2abda1f"
   );
 });
+
+test("retained YouTube publication observation stays bounded to anonymous availability", async () => {
+  const publishedMediaBytes = await readFile(
+    resolve(
+      repositoryRoot,
+      "evidence",
+      "submission",
+      "demo-videos",
+      "89a99e84c62905fa77aed9c431e7cb730f2c342f",
+      "final",
+      "proofera-final-demo.mp4"
+    )
+  );
+  const observation = JSON.parse(
+    await readFile(
+      resolve(repositoryRoot, "evidence", "submission", "youtube-publication-2026-09-05.json"),
+      "utf8"
+    )
+  );
+
+  assert.equal(observation.schemaVersion, "proofera-youtube-publication-observation-v1.0.0");
+  assert.equal(observation.video.id, "ron927GeVXI");
+  assert.equal(observation.video.shortUrl, "https://youtu.be/ron927GeVXI");
+  assert.equal(observation.video.canonicalUrl, "https://www.youtube.com/watch?v=ron927GeVXI");
+  assert.equal(observation.video.durationSeconds, 325);
+  assert.equal(observation.anonymousObservation.oembed.httpStatus, 200);
+  assert.equal(observation.anonymousObservation.watchPage.httpStatus, 200);
+  assert.equal(observation.anonymousObservation.watchPage.playabilityStatus, "OK");
+  assert.equal(observation.anonymousObservation.watchPage.isPrivate, false);
+  assert.equal(observation.anonymousObservation.watchPage.isUnlisted, false);
+  assert.equal(observation.classification.anonymousAccessObserved, true);
+  assert.equal(observation.classification.publicVisibilityObserved, true);
+  assert.equal(observation.classification.youtubePublicationObserved, true);
+  assert.equal(observation.classification.humanPlaybackAttested, false);
+  assert.equal(observation.classification.hackathonEntrySubmitted, false);
+  assert.equal(observation.classification.organizerAcceptanceObserved, false);
+  assert.equal(observation.retainedMedia.bytes, publishedMediaBytes.byteLength);
+  assert.equal(observation.retainedMedia.sha256, sha256(publishedMediaBytes));
+  assert.equal(observation.retainedMedia.durationSeconds, "325.014");
+  assert.match(observation.limitations.join(" "), /does not prove human playback/u);
+  assert.match(observation.limitations.join(" "), /does not prove byte identity/u);
+  assert.match(observation.limitations.join(" "), /organizer acceptance/u);
+});

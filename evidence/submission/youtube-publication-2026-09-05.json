@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "proofera-youtube-publication-observation-v1.0.0",
+  "observedAtUtc": "2026-09-05T03:02:09.000Z",
+  "video": {
+    "id": "ron927GeVXI",
+    "shortUrl": "https://youtu.be/ron927GeVXI",
+    "canonicalUrl": "https://www.youtube.com/watch?v=ron927GeVXI",
+    "title": "ProofEra - Hire Agents by Proof, Not Promises | BNB Chain Demo",
+    "authorName": "VanG",
+    "authorUrl": "https://www.youtube.com/@VanG_G",
+    "durationSeconds": 325
+  },
+  "anonymousObservation": {
+    "oembed": {
+      "url": "https://www.youtube.com/oembed?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dron927GeVXI&format=json",
+      "httpStatus": 200,
+      "responseDate": "Sat, 05 Sep 2026 03:02:08 GMT",
+      "contentType": "application/json",
+      "responseBytes": 843,
+      "responseSha256": "e5eae3d54cac54b462ec149a223667cf22588a86bcba3a3247bdca2163f5a3cf",
+      "providerName": "YouTube",
+      "type": "video",
+      "thumbnailUrl": "https://i.ytimg.com/vi/ron927GeVXI/hqdefault.jpg"
+    },
+    "watchPage": {
+      "url": "https://www.youtube.com/watch?v=ron927GeVXI",
+      "httpStatus": 200,
+      "responseDate": "Sat, 05 Sep 2026 03:02:09 GMT",
+      "contentType": "text/html; charset=utf-8",
+      "playabilityStatus": "OK",
+      "isPrivate": false,
+      "isUnlisted": false,
+      "canonicalUrlMatches": true,
+      "titleMatches": true,
+      "durationSeconds": 325
+    }
+  },
+  "retainedMedia": {
+    "path": "evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/final/proofera-final-demo.mp4",
+    "bytes": 68211573,
+    "durationSeconds": "325.014",
+    "sha256": "b78b364efc104aed35da4ed70af3a030bc7ded59a781af82a7a7499bf13a4c8b"
+  },
+  "classification": {
+    "anonymousAccessObserved": true,
+    "publicVisibilityObserved": true,
+    "youtubePublicationObserved": true,
+    "humanPlaybackAttested": false,
+    "hackathonEntrySubmitted": false,
+    "organizerAcceptanceObserved": false
+  },
+  "limitations": [
+    "This is a timestamped anonymous HTTP, oEmbed and watch-page observation, not a guarantee of uninterrupted future availability.",
+    "The YouTube duration is rounded to a whole second and is consistent with, but does not prove byte identity to, the retained 325.014-second MP4.",
+    "This observation does not prove human playback, narration intelligibility, hackathon entry submission or organizer acceptance."
+  ]
+}
