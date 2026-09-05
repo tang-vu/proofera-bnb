@@ -59,8 +59,9 @@ the Pancake benefit gate. Published media source `89a99e8` has a 325.014-second 
 runtime-equivalent public UI build `1282910`, with one video and one audio stream plus a
 separate-process copy/hash/full-decode/six-scene verification.
 YouTube video `ron927GeVXI` has a retained anonymous `200`/playability/public-visibility observation
-and reports the matching rounded 325-second duration. Human-perceived narration quality,
-independent review and the organizer receipt remain separate external transitions.
+and reports the matching rounded 325-second duration. The owner subsequently listened to and
+accepted the narration; visual presentation review, independent review and the organizer receipt
+remain separate transitions.
 
 The 2026-09-01 submission audit corrected two avoidable release assumptions. First, the official CMS
 names the current Google Form as `submit_project_url`; it is the entry flow to use now, with public
@@ -396,3 +397,4 @@ The bounded v2 attempt then completed without rewriting v1. Grant `0xbfa1e3216d3
 | 2026-09-04 | Bind successor capture to a runtime-equivalent ancestor                                       | The collector separates media source from public UI build, requires ancestor lineage, records changed paths, rejects runtime-path deltas, and admits a prior demo only with its retained video, manifest, playback check and blocker                                                     |
 | 2026-09-04 | Retain the MiMo successor video and automated playback                                        | The 325.014-second MP4 binds six public scenes and exact narration bytes; a separate process copied, rehashed, fully decoded and rechecked it without claiming human listening or organizer submission                                                                                   |
 | 2026-09-05 | Retain the public YouTube publication observation                                             | Anonymous oEmbed/watch requests returned `200`; the watch page reported `OK`, public visibility and 325 seconds for `ron927GeVXI`. The bounded artifact does not claim byte identity, human playback, hackathon submission or organizer acceptance                                       |
+| 2026-09-05 | Retain the owner audio review without widening its scope                                      | The owner confirmed listening and acceptable narration; the record keeps playback surface and source timestamp unspecified, visual scene/link review false, and independent-review/submission/acceptance claims false                                                                    |

@@ -46,8 +46,8 @@ eleven-response observation, while product ancestor `f25a67d` retains four avail
 20 facts, eight screenshots and four completed analysis-service runs. A narrated 325.014-second
 MiMo final demo is retained with a separate automated playback verification and published at
 `https://youtu.be/ron927GeVXI`. Capital-bearing production
-activation remains fail-closed; human playback confirmation and the authoritative submission
-receipt remain absent.
+activation remains fail-closed. Owner audio acceptance is retained; visual presentation review and
+the authoritative submission receipt remain absent.
 
 ## Slide 4 — Proof, not a leaderboard
 

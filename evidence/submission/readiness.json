@@ -1,6 +1,6 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.2.0",
-  "updatedAtUtc": "2026-09-05T03:02:09.000Z",
+  "updatedAtUtc": "2026-09-05T03:32:11.445Z",
   "readyForSubmission": false,
   "gates": [
     {
@@ -147,10 +147,10 @@
     },
     {
       "gateId": "demo",
-      "state": "recorded_pending_human_playback",
-      "claim": "A 325.014-second MiMo narrated MP4 from published media source 89a99e84c62905fa77aed9c431e7cb730f2c342f retains six scenes from runtime-equivalent public UI build 12829109f26b8f6d15fc2f7beda2008548ae9be0, one 1440x900 H.264 video stream, one AAC audio stream and a complete decode. A separate-process automated playback copied and rehashed the media, completed another full audio/video decode and rechecked all six public scene assertions. On 2026-09-05, anonymous YouTube oEmbed and watch requests returned HTTP 200 for ron927GeVXI; the watch page reported playability OK, false private/unlisted flags and the matching rounded 325-second duration. These checks are not a human review or separate physical-device attestation, so narration intelligibility and presentation quality remain owner-confirmed rather than inferred.",
+      "state": "recorded_pending_human_visual_review",
+      "claim": "A 325.014-second MiMo narrated MP4 from published media source 89a99e84c62905fa77aed9c431e7cb730f2c342f retains six scenes from runtime-equivalent public UI build 12829109f26b8f6d15fc2f7beda2008548ae9be0, one 1440x900 H.264 video stream, one AAC audio stream and a complete decode. A separate-process automated playback copied and rehashed the media, completed another full audio/video decode and rechecked all six public scene assertions. On 2026-09-05, anonymous YouTube oEmbed and watch requests returned HTTP 200 for ron927GeVXI; the watch page reported playability OK, false private/unlisted flags and the matching rounded 325-second duration. The repository owner then confirmed they listened and found the audio acceptable. That owner attestation is not independent review and did not specify visual scene-order or evidence-link review, so only the visual presentation check remains open.",
       "blockers": [
-        "Play the retained final MP4 or public YouTube video once on a separate viewer, confirm narration intelligibility and evidence-link presentation, then retain the owner timestamp without treating it as independent review."
+        "Review the retained final MP4 or public YouTube video visually, confirm scene order and evidence-link presentation, then retain that owner review without treating it as independent review."
       ],
       "artifacts": [
         {
@@ -172,6 +172,11 @@
           "kind": "youtube_publication_observation",
           "path": "evidence/submission/youtube-publication-2026-09-05.json",
           "sha256": "2315379f90bd1f04e3550054df0b7518980794f30bb2c4640c5a2232ab6bcdd0"
+        },
+        {
+          "kind": "owner_audio_review",
+          "path": "evidence/submission/final/demo-owner-audio-review-2026-09-05.json",
+          "sha256": "3c1ff87f27ef7aa1de112ac7aa1bde8dfa1d776e1f58e065f6ce6063ea87291b"
         },
         {
           "kind": "current_video_rehearsal_manifest",

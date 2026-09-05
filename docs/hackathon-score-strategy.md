@@ -1,6 +1,6 @@
 # Hackathon score strategy
 
-Updated: 2026-09-01. This is an internal evidence-backed prioritization record, not a judge score,
+Updated: 2026-09-05. This is an internal evidence-backed prioritization record, not a judge score,
 partner endorsement, eligibility decision, or submission receipt.
 
 Authoritative sources:
@@ -67,8 +67,8 @@ owner-facing session entry point; /mission-control is the read-only authority an
 
 ## Highest-value next actions
 
-1. Play the retained final MP4 on a separate owner viewer and retain a timestamped intelligibility
-   and presentation check without relabeling it as independent review.
+1. Keep the retained owner-audio acceptance separate from independent review; visually inspect the
+   final video and retain the scene-order/evidence-link presentation check.
 2. Fill the owner-only fields, place product/evidence/Altana wallet links in Additional Notes,
    submit the official CMS-linked form, request a response copy and retain it.
 3. Add independent uptime/paging evidence if the judging window and remaining time permit.

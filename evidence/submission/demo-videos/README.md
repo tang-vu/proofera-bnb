@@ -13,5 +13,7 @@ The retained `89a99e8` final artifact has six scenes and a 325.014-second MiMo-n
 separate process copied the media to a temporary boundary, rehashed it, completed another full
 audio/video decode and rechecked all six public scene assertions. YouTube video `ron927GeVXI` has a
 separate timestamped anonymous publication observation in
-`evidence/submission/youtube-publication-2026-09-05.json`. Neither automated check is a human
-narration-quality attestation, a separate physical-device review, or a hackathon submission receipt.
+`evidence/submission/youtube-publication-2026-09-05.json`. The owner's later audio acceptance is
+retained separately in `evidence/submission/final/demo-owner-audio-review-2026-09-05.json`; visual
+scene/link review remains open. Neither automated check is a human attestation, and the owner record
+is not an independent review, separate physical-device attestation, or hackathon submission receipt.

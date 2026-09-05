@@ -31,7 +31,7 @@ test("submission readiness records all seven objective gates without claiming co
       ["altana-lifecycle", "verified"],
       ["pancake-benefit", "controlled_outcome_observed"],
       ["termix-pairs", "verified"],
-      ["demo", "recorded_pending_human_playback"],
+      ["demo", "recorded_pending_human_visual_review"],
       ["submission", "draft"]
     ]
   );

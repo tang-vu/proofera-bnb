@@ -1,6 +1,6 @@
 # ProofEra judge demo script
 
-Updated: 2026-09-04. This is the retained production script and shot list for the MiMo final video sourced at `89a99e8`. The file is not an organizer receipt or a human presentation-quality attestation. Never show a secret, wallet export, environment file, passkey credential payload, or session signer.
+Updated: 2026-09-05. This is the retained production script and shot list for the MiMo final video sourced at `89a99e8`. The file is not an organizer receipt or a human presentation-quality attestation. Never show a secret, wallet export, environment file, passkey credential payload, or session signer.
 
 ## Current recording boundary
 
@@ -24,8 +24,8 @@ are verified; the TermiX review remains owner-designated internal and identity-l
 The 325.014-second MiMo V2.5 capture now replaces the earlier video as the primary final demo. Its
 eight ASR chapters passed the reviewed machine-transcription threshold, and the retained MP4 adds a
 dark animated opener, smooth scene motion and an editorial close. A separate process copied,
-rehashed and fully decoded it, then rechecked all six public scenes. Human-perceived narration and
-presentation quality plus organizer submission remain open.
+rehashed and fully decoded it, then rechecked all six public scenes. The owner subsequently listened
+to and accepted the narration; visual presentation review and organizer submission remain open.
 
 ## One-session operator checklist
 
@@ -37,8 +37,8 @@ presentation quality plus organizer submission remain open.
    create-only output.
 4. Record at 1440x900 with browser zoom 100%. Keep the cursor deliberate and avoid scrolling while speaking.
 5. Use the committed MP3 voice-over with the exact-release capture command in `docs/final-demo.md`.
-6. Play the retained MP4 end to end on a separate owner viewer and retain the timestamped
-   intelligibility/presentation check before submission.
+6. The owner-audio check is retained. Visually review the retained MP4 or public YouTube video and
+   retain the scene-order/evidence-link presentation check before submission.
 
 ## 0:00-0:30 — thesis
 
