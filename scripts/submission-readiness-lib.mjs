@@ -9,7 +9,8 @@ const GATE_DEFINITIONS = Object.freeze([
   {
     gateId: "production-release",
     incompleteStates: ["deployed_unfrozen"],
-    requiredKinds: ["public_probe", "release_manifest"]
+    requiredKinds: ["public_probe", "release_manifest"],
+    verifiedPathPrefixes: ["evidence/submission/final/", "evidence/submission/release-probes/"]
   },
   {
     gateId: "agent-registration",

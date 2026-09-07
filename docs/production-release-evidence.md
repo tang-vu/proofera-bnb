@@ -140,3 +140,12 @@ judging readiness false. Manifest SHA-256 is
 restart a service, access a wallet, sign or broadcast. This is host-origin rehearsal evidence, not
 independent uptime, a new frozen release, rollback repetition, capital execution or organizer
 acceptance.
+
+On 2026-09-07, judge-facing build `0ff8af690e745f0e93ea76c84fea5acda0e31daa`
+passed the same create-only rehearsal after the Proof Room submission-status update. Google and
+Cloudflare agreed for all five hosts, TLS was authorized 5/5 through judging, and all eleven exact
+HTTPS observations passed. The Proof Room observation additionally binds the submitted-entry marker
+and intentionally disabled capital boundary. Manifest SHA-256 is
+`a0bba3abe1916b539b1dccf2a5c12b06b5898e6a646ca023e9d089d6a9f6eb9f`. It remains
+host-origin rehearsal evidence, not organizer acceptance, independent paging, capital execution,
+or a replacement for the frozen rollback exercise.

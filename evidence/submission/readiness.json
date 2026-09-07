@@ -1,12 +1,12 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.2.0",
-  "updatedAtUtc": "2026-09-07T05:47:44.586Z",
+  "updatedAtUtc": "2026-09-07T06:15:48.476Z",
   "readyForSubmission": false,
   "gates": [
     {
       "gateId": "production-release",
       "state": "verified",
-      "claim": "Commit ad0cee11885b2131c27bfa14c3b0a27f2f8fee69 remains the frozen base release with retained two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses and bounded rollback/restoration evidence. Current public carrier 12829109f26b8f6d15fc2f7beda2008548ae9be0 has a separate read-only rehearsal with two-resolver agreement, five authorized TLS hosts, eleven exact responses, exact build identity and split readiness: analysis activation implemented, capital activation unavailable and judging readiness false. The capture did not restart services or replace the frozen base-release claim. This proves bounded observations only; it is not independent uptime, reboot, data restore, capital execution or organizer acceptance evidence.",
+      "claim": "Commit ad0cee11885b2131c27bfa14c3b0a27f2f8fee69 remains the frozen base release with retained two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses and bounded rollback/restoration evidence. Current judge-facing public build 0ff8af690e745f0e93ea76c84fea5acda0e31daa has a separate read-only rehearsal with two-resolver agreement, five authorized TLS hosts, eleven exact responses, exact build identity, submitted-entry marker and intentionally disabled capital boundary. Readiness remains split: analysis activation implemented, capital activation unavailable and judging readiness false. The capture did not restart services or replace the frozen base-release claim. This proves bounded observations only; it is not independent uptime, reboot, data restore, capital execution or organizer acceptance evidence.",
       "blockers": [],
       "artifacts": [
         {
@@ -33,6 +33,11 @@
           "kind": "submission_public_probe",
           "path": "evidence/submission/final/submission-public-release.json",
           "sha256": "88576af95545c5f831391a295c9b00501d94e0c42821357f653d20a6e164c02a"
+        },
+        {
+          "kind": "judge_facing_public_probe",
+          "path": "evidence/submission/release-probes/0ff8af690e745f0e93ea76c84fea5acda0e31daa/rehearsal/manifest.json",
+          "sha256": "a0bba3abe1916b539b1dccf2a5c12b06b5898e6a646ca023e9d089d6a9f6eb9f"
         }
       ]
     },
