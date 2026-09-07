@@ -44,7 +44,10 @@ test("collector fixes the five public hosts and exact judge-facing HTTP surface"
   ]) {
     assert.match(source, new RegExp(path.replaceAll("/", "\\/"), "u"));
   }
-  assert.match(source, /No \\u2014 gates remain open/u);
+  assert.match(source, /Submitted \\u2014 response receipt retained/u);
+  assert.match(source, /Intentionally disabled/u);
+  assert.match(source, /capitalBoundaryVisible: true/u);
+  assert.match(source, /submittedEntryVisible: true/u);
   assert.match(source, /audit_altana_permission_bundle/u);
   assert.match(source, /executionEnabled !== false/u);
   assert.match(source, /protocolVersion !== "0\.3\.0"/u);

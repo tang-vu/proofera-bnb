@@ -37,7 +37,12 @@ jobs:
           node-version: 24.14.1
       - name: Probe exact public carrier
         if: steps.judging-window.outputs.active == 'true'
-        run: >-
-          node scripts/check-local-production.mjs
-          --public
-          --expected-build=12829109f26b8f6d15fc2f7beda2008548ae9be0
+        env:
+          EXPECTED_BUILD: ${{ vars.PROOFERA_PUBLIC_BUILD }}
+        shell: bash
+        run: |
+          if [[ ! "$EXPECTED_BUILD" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "PROOFERA_PUBLIC_BUILD must be the exact deployed commit."
+            exit 1
+          fi
+          node scripts/check-local-production.mjs --public "--expected-build=$EXPECTED_BUILD"

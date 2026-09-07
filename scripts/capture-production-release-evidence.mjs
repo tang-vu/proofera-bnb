@@ -271,7 +271,8 @@ async function captureHttp(sourceCommit) {
   const proofText = proof.bytes.toString("utf8");
   if (
     !proofText.includes(sourceCommit) ||
-    !proofText.includes("No \u2014 gates remain open") ||
+    !proofText.includes("Submitted \u2014 response receipt retained") ||
+    !proofText.includes("Intentionally disabled") ||
     !proofText.includes("audit_altana_permission_bundle")
   ) {
     fail("PRODUCTION_RELEASE_PROOF_ROOM_INVALID");
@@ -279,8 +280,9 @@ async function captureHttp(sourceCommit) {
   observations.push(
     httpObservation("marketplace-proof-room", proof, {
       buildVisible: true,
-      openGatesVisible: true,
-      permissionAuditSkillVisible: true
+      capitalBoundaryVisible: true,
+      permissionAuditSkillVisible: true,
+      submittedEntryVisible: true
     })
   );
 
