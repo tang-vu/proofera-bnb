@@ -69,6 +69,8 @@ function formatNanoseconds(value: string): string {
 export default function ProofRoomPage() {
   const build = publicBuildIdentifier();
   const verifiedGateCount = readiness.gates.filter((gate) => gate.state === "verified").length;
+  const submissionGate = readiness.gates.find((gate) => gate.gateId === "submission");
+  const entrySubmitted = submissionGate?.state === "verified";
   const official = hackathonSubmissionAudit.officialPage;
   const linkedForm = hackathonSubmissionAudit.linkedForm;
 
@@ -111,12 +113,32 @@ export default function ProofRoomPage() {
     <main id="main-content" tabIndex={-1}>
       <section className={`shell ${styles.hero}`} aria-labelledby="proof-room-heading">
         <div>
-          <span className="eyebrow">JUDGE-FACING EVIDENCE INDEX</span>
-          <h1 id="proof-room-heading">Proof, including what is missing.</h1>
+          <span className="eyebrow">JUDGE QUICK START · SUBMITTED ENTRY</span>
+          <h1 id="proof-room-heading">Analysis ready. Evidence one click away.</h1>
           <p className="lede">
-            This page separates public capability from onchain identity, execution receipts, and
-            measured advantage. A green build cannot turn an incomplete gate into evidence.
+            ProofEra&apos;s four public analysis services are ready for judging. Capital execution
+            remains intentionally disabled; that is a safety boundary, not an outage.
           </p>
+          <nav className={styles.heroLinks} aria-label="Judge quick links">
+            <a href="https://youtu.be/ron927GeVXI" rel="noopener noreferrer" target="_blank">
+              Watch 5:25 demo <span aria-hidden="true">↗</span>
+            </a>
+            <a href="/marketplace">Try marketplace</a>
+            <a
+              href="https://github.com/tang-vu/proofera-bnb"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Inspect source <span aria-hidden="true">↗</span>
+            </a>
+            <a
+              href="https://github.com/tang-vu/proofera-bnb/blob/main/docs/agent-advantage-report.md"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Agent report <span aria-hidden="true">↗</span>
+            </a>
+          </nav>
         </div>
         <aside className={styles.releasePanel} aria-label="Current release evidence status">
           <div className={styles.releaseSignal}>
@@ -125,11 +147,11 @@ export default function ProofRoomPage() {
               <i />
             </div>
             <div>
-              <span>RELEASE LEDGER</span>
+              <span>JUDGE STATUS</span>
               <strong>
                 {verifiedGateCount} / {readiness.gates.length} gates verified
               </strong>
-              <p>Non-final states remain visible</p>
+              <p>Entry submitted · Pancake benefit not claimed</p>
             </div>
           </div>
           <div
@@ -143,22 +165,30 @@ export default function ProofRoomPage() {
           </div>
           <dl className={styles.releaseFacts}>
             <div>
-              <dt>Public build</dt>
-              <dd>{build}</dd>
-            </div>
-            <div>
-              <dt>Closure schema</dt>
-              <dd>{readiness.schemaVersion}</dd>
-            </div>
-            <div>
-              <dt>Submission-ready</dt>
-              <dd className={readiness.readyForSubmission ? styles.verified : styles.incomplete}>
-                {readiness.readyForSubmission ? "Verified" : "No — gates remain open"}
+              <dt>Entry status</dt>
+              <dd className={entrySubmitted ? styles.verified : styles.incomplete}>
+                {entrySubmitted ? "Submitted — response receipt retained" : "Submission unverified"}
               </dd>
+            </div>
+            <div>
+              <dt>Analysis demo</dt>
+              <dd className={styles.verified}>Ready — four public services</dd>
+            </div>
+            <div>
+              <dt>Capital execution</dt>
+              <dd className={styles.incomplete}>Intentionally disabled</dd>
+            </div>
+            <div>
+              <dt>Pancake benefit claim</dt>
+              <dd className={styles.incomplete}>Not claimed — no benefit observed</dd>
             </div>
             <div>
               <dt>Anonymous source access</dt>
               <dd className={styles.verified}>Verified — repository and demo return 200</dd>
+            </div>
+            <div>
+              <dt>Public build</dt>
+              <dd>{build}</dd>
             </div>
           </dl>
         </aside>
@@ -275,7 +305,7 @@ export default function ProofRoomPage() {
         <div className="section-heading">
           <div>
             <span className="eyebrow">OFFICIAL TRACK ALIGNMENT · BOUNDED OBSERVATION</span>
-            <h2 id="official-audit-heading">What the official page requires — and what remains.</h2>
+            <h2 id="official-audit-heading">Track evidence, without inflated claims.</h2>
           </div>
           <p>
             Source checked at{" "}
@@ -306,17 +336,23 @@ export default function ProofRoomPage() {
           ))}
         </div>
         <div className={styles.blocker} role="status">
-          <strong>Official entry flow and remaining product boundaries</strong>
+          <strong>Official entry and product boundaries</strong>
           <ul>
             <li>
-              The CMS submit-project URL resolves to “{linkedForm.title}” and asks for project name,
-              pitch, description and GitHub link. It is the official linked entry form, even though
-              it has no public-product, demo or evidence field.
+              The “{linkedForm.title}” Google Form was submitted. A privacy-sanitized response-copy
+              artifact retains the non-personal project fields; no organizer acceptance or judging
+              result is inferred.
+            </li>
+            <li>
+              The official form had no demo field, and the submitted Additional Notes did not
+              contain the demo URL. The public demo, source and Proof Room are therefore exposed in
+              the judge quick links and repository README; a Telegram correction remains
+              recommended.
             </li>
             <li>
               Its track options are {linkedForm.trackOptions.join(", ")}; Altana is absent despite
-              remaining on the official track page, so the Altana request and public testnet wallet
-              evidence belong in Additional Notes.
+              remaining on the official track page. ProofEra requests Altana consideration without
+              treating the missing checkbox as eligibility evidence.
             </li>
             <li>
               A later anonymous source probe at{" "}
@@ -337,13 +373,13 @@ export default function ProofRoomPage() {
       <section className={`shell section ${styles.section}`} aria-labelledby="closure-heading">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">SUBMISSION CLOSURE CONTRACT</span>
-            <h2 id="closure-heading">Seven gates. No inferred receipts.</h2>
+            <span className="eyebrow">EVIDENCE COVERAGE</span>
+            <h2 id="closure-heading">Six verified gates. One honest non-benefit outcome.</h2>
           </div>
           <p>
-            The committed manifest digest-binds every listed artifact. Final mode additionally
-            requires complete evidence kinds, final-only paths, a clean worktree, and a published
-            commit.
+            Every positive claim is digest-bound below. Pancake&apos;s controlled LP run is
+            retained, but unchanged price, liquidity and fees mean ProofEra deliberately claims no
+            realized benefit.
           </p>
         </div>
         <ol className={styles.gateList}>

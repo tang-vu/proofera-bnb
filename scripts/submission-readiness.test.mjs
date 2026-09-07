@@ -24,7 +24,7 @@ const librarySource = await readFile(
   "utf8"
 );
 
-test("submission readiness records all seven objective gates without claiming completion", async () => {
+test("submission readiness records the submitted entry without promoting the negative Pancake outcome", async () => {
   const readiness = validateSubmissionReadiness(manifest);
   assert.equal(readiness.schemaVersion, SUBMISSION_READINESS_SCHEMA_VERSION);
   assert.equal(readiness.readyForSubmission, false);
@@ -37,7 +37,7 @@ test("submission readiness records all seven objective gates without claiming co
       ["pancake-benefit", "controlled_outcome_observed"],
       ["termix-pairs", "verified"],
       ["demo", "verified"],
-      ["submission", "draft"]
+      ["submission", "verified"]
     ]
   );
   assert.ok(
@@ -169,6 +169,22 @@ test("the verified demo gate accepts only its bounded media and review namespace
   });
   assert.throws(
     () => validateSubmissionReadiness(verifiedDemo),
+    /SUBMISSION_READINESS_VERIFIED_PATH_INVALID/u
+  );
+});
+
+test("the verified submission gate accepts only bounded final, journey, and source namespaces", () => {
+  const verifiedSubmission = structuredClone(manifest);
+  assert.doesNotThrow(() => validateSubmissionReadiness(verifiedSubmission));
+
+  const submissionGate = verifiedSubmission.gates.find(({ gateId }) => gateId === "submission");
+  submissionGate.artifacts.push({
+    kind: "unbounded_submission_artifact",
+    path: "evidence/development/unreviewed-submission.json",
+    sha256: "0".repeat(64)
+  });
+  assert.throws(
+    () => validateSubmissionReadiness(verifiedSubmission),
     /SUBMISSION_READINESS_VERIFIED_PATH_INVALID/u
   );
 });

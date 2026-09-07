@@ -57,7 +57,12 @@ const GATE_DEFINITIONS = Object.freeze([
   {
     gateId: "submission",
     incompleteStates: ["draft"],
-    requiredKinds: ["final_copy", "hackathon_entry", "main_track_journey", "public_source_probe"]
+    requiredKinds: ["final_copy", "hackathon_entry", "main_track_journey", "public_source_probe"],
+    verifiedPathPrefixes: [
+      "evidence/submission/final/",
+      "evidence/submission/public-analysis-activation/",
+      "evidence/submission/public-source-access-"
+    ]
   }
 ]);
 

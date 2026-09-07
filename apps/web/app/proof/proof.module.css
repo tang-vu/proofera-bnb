@@ -11,6 +11,46 @@
   font-size: clamp(3rem, 7vw, 6.3rem);
 }
 
+.heroLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.heroLinks a {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 11px 16px;
+  background: rgb(20 27 22 / 72%);
+  color: var(--text);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.heroLinks a:first-child {
+  border-color: rgb(244 211 94 / 52%);
+  color: var(--signal);
+}
+
+.heroLinks a:hover {
+  border-color: var(--signal);
+  color: var(--signal);
+  transform: translateY(-2px);
+}
+
+.heroLinks a:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 3px;
+}
+
 .releasePanel {
   overflow: hidden;
   border: 1px solid var(--line);

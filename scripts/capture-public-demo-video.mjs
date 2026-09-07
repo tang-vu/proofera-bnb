@@ -89,7 +89,10 @@ const SCENES = Object.freeze([
     rehearsalHoldMs: 3_000
   }),
   Object.freeze({
-    assertions: ["Proof, including what is missing.", "Seven gates."],
+    assertions: [
+      "Analysis ready. Evidence one click away.",
+      "Six verified gates. One honest non-benefit outcome."
+    ],
     finalWeight: 163,
     key: "proof-room",
     path: "/proof",

@@ -10,7 +10,9 @@ This repository is under active development for BNB Chain's “The Smart Money E
 
 > **Hackathon entry:** the repository owner confirmed submission on 2026-09-05. The official form
 > exposed no dedicated demo-link field, so the public demo and judge-facing evidence links are kept
-> prominent here. This owner-confirmed status is not an organizer acceptance or judging result.
+> prominent here. A [privacy-sanitized response-copy artifact](./evidence/submission/final/hackathon-entry-2026-09-05.json)
+> retains the non-personal submitted fields. This bounded record is not organizer acceptance or a
+> judging result.
 
 ## Public judge surface
 
@@ -18,7 +20,7 @@ This repository is under active development for BNB Chain's “The Smart Money E
 - Proof Room: [proofera.tangvu.dev/proof](https://proofera.tangvu.dev/proof)
 - Final narrated demo: [watch on YouTube](https://youtu.be/ron927GeVXI)
 - Retained demo bytes and publication observation: [`proofera-final-demo.mp4`](./evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/final/proofera-final-demo.mp4) · [`youtube-publication-2026-09-05.json`](./evidence/submission/youtube-publication-2026-09-05.json)
-- Prepared form copy and exact evidence links: [`docs/submission-packet.md`](./docs/submission-packet.md)
+- Submitted entry record and recovery links: [`docs/submission-packet.md`](./docs/submission-packet.md)
 
 Current public carrier `12829109f26b8f6d15fc2f7beda2008548ae9be0` passed a two-resolver, five-host TLS and eleven-response rehearsal with exact build identity. Its product ancestor `f25a67daa0292b5a04c142a42606888f7ec2b8e6` retains the richer four-category `land → find → inspect current evidence → activate analysis → inspect run` journey: 20 source-specific facts, eight screenshots, four completed A2A runs and four hashed responses. Readiness v2 reports analysis-service activation as implemented while keeping capital activation and judging readiness false. Current-source evidence remains separate from analyzer presets; this is not performance, economic-benefit or transaction evidence.
 

@@ -1,6 +1,6 @@
 # ProofEra judge scorecard
 
-Updated: 2026-09-05. This is an internal pre-submission control sheet derived from the official Smart Money Era page review recorded in [`research.md`](./research.md), the bounded [submission audit](../evidence/submission/hackathon-submission-audit-2026-09-01.json), the [fresh form preparation observation](../evidence/submission/form-preparation-observation-2026-09-05.json) and the current [score strategy](./hackathon-score-strategy.md). It is not a judging result, partner endorsement, eligibility decision, or submission receipt. Every “current proof” item must remain independently inspectable; every open item blocks the corresponding claim.
+Updated: 2026-09-07. This is an internal judge-facing control sheet derived from the official Smart Money Era page review, the bounded submission audit, the fresh form observation, the privacy-sanitized owner-provided [entry receipt](../evidence/submission/final/hackathon-entry-2026-09-05.json), and the current score strategy. It is not a judging result, partner endorsement, eligibility decision, or organizer acceptance. Every “current proof” item must remain independently inspectable; every open item blocks only its corresponding claim.
 
 ## Top-1 thesis
 
@@ -77,15 +77,17 @@ All six methods and the protected final bundle are retained. Narration must rema
 | Proof room         | Public seven-gate ledger                                                                                                                                       | All seven gates verified by final artifacts                                            |
 | Demo               | [Public YouTube video](https://youtu.be/ron927GeVXI), retained six-scene 325.014-second MiMo MP4, automated playback, and scoped owner audio/visual acceptance | No scoped demo blocker; keep independent/organizer claims absent                       |
 | Pitch deck         | Eleven-slide evidence-backed source plus business model and 90-day roadmap                                                                                     | Export/freeze after owner fields are supplied                                          |
-| Submission copy    | Evidence-backed draft in [`submission.md`](./submission.md)                                                                                                    | Final copy plus authoritative entry receipt                                            |
+| Submission copy    | Owner-confirmed submitted form plus privacy-sanitized response-copy artifact in [`submission.md`](./submission.md)                                             | No organizer acceptance or judging result; demo-link correction remains recommended    |
 
-Submission-flow watch: as rechecked on 2026-09-05, the canonical CMS-linked one-page
+Submission-flow status: the canonical CMS-linked one-page
 `Build the Era Hackathon Registration` form returned HTTP `200` with 23 question fields. Use it as
 the current entry flow rather than waiting for an unannounced replacement. It contains
 project/repository/Additional Notes fields but no product/demo/evidence
 field. Put those links and the Altana request/wallet evidence in Additional Notes; its checkbox
-still omits Altana while the canonical page retains the track. A retained response to this official
-form is required before claiming entry completion.
+still omits Altana while the canonical page retains the track. The form was submitted and a
+sanitized response-copy artifact is retained. The submitted Additional
+Notes did not contain the demo URL, so the README and Proof Room expose direct recovery links and a
+Telegram correction is recommended. No organizer acceptance is inferred.
 
 ## Red-team narration rules
 
@@ -98,4 +100,7 @@ form is required before claiming entry completion.
 
 ## Final go/no-go
 
-Run `pnpm submission:require-ready` on the clean, published release. A nonzero exit is a no-go for any “submission complete” or “all evidence verified” statement, even if the product build and public endpoints are green.
+Run `pnpm submission:check` on the release and inspect each gate independently. The verified
+`submission` gate supports only “owner-confirmed entry submitted.” `pnpm submission:require-ready`
+remains nonzero because the Pancake benefit gate is intentionally not verified, so never claim
+“all evidence verified” or a realized Pancake benefit.

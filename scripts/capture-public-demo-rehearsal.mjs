@@ -40,7 +40,10 @@ const SCENES = Object.freeze([
     key: "proof-room",
     path: "/proof",
     screenshot: "05-proof-room.png",
-    assertions: ["Proof, including what is missing.", "Seven gates. No inferred receipts."]
+    assertions: [
+      "Analysis ready. Evidence one click away.",
+      "Six verified gates. One honest non-benefit outcome."
+    ]
   },
   {
     key: "mission-control",
@@ -160,7 +163,7 @@ async function capture(sourceCommit) {
       if (scene.key === "proof-room") {
         await page.getByText(sourceCommit, { exact: true }).waitFor({ state: "visible" });
         await page
-          .getByText("No — gates remain open", { exact: true })
+          .getByText("Submitted — response receipt retained", { exact: true })
           .waitFor({ state: "visible" });
       }
       const screenshotPath = resolve(outputDirectory, scene.screenshot);

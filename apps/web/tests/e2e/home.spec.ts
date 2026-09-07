@@ -391,7 +391,9 @@ test("provides a working skip link and keeps Marketplace navigation visible", as
   ).toBeVisible();
 });
 
-test("opens the judge proof room without promoting incomplete gates", async ({ page }) => {
+test("opens the judge proof room with submitted-entry and honest execution boundaries", async ({
+  page
+}) => {
   await page.goto("/");
   await page
     .getByRole("navigation", { name: "Primary navigation" })
@@ -400,11 +402,13 @@ test("opens the judge proof room without promoting incomplete gates", async ({ p
 
   await expect(page).toHaveURL(/\/proof$/u);
   await expect(
-    page.getByRole("heading", { name: "Proof, including what is missing." })
+    page.getByRole("heading", { name: "Analysis ready. Evidence one click away." })
   ).toBeVisible();
-  await expect(page.getByText("No — gates remain open")).toBeVisible();
+  await expect(page.getByText("Submitted — response receipt retained")).toBeVisible();
+  await expect(page.getByText("Intentionally disabled", { exact: true })).toBeVisible();
+  await expect(page.getByText("Not claimed — no benefit observed")).toBeVisible();
   await expect(page.locator("[data-gate-id]")).toHaveCount(7);
-  await expect(page.locator('[data-gate-state="verified"]')).toHaveCount(4);
+  await expect(page.locator('[data-gate-state="verified"]')).toHaveCount(6);
   await expect(page.locator('[data-gate-id="production-release"]')).toHaveAttribute(
     "data-gate-state",
     "verified"
@@ -419,7 +423,11 @@ test("opens the judge proof room without promoting incomplete gates", async ({ p
   );
   await expect(page.locator('[data-gate-id="demo"]')).toHaveAttribute(
     "data-gate-state",
-    "recorded_pending_human_playback"
+    "verified"
+  );
+  await expect(page.locator('[data-gate-id="submission"]')).toHaveAttribute(
+    "data-gate-state",
+    "verified"
   );
   await expect(page.getByText(/BSC testnet ERC-8004 Agent ID/u)).toHaveCount(4);
   await expect(page.getByText(/Execution disabled/u)).toHaveCount(4);

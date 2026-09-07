@@ -63,7 +63,9 @@ const probes = [
           validate: (body) =>
             typeof body === "string" &&
             body.includes(expectedBuild) &&
-            body.includes("No — gates remain open") &&
+            body.includes("Analysis ready. Evidence one click away.") &&
+            body.includes("Submitted — response receipt retained") &&
+            body.includes("Intentionally disabled") &&
             body.includes("audit_altana_permission_bundle")
         },
         {

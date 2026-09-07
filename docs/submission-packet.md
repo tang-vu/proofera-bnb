@@ -1,8 +1,11 @@
-# ProofEra owner-completion submission packet
+# ProofEra submitted-entry packet
 
-Updated: 2026-09-05. The canonical CMS currently names the linked Google Form as its
-`submit_project_url`. This packet maps that exact one-page form and prepares every non-personal
-field. It is not an organizer receipt or evidence that ProofEra was submitted.
+Updated: 2026-09-07. The repository owner confirmed submission through the canonical CMS-linked
+Google Form and supplied its response-copy text. The privacy-sanitized
+[entry artifact](../evidence/submission/final/hackathon-entry-2026-09-05.json) retains only the
+non-personal project fields and has SHA-256
+`7014f45c01e2ab8828aad6eb463765a48e84b2c76535d05d59c49e6a56319415`. It is bounded
+owner-provided evidence of submission, not organizer acceptance or a judging result.
 
 A fresh anonymous form read at `2026-09-05T05:26:01Z` returned HTTP `200`, title
 `Build the Era Hackathon Registration`, and 23 question fields. The retained
@@ -22,7 +25,7 @@ Remaining product and owner boundaries must stay visible:
 Personal contact fields and the prize-payment wallet remain owner-only inputs. The public Altana
 testnet wallet/session addresses below are qualification evidence, not a payout-wallet suggestion.
 
-## Exact current form mapping
+## Historical form mapping (completed by owner)
 
 | Current form field                     | Prepared value or owner action                                                                                                          |
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
@@ -71,9 +74,10 @@ post-state. Its 9,104-second outcome observed unchanged price/liquidity and zero
 therefore claims no realized Pancake benefit. The Proof Room binds every positive claim and blocker
 to retained evidence. Missing evidence stays missing.
 
-## Additional Notes — prepared text
+## Additional Notes — intended recovery text
 
-Paste only after every public link is rechecked and the owner has reviewed every sentence:
+The submitted Additional Notes did not contain these links. Send this bounded recovery text through
+the official support channel after rechecking every public URL:
 
 > Public product: https://proofera.tangvu.dev
 >
@@ -113,7 +117,7 @@ Paste only after every public link is rechecked and the owner has reviewed every
 >
 > Exact artifact hashes, receipts, limitations and remaining blockers are indexed in the Proof Room and repository.
 
-## Evidence links to recheck before entry
+## Evidence links to recheck during judging
 
 | Asset                 | Path or URL                                                                                                                                                                                   | Current access state                                                                   |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
@@ -129,24 +133,20 @@ Paste only after every public link is rechecked and the owner has reviewed every
 | YouTube observation   | `evidence/submission/youtube-publication-2026-09-05.json`                                                                                                                                     | Timestamped anonymous availability record; not playback or submission proof            |
 | Owner audio review    | `evidence/submission/final/demo-owner-audio-review-2026-09-05.json`                                                                                                                           | Narration accepted by owner; not independent review                                    |
 | Owner visual review   | `evidence/submission/final/demo-owner-visual-review-2026-09-05.json`                                                                                                                          | Scene order and evidence-link presentation accepted; not independent review            |
+| Submitted entry       | `evidence/submission/final/hackathon-entry-2026-09-05.json`                                                                                                                                   | Sanitized response copy; owner-confirmed submission; no organizer acceptance           |
 | Form preparation      | `evidence/submission/form-preparation-observation-2026-09-05.json`                                                                                                                            | HTTP `200`, 23 fields and prepared project values; no response created                 |
 | TermiX final bundle   | `evidence/submission/final/termix/6d1adf3c948e49be7d9d42332df04904fdd43e3a/`                                                                                                                  | Public repository path                                                                 |
 | Altana lifecycle      | `evidence/submission/final/altana-lifecycle.json`                                                                                                                                             | Public repository copy and explorer links are reachable                                |
 | Pancake controlled LP | `evidence/onchain/bsc-testnet-pta-wbnb-first-lp-eed9c32a107b57735f45bd6246d967cb12fbb1579a05faa9f17e0ead46187d01.json` and `evidence/pancake/runs/pta-wbnb-outcomes/127841040-127861271.json` | Public repository copies; transaction hashes remain public on BscScan                  |
 
-## Owner completion order
+## Post-submission follow-up
 
-1. Owner audio and visual scene/link reviews are retained. Keep them classified as scoped owner
-   attestations, not independent or organizer review.
-2. Re-run anonymous repository/API/README/artifact and YouTube checks immediately before form
-   submission.
-3. Confirm the retained public analysis-activation capture for all four categories while keeping
-   capital execution, current-market evidence and testnet eligibility boundaries explicit.
-4. Recheck the official page/form for changes, fill every owner-only field, select PancakeSwap,
-   AltLayer and TermiX, and request Altana in Additional Notes.
-5. Keep the payout wallet distinct from testnet evidence addresses unless the owner intentionally
-   reviews and designates otherwise.
-6. Submit the official CMS-linked form, select the option to receive a response copy, save the
-   organizer response and only then create a final submission artifact.
+1. Keep the owner audio/visual reviews and entry receipt classified as owner-provided evidence, not
+   independent review or organizer acceptance.
+2. Keep the product, Proof Room, source and YouTube demo anonymously reachable throughout judging.
+3. Send the missing demo/source links and Altana consideration request to the official Telegram
+   support group; do not submit a duplicate form unless an organizer explicitly requests it.
+4. Preserve capital execution as intentionally disabled and the Pancake result as no observed
+   benefit.
 
 Do not infer owner data from Git history, testnet custody, passkey metadata or transaction owners.
