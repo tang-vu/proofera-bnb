@@ -91,9 +91,9 @@ the official support channel after rechecking every public URL:
 >
 > Agent Advantage Report: https://github.com/tang-vu/proofera-bnb/blob/main/docs/agent-advantage-report.md
 >
-> Hosted clean-checkout CI: https://github.com/tang-vu/proofera-bnb/actions/runs/33489679675
+> Hosted clean-checkout CI: https://github.com/tang-vu/proofera-bnb/actions/runs/34092851888
 >
-> Hosted exact-build availability probe: https://github.com/tang-vu/proofera-bnb/actions/runs/33533498008
+> Hosted exact-build availability probe: https://github.com/tang-vu/proofera-bnb/actions/runs/34093342689
 >
 > Requested tracks: Main Track, Best Built with Altana, TermiX, PancakeSwap, and AltLayer/8004scan. The current form omits Altana from its checkbox although the official page retains the track.
 >
@@ -121,12 +121,12 @@ the official support channel after rechecking every public URL:
 
 | Asset                 | Path or URL                                                                                                                                                                                   | Current access state                                                                   |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Public product        | https://proofera.tangvu.dev                                                                                                                                                                   | Build `0ff8af6`; DNS 5/5, TLS 5/5, HTTP 11/11; capital/judging false                   |
+| Public product        | https://proofera.tangvu.dev                                                                                                                                                                   | Build `dcd1de0`; DNS 5/5, TLS 5/5, HTTP 11/11; capital/judging false                   |
 | Proof Room            | https://proofera.tangvu.dev/proof                                                                                                                                                             | Public evidence index; exact carrier identity remains visible                          |
 | Main-track journey    | `evidence/submission/public-analysis-activation/f25a67daa0292b5a04c142a42606888f7ec2b8e6/manifest.json`                                                                                       | 4 available evidence panels, 20 facts, 8 PNGs, 4 completed runs; no capital execution  |
 | Source repository     | https://github.com/tang-vu/proofera-bnb                                                                                                                                                       | Public; page/API/raw README/exact commit returned `200`                                |
-| Hosted clean CI       | https://github.com/tang-vu/proofera-bnb/actions/runs/33489679675                                                                                                                              | Nine of nine clean-checkout jobs passed                                                |
-| Hosted uptime probe   | https://github.com/tang-vu/proofera-bnb/actions/runs/33533498008                                                                                                                              | Current carrier passed all eleven exact-build public checks; recurring history remains |
+| Hosted clean CI       | https://github.com/tang-vu/proofera-bnb/actions/runs/34092851888                                                                                                                              | Nine of nine clean-checkout jobs passed for deployed build `dcd1de0`                   |
+| Hosted uptime probe   | https://github.com/tang-vu/proofera-bnb/actions/runs/34093342689                                                                                                                              | Current carrier passed all eleven exact-build public checks; recurring history remains |
 | YouTube demo          | https://youtu.be/ron927GeVXI                                                                                                                                                                  | Anonymous oEmbed/watch returned `200`; playability `OK`; 325-second public video       |
 | Retained demo media   | `evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/final/proofera-final-demo.mp4`                                                                                      | Exact 68,211,573-byte source media and SHA-256 remain retained                         |
 | Demo manifests        | `evidence/submission/demo-videos/89a99e84c62905fa77aed9c431e7cb730f2c342f/`                                                                                                                   | Public final-capture and automated-playback records                                    |

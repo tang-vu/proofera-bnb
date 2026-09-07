@@ -1,12 +1,12 @@
 {
   "schemaVersion": "proofera-submission-readiness-v1.2.0",
-  "updatedAtUtc": "2026-09-07T06:15:48.476Z",
+  "updatedAtUtc": "2026-09-07T07:00:31.141Z",
   "readyForSubmission": false,
   "gates": [
     {
       "gateId": "production-release",
       "state": "verified",
-      "claim": "Commit ad0cee11885b2131c27bfa14c3b0a27f2f8fee69 remains the frozen base release with retained two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses and bounded rollback/restoration evidence. Current judge-facing public build 0ff8af690e745f0e93ea76c84fea5acda0e31daa has a separate read-only rehearsal with two-resolver agreement, five authorized TLS hosts, eleven exact responses, exact build identity, submitted-entry marker and intentionally disabled capital boundary. Readiness remains split: analysis activation implemented, capital activation unavailable and judging readiness false. The capture did not restart services or replace the frozen base-release claim. This proves bounded observations only; it is not independent uptime, reboot, data restore, capital execution or organizer acceptance evidence.",
+      "claim": "Commit ad0cee11885b2131c27bfa14c3b0a27f2f8fee69 remains the frozen base release with retained two-resolver agreement, five authorized TLS hosts, eleven exact HTTP responses and bounded rollback/restoration evidence. Current judge-facing public build dcd1de0789b8d6180dd5445f4bb3ef7afcc276f8 has a separate read-only rehearsal with two-resolver agreement, five authorized TLS hosts, eleven exact responses, exact build identity, submitted-entry marker and intentionally disabled capital boundary. Readiness remains split: analysis activation implemented, capital activation unavailable and judging readiness false. The capture did not restart services or replace the frozen base-release claim. This proves bounded observations only; it is not independent uptime, reboot, data restore, capital execution or organizer acceptance evidence.",
       "blockers": [],
       "artifacts": [
         {
@@ -36,8 +36,8 @@
         },
         {
           "kind": "judge_facing_public_probe",
-          "path": "evidence/submission/release-probes/0ff8af690e745f0e93ea76c84fea5acda0e31daa/rehearsal/manifest.json",
-          "sha256": "a0bba3abe1916b539b1dccf2a5c12b06b5898e6a646ca023e9d089d6a9f6eb9f"
+          "path": "evidence/submission/release-probes/dcd1de0789b8d6180dd5445f4bb3ef7afcc276f8/rehearsal/manifest.json",
+          "sha256": "ff4f401770c98077fbb4c24ff44a162ba014ee8940ee8eddd7ebbf8f6ad72720"
         }
       ]
     },

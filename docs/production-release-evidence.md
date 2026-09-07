@@ -149,3 +149,15 @@ and intentionally disabled capital boundary. Manifest SHA-256 is
 `a0bba3abe1916b539b1dccf2a5c12b06b5898e6a646ca023e9d089d6a9f6eb9f`. It remains
 host-origin rehearsal evidence, not organizer acceptance, independent paging, capital execution,
 or a replacement for the frozen rollback exercise.
+
+Later on 2026-09-07, patched judge-facing build
+`dcd1de0789b8d6180dd5445f4bb3ef7afcc276f8` passed the same create-only rehearsal after its
+clean-checkout CI completed. Two resolvers agreed for all five hosts, TLS was authorized 5/5
+through judging, and all eleven exact-build HTTPS observations passed. The Proof Room observation
+retained the submitted-entry and disabled-capital markers; readiness remained analysis implemented,
+capital unavailable and judging false. Manifest SHA-256 is
+`ff4f401770c98077fbb4c24ff44a162ba014ee8940ee8eddd7ebbf8f6ad72720`. GitHub-hosted
+[public uptime run 34093342689](https://github.com/tang-vu/proofera-bnb/actions/runs/34093342689)
+independently repeated the eleven-surface read-only probe. Neither observation is organizer
+acceptance, an SLA, independent paging, capital execution or a replacement for the frozen rollback
+exercise.
