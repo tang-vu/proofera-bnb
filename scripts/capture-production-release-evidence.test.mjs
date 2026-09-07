@@ -239,6 +239,41 @@ test("judge-facing public rehearsal binds the submitted marker and capital bound
   assert.equal(manifest.classification.hackathonEntrySubmitted, false);
 });
 
+test("patched judge-facing rehearsal binds the exact monitored release", async () => {
+  const manifestUrl = new URL(
+    "../evidence/submission/release-probes/dcd1de0789b8d6180dd5445f4bb3ef7afcc276f8/rehearsal/manifest.json",
+    import.meta.url
+  );
+  const bytes = await readFile(manifestUrl);
+  const manifest = JSON.parse(bytes.toString("utf8"));
+  assert.equal(
+    createHash("sha256").update(bytes).digest("hex"),
+    "ff4f401770c98077fbb4c24ff44a162ba014ee8940ee8eddd7ebbf8f6ad72720"
+  );
+  assert.equal(manifest.sourceCommit, "dcd1de0789b8d6180dd5445f4bb3ef7afcc276f8");
+  assert.equal(manifest.mode, "rehearsal");
+  assert.deepEqual(manifest.summary, {
+    dnsAgreement: true,
+    exactBuildObserved: true,
+    httpObservationCount: 11,
+    tlsAuthorized: true
+  });
+  const proofRoom = manifest.http.find(({ key }) => key === "marketplace-proof-room");
+  assert.deepEqual(proofRoom?.facts, {
+    buildVisible: true,
+    capitalBoundaryVisible: true,
+    permissionAuditSkillVisible: true,
+    submittedEntryVisible: true
+  });
+  const readiness = manifest.http.find(({ key }) => key === "marketplace-readiness");
+  assert.equal(readiness?.status, 503);
+  assert.equal(readiness?.facts.analysisActivation, "implemented");
+  assert.equal(readiness?.facts.capitalExecution, "unavailable");
+  assert.equal(readiness?.facts.readyForJudging, false);
+  assert.equal(manifest.classification.pancakeBenefitClaimVerified, false);
+  assert.equal(manifest.classification.submissionReady, false);
+});
+
 test("retained final release binds the negative-benefit boundary, rollback and evidence carrier", async () => {
   const probeUrl = new URL(
     "../evidence/submission/release-probes/ad0cee11885b2131c27bfa14c3b0a27f2f8fee69/final/manifest.json",
