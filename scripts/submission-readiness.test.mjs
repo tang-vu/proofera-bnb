@@ -14,6 +14,11 @@ import {
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const manifestPath = resolve(repositoryRoot, "evidence/submission/readiness.json");
 const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+const hackathonEntryReceiptRaw = await readFile(
+  resolve(repositoryRoot, "evidence/submission/final/hackathon-entry-2026-09-05.json"),
+  "utf8"
+);
+const hackathonEntryReceipt = JSON.parse(hackathonEntryReceiptRaw);
 const librarySource = await readFile(
   resolve(repositoryRoot, "scripts/submission-readiness-lib.mjs"),
   "utf8"
@@ -50,6 +55,26 @@ test("submission readiness cannot turn green by changing only its top-level bool
     () => validateSubmissionReadiness(altered),
     /SUBMISSION_READINESS_BOOLEAN_MISMATCH/u
   );
+});
+
+test("sanitized Google Forms receipt proves submission without retaining owner data or acceptance", () => {
+  assert.equal(hackathonEntryReceipt.schemaVersion, "proofera-hackathon-entry-receipt-v1.0.0");
+  assert.equal(hackathonEntryReceipt.receiptObservation.responseCopyObserved, true);
+  assert.equal(hackathonEntryReceipt.classification.hackathonEntrySubmittedObserved, true);
+  assert.equal(hackathonEntryReceipt.classification.organizerAcceptanceObserved, false);
+  assert.equal(hackathonEntryReceipt.classification.judgingResultObserved, false);
+  assert.equal(hackathonEntryReceipt.privacy.personalFieldsRetained, false);
+  assert.equal(hackathonEntryReceipt.privacy.editResponseLinkRetained, false);
+  assert.equal(hackathonEntryReceipt.submittedProject.projectDescription.length <= 800, true);
+  assert.deepEqual(hackathonEntryReceipt.submittedProject.selectedTracks, [
+    "PancakeSwap",
+    "AltLayer",
+    "TermiX"
+  ]);
+  assert.equal(hackathonEntryReceipt.submittedProject.additionalNotes.demoLinkIncluded, false);
+  assert.equal(hackathonEntryReceipt.publicRecoveryLinks.demo, "https://youtu.be/ron927GeVXI");
+  assert.doesNotMatch(hackathonEntryReceiptRaw, /[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/u);
+  assert.doesNotMatch(hackathonEntryReceiptRaw, /0x[0-9a-fA-F]{40}/u);
 });
 
 test("an audio-only owner review keeps the visual demo review incomplete", () => {

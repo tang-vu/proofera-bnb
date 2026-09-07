@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "proofera-hackathon-entry-receipt-v1.0.0",
+  "recordedAtUtc": "2026-09-07T05:42:52.145Z",
+  "officialEntryFlow": {
+    "title": "Build the Era Hackathon Registration",
+    "officialPageUrl": "https://www.bnbchain.org/en/hackathons/smart-money-era",
+    "formUrl": "https://forms.gle/9g9XPNFwnYaHAz9L8"
+  },
+  "receiptObservation": {
+    "sourceType": "owner_provided_google_forms_response_receipt_copy",
+    "senderDomain": "google.com",
+    "subjectTitleMatched": true,
+    "responseCopyObserved": true,
+    "emailReceivedAtApproxUtc": "2026-09-05T07:48:00.000Z",
+    "timePrecision": "minute",
+    "rawEmailRetained": false,
+    "sourceAuthenticityIndependentlyVerified": false
+  },
+  "submittedProject": {
+    "projectName": "ProofEra",
+    "oneLinePitch": "ProofEra helps users hire BNB Chain DeFi agents through verifiable evidence, bounded authority, and receipt-backed revocation - not promises.",
+    "projectDescription": "ProofEra is an evidence-first marketplace for BNB Chain DeFi agents: users hire by financial job, not by agent descriptions or popularity. It gives LP, grid, yield, and health-monitoring agents category-specific passports showing sources, freshness, costs, downside, permissions, receipts, and explicit unknowns. ERC-8004 identity is treated as identity-not performance proof. Before capital access, ProofEra bounds chain, target, selector, token, spend cap, and expiry; afterward, users can inspect receipts and verify revocation. We optimized for a simple discover-to-understand-to-activate journey, read-only analysis before capital, fail-closed integrations, and honest evidence. Missing, stale, testnet, and unverified data remain visible instead of becoming a score or marketing claim.",
+    "selectedTracks": ["PancakeSwap", "AltLayer", "TermiX"],
+    "repositoryUrl": "https://github.com/tang-vu/proofera-bnb",
+    "additionalNotes": {
+      "present": true,
+      "valueRetained": false,
+      "classification": "single_opaque_evm_address",
+      "demoLinkIncluded": false,
+      "correctionRecommended": true
+    }
+  },
+  "publicRecoveryLinks": {
+    "product": "https://proofera.tangvu.dev",
+    "proofRoom": "https://proofera.tangvu.dev/proof",
+    "source": "https://github.com/tang-vu/proofera-bnb",
+    "demo": "https://youtu.be/ron927GeVXI",
+    "agentAdvantageReport": "https://github.com/tang-vu/proofera-bnb/blob/main/docs/agent-advantage-report.md"
+  },
+  "privacy": {
+    "personalFieldsRetained": false,
+    "redactedFieldClasses": [
+      "account_email",
+      "full_name",
+      "contact_email",
+      "telegram_handle",
+      "x_handle",
+      "discord_handle",
+      "country_and_timezone",
+      "experience_self_assessment",
+      "payout_wallet",
+      "opaque_additional_notes_address"
+    ],
+    "editResponseLinkRetained": false
+  },
+  "classification": {
+    "hackathonEntrySubmittedObserved": true,
+    "finalNonPersonalCopyRetained": true,
+    "googleFormsResponseReceiptObserved": true,
+    "ownerConfirmedSubmitted": true,
+    "organizerAcceptanceObserved": false,
+    "judgingResultObserved": false,
+    "prizeEligibilityInferred": false
+  },
+  "limitations": [
+    "The owner supplied the rendered Google Forms response-receipt text in the interactive project session; original email bytes, headers and an edit-response link are not retained.",
+    "Personal identity, contact, location, experience, payout-wallet and opaque Additional Notes values are intentionally omitted from repository evidence.",
+    "The response receipt supports the bounded claim that a ProofEra entry was submitted through the official linked form; it does not prove organizer acceptance, eligibility, judging outcome or prize status.",
+    "The submitted Additional Notes did not include the demo or evidence links. Public recovery links are retained separately and a Telegram correction is recommended."
+  ]
+}
